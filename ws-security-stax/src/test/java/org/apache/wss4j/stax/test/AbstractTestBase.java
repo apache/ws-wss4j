@@ -273,6 +273,7 @@ public abstract class AbstractTestBase {
         }
         
         // Disable PrefixList checking as the stax code doesn't support this yet
+        //todo
         List<BSPRule> ignoredRules = new ArrayList<BSPRule>();
         ignoredRules.add(BSPRule.R5404);
         ignoredRules.add(BSPRule.R5406);
@@ -280,6 +281,7 @@ public abstract class AbstractTestBase {
         ignoredRules.add(BSPRule.R5417);
         ignoredRules.add(BSPRule.R3063);
         ignoredRules.add(BSPRule.R5621);
+        //ignoredRules.add(BSPRule.R5215);
         requestData.setIgnoredBSPRules(ignoredRules);
 
         wss4JHandler.doReceiver(messageContext, requestData, false);

@@ -30,7 +30,6 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
-import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
@@ -39,7 +38,6 @@ import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import java.security.Key;
 import java.security.cert.X509Certificate;
@@ -142,7 +140,6 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     || WSSConstants.SAML_TOKEN_SIGNED.equals(action)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, bstId);
                 if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(getSecurityProperties().getSignatureKeyIdentifier())) {
-                    outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_APPEND_SIGNATURE_ON_THIS_ID, bstId);
                     FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = new FinalBinarySecurityTokenOutputProcessor(binarySecurityToken);
                     finalBinarySecurityTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
                     finalBinarySecurityTokenOutputProcessor.setAction(getAction());
@@ -217,20 +214,25 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
         }
 
         @Override
-        public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
+                throws XMLStreamException, XMLSecurityException {
+
             outputProcessorChain.processEvent(xmlSecEvent);
-            if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
-                XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
-                if (xmlSecStartElement.getName().equals(WSSConstants.TAG_wsse_Security)
-                        && WSSUtils.isInSecurityHeader(xmlSecStartElement, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
-                    OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-                    boolean useSingleCertificate = getSecurityProperties().isUseSingleCert();
-                    WSSUtils.createBinarySecurityTokenStructure(this, subOutputProcessorChain, securityToken.getId(), securityToken.getX509Certificates(), useSingleCertificate);
+            if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
 
-                    outputProcessorChain.removeProcessor(this);
-                }
+                WSSUtils.updateSecurityHeaderOrder(
+                        outputProcessorChain, WSSConstants.TAG_wsse_BinarySecurityToken, getAction(), false);
+
+                OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
+
+                boolean useSingleCertificate = getSecurityProperties().isUseSingleCert();
+                WSSUtils.createBinarySecurityTokenStructure(
+                        this, subOutputProcessorChain, securityToken.getId(),
+                        securityToken.getX509Certificates(), useSingleCertificate);
+
+                outputProcessorChain.removeProcessor(this);
             }
-        }
+        }        
     }
 }

@@ -12,7 +12,7 @@
             <param name="ConversionPattern" value="%d [%t] %-5p %c - %m%n"/>
         </layout>
     </appender>
-    <logger name="org.apache.xml.security.utils.SignerOutputStream">
+    <!--<logger name="org.apache.xml.security.utils.SignerOutputStream">
         <level value="INFO"/>
     </logger>
     <logger name="org.apache.xml.security.utils.DigesterOutputStream">
@@ -38,9 +38,9 @@
     </logger>
     <logger name="org.apache.wss4j.stax.test.AbstractTestBase$CustomWSS4JHandler">
         <level value="INFO"/>
-    </logger>
+    </logger>-->
     <root>
-        <level value="INFO"/>
+        <level value="DEBUG"/>
         <appender-ref ref="FILE"/>
         <!--<appender-ref ref="STDOUT"/>-->
     </root>

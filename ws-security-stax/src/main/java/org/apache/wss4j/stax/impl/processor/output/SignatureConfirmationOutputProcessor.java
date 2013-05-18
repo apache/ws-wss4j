@@ -27,13 +27,12 @@ import org.apache.xml.security.stax.ext.AbstractOutputProcessor;
 import org.apache.xml.security.stax.ext.OutputProcessorChain;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
-import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
 
-import javax.xml.stream.XMLStreamConstants;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,40 +46,44 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
     }
 
     @Override
-    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
+            throws XMLStreamException, XMLSecurityException {
+
         outputProcessorChain.processEvent(xmlSecEvent);
-        if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
-            XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
-            if (xmlSecStartElement.getName().equals(WSSConstants.TAG_wsse_Security)
-                    && WSSUtils.isInSecurityHeader(xmlSecStartElement, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
-                OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-                boolean aSignatureFound = false;
+        if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
 
-                List<SecurityEvent> requestSecurityEvents = outputProcessorChain.getSecurityContext().getAsList(SecurityEvent.class);
-                for (int i = 0; i < requestSecurityEvents.size(); i++) {
-                    SecurityEvent securityEvent = requestSecurityEvents.get(i);
-                    if (SecurityEventConstants.SignatureValue.equals(securityEvent.getSecurityEventType())) {
-                        aSignatureFound = true;
-                        SignatureValueSecurityEvent signatureValueSecurityEvent = (SignatureValueSecurityEvent) securityEvent;
+            final QName headerElementName = WSSConstants.TAG_wsse11_SignatureConfirmation;
 
-                        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
-                        attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
-                        attributes.add(createAttribute(WSSConstants.ATT_NULL_Value, new Base64(76, new byte[]{'\n'}).encodeToString(signatureValueSecurityEvent.getSignatureValue())));
-                        createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_SignatureConfirmation, true, attributes);
-                        createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_SignatureConfirmation);
-                    }
-                }
+            OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-                if (!aSignatureFound) {
-                    List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
+            boolean aSignatureFound = false;
+
+            List<SecurityEvent> requestSecurityEvents = outputProcessorChain.getSecurityContext().getAsList(SecurityEvent.class);
+            for (int i = 0; i < requestSecurityEvents.size(); i++) {
+                SecurityEvent securityEvent = requestSecurityEvents.get(i);
+                if (SecurityEventConstants.SignatureValue.equals(securityEvent.getSecurityEventType())) {
+                    aSignatureFound = true;
+                    SignatureValueSecurityEvent signatureValueSecurityEvent = (SignatureValueSecurityEvent) securityEvent;
+
+                    WSSUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
+
+                    List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
                     attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_SignatureConfirmation, true, attributes);
-                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_SignatureConfirmation);
+                    attributes.add(createAttribute(WSSConstants.ATT_NULL_Value, new Base64(76, new byte[]{'\n'}).encodeToString(signatureValueSecurityEvent.getSignatureValue())));
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, true, attributes);
+                    createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);
                 }
-
-                outputProcessorChain.removeProcessor(this);
             }
+
+            if (!aSignatureFound) {
+                List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
+                attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, true, attributes);
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);
+            }
+
+            outputProcessorChain.removeProcessor(this);
         }
     }
 }

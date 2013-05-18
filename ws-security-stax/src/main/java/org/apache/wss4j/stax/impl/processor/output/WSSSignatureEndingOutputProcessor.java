@@ -22,6 +22,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.ext.WSSUtils;
+import org.apache.wss4j.stax.impl.SecurityHeaderOrder;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.OutputProcessorChain;
@@ -36,24 +37,12 @@ import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
 public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOutputProcessor {
-
-    private static final List<QName> appendAfterOneOfThisAttributes;
-
-    static {
-        List<QName> list = new ArrayList<QName>(5);
-        list.add(WSSConstants.ATT_wsu_Id);
-        list.add(WSSConstants.ATT_NULL_Id);
-        list.add(WSSConstants.ATT_NULL_AssertionID);
-        list.add(WSSConstants.ATT_NULL_ID);
-        appendAfterOneOfThisAttributes = Collections.unmodifiableList(list);
-    }
 
     private SignedInfoProcessor signedInfoProcessor = null;
 
@@ -200,18 +189,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
     }
 
     @Override
-    protected List<QName> getAppendAfterOneOfThisAttributes() {
-        return appendAfterOneOfThisAttributes;
-    }
-
-    @Override
-    public void doFinal(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
-        setAppendAfterThisTokenId(outputProcessorChain.getSecurityContext().<String>get(XMLSecurityConstants.PROP_APPEND_SIGNATURE_ON_THIS_ID));
-        super.doFinal(outputProcessorChain);
-    }
-
-    @Override
-    public void flushBufferAndCallbackAfterTokenID(OutputProcessorChain outputProcessorChain,
+    public void flushBufferAndCallbackAfterHeader(OutputProcessorChain outputProcessorChain,
                                                    Deque<XMLSecEvent> xmlSecEventDeque)
             throws XMLStreamException, XMLSecurityException {
 
@@ -223,12 +201,25 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
             XMLSecEvent xmlSecEvent = xmlSecEventDeque.pop();
             switch (xmlSecEvent.getEventType()) {
                 case XMLStreamConstants.START_ELEMENT:
-                    XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
-                    if (xmlSecStartElement.getName().equals(WSSConstants.TAG_wsse_Security)
-                            && WSSUtils.isResponsibleActorOrRole(
-                            xmlSecStartElement, actor)) {
+                    if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, actor)) {
+                        
+                        WSSUtils.updateSecurityHeaderOrder(
+                                outputProcessorChain, WSSConstants.TAG_dsig_Signature, getAction(), true);
+                        
+                        List<SecurityHeaderOrder> securityHeaderOrderList = 
+                                outputProcessorChain.getSecurityContext().getAsList(SecurityHeaderOrder.class);
+                        List<SecurityHeaderOrder> tmpList = null;
+                        if (securityHeaderOrderList != null) {
+                            tmpList = new ArrayList<SecurityHeaderOrder>(securityHeaderOrderList);
+                            securityHeaderOrderList.clear();
+                        }
+                        
                         outputProcessorChain.reset();
                         outputProcessorChain.processEvent(xmlSecEvent);
+
+                        if (securityHeaderOrderList != null) {
+                            securityHeaderOrderList.addAll(tmpList);
+                        }
                         break loop;
                     }
                     break;
@@ -236,6 +227,6 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
             outputProcessorChain.reset();
             outputProcessorChain.processEvent(xmlSecEvent);
         }
-        super.flushBufferAndCallbackAfterTokenID(outputProcessorChain, xmlSecEventDeque);
+        super.flushBufferAndCallbackAfterHeader(outputProcessorChain, xmlSecEventDeque);
     }
 }

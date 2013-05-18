@@ -27,13 +27,12 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
-import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
-import javax.xml.stream.XMLStreamConstants;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.security.Key;
 import java.security.PublicKey;
@@ -143,24 +142,27 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
         }
 
         @Override
-        public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
+                throws XMLStreamException, XMLSecurityException {
+
             outputProcessorChain.processEvent(xmlSecEvent);
-            if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
-                XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
-                if (xmlSecStartElement.getName().equals(WSSConstants.TAG_wsse_Security)
-                        && WSSUtils.isInSecurityHeader(xmlSecStartElement, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
-                    OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-                    List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
-                    attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, securityToken.getId()));
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_SecurityContextToken, true, attributes);
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Identifier, false, null);
-                    createCharactersAndOutputAsEvent(subOutputProcessorChain, identifier);
-                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Identifier);
-                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_SecurityContextToken);
+            if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
 
-                    outputProcessorChain.removeProcessor(this);
-                }
+                final QName headerElementName = WSSConstants.TAG_wsc0502_SecurityContextToken;
+                WSSUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
+
+                OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
+
+                List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
+                attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, securityToken.getId()));
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, true, attributes);
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Identifier, false, null);
+                createCharactersAndOutputAsEvent(subOutputProcessorChain, identifier);
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Identifier);
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);
+
+                outputProcessorChain.removeProcessor(this);
             }
         }
     }

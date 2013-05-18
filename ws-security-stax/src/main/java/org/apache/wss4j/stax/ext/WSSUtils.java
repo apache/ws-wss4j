@@ -19,6 +19,7 @@
 package org.apache.wss4j.stax.ext;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.wss4j.stax.impl.SecurityHeaderOrder;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.securityEvent.*;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -48,10 +49,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class WSSUtils extends XMLSecurityUtils {
 
@@ -182,6 +180,43 @@ public class WSSUtils extends XMLSecurityUtils {
                     && elementPath.get(0).getNamespaceURI().equals(secondLevelElementName.getNamespaceURI());
         }
         return false;
+    }
+
+    public static boolean isSecurityHeaderElement(XMLSecEvent xmlSecEvent, String actorOrRole) {
+        if (!xmlSecEvent.isStartElement()) {
+            return false;
+        }
+
+        final List<QName> elementPath = xmlSecEvent.getElementPath();
+        if (elementPath.size() == 3) {
+            final QName secondLevelElementName = elementPath.get(1);
+            return WSSConstants.TAG_wsse_Security.equals(elementPath.get(2))
+                    && isResponsibleActorOrRole(xmlSecEvent.getStartElementAtLevel(3), actorOrRole)
+                    && WSSConstants.TAG_soap_Header_LocalName.equals(secondLevelElementName.getLocalPart())
+                    && elementPath.get(0).getNamespaceURI().equals(secondLevelElementName.getNamespaceURI());
+        }
+        return false;
+    }
+
+    public static void updateSecurityHeaderOrder(
+            OutputProcessorChain outputProcessorChain, QName headerElementName,
+            XMLSecurityConstants.Action action, boolean onTop) {
+
+        final OutboundSecurityContext securityContext = outputProcessorChain.getSecurityContext();
+
+        Map<Object, SecurePart> dynamicSecureParts = securityContext.getAsMap(WSSConstants.ENCRYPTION_PARTS);
+        boolean encrypted = dynamicSecureParts.containsKey(headerElementName);
+
+        List<SecurityHeaderOrder> securityHeaderOrderList = securityContext.getAsList(SecurityHeaderOrder.class);
+        if (securityHeaderOrderList == null) {
+            securityContext.putList(SecurityHeaderOrder.class, Collections.<SecurityHeaderOrder>emptyList());
+            securityHeaderOrderList = securityContext.getAsList(SecurityHeaderOrder.class);
+        }
+        if (onTop) {
+            securityHeaderOrderList.add(0, new SecurityHeaderOrder(headerElementName, action, encrypted));
+        } else {
+            securityHeaderOrderList.add(new SecurityHeaderOrder(headerElementName, action, encrypted));
+        }
     }
 
     public static boolean isResponsibleActorOrRole(XMLSecStartElement xmlSecStartElement, String responsibleActor) {
@@ -477,5 +512,5 @@ public class WSSUtils extends XMLSecurityUtils {
             stringBuilder.append(qName.toString());
         }
         return stringBuilder.toString();
-    }
+    }    
 }

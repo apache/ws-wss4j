@@ -33,14 +33,13 @@ import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
-import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.stream.XMLStreamConstants;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.UnsupportedEncodingException;
 import java.security.Key;
@@ -164,7 +163,6 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
             if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, wsuIdDKT);
-                outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_APPEND_SIGNATURE_ON_THIS_ID, wsuIdDKT);
             } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, wsuIdDKT);
             }
@@ -199,34 +197,37 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
         }
 
         @Override
-        public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
+                throws XMLStreamException, XMLSecurityException {
+
             outputProcessorChain.processEvent(xmlSecEvent);
-            if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
-                XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
-                if (xmlSecStartElement.getName().equals(WSSConstants.TAG_wsse_Security)
-                        && WSSUtils.isInSecurityHeader(xmlSecStartElement, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
-                    OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-                    List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
-                    attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, securityToken.getId()));
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_DerivedKeyToken, true, attributes);
+            if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
 
-                    createSecurityTokenReferenceStructureForDerivedKey(subOutputProcessorChain, securityToken,
-                            ((WSSSecurityProperties) getSecurityProperties()).getDerivedKeyKeyIdentifier(),
-                            ((WSSSecurityProperties) getSecurityProperties()).getDerivedKeyTokenReference(), getSecurityProperties().isUseSingleCert());
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Offset, false, null);
-                    createCharactersAndOutputAsEvent(subOutputProcessorChain, "" + offset);
-                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Offset);
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Length, false, null);
-                    createCharactersAndOutputAsEvent(subOutputProcessorChain, "" + length);
-                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Length);
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Nonce, false, null);
-                    createCharactersAndOutputAsEvent(subOutputProcessorChain, nonce);
-                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Nonce);
-                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_DerivedKeyToken);
+                final QName headerElementName = WSSConstants.TAG_wsc0502_DerivedKeyToken;
+                WSSUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
 
-                    outputProcessorChain.removeProcessor(this);
-                }
+                OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
+
+                List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
+                attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, securityToken.getId()));
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, true, attributes);
+
+                createSecurityTokenReferenceStructureForDerivedKey(subOutputProcessorChain, securityToken,
+                        ((WSSSecurityProperties) getSecurityProperties()).getDerivedKeyKeyIdentifier(),
+                        ((WSSSecurityProperties) getSecurityProperties()).getDerivedKeyTokenReference(), getSecurityProperties().isUseSingleCert());
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Offset, false, null);
+                createCharactersAndOutputAsEvent(subOutputProcessorChain, "" + offset);
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Offset);
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Length, false, null);
+                createCharactersAndOutputAsEvent(subOutputProcessorChain, "" + length);
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Length);
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Nonce, false, null);
+                createCharactersAndOutputAsEvent(subOutputProcessorChain, nonce);
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Nonce);
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);
+
+                outputProcessorChain.removeProcessor(this);
             }
         }
 

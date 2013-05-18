@@ -18,16 +18,15 @@
  */
 package org.apache.wss4j.stax.impl.processor.output;
 
+import org.apache.wss4j.stax.impl.SecurityHeaderOrder;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.OutputProcessorChain;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
-import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.processor.output.AbstractEncryptEndingOutputProcessor;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.ext.WSSUtils;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import java.util.*;
@@ -36,17 +35,6 @@ import java.util.*;
  * Processor buffers encrypted XMLEvents and forwards them when final is called
  */
 public class EncryptEndingOutputProcessor extends AbstractEncryptEndingOutputProcessor {
-
-    private static final List<QName> appendAfterOneOfThisAttributes;
-
-    static {
-        List<QName> list = new ArrayList<QName>(5);
-        list.add(WSSConstants.ATT_wsu_Id);
-        list.add(WSSConstants.ATT_NULL_Id);
-        list.add(WSSConstants.ATT_NULL_AssertionID);
-        list.add(WSSConstants.ATT_NULL_ID);
-        appendAfterOneOfThisAttributes = Collections.unmodifiableList(list);
-    }
 
     public EncryptEndingOutputProcessor() throws XMLSecurityException {
         super();
@@ -63,12 +51,7 @@ public class EncryptEndingOutputProcessor extends AbstractEncryptEndingOutputPro
     }
 
     @Override
-    protected List<QName> getAppendAfterOneOfThisAttributes() {
-        return appendAfterOneOfThisAttributes;
-    }
-
-    @Override
-    public void flushBufferAndCallbackAfterTokenID(OutputProcessorChain outputProcessorChain,
+    public void flushBufferAndCallbackAfterHeader(OutputProcessorChain outputProcessorChain,
                                                    Deque<XMLSecEvent> xmlSecEventDeque)
             throws XMLStreamException, XMLSecurityException {
 
@@ -80,12 +63,26 @@ public class EncryptEndingOutputProcessor extends AbstractEncryptEndingOutputPro
             XMLSecEvent xmlSecEvent = xmlSecEventDeque.pop();
             switch (xmlSecEvent.getEventType()) {
                 case XMLStreamConstants.START_ELEMENT:
-                    XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
-                    if (xmlSecStartElement.getName().equals(WSSConstants.TAG_wsse_Security)
-                            && WSSUtils.isResponsibleActorOrRole(
-                            xmlSecStartElement, actor)) {
+                    if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, actor)) {
+
+                        if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(getAction())) {
+                            WSSUtils.updateSecurityHeaderOrder(
+                                    outputProcessorChain, WSSConstants.TAG_xenc_ReferenceList, getAction(), true);                            
+                        }
+                        List<SecurityHeaderOrder> securityHeaderOrderList = 
+                                outputProcessorChain.getSecurityContext().getAsList(SecurityHeaderOrder.class);
+                        List<SecurityHeaderOrder> tmpList = null;
+                        if (securityHeaderOrderList != null) {
+                            tmpList = new ArrayList<SecurityHeaderOrder>(securityHeaderOrderList);
+                            securityHeaderOrderList.clear();
+                        }
+                        
                         outputProcessorChain.reset();
                         outputProcessorChain.processEvent(xmlSecEvent);
+                        
+                        if (securityHeaderOrderList != null) {
+                            securityHeaderOrderList.addAll(tmpList);
+                        }
                         break loop;
                     }
                     break;
@@ -93,6 +90,6 @@ public class EncryptEndingOutputProcessor extends AbstractEncryptEndingOutputPro
             outputProcessorChain.reset();
             outputProcessorChain.processEvent(xmlSecEvent);
         }
-        super.flushBufferAndCallbackAfterTokenID(outputProcessorChain, xmlSecEventDeque);
+        super.flushBufferAndCallbackAfterHeader(outputProcessorChain, xmlSecEventDeque);
     }
 }

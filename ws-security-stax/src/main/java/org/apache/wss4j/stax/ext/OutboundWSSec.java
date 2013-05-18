@@ -225,6 +225,10 @@ public class OutboundWSSec {
                     initializeOutputProcessor(outputProcessorChain, encryptOutputProcessor, action);
                 }
             }
+            
+            final SecurityHeaderReorderProcessor securityHeaderReorderProcessor = new SecurityHeaderReorderProcessor();
+            initializeOutputProcessor(outputProcessorChain, securityHeaderReorderProcessor, null);
+            
             if (output instanceof OutputStream) {
                 final FinalOutputProcessor finalOutputProcessor = new FinalOutputProcessor((OutputStream) output, encoding);
                 initializeOutputProcessor(outputProcessorChain, finalOutputProcessor, null);

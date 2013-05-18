@@ -30,13 +30,12 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
-import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.stream.XMLStreamConstants;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -46,6 +45,9 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
 
     public UsernameTokenOutputProcessor() throws XMLSecurityException {
         super();
+        addAfterProcessor(TimestampOutputProcessor.class.getName());
+        addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
+        addBeforeProcessor(EncryptOutputProcessor.class.getName());
     }
 
     @Override
@@ -116,7 +118,6 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
             if (WSSConstants.USERNAMETOKEN_SIGNED.equals(getAction())) {
                 outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(wsuId, securityTokenProvider);
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, wsuId);
-                outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_APPEND_SIGNATURE_ON_THIS_ID, wsuId);
             }
             final FinalUsernameTokenOutputProcessor finalUsernameTokenOutputProcessor = 
                 new FinalUsernameTokenOutputProcessor(wsuId, nonceValue, password, created, salt, derivedIterations, getAction());
@@ -157,69 +158,68 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
         }
 
         @Override
-        public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
+                throws XMLStreamException, XMLSecurityException {
+
             outputProcessorChain.processEvent(xmlSecEvent);
-            if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
-                XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
-                if (xmlSecStartElement.getName().equals(WSSConstants.TAG_wsse_Security)
-                        && WSSUtils.isInSecurityHeader(xmlSecStartElement, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
-                    OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-                    List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
-                    attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, this.wsuId));
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_UsernameToken, false, attributes);
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Username, false, null);
-                    createCharactersAndOutputAsEvent(subOutputProcessorChain, ((WSSSecurityProperties) getSecurityProperties()).getTokenUser());
-                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Username);
-                    if (((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType() != WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE
+            if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
+
+                final QName headerElementName = WSSConstants.TAG_wsse_UsernameToken;
+                WSSUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
+
+                OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
+
+                List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
+                attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, this.wsuId));
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, false, attributes);
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Username, false, null);
+                createCharactersAndOutputAsEvent(subOutputProcessorChain, ((WSSSecurityProperties) getSecurityProperties()).getTokenUser());
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Username);
+                if (((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType() != WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE
                         && !WSSConstants.USERNAMETOKEN_SIGNED.equals(action)) {
-                        attributes = new ArrayList<XMLSecAttribute>(1);
-                        attributes.add(createAttribute(WSSConstants.ATT_NULL_Type,
-                                ((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType() == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
-                                        ? WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST.getNamespace()
-                                        : WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT.getNamespace()));
-                        createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Password, false, attributes);
-                        createCharactersAndOutputAsEvent(subOutputProcessorChain,
-                                ((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType() == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
-                                        ? WSSUtils.doPasswordDigest(this.nonceValue, this.created.toXMLFormat(), this.password)
-                                        : this.password);
-                        createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Password);
-                    }
-                    
-                    if (salt != null) {
-                        createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_Salt, true, null);
-                        createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(this.salt));
-                        createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_Salt);
-                    
-                        if (iterations > 0) {
-                            createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_Iteration, true, null);
-                            createCharactersAndOutputAsEvent(subOutputProcessorChain, "" + iterations);
-                            createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_Iteration);
-                        }
-                    }
-
-                    if (nonceValue != null && !WSSConstants.USERNAMETOKEN_SIGNED.equals(action)) {
-                        attributes = new ArrayList<XMLSecAttribute>(1);
-                        attributes.add(createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
-                        createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Nonce, false, attributes);
-
-
-                        createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(this.nonceValue));
-                        createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Nonce);
-                        
-                    }
-                    
-                    if (created != null && !WSSConstants.USERNAMETOKEN_SIGNED.equals(action)) {
-                        createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Created, false, null);
-
-                        createCharactersAndOutputAsEvent(subOutputProcessorChain, this.created.toXMLFormat());
-                        createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Created);
-                    }
-                    
-                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_UsernameToken);
-
-                    outputProcessorChain.removeProcessor(this);
+                    attributes = new ArrayList<XMLSecAttribute>(1);
+                    attributes.add(createAttribute(WSSConstants.ATT_NULL_Type,
+                            ((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType() == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
+                                    ? WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST.getNamespace()
+                                    : WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT.getNamespace()));
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Password, false, attributes);
+                    createCharactersAndOutputAsEvent(subOutputProcessorChain,
+                            ((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType() == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
+                                    ? WSSUtils.doPasswordDigest(this.nonceValue, this.created.toXMLFormat(), this.password)
+                                    : this.password);
+                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Password);
                 }
+
+                if (salt != null) {
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_Salt, true, null);
+                    createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(this.salt));
+                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_Salt);
+
+                    if (iterations > 0) {
+                        createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_Iteration, true, null);
+                        createCharactersAndOutputAsEvent(subOutputProcessorChain, "" + iterations);
+                        createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_Iteration);
+                    }
+                }
+
+                if (nonceValue != null && !WSSConstants.USERNAMETOKEN_SIGNED.equals(action)) {
+                    attributes = new ArrayList<XMLSecAttribute>(1);
+                    attributes.add(createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Nonce, false, attributes);
+                    createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(this.nonceValue));
+                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Nonce);
+                }
+
+                if (created != null && !WSSConstants.USERNAMETOKEN_SIGNED.equals(action)) {
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Created, false, null);
+                    createCharactersAndOutputAsEvent(subOutputProcessorChain, this.created.toXMLFormat());
+                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Created);
+                }
+
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);
+
+                outputProcessorChain.removeProcessor(this);
             }
         }
     }

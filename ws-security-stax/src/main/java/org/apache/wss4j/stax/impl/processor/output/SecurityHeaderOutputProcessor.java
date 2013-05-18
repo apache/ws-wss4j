@@ -131,11 +131,9 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                             }
                         }
                     }
-                } else if (level == 3 && WSSConstants.TAG_wsse_Security.equals(xmlSecStartElement.getName())) {
-                    if (WSSUtils.isResponsibleActorOrRole(xmlSecStartElement, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
+                } else if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
                         //remove this processor. its no longer needed.
-                        outputProcessorChain.removeProcessor(this);
-                    }
+                        outputProcessorChain.removeProcessor(this);                    
                 } else if (level == 2
                         && WSSConstants.TAG_soap_Body_LocalName.equals(xmlSecStartElement.getName().getLocalPart())
                         && xmlSecStartElement.getName().getNamespaceURI().equals(soapMessageVersion)) {

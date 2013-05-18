@@ -25,20 +25,21 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.AbstractOutputProcessor;
 import org.apache.xml.security.stax.ext.OutputProcessorChain;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
-import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.stream.XMLStreamConstants;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.*;
 
 public class TimestampOutputProcessor extends AbstractOutputProcessor {
 
     public TimestampOutputProcessor() throws XMLSecurityException {
         super();
+        addAfterProcessor(UsernameTokenOutputProcessor.class.getName());
+        addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
+        addBeforeProcessor(EncryptOutputProcessor.class.getName());
     }
-
+    
     /*
     <wsu:Timestamp wsu:Id="Timestamp-1247751600"
         xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
@@ -52,31 +53,34 @@ public class TimestampOutputProcessor extends AbstractOutputProcessor {
      */
 
     @Override
-    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) 
+            throws XMLStreamException, XMLSecurityException {
+        
         outputProcessorChain.processEvent(xmlSecEvent);
-        if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
-            XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
-            if (xmlSecStartElement.getName().equals(WSSConstants.TAG_wsse_Security)
-                    && WSSUtils.isInSecurityHeader(xmlSecStartElement, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
-                XMLGregorianCalendar created = WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar());
 
-                GregorianCalendar expiresCalendar = new GregorianCalendar();
-                expiresCalendar.add(Calendar.SECOND, ((WSSSecurityProperties) getSecurityProperties()).getTimestampTTL());
-                XMLGregorianCalendar expires = WSSConstants.datatypeFactory.newXMLGregorianCalendar(expiresCalendar);
+        if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
+            
+            final QName headerElementName = WSSConstants.TAG_wsu_Timestamp;
+            WSSUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
 
-                OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
-                //wsu:id is optional and will be added when signing...
-                createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Timestamp, true, null);
-                createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Created, false, null);
-                createCharactersAndOutputAsEvent(subOutputProcessorChain, created.toXMLFormat());
-                createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Created);
-                createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Expires, false, null);
-                createCharactersAndOutputAsEvent(subOutputProcessorChain, expires.toXMLFormat());
-                createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Expires);
-                createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Timestamp);
+            XMLGregorianCalendar created = WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar());
 
-                outputProcessorChain.removeProcessor(this);
-            }
+            GregorianCalendar expiresCalendar = new GregorianCalendar();
+            expiresCalendar.add(Calendar.SECOND, ((WSSSecurityProperties) getSecurityProperties()).getTimestampTTL());
+            XMLGregorianCalendar expires = WSSConstants.datatypeFactory.newXMLGregorianCalendar(expiresCalendar);
+
+            OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
+            //wsu:id is optional and will be added when signing...
+            createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, true, null);
+            createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Created, false, null);
+            createCharactersAndOutputAsEvent(subOutputProcessorChain, created.toXMLFormat());
+            createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Created);
+            createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Expires, false, null);
+            createCharactersAndOutputAsEvent(subOutputProcessorChain, expires.toXMLFormat());
+            createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Expires);
+            createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);
+
+            outputProcessorChain.removeProcessor(this);
         }
     }
 }

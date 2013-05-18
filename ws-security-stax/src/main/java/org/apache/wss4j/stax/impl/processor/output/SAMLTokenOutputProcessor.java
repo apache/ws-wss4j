@@ -34,7 +34,6 @@ import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecNamespace;
-import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
@@ -44,7 +43,6 @@ import org.w3c.dom.*;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import java.security.Key;
 import java.security.PrivateKey;
@@ -138,7 +136,6 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
                 outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(binarySecurityTokenId, securityTokenProvider);
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, binarySecurityTokenId);
-                outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_APPEND_SIGNATURE_ON_THIS_ID, securityTokenReferenceId);
 
             } else {
                 final SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo();
@@ -231,7 +228,6 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
                 outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(tokenId, securityTokenProvider);
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, tokenId);
-                outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_APPEND_SIGNATURE_ON_THIS_ID, tokenId);
             }
 
             XMLSecurityConstants.Action action = getAction();
@@ -277,26 +273,36 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 throws XMLStreamException, XMLSecurityException {
 
             outputProcessorChain.processEvent(xmlSecEvent);
-            if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
-                XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
-                if (xmlSecStartElement.getName().equals(WSSConstants.TAG_wsse_Security)
-                        && WSSUtils.isInSecurityHeader(xmlSecStartElement,
-                        ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
 
-                    OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
-                    if (senderVouches && getSecurityProperties().getSignatureKeyIdentifier() ==
-                            WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference) {
+            if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
 
-                        WSSUtils.createBinarySecurityTokenStructure(this, outputProcessorChain, securityToken.getId(),
-                                securityToken.getX509Certificates(), getSecurityProperties().isUseSingleCert());
-                    }
-                    outputSamlAssertion(samlAssertionWrapper.toDOM(null), subOutputProcessorChain);
-                    if (senderVouches && WSSConstants.SAML_TOKEN_SIGNED.equals(getAction())) {
-                        outputSecurityTokenReference(subOutputProcessorChain, samlAssertionWrapper,
-                                securityTokenReferenceId, samlAssertionWrapper.getId());
-                    }
-                    outputProcessorChain.removeProcessor(this);
+                OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
+                if (senderVouches && getSecurityProperties().getSignatureKeyIdentifier() ==
+                        WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference) {
+
+                    WSSUtils.updateSecurityHeaderOrder(
+                            outputProcessorChain, WSSConstants.TAG_wsse_BinarySecurityToken, getAction(), false);
+
+                    WSSUtils.createBinarySecurityTokenStructure(this, outputProcessorChain, securityToken.getId(),
+                            securityToken.getX509Certificates(), getSecurityProperties().isUseSingleCert());
                 }
+
+                final QName headerElementName;
+                if (samlAssertionWrapper.getSamlVersion() == SAMLVersion.VERSION_11) {
+                    headerElementName = WSSConstants.TAG_saml_Assertion;
+                } else {
+                    headerElementName = WSSConstants.TAG_saml2_Assertion;
+                }
+                WSSUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
+
+                outputSamlAssertion(samlAssertionWrapper.toDOM(null), subOutputProcessorChain);
+                if (senderVouches && WSSConstants.SAML_TOKEN_SIGNED.equals(getAction())) {                    
+                    WSSUtils.updateSecurityHeaderOrder(
+                            outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, getAction(), false);                    
+                    outputSecurityTokenReference(subOutputProcessorChain, samlAssertionWrapper,
+                            securityTokenReferenceId, samlAssertionWrapper.getId());
+                }
+                outputProcessorChain.removeProcessor(this);
             }
         }
     }
