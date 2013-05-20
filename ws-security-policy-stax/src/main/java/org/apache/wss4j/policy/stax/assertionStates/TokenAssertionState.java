@@ -99,14 +99,23 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
                     continue loop;
                 }
 
-                SupportingTokens supportingTokens = (SupportingTokens) parentAssertion;
-                
-                // Allow *SupportingToken policies which are processed as Signed*SupportingTokens
-                if (!(tokenUsage.getName().startsWith("Signed")
-                    && !supportingTokens.getName().getLocalPart().contains("Signed"))
-                    && !tokenUsage.getName().equals(supportingTokens.getName().getLocalPart())) {
-                    ignoreToken++;
-                    continue loop;
+                // Allow *SupportingToken policies which are processed as Signed|Encrypted*SupportingTokens
+                final SupportingTokens supportingTokens = (SupportingTokens) parentAssertion;
+                final String tokenUsageName = tokenUsage.getName();
+                final String supportingTokensName = supportingTokens.getName().getLocalPart();
+                if (!tokenUsageName.equals(supportingTokensName)) {
+                    if (supportingTokensName.contains("Endorsing") && !tokenUsageName.contains("Endorsing")) {
+                        ignoreToken++;
+                        continue loop;
+                    }
+                    if (supportingTokensName.startsWith("Signed") && !tokenUsageName.startsWith("Signed")) {
+                        ignoreToken++;
+                        continue loop;
+                    }
+                    if (supportingTokensName.contains("Encrypted") && !tokenUsageName.contains("Encrypted")) {
+                        ignoreToken++;
+                        continue loop;
+                    }
                 }
             }
         }

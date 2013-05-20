@@ -238,7 +238,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
 
             boolean transportSecurityActive = Boolean.TRUE == get(WSSConstants.TRANSPORT_SECURITY_ACTIVE);
 
-            List<InboundSecurityToken> encryptingSecurityTokens = isEncryptedToken(tokenSecurityEvent, securityEventDeque);
+            List<InboundSecurityToken> encryptingSecurityTokens = isEncryptedToken(tokenSecurityEvent, securityEventDeque, httpsTokenSecurityEvent);
 
             boolean signatureUsage = tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_Signature);
             boolean encryptionUsage = tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_Encryption);
@@ -483,9 +483,14 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
     }
 
     private List<InboundSecurityToken> isEncryptedToken(TokenSecurityEvent tokenSecurityEvent,
-                                                 Deque<SecurityEvent> securityEventDeque) throws XMLSecurityException {
+                                                 Deque<SecurityEvent> securityEventDeque,
+                                                 HttpsTokenSecurityEvent httpsTokenSecurityEvent) throws XMLSecurityException {
 
         List<InboundSecurityToken> securityTokenList = new ArrayList<InboundSecurityToken>();
+        if (httpsTokenSecurityEvent != null) {
+            securityTokenList.add(httpsTokenSecurityEvent.getSecurityToken());
+            return securityTokenList;
+        }
         for (Iterator<SecurityEvent> iterator = securityEventDeque.iterator(); iterator.hasNext(); ) {
             SecurityEvent securityEvent = iterator.next();
             if (WSSecurityEventConstants.EncryptedElement.equals(securityEvent.getSecurityEventType())) {

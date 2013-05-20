@@ -18,10 +18,12 @@
  */
 package org.apache.wss4j.stax.test;
 
+import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.impl.InboundWSSecurityContextImpl;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
@@ -32,12 +34,14 @@ import org.apache.wss4j.stax.impl.securityToken.X509SecurityTokenImpl;
 import org.apache.wss4j.stax.securityEvent.*;
 import org.apache.wss4j.stax.securityEvent.X509TokenSecurityEvent;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.config.Init;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecEventFactory;
 import org.apache.xml.security.stax.securityEvent.*;
 import org.opensaml.common.SAMLVersion;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
@@ -49,6 +53,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class InboundWSSecurityContextImplTest {
+
+    @BeforeClass
+    public void setUp() throws Exception {
+        WSProviderConfig.init();
+        Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
+    }
 
     @Test
     public void testTokenIdentificationTransportSecurity() throws Exception {
@@ -71,7 +81,7 @@ public class InboundWSSecurityContextImplTest {
             } else if (securityEvent instanceof UsernameTokenSecurityEvent) {
                 UsernameTokenSecurityEvent tokenSecurityEvent = (UsernameTokenSecurityEvent) securityEvent;
                 Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_SignedSupportingTokens));
+                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_SignedEncryptedSupportingTokens));
             }
         }
     }
