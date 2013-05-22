@@ -416,7 +416,7 @@ public class PolicyEnforcerFactory {
         }
     }
 
-    public PolicyEnforcer newPolicyEnforcer(String soapAction) throws WSSPolicyException {
-        return new PolicyEnforcer(this.operationPolicies, soapAction);
+    public PolicyEnforcer newPolicyEnforcer(String soapAction, boolean initiator) throws WSSPolicyException {
+        return new PolicyEnforcer(this.operationPolicies, soapAction, initiator);
     }
 }

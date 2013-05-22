@@ -36,7 +36,9 @@ import org.apache.neethi.PolicyContainingAssertion;
 import org.apache.neethi.PolicyOperator;
 import org.apache.neethi.builders.PrimitiveAssertion;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.WSSPolicyException;
+import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
 import org.apache.wss4j.policy.model.AbstractBinding;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
@@ -120,8 +122,9 @@ public class PolicyEnforcer implements SecurityEventListener {
 
     private final Deque<SecurityEvent> securityEventQueue = new LinkedList<SecurityEvent>();
     private boolean operationSecurityEventOccured = false;
+    private boolean initiator;
 
-    public PolicyEnforcer(List<OperationPolicy> operationPolicies, String soapAction) throws WSSPolicyException {
+    public PolicyEnforcer(List<OperationPolicy> operationPolicies, String soapAction, boolean initiator) throws WSSPolicyException {
         this.operationPolicies = operationPolicies;
         assertionStateMap = new LinkedList<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>>();
         failedAssertionStateMap = new LinkedList<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>>();
@@ -132,6 +135,7 @@ public class PolicyEnforcer implements SecurityEventListener {
                 buildAssertionStateMap(effectivePolicy.getPolicy(), assertionStateMap);
             }
         }
+        this.initiator = initiator;
     }
 
     private OperationPolicy findPolicyBySOAPAction(List<OperationPolicy> operationPolicies, String soapAction) {
@@ -229,6 +233,19 @@ public class PolicyEnforcer implements SecurityEventListener {
 
     protected List<Assertable> getAssertableForAssertion(AbstractSecurityAssertion abstractSecurityAssertion) throws WSSPolicyException {
         List<Assertable> assertableList = new LinkedList<Assertable>();
+        if (abstractSecurityAssertion instanceof AbstractToken) {
+            // Don't return a Token that is not required
+            SPConstants.IncludeTokenType includeTokenType = 
+                ((AbstractToken)abstractSecurityAssertion).getIncludeTokenType();
+            if (initiator 
+                && includeTokenType == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT) {
+                return assertableList;
+            } else if (!initiator 
+                && includeTokenType == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_INITIATOR) {
+                return assertableList;
+            }
+        }
+        
         if (abstractSecurityAssertion instanceof ContentEncryptedElements) {
             //initialized with asserted=true because it could be that parent elements are encrypted and therefore these element are also encrypted
             //the test if it is really encrypted is done via the PolicyInputProcessor which emits EncryptedElementEvents for unencrypted elements with the unencrypted flag
