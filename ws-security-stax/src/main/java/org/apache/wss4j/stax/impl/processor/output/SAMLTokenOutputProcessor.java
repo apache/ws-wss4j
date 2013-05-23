@@ -93,7 +93,10 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             if (senderVouches) {
                 CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
                 cryptoType.setAlias(samlCallback.getIssuerKeyName());
-                X509Certificate[] certificates = samlCallback.getIssuerCrypto().getX509Certificates(cryptoType);
+                X509Certificate[] certificates = null;
+                if (samlCallback.getIssuerCrypto() != null) {
+                    certificates = samlCallback.getIssuerCrypto().getX509Certificates(cryptoType);
+                }
                 if (certificates == null) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                             "empty", "No issuer certs were found to sign the SAML Assertion using issuer name: "
