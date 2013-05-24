@@ -18,10 +18,24 @@
  */
 package org.apache.wss4j.stax.impl.processor.output;
 
+import java.security.Key;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.crypto.spec.SecretKeySpec;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.*;
+import org.apache.wss4j.common.saml.OpenSAMLUtil;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.stax.ext.WSSConstants;
@@ -30,7 +44,10 @@ import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
-import org.apache.xml.security.stax.ext.*;
+import org.apache.xml.security.stax.ext.AbstractOutputProcessor;
+import org.apache.xml.security.stax.ext.OutputProcessorChain;
+import org.apache.xml.security.stax.ext.SecurePart;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecNamespace;
@@ -39,16 +56,12 @@ import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 import org.opensaml.common.SAMLVersion;
-import org.w3c.dom.*;
-
-import javax.crypto.spec.SecretKeySpec;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import java.security.Key;
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 
 public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
@@ -89,8 +102,10 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             final String tokenId = samlAssertionWrapper.getId();
 
             final FinalSAMLTokenOutputProcessor finalSAMLTokenOutputProcessor;
+            
+            XMLSecurityConstants.Action action = getAction();
 
-            if (senderVouches) {
+            if (WSSConstants.SAML_TOKEN_SIGNED.equals(action) && senderVouches) {
                 CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
                 cryptoType.setAlias(samlCallback.getIssuerKeyName());
                 X509Certificate[] certificates = null;
@@ -232,8 +247,6 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(tokenId, securityTokenProvider);
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, tokenId);
             }
-
-            XMLSecurityConstants.Action action = getAction();
 
             finalSAMLTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
             finalSAMLTokenOutputProcessor.setAction(action);
