@@ -20,6 +20,7 @@ package org.apache.wss4j.stax.impl.processor.output;
 
 import java.security.Key;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -179,6 +180,12 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                                     getSignatureCrypto().getX509Certificates(cryptoType));
                             samlKeyInfo.setPrivateKey(((WSSSecurityProperties) getSecurityProperties()).
                                     getSignatureCrypto().getPrivateKey(alias, wsPasswordCallback.getPassword()));
+                        } else if (keyInfoBean.getPublicKey() != null) {
+                            PublicKey publicKey = keyInfoBean.getPublicKey();
+                            samlKeyInfo.setPublicKey(publicKey);
+                            samlKeyInfo.setPrivateKey(((WSSSecurityProperties) getSecurityProperties()).
+                                    getSignatureCrypto().getPrivateKey(
+                                            samlCallback.getIssuerKeyName(), samlCallback.getIssuerKeyPassword()));
                         } else {
                             samlKeyInfo.setSecret(keyInfoBean.getEphemeralKey());
                         }
