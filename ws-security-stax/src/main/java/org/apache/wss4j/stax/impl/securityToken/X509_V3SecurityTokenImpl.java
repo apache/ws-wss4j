@@ -20,6 +20,7 @@ package org.apache.wss4j.stax.impl.securityToken;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
+import org.apache.wss4j.stax.ext.WSSConfigurationException;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -31,6 +32,7 @@ import java.security.cert.X509Certificate;
 public class X509_V3SecurityTokenImpl extends X509SecurityTokenImpl {
 
     private String alias = null;
+    private Crypto crypto;
 
     public X509_V3SecurityTokenImpl(WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
                                     byte[] binaryContent, String id, WSSecurityTokenConstants.KeyIdentifier keyIdentifier,
@@ -38,7 +40,23 @@ public class X509_V3SecurityTokenImpl extends X509SecurityTokenImpl {
             throws XMLSecurityException {
 
         super(WSSecurityTokenConstants.X509V3Token, wsInboundSecurityContext, crypto, callbackHandler, id, keyIdentifier, securityProperties);
+        this.crypto = crypto;
         setX509Certificates(new X509Certificate[]{getCrypto().loadCertificate(new UnsynchronizedByteArrayInputStream(binaryContent))});
+        
+        // Check to see if the certificates actually correspond to the decryption crypto
+        if (getX509Certificates() != null 
+            && getCrypto().getX509Identifier(getX509Certificates()[0]) == null) {
+            try {
+                Crypto decCrypto = securityProperties.getDecryptionCrypto();
+                if (decCrypto != null
+                    && decCrypto != getCrypto()
+                    && decCrypto.getX509Identifier(getX509Certificates()[0]) != null) {
+                    this.crypto = decCrypto;
+                }
+            } catch (WSSConfigurationException ex) { //NOPMD
+                // Just continue
+            }
+        }
     }
 
     @Override
@@ -47,5 +65,10 @@ public class X509_V3SecurityTokenImpl extends X509SecurityTokenImpl {
             this.alias = getCrypto().getX509Identifier(getX509Certificates()[0]);
         }
         return this.alias;
+    }
+    
+    @Override
+    public Crypto getCrypto() {
+        return crypto;
     }
 }
