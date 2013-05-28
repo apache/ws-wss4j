@@ -378,6 +378,10 @@ public final class ConfigurationConverter {
         boolean validateSamlSubjectConf = 
             decodeBooleanConfigValue(ConfigurationConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, true, config);
         properties.setValidateSamlSubjectConfirmation(validateSamlSubjectConf);
+        
+        boolean includeSignatureToken = 
+            decodeBooleanConfigValue(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, false, config);
+        properties.setIncludeSignatureToken(includeSignatureToken);
     }
     
     private static void parseNonBooleanProperties(

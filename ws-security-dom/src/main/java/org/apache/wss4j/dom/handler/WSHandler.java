@@ -533,6 +533,9 @@ public abstract class WSHandler {
         
         boolean useSingleCert = decodeUseSingleCertificate(reqData);
         reqData.setUseSingleCert(useSingleCert);
+        
+        boolean includeSignatureToken = decodeIncludeSignatureToken(reqData);
+        reqData.setIncludeSignatureToken(includeSignatureToken);
     }
 
     protected void decodeAlgorithmSuite(RequestData reqData) throws WSSecurityException {
@@ -785,6 +788,13 @@ public abstract class WSHandler {
         throws WSSecurityException {
         return decodeBooleanConfigValue(
             reqData, WSHandlerConstants.USE_SINGLE_CERTIFICATE, true
+        );
+    }
+    
+    protected boolean decodeIncludeSignatureToken(RequestData reqData) 
+        throws WSSecurityException {
+        return decodeBooleanConfigValue(
+            reqData, WSHandlerConstants.INCLUDE_SIGNATURE_TOKEN, false
         );
     }
     

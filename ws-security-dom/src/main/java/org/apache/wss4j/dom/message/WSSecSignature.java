@@ -106,6 +106,7 @@ public class WSSecSignature extends WSSecSignatureBase {
     private Element securityHeader;
     private boolean useCustomSecRef;
     private boolean bstAddedToSecurityHeader;
+    private boolean includeSignatureToken;
 
     public WSSecSignature() {
         super();
@@ -220,6 +221,10 @@ public class WSSecSignature extends WSSecSignatureBase {
                     new DOMX509IssuerSerial(doc, issuer, serialNumber);
                 DOMX509Data domX509Data = new DOMX509Data(doc, domIssuerSerial);
                 secRef.setX509Data(domX509Data);
+                
+                if (includeSignatureToken) {
+                    addBST(certs);
+                }
                 break;
     
             case WSConstants.X509_KEY_IDENTIFIER:
@@ -228,10 +233,18 @@ public class WSSecSignature extends WSSecSignatureBase {
     
             case WSConstants.SKI_KEY_IDENTIFIER:
                 secRef.setKeyIdentifierSKI(certs[0], crypto);
+                
+                if (includeSignatureToken) {
+                    addBST(certs);
+                }
                 break;
     
             case WSConstants.THUMBPRINT_IDENTIFIER:
                 secRef.setKeyIdentifierThumb(certs[0]);
+                
+                if (includeSignatureToken) {
+                    addBST(certs);
+                }
                 break;
                 
             case WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER:
@@ -429,6 +442,21 @@ public class WSSecSignature extends WSSecSignatureBase {
                 WSConstants.SIG_LN,
                 WSConstants.SIG_NS
             );
+    }
+    
+    /**
+     * Add a BinarySecurityToken
+     */
+    private void addBST(X509Certificate[] certs) throws WSSecurityException {
+        if (!useSingleCert) {
+            bstToken = new PKIPathSecurity(document);
+            ((PKIPathSecurity) bstToken).setX509Certificates(certs, crypto);
+        } else {
+            bstToken = new X509Security(document);
+            ((X509Security) bstToken).setX509Certificate(certs[0]);
+        }
+        bstToken.setID(certUri);
+        wsDocInfo.addTokenElement(bstToken.getElement(), false);
     }
     
     /**
@@ -815,6 +843,14 @@ public class WSSecSignature extends WSSecSignatureBase {
             }
         }
         return certs;
+    }
+
+    public boolean isIncludeSignatureToken() {
+        return includeSignatureToken;
+    }
+
+    public void setIncludeSignatureToken(boolean includeSignatureToken) {
+        this.includeSignatureToken = includeSignatureToken;
     }
     
 }

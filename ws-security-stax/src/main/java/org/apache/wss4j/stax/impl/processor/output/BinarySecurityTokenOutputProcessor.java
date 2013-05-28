@@ -139,7 +139,10 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
             if (WSSConstants.SIGNATURE.equals(action)
                     || WSSConstants.SAML_TOKEN_SIGNED.equals(action)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, bstId);
-                if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(getSecurityProperties().getSignatureKeyIdentifier())) {
+                boolean includeSignatureToken = 
+                    ((WSSSecurityProperties) getSecurityProperties()).isIncludeSignatureToken();
+                if (includeSignatureToken 
+                    || WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(getSecurityProperties().getSignatureKeyIdentifier())) {
                     FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = new FinalBinarySecurityTokenOutputProcessor(binarySecurityToken);
                     finalBinarySecurityTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
                     finalBinarySecurityTokenOutputProcessor.setAction(getAction());

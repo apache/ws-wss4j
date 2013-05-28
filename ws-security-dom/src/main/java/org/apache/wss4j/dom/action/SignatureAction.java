@@ -52,6 +52,8 @@ public class SignatureAction implements Action {
         if (reqData.getSigDigestAlgorithm() != null) {
             wsSign.setDigestAlgo(reqData.getSigDigestAlgorithm());
         }
+        
+        wsSign.setIncludeSignatureToken(reqData.isIncludeSignatureToken());
 
         wsSign.setUserInfo(reqData.getSignatureUser(), passwordCallback.getPassword());
         wsSign.setUseSingleCertificate(reqData.isUseSingleCert());

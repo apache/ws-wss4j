@@ -100,6 +100,7 @@ public class RequestData {
     private boolean addUsernameTokenNonce;
     private boolean addUsernameTokenCreated;
     private Certificate[] tlsCerts;
+    private boolean includeSignatureToken;
 
     public void clear() {
         soapConstants = null;
@@ -132,6 +133,7 @@ public class RequestData {
         setAddUsernameTokenNonce(false);
         setAddUsernameTokenCreated(false);
         setTlsCerts(null);
+        includeSignatureToken = false;
     }
 
     public Object getMsgContext() {
@@ -621,6 +623,14 @@ public class RequestData {
 
     public void setTlsCerts(Certificate[] tlsCerts) {
         this.tlsCerts = tlsCerts;
+    }
+
+    public boolean isIncludeSignatureToken() {
+        return includeSignatureToken;
+    }
+
+    public void setIncludeSignatureToken(boolean includeSignatureToken) {
+        this.includeSignatureToken = includeSignatureToken;
     }
         
 }

@@ -502,6 +502,13 @@ public final class WSHandlerConstants {
     public static final String VALIDATE_SAML_SUBJECT_CONFIRMATION = 
         ConfigurationConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION;
     
+    /**
+     * Whether to include the Signature Token in the security header as well or not. This is only
+     * applicable to the IssuerSerial and Thumbprint Key Identifier cases. The default is false.
+     */
+    public static final String INCLUDE_SIGNATURE_TOKEN = 
+        ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN;
+    
     //
     // (Non-boolean) Configuration parameters for the actions/processors
     //

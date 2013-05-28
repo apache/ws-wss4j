@@ -100,6 +100,36 @@ public class SignatureTest extends org.junit.Assert {
         assertTrue(referenceType == REFERENCE_TYPE.ISSUER_SERIAL);
     }
     
+    @org.junit.Test
+    public void testX509SignatureISAttached() throws Exception {
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        builder.setIncludeSignatureToken(true);
+        LOG.info("Before Signing IS....");
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, crypto, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message with IssuerSerial key identifier:");
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        LOG.info("After Signing IS....");
+        List<WSSecurityEngineResult> results = verify(signedDoc);
+        
+        WSSecurityEngineResult actionResult =
+                WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
+        assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
+        REFERENCE_TYPE referenceType = 
+            (REFERENCE_TYPE)actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
+        assertTrue(referenceType == REFERENCE_TYPE.ISSUER_SERIAL);
+    }
+    
 
     /**
      * Test that signs (twice) and verifies a WS-Security envelope.
@@ -366,6 +396,38 @@ public class SignatureTest extends org.junit.Assert {
         assertTrue(referenceType == REFERENCE_TYPE.THUMBPRINT_SHA1);
     }
 
+    @org.junit.Test
+    public void testX509SignatureThumbAttached() throws Exception {
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
+        builder.setIncludeSignatureToken(true);
+        LOG.info("Before Signing ThumbprintSHA1....");
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+
+        Document signedDoc = builder.build(doc, crypto, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message with ThumbprintSHA1 key identifier:");
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        LOG.info("After Signing ThumbprintSHA1....");
+        
+        List<WSSecurityEngineResult> results = verify(signedDoc);
+        
+        WSSecurityEngineResult actionResult =
+                WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
+        assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
+        REFERENCE_TYPE referenceType = 
+            (REFERENCE_TYPE)actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
+        assertTrue(referenceType == REFERENCE_TYPE.THUMBPRINT_SHA1);
+    }
     
     /**
      * Test that signs (twice) and verifies a WS-Security envelope.
