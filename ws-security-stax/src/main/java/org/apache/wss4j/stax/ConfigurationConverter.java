@@ -33,6 +33,7 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.StringUtil;
+import org.apache.wss4j.stax.ext.WSSConfigurationException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSConstants.UsernameTokenPasswordType;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
@@ -147,6 +148,9 @@ public final class ConfigurationConverter {
                 foundSigRef = true;
                 properties.setSignatureCryptoProperties((Properties)sigRef);
             }
+            if (foundSigRef && properties.getSignatureUser() == null) {
+                properties.setSignatureUser(getDefaultX509Identifier(properties));
+            }
         }
         
         if (!foundSigRef) {
@@ -156,6 +160,9 @@ public final class ConfigurationConverter {
                     Properties sigProperties = 
                         CryptoFactory.getProperties(sigPropFile, getClassLoader());
                     properties.setSignatureCryptoProperties(sigProperties);
+                    if (properties.getSignatureUser() == null) {
+                        properties.setSignatureUser(getDefaultX509Identifier(properties));
+                    }
                 } catch (WSSecurityException e) {
                     log.error(e.getMessage(), e);
                 }
@@ -239,6 +246,20 @@ public final class ConfigurationConverter {
                 }
             }
         }
+    }
+    
+    private static String getDefaultX509Identifier(
+        WSSSecurityProperties properties
+    ) {
+        try {
+            Crypto sigCrypto = properties.getSignatureCrypto();
+            return sigCrypto.getDefaultX509Identifier();
+        } catch (WSSConfigurationException e) {
+            log.debug(e.getMessage(), e);
+        } catch (WSSecurityException e) {
+            log.debug(e.getMessage(), e);
+        }
+        return null;
     }
     
     private static void parseCallback(
