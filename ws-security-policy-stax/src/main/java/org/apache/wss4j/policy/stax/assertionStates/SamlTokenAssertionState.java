@@ -30,6 +30,7 @@ import org.apache.wss4j.stax.securityEvent.SamlTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+import org.apache.xml.security.stax.securityToken.SecurityToken;
 
 /**
  * WSP1.3, 5.4.8 SamlToken Assertion
@@ -49,7 +50,8 @@ public class SamlTokenAssertionState extends TokenAssertionState {
     }
 
     @Override
-    public boolean assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken) throws WSSPolicyException, XMLSecurityException {
+    public boolean assertToken(TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent,
+                               AbstractToken abstractToken) throws WSSPolicyException, XMLSecurityException {
         if (!(tokenSecurityEvent instanceof SamlTokenSecurityEvent)) {
             throw new WSSPolicyException("Expected a SamlTokenSecurityEvent but got " + tokenSecurityEvent.getClass().getName());
         }

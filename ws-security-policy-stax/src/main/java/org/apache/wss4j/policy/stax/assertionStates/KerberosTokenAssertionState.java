@@ -26,6 +26,7 @@ import org.apache.wss4j.stax.securityToken.KerberosServiceSecurityToken;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.wss4j.stax.securityEvent.KerberosTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
@@ -47,7 +48,8 @@ public class KerberosTokenAssertionState extends TokenAssertionState {
     }
 
     @Override
-    public boolean assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken) throws WSSPolicyException {
+    public boolean assertToken(TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent,
+                               AbstractToken abstractToken) throws WSSPolicyException {
         if (!(tokenSecurityEvent instanceof KerberosTokenSecurityEvent)) {
             throw new WSSPolicyException("Expected a KerberosTokenSecurityEvent but got " + tokenSecurityEvent.getClass().getName());
         }

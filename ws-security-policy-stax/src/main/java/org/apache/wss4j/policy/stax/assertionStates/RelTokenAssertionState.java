@@ -24,6 +24,7 @@ import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.RelToken;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.wss4j.stax.securityEvent.RelTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
@@ -45,7 +46,8 @@ public class RelTokenAssertionState extends TokenAssertionState {
     }
 
     @Override
-    public boolean assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken) throws WSSPolicyException {
+    public boolean assertToken(TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent,
+                               AbstractToken abstractToken) throws WSSPolicyException {
         if (!(tokenSecurityEvent instanceof RelTokenSecurityEvent)) {
             throw new WSSPolicyException("Expected a RelTokenSecurityEvent but got " + tokenSecurityEvent.getClass().getName());
         }

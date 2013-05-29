@@ -30,6 +30,7 @@ import org.apache.wss4j.stax.securityEvent.SamlTokenSecurityEvent;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.wss4j.stax.securityEvent.IssuedTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.opensaml.common.SAMLVersion;
@@ -65,13 +66,15 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
     }
 
     @Override
-    public boolean assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken) throws WSSPolicyException {
+    public boolean assertToken(TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent,
+                               AbstractToken abstractToken) throws WSSPolicyException {
         if (!(tokenSecurityEvent instanceof IssuedTokenSecurityEvent)) {
             throw new WSSPolicyException("Expected a IssuedTokenSecurityEvent but got " + tokenSecurityEvent.getClass().getName());
         }
 
         IssuedToken issuedToken = (IssuedToken) abstractToken;
-        IssuedTokenSecurityEvent issuedTokenSecurityEvent = (IssuedTokenSecurityEvent) tokenSecurityEvent;
+        IssuedTokenSecurityEvent<? extends SecurityToken> issuedTokenSecurityEvent 
+            = (IssuedTokenSecurityEvent<? extends SecurityToken>) tokenSecurityEvent;
         try {
             if ((issuedToken.getIssuerName() != null) &&
                     !issuedToken.getIssuerName().equals(issuedTokenSecurityEvent.getIssuerName())) {

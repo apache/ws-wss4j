@@ -53,7 +53,8 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
             return true;
         }
 
-        TokenSecurityEvent tokenSecurityEvent = (TokenSecurityEvent) securityEvent;
+        @SuppressWarnings("unchecked")
+        TokenSecurityEvent<SecurityToken> tokenSecurityEvent = (TokenSecurityEvent<SecurityToken>) securityEvent;
         AbstractToken abstractToken = (AbstractToken) getAssertion();
         final AbstractSecurityAssertion parentAssertion = abstractToken.getParentAssertion();
 
@@ -169,7 +170,8 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
         }
     }
 
-    public abstract boolean assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken)
+    public abstract boolean assertToken(TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent,
+                                        AbstractToken abstractToken)
         throws WSSPolicyException, XMLSecurityException;
 
     protected boolean hasDerivedKeys(SecurityToken securityToken) throws XMLSecurityException {

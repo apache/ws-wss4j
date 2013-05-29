@@ -49,7 +49,8 @@ public class X509TokenAssertionState extends TokenAssertionState {
     }
 
     @Override
-    public boolean assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken) throws WSSPolicyException, XMLSecurityException {
+    public boolean assertToken(TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent,
+                               AbstractToken abstractToken) throws WSSPolicyException, XMLSecurityException {
         if (!(tokenSecurityEvent instanceof X509TokenSecurityEvent)) {
             throw new WSSPolicyException("Expected a X509TokenSecurityEvent but got " + tokenSecurityEvent.getClass().getName());
         }

@@ -45,7 +45,7 @@ import java.util.List;
 public class TokenProtectionAssertionState extends AssertionState implements Assertable {
 
     private final List<SignedElementSecurityEvent> signedElementEvents = new LinkedList<SignedElementSecurityEvent>();
-    private final List<TokenSecurityEvent> tokenSecurityEvents = new LinkedList<TokenSecurityEvent>();
+    private final List<TokenSecurityEvent<?>> tokenSecurityEvents = new LinkedList<TokenSecurityEvent<?>>();
 
     public TokenProtectionAssertionState(Assertion assertion, boolean initialAssertionState) {
         super(assertion, initialAssertionState);
@@ -82,12 +82,14 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                 signedElementEvents.add(signedElementSecurityEvent);
             }
         } else if (securityEvent instanceof TokenSecurityEvent) {
-            TokenSecurityEvent tokenSecurityEvent = (TokenSecurityEvent) securityEvent;
+            @SuppressWarnings("unchecked")
+            TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent 
+                = (TokenSecurityEvent<? extends SecurityToken>) securityEvent;
             tokenSecurityEvents.add(tokenSecurityEvent);
         } else { //Operation
-            Iterator<TokenSecurityEvent> tokenSecurityEventIterator = tokenSecurityEvents.iterator();
+            Iterator<TokenSecurityEvent<? extends SecurityToken>> tokenSecurityEventIterator = tokenSecurityEvents.iterator();
             while (tokenSecurityEventIterator.hasNext()) {
-                TokenSecurityEvent tokenSecurityEvent = tokenSecurityEventIterator.next();
+                TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent = tokenSecurityEventIterator.next();
 
                 SecurityToken securityToken = tokenSecurityEvent.getSecurityToken();
                 while (securityToken.getKeyWrappingToken() != null) {
@@ -212,9 +214,9 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
 
         List<SecurityToken> signedSupportingTokens = new LinkedList<SecurityToken>();
         List<SignedElementSecurityEvent> signedElements = new LinkedList<SignedElementSecurityEvent>();
-        Iterator<TokenSecurityEvent> tokenSecurityEventIterator = tokenSecurityEvents.iterator();
+        Iterator<TokenSecurityEvent<? extends SecurityToken>> tokenSecurityEventIterator = tokenSecurityEvents.iterator();
         while (tokenSecurityEventIterator.hasNext()) {
-            TokenSecurityEvent tokenSecurityEvent = tokenSecurityEventIterator.next();
+            TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent = tokenSecurityEventIterator.next();
             SecurityToken supportingToken = tokenSecurityEvent.getSecurityToken();
             if (isSignedSupportingToken(supportingToken)) {
                 if (signedSupportingTokens.contains(supportingToken)) {
