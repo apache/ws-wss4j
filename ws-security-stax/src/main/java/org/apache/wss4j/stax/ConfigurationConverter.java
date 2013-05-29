@@ -407,6 +407,14 @@ public final class ConfigurationConverter {
         boolean includeSignatureToken = 
             decodeBooleanConfigValue(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, false, config);
         properties.setIncludeSignatureToken(includeSignatureToken);
+        
+        boolean enableTimestampCache = 
+            decodeBooleanConfigValue(ConfigurationConstants.ENABLE_TIMESTAMP_CACHE, true, config);
+        properties.setEnableTimestampReplayCache(enableTimestampCache);
+        
+        boolean enableNonceCache = 
+            decodeBooleanConfigValue(ConfigurationConstants.ENABLE_NONCE_CACHE, true, config);
+        properties.setEnableNonceReplayCache(enableNonceCache);
     }
     
     private static void parseNonBooleanProperties(

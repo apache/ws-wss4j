@@ -102,6 +102,8 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private boolean enableRevocation = false;
     private ReplayCache timestampReplayCache;
     private ReplayCache nonceReplayCache;
+    private boolean enableTimestampReplayCache = true;
+    private boolean enableNonceReplayCache = true;
     private boolean validateSamlSubjectConfirmation = true;
 
     public WSSSecurityProperties() {
@@ -146,6 +148,8 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.enableRevocation = wssSecurityProperties.enableRevocation;
         this.timestampReplayCache = wssSecurityProperties.timestampReplayCache;
         this.nonceReplayCache = wssSecurityProperties.nonceReplayCache;
+        this.enableTimestampReplayCache = wssSecurityProperties.enableTimestampReplayCache;
+        this.enableNonceReplayCache = wssSecurityProperties.enableNonceReplayCache;
         this.allowRSA15KeyTransportAlgorithm = wssSecurityProperties.allowRSA15KeyTransportAlgorithm;
         this.derivedKeyIterations = wssSecurityProperties.derivedKeyIterations;
         this.useDerivedKeyForMAC = wssSecurityProperties.useDerivedKeyForMAC;
@@ -706,7 +710,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      * @throws WSSecurityException 
      */
     public ReplayCache getTimestampReplayCache() throws WSSecurityException {
-        if (timestampReplayCache == null) {
+        if (enableTimestampReplayCache && timestampReplayCache == null) {
             timestampReplayCache = createCache("wss4j-timestamp-cache-");
         }
         
@@ -733,7 +737,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      * @throws WSSecurityException 
      */
     public ReplayCache getNonceReplayCache() throws WSSecurityException {
-        if (nonceReplayCache == null) {
+        if (enableNonceReplayCache && nonceReplayCache == null) {
             nonceReplayCache = createCache("wss4j-nonce-cache-");
         }
         
@@ -818,6 +822,22 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public void setIncludeSignatureToken(boolean includeSignatureToken) {
         this.includeSignatureToken = includeSignatureToken;
+    }
+
+    public boolean isEnableTimestampReplayCache() {
+        return enableTimestampReplayCache;
+    }
+
+    public void setEnableTimestampReplayCache(boolean enableTimestampReplayCache) {
+        this.enableTimestampReplayCache = enableTimestampReplayCache;
+    }
+
+    public boolean isEnableNonceReplayCache() {
+        return enableNonceReplayCache;
+    }
+
+    public void setEnableNonceReplayCache(boolean enableNonceReplayCache) {
+        this.enableNonceReplayCache = enableNonceReplayCache;
     }
     
 }

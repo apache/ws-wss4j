@@ -484,6 +484,17 @@ public final class ConfigurationConstants {
      */
     public static final String INCLUDE_SIGNATURE_TOKEN = "includeSignatureToken";
     
+    /**
+     * Whether to cache UsernameToken nonces. The default value is "true".
+     */
+    public static final String ENABLE_NONCE_CACHE = "enableNonceCache";
+    
+    /**
+     * Whether to cache Timestamp Created Strings (these are only cached in conjunction with a message 
+     * Signature). The default value is "true".
+     */
+    public static final String ENABLE_TIMESTAMP_CACHE = "ws-security.enable.timestamp.cache";
+    
     //
     // (Non-boolean) Configuration parameters for the actions/processors
     //
