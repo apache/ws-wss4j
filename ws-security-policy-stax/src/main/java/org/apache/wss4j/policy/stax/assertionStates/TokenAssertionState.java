@@ -169,7 +169,8 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
         }
     }
 
-    public abstract boolean assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken) throws WSSPolicyException, XMLSecurityException;
+    public abstract boolean assertToken(TokenSecurityEvent tokenSecurityEvent, AbstractToken abstractToken)
+        throws WSSPolicyException, XMLSecurityException;
 
     protected boolean hasDerivedKeys(SecurityToken securityToken) throws XMLSecurityException {
         if (securityToken == null) {

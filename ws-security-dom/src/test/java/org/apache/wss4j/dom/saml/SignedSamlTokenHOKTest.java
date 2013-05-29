@@ -198,6 +198,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
+        @SuppressWarnings("unchecked")
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
@@ -322,6 +323,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
+        @SuppressWarnings("unchecked")
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
