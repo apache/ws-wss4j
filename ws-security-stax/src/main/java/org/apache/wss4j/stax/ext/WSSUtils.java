@@ -32,6 +32,7 @@ import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityToken;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -431,11 +432,11 @@ public class WSSUtils extends XMLSecurityUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static TokenSecurityEvent<? extends InboundSecurityToken> createTokenSecurityEvent(
-            final InboundSecurityToken inboundSecurityToken, String correlationID) throws WSSecurityException {
+    public static TokenSecurityEvent<? extends InboundSecurityToken> 
+        createTokenSecurityEvent(final InboundSecurityToken inboundSecurityToken, String correlationID) throws WSSecurityException {
         WSSecurityTokenConstants.TokenType tokenType = inboundSecurityToken.getTokenType();
 
-        TokenSecurityEvent tokenSecurityEvent;
+        TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent;
         if (WSSecurityTokenConstants.X509V1Token.equals(tokenType) ||
                 WSSecurityTokenConstants.X509V3Token.equals(tokenType) ||
                 WSSecurityTokenConstants.X509Pkcs7Token.equals(tokenType) ||
@@ -468,9 +469,9 @@ public class WSSUtils extends XMLSecurityUtils {
         } else {
             throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN);
         }
-        tokenSecurityEvent.setSecurityToken(inboundSecurityToken);
+        ((TokenSecurityEvent<SecurityToken>)tokenSecurityEvent).setSecurityToken(inboundSecurityToken);
         tokenSecurityEvent.setCorrelationID(correlationID);
-        return tokenSecurityEvent;
+        return (TokenSecurityEvent<? extends InboundSecurityToken>)tokenSecurityEvent;
     }
 
     public static boolean pathMatches(List<QName> path1, List<QName> path2, boolean matchAnySoapNS, boolean lastElementWildCard) {

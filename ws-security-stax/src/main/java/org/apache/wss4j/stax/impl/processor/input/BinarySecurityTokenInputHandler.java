@@ -37,6 +37,7 @@ import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 import javax.xml.bind.JAXBElement;
@@ -91,7 +92,7 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
 
         wsInboundSecurityContext.registerSecurityTokenProvider(binarySecurityTokenType.getId(), securityTokenProvider);
 
-        TokenSecurityEvent tokenSecurityEvent;
+        TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent;
         //fire a tokenSecurityEvent
         if (binarySecurityTokenType.getValueType().startsWith(WSSConstants.NS_X509TOKEN_PROFILE)) {
             X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();

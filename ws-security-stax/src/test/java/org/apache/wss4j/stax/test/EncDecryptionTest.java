@@ -937,7 +937,6 @@ public class EncDecryptionTest extends AbstractTestBase {
     @Test
     public void testExceptionOnElementToEncryptNotFound() throws Exception {
 
-        ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
@@ -948,7 +947,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             try {
-                baos = doOutboundSecurity(securityProperties, sourceDocument);
+                doOutboundSecurity(securityProperties, sourceDocument);
                 Assert.fail("Exception expected");
             } catch (XMLStreamException e) {
                 org.junit.Assert.assertTrue(e.getCause() instanceof XMLSecurityException);

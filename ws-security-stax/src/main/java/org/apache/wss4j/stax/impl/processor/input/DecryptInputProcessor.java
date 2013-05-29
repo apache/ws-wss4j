@@ -53,6 +53,7 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.securityEvent.EncryptedPartSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityToken;
 
 /**
  * Processor for decryption of EncryptedData XML structures
@@ -190,7 +191,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
     protected void handleSecurityToken(InboundSecurityToken inboundSecurityToken, InboundSecurityContext inboundSecurityContext,
                                        EncryptedDataType encryptedDataType) throws XMLSecurityException {
         inboundSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_Encryption);
-        TokenSecurityEvent tokenSecurityEvent = WSSUtils.createTokenSecurityEvent(inboundSecurityToken, encryptedDataType.getId());
+        TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent = WSSUtils.createTokenSecurityEvent(inboundSecurityToken, encryptedDataType.getId());
         inboundSecurityContext.registerSecurityEvent(tokenSecurityEvent);
     }
     

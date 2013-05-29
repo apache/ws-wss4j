@@ -73,7 +73,7 @@ public class PerformanceMemoryTest extends AbstractTestBase {
 
     @DataProvider(name = "xmlsizes")
     public Object[][] getXMLSizes() throws Exception {
-        File input = genBigFile(1);
+        genBigFile(1);
         int tagCount = 0;
         File target = new File("target/performanceMemoryTest/tmp.xml");
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(new BufferedInputStream(new FileInputStream(target)));
@@ -200,7 +200,7 @@ public class PerformanceMemoryTest extends AbstractTestBase {
     //warm up.
     @BeforeMethod(groups = {"memory-in"}, dependsOnGroups = {"memory-out"})
     public void setUpIn() throws Exception {
-        File input = genBigFile(1);
+        genBigFile(1);
         doDOMInSecurity(new File("target/performanceMemoryTest/bigfile-dom.xml"));
         doStreamingInSecurity(new File("target/performanceMemoryTest/bigfile-stream.xml"));
     }

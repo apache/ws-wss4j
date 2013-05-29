@@ -35,6 +35,7 @@ import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -192,7 +193,9 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
             for (int i = 0; i < securityEventList.size(); i++) {
                 SecurityEvent securityEvent = securityEventList.get(i);
                 if (securityEvent instanceof TokenSecurityEvent) {
-                    TokenSecurityEvent tokenSecurityEvent = (TokenSecurityEvent) securityEvent;
+                    @SuppressWarnings("unchecked")
+                    TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent 
+                        = (TokenSecurityEvent<? extends SecurityToken>) securityEvent;
                     if (!tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_MainSignature)) {
                         continue;
                     }

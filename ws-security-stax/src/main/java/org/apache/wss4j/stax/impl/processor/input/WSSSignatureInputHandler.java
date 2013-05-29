@@ -40,6 +40,7 @@ import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenFactory;
 
 import java.math.BigInteger;
@@ -167,7 +168,8 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
 
             //we have to emit a TokenSecurityEvent here too since it could be an embedded token
             inboundSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_Signature);
-            TokenSecurityEvent tokenSecurityEvent = WSSUtils.createTokenSecurityEvent(inboundSecurityToken, signatureType.getId());
+            TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent 
+                = WSSUtils.createTokenSecurityEvent(inboundSecurityToken, signatureType.getId());
             inboundSecurityContext.registerSecurityEvent(tokenSecurityEvent);
 
             return inboundSecurityToken;

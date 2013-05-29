@@ -138,7 +138,7 @@ public class InboundWSSec {
                     if (securityEvent instanceof TokenSecurityEvent) {
                         @SuppressWarnings("unchecked")
                         final TokenSecurityEvent<? extends InboundSecurityToken> tokenSecurityEvent =
-                                (TokenSecurityEvent)securityEvent;
+                                (TokenSecurityEvent<? extends InboundSecurityToken>)securityEvent;
 
                         if (WSSecurityEventConstants.HttpsToken.equals(securityEvent.getSecurityEventType())) {
                             securityContextImpl.registerSecurityEvent(securityEvent);

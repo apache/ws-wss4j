@@ -365,7 +365,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
 
     private boolean containsSecurityToken(List<TokenSecurityEvent<? extends InboundSecurityToken>> supportingTokens, SecurityToken securityToken) {
         for (int i = 0; i < supportingTokens.size(); i++) {
-            TokenSecurityEvent tokenSecurityEvent = supportingTokens.get(i);
+            TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent = supportingTokens.get(i);
             if (tokenSecurityEvent.getSecurityToken() == securityToken) {
                 return true;
             }
@@ -402,21 +402,21 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
             }
         }
         for (int i = 0; i < signedEndorsingSupportingTokens.size(); i++) {
-            TokenSecurityEvent tokenSecurityEvent = signedEndorsingSupportingTokens.get(i);
+            TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent = signedEndorsingSupportingTokens.get(i);
             List<InboundSecurityToken> signingSecurityTokens = getSigningToken(tokenSecurityEvent, securityEventDeque);
             if (signingSecurityTokens.size() == 1) {
                 return signingSecurityTokens.get(0);
             }
         }
         for (int i = 0; i < signedEncryptedSupportingTokens.size(); i++) {
-            TokenSecurityEvent tokenSecurityEvent = signedEncryptedSupportingTokens.get(i);
+            TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent = signedEncryptedSupportingTokens.get(i);
             List<InboundSecurityToken> signingSecurityTokens = getSigningToken(tokenSecurityEvent, securityEventDeque);
             if (signingSecurityTokens.size() == 1) {
                 return signingSecurityTokens.get(0);
             }
         }
         for (int i = 0; i < signedEndorsingEncryptedSupportingTokens.size(); i++) {
-            TokenSecurityEvent tokenSecurityEvent = signedEndorsingEncryptedSupportingTokens.get(i);
+            TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent = signedEndorsingEncryptedSupportingTokens.get(i);
             List<InboundSecurityToken> signingSecurityTokens = getSigningToken(tokenSecurityEvent, securityEventDeque);
             if (signingSecurityTokens.size() == 1) {
                 return signingSecurityTokens.get(0);
@@ -425,7 +425,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
         return null;
     }
 
-    private List<InboundSecurityToken> getSigningToken(TokenSecurityEvent tokenSecurityEvent, Deque<SecurityEvent> securityEventDeque) throws XMLSecurityException {
+    private List<InboundSecurityToken> getSigningToken(TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent, Deque<SecurityEvent> securityEventDeque) throws XMLSecurityException {
         List<InboundSecurityToken> signingSecurityTokens = new ArrayList<InboundSecurityToken>();
 
         for (Iterator<SecurityEvent> iterator = securityEventDeque.iterator(); iterator.hasNext(); ) {
@@ -458,7 +458,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
         tokenSecurityEvent.getSecurityToken().addTokenUsage(tokenUsage);
     }
 
-    private List<InboundSecurityToken> isSignedToken(TokenSecurityEvent tokenSecurityEvent,
+    private List<InboundSecurityToken> isSignedToken(TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent,
                                               Deque<SecurityEvent> securityEventDeque,
                                               HttpsTokenSecurityEvent httpsTokenSecurityEvent) throws XMLSecurityException {
         List<InboundSecurityToken> securityTokenList = new ArrayList<InboundSecurityToken>();
@@ -482,7 +482,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
         return securityTokenList;
     }
 
-    private List<InboundSecurityToken> isEncryptedToken(TokenSecurityEvent tokenSecurityEvent,
+    private List<InboundSecurityToken> isEncryptedToken(TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent,
                                                  Deque<SecurityEvent> securityEventDeque,
                                                  HttpsTokenSecurityEvent httpsTokenSecurityEvent) throws XMLSecurityException {
 
@@ -507,7 +507,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
         return securityTokenList;
     }
 
-    private boolean signsElement(TokenSecurityEvent tokenSecurityEvent, List<QName> elementPath,
+    private boolean signsElement(TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent, List<QName> elementPath,
                                  Deque<SecurityEvent> securityEventDeque) throws XMLSecurityException {
         for (Iterator<SecurityEvent> iterator = securityEventDeque.iterator(); iterator.hasNext(); ) {
             SecurityEvent securityEvent = iterator.next();
@@ -523,7 +523,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
         return false;
     }
 
-    private boolean encryptsElement(TokenSecurityEvent tokenSecurityEvent, List<QName> elementPath,
+    private boolean encryptsElement(TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent, List<QName> elementPath,
                                     Deque<SecurityEvent> securityEventDeque) throws XMLSecurityException {
         for (Iterator<SecurityEvent> iterator = securityEventDeque.iterator(); iterator.hasNext(); ) {
             SecurityEvent securityEvent = iterator.next();
