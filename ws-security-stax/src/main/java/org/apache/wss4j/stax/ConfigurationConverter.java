@@ -100,6 +100,10 @@ public final class ConfigurationConverter {
                 actions.add(WSSConstants.TIMESTAMP);
             } else if (single[i].equals(ConfigurationConstants.USERNAME_TOKEN_SIGNATURE)) {
                 actions.add(WSSConstants.USERNAMETOKEN_SIGNED);
+            } else if (single[i].equals(ConfigurationConstants.SIGNATURE_DERIVED)) {
+                actions.add(WSSConstants.SIGNATURE_WITH_DERIVED_KEY);
+            } else if (single[i].equals(ConfigurationConstants.ENCRYPT_DERIVED)) {
+                actions.add(WSSConstants.ENCRYPT_WITH_DERIVED_KEY);
             }
         }
         

@@ -84,6 +84,18 @@ public final class ConfigurationConstants {
      */
     public static final String TIMESTAMP = "Timestamp";
     
+    /**
+     * Perform a Signature action with derived keys. The signature specific parameters define how
+     * to sign, which keys to use, and so on.
+     */
+    public static final String SIGNATURE_DERIVED = "SignatureDerived";
+
+    /**
+     * Perform an Encryption action with derived keys. The encryption specific parameters define how 
+     * to encrypt, which keys to use, and so on.
+     */
+    public static final String ENCRYPT_DERIVED = "EncryptDerived";
+    
     //
     // User properties
     //
