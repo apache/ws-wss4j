@@ -101,7 +101,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <targetJdk>1.6</targetJdk>
-        <bcprov.version>1.47</bcprov.version>
     </properties>
 
     <modules>
@@ -293,20 +292,6 @@
     </build>
 
     <profiles>
-        <profile>
-            <id>jdk16</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-                <jdk>[1.5,)</jdk>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcprov-jdk15on</artifactId>
-                    <version>${bcprov.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
         <profile>
             <id>fastinstall</id>
             <properties>
