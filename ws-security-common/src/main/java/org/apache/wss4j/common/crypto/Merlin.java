@@ -683,7 +683,10 @@ public class Merlin extends CryptoBase {
             }
             String password = getPassword(identifier, callbackHandler);
             if (password == null && privatePasswordSet) {
-                password = properties.getProperty(KEYSTORE_PRIVATE_PASSWORD);
+                password = properties.getProperty(PREFIX + KEYSTORE_PRIVATE_PASSWORD);
+                if (password == null) {
+                    password = properties.getProperty(OLD_PREFIX + KEYSTORE_PRIVATE_PASSWORD);
+                }
                 if (password != null) {
                     password = password.trim();
                 }
@@ -734,7 +737,10 @@ public class Merlin extends CryptoBase {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", msg);
             }
             if (password == null && privatePasswordSet) {
-                password = properties.getProperty(KEYSTORE_PRIVATE_PASSWORD);
+                password = properties.getProperty(PREFIX + KEYSTORE_PRIVATE_PASSWORD);
+                if (password == null) {
+                    password = properties.getProperty(OLD_PREFIX + KEYSTORE_PRIVATE_PASSWORD);
+                }
                 if (password != null) {
                     password = password.trim();
                 }
