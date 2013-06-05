@@ -231,10 +231,6 @@
                 </exclusion>
                 <exclusion>
                     <groupId>org.apache.directory.server</groupId>
-                    <artifactId>apacheds-i18n</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.directory.server</groupId>
                     <artifactId>apacheds-core-jndi</artifactId>
                 </exclusion>
                 <exclusion>

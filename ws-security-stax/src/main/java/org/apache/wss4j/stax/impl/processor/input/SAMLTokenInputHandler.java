@@ -614,6 +614,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                 InputProcessorChain inputProcessorChain, SamlAssertionWrapper samlAssertionWrapper,
                 InboundSecurityToken subjectSecurityToken) throws WSSecurityException {
 
+            boolean methodNotSatisfied = false;
             try {
                 SecurityToken httpsSecurityToken = getHttpsSecurityToken(inputProcessorChain);
 
@@ -684,6 +685,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                                 }
                             }
                         }
+                        methodNotSatisfied = true;
                     } else if (OpenSAMLUtil.isMethodSenderVouches(confirmationMethod)) {
                         /**
                          * Check the sender-vouches requirements against the received assertion. The SAML
@@ -714,13 +716,16 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                                         samlTokenSignedElementSecurityEvent.getSecurityToken()) {
                             return;
                         }
+                        methodNotSatisfied = true;
                     }
                 }
             } catch (XMLSecurityException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION,
+            if (methodNotSatisfied) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION,
                     "empty", "SAML proof-of-possession of the private/secret key failed");
+            }
         }
 
         private SecurityToken getHttpsSecurityToken(InputProcessorChain inputProcessorChain) throws XMLSecurityException {
