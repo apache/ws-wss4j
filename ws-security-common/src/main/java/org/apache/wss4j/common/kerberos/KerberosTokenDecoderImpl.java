@@ -18,6 +18,9 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class KerberosTokenDecoderImpl implements KerberosTokenDecoder {
+    
+    private static org.slf4j.Logger log =
+        org.slf4j.LoggerFactory.getLogger(KerberosTokenDecoderImpl.class);
 
     private static final String KERBEROS_OID = "1.2.840.113554.1.2.2";
 
@@ -64,7 +67,10 @@ public class KerberosTokenDecoderImpl implements KerberosTokenDecoder {
         if (!decoded) {
             decodeServiceTicket();
         }
-        return encTicketPart.getSessionKey().getKeyValue();
+        if (encTicketPart != null && encTicketPart.getSessionKey() != null) {
+            return encTicketPart.getSessionKey().getKeyValue();
+        }
+        return null;
     }
 
     /**
@@ -85,7 +91,7 @@ public class KerberosTokenDecoderImpl implements KerberosTokenDecoder {
             parseServiceTicket(serviceTicket);
             decoded = true;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.debug("Error retrieving a service ticket", e);
         }
     }
 
