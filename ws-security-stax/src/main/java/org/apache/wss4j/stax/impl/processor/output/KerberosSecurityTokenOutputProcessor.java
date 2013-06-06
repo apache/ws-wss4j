@@ -52,48 +52,54 @@ public class KerberosSecurityTokenOutputProcessor extends AbstractOutputProcesso
 
             XMLSecurityConstants.Action action = getAction();
 
-            final KerberosClientSecurityToken kerberosClientSecurityToken =
-                    new KerberosClientSecurityToken(
-                            ((WSSSecurityProperties) getSecurityProperties()).getCallbackHandler(),
-                            bstId
-                    );
-
-
-            final SecurityTokenProvider<OutboundSecurityToken> kerberosSecurityTokenProvider =
-                    new SecurityTokenProvider<OutboundSecurityToken>() {
-
-                @Override
-                public OutboundSecurityToken getSecurityToken() throws WSSecurityException {
-                    return kerberosClientSecurityToken;
-                }
-
-                @Override
-                public String getId() {
-                    return bstId;
-                }
-            };
-
-            if (WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN.equals(action)) {
-                outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, bstId);
-                FinalKerberosSecurityTokenOutputProcessor finalKerberosSecurityTokenOutputProcessor =
-                        new FinalKerberosSecurityTokenOutputProcessor(kerberosClientSecurityToken);
-                finalKerberosSecurityTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
-                finalKerberosSecurityTokenOutputProcessor.setAction(getAction());
-                finalKerberosSecurityTokenOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
-                finalKerberosSecurityTokenOutputProcessor.init(outputProcessorChain);
-                kerberosClientSecurityToken.setProcessor(finalKerberosSecurityTokenOutputProcessor);
-            } else if (WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN.equals(action)) {
-                outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, bstId);
-                FinalKerberosSecurityTokenOutputProcessor finalKerberosSecurityTokenOutputProcessor =
-                        new FinalKerberosSecurityTokenOutputProcessor(kerberosClientSecurityToken);
-                finalKerberosSecurityTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
-                finalKerberosSecurityTokenOutputProcessor.setAction(getAction());
-                finalKerberosSecurityTokenOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
-                finalKerberosSecurityTokenOutputProcessor.init(outputProcessorChain);
-                kerberosClientSecurityToken.setProcessor(finalKerberosSecurityTokenOutputProcessor);
+            String tokenId = 
+                outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_BST);
+            KerberosClientSecurityToken kerberosToken = null;
+            if (tokenId != null) {
+                SecurityTokenProvider<OutboundSecurityToken> securityTokenProvider = 
+                    outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
+                kerberosToken = (KerberosClientSecurityToken)securityTokenProvider.getSecurityToken();
+            }
+            if (kerberosToken == null) {
+                final KerberosClientSecurityToken kerberosClientSecurityToken =
+                        new KerberosClientSecurityToken(
+                                ((WSSSecurityProperties) getSecurityProperties()).getCallbackHandler(),
+                                bstId
+                        );
+    
+                final SecurityTokenProvider<OutboundSecurityToken> kerberosSecurityTokenProvider =
+                        new SecurityTokenProvider<OutboundSecurityToken>() {
+    
+                    @Override
+                    public OutboundSecurityToken getSecurityToken() throws WSSecurityException {
+                        return kerberosClientSecurityToken;
+                    }
+    
+                    @Override
+                    public String getId() {
+                        return bstId;
+                    }
+                };
+                
+                outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(bstId, kerberosSecurityTokenProvider);
+                kerberosToken = kerberosClientSecurityToken;
             }
 
-            outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(bstId, kerberosSecurityTokenProvider);
+            FinalKerberosSecurityTokenOutputProcessor finalKerberosSecurityTokenOutputProcessor =
+                new FinalKerberosSecurityTokenOutputProcessor(kerberosToken);
+            finalKerberosSecurityTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
+            finalKerberosSecurityTokenOutputProcessor.setAction(getAction());
+        
+            if (WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN.equals(action)) {
+                outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, bstId);
+                finalKerberosSecurityTokenOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
+            } else if (WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN.equals(action)) {
+                outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, bstId);
+                finalKerberosSecurityTokenOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
+            }
+            finalKerberosSecurityTokenOutputProcessor.init(outputProcessorChain);
+            kerberosToken.setProcessor(finalKerberosSecurityTokenOutputProcessor);
+
 
         } finally {
             outputProcessorChain.removeProcessor(this);

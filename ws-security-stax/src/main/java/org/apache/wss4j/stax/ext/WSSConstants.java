@@ -266,6 +266,7 @@ public class WSSConstants extends XMLSecurityConstants {
 
     public static final String NS_WSS_ENC_KEY_VALUE_TYPE = NS11_SOAPMESSAGE_SECURITY + "#EncryptedKey";
 
+    public static final String PROP_USE_THIS_TOKEN_ID_FOR_BST = "PROP_USE_THIS_TOKEN_ID_FOR_BST";
     public static final String PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY = "PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY";
     public static final String PROP_USE_THIS_TOKEN_ID_FOR_SECURITYCONTEXTTOKEN = "PROP_USE_THIS_TOKEN_ID_FOR_SECURITYCONTEXTTOKEN";
 
@@ -280,6 +281,7 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final Action SAML_TOKEN_UNSIGNED = new Action(ConfigurationConstants.SAML_TOKEN_UNSIGNED);
     public static final Action SIGNATURE_WITH_KERBEROS_TOKEN = new Action("SignatureWithKerberosToken");
     public static final Action ENCRYPT_WITH_KERBEROS_TOKEN = new Action("EncryptWithKerberosToken");
+    public static final Action KERBEROS_TOKEN = new Action("KerberosToken");
 
     public static final AlgorithmUsage Comp_Key = new AlgorithmUsage("Comp_Key");
     public static final AlgorithmUsage Enc_KD = new AlgorithmUsage("Enc_KD");

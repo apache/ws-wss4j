@@ -21,6 +21,7 @@ package org.apache.wss4j.stax.ext;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.impl.processor.output.*;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.ext.OutboundSecurityContext;
 import org.apache.xml.security.stax.ext.OutputProcessor;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.impl.DocumentContextImpl;
@@ -86,7 +87,10 @@ public class OutboundWSSec {
     public XMLStreamWriter processOutMessage(
             OutputStream outputStream, String encoding, List<SecurityEvent> requestSecurityEvents,
             SecurityEventListener securityEventListener) throws WSSecurityException {
-        return processOutMessage((Object) outputStream, encoding, requestSecurityEvents, securityEventListener);
+        final OutboundSecurityContextImpl outboundSecurityContext = new OutboundSecurityContextImpl();
+        outboundSecurityContext.putList(SecurityEvent.class, requestSecurityEvents);
+        outboundSecurityContext.addSecurityEventListener(securityEventListener);
+        return processOutMessage((Object) outputStream, encoding, outboundSecurityContext);
     }
 
     /**
@@ -100,16 +104,28 @@ public class OutboundWSSec {
     public XMLStreamWriter processOutMessage(
             XMLStreamWriter xmlStreamWriter, String encoding, List<SecurityEvent> requestSecurityEvents,
             SecurityEventListener securityEventListener) throws WSSecurityException {
-        return processOutMessage((Object) xmlStreamWriter, encoding, requestSecurityEvents, securityEventListener);
-    }
-
-    private XMLStreamWriter processOutMessage(
-            Object output, String encoding, List<SecurityEvent> requestSecurityEvents,
-            SecurityEventListener securityEventListener) throws WSSecurityException {
-
         final OutboundSecurityContextImpl outboundSecurityContext = new OutboundSecurityContextImpl();
         outboundSecurityContext.putList(SecurityEvent.class, requestSecurityEvents);
         outboundSecurityContext.addSecurityEventListener(securityEventListener);
+        return processOutMessage((Object) xmlStreamWriter, encoding, outboundSecurityContext);
+    }
+    
+    /**
+     * This method is the entry point for the incoming security-engine.
+     * Hand over the original XMLStreamWriter and use the returned one for further processing
+     *
+     * @param xmlStreamWriter The original outputStream
+     * @return A new XMLStreamWriter which does transparently the security processing.
+     * @throws WSSecurityException thrown when a Security failure occurs
+     */
+    public XMLStreamWriter processOutMessage(
+            XMLStreamWriter xmlStreamWriter, String encoding, OutboundSecurityContext outbounSecurityContext) throws WSSecurityException {
+        return processOutMessage((Object) xmlStreamWriter, encoding, outbounSecurityContext);
+    }
+
+    public XMLStreamWriter processOutMessage(
+            Object output, String encoding, OutboundSecurityContext outboundSecurityContext
+        ) throws WSSecurityException {
 
         final DocumentContextImpl documentContext = new DocumentContextImpl();
         documentContext.setEncoding(encoding);
@@ -223,6 +239,10 @@ public class OutboundWSSec {
 
                     final EncryptOutputProcessor encryptOutputProcessor = new EncryptOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, encryptOutputProcessor, action);
+                } else if (WSSConstants.KERBEROS_TOKEN.equals(action)) {
+                    final KerberosSecurityTokenOutputProcessor kerberosTokenOutputProcessor =
+                        new KerberosSecurityTokenOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, kerberosTokenOutputProcessor, action);
                 }
             }
             

@@ -45,6 +45,12 @@ public class KerberosClientSecurityToken extends GenericOutboundSecurityToken {
     private Key secretKey;
     private byte[] ticket;
 
+    public KerberosClientSecurityToken(byte[] ticket, Key secretKey, String id) {
+        super(id, WSSecurityTokenConstants.KerberosToken);
+        this.ticket = ticket;
+        this.secretKey = secretKey;
+    }
+    
     public KerberosClientSecurityToken(CallbackHandler callbackHandler, String id) {
         super(id, WSSecurityTokenConstants.KerberosToken);
         this.callbackHandler = callbackHandler;

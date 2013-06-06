@@ -104,6 +104,12 @@ public final class ConfigurationConverter {
                 actions.add(WSSConstants.SIGNATURE_WITH_DERIVED_KEY);
             } else if (single[i].equals(ConfigurationConstants.ENCRYPT_DERIVED)) {
                 actions.add(WSSConstants.ENCRYPT_WITH_DERIVED_KEY);
+            } else if (single[i].equals(ConfigurationConstants.SIGNATURE_WITH_KERBEROS_TOKEN)) {
+                actions.add(WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN);
+            } else if (single[i].equals(ConfigurationConstants.ENCRYPT_WITH_KERBEROS_TOKEN)) {
+                actions.add(WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN);
+            } else if (single[i].equals(ConfigurationConstants.KERBEROS_TOKEN)) {
+                actions.add(WSSConstants.KERBEROS_TOKEN);
             }
         }
         

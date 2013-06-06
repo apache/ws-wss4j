@@ -96,6 +96,23 @@ public final class ConfigurationConstants {
      */
     public static final String ENCRYPT_DERIVED = "EncryptDerived";
     
+    /**
+     * Perform a Signature action with a kerberos token. The signature specific parameters define how
+     * to sign, which keys to use, and so on.
+     */
+    public static final String SIGNATURE_WITH_KERBEROS_TOKEN = "SignatureWithKerberosToken";
+    
+    /**
+     * Perform a Encryption action with a kerberos token. The signature specific parameters define how
+     * to encrypt, which keys to use, and so on.
+     */
+    public static final String ENCRYPT_WITH_KERBEROS_TOKEN = "EncryptWithKerberosToken";
+    
+    /**
+     * Add a kerberos token. 
+     */
+    public static final String KERBEROS_TOKEN = "KerberosToken";
+    
     //
     // User properties
     //
