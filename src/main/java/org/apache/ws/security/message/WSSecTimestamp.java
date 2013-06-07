@@ -69,7 +69,8 @@ public class WSSecTimestamp extends WSSecBase {
      * @param doc The SOAP envelope as W3C document
      */
     public void prepare(Document doc) {
-        ts = new Timestamp(getWsConfig().isPrecisionInMilliSeconds(), doc, timeToLive);
+        ts = new Timestamp(getWsConfig().isPrecisionInMilliSeconds(), doc, 
+                           getWsConfig().getCurrentTime(), timeToLive);
         String tsId = getWsConfig().getIdAllocator().createId("TS-", ts);
         ts.setID(tsId);
     }

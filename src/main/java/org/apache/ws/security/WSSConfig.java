@@ -34,6 +34,8 @@ import org.apache.ws.security.action.Action;
 import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.util.Loader;
 import org.apache.ws.security.util.UUIDGenerator;
+import org.apache.ws.security.util.WSCurrentTimeSource;
+import org.apache.ws.security.util.WSTimeSource;
 import org.apache.ws.security.validate.Validator;
 import org.apache.xml.security.utils.XMLUtils;
 
@@ -298,6 +300,11 @@ public class WSSConfig {
      * See https://issues.apache.org/jira/browse/WSS-239
      */
     protected boolean passwordsAreEncoded = false;
+    
+    /**
+     * This allows the user to specify a different time than that of the current System time.
+     */
+    private WSTimeSource currentTime;
     
     /**
      * The default wsu:Id allocator is a simple "start at 1 and increment up"
@@ -998,4 +1005,14 @@ public class WSSConfig {
         this.utFutureTTL = utFutureTTL;
     }
     
+    public WSTimeSource getCurrentTime() {
+        if (currentTime != null) {
+            return currentTime;
+        }
+        return new WSCurrentTimeSource();
+    }
+
+    public void setCurrentTime(WSTimeSource currentTime) {
+        this.currentTime = currentTime;
+    }
 }

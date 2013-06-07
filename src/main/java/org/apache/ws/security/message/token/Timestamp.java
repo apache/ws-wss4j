@@ -23,7 +23,9 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.DOM2Writer;
 import org.apache.ws.security.util.DateUtil;
+import org.apache.ws.security.util.WSCurrentTimeSource;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.util.WSTimeSource;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -179,6 +181,17 @@ public class Timestamp {
      * @param ttl the time to live (validity of the security semantics) in seconds
      */
     public Timestamp(boolean milliseconds, Document doc, int ttl) {
+        this(milliseconds, doc, new WSCurrentTimeSource(), ttl);
+    }
+    
+    /**
+     * Constructs a <code>Timestamp</code> object according
+     * to the defined parameters.
+     *
+     * @param doc the SOAP envelope as <code>Document</code>
+     * @param ttl the time to live (validity of the security semantics) in seconds
+     */
+    public Timestamp(boolean milliseconds, Document doc, WSTimeSource timeSource, int ttl) {
 
         customElements = new ArrayList<Element>();
         element = 
@@ -197,11 +210,11 @@ public class Timestamp {
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
-        createdDate = new Date();
+        createdDate = timeSource.now();
         elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
         element.appendChild(elementCreated);
         if (ttl != 0) {
-            expiresDate = new Date();
+            expiresDate = timeSource.now();
             expiresDate.setTime(createdDate.getTime() + ((long)ttl * 1000L));
 
             Element elementExpires =

@@ -27,8 +27,11 @@ import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.util.WSTimeSource;
+import org.apache.ws.security.util.XMLUtils;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
 import org.apache.ws.security.validate.NoOpValidator;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -720,6 +723,51 @@ public class TimestampTest extends org.junit.Assert {
         // Now it should pass...
         wssConfig.setWsiBSPCompliant(false);
         verify(doc, wssConfig);
+    }
+    
+    /**
+     * This is a test to create a "Spoofed" Timestamp (see WSS-441)
+     */
+    @org.junit.Test
+    public void testSpoofedTimestamp() throws Exception {
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        WSSecTimestamp timestamp = new WSSecTimestamp();
+        timestamp.setTimeToLive(300);
+        
+        WSSConfig config = WSSConfig.getNewInstance();
+        WSTimeSource spoofedTimeSource = new WSTimeSource() {
+
+            public Date now() {
+                Date currentTime = new Date();
+                currentTime.setTime(currentTime.getTime() - (500L * 1000L));
+                return currentTime;
+            }
+            
+        };
+        config.setCurrentTime(spoofedTimeSource);
+        
+        timestamp.setWsConfig(config);
+        Document createdDoc = timestamp.build(doc, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(createdDoc);
+            LOG.debug(outputString);
+        }
+        
+        //
+        // Do some processing
+        //
+        try {
+            verify(createdDoc, WSSConfig.getNewInstance());
+            fail("Expected failure on an expired timestamp");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.MESSAGE_EXPIRED); 
+        }
     }
     
     /**
