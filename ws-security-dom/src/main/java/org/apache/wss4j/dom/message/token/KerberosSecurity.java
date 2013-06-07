@@ -19,17 +19,21 @@
 
 package org.apache.wss4j.dom.message.token;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.Set;
 
 import javax.crypto.SecretKey;
 import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.kerberos.KerberosTicket;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
 import org.apache.wss4j.common.kerberos.KerberosClientAction;
+import org.apache.wss4j.common.kerberos.KerberosContextAndServiceNameCallback;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
@@ -95,6 +99,37 @@ public class KerberosSecurity extends BinarySecurity {
             return true;
         }
         return false;
+    }
+    
+    /**
+     * Retrieve a service ticket from a KDC using the Kerberos JAAS module, and set it in this
+     * BinarySecurityToken.
+     * @param callbackHandler a CallbackHandler instance to retrieve a password (optional),
+     * JAAS Login Module name (required) + service name (required)
+     * @throws WSSecurityException
+     */
+    public void retrieveServiceTicket(
+        CallbackHandler callbackHandler
+    ) throws WSSecurityException {
+        KerberosContextAndServiceNameCallback contextAndServiceNameCallback = new KerberosContextAndServiceNameCallback();
+        try {
+            callbackHandler.handle(new Callback[]{contextAndServiceNameCallback});
+        } catch (IOException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        } catch (UnsupportedCallbackException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        } 
+
+        String jaasLoginModuleName = contextAndServiceNameCallback.getContextName();
+        if (jaasLoginModuleName == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "kerberosCallbackContextNameNotSupplied");
+        }
+        String serviceName = contextAndServiceNameCallback.getServiceName();
+        if (serviceName == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "kerberosCallbackServiceNameNotSupplied");
+        }
+        
+        retrieveServiceTicket(jaasLoginModuleName, callbackHandler, serviceName);
     }
 
     /**
