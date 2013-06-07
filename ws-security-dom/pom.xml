@@ -29,10 +29,27 @@
     </parent>
     <groupId>org.apache.wss4j</groupId>
     <artifactId>wss4j-ws-security-dom</artifactId>
-    <packaging>bundle</packaging>
     <name>Apache WSS4J DOM WS-Security</name>
     <version>2.0-SNAPSHOT</version>
     
+    <properties>
+        <wss4j.osgi.dynamic.import>
+            org.bouncycastle.jce.provider
+        </wss4j.osgi.dynamic.import>
+                        <!-- Import-Package>
+                              !org.apache.wss4j.dom.*,
+                              javax.xml.crypto.*,
+                              org.slf4j.*;version="[1.7,2)",
+                              org.apache.xml.security.*;version="[2.0.0,3]",
+                              org.apache.wss4j.common.*;version="[2.0,3)",
+                              org.bouncycastle.*;resolution:=optional,
+                              org.apache.jcp.xml.dsig.internal.*,
+                              org.opensaml.*;resolution:=optional;version="[2.5.0,3)",
+                              *;resolution:=optional
+                        </Import-Package-->
+        
+    </properties>
+        
     <build>
         <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
         <testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
@@ -66,41 +83,6 @@
         </testResources>
 
         <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.3.4</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Implementation-Title>Apache WSS4J DOM WS-Security</Implementation-Title>
-                        <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
-                        <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
-                        <Implementation-Version>${project.version}</Implementation-Version>
-                        <Specification-Title>Apache WSS4J DOM WS-Security</Specification-Title>
-                        <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
-                        <Specification-Version>${project.version}</Specification-Version>
-
-                        <Export-Package>
-                              org.apache.wss4j.dom.*;version="${project.version}"
-                        </Export-Package>
-                        <Import-Package>
-                              !org.apache.wss4j.dom.*,
-                              javax.xml.crypto.*,
-                              org.slf4j.*;version="[1.7,2)",
-                              org.apache.xml.security.*;version="[2.0.0,3]",
-                              org.apache.wss4j.common.*;version="[2.0,3)",
-                              org.bouncycastle.*;resolution:=optional,
-                              org.apache.jcp.xml.dsig.internal.*,
-                              org.opensaml.*;resolution:=optional;version="[2.5.0,3)",
-                              *;resolution:=optional
-                        </Import-Package>
-                        <DynamicImport-Package>
-                              org.bouncycastle.jce.provider
-                        </DynamicImport-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>

@@ -29,9 +29,29 @@
     </parent>
     <groupId>org.apache.wss4j</groupId>
     <artifactId>wss4j-ws-security-common</artifactId>
-    <packaging>bundle</packaging>
     <name>Apache WSS4J WS-Security Common</name>
     <version>2.0-SNAPSHOT</version>
+    
+    <properties>
+        <!-- 
+        <wss4j.osgi.import>
+                              !org.apache.wss4j.common.*,
+                              javax.xml.crypto.*,
+                              org.slf4j.*;version="[1.7,2)",
+                              org.apache.xml.security.*;version="[2.0.0,3)",
+                              org.bouncycastle.*;resolution:=optional,
+                              org.apache.jcp.xml.dsig.internal.*,
+                              org.opensaml.*;resolution:=optional;version="[2.5.0,3)",
+                              net.sf.ehcache.*;resolution:=optional;version="2.5, 3.0.0)",
+                              *;resolution:=optional
+        </wss4j.osgi.import>
+                        <DynamicImport-Package>
+                              org.bouncycastle.jce.provider,
+                              org.apache.wss4j.components.crypto,
+                              org.apache.wss4j.saml
+                        </DynamicImport-Package>
+       -->
+    </properties>
     
     <build>
         <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
@@ -66,43 +86,6 @@
         </testResources>
 
         <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.3.4</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Implementation-Title>Apache WSS4J WS-Security Common</Implementation-Title>
-                        <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
-                        <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
-                        <Implementation-Version>${project.version}</Implementation-Version>
-                        <Specification-Title>Apache WSS4J WS-Security Common</Specification-Title>
-                        <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
-                        <Specification-Version>${project.version}</Specification-Version>
-
-                        <Export-Package>
-                              org.apache.wss4j.common.*;version="${project.version}"
-                        </Export-Package>
-                        <Import-Package>
-                              !org.apache.wss4j.common.*,
-                              javax.xml.crypto.*,
-                              org.slf4j.*;version="[1.7,2)",
-                              org.apache.xml.security.*;version="[2.0.0,3)",
-                              org.bouncycastle.*;resolution:=optional,
-                              org.apache.jcp.xml.dsig.internal.*,
-                              org.opensaml.*;resolution:=optional;version="[2.5.0,3)",
-                              net.sf.ehcache.*;resolution:=optional;version="2.5, 3.0.0)",
-                              *;resolution:=optional
-                        </Import-Package>
-                        <DynamicImport-Package>
-                              org.bouncycastle.jce.provider,
-                              org.apache.wss4j.components.crypto,
-                              org.apache.wss4j.saml
-                        </DynamicImport-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -224,6 +207,7 @@
             <groupId>org.apache.directory.server</groupId>
             <artifactId>apacheds-kerberos-shared</artifactId>
             <version>1.5.7</version>
+            <optional>true</optional>
             <exclusions>
                 <exclusion>
                     <groupId>bouncycastle</groupId>
@@ -291,6 +275,7 @@
             <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache-core</artifactId>
             <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
