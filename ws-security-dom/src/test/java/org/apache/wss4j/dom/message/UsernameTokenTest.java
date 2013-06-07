@@ -31,6 +31,7 @@ import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
@@ -1060,6 +1061,48 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             LOG.debug(outputString);
         }
     }
+    
+    /**
+     * This is a test to create a "Spoofed" UsernameToken (see WSS-441)
+     */
+    @org.junit.Test
+    public void testSpoofedUsernameToken() throws Exception {
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setUserInfo("wernerd", "verySecret");
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        WSSConfig config = WSSConfig.getNewInstance();
+        WSTimeSource spoofedTimeSource = new WSTimeSource() {
+
+            public Date now() {
+                Date currentTime = new Date();
+                currentTime.setTime(currentTime.getTime() - (500L * 1000L));
+                return currentTime;
+            }
+            
+        };
+        config.setCurrentTime(spoofedTimeSource);
+        
+        builder.setWsConfig(config);
+        Document signedDoc = builder.build(doc, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        
+        try {
+            WSSecurityEngine secEngine = new WSSecurityEngine();
+            secEngine.processSecurityHeader(doc, null, callbackHandler, null);
+            fail("The UsernameToken validation should have failed");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
+        }  
+    }
+
     
     private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
         return verify(doc, false);

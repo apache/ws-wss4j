@@ -169,7 +169,8 @@ public class WSSecUsernameToken extends WSSecBase {
      * @param doc The SOAP envelope as W3C document
      */
     public void prepare(Document doc) {
-        ut = new UsernameToken(getWsConfig().isPrecisionInMilliSeconds(), doc, passwordType);
+        ut = new UsernameToken(getWsConfig().isPrecisionInMilliSeconds(), doc, 
+                               getWsConfig().getCurrentTime(), passwordType);
         ut.setPasswordsAreEncoded(passwordsAreEncoded);
         ut.setName(user);
         if (useDerivedKey) {
@@ -182,7 +183,7 @@ public class WSSecUsernameToken extends WSSecBase {
             ut.addNonce(doc);
         }
         if (created) {
-            ut.addCreated(getWsConfig().isPrecisionInMilliSeconds(), doc);
+            ut.addCreated(getWsConfig().isPrecisionInMilliSeconds(), getWsConfig().getCurrentTime(), doc);
         }
         ut.setID(getWsConfig().getIdAllocator().createId("UsernameToken-", ut));
     }

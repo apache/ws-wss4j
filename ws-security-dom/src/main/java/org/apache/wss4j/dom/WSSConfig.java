@@ -32,6 +32,8 @@ import javax.xml.namespace.QName;
 import org.apache.wss4j.dom.action.Action;
 import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.WSCurrentTimeSource;
+import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.dom.processor.Processor;
 import org.apache.wss4j.dom.validate.Validator;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
@@ -310,6 +312,11 @@ public class WSSConfig {
      * (sender-vouches or holder-of-key). The default is true.
      */
     private boolean validateSamlSubjectConfirmation = true;
+    
+    /**
+     * This allows the user to specify a different time than that of the current System time.
+     */
+    private WSTimeSource currentTime;
     
     /**
      * The default wsu:Id allocator is a simple "start at 1 and increment up"
@@ -764,4 +771,14 @@ public class WSSConfig {
         this.validateSamlSubjectConfirmation = validateSamlSubjectConfirmation;
     }
     
+    public WSTimeSource getCurrentTime() {
+        if (currentTime != null) {
+            return currentTime;
+        }
+        return new WSCurrentTimeSource();
+    }
+
+    public void setCurrentTime(WSTimeSource currentTime) {
+        this.currentTime = currentTime;
+    }
 }

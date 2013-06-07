@@ -40,6 +40,8 @@ import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.common.util.UsernameTokenUtil;
+import org.apache.wss4j.common.util.WSCurrentTimeSource;
+import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
@@ -249,6 +251,10 @@ public class UsernameToken {
      *               password required
      */
     public UsernameToken(boolean milliseconds, Document doc, String pwType) {
+        this(milliseconds, doc, new WSCurrentTimeSource(), pwType);
+    }
+    
+    public UsernameToken(boolean milliseconds, Document doc, WSTimeSource timeSource, String pwType) {
         element = 
             doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.USERNAME_TOKEN_LN);
 
@@ -266,7 +272,7 @@ public class UsernameToken {
             passwordType = pwType;
             if (passwordType.equals(WSConstants.PASSWORD_DIGEST)) {
                 addNonce(doc);
-                addCreated(milliseconds, doc);
+                addCreated(milliseconds, timeSource, doc);
             } else {
                 hashed = false;
             }
@@ -313,6 +319,13 @@ public class UsernameToken {
      * Creates and adds a Created element to this UsernameToken
      */
     public void addCreated(boolean milliseconds, Document doc) {
+        addCreated(milliseconds, new WSCurrentTimeSource(), doc);
+    }
+    
+    /**
+     * Creates and adds a Created element to this UsernameToken
+     */
+    public void addCreated(boolean milliseconds, WSTimeSource timeSource, Document doc) {
         if (elementCreated != null) {
             return;
         }
@@ -327,7 +340,7 @@ public class UsernameToken {
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
-        Date currentTime = new Date();
+        Date currentTime = timeSource.now();
         elementCreated.appendChild(doc.createTextNode(zulu.format(currentTime)));
         element.appendChild(elementCreated);
     }
