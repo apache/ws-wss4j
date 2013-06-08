@@ -22,7 +22,6 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.PublicKeyPrincipalImpl;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.securityToken.ECKeyValueSecurityToken;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.binding.xmldsig11.ECKeyValueType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 
@@ -36,9 +35,9 @@ public class ECKeyValueSecurityTokenImpl
     private Principal principal;
 
     public ECKeyValueSecurityTokenImpl(
-            ECKeyValueType ecKeyValueType, WSInboundSecurityContext wsInboundSecurityContext,
-            WSSecurityTokenConstants.KeyIdentifier keyIdentifier) throws XMLSecurityException {
-        super(ecKeyValueType, wsInboundSecurityContext, keyIdentifier);
+            ECKeyValueType ecKeyValueType, WSInboundSecurityContext wsInboundSecurityContext)
+            throws XMLSecurityException {
+        super(ecKeyValueType, wsInboundSecurityContext);
     }
 
     @Override

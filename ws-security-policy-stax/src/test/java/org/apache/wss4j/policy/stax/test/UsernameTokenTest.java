@@ -28,6 +28,7 @@ import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.UsernameTokenSecurityEvent;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.testng.Assert;
@@ -81,7 +82,7 @@ public class UsernameTokenTest extends AbstractPolicyTestBase {
         UsernameSecurityTokenImpl securityToken = new UsernameSecurityTokenImpl(
                 WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST,
                 "username", "password", new Date().toString(), null, new byte[10], 10L,
-                null, null, null);
+                null, IDGenerator.generateID(null), WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
@@ -91,7 +92,7 @@ public class UsernameTokenTest extends AbstractPolicyTestBase {
         securityToken = new UsernameSecurityTokenImpl(
                 WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST,
                 "username", "password", new Date().toString(), null, new byte[10], 10L,
-                null, null, null);
+                null, IDGenerator.generateID(null), WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
@@ -159,7 +160,7 @@ public class UsernameTokenTest extends AbstractPolicyTestBase {
         UsernameSecurityTokenImpl securityToken = new UsernameSecurityTokenImpl(
                 WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT,
                 "username", "password", new Date().toString(), null, new byte[10], 10L,
-                null, null, null);
+                null, IDGenerator.generateID(null), WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         usernameTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(usernameTokenSecurityEvent);
@@ -169,7 +170,7 @@ public class UsernameTokenTest extends AbstractPolicyTestBase {
         securityToken = new UsernameSecurityTokenImpl(
                 WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT,
                 "username", "password", new Date().toString(), null, new byte[10], 10L,
-                null, null, null);
+                null, IDGenerator.generateID(null), WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);

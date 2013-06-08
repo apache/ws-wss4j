@@ -28,24 +28,27 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import javax.security.auth.callback.CallbackHandler;
 import java.security.cert.X509Certificate;
 
-public class X509SubjectKeyIdentifierSecurityTokenImpl extends X509SecurityTokenImpl {
+public class X509ThumbprintSHA1SecurityTokenImpl extends X509SecurityTokenImpl {
 
     private String alias = null;
     private final byte[] binaryContent;
 
-    X509SubjectKeyIdentifierSecurityTokenImpl(WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
-                                              byte[] binaryContent, String id, WSSecurityTokenConstants.KeyIdentifier keyIdentifier,
-                                              WSSSecurityProperties securityProperties) {
-        super(WSSecurityTokenConstants.X509V3Token, wsInboundSecurityContext, crypto, callbackHandler, id, keyIdentifier, securityProperties);
+    X509ThumbprintSHA1SecurityTokenImpl(
+            WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
+            byte[] binaryContent, String id, WSSSecurityProperties securityProperties) {
+
+        super(WSSecurityTokenConstants.X509V3Token, wsInboundSecurityContext, crypto, callbackHandler, id,
+                WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier, securityProperties, false);
         this.binaryContent = binaryContent;
     }
 
     @Override
     protected String getAlias() throws XMLSecurityException {
         if (this.alias == null) {
-            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.SKI_BYTES);
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.THUMBPRINT_SHA1);
             cryptoType.setBytes(binaryContent);
             X509Certificate[] certs = getCrypto().getX509Certificates(cryptoType);
+
             this.alias = getCrypto().getX509Identifier(certs[0]);
         }
         return this.alias;

@@ -51,8 +51,8 @@ import java.util.Map;
 
 public class IssuedTokenAssertionState extends TokenAssertionState {
 
-    public IssuedTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
-        super(assertion, asserted);
+    public IssuedTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, boolean initiator) {
+        super(assertion, asserted, initiator);
     }
 
     @Override

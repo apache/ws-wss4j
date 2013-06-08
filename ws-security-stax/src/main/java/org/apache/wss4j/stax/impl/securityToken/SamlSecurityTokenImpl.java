@@ -54,7 +54,7 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
                                  WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto,
                                  WSSecurityTokenConstants.KeyIdentifier keyIdentifier,
                                  WSSSecurityProperties securityProperties) {
-        super(wsInboundSecurityContext, samlAssertionWrapper.getId(), keyIdentifier);
+        super(wsInboundSecurityContext, samlAssertionWrapper.getId(), keyIdentifier, true);
         this.samlAssertionWrapper = samlAssertionWrapper;
         this.crypto = crypto;
         this.subjectSecurityToken = subjectSecurityToken;

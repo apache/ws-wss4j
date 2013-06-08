@@ -35,8 +35,8 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 public class KeyValueTokenAssertionState extends TokenAssertionState {
 
-    public KeyValueTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
-        super(assertion, asserted);
+    public KeyValueTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, boolean initiator) {
+        super(assertion, asserted, initiator);
     }
 
     @Override

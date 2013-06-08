@@ -163,7 +163,7 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
                                         xmlSecEventList,
                                         (WSInboundSecurityContext) inputProcessorChain.getSecurityContext(),
                                         securityTokenReferenceId,
-                                        WSSecurityTokenConstants.KeyIdentifier_SecurityTokenReference);
+                                        WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                             }
 
                             @Override

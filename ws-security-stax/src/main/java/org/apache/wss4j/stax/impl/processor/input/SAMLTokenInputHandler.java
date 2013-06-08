@@ -50,6 +50,7 @@ import org.apache.xml.security.stax.ext.stax.XMLSecNamespace;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.XMLSecurityEventReader;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
@@ -172,8 +173,8 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             if (subjectSecretKey != null && subjectSecretKey.length > 0) {
 
                 subjectSecurityToken = new AbstractInboundSecurityToken(
-                        wsInboundSecurityContext, "",
-                        WSSecurityTokenConstants.KeyIdentifier_NoKeyInfo) {
+                        wsInboundSecurityContext, IDGenerator.generateID(null),
+                        WSSecurityTokenConstants.KeyIdentifier_NoKeyInfo, true) {
                     @Override
                     public WSSecurityTokenConstants.TokenType getTokenType() {
                         return WSSecurityTokenConstants.DefaultToken;
@@ -359,8 +360,8 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             }
 
             return new AbstractInboundSecurityToken(
-                    inputProcessorChain.getSecurityContext(), "",
-                    WSSecurityTokenConstants.KeyIdentifier_NoKeyInfo) {
+                    inputProcessorChain.getSecurityContext(), IDGenerator.generateID(null),
+                    WSSecurityTokenConstants.KeyIdentifier_NoKeyInfo, true) {
                 @Override
                 public WSSecurityTokenConstants.TokenType getTokenType() {
                     return WSSecurityTokenConstants.DefaultToken;

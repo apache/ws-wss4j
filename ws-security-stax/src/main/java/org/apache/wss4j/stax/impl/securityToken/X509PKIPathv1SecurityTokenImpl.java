@@ -43,7 +43,9 @@ public class X509PKIPathv1SecurityTokenImpl extends X509SecurityTokenImpl {
             WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
             byte[] binaryContent, String id, WSSecurityTokenConstants.KeyIdentifier keyIdentifier,
             WSSSecurityProperties securityProperties) throws XMLSecurityException {
-        super(WSSecurityTokenConstants.X509PkiPathV1Token, wsInboundSecurityContext, crypto, callbackHandler, id, keyIdentifier, securityProperties);
+
+        super(WSSecurityTokenConstants.X509PkiPathV1Token, wsInboundSecurityContext, crypto,
+                callbackHandler, id, keyIdentifier, securityProperties, true);
 
         InputStream in = new UnsynchronizedByteArrayInputStream(binaryContent);
         try {

@@ -96,7 +96,8 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                     securityToken = securityToken.getKeyWrappingToken();
                 }
 
-                if (isSignatureToken(securityToken)) {
+                //a token can only be signed if it is included in the message:
+                if (securityToken.isIncludedInMessage() && isSignatureToken(securityToken)) {
                     //[WSP1.3_8.9]
                     boolean signsItsSignatureToken = signsItsSignatureToken(securityToken);
                     if (protectTokens && !signsItsSignatureToken) {
@@ -183,7 +184,7 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                     signingSecurityToken = signingSecurityToken.getKeyWrappingToken();
                 }
                 //todo ATM me just check if the token signs a signature but we don't know if it's the main signature
-                if (signingSecurityToken == securityToken) {
+                if (signingSecurityToken != null && signingSecurityToken.getId().equals(securityToken.getId())) {
                     return true;
                 }
             }
@@ -202,7 +203,7 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                     signingSecurityToken = signingSecurityToken.getKeyWrappingToken();
                 }
 
-                if (signingSecurityToken == securityToken) {
+                if (signingSecurityToken != null && signingSecurityToken.getId().equals(securityToken.getId())) {
                     return true;
                 }
             }
@@ -234,7 +235,7 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                         while (elementSignatureToken != null && elementSignatureToken.getKeyWrappingToken() != null) {
                             elementSignatureToken = elementSignatureToken.getKeyWrappingToken();
                         }
-                        if (signedElementSecurityEvent.getSecurityToken() == securityToken) {
+                        if (elementSignatureToken != null && elementSignatureToken.getId().equals(securityToken.getId())) {
                             if (!signedElements.contains(signedElementSecurityEvent)) {
                                 signedElements.add(signedElementSecurityEvent);
                             }

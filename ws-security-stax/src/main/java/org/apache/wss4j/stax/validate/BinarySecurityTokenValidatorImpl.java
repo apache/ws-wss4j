@@ -25,10 +25,10 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSConfigurationException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.impl.securityToken.X509V3SecurityTokenImpl;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.impl.securityToken.KerberosServiceSecurityTokenImpl;
 import org.apache.wss4j.stax.impl.securityToken.X509PKIPathv1SecurityTokenImpl;
-import org.apache.wss4j.stax.impl.securityToken.X509_V3SecurityTokenImpl;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
@@ -54,12 +54,11 @@ public class BinarySecurityTokenValidatorImpl implements BinarySecurityTokenVali
         try {
             if (WSSConstants.NS_X509_V3_TYPE.equals(binarySecurityTokenType.getValueType())) {
                 Crypto crypto = getCrypto(tokenContext.getWssSecurityProperties());
-                X509_V3SecurityTokenImpl x509V3SecurityToken = new X509_V3SecurityTokenImpl(
+                X509V3SecurityTokenImpl x509V3SecurityToken = new X509V3SecurityTokenImpl(
                         tokenContext.getWsSecurityContext(),
                         crypto,
                         tokenContext.getWssSecurityProperties().getCallbackHandler(),
                         securityTokenData, binarySecurityTokenType.getId(),
-                        WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference,
                         tokenContext.getWssSecurityProperties()
                 );
                 x509V3SecurityToken.setElementPath(tokenContext.getElementPath());

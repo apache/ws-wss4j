@@ -41,7 +41,7 @@ public class SecurityTokenReferenceImpl extends AbstractInboundSecurityToken imp
     public SecurityTokenReferenceImpl(InboundSecurityToken inboundSecurityToken, Deque<XMLSecEvent> xmlSecEvents,
                                       WSInboundSecurityContext wsInboundSecurityContext, String id,
                                       WSSecurityTokenConstants.KeyIdentifier keyIdentifier) {
-        super(wsInboundSecurityContext, id, keyIdentifier);
+        super(wsInboundSecurityContext, id, keyIdentifier, true);
         this.inboundSecurityToken = inboundSecurityToken;
         this.xmlSecEvents = xmlSecEvents;
     }
@@ -90,6 +90,11 @@ public class SecurityTokenReferenceImpl extends AbstractInboundSecurityToken imp
     @Override
     public InboundSecurityToken getKeyWrappingToken() throws XMLSecurityException {
         return inboundSecurityToken.getKeyWrappingToken();
+    }
+
+    @Override
+    public boolean isIncludedInMessage() {
+        return inboundSecurityToken.isIncludedInMessage();
     }
 
     @Override

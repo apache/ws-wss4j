@@ -19,29 +19,37 @@
 package org.apache.wss4j.stax.impl.securityToken;
 
 import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 
 import javax.security.auth.callback.CallbackHandler;
+import java.security.cert.X509Certificate;
 
-public class X509DefaultSecurityTokenImpl extends X509SecurityTokenImpl {
+public class X509SKISecurityTokenImpl extends X509SecurityTokenImpl {
 
     private String alias = null;
+    private final byte[] binaryContent;
 
-    X509DefaultSecurityTokenImpl(
+    X509SKISecurityTokenImpl(
             WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
-            String alias, String id, WSSecurityTokenConstants.KeyIdentifier keyIdentifier,
-            WSSSecurityProperties securityProperties) {
+            byte[] binaryContent, String id, WSSSecurityProperties securityProperties) {
 
         super(WSSecurityTokenConstants.X509V3Token, wsInboundSecurityContext, crypto, callbackHandler, id,
-                keyIdentifier, securityProperties, false);
-        this.alias = alias;
+                WSSecurityTokenConstants.KeyIdentifier_SkiKeyIdentifier, securityProperties, false);
+        this.binaryContent = binaryContent;
     }
 
     @Override
     protected String getAlias() throws XMLSecurityException {
+        if (this.alias == null) {
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.SKI_BYTES);
+            cryptoType.setBytes(binaryContent);
+            X509Certificate[] certs = getCrypto().getX509Certificates(cryptoType);
+            this.alias = getCrypto().getX509Identifier(certs[0]);
+        }
         return this.alias;
     }
 }

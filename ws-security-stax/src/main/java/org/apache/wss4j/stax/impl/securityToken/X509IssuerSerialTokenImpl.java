@@ -20,34 +20,49 @@ package org.apache.wss4j.stax.impl.securityToken;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.xml.security.binding.xmldsig.X509IssuerSerialType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 
 import javax.security.auth.callback.CallbackHandler;
 import java.security.cert.X509Certificate;
 
-public class ThumbprintSHA1SecurityTokenImpl extends X509SecurityTokenImpl {
+public class X509IssuerSerialTokenImpl extends X509SecurityTokenImpl {
 
     private String alias = null;
-    private final byte[] binaryContent;
+    private final X509IssuerSerialType x509IssuerSerialType;
 
-    ThumbprintSHA1SecurityTokenImpl(WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
-                                    byte[] binaryContent, String id, WSSecurityTokenConstants.KeyIdentifier keyIdentifier,
-                                    WSSSecurityProperties securityProperties) {
-        super(WSSecurityTokenConstants.X509V3Token, wsInboundSecurityContext, crypto, callbackHandler, id, keyIdentifier, securityProperties);
-        this.binaryContent = binaryContent;
+    X509IssuerSerialTokenImpl(
+            WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
+            X509IssuerSerialType x509IssuerSerialType, String id, WSSSecurityProperties securityProperties)
+            throws XMLSecurityException {
+
+        super(WSSecurityTokenConstants.X509V3Token, wsInboundSecurityContext, crypto, callbackHandler, id,
+                WSSecurityTokenConstants.KeyIdentifier_IssuerSerial, securityProperties, false);
+
+        if (x509IssuerSerialType.getX509IssuerName() == null
+                || x509IssuerSerialType.getX509SerialNumber() == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");
+        }
+        this.x509IssuerSerialType = x509IssuerSerialType;
     }
 
     @Override
     protected String getAlias() throws XMLSecurityException {
         if (this.alias == null) {
-            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.THUMBPRINT_SHA1);
-            cryptoType.setBytes(binaryContent);
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
+            cryptoType.setIssuerSerial(
+                    x509IssuerSerialType.getX509IssuerName(), x509IssuerSerialType.getX509SerialNumber()
+            );
             X509Certificate[] certs = getCrypto().getX509Certificates(cryptoType);
-
-            this.alias = getCrypto().getX509Identifier(certs[0]);
+            setX509Certificates(certs);
+            if (certs == null) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
+            }
+            return this.alias = getCrypto().getX509Identifier(certs[0]);
         }
         return this.alias;
     }

@@ -22,7 +22,6 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.PublicKeyPrincipalImpl;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.securityToken.RsaKeyValueSecurityToken;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.binding.xmldsig.RSAKeyValueType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 
@@ -36,9 +35,8 @@ public class RsaKeyValueSecurityTokenImpl
     private Principal principal;
 
     public RsaKeyValueSecurityTokenImpl(
-            RSAKeyValueType rsaKeyValueType, WSInboundSecurityContext wsInboundSecurityContext,
-            WSSecurityTokenConstants.KeyIdentifier keyIdentifier) throws XMLSecurityException {
-        super(rsaKeyValueType, wsInboundSecurityContext, keyIdentifier);
+            RSAKeyValueType rsaKeyValueType, WSInboundSecurityContext wsInboundSecurityContext) {
+        super(rsaKeyValueType, wsInboundSecurityContext);
     }
 
     @Override

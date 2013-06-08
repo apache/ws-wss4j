@@ -45,11 +45,12 @@ public abstract class X509SecurityTokenImpl
     private WSSSecurityProperties securityProperties;
     private Principal principal;
 
-    protected X509SecurityTokenImpl(WSSecurityTokenConstants.TokenType tokenType, WSInboundSecurityContext wsInboundSecurityContext,
-                                    Crypto crypto, CallbackHandler callbackHandler, String id,
-                                    WSSecurityTokenConstants.KeyIdentifier keyIdentifier,
-                                    WSSSecurityProperties securityProperties) {
-        super(tokenType, wsInboundSecurityContext, id, keyIdentifier);
+    protected X509SecurityTokenImpl(
+            WSSecurityTokenConstants.TokenType tokenType, WSInboundSecurityContext wsInboundSecurityContext,
+            Crypto crypto, CallbackHandler callbackHandler, String id,
+            WSSecurityTokenConstants.KeyIdentifier keyIdentifier, WSSSecurityProperties securityProperties,
+            boolean includedInMessage) {
+        super(tokenType, wsInboundSecurityContext, id, keyIdentifier, includedInMessage);
         this.crypto = crypto;
         this.callbackHandler = callbackHandler;
         this.securityProperties = securityProperties;
@@ -57,6 +58,10 @@ public abstract class X509SecurityTokenImpl
 
     protected Crypto getCrypto() {
         return crypto;
+    }
+
+    protected void setCrypto(Crypto crypto) {
+        this.crypto = crypto;
     }
 
     public CallbackHandler getCallbackHandler() {

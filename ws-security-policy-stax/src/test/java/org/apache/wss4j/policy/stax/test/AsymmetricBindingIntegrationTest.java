@@ -60,7 +60,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                    <wsp:Policy>\n" +
                         "                        <sp:InitiatorToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
                         "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                    <wsp:Policy>\n" +
                         "                                        <sp:WssX509V3Token11/>\n" +
@@ -70,7 +70,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                        </sp:InitiatorToken>\n" +
                         "                        <sp:RecipientToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                              <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
                         "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                  <wsp:Policy>\n" +
                         "                                      <sp:WssX509V3Token11/>\n" +
@@ -166,7 +166,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                       <wsp:All>\n" +
                         "                        <sp:InitiatorToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
                         "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                    <wsp:Policy>\n" +
                         "                                        <sp:WssX509V1Token11/>\n" +
@@ -176,7 +176,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                        </sp:InitiatorToken>\n" +
                         "                        <sp:RecipientToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                              <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
                         "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                  <wsp:Policy>\n" +
                         "                                      <sp:WssX509V3Token11/>\n" +
@@ -198,7 +198,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                       <wsp:All>\n" +
                         "                        <sp:InitiatorToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
                         "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                    <wsp:Policy>\n" +
                         "                                        <sp:WssX509V3Token11/>\n" +
@@ -208,7 +208,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                        </sp:InitiatorToken>\n" +
                         "                        <sp:RecipientToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                              <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
                         "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                  <wsp:Policy>\n" +
                         "                                      <sp:WssX509V3Token11/>\n" +
@@ -304,7 +304,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                    <wsp:Policy>\n" +
                         "                        <sp:InitiatorToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
                         "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                    <wsp:Policy>\n" +
                         "                                        <sp:WssX509V3Token11/>\n" +
@@ -314,7 +314,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                        </sp:InitiatorToken>\n" +
                         "                        <sp:RecipientToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                              <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
                         "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                  <wsp:Policy>\n" +
                         "                                      <sp:WssX509V3Token11/>\n" +
@@ -415,7 +415,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                    <wsp:Policy>\n" +
                         "                        <sp:InitiatorToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
                         "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                    <wsp:Policy>\n" +
                         "                                        <sp:WssX509V3Token11/>\n" +
@@ -425,7 +425,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                        </sp:InitiatorToken>\n" +
                         "                        <sp:RecipientToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                              <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
                         "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                  <wsp:Policy>\n" +
                         "                                      <sp:WssX509V3Token11/>\n" +
@@ -467,7 +467,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                </sp:ContentEncryptedElements>\n" +
                         "                <sp:SignedSupportingTokens>\n" +
                         "                    <wsp:Policy>\n" +
-                        "                        <sp:UsernameToken IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                        <sp:UsernameToken sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                            <wsp:Policy>\n" +
                         "                                <sp:NoPassword/>\n" +
                         "                            </wsp:Policy>\n" +
@@ -532,7 +532,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                    <wsp:Policy>\n" +
                         "                        <sp:InitiatorToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                    <wsp:Policy>\n" +
                         "                                        <sp:WssX509V3Token11/>\n" +
@@ -542,7 +542,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                        </sp:InitiatorToken>\n" +
                         "                        <sp:RecipientToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                              <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                  <wsp:Policy>\n" +
                         "                                      <sp:WssX509V3Token11/>\n" +
@@ -584,7 +584,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                </sp:ContentEncryptedElements>\n" +
                         "                <sp:SignedSupportingTokens>\n" +
                         "                    <wsp:Policy>\n" +
-                        "                        <sp:UsernameToken IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                        <sp:UsernameToken sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                            <wsp:Policy>\n" +
                         "                                <sp:NoPassword/>\n" +
                         "                            </wsp:Policy>\n" +
@@ -657,7 +657,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                    <wsp:Policy>\n" +
                         "                        <sp:InitiatorToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
                         "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                    <wsp:Policy>\n" +
                         "                                        <sp:WssX509V3Token11/>\n" +
@@ -667,7 +667,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                        </sp:InitiatorToken>\n" +
                         "                        <sp:RecipientToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                              <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
                         "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                  <wsp:Policy>\n" +
                         "                                      <sp:WssX509V3Token11/>\n" +
@@ -709,7 +709,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                </sp:ContentEncryptedElements>\n" +
                         "                <sp:SignedSupportingTokens>\n" +
                         "                    <wsp:Policy>\n" +
-                        "                        <sp:UsernameToken IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                        <sp:UsernameToken sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                            <wsp:Policy>\n" +
                         "                                <sp:NoPassword/>\n" +
                         "                            </wsp:Policy>\n" +
@@ -782,7 +782,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                    <wsp:Policy>\n" +
                         "                        <sp:InitiatorToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
                         "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                    <wsp:Policy>\n" +
                         "                                        <sp:WssX509V3Token11/>\n" +
@@ -792,7 +792,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                        </sp:InitiatorToken>\n" +
                         "                        <sp:RecipientToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                              <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
                         "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                  <wsp:Policy>\n" +
                         "                                      <sp:WssX509V3Token11/>\n" +
@@ -827,7 +827,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                </sp:EncryptedParts>\n" +
                         "                <sp:SignedSupportingTokens>\n" +
                         "                    <wsp:Policy>\n" +
-                        "                        <sp:UsernameToken IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                        <sp:UsernameToken sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                            <wsp:Policy>\n" +
                         "                                <sp:NoPassword/>\n" +
                         "                            </wsp:Policy>\n" +
@@ -892,7 +892,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                    <wsp:Policy>\n" +
                         "                        <sp:InitiatorToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                    <wsp:Policy>\n" +
                         "                                        <sp:WssX509V3Token11/>\n" +
@@ -902,7 +902,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                        </sp:InitiatorToken>\n" +
                         "                        <sp:RecipientToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                              <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                  <wsp:Policy>\n" +
                         "                                      <sp:WssX509V3Token11/>\n" +
@@ -1008,7 +1008,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                    <wsp:Policy>\n" +
                         "                        <sp:InitiatorToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                    <wsp:Policy>\n" +
                         "                                        <sp:WssX509V3Token11/>\n" +
@@ -1018,7 +1018,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                        </sp:InitiatorToken>\n" +
                         "                        <sp:RecipientToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                              <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                  <wsp:Policy>\n" +
                         "                                      <sp:WssX509V3Token11/>\n" +
@@ -1125,7 +1125,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                    <wsp:Policy>\n" +
                         "                        <sp:InitiatorToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                    <wsp:Policy>\n" +
                         "                                        <sp:WssX509V3Token11/>\n" +
@@ -1135,7 +1135,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                        </sp:InitiatorToken>\n" +
                         "                        <sp:RecipientToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                              <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                  <wsp:Policy>\n" +
                         "                                      <sp:WssX509V3Token11/>\n" +
@@ -1244,7 +1244,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                    <wsp:Policy>\n" +
                         "                        <sp:InitiatorToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                    <wsp:Policy>\n" +
                         "                                        <sp:WssX509V3Token11/>\n" +
@@ -1254,7 +1254,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                        </sp:InitiatorToken>\n" +
                         "                        <sp:RecipientToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                              <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                  <wsp:Policy>\n" +
                         "                                      <sp:WssX509V3Token11/>\n" +
@@ -1359,7 +1359,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                    <wsp:Policy>\n" +
                         "                        <sp:InitiatorToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
                         "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                    <wsp:Policy>\n" +
                         "                                        <sp:WssX509V3Token11/>\n" +
@@ -1369,7 +1369,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                        </sp:InitiatorToken>\n" +
                         "                        <sp:RecipientToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                              <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
                         "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                  <wsp:Policy>\n" +
                         "                                      <sp:WssX509V3Token11/>\n" +
@@ -1464,7 +1464,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                    <wsp:Policy>\n" +
                         "                        <sp:InitiatorToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
                         "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                    <wsp:Policy>\n" +
                         "                                        <sp:WssX509V3Token11/>\n" +
@@ -1474,7 +1474,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                        </sp:InitiatorToken>\n" +
                         "                        <sp:RecipientToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                              <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
                         "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                  <wsp:Policy>\n" +
                         "                                      <sp:WssX509V3Token11/>\n" +
@@ -1570,7 +1570,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                    <wsp:Policy>\n" +
                         "                        <sp:InitiatorToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                    <wsp:Policy>\n" +
                         "                                        <sp:WssX509V3Token11/>\n" +
@@ -1580,7 +1580,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                        </sp:InitiatorToken>\n" +
                         "                        <sp:RecipientToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                              <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                  <wsp:Policy>\n" +
                         "                                      <sp:WssX509V3Token11/>\n" +
@@ -1683,7 +1683,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                    <wsp:Policy>\n" +
                         "                        <sp:InitiatorToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
                         "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                    <wsp:Policy>\n" +
                         "                                        <sp:WssX509V3Token11/>\n" +
@@ -1693,7 +1693,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                        </sp:InitiatorToken>\n" +
                         "                        <sp:RecipientToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                              <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
                         "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                  <wsp:Policy>\n" +
                         "                                      <sp:WssX509V3Token11/>\n" +
@@ -1796,7 +1796,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                    <wsp:Policy>\n" +
                         "                        <sp:InitiatorToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
                         "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                    <wsp:Policy>\n" +
                         "                                        <sp:WssX509V3Token11/>\n" +
@@ -1806,7 +1806,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                        </sp:InitiatorToken>\n" +
                         "                        <sp:RecipientToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                              <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
                         "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                  <wsp:Policy>\n" +
                         "                                      <sp:WssX509V3Token11/>\n" +
@@ -1914,7 +1914,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                    <wsp:Policy>\n" +
                         "                        <sp:InitiatorToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                    <wsp:Policy>\n" +
                         "                                        <sp:WssX509V3Token11/>\n" +
@@ -1924,7 +1924,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                        </sp:InitiatorToken>\n" +
                         "                        <sp:RecipientToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                              <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                  <wsp:Policy>\n" +
                         "                                      <sp:WssX509V3Token11/>\n" +
@@ -2027,7 +2027,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                    <wsp:Policy>\n" +
                         "                        <sp:InitiatorToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                                <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                    <wsp:Policy>\n" +
                         "                                        <sp:WssX509V3Token11/>\n" +
@@ -2037,7 +2037,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                        </sp:InitiatorToken>\n" +
                         "                        <sp:RecipientToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                              <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                  <wsp:Policy>\n" +
                         "                                      <sp:WssX509V3Token11/>\n" +
@@ -2139,7 +2139,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                    <wsp:Policy>\n" +
                         "                        <sp:InitiatorToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                               <sp:SamlToken IncludeToken=\" http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always\">\n" +
+                        "                               <sp:SamlToken sp:IncludeToken=\" http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always\">\n" +
                         "                                  <sp:IssuerName>www.example.com</sp:IssuerName>\n" +
                         "                                    <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "                                        <sp:WssSamlV20Token11/>\n" +
@@ -2149,7 +2149,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                        </sp:InitiatorToken>\n" +
                         "                        <sp:RecipientToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                              <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                  <wsp:Policy>\n" +
                         "                                      <sp:RequireDerivedKeys/>\n" +
@@ -2168,7 +2168,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                </sp:AsymmetricBinding>\n" +
                         "                <sp:SignedSupportingTokens>\n" +
                         "                   <wsp:Policy>\n" +
-                        "                     <sp:UsernameToken IncludeToken=\" http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                     <sp:UsernameToken sp:IncludeToken=\" http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                       <wsp:Policy>\n" +
                         "                       </wsp:Policy>\n" +
                         "                     </sp:UsernameToken>\n" +
@@ -2277,7 +2277,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                    <wsp:Policy>\n" +
                         "                        <sp:InitiatorToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                               <sp:SamlToken IncludeToken=\" http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always\">\n" +
+                        "                               <sp:SamlToken sp:IncludeToken=\" http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always\">\n" +
                         "                                  <sp:IssuerName>www.example.com</sp:IssuerName>\n" +
                         "                                    <wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
                         "                                        <sp:WssSamlV20Token11/>\n" +
@@ -2287,7 +2287,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                        </sp:InitiatorToken>\n" +
                         "                        <sp:RecipientToken>\n" +
                         "                            <wsp:Policy>\n" +
-                        "                              <sp:X509Token IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                              <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
                         "                                  <wsp:Policy>\n" +
                         "                                      <sp:RequireDerivedKeys/>\n" +
@@ -2306,7 +2306,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                </sp:AsymmetricBinding>\n" +
                         "                <sp:SignedSupportingTokens>\n" +
                         "                   <wsp:Policy>\n" +
-                        "                     <sp:UsernameToken IncludeToken=\" http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                     <sp:UsernameToken sp:IncludeToken=\" http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                       <wsp:Policy>\n" +
                         "                       </wsp:Policy>\n" +
                         "                     </sp:UsernameToken>\n" +
@@ -2388,5 +2388,227 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
                     }
                 }
         ));
+    }
+
+    @Test
+    public void testRecipientTokenInclusionAlwaysToRecipientPolicy() throws Exception {
+
+        String policyString =
+                "<wsp:ExactlyOne xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" " +
+                        "xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
+                        "            <wsp:All>\n" +
+                        "                <sp:AsymmetricBinding>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                        <sp:InitiatorToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
+                        "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                    <wsp:Policy>\n" +
+                        "                                        <sp:WssX509V3Token11/>\n" +
+                        "                                    </wsp:Policy>\n" +
+                        "                                </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:InitiatorToken>\n" +
+                        "                        <sp:RecipientToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                              <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                  <wsp:Policy>\n" +
+                        "                                      <sp:WssX509V3Token11/>\n" +
+                        "                                  </wsp:Policy>\n" +
+                        "                              </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                         </sp:RecipientToken>\n" +
+                        "                        <sp:AlgorithmSuite>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Basic256/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:AlgorithmSuite>\n" +
+                        "                        <sp:Layout>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Lax/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:Layout>\n" +
+                        "                        <sp:IncludeTimestamp/>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:AsymmetricBinding>\n" +
+                        "                <sp:SignedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header1\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:SignedParts>\n" +
+                        "                <sp:SignedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:SignedElements>\n" +
+                        "                <sp:EncryptedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header2\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:EncryptedParts>\n" +
+                        "                <sp:EncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:EncryptedElements>\n" +
+                        "                <sp:ContentEncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Expires</sp:XPath>\n" +
+                        "                </sp:ContentEncryptedElements>\n" +
+                        "            </wsp:All>\n" +
+                        "        </wsp:ExactlyOne>";
+
+        WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
+        outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        outSecurityProperties.setEncryptionUser("receiver");
+        outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setSignatureUser("transmitter");
+        outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
+        outSecurityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
+
+        WSSSecurityProperties inSecurityProperties = new WSSSecurityProperties();
+        inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
+
+        try {
+            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+
+            //read the whole stream:
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.transform(new DOMSource(document), new StreamResult(
+                    new OutputStream() {
+                        @Override
+                        public void write(int b) throws IOException {
+                            // > /dev/null
+                        }
+                    }
+            ));
+            Assert.fail("Exception expected");
+        } catch (XMLStreamException e) {
+            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
+            Assert.assertEquals(e.getCause().getMessage(), "Token must be included");
+            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
+        }
+    }
+
+    @Test
+    public void testInitiatorTokenInclusionAlwaysToRecipientPolicy() throws Exception {
+
+        String policyString =
+                "<wsp:ExactlyOne xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\" " +
+                        "xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\">\n" +
+                        "            <wsp:All>\n" +
+                        "                <sp:AsymmetricBinding>\n" +
+                        "                    <wsp:Policy>\n" +
+                        "                        <sp:InitiatorToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                                    <sp:IssuerName>CN=transmitter,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                    <wsp:Policy>\n" +
+                        "                                        <sp:WssX509V3Token11/>\n" +
+                        "                                    </wsp:Policy>\n" +
+                        "                                </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:InitiatorToken>\n" +
+                        "                        <sp:RecipientToken>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                              <sp:X509Token sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never\">\n" +
+                        "                                  <sp:IssuerName>CN=receiver,OU=swssf,C=CH</sp:IssuerName>\n" +
+                        "                                  <wsp:Policy>\n" +
+                        "                                      <sp:WssX509V3Token11/>\n" +
+                        "                                  </wsp:Policy>\n" +
+                        "                              </sp:X509Token>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                         </sp:RecipientToken>\n" +
+                        "                        <sp:AlgorithmSuite>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Basic256/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:AlgorithmSuite>\n" +
+                        "                        <sp:Layout>\n" +
+                        "                            <wsp:Policy>\n" +
+                        "                                <sp:Lax/>\n" +
+                        "                            </wsp:Policy>\n" +
+                        "                        </sp:Layout>\n" +
+                        "                        <sp:IncludeTimestamp/>\n" +
+                        "                    </wsp:Policy>\n" +
+                        "                </sp:AsymmetricBinding>\n" +
+                        "                <sp:SignedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header1\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:SignedParts>\n" +
+                        "                <sp:SignedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:SignedElements>\n" +
+                        "                <sp:EncryptedParts>\n" +
+                        "                    <sp:Body/>\n" +
+                        "                    <sp:Header Name=\"Header2\" Namespace=\"...\"/>\n" +
+                        "                    <sp:Header Namespace=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"/>\n" +
+                        "                </sp:EncryptedParts>\n" +
+                        "                <sp:EncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Created</sp:XPath>\n" +
+                        "                </sp:EncryptedElements>\n" +
+                        "                <sp:ContentEncryptedElements>\n" +
+                        "                    <sp:XPath xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">wsu:Expires</sp:XPath>\n" +
+                        "                </sp:ContentEncryptedElements>\n" +
+                        "            </wsp:All>\n" +
+                        "        </wsp:ExactlyOne>";
+
+        WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
+        outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        outSecurityProperties.setEncryptionUser("receiver");
+        outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        outSecurityProperties.setSignatureUser("transmitter");
+        outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
+        outSecurityProperties.setOutAction(actions);
+
+        InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+        ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
+
+        WSSSecurityProperties inSecurityProperties = new WSSSecurityProperties();
+        inSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        inSecurityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+        inSecurityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
+
+        try {
+            Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
+
+            //read the whole stream:
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.transform(new DOMSource(document), new StreamResult(
+                    new OutputStream() {
+                        @Override
+                        public void write(int b) throws IOException {
+                            // > /dev/null
+                        }
+                    }
+            ));
+            Assert.fail("Exception expected");
+        } catch (XMLStreamException e) {
+            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
+            Assert.assertEquals(e.getCause().getMessage(), "Token must be included");
+            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
+        }
     }
 }

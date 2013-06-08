@@ -37,8 +37,8 @@ import org.apache.xml.security.stax.securityToken.SecurityToken;
 
 public class UsernameTokenAssertionState extends TokenAssertionState {
 
-    public UsernameTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
-        super(assertion, asserted);
+    public UsernameTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, boolean initiator) {
+        super(assertion, asserted, initiator);
     }
 
     @Override

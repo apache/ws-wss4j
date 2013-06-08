@@ -56,7 +56,7 @@ public class UsernameSecurityTokenImpl extends AbstractInboundSecurityToken impl
                                      byte[] salt, Long iteration,
                                      WSInboundSecurityContext wsInboundSecurityContext, String id,
                                      WSSecurityTokenConstants.KeyIdentifier keyIdentifier) {
-        super(wsInboundSecurityContext, id, keyIdentifier);
+        super(wsInboundSecurityContext, id, keyIdentifier, true);
         this.usernameTokenPasswordType = usernameTokenPasswordType;
         this.username = username;
         this.password = password;

@@ -29,7 +29,7 @@ public class SecureConversationSecurityTokenImpl
 
     public SecureConversationSecurityTokenImpl(WSInboundSecurityContext wsInboundSecurityContext, String id,
                                                WSSecurityTokenConstants.KeyIdentifier keyIdentifier) {
-        super(wsInboundSecurityContext, id, keyIdentifier);
+        super(wsInboundSecurityContext, id, keyIdentifier, false);
     }
 
     @Override

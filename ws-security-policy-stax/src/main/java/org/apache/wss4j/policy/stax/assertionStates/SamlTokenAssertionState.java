@@ -38,8 +38,8 @@ import org.apache.xml.security.stax.securityToken.SecurityToken;
 
 public class SamlTokenAssertionState extends TokenAssertionState {
 
-    public SamlTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
-        super(assertion, asserted);
+    public SamlTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, boolean initiator) {
+        super(assertion, asserted, initiator);
     }
 
     @Override

@@ -36,8 +36,8 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 public class KerberosTokenAssertionState extends TokenAssertionState {
 
-    public KerberosTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
-        super(assertion, asserted);
+    public KerberosTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, boolean initiator) {
+        super(assertion, asserted, initiator);
     }
 
     @Override

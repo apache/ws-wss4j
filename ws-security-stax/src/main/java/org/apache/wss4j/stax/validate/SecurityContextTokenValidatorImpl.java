@@ -40,8 +40,8 @@ public class SecurityContextTokenValidatorImpl implements SecurityContextTokenVa
             throws WSSecurityException {
 
         AbstractInboundSecurityToken securityContextToken = new AbstractInboundSecurityToken(
-                tokenContext.getWsSecurityContext(),
-                securityContextTokenType.getId(), null) {
+                tokenContext.getWsSecurityContext(), securityContextTokenType.getId(),
+                WSSecurityTokenConstants.KeyIdentifier_ExternalReference, false) {
 
             @Override
             public boolean isAsymmetric() {
@@ -73,7 +73,6 @@ public class SecurityContextTokenValidatorImpl implements SecurityContextTokenVa
 
             @Override
             public WSSecurityTokenConstants.TokenType getTokenType() {
-                //todo and set externalUriRef
                 return WSSecurityTokenConstants.SecurityContextToken;
             }
         };

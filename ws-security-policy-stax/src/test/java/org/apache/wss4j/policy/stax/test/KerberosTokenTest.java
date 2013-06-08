@@ -27,6 +27,7 @@ import org.apache.wss4j.stax.securityEvent.KerberosTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.testng.Assert;
@@ -78,7 +79,7 @@ public class KerberosTokenTest extends AbstractPolicyTestBase {
         initiatorTokenSecurityEvent.setIssuerName("xs:anyURI");
 
         KerberosServiceSecurityTokenImpl kerberosServiceSecurityToken =
-                new KerberosServiceSecurityTokenImpl(null, null, null, WSSConstants.NS_Kerberos5_AP_REQ, null,
+                new KerberosServiceSecurityTokenImpl(null, null, null, WSSConstants.NS_Kerberos5_AP_REQ, IDGenerator.generateID(null),
                         WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
         kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         initiatorTokenSecurityEvent.setSecurityToken(kerberosServiceSecurityToken);
@@ -88,7 +89,7 @@ public class KerberosTokenTest extends AbstractPolicyTestBase {
         recipientTokenSecurityEvent.setIssuerName("xs:anyURI");
 
         kerberosServiceSecurityToken =
-                new KerberosServiceSecurityTokenImpl(null, null, null, WSSConstants.NS_Kerberos5_AP_REQ, null,
+                new KerberosServiceSecurityTokenImpl(null, null, null, WSSConstants.NS_Kerberos5_AP_REQ, IDGenerator.generateID(null),
                         WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
         kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
         recipientTokenSecurityEvent.setSecurityToken(kerberosServiceSecurityToken);
@@ -154,7 +155,7 @@ public class KerberosTokenTest extends AbstractPolicyTestBase {
         initiatorTokenSecurityEvent.setIssuerName("xs:anyURI");
 
         KerberosServiceSecurityTokenImpl kerberosServiceSecurityToken =
-                new KerberosServiceSecurityTokenImpl(null, null, null, WSSConstants.NS_GSS_Kerberos5_AP_REQ, null,
+                new KerberosServiceSecurityTokenImpl(null, null, null, WSSConstants.NS_GSS_Kerberos5_AP_REQ, IDGenerator.generateID(null),
                         WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier);
         kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         initiatorTokenSecurityEvent.setSecurityToken(kerberosServiceSecurityToken);
@@ -164,7 +165,7 @@ public class KerberosTokenTest extends AbstractPolicyTestBase {
         recipientTokenSecurityEvent.setIssuerName("xs:anyURI");
 
         kerberosServiceSecurityToken =
-                new KerberosServiceSecurityTokenImpl(null, null, null, WSSConstants.NS_Kerberos5_AP_REQ, null,
+                new KerberosServiceSecurityTokenImpl(null, null, null, WSSConstants.NS_Kerberos5_AP_REQ, IDGenerator.generateID(null),
                         WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier);
         kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
         recipientTokenSecurityEvent.setSecurityToken(kerberosServiceSecurityToken);

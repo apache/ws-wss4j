@@ -309,7 +309,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                </sp:ContentEncryptedElements>\n" +
                         "                <sp:SignedSupportingTokens>\n" +
                         "                    <wsp:Policy>\n" +
-                        "                        <sp:UsernameToken IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                        <sp:UsernameToken sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                            <wsp:Policy>\n" +
                         "                                <sp:NoPassword/>\n" +
                         "                            </wsp:Policy>\n" +
@@ -420,7 +420,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                </sp:ContentEncryptedElements>\n" +
                         "                <sp:SignedSupportingTokens>\n" +
                         "                    <wsp:Policy>\n" +
-                        "                        <sp:UsernameToken IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                        <sp:UsernameToken sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                            <wsp:Policy>\n" +
                         "                                <sp:NoPassword/>\n" +
                         "                            </wsp:Policy>\n" +
@@ -519,7 +519,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                </sp:TransportBinding>\n" +
                         "                <sp:SignedSupportingTokens>\n" +
                         "                    <wsp:Policy>\n" +
-                        "                        <sp:UsernameToken IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                        <sp:UsernameToken sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                            <wsp:Policy>\n" +
                         "                                <sp:NoPassword/>\n" +
                         "                            </wsp:Policy>\n" +
@@ -640,7 +640,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                </sp:ContentEncryptedElements>\n" +
                         "                <sp:SignedEncryptedSupportingTokens>\n" +
                         "                    <wsp:Policy>\n" +
-                        "                        <sp:UsernameToken IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                        <sp:UsernameToken sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                            <wsp:Policy>\n" +
                         "                                <sp:NoPassword/>\n" +
                         "                            </wsp:Policy>\n" +
@@ -743,7 +743,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                </sp:EncryptedParts>\n" +
                         "                <sp:SignedSupportingTokens>\n" +
                         "                    <wsp:Policy>\n" +
-                        "                        <sp:UsernameToken IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                        <sp:UsernameToken sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                            <wsp:Policy>\n" +
                         "                                <sp:NoPassword/>\n" +
                         "                            </wsp:Policy>\n" +
@@ -868,7 +868,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                </sp:ContentEncryptedElements>\n" +
                         "                <sp:SignedSupportingTokens>\n" +
                         "                    <wsp:Policy>\n" +
-                        "                        <sp:UsernameToken IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                        <sp:UsernameToken sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                            <wsp:Policy>\n" +
                         "                                <!--<sp:HashPassword/>-->\n" +
                         "                                <sp:NoPassword/>\n" +
@@ -984,7 +984,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
                         "                </sp:ContentEncryptedElements>\n" +
                         "                <sp:SignedSupportingTokens>\n" +
                         "                    <wsp:Policy>\n" +
-                        "                        <sp:UsernameToken IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
+                        "                        <sp:UsernameToken sp:IncludeToken=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient\">\n" +
                         "                            <wsp:Policy>\n" +
                         "                                <!--<sp:HashPassword/>-->\n" +
                         "                                <sp:NoPassword/>\n" +

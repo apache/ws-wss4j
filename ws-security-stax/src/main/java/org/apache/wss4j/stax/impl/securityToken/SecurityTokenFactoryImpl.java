@@ -33,11 +33,16 @@ import org.apache.xml.security.binding.xmldsig.*;
 import org.apache.xml.security.binding.xmldsig11.ECKeyValueType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenFactory;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 import javax.security.auth.callback.CallbackHandler;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -76,10 +81,10 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                 return getSecurityToken(keyValueType, crypto, ((WSSSecurityProperties)securityProperties).getCallbackHandler(), inboundSecurityContext);
             }
 
-        } else if (crypto.getDefaultX509Identifier() != null) {
+        } else if (crypto != null && crypto.getDefaultX509Identifier() != null) {
             return new X509DefaultSecurityTokenImpl(
                     (WSInboundSecurityContext) inboundSecurityContext, crypto, ((WSSSecurityProperties)securityProperties).getCallbackHandler(), crypto.getDefaultX509Identifier(),
-                    crypto.getDefaultX509Identifier(), null, ((WSSSecurityProperties)securityProperties)
+                    crypto.getDefaultX509Identifier(), WSSecurityTokenConstants.KeyIdentifier_NoKeyInfo, ((WSSSecurityProperties)securityProperties)
             );
         }
         throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");
@@ -101,16 +106,46 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             if (securityTokenReferenceType.getAny().size() > 1) {
                 ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3061);
             }
+
+            if (securityTokenReferenceType.getId() == null) {
+                securityTokenReferenceType.setId(IDGenerator.generateID(null));
+            }
             
             //todo BSP.R3027 KeyName? not supported ATM
             //todo BSP.R3060,BSP.R3025,BSP.R3056 only one Embedded element? Not supported ATM
             final X509DataType x509DataType
                     = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_dsig_X509Data);
             if (x509DataType != null) {
-                return new X509DataSecurityTokenImpl((WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler,
-                        x509DataType, securityTokenReferenceType.getId(),
-                        WSSecurityTokenConstants.KeyIdentifier_IssuerSerial,
-                        securityProperties);
+
+                //Issuer Serial
+                X509IssuerSerialType x509IssuerSerialType = XMLSecurityUtils.getQNameType(
+                        x509DataType.getX509IssuerSerialOrX509SKIOrX509SubjectName(), WSSConstants.TAG_dsig_X509IssuerSerial);
+                if (x509IssuerSerialType != null) {
+                    return new X509IssuerSerialTokenImpl(
+                            (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler, x509IssuerSerialType,
+                            securityTokenReferenceType.getId(), securityProperties);
+                }
+
+                //Subject Key Identifier
+                byte[] skiBytes =
+                        XMLSecurityUtils.getQNameType(
+                                x509DataType.getX509IssuerSerialOrX509SKIOrX509SubjectName(),
+                                XMLSecurityConstants.TAG_dsig_X509SKI
+                        );
+                if (skiBytes != null) {
+                    return new X509SKISecurityTokenImpl(
+                            (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler, skiBytes,
+                            securityTokenReferenceType.getId(), securityProperties);
+                }
+
+                //X509Certificate
+                byte[] x509CertificateBytes = XMLSecurityUtils.getQNameType(
+                        x509DataType.getX509IssuerSerialOrX509SKIOrX509SubjectName(), WSSConstants.TAG_dsig_X509Certificate);
+                if (x509CertificateBytes != null) {
+                    return new X509V3SecurityTokenImpl(
+                            (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler,
+                            x509CertificateBytes, securityTokenReferenceType.getId(), securityProperties);
+                }
             }
             
             String tokenType = 
@@ -142,24 +177,21 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                 }
 
                 if (WSSConstants.NS_X509_V3_TYPE.equals(valueType)) {
-                    return new X509_V3SecurityTokenImpl(
+                    return new X509V3SecurityTokenImpl(
                             (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler,
-                            binaryContent, securityTokenReferenceType.getId(), WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier,
-                            securityProperties);
+                            binaryContent, securityTokenReferenceType.getId(), securityProperties);
                 } else if (WSSConstants.NS_X509SubjectKeyIdentifier.equals(valueType)) {
-                    return new X509SubjectKeyIdentifierSecurityTokenImpl(
+                    return new X509SKISecurityTokenImpl(
                             (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler, binaryContent,
-                            securityTokenReferenceType.getId(), WSSecurityTokenConstants.KeyIdentifier_SkiKeyIdentifier,
-                            securityProperties);
+                            securityTokenReferenceType.getId(), securityProperties);
                 } else if (WSSConstants.NS_THUMBPRINT.equals(valueType)) {
-                    return new ThumbprintSHA1SecurityTokenImpl(
+                    return new X509ThumbprintSHA1SecurityTokenImpl(
                             (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler, binaryContent,
-                            securityTokenReferenceType.getId(), WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier,
-                            securityProperties);
+                            securityTokenReferenceType.getId(), securityProperties);
                 } else if (WSSConstants.NS_ENCRYPTED_KEY_SHA1.equals(valueType)) {
                     return new EncryptedKeySha1SecurityTokenImpl(
                             (WSInboundSecurityContext) inboundSecurityContext, callbackHandler, keyIdentifierType.getValue(),
-                            securityTokenReferenceType.getId(), WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier);
+                            securityTokenReferenceType.getId());
                 } else if (WSSConstants.NS_SAML10_TYPE.equals(valueType) || WSSConstants.NS_SAML20_TYPE.equals(valueType)) {
                     if (WSSConstants.NS_SAML20_TYPE.equals(valueType) && !WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE.equals(tokenType)) {
                         ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6617);
@@ -172,12 +204,14 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                         throw new WSSecurityException(
                                 WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", keyIdentifierType.getValue());
                     }
-                    return securityTokenProvider.getSecurityToken();
+                    return createSecurityTokenProxy(securityTokenProvider.getSecurityToken(),
+                            WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                 } else if (WSSConstants.NS_Kerberos5_AP_REQ_SHA1.equals(valueType)) {
                     SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider =
                             inboundSecurityContext.getSecurityTokenProvider(keyIdentifierType.getValue());
                     if (securityTokenProvider != null) {
-                        return securityTokenProvider.getSecurityToken();
+                        return createSecurityTokenProxy(securityTokenProvider.getSecurityToken(),
+                                WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                     }
 
                     MessageDigest messageDigest = null;
@@ -196,7 +230,8 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                             KerberosServiceSecurityToken kerberosSecurityToken = (KerberosServiceSecurityToken)inboundSecurityToken;
                             byte[] tokenDigest = messageDigest.digest(kerberosSecurityToken.getBinaryContent());
                             if (Arrays.equals(tokenDigest, binaryContent)) {
-                                return inboundSecurityToken;
+                                return createSecurityTokenProxy(inboundSecurityToken,
+                                        WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier);
                             }
                         }
                     }
@@ -278,7 +313,8 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     }
                 }
                 
-                return securityTokenProvider.getSecurityToken();
+                return createSecurityTokenProxy(securityTokenProvider.getSecurityToken(),
+                        WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
             }
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");
         } finally {
@@ -295,8 +331,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
         final RSAKeyValueType rsaKeyValueType
                 = XMLSecurityUtils.getQNameType(keyValueType.getContent(), WSSConstants.TAG_dsig_RSAKeyValue);
         if (rsaKeyValueType != null) {
-            return new RsaKeyValueSecurityTokenImpl(rsaKeyValueType, (WSInboundSecurityContext) securityContext,
-                    WSSecurityTokenConstants.KeyIdentifier_KeyValue) {
+            return new RsaKeyValueSecurityTokenImpl(rsaKeyValueType, (WSInboundSecurityContext) securityContext) {
                 @Override
                 public void verify() throws XMLSecurityException {
                     crypto.verifyTrust(getPubKey("", null, null));
@@ -306,8 +341,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
         final DSAKeyValueType dsaKeyValueType
                 = XMLSecurityUtils.getQNameType(keyValueType.getContent(), WSSConstants.TAG_dsig_DSAKeyValue);
         if (dsaKeyValueType != null) {
-            return new DsaKeyValueSecurityTokenImpl(dsaKeyValueType, (WSInboundSecurityContext) securityContext,
-                    WSSecurityTokenConstants.KeyIdentifier_KeyValue) {
+            return new DsaKeyValueSecurityTokenImpl(dsaKeyValueType, (WSInboundSecurityContext) securityContext) {
                 @Override
                 public void verify() throws XMLSecurityException {
                     crypto.verifyTrust(getPubKey("", null, null));
@@ -317,8 +351,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
         final ECKeyValueType ecKeyValueType
                 = XMLSecurityUtils.getQNameType(keyValueType.getContent(), WSSConstants.TAG_dsig11_ECKeyValue);
         if (ecKeyValueType != null) {
-            return new ECKeyValueSecurityTokenImpl(ecKeyValueType, (WSInboundSecurityContext) securityContext,
-                    WSSecurityTokenConstants.KeyIdentifier_KeyValue) {
+            return new ECKeyValueSecurityTokenImpl(ecKeyValueType, (WSInboundSecurityContext) securityContext) {
                 @Override
                 public void verify() throws XMLSecurityException {
                     crypto.verifyTrust(getPubKey("", null, null));
@@ -326,5 +359,32 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             };
         }
         throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "unsupportedKeyInfo");
+    }
+
+    private static InboundSecurityToken createSecurityTokenProxy(
+            final InboundSecurityToken inboundSecurityToken,
+            final WSSecurityTokenConstants.KeyIdentifier keyIdentifier) {
+
+        Class<?>[] interfaces = new Class<?>[inboundSecurityToken.getClass().getInterfaces().length + 1];
+        System.arraycopy(inboundSecurityToken.getClass().getInterfaces(), 0, interfaces, 0, inboundSecurityToken.getClass().getInterfaces().length);
+        interfaces[interfaces.length - 1] = InboundSecurityToken.class;
+        return (InboundSecurityToken) Proxy.newProxyInstance(
+                inboundSecurityToken.getClass().getClassLoader(),
+                interfaces,
+                new InvocationHandler() {
+
+                    @Override
+                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                        //todo static final initializer for getKeyIdentifier?
+                        if (method.getName().equals("getKeyIdentifier")) {
+                            return keyIdentifier;
+                        }
+                        try {
+                            return method.invoke(inboundSecurityToken, args);
+                        } catch (InvocationTargetException e) {
+                            throw e.getTargetException();
+                        }
+                    }
+                });
     }
 }

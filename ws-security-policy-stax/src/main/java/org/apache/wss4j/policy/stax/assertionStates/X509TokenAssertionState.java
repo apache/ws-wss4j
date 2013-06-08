@@ -37,8 +37,8 @@ import java.security.cert.X509Certificate;
 
 public class X509TokenAssertionState extends TokenAssertionState {
 
-    public X509TokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
-        super(assertion, asserted);
+    public X509TokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, boolean initiator) {
+        super(assertion, asserted, initiator);
     }
 
     @Override

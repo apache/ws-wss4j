@@ -23,6 +23,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.stax.securityToken.SamlSecurityToken;
 import org.apache.wss4j.stax.impl.securityToken.SamlSecurityTokenImpl;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implements SamlTokenValidator {
@@ -80,7 +81,7 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
                 samlAssertionWrapper, subjectSecurityToken,
                 tokenContext.getWsSecurityContext(),
                 sigVerCrypto,
-                null,
+                WSSecurityTokenConstants.KeyIdentifier_NoKeyInfo,
                 tokenContext.getWssSecurityProperties());
 
         securityToken.setElementPath(tokenContext.getElementPath());

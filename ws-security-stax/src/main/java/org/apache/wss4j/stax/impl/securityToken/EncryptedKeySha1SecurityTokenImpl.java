@@ -41,11 +41,11 @@ public class EncryptedKeySha1SecurityTokenImpl
     private CallbackHandler callbackHandler;
     private String sha1Identifier;
 
-    public EncryptedKeySha1SecurityTokenImpl(WSInboundSecurityContext inboundSecurityContext,
-                                             CallbackHandler callbackHandler, String sha1Identifier,
-                                             String id, SecurityTokenConstants.KeyIdentifier keyIdentifier) {
+    public EncryptedKeySha1SecurityTokenImpl(
+            WSInboundSecurityContext inboundSecurityContext, CallbackHandler callbackHandler,
+            String sha1Identifier, String id) {
 
-        super(inboundSecurityContext, id, keyIdentifier);
+        super(inboundSecurityContext, id, WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier, false);
         this.callbackHandler = callbackHandler;
         this.sha1Identifier = sha1Identifier;
     }

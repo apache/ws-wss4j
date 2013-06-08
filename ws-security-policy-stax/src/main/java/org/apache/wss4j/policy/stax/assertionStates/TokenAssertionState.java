@@ -41,8 +41,11 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
     //todo? WSP1.3 5.2.3 Required Claims
     //todo derived keys?
 
-    public TokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
+    private boolean initiator;
+
+    public TokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, boolean initiator) {
         super(assertion, asserted);
+        this.initiator = initiator;
     }
 
     @Override
@@ -65,7 +68,15 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
         while (tokenUsageIterator.hasNext()) {
             WSSecurityTokenConstants.TokenUsage tokenUsage = tokenUsageIterator.next();
             if (WSSecurityTokenConstants.TokenUsage_MainSignature.equals(tokenUsage)) {
-                if (!(parentAssertion instanceof InitiatorToken)
+                if (initiator && !(parentAssertion instanceof RecipientToken)
+                        && !(parentAssertion instanceof RecipientSignatureToken)
+                        && !(parentAssertion instanceof SignatureToken)
+                        && !(parentAssertion instanceof ProtectionToken)
+                        && !(parentAssertion instanceof TransportToken)) {
+                    ignoreToken++;
+                    continue loop;
+                }
+                else if (!initiator && !(parentAssertion instanceof InitiatorToken)
                         && !(parentAssertion instanceof InitiatorSignatureToken)
                         && !(parentAssertion instanceof SignatureToken)
                         && !(parentAssertion instanceof ProtectionToken)
@@ -76,7 +87,15 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
             } else if (WSSecurityTokenConstants.TokenUsage_Signature.equals(tokenUsage)) {
                     throw new WSSPolicyException("Illegal token usage!");
             } else if (WSSecurityTokenConstants.TokenUsage_MainEncryption.equals(tokenUsage)) {
-                if (!(parentAssertion instanceof RecipientToken)
+                if (initiator && !(parentAssertion instanceof InitiatorToken)
+                        && !(parentAssertion instanceof InitiatorEncryptionToken)
+                        && !(parentAssertion instanceof EncryptionToken)
+                        && !(parentAssertion instanceof ProtectionToken)
+                        && !(parentAssertion instanceof TransportToken)) {
+                    ignoreToken++;
+                    continue loop;
+                }
+                else if (!initiator && !(parentAssertion instanceof RecipientToken)
                         && !(parentAssertion instanceof RecipientEncryptionToken)
                         && !(parentAssertion instanceof EncryptionToken)
                         && !(parentAssertion instanceof ProtectionToken)
@@ -130,9 +149,40 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
         //WSP1.3, 5.1 Token Inclusion
         //todo do we need a global token cache to fullfill ".../IncludeToken/Once" ?
         SPConstants.IncludeTokenType includeTokenType = abstractToken.getIncludeTokenType();
-        if (includeTokenType == SPConstants.IncludeTokenType.INCLUDE_TOKEN_NEVER) {
-            setErrorMessage("Token must not be included");
-            asserted = false;
+        boolean isIncludedInMessage = tokenSecurityEvent.getSecurityToken().isIncludedInMessage();
+        switch (includeTokenType) {
+            case INCLUDE_TOKEN_NEVER:
+                if (isIncludedInMessage) {
+                    setErrorMessage("Token must not be included");
+                    asserted = false;
+                }
+                break;
+            case INCLUDE_TOKEN_ONCE:
+                break;
+            case INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT:
+                if (initiator && isIncludedInMessage) {
+                    setErrorMessage("Token must not be included");
+                    asserted = false;
+                } else if (!initiator && !isIncludedInMessage) {
+                    setErrorMessage("Token must be included");
+                    asserted = false;
+                }
+                break;
+            case INCLUDE_TOKEN_ALWAYS_TO_INITIATOR:
+                if (initiator && !isIncludedInMessage) {
+                    setErrorMessage("Token must be included");
+                    asserted = false;
+                } else if (!initiator && isIncludedInMessage) {
+                    setErrorMessage("Token must not be included");
+                    asserted = false;
+                }
+                break;
+            case INCLUDE_TOKEN_ALWAYS:
+                if (!isIncludedInMessage) {
+                    setErrorMessage("Token must be included");
+                    asserted = false;
+                }
+                break;
         }
 
         //WSP1.3, 5.3 Token Properties

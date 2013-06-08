@@ -38,6 +38,7 @@ import org.apache.xml.security.stax.config.Init;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecEventFactory;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.*;
 import org.opensaml.common.SAMLVersion;
 import org.testng.Assert;
@@ -128,7 +129,7 @@ public class InboundWSSecurityContextImplTest {
         UsernameSecurityTokenImpl usernameSecurityToken = new UsernameSecurityTokenImpl(
                 WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST,
                 "username", "password", new Date().toString(), null, new byte[10], 10L,
-                null, null, null);
+                null, IDGenerator.generateID(null), WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
         usernameSecurityToken.setElementPath(usernameTokenPath);
         usernameSecurityToken.setXMLSecEvent(usernameTokenXmlEvent);
         usernameTokenSecurityEvent.setSecurityToken(usernameSecurityToken);
@@ -318,7 +319,7 @@ public class InboundWSSecurityContextImplTest {
         UsernameSecurityTokenImpl usernameSecurityToken = new UsernameSecurityTokenImpl(
                 WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST,
                 "username", "password", new Date().toString(), null, new byte[10], 10L,
-                null, null, null);
+                null, IDGenerator.generateID(null), WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
         usernameSecurityToken.setElementPath(usernameTokenPath);
         usernameSecurityToken.setXMLSecEvent(usernameTokenXmlEvent);
         usernameTokenSecurityEvent.setSecurityToken(usernameSecurityToken);
@@ -561,7 +562,7 @@ public class InboundWSSecurityContextImplTest {
         UsernameSecurityTokenImpl usernameSecurityToken = new UsernameSecurityTokenImpl(
                 WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST,
                 "username", "password", new Date().toString(), null, new byte[10], 10L,
-                null, null, null);
+                null, IDGenerator.generateID(null), WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
         usernameSecurityToken.setElementPath(usernamePath);
         usernameSecurityToken.setXMLSecEvent(usernameTokenXmlEvent);
         usernameTokenSecurityEvent.setSecurityToken(usernameSecurityToken);
@@ -671,8 +672,8 @@ public class InboundWSSecurityContextImplTest {
         keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
 
         X509SecurityTokenImpl x509SecurityToken =
-                new X509SecurityTokenImpl(tokenType, null, null, null, "",
-                        WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier, null) {
+                new X509SecurityTokenImpl(tokenType, null, null, null, IDGenerator.generateID(null),
+                        WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier, null, true) {
 
             @Override
             protected String getAlias() throws WSSecurityException {

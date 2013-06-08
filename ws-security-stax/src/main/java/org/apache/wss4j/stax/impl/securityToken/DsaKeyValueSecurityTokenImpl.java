@@ -22,7 +22,6 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.PublicKeyPrincipalImpl;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.securityToken.DsaKeyValueSecurityToken;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.binding.xmldsig.DSAKeyValueType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 
@@ -36,9 +35,8 @@ public class DsaKeyValueSecurityTokenImpl
     private Principal principal;
 
     public DsaKeyValueSecurityTokenImpl(
-            DSAKeyValueType dsaKeyValueType, WSInboundSecurityContext wsInboundSecurityContext,
-            WSSecurityTokenConstants.KeyIdentifier keyIdentifier) throws XMLSecurityException {
-        super(dsaKeyValueType, wsInboundSecurityContext, keyIdentifier);
+            DSAKeyValueType dsaKeyValueType, WSInboundSecurityContext wsInboundSecurityContext) {
+        super(dsaKeyValueType, wsInboundSecurityContext);
     }
 
     @Override

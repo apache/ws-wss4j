@@ -43,20 +43,18 @@ public class HttpsSecurityTokenImpl extends AbstractInboundSecurityToken impleme
     }
 
     public HttpsSecurityTokenImpl() {
-        super(null, IDGenerator.generateID(null), null);
+        super(null, IDGenerator.generateID(null), WSSecurityTokenConstants.KeyIdentifier_NoKeyInfo, true);
         this.authenticationType = AuthenticationType.noAuthentication;
     }
     
     public HttpsSecurityTokenImpl(X509Certificate x509Certificate) {
-
-        super(null, IDGenerator.generateID(null), null);
+        super(null, IDGenerator.generateID(null), WSSecurityTokenConstants.KeyIdentifier_NoKeyInfo, true);
         setX509Certificates(new X509Certificate[]{x509Certificate});
         this.authenticationType = AuthenticationType.httpsClientAuthentication;
     }
 
     public HttpsSecurityTokenImpl(boolean basicAuthentication, String username) {
-
-        super(null, IDGenerator.generateID(null), null);
+        super(null, IDGenerator.generateID(null), WSSecurityTokenConstants.KeyIdentifier_NoKeyInfo, true);
         if (basicAuthentication) {
             this.authenticationType = AuthenticationType.httpBasicAuthentication;
         } else {

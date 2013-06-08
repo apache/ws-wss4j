@@ -126,6 +126,7 @@ public class PolicyEnforcer implements SecurityEventListener {
 
     public PolicyEnforcer(List<OperationPolicy> operationPolicies, String soapAction, boolean initiator) throws WSSPolicyException {
         this.operationPolicies = operationPolicies;
+        this.initiator = initiator;
         assertionStateMap = new LinkedList<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>>();
         failedAssertionStateMap = new LinkedList<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>>();
 
@@ -135,7 +136,6 @@ public class PolicyEnforcer implements SecurityEventListener {
                 buildAssertionStateMap(effectivePolicy.getPolicy(), assertionStateMap);
             }
         }
-        this.initiator = initiator;
     }
 
     private OperationPolicy findPolicyBySOAPAction(List<OperationPolicy> operationPolicies, String soapAction) {
@@ -268,27 +268,27 @@ public class PolicyEnforcer implements SecurityEventListener {
         } else if (abstractSecurityAssertion instanceof RequiredParts) {
             assertableList.add(new RequiredPartsAssertionState(abstractSecurityAssertion, false));
         } else if (abstractSecurityAssertion instanceof UsernameToken) {
-            assertableList.add(new UsernameTokenAssertionState(abstractSecurityAssertion, false));
+            assertableList.add(new UsernameTokenAssertionState(abstractSecurityAssertion, false, initiator));
         } else if (abstractSecurityAssertion instanceof IssuedToken) {
-            assertableList.add(new IssuedTokenAssertionState(abstractSecurityAssertion, false));
+            assertableList.add(new IssuedTokenAssertionState(abstractSecurityAssertion, false, initiator));
         } else if (abstractSecurityAssertion instanceof X509Token) {
-            assertableList.add(new X509TokenAssertionState(abstractSecurityAssertion, false));
+            assertableList.add(new X509TokenAssertionState(abstractSecurityAssertion, false, initiator));
         } else if (abstractSecurityAssertion instanceof KerberosToken) {
-            assertableList.add(new KerberosTokenAssertionState(abstractSecurityAssertion, false));
+            assertableList.add(new KerberosTokenAssertionState(abstractSecurityAssertion, false, initiator));
         } else if (abstractSecurityAssertion instanceof SpnegoContextToken) {
-            assertableList.add(new SpnegoContextTokenAssertionState(abstractSecurityAssertion, false));
+            assertableList.add(new SpnegoContextTokenAssertionState(abstractSecurityAssertion, false, initiator));
         } else if (abstractSecurityAssertion instanceof SecureConversationToken) {
-            assertableList.add(new SecureConversationTokenAssertionState(abstractSecurityAssertion, false));
+            assertableList.add(new SecureConversationTokenAssertionState(abstractSecurityAssertion, false, initiator));
         } else if (abstractSecurityAssertion instanceof SecurityContextToken) {
-            assertableList.add(new SecurityContextTokenAssertionState(abstractSecurityAssertion, false));
+            assertableList.add(new SecurityContextTokenAssertionState(abstractSecurityAssertion, false, initiator));
         } else if (abstractSecurityAssertion instanceof SamlToken) {
-            assertableList.add(new SamlTokenAssertionState(abstractSecurityAssertion, false));
+            assertableList.add(new SamlTokenAssertionState(abstractSecurityAssertion, false, initiator));
         } else if (abstractSecurityAssertion instanceof RelToken) {
-            assertableList.add(new RelTokenAssertionState(abstractSecurityAssertion, false));
+            assertableList.add(new RelTokenAssertionState(abstractSecurityAssertion, false, initiator));
         } else if (abstractSecurityAssertion instanceof HttpsToken) {
-            assertableList.add(new HttpsTokenAssertionState(abstractSecurityAssertion, false));
+            assertableList.add(new HttpsTokenAssertionState(abstractSecurityAssertion, false, initiator));
         } else if (abstractSecurityAssertion instanceof KeyValueToken) {
-            assertableList.add(new KeyValueTokenAssertionState(abstractSecurityAssertion, false));
+            assertableList.add(new KeyValueTokenAssertionState(abstractSecurityAssertion, false, initiator));
         } else if (abstractSecurityAssertion instanceof AlgorithmSuite) {
             //initialized with asserted=true because we do negative matching
             assertableList.add(new AlgorithmSuiteAssertionState(abstractSecurityAssertion, true));

@@ -29,29 +29,28 @@ import org.apache.xml.security.stax.impl.util.UnsynchronizedByteArrayInputStream
 import javax.security.auth.callback.CallbackHandler;
 import java.security.cert.X509Certificate;
 
-public class X509_V3SecurityTokenImpl extends X509SecurityTokenImpl {
+public class X509V3SecurityTokenImpl extends X509SecurityTokenImpl {
 
     private String alias = null;
-    private Crypto crypto;
 
-    public X509_V3SecurityTokenImpl(WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
-                                    byte[] binaryContent, String id, WSSecurityTokenConstants.KeyIdentifier keyIdentifier,
-                                    WSSSecurityProperties securityProperties)
-            throws XMLSecurityException {
+    public X509V3SecurityTokenImpl(
+            WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto, CallbackHandler callbackHandler,
+            byte[] binaryContent, String id, WSSSecurityProperties securityProperties) throws XMLSecurityException {
 
-        super(WSSecurityTokenConstants.X509V3Token, wsInboundSecurityContext, crypto, callbackHandler, id, keyIdentifier, securityProperties);
-        this.crypto = crypto;
-        setX509Certificates(new X509Certificate[]{getCrypto().loadCertificate(new UnsynchronizedByteArrayInputStream(binaryContent))});
-        
+        super(WSSecurityTokenConstants.X509V3Token, wsInboundSecurityContext, crypto, callbackHandler, id,
+                WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier, securityProperties, true);
+
+        X509Certificate x509Certificate = getCrypto().loadCertificate(new UnsynchronizedByteArrayInputStream(binaryContent));
+        setX509Certificates(new X509Certificate[]{x509Certificate});
+
         // Check to see if the certificates actually correspond to the decryption crypto
-        if (getX509Certificates() != null 
-            && getCrypto().getX509Identifier(getX509Certificates()[0]) == null) {
+        if (getCrypto().getX509Identifier(getX509Certificates()[0]) == null) {
             try {
                 Crypto decCrypto = securityProperties.getDecryptionCrypto();
                 if (decCrypto != null
-                    && decCrypto != getCrypto()
-                    && decCrypto.getX509Identifier(getX509Certificates()[0]) != null) {
-                    this.crypto = decCrypto;
+                        && decCrypto != getCrypto()
+                        && decCrypto.getX509Identifier(getX509Certificates()[0]) != null) {
+                    setCrypto(decCrypto);
                 }
             } catch (WSSConfigurationException ex) { //NOPMD
                 // Just continue
@@ -65,10 +64,5 @@ public class X509_V3SecurityTokenImpl extends X509SecurityTokenImpl {
             this.alias = getCrypto().getX509Identifier(getX509Certificates()[0]);
         }
         return this.alias;
-    }
-    
-    @Override
-    public Crypto getCrypto() {
-        return crypto;
     }
 }

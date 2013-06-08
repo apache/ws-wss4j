@@ -34,8 +34,8 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 public class SpnegoContextTokenAssertionState extends TokenAssertionState {
 
-    public SpnegoContextTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
-        super(assertion, asserted);
+    public SpnegoContextTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, boolean initiator) {
+        super(assertion, asserted, initiator);
     }
 
     @Override
