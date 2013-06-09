@@ -263,7 +263,7 @@ public class KerberosTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 1);
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
 
-            Assert.assertEquals(kerberosTokenSecurityEvents.size(), 2);
+            Assert.assertEquals(kerberosTokenSecurityEvents.size(), 1);
             final KerberosTokenSecurityEvent kerberosTokenSecurityEvent = kerberosTokenSecurityEvents.get(0);
             Assert.assertNotNull(kerberosTokenSecurityEvent.getSecurityToken().getSubject());
             Assert.assertTrue(kerberosTokenSecurityEvent.getSecurityToken().getPrincipal() instanceof KerberosPrincipal);
@@ -360,7 +360,7 @@ public class KerberosTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 1);
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
 
-            Assert.assertEquals(kerberosTokenSecurityEvents.size(), 2);
+            Assert.assertEquals(kerberosTokenSecurityEvents.size(), 1);
         }
     }
 
@@ -529,7 +529,7 @@ public class KerberosTest extends AbstractTestBase {
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 0);
 
-            Assert.assertEquals(kerberosTokenSecurityEvents.size(), 2);
+            Assert.assertEquals(kerberosTokenSecurityEvents.size(), 1);
         }
     }
 
@@ -625,7 +625,7 @@ public class KerberosTest extends AbstractTestBase {
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 0);
 
-            Assert.assertEquals(kerberosTokenSecurityEvents.size(), 2);
+            Assert.assertEquals(kerberosTokenSecurityEvents.size(), 1);
         }
     }
 }

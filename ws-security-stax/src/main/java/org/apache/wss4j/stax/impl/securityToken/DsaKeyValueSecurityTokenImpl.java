@@ -18,6 +18,7 @@
  */
 package org.apache.wss4j.stax.impl.securityToken;
 
+import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.PublicKeyPrincipalImpl;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
@@ -32,11 +33,18 @@ public class DsaKeyValueSecurityTokenImpl
         extends org.apache.xml.security.stax.impl.securityToken.DsaKeyValueSecurityToken
         implements DsaKeyValueSecurityToken {
 
+    private Crypto crypto;
     private Principal principal;
 
     public DsaKeyValueSecurityTokenImpl(
-            DSAKeyValueType dsaKeyValueType, WSInboundSecurityContext wsInboundSecurityContext) {
+            DSAKeyValueType dsaKeyValueType, WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto) {
         super(dsaKeyValueType, wsInboundSecurityContext);
+        this.crypto = crypto;
+    }
+
+    @Override
+    public void verify() throws XMLSecurityException {
+        crypto.verifyTrust(getPublicKey());
     }
 
     @Override

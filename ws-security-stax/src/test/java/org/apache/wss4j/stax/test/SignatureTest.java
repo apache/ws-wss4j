@@ -1316,8 +1316,8 @@ public class SignatureTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignatureValue,
                     WSSecurityEventConstants.KeyValueToken,
+                    WSSecurityEventConstants.SignatureValue,
                     WSSecurityEventConstants.SignedElement,
                     WSSecurityEventConstants.Operation,
             };

@@ -18,6 +18,7 @@
  */
 package org.apache.wss4j.stax.impl.securityToken;
 
+import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.PublicKeyPrincipalImpl;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
@@ -32,12 +33,19 @@ public class ECKeyValueSecurityTokenImpl
         extends org.apache.xml.security.stax.impl.securityToken.ECKeyValueSecurityToken
         implements ECKeyValueSecurityToken {
 
+    private Crypto crypto;
     private Principal principal;
 
     public ECKeyValueSecurityTokenImpl(
-            ECKeyValueType ecKeyValueType, WSInboundSecurityContext wsInboundSecurityContext)
+            ECKeyValueType ecKeyValueType, WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto)
             throws XMLSecurityException {
         super(ecKeyValueType, wsInboundSecurityContext);
+        this.crypto = crypto;
+    }
+
+    @Override
+    public void verify() throws XMLSecurityException {
+        crypto.verifyTrust(getPublicKey());
     }
 
     @Override

@@ -20,6 +20,7 @@ package org.apache.wss4j.stax.impl.securityToken;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
@@ -48,6 +49,9 @@ public class X509SKISecurityTokenImpl extends X509SecurityTokenImpl {
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.SKI_BYTES);
             cryptoType.setBytes(binaryContent);
             X509Certificate[] certs = getCrypto().getX509Certificates(cryptoType);
+            if (certs == null) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE);
+            }
             this.alias = getCrypto().getX509Identifier(certs[0]);
         }
         return this.alias;

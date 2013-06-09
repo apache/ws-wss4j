@@ -145,17 +145,17 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
     }
 
     public RsaKeyValueSecurityTokenImpl getRsaKeyValueSecurityToken() throws Exception {
-        return new RsaKeyValueSecurityTokenImpl(null, null);
+        return new RsaKeyValueSecurityTokenImpl(null, null, null);
     }
 
     public DsaKeyValueSecurityTokenImpl getDsaKeyValueSecurityToken() throws Exception {
-        return new DsaKeyValueSecurityTokenImpl(null, null);
+        return new DsaKeyValueSecurityTokenImpl(null, null, null);
     }
 
     public ECKeyValueSecurityTokenImpl getECKeyValueSecurityToken() throws Exception {
         ECKeyValueType ecKeyValueType = new ECKeyValueType();
         ecKeyValueType.setNamedCurve(new NamedCurveType());
-        return new ECKeyValueSecurityTokenImpl(ecKeyValueType, null);
+        return new ECKeyValueSecurityTokenImpl(ecKeyValueType, null, null);
     }
 
     protected String loadResourceAsString(String resource, String encoding) throws IOException {

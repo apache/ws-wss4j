@@ -39,12 +39,16 @@ import org.apache.xml.security.stax.securityToken.SecurityTokenFactory;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.x500.X500Principal;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -116,11 +120,27 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             final X509DataType x509DataType
                     = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_dsig_X509Data);
             if (x509DataType != null) {
-
                 //Issuer Serial
                 X509IssuerSerialType x509IssuerSerialType = XMLSecurityUtils.getQNameType(
                         x509DataType.getX509IssuerSerialOrX509SKIOrX509SubjectName(), WSSConstants.TAG_dsig_X509IssuerSerial);
                 if (x509IssuerSerialType != null) {
+                    //first look if the token is included in the message (necessary for TokenInclusion policy)...
+                    List<SecurityTokenProvider<? extends InboundSecurityToken>> securityTokenProviders =
+                            inboundSecurityContext.getRegisteredSecurityTokenProviders();
+                    for (int i = 0; i < securityTokenProviders.size(); i++) {
+                        SecurityTokenProvider<? extends InboundSecurityToken> tokenProvider = securityTokenProviders.get(i);
+                        InboundSecurityToken inboundSecurityToken = tokenProvider.getSecurityToken();
+                        if (inboundSecurityToken instanceof X509SecurityToken) {
+                            X509SecurityToken x509SecurityToken = (X509SecurityToken) inboundSecurityToken;
+
+                            final X509Certificate x509Certificate = x509SecurityToken.getX509Certificates()[0];
+                            if (x509Certificate.getSerialNumber().compareTo(x509IssuerSerialType.getX509SerialNumber()) == 0 &&
+                                    x509Certificate.getIssuerX500Principal().equals(new X500Principal(x509IssuerSerialType.getX509IssuerName())))
+                                return createSecurityTokenProxy(inboundSecurityToken,
+                                        WSSecurityTokenConstants.KeyIdentifier_IssuerSerial);
+                        }
+                    }
+                    //...then if none is found create a new SecurityToken instance
                     return new X509IssuerSerialTokenImpl(
                             (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler, x509IssuerSerialType,
                             securityTokenReferenceType.getId(), securityProperties);
@@ -185,6 +205,31 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                             (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler, binaryContent,
                             securityTokenReferenceType.getId(), securityProperties);
                 } else if (WSSConstants.NS_THUMBPRINT.equals(valueType)) {
+                    try {
+                        MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
+                        //first look if the token is included in the message (necessary for TokenInclusion policy)...
+                        List<SecurityTokenProvider<? extends InboundSecurityToken>> securityTokenProviders =
+                                inboundSecurityContext.getRegisteredSecurityTokenProviders();
+                        for (int i = 0; i < securityTokenProviders.size(); i++) {
+                            SecurityTokenProvider<? extends InboundSecurityToken> tokenProvider = securityTokenProviders.get(i);
+                            InboundSecurityToken inboundSecurityToken = tokenProvider.getSecurityToken();
+                            if (inboundSecurityToken instanceof X509SecurityToken) {
+                                X509SecurityToken x509SecurityToken = (X509SecurityToken)inboundSecurityToken;
+                                byte[] tokenDigest = messageDigest.digest(x509SecurityToken.getX509Certificates()[0].getEncoded());
+
+                                if (Arrays.equals(tokenDigest, binaryContent)) {
+                                    return createSecurityTokenProxy(inboundSecurityToken,
+                                            WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier);
+                                }
+                            }
+                        }
+                    } catch (NoSuchAlgorithmException e) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+                    } catch (CertificateEncodingException e) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN);
+                    }
+
+                    //...then if none is found create a new SecurityToken instance
                     return new X509ThumbprintSHA1SecurityTokenImpl(
                             (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler, binaryContent,
                             securityTokenReferenceType.getId(), securityProperties);
@@ -214,27 +259,27 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                                 WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                     }
 
-                    MessageDigest messageDigest = null;
                     try {
-                        messageDigest = MessageDigest.getInstance("SHA-1");
+                        //ok we have to find the token via digesting...
+                        MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
+                        List<SecurityTokenProvider<? extends InboundSecurityToken>> securityTokenProviders =
+                                inboundSecurityContext.getRegisteredSecurityTokenProviders();
+                        for (int i = 0; i < securityTokenProviders.size(); i++) {
+                            SecurityTokenProvider<? extends InboundSecurityToken> tokenProvider = securityTokenProviders.get(i);
+                            InboundSecurityToken inboundSecurityToken = tokenProvider.getSecurityToken();
+                            if (inboundSecurityToken instanceof KerberosServiceSecurityToken) {
+                                KerberosServiceSecurityToken kerberosSecurityToken = (KerberosServiceSecurityToken)inboundSecurityToken;
+                                byte[] tokenDigest = messageDigest.digest(kerberosSecurityToken.getBinaryContent());
+                                if (Arrays.equals(tokenDigest, binaryContent)) {
+                                    return createSecurityTokenProxy(inboundSecurityToken,
+                                            WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier);
+                                }
+                            }
+                        }
                     } catch (NoSuchAlgorithmException e) {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
                     }
 
-                    //ok we have to find the token via digesting...
-                    List<SecurityTokenProvider<? extends InboundSecurityToken>> securityTokenProviders = inboundSecurityContext.getRegisteredSecurityTokenProviders();
-                    for (int i = 0; i < securityTokenProviders.size(); i++) {
-                        SecurityTokenProvider<? extends InboundSecurityToken> tokenProvider = securityTokenProviders.get(i);
-                        InboundSecurityToken inboundSecurityToken = tokenProvider.getSecurityToken();
-                        if (inboundSecurityToken instanceof KerberosServiceSecurityToken) {
-                            KerberosServiceSecurityToken kerberosSecurityToken = (KerberosServiceSecurityToken)inboundSecurityToken;
-                            byte[] tokenDigest = messageDigest.digest(kerberosSecurityToken.getBinaryContent());
-                            if (Arrays.equals(tokenDigest, binaryContent)) {
-                                return createSecurityTokenProxy(inboundSecurityToken,
-                                        WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier);
-                            }
-                        }
-                    }
                     throw new WSSecurityException(
                             WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", keyIdentifierType.getValue());
                 } else {
@@ -273,7 +318,8 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                 }
                 inboundSecurityContext.put("" + Thread.currentThread().hashCode(), invokeCount);
 
-                SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider = inboundSecurityContext.getSecurityTokenProvider(uri);
+                SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider =
+                        inboundSecurityContext.getSecurityTokenProvider(uri);
                 if (securityTokenProvider == null) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", uri);
                 }
@@ -326,37 +372,22 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                                                  final CallbackHandler callbackHandler, SecurityContext securityContext)
             throws XMLSecurityException {
 
-        //todo *KeyValueSecurityToken verify() inline in classes
-        //todo either handover crypto to verify() or to constructor
         final RSAKeyValueType rsaKeyValueType
                 = XMLSecurityUtils.getQNameType(keyValueType.getContent(), WSSConstants.TAG_dsig_RSAKeyValue);
         if (rsaKeyValueType != null) {
-            return new RsaKeyValueSecurityTokenImpl(rsaKeyValueType, (WSInboundSecurityContext) securityContext) {
-                @Override
-                public void verify() throws XMLSecurityException {
-                    crypto.verifyTrust(getPubKey("", null, null));
-                }
-            };
+            return new RsaKeyValueSecurityTokenImpl(rsaKeyValueType, (WSInboundSecurityContext) securityContext, crypto);
         }
+
         final DSAKeyValueType dsaKeyValueType
                 = XMLSecurityUtils.getQNameType(keyValueType.getContent(), WSSConstants.TAG_dsig_DSAKeyValue);
         if (dsaKeyValueType != null) {
-            return new DsaKeyValueSecurityTokenImpl(dsaKeyValueType, (WSInboundSecurityContext) securityContext) {
-                @Override
-                public void verify() throws XMLSecurityException {
-                    crypto.verifyTrust(getPubKey("", null, null));
-                }
-            };
+            return new DsaKeyValueSecurityTokenImpl(dsaKeyValueType, (WSInboundSecurityContext) securityContext, crypto);
         }
+
         final ECKeyValueType ecKeyValueType
                 = XMLSecurityUtils.getQNameType(keyValueType.getContent(), WSSConstants.TAG_dsig11_ECKeyValue);
         if (ecKeyValueType != null) {
-            return new ECKeyValueSecurityTokenImpl(ecKeyValueType, (WSInboundSecurityContext) securityContext) {
-                @Override
-                public void verify() throws XMLSecurityException {
-                    crypto.verifyTrust(getPubKey("", null, null));
-                }
-            };
+            return new ECKeyValueSecurityTokenImpl(ecKeyValueType, (WSInboundSecurityContext) securityContext, crypto);
         }
         throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "unsupportedKeyInfo");
     }
@@ -365,9 +396,10 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             final InboundSecurityToken inboundSecurityToken,
             final WSSecurityTokenConstants.KeyIdentifier keyIdentifier) {
 
-        Class<?>[] interfaces = new Class<?>[inboundSecurityToken.getClass().getInterfaces().length + 1];
-        System.arraycopy(inboundSecurityToken.getClass().getInterfaces(), 0, interfaces, 0, inboundSecurityToken.getClass().getInterfaces().length);
-        interfaces[interfaces.length - 1] = InboundSecurityToken.class;
+        List<Class<?>> implementedInterfaces = new ArrayList<Class<?>>();
+        getImplementedInterfaces(inboundSecurityToken.getClass(), implementedInterfaces);
+        Class<?>[] interfaces = implementedInterfaces.toArray(new Class<?>[implementedInterfaces.size()]);
+
         return (InboundSecurityToken) Proxy.newProxyInstance(
                 inboundSecurityToken.getClass().getClassLoader(),
                 interfaces,
@@ -375,7 +407,6 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
 
                     @Override
                     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                        //todo static final initializer for getKeyIdentifier?
                         if (method.getName().equals("getKeyIdentifier")) {
                             return keyIdentifier;
                         }
@@ -385,6 +416,23 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                             throw e.getTargetException();
                         }
                     }
-                });
+                }
+        );
+    }
+
+    private static void getImplementedInterfaces(Class<?> clazz, List<Class<?>> interfaceList) {
+        if (clazz == null) {
+            return;
+        }
+        Class<?>[] interfaces = clazz.getInterfaces();
+        for (int i = 0; i < interfaces.length; i++) {
+            Class<?> anInterface = interfaces[i];
+
+            if (!interfaceList.contains(anInterface)) {
+                interfaceList.add(anInterface);
+            }
+            getImplementedInterfaces(anInterface, interfaceList);
+        }
+        getImplementedInterfaces(clazz.getSuperclass(), interfaceList);
     }
 }

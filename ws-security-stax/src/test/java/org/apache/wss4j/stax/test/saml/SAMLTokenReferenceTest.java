@@ -158,8 +158,8 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.SamlToken,
-                    WSSecurityEventConstants.SignatureValue,
                     WSSecurityEventConstants.X509Token,
+                    WSSecurityEventConstants.SignatureValue,
                     WSSecurityEventConstants.SignedElement,
                     WSSecurityEventConstants.SignedElement,
                     WSSecurityEventConstants.Operation,
@@ -271,7 +271,6 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.SamlToken,
                     WSSecurityEventConstants.SignatureValue,
-                    WSSecurityEventConstants.SamlToken,
                     WSSecurityEventConstants.SignedElement,
                     WSSecurityEventConstants.Operation,
             };
@@ -602,8 +601,8 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.SamlToken,
-                    WSSecurityEventConstants.SignatureValue,
                     WSSecurityEventConstants.X509Token,
+                    WSSecurityEventConstants.SignatureValue,
                     WSSecurityEventConstants.SignedElement,
                     WSSecurityEventConstants.SignedElement,
                     WSSecurityEventConstants.Operation,
@@ -716,7 +715,6 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.SamlToken,
                     WSSecurityEventConstants.SignatureValue,
-                    WSSecurityEventConstants.SamlToken,
                     WSSecurityEventConstants.SignedElement,
                     WSSecurityEventConstants.Operation,
             };
@@ -842,7 +840,6 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.SamlToken,
                     WSSecurityEventConstants.SignatureValue,
-                    WSSecurityEventConstants.SamlToken,
                     WSSecurityEventConstants.SignedElement,
                     WSSecurityEventConstants.Operation,
             };

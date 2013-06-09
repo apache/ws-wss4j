@@ -182,31 +182,21 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
             }
         }
 
-        //search for the root tokens...
-        for (int i = 0; i < tokenSecurityEvents.size(); i++) {
-            TokenSecurityEvent<? extends InboundSecurityToken> tokenSecurityEvent = tokenSecurityEvents.get(i);
-            SecurityToken securityToken = tokenSecurityEvent.getSecurityToken();
-            if (securityToken.getKeyWrappingToken() == null && !containsSecurityToken(supportingTokens, securityToken)) {
-                supportingTokens = addTokenSecurityEvent(tokenSecurityEvent, supportingTokens);
-            }
-        }
-        //...and then for the intermediare tokens and create new TokenSecurityEvents if not already there
+        //search the root tokens and create new TokenSecurityEvents if not already there...
         for (int i = 0; i < tokenSecurityEvents.size(); i++) {
             TokenSecurityEvent<? extends InboundSecurityToken> tokenSecurityEvent = tokenSecurityEvents.get(i);
             InboundSecurityToken securityToken = tokenSecurityEvent.getSecurityToken();
-            if (securityToken.getKeyWrappingToken() != null) {
-                while (securityToken.getKeyWrappingToken() != null) {
-                    securityToken = securityToken.getKeyWrappingToken();
-                }
-                if (!containsSecurityToken(supportingTokens, securityToken)) {
-                    TokenSecurityEvent<? extends InboundSecurityToken> newTokenSecurityEvent =
-                            WSSUtils.createTokenSecurityEvent(securityToken, tokenSecurityEvent.getCorrelationID());
-                    supportingTokens = addTokenSecurityEvent(newTokenSecurityEvent, supportingTokens);
-                    securityEventDeque.offer(newTokenSecurityEvent);
-                }
-                //remove old TokenSecurityEvent so that only root tokens are in the queue
-                securityEventDeque.remove(tokenSecurityEvent);
+            while (securityToken.getKeyWrappingToken() != null) {
+                securityToken = securityToken.getKeyWrappingToken();
             }
+            if (!containsSecurityToken(supportingTokens, securityToken)) {
+                TokenSecurityEvent<? extends InboundSecurityToken> newTokenSecurityEvent =
+                        WSSUtils.createTokenSecurityEvent(securityToken, tokenSecurityEvent.getCorrelationID());
+                supportingTokens = addTokenSecurityEvent(newTokenSecurityEvent, supportingTokens);
+                securityEventDeque.offer(newTokenSecurityEvent);
+            }
+            //remove old TokenSecurityEvent so that only root tokens are in the queue
+            securityEventDeque.remove(tokenSecurityEvent);
         }
 
         Iterator<TokenSecurityEvent<? extends InboundSecurityToken>> supportingTokensIterator = supportingTokens.iterator();
