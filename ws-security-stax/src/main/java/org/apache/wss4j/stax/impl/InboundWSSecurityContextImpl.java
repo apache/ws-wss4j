@@ -258,6 +258,9 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
             } else if (signsSignature && signingSecurityTokens.size() > 0 && encryptingSecurityTokens.size() > 0) {
                 supportingTokensIterator.remove();
                 signedEndorsingEncryptedSupportingTokens = addTokenSecurityEvent(tokenSecurityEvent, signedEndorsingEncryptedSupportingTokens);
+            } else if (transportSecurityActive && signsTimestamp && signingSecurityTokens.size() > 0 && encryptingSecurityTokens.size() > 0) {
+                supportingTokensIterator.remove();
+                signedEndorsingEncryptedSupportingTokens = addTokenSecurityEvent(tokenSecurityEvent, signedEndorsingEncryptedSupportingTokens);
             } else if (signsSignature && signingSecurityTokens.size() == 0 && encryptingSecurityTokens.size() > 0) {
                 supportingTokensIterator.remove();
                 endorsingEncryptedSupportingTokens = addTokenSecurityEvent(tokenSecurityEvent, endorsingEncryptedSupportingTokens);

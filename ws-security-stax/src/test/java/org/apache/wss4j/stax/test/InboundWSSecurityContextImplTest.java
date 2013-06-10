@@ -78,7 +78,7 @@ public class InboundWSSecurityContextImplTest {
             } else if (securityEvent instanceof X509TokenSecurityEvent) {
                 X509TokenSecurityEvent tokenSecurityEvent = (X509TokenSecurityEvent) securityEvent;
                 Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
-                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_SignedEndorsingSupportingTokens));
+                Assert.assertTrue(tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_SignedEndorsingEncryptedSupportingTokens));
             } else if (securityEvent instanceof UsernameTokenSecurityEvent) {
                 UsernameTokenSecurityEvent tokenSecurityEvent = (UsernameTokenSecurityEvent) securityEvent;
                 Assert.assertEquals(tokenSecurityEvent.getSecurityToken().getTokenUsages().size(), 1);
@@ -142,11 +142,11 @@ public class InboundWSSecurityContextImplTest {
         XMLSecEvent signedEndorsingSupportingTokenXmlEvent = XMLSecEventFactory.createXmlSecStartElement(WSSConstants.TAG_wsse_UsernameToken, null, null);
 
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
-        X509SecurityTokenImpl signedEndorsingSupportingToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
-        signedEndorsingSupportingToken.setElementPath(bstPath);
-        signedEndorsingSupportingToken.setXMLSecEvent(signedEndorsingSupportingTokenXmlEvent);
-        x509TokenSecurityEvent.setSecurityToken(signedEndorsingSupportingToken);
-        signedEndorsingSupportingToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_Signature);
+        X509SecurityTokenImpl signedEndorsingEncryptedSupportingToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
+        signedEndorsingEncryptedSupportingToken.setElementPath(bstPath);
+        signedEndorsingEncryptedSupportingToken.setXMLSecEvent(signedEndorsingSupportingTokenXmlEvent);
+        x509TokenSecurityEvent.setSecurityToken(signedEndorsingEncryptedSupportingToken);
+        signedEndorsingEncryptedSupportingToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_Signature);
         inboundWSSecurityContext.registerSecurityEvent(x509TokenSecurityEvent);
 
         SignatureValueSecurityEvent signatureValueSecurityEvent = new SignatureValueSecurityEvent();
@@ -155,11 +155,11 @@ public class InboundWSSecurityContextImplTest {
         List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
-        SignedElementSecurityEvent signedTimestampElementSecurityEvent = new SignedElementSecurityEvent(signedEndorsingSupportingToken, true, protectionOrder);
+        SignedElementSecurityEvent signedTimestampElementSecurityEvent = new SignedElementSecurityEvent(signedEndorsingEncryptedSupportingToken, true, protectionOrder);
         signedTimestampElementSecurityEvent.setElementPath(timestampPath);
         inboundWSSecurityContext.registerSecurityEvent(signedTimestampElementSecurityEvent);
 
-        SignedElementSecurityEvent signedBSTElementSecurityEvent = new SignedElementSecurityEvent(signedEndorsingSupportingToken, true, protectionOrder);
+        SignedElementSecurityEvent signedBSTElementSecurityEvent = new SignedElementSecurityEvent(signedEndorsingEncryptedSupportingToken, true, protectionOrder);
         signedBSTElementSecurityEvent.setElementPath(bstPath);
         signedBSTElementSecurityEvent.setXmlSecEvent(signedEndorsingSupportingTokenXmlEvent);
         inboundWSSecurityContext.registerSecurityEvent(signedBSTElementSecurityEvent);
