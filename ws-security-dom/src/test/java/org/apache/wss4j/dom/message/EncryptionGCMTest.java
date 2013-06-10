@@ -180,6 +180,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
         RequestData requestData = new RequestData();
         List<BSPRule> bspRules = new ArrayList<BSPRule>();
         bspRules.add(BSPRule.R5621);
+        bspRules.add(BSPRule.R5620);
         requestData.setIgnoredBSPRules(bspRules);
         requestData.setCallbackHandler(handler);
         requestData.setDecCrypto(crypto);

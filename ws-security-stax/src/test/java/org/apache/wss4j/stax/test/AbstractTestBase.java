@@ -280,6 +280,7 @@ public abstract class AbstractTestBase {
         ignoredRules.add(BSPRule.R5407);
         ignoredRules.add(BSPRule.R5417);
         ignoredRules.add(BSPRule.R3063);
+        ignoredRules.add(BSPRule.R5620);
         ignoredRules.add(BSPRule.R5621);
         //ignoredRules.add(BSPRule.R5215);
         requestData.setIgnoredBSPRules(ignoredRules);
