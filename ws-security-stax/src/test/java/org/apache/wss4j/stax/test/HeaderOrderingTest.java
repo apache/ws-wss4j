@@ -665,4 +665,74 @@ public class HeaderOrderingTest extends AbstractTestBase {
             doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, true);
         }
     }
+
+    @Test
+    public void testUsernameTokenPlusTimestampPlusSignatureWithBSTSignedAndEncryptedStrictHeaderOrdering() throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.ENCRYPT, WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP};
+            securityProperties.setOutAction(actions);
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setSignatureUser("transmitter");
+            securityProperties.setTokenUser("transmitter");
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
+            securityProperties.addSignaturePart(
+                    new SecurePart(new QName(WSSConstants.NS_WSSE10, "UsernameToken"), SecurePart.Modifier.Element)
+            );
+            securityProperties.addSignaturePart(
+                    new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), SecurePart.Modifier.Element)
+            );
+            securityProperties.addSignaturePart(
+                    new SecurePart(new QName(WSSConstants.NS_SOAP11, "Body"), SecurePart.Modifier.Element)
+            );
+
+            securityProperties.setEncryptionUser("receiver");
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
+            securityProperties.addEncryptionPart(
+                    new SecurePart(new QName(WSSConstants.NS_DSIG, "Signature"), SecurePart.Modifier.Element)
+            );
+            securityProperties.addEncryptionPart(
+                    new SecurePart(new QName(WSSConstants.NS_WSSE10, "UsernameToken"), SecurePart.Modifier.Element)
+            );
+            securityProperties.addEncryptionPart(
+                    new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), SecurePart.Modifier.Element)
+            );
+            securityProperties.addEncryptionPart(
+                    new SecurePart(new QName(WSSConstants.NS_SOAP11, "Body"), SecurePart.Modifier.Content)
+            );
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+
+            NodeList securityHeaderElement = document.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
+            Assert.assertEquals(1, securityHeaderElement.getLength());
+            NodeList childs = securityHeaderElement.item(0).getChildNodes();
+
+            Assert.assertEquals(childs.getLength(), 6);
+            Assert.assertEquals(childs.item(0).getLocalName(), "BinarySecurityToken");
+            Assert.assertEquals(childs.item(1).getLocalName(), "EncryptedKey");
+            Assert.assertEquals(childs.item(2).getLocalName(), "EncryptedData");
+            Assert.assertEquals(childs.item(3).getLocalName(), "EncryptedData");
+            Assert.assertEquals(childs.item(4).getLocalName(), "BinarySecurityToken");
+            Assert.assertEquals(childs.item(5).getLocalName(), "EncryptedData");
+
+            NodeList sigReferences = document.getElementsByTagNameNS(WSConstants.SIG_NS, "Reference");
+            Assert.assertEquals(0, sigReferences.getLength()); //0 because the signature is encrypted
+        }
+
+        //done UsernameToken; now verification:
+        {
+            String action = WSHandlerConstants.SIGNATURE  + " " + WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.ENCRYPT;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
 }

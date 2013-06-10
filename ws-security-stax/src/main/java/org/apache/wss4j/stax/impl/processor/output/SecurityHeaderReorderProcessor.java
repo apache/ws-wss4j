@@ -31,7 +31,6 @@ import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.processor.output.FinalOutputProcessor;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import java.util.*;
@@ -46,8 +45,8 @@ import java.util.*;
  */
 public class SecurityHeaderReorderProcessor extends AbstractOutputProcessor {
 
-    final private Map<XMLSecurityConstants.Action, Map<QName, Deque<XMLSecEvent>>> actionEventMap =
-            new LinkedHashMap<XMLSecurityConstants.Action, Map<QName, Deque<XMLSecEvent>>>();
+    final private Map<XMLSecurityConstants.Action, Map<SecurityHeaderOrder, Deque<XMLSecEvent>>> actionEventMap =
+            new LinkedHashMap<XMLSecurityConstants.Action, Map<SecurityHeaderOrder, Deque<XMLSecEvent>>>();
 
     private int securityHeaderIndex = 0;
     private Deque<XMLSecEvent> currentDeque;
@@ -65,12 +64,12 @@ public class SecurityHeaderReorderProcessor extends AbstractOutputProcessor {
         XMLSecurityConstants.Action[] outActions = getSecurityProperties().getOutAction();
         for (int i = outActions.length - 1; i >= 0; i--) {
             XMLSecurityConstants.Action outAction = outActions[i];
-            actionEventMap.put(outAction, new TreeMap<QName, Deque<XMLSecEvent>>(new Comparator<QName>() {
+            actionEventMap.put(outAction, new TreeMap<SecurityHeaderOrder, Deque<XMLSecEvent>>(new Comparator<SecurityHeaderOrder>() {
                 @Override
-                public int compare(QName o1, QName o2) {
-                    if (WSSConstants.TAG_dsig_Signature.equals(o1)) {
+                public int compare(SecurityHeaderOrder o1, SecurityHeaderOrder o2) {
+                    if (WSSConstants.TAG_dsig_Signature.equals(o1.getSecurityHeaderElementName())) {
                         return 1;
-                    } else if (WSSConstants.TAG_dsig_Signature.equals(o2)) {
+                    } else if (WSSConstants.TAG_dsig_Signature.equals(o2.getSecurityHeaderElementName())) {
                         return -1;
                     }
                     return 1;
@@ -95,12 +94,43 @@ public class SecurityHeaderReorderProcessor extends AbstractOutputProcessor {
             if (xmlSecEvent.isEndElement() && xmlSecEvent.asEndElement().getName().equals(WSSConstants.TAG_wsse_Security)) {
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-                Iterator<Map.Entry<XMLSecurityConstants.Action, Map<QName, Deque<XMLSecEvent>>>> iterator = actionEventMap.entrySet().iterator();
+                Iterator<Map.Entry<XMLSecurityConstants.Action, Map<SecurityHeaderOrder, Deque<XMLSecEvent>>>> iterator = actionEventMap.entrySet().iterator();
+                loop:
                 while (iterator.hasNext()) {
-                    Map.Entry<XMLSecurityConstants.Action, Map<QName, Deque<XMLSecEvent>>> next = iterator.next();
-                    Iterator<Map.Entry<QName, Deque<XMLSecEvent>>> entryIterator = next.getValue().entrySet().iterator();
+                    Map.Entry<XMLSecurityConstants.Action, Map<SecurityHeaderOrder, Deque<XMLSecEvent>>> next = iterator.next();
+
+                    boolean encryptAction = false;
+                    Iterator<Map.Entry<SecurityHeaderOrder, Deque<XMLSecEvent>>> entryIterator = next.getValue().entrySet().iterator();
                     while (entryIterator.hasNext()) {
-                        Map.Entry<QName, Deque<XMLSecEvent>> entry = entryIterator.next();
+                        Map.Entry<SecurityHeaderOrder, Deque<XMLSecEvent>> entry = entryIterator.next();
+                        //output all non encrypted headers until...
+                        if (!entry.getKey().isEncrypted()) {
+                            Deque<XMLSecEvent> xmlSecEvents = entry.getValue();
+                            while (!xmlSecEvents.isEmpty()) {
+                                XMLSecEvent event = xmlSecEvents.pop();
+                                subOutputProcessorChain.reset();
+                                subOutputProcessorChain.processEvent(event);
+                            }
+                            //remove the actual header so that it won't be outputted twice in the loop below
+                            entryIterator.remove();
+                        }
+                        //... the action is encryption and...
+                        if (entry.getKey().getAction().getName().contains("Encrypt")) {
+                            encryptAction = true;
+                        }
+                    }
+                    //...output the rest of the encrypt action and...
+                    if (encryptAction) {
+                        break loop;
+                    }
+                }
+                //...loop again over the headers and output the leftover headers
+                iterator = actionEventMap.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<XMLSecurityConstants.Action, Map<SecurityHeaderOrder, Deque<XMLSecEvent>>> next = iterator.next();
+                    Iterator<Map.Entry<SecurityHeaderOrder, Deque<XMLSecEvent>>> entryIterator = next.getValue().entrySet().iterator();
+                    while (entryIterator.hasNext()) {
+                        Map.Entry<SecurityHeaderOrder, Deque<XMLSecEvent>> entry = entryIterator.next();
                         Deque<XMLSecEvent> xmlSecEvents = entry.getValue();
                         while (!xmlSecEvents.isEmpty()) {
                             XMLSecEvent event = xmlSecEvents.pop();
@@ -129,24 +159,9 @@ public class SecurityHeaderReorderProcessor extends AbstractOutputProcessor {
                                         " but got " + xmlSecStartElement.getName());
                     }
 
-                    Map<QName, Deque<XMLSecEvent>> map = null;
-                    if (!securityHeaderOrder.isEncrypted()) {
-                        map = actionEventMap.get(securityHeaderOrder.getAction());
-                    } else {
-                        Iterator<Map.Entry<XMLSecurityConstants.Action, Map<QName, Deque<XMLSecEvent>>>> iterator = actionEventMap.entrySet().iterator();
-                        while (iterator.hasNext()) {
-                            Map.Entry<XMLSecurityConstants.Action, Map<QName, Deque<XMLSecEvent>>> next = iterator.next();
-                            if (next.getKey().getName().contains("Encrypt")) {
-                                map = next.getValue();
-                                break;
-                            }
-                        }
-                        if (map == null) {
-                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", "No encrypt action found");
-                        }
-                    }
+                    Map<SecurityHeaderOrder, Deque<XMLSecEvent>> map = actionEventMap.get(securityHeaderOrder.getAction());
                     currentDeque = new ArrayDeque<XMLSecEvent>();
-                    map.put(securityHeaderOrder.getSecurityHeaderElementName(), currentDeque);
+                    map.put(securityHeaderOrder, currentDeque);
 
                     securityHeaderIndex++;
                     break;
