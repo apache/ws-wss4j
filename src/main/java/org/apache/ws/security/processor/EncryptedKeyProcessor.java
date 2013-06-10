@@ -397,6 +397,25 @@ public class EncryptedKeyProcessor implements Processor {
         // Prepare the SecretKey object to decrypt EncryptedData
         //
         String symEncAlgo = X509Util.getEncAlgo(encryptedDataElement);
+        
+        // EncryptionAlgorithm cannot be null
+        if (data.getWssConfig().isWsiBSPCompliant() && symEncAlgo == null) {
+            throw new WSSecurityException(
+                WSSecurityException.UNSUPPORTED_ALGORITHM, "noEncAlgo"
+            );
+        }
+        // EncryptionAlgorithm must be 3DES, or AES128, or AES256
+        if (data.getWssConfig().isWsiBSPCompliant() 
+            && !WSConstants.TRIPLE_DES.equals(symEncAlgo)
+            && !WSConstants.AES_128.equals(symEncAlgo)
+            && !WSConstants.AES_128_GCM.equals(symEncAlgo)
+            && !WSConstants.AES_256.equals(symEncAlgo)
+            && !WSConstants.AES_256_GCM.equals(symEncAlgo)) {
+            throw new WSSecurityException(
+                WSSecurityException.INVALID_SECURITY, "badEncAlgo", new Object[]{symEncAlgo}
+            );
+        }
+        
         SecretKey symmetricKey = null;
         try {
             symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, decryptedData);
