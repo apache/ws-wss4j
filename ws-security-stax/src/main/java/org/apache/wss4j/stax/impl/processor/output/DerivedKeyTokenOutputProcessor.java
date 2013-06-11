@@ -77,9 +77,9 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
             XMLSecurityConstants.Action action = getAction();
             if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
-                length = JCEAlgorithmMapper.getAlgorithmMapping(getSecurityProperties().getSignatureAlgorithm()).getKeyLength() / 8;
+                length = JCEAlgorithmMapper.getKeyLengthFromURI(getSecurityProperties().getSignatureAlgorithm()) / 8;
             } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
-                length = JCEAlgorithmMapper.getAlgorithmMapping(getSecurityProperties().getEncryptionSymAlgorithm()).getKeyLength() / 8;
+                length = JCEAlgorithmMapper.getKeyLengthFromURI(getSecurityProperties().getEncryptionSymAlgorithm()) / 8;
             }
 
             byte[] label;
@@ -137,7 +137,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                     if (key != null) {
                         return key;
                     }
-                    String algoFamily = JCEAlgorithmMapper.getJCERequiredKeyFromURI(algorithmURI);
+                    String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
                     key = new SecretKeySpec(derivedKeyBytes, algoFamily);
                     setSecretKey(algorithmURI, key);
                     return key;

@@ -82,7 +82,7 @@ public class UsernameSecurityTokenImpl extends AbstractInboundSecurityToken impl
         }
 
         byte[] secretToken = generateDerivedKey(wsInboundSecurityContext);
-        String algoFamily = JCEAlgorithmMapper.getJCERequiredKeyFromURI(algorithmURI);
+        String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
         key = new SecretKeySpec(secretToken, algoFamily);
         setSecretKey(algorithmURI, key);
         return key;

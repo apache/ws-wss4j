@@ -89,7 +89,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
         WSSecurityTokenConstants.KeyIdentifier keyIdentifier = getSecurityProperties().getSignatureKeyIdentifier();
 
         X509Certificate[] x509Certificates = securityToken.getX509Certificates();
-
+        
         if (WSSecurityTokenConstants.KeyIdentifier_KeyValue.equals(keyIdentifier)) {
             WSSUtils.createKeyValueTokenStructure(this, outputProcessorChain, x509Certificates);
         } else {
@@ -97,7 +97,8 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
             attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
             if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier) && !useSingleCertificate) {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_X509PKIPathv1));
-            } else if (WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier.equals(keyIdentifier)) {
+            } else if (WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier.equals(keyIdentifier)
+                || (WSSecurityTokenConstants.KeyIdentifier_EncryptedKey.equals(keyIdentifier))) {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
             } else if (WSSecurityTokenConstants.Saml10Token.equals(securityToken.getTokenType())
                     || WSSecurityTokenConstants.Saml11Token.equals(securityToken.getTokenType())) {
@@ -122,6 +123,9 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
             } else if (WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier.equals(keyIdentifier)) {
                 WSSUtils.createEncryptedKeySha1IdentifierStructure(this, outputProcessorChain,
                         securityToken.getSecretKey(getSecurityProperties().getSignatureAlgorithm()));
+            } else if (WSSecurityTokenConstants.KeyIdentifier_EncryptedKey.equals(keyIdentifier)) {
+                String id = securityToken.getId();
+                WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, id, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE);
             } else if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier)) {
                 String valueType;
                 if (WSSecurityTokenConstants.Saml20Token.equals(securityToken.getTokenType())) {

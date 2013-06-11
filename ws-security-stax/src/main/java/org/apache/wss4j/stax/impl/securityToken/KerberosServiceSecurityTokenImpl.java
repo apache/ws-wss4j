@@ -140,7 +140,7 @@ public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityTok
         }
 
         byte[] secretToken = this.kerberosTokenDecoder.getSessionKey();
-        String algoFamily = JCEAlgorithmMapper.getJCERequiredKeyFromURI(algorithmURI);
+        String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
         key = new SecretKeySpec(secretToken, algoFamily);
         setSecretKey(algorithmURI, key);
         return key;

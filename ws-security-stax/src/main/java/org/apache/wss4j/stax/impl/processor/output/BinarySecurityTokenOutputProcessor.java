@@ -53,35 +53,57 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
     @Override
     public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
         try {
-            final String bstId = IDGenerator.generateID(null);
+            final String bstId;
             final X509Certificate[] x509Certificates;
-            final Key key;
+            Key key = null;
 
             XMLSecurityConstants.Action action = getAction();
             if (WSSConstants.SIGNATURE.equals(action)
                     || WSSConstants.SAML_TOKEN_SIGNED.equals(action)
                     || WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
-
-                String alias = ((WSSSecurityProperties) getSecurityProperties()).getSignatureUser();
-                WSPasswordCallback pwCb = new WSPasswordCallback(alias, WSPasswordCallback.Usage.SIGNATURE);
-                WSSUtils.doPasswordCallback(((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler(), pwCb);
-                String password = pwCb.getPassword();
-                byte[] secretKey = pwCb.getKey();
-                if (password == null && secretKey == null) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noPassword", alias);
-                }
-                if (password != null) {
-                    key = ((WSSSecurityProperties) getSecurityProperties()).getSignatureCrypto().getPrivateKey(alias, password);
-                    CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-                    cryptoType.setAlias(alias);
-                    x509Certificates = ((WSSSecurityProperties) getSecurityProperties()).getSignatureCrypto().getX509Certificates(cryptoType);
-                    if (x509Certificates == null || x509Certificates.length == 0) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noUserCertsFound", alias);
+                // See if a Symmetric Key is already available
+                String tokenId = 
+                    outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE);
+                SecurityTokenProvider<OutboundSecurityToken> signatureTokenProvider = null;
+                GenericOutboundSecurityToken securityToken = null;
+                if (tokenId != null && !WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(getAction())) {
+                    signatureTokenProvider = 
+                        outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
+                    if (signatureTokenProvider != null) {
+                        securityToken = 
+                            (GenericOutboundSecurityToken)signatureTokenProvider.getSecurityToken();
+                        if (securityToken != null) {
+                            key = securityToken.getSecretKey(getSecurityProperties().getSignatureAlgorithm());
+                        }
                     }
+                }
+                
+                if (key == null) {
+                    bstId = IDGenerator.generateID(null);
+                    String alias = ((WSSSecurityProperties) getSecurityProperties()).getSignatureUser();
+                    WSPasswordCallback pwCb = new WSPasswordCallback(alias, WSPasswordCallback.Usage.SIGNATURE);
+                    WSSUtils.doPasswordCallback(((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler(), pwCb);
+                    String password = pwCb.getPassword();
+                    byte[] secretKey = pwCb.getKey();
+                    if (password == null && secretKey == null) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noPassword", alias);
+                    }
+                    if (password != null) {
+                        key = ((WSSSecurityProperties) getSecurityProperties()).getSignatureCrypto().getPrivateKey(alias, password);
+                        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+                        cryptoType.setAlias(alias);
+                        x509Certificates = ((WSSSecurityProperties) getSecurityProperties()).getSignatureCrypto().getX509Certificates(cryptoType);
+                        if (x509Certificates == null || x509Certificates.length == 0) {
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noUserCertsFound", alias);
+                        }
+                    } else {
+                        x509Certificates = null;
+                        String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(getSecurityProperties().getSignatureAlgorithm());
+                        key = new SecretKeySpec(secretKey, algoFamily);
+                    } 
                 } else {
+                    bstId = tokenId;
                     x509Certificates = null;
-                    String algoFamily = JCEAlgorithmMapper.getJCERequiredKeyFromURI(getSecurityProperties().getSignatureAlgorithm());
-                    key = new SecretKeySpec(secretKey, algoFamily);
                 }
             } else if (WSSConstants.ENCRYPT.equals(action) ||
                     WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
@@ -116,7 +138,9 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                 }
 
                 key = null;
+                bstId = IDGenerator.generateID(null);
             } else {
+                bstId = IDGenerator.generateID(null);
                 x509Certificates = null;
                 key = null;
             }

@@ -74,7 +74,7 @@ public class OutboundUsernameSecurityToken extends GenericOutboundSecurityToken 
         byte[] secretToken = 
             UsernameTokenUtil.generateDerivedKey(getPassword(), salt, iterations);
         
-        String algoFamily = JCEAlgorithmMapper.getJCERequiredKeyFromURI(algorithmURI);
+        String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
         key = new SecretKeySpec(secretToken, algoFamily);
         setSecretKey(algorithmURI, key);
         return key;

@@ -234,9 +234,11 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                                     if (key != null) {
                                         return key;
                                     }
-                                    String algoFamily = JCEAlgorithmMapper.getJCERequiredKeyFromURI(algorithmURI);
-                                    key = new SecretKeySpec(samlKeyInfo.getSecret(), algoFamily);
-                                    setSecretKey(algorithmURI, key);
+                                    if (samlKeyInfo.getSecret() != null) {
+                                        String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
+                                        key = new SecretKeySpec(samlKeyInfo.getSecret(), algoFamily);
+                                        setSecretKey(algorithmURI, key);
+                                    }
                                     return key;
                                 }
                             };

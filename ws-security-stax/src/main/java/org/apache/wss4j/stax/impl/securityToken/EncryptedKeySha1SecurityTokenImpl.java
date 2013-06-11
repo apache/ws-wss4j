@@ -72,7 +72,7 @@ public class EncryptedKeySha1SecurityTokenImpl
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKey", sha1Identifier);
         }
 
-        String algoFamily = JCEAlgorithmMapper.getJCERequiredKeyFromURI(algorithmURI);
+        String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
         key = new SecretKeySpec(secretKeyCallback.getKey(), algoFamily);
         setSecretKey(algorithmURI, key);
         return key;

@@ -136,7 +136,7 @@ public class OutboundWSSec {
             final SecurityHeaderOutputProcessor securityHeaderOutputProcessor = new SecurityHeaderOutputProcessor();
             initializeOutputProcessor(outputProcessorChain, securityHeaderOutputProcessor, null);
             //todo some combinations are not possible atm: eg Action.SIGNATURE and Action.USERNAMETOKEN_SIGNED
-            //todo they use the same signaure parts
+            //todo they use the same signature parts
             for (int i = 0; i < securityProperties.getOutAction().length; i++) {
                 XMLSecurityConstants.Action action = securityProperties.getOutAction()[i];
                 if (WSSConstants.TIMESTAMP.equals(action)) {

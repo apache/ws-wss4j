@@ -74,64 +74,84 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
             if (wrappingSecurityToken == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
-
-            //prepare the symmetric session key for all encryption parts
-            String keyAlgorithm = JCEAlgorithmMapper.getJCERequiredKeyFromURI(securityProperties.getEncryptionSymAlgorithm());
-            KeyGenerator keyGen;
-            try {
-                keyGen = KeyGenerator.getInstance(keyAlgorithm);
-            } catch (NoSuchAlgorithmException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+            
+            // See if a Symmetric Key is already available
+            String encTokenId = 
+                outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION);
+            SecurityTokenProvider<OutboundSecurityToken> encryptedKeySecurityTokenProvider = null;
+            GenericOutboundSecurityToken encryptedKeySecurityToken = null;
+            if (encTokenId != null && !WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(getAction())) {
+                encryptedKeySecurityTokenProvider = 
+                    outputProcessorChain.getSecurityContext().getSecurityTokenProvider(encTokenId);
+                if (encryptedKeySecurityTokenProvider != null) {
+                    encryptedKeySecurityToken = 
+                        (GenericOutboundSecurityToken)encryptedKeySecurityTokenProvider.getSecurityToken();
+                }
             }
-            //the sun JCE provider expects the real key size for 3DES (112 or 168 bit)
-            //whereas bouncy castle expects the block size of 128 or 192 bits
-            if (keyAlgorithm.contains("AES")) {
-                int keyLength = JCEAlgorithmMapper.getKeyLengthFromURI(securityProperties.getEncryptionSymAlgorithm());
-                keyGen.init(keyLength);
+            
+            if (encryptedKeySecurityToken == null) {
+                // Generate Key
+                //prepare the symmetric session key for all encryption parts
+                String keyAlgorithm = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(securityProperties.getEncryptionSymAlgorithm());
+                KeyGenerator keyGen;
+                try {
+                    keyGen = KeyGenerator.getInstance(keyAlgorithm);
+                } catch (NoSuchAlgorithmException e) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+                }
+                //the sun JCE provider expects the real key size for 3DES (112 or 168 bit)
+                //whereas bouncy castle expects the block size of 128 or 192 bits
+                if (keyAlgorithm.contains("AES")) {
+                    int keyLength = JCEAlgorithmMapper.getKeyLengthFromURI(securityProperties.getEncryptionSymAlgorithm());
+                    keyGen.init(keyLength);
+                }
+    
+                final Key symmetricKey = keyGen.generateKey();
+    
+                final String ekId = IDGenerator.generateID(null);
+    
+                final GenericOutboundSecurityToken securityToken = new GenericOutboundSecurityToken(ekId, WSSecurityTokenConstants.EncryptedKeyToken, symmetricKey);
+                final SecurityTokenProvider<OutboundSecurityToken> securityTokenProvider =
+                        new SecurityTokenProvider<OutboundSecurityToken>() {
+    
+                    @Override
+                    public OutboundSecurityToken getSecurityToken() throws XMLSecurityException {
+                        return securityToken;
+                    }
+    
+                    @Override
+                    public String getId() {
+                        return ekId;
+                    }
+                };
+                
+                encryptedKeySecurityTokenProvider = securityTokenProvider;
+                encryptedKeySecurityToken = securityToken;
             }
-
-            final Key symmetricKey = keyGen.generateKey();
-
-            final String ekId = IDGenerator.generateID(null);
-
-            final GenericOutboundSecurityToken encryptedKeySecurityToken = new GenericOutboundSecurityToken(ekId, WSSecurityTokenConstants.EncryptedKeyToken, symmetricKey);
+            
             encryptedKeySecurityToken.setKeyWrappingToken(wrappingSecurityToken);
             wrappingSecurityToken.addWrappedToken(encryptedKeySecurityToken);
-
-            final SecurityTokenProvider<OutboundSecurityToken> encryptedKeySecurityTokenProvider =
-                    new SecurityTokenProvider<OutboundSecurityToken>() {
-
-                @Override
-                public OutboundSecurityToken getSecurityToken() throws XMLSecurityException {
-                    return encryptedKeySecurityToken;
-                }
-
-                @Override
-                public String getId() {
-                    return ekId;
-                }
-            };
 
             FinalEncryptedKeyOutputProcessor finalEncryptedKeyOutputProcessor = new FinalEncryptedKeyOutputProcessor(encryptedKeySecurityToken);
             finalEncryptedKeyOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
             finalEncryptedKeyOutputProcessor.setAction(getAction());
             XMLSecurityConstants.Action action = getAction();
             if (WSSConstants.ENCRYPT.equals(action)) {
-                outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, ekId);
+                outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, encryptedKeySecurityToken.getId());
                 if (wrappingSecurityToken.getProcessor() != null) {
                     finalEncryptedKeyOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
                 } else {
                     finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
                 }
             } else if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
-                outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, ekId);
+                outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, encryptedKeySecurityToken.getId());
                 if (wrappingSecurityToken.getProcessor() != null) {
                     finalEncryptedKeyOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
                 } else {
                     finalEncryptedKeyOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
                 }
             } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
-                outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, ekId);
+                outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, encryptedKeySecurityToken.getId());
                 if (wrappingSecurityToken.getProcessor() != null) {
                     finalEncryptedKeyOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
                 } else {
@@ -139,7 +159,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                 }
             }
             finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
-            outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(ekId, encryptedKeySecurityTokenProvider);
+            outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(encryptedKeySecurityToken.getId(), encryptedKeySecurityTokenProvider);
             encryptedKeySecurityToken.setProcessor(finalEncryptedKeyOutputProcessor);
         } finally {
             outputProcessorChain.removeProcessor(this);

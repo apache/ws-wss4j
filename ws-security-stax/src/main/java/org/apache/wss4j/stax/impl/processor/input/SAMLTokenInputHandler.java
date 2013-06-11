@@ -191,7 +191,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
                         Key key = super.getKey(algorithmURI, algorithmUsage, correlationID);
                         if (key == null) {
-                            String algoFamily = JCEAlgorithmMapper.getJCERequiredKeyFromURI(algorithmURI);
+                            String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
                             key = new SecretKeySpec(subjectSecretKey, algoFamily);
                             setSecretKey(algorithmURI, key);
                         }
@@ -377,7 +377,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                         throws XMLSecurityException {
                     Key key = super.getKey(algorithmURI, algorithmUsage, correlationID);
                     if (key == null) {
-                        String algoFamily = JCEAlgorithmMapper.getJCERequiredKeyFromURI(algorithmURI);
+                        String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
                         key = new SecretKeySpec(Base64.decodeBase64(stringBuilder.toString()), algoFamily);
                         setSecretKey(algorithmURI, key);
                     }

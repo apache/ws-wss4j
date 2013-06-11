@@ -138,7 +138,7 @@ public class KerberosClientSecurityToken extends GenericOutboundSecurityToken {
         if (this.secretKey == null) {
             getTGT();
         }
-        String algoFamily = JCEAlgorithmMapper.getJCERequiredKeyFromURI(algorithmURI);
+        String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
         key = new SecretKeySpec(this.secretKey.getEncoded(), algoFamily);
         setSecretKey(algorithmURI, key);
         return key;
