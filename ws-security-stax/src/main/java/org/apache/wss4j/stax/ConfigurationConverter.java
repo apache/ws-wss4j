@@ -534,6 +534,8 @@ public final class ConfigurationConverter {
             return WSSecurityTokenConstants.KeyIdentifier_SkiKeyIdentifier;
         } else if ("EncryptedKeySHA1".equals(keyIdentifier)) {
             return WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier;
+        } else if ("EncryptedKey".equals(keyIdentifier)) {
+            return WSSecurityTokenConstants.KeyIdentifier_EncryptedKey;
         } else if ("KeyValue".equals(keyIdentifier)) {
             return WSSecurityTokenConstants.KeyIdentifier_KeyValue;
         }
