@@ -123,10 +123,13 @@ public class PolicyEnforcer implements SecurityEventListener {
     private final Deque<SecurityEvent> securityEventQueue = new LinkedList<SecurityEvent>();
     private boolean operationSecurityEventOccured = false;
     private boolean initiator;
+    private String actorOrRole;
 
-    public PolicyEnforcer(List<OperationPolicy> operationPolicies, String soapAction, boolean initiator) throws WSSPolicyException {
+    public PolicyEnforcer(List<OperationPolicy> operationPolicies, String soapAction, boolean initiator,
+                          String actorOrRole) throws WSSPolicyException {
         this.operationPolicies = operationPolicies;
         this.initiator = initiator;
+        this.actorOrRole = actorOrRole;
         assertionStateMap = new LinkedList<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>>();
         failedAssertionStateMap = new LinkedList<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>>();
 
@@ -306,7 +309,8 @@ public class PolicyEnforcer implements SecurityEventListener {
                 assertableList.add(new ProtectionOrderAssertionState(abstractSymmetricAsymmetricBinding, true));
                 assertableList.add(new SignatureProtectionAssertionState(abstractSymmetricAsymmetricBinding, true));
                 if (abstractSymmetricAsymmetricBinding.isOnlySignEntireHeadersAndBody()) {
-                    assertableList.add(new OnlySignEntireHeadersAndBodyAssertionState(abstractSecurityAssertion, false));
+                    //initialized with asserted=true because we do negative matching
+                    assertableList.add(new OnlySignEntireHeadersAndBodyAssertionState(abstractSecurityAssertion, true, actorOrRole));
                 }
                 assertableList.add(new TokenProtectionAssertionState(abstractSecurityAssertion, true));
             }

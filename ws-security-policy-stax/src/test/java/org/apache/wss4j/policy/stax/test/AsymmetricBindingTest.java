@@ -26,6 +26,7 @@ import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.impl.securityToken.X509SecurityTokenImpl;
 import org.apache.wss4j.stax.securityEvent.*;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.stax.XMLSecEventFactory;
 import org.apache.xml.security.stax.securityEvent.EncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.X509TokenSecurityEvent;
 import org.testng.Assert;
@@ -295,8 +296,14 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
         headerPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
         encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
-        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, false, protectionOrder);
-        signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
+
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true, protectionOrder);
+        QName elementName = new QName("http://www.example.com", "bodyChildElement");
+        signedPartSecurityEvent.setXmlSecEvent(XMLSecEventFactory.createXmlSecStartElement(elementName, null, null));
+        List<QName> elementPath = new ArrayList<QName>();
+        elementPath.addAll(WSSConstants.SOAP_11_BODY_PATH);
+        elementPath.add(elementName);
+        signedPartSecurityEvent.setElementPath(elementPath);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
 
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
@@ -307,8 +314,104 @@ public class AsymmetricBindingTest extends AbstractPolicyTestBase {
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
             Assert.assertEquals(e.getCause().getMessage(),
-                    "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Body must be signed");
+                    "OnlySignEntireHeadersAndBody not fulfilled, offending element: " +
+                            "/{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Body/{http://www.example.com}bodyChildElement");
             Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
+    }
+
+    @Test
+    public void testPolicyNotWholeSecurityHeaderChildSigned() throws Exception {
+        String policyString =
+                "<sp:AsymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
+                        "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
+                        "<sp:IncludeTimestamp/>\n" +
+                        "<sp:EncryptSignature/>\n" +
+                        "<sp:ProtectTokens/>\n" +
+                        "<sp:OnlySignEntireHeadersAndBody/>\n" +
+                        "</wsp:Policy>\n" +
+                        "</sp:AsymmetricBinding>";
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+        TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
+        policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
+
+        X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
+        X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        x509TokenSecurityEvent.setSecurityToken(securityToken);
+        policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
+
+        x509TokenSecurityEvent = new X509TokenSecurityEvent();
+        securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
+        x509TokenSecurityEvent.setSecurityToken(securityToken);
+
+        policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
+
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
+        protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
+        EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, protectionOrder);
+        List<QName> headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_dsig_Signature);
+        encryptedElementSecurityEvent.setElementPath(headerPath);
+        policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
+
+        encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, protectionOrder);
+        headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        headerPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
+        encryptedElementSecurityEvent.setElementPath(headerPath);
+        policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
+
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true, protectionOrder);
+        QName elementName = WSSConstants.TAG_wsse_Username;
+        signedPartSecurityEvent.setXmlSecEvent(XMLSecEventFactory.createXmlSecStartElement(elementName, null, null));
+        List<QName> elementPath = new ArrayList<QName>();
+        elementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        elementPath.add(WSSConstants.TAG_wsse_UsernameToken);
+        elementPath.add(elementName);
+        signedPartSecurityEvent.setElementPath(elementPath);
+        policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        try {
+            policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+            Assert.fail("Exception expected");
+        } catch (WSSecurityException e) {
+            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
+            Assert.assertEquals(e.getCause().getMessage(),
+                    "OnlySignEntireHeadersAndBody not fulfilled, offending element: " +
+                            "/{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}UsernameToken/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Username");
+            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
+        }
+    }
+
+    @Test
+    public void testOnlySignEntireHeadersAndBodyPolicyNothingSigned() throws Exception {
+        String policyString =
+                "<sp:AsymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
+                        "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
+                        "<sp:OnlySignEntireHeadersAndBody/>\n" +
+                        "</wsp:Policy>\n" +
+                        "</sp:AsymmetricBinding>";
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+        policyEnforcer.doFinal();
     }
 }

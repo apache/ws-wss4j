@@ -416,7 +416,15 @@ public class PolicyEnforcerFactory {
         }
     }
 
-    public PolicyEnforcer newPolicyEnforcer(String soapAction, boolean initiator) throws WSSPolicyException {
-        return new PolicyEnforcer(this.operationPolicies, soapAction, initiator);
+    /**
+     * creates a new PolicyEnforcer instance
+     * @param soapAction The requested soapAction of the actual request
+     * @param initiator Boolean flag to tell the engine if it is running in client or server mode
+     * @param roleOrActor The actor or role of the security processing. Must be set to the same value as WSSSecurityProperties#setActor()
+     * @return the newly created PolicyEnforcer instance
+     * @throws WSSPolicyException
+     */
+    public PolicyEnforcer newPolicyEnforcer(String soapAction, boolean initiator, String roleOrActor) throws WSSPolicyException {
+        return new PolicyEnforcer(this.operationPolicies, soapAction, initiator, roleOrActor);
     }
 }

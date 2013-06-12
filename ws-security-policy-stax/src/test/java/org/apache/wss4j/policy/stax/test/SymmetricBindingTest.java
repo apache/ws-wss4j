@@ -26,6 +26,7 @@ import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.impl.securityToken.SecureConversationSecurityTokenImpl;
 import org.apache.wss4j.stax.securityEvent.*;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.stax.XMLSecEventFactory;
 import org.apache.xml.security.stax.securityEvent.EncryptedElementSecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -101,6 +102,7 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true, protectionOrder);
+        signedPartSecurityEvent.setXmlSecEvent(XMLSecEventFactory.createXmlSecStartElement(WSSConstants.TAG_soap11_Body, null, null));
         signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
         policyEnforcer.doFinal();
@@ -313,15 +315,21 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         operationSecurityEvent.setOperation(new QName("definitions"));
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
-        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, false, protectionOrder);
-        signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
+        SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true, protectionOrder);
+        QName elementName = new QName("http://www.example.com", "bodyChildElement");
+        signedPartSecurityEvent.setXmlSecEvent(XMLSecEventFactory.createXmlSecStartElement(elementName, null, null));
+        List<QName> elementPath = new ArrayList<QName>();
+        elementPath.addAll(WSSConstants.SOAP_11_BODY_PATH);
+        elementPath.add(elementName);
+        signedPartSecurityEvent.setElementPath(elementPath);
         try {
             policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
             Assert.fail("Exception expected");
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
             Assert.assertEquals(e.getCause().getMessage(),
-                    "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Body must be signed");
+                    "OnlySignEntireHeadersAndBody not fulfilled, offending element: " +
+                            "/{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Body/{http://www.example.com}bodyChildElement");
             Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
