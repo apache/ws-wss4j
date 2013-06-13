@@ -36,7 +36,7 @@
     <url>http://ws.apache.org/wss4j/</url>
 
     <properties>
-        <bcprov.version>1.47</bcprov.version>
+        <bcprov.version>1.49</bcprov.version>
         <ehcache.version>2.5.1</ehcache.version>
         <log4j.version>1.2.17</log4j.version>
         <neethi.version>3.0.2</neethi.version>
