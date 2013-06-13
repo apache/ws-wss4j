@@ -35,7 +35,7 @@ import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
 
 import javax.xml.namespace.QName;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,9 +44,9 @@ import java.util.List;
  */
 public class TokenProtectionAssertionState extends AssertionState implements Assertable {
 
-    private final List<SignedElementSecurityEvent> signedElementEvents = new LinkedList<SignedElementSecurityEvent>();
-    private final List<TokenSecurityEvent<? extends SecurityToken>> tokenSecurityEvents =
-            new LinkedList<TokenSecurityEvent<? extends SecurityToken>>();
+    private final ArrayList<SignedElementSecurityEvent> signedElementEvents = new ArrayList<SignedElementSecurityEvent>();
+    private final ArrayList<TokenSecurityEvent<? extends SecurityToken>> tokenSecurityEvents =
+            new ArrayList<TokenSecurityEvent<? extends SecurityToken>>();
 
     public TokenProtectionAssertionState(Assertion assertion, boolean initialAssertionState) {
         super(assertion, initialAssertionState);
@@ -88,9 +88,8 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                 = (TokenSecurityEvent<? extends SecurityToken>) securityEvent;
             tokenSecurityEvents.add(tokenSecurityEvent);
         } else { //Operation
-            Iterator<TokenSecurityEvent<? extends SecurityToken>> tokenSecurityEventIterator = tokenSecurityEvents.iterator();
-            while (tokenSecurityEventIterator.hasNext()) {
-                TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent = tokenSecurityEventIterator.next();
+            for (int i = 0; i < tokenSecurityEvents.size(); i++) {
+                TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent = tokenSecurityEvents.get(i);
 
                 SecurityToken securityToken = tokenSecurityEvent.getSecurityToken();
                 while (securityToken.getKeyWrappingToken() != null) {
@@ -176,9 +175,8 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
         signaturePath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         signaturePath.add(WSSConstants.TAG_dsig_Signature);
 
-        Iterator<SignedElementSecurityEvent> securityEventIterator = signedElementEvents.iterator();
-        while (securityEventIterator.hasNext()) {
-            SignedElementSecurityEvent signedElementSecurityEvent = securityEventIterator.next();
+        for (int i = 0; i < signedElementEvents.size(); i++) {
+            SignedElementSecurityEvent signedElementSecurityEvent = signedElementEvents.get(i);
             if (WSSUtils.pathMatches(signedElementSecurityEvent.getElementPath(), signaturePath, true, false)) {
                 SecurityToken signingSecurityToken = signedElementSecurityEvent.getSecurityToken();
                 while (signingSecurityToken != null && signingSecurityToken.getKeyWrappingToken() != null) {
@@ -194,9 +192,8 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
     }
 
     private boolean signsItsSignatureToken(SecurityToken securityToken) throws XMLSecurityException {
-        Iterator<SignedElementSecurityEvent> securityEventIterator = signedElementEvents.iterator();
-        while (securityEventIterator.hasNext()) {
-            SignedElementSecurityEvent signedElementSecurityEvent = securityEventIterator.next();
+        for (int i = 0; i < signedElementEvents.size(); i++) {
+            SignedElementSecurityEvent signedElementSecurityEvent = signedElementEvents.get(i);
             if (WSSUtils.pathMatches(signedElementSecurityEvent.getElementPath(), securityToken.getElementPath(), false, false)) {
 
                 SecurityToken signingSecurityToken = signedElementSecurityEvent.getSecurityToken();
@@ -205,7 +202,22 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                 }
 
                 if (signingSecurityToken != null && signingSecurityToken.getId().equals(securityToken.getId())) {
-                    return true;
+                    //ok we've found the correlating signedElementSecurityEvent. Now we have to find the Token that
+                    //is covered by this signedElementSecurityEvent:
+                    for (int j = 0; j < tokenSecurityEvents.size(); j++) {
+                        TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent = tokenSecurityEvents.get(j);
+                        SecurityToken st = tokenSecurityEvent.getSecurityToken();
+                        while (st.getKeyWrappingToken() != null) {
+                            st = st.getKeyWrappingToken();
+                        }
+                        if (signedElementSecurityEvent.getXmlSecEvent() == st.getXMLSecEvent()) {
+                            //...and we got the covered token
+                            //next we have to see if the token is the same:
+                            if (st.getId().equals(securityToken.getId())) { //NOPMD
+                                return true;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -216,9 +228,9 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
 
         List<SecurityToken> signedSupportingTokens = new LinkedList<SecurityToken>();
         List<SignedElementSecurityEvent> signedElements = new LinkedList<SignedElementSecurityEvent>();
-        Iterator<TokenSecurityEvent<? extends SecurityToken>> tokenSecurityEventIterator = tokenSecurityEvents.iterator();
-        while (tokenSecurityEventIterator.hasNext()) {
-            TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent = tokenSecurityEventIterator.next();
+
+        for (int i = 0; i < tokenSecurityEvents.size(); i++) {
+            TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent = tokenSecurityEvents.get(i);
             SecurityToken supportingToken = tokenSecurityEvent.getSecurityToken();
             if (isSignedSupportingToken(supportingToken)) {
                 if (signedSupportingTokens.contains(supportingToken)) {
@@ -228,9 +240,8 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                 List<QName> elementPath = supportingToken.getElementPath();
 
                 boolean found = false;
-                Iterator<SignedElementSecurityEvent> signedElementSecurityEventIterator = signedElementEvents.iterator();
-                while (signedElementSecurityEventIterator.hasNext()) {
-                    SignedElementSecurityEvent signedElementSecurityEvent = signedElementSecurityEventIterator.next();
+                for (int j = 0; j < signedElementEvents.size(); j++) {
+                    SignedElementSecurityEvent signedElementSecurityEvent = signedElementEvents.get(j);
                     if (WSSUtils.pathMatches(signedElementSecurityEvent.getElementPath(), elementPath, false, false)) {
                         SecurityToken elementSignatureToken = signedElementSecurityEvent.getSecurityToken();
                         while (elementSignatureToken != null && elementSignatureToken.getKeyWrappingToken() != null) {
