@@ -19,6 +19,8 @@
 package org.apache.wss4j.stax.impl.processor.output;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.ext.WSPasswordCallback.Usage;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
@@ -40,8 +42,12 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+
+import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -303,6 +309,20 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                         );
                     }
                     byte[] encryptedEphemeralKey = cipher.wrap(secretKey);
+                    
+                    if (((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler() != null) {
+                        // Store the Encrypted Key in the CallbackHandler for processing on the inbound side
+                        WSPasswordCallback callback = 
+                            new WSPasswordCallback(securityToken.getId(), Usage.ENCRYPTED_KEY_TOKEN);
+                        callback.setKey(encryptedEphemeralKey);
+                        try {
+                            ((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler().handle(new Callback[]{callback});
+                        } catch (IOException e) { // NOPMD
+                            // Do nothing
+                        } catch (UnsupportedCallbackException e) { // NOPMD
+                            // Do nothing
+                        }
+                    }
 
                     createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(encryptedEphemeralKey));
 

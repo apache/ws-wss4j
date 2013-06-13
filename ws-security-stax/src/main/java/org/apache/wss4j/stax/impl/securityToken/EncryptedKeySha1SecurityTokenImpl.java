@@ -65,7 +65,7 @@ public class EncryptedKeySha1SecurityTokenImpl
         }
 
         WSPasswordCallback secretKeyCallback =
-                new WSPasswordCallback(getId(), null,
+                new WSPasswordCallback(sha1Identifier, null,
                         WSSConstants.NS_ENCRYPTED_KEY_SHA1, WSPasswordCallback.Usage.SECRET_KEY);
         WSSUtils.doSecretKeyCallback(callbackHandler, secretKeyCallback, sha1Identifier);
         if (secretKeyCallback.getKey() == null) {
