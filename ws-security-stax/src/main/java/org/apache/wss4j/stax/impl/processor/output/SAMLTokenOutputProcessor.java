@@ -107,54 +107,73 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             XMLSecurityConstants.Action action = getAction();
 
             if (WSSConstants.SAML_TOKEN_SIGNED.equals(action) && senderVouches) {
-                CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-                cryptoType.setAlias(samlCallback.getIssuerKeyName());
-                X509Certificate[] certificates = null;
-                if (samlCallback.getIssuerCrypto() != null) {
-                    certificates = samlCallback.getIssuerCrypto().getX509Certificates(cryptoType);
+                GenericOutboundSecurityToken securityToken = null;
+                
+                // See if a token is already available
+                String sigTokenId = 
+                    outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE);
+                SecurityTokenProvider<OutboundSecurityToken> signatureTokenProvider = null;
+                if (sigTokenId != null) {
+                    signatureTokenProvider = 
+                        outputProcessorChain.getSecurityContext().getSecurityTokenProvider(sigTokenId);
+                    if (signatureTokenProvider != null) {
+                        securityToken = 
+                            (GenericOutboundSecurityToken)signatureTokenProvider.getSecurityToken();
+                    }
                 }
-                if (certificates == null) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                            "empty", "No issuer certs were found to sign the SAML Assertion using issuer name: "
-                            + samlCallback.getIssuerKeyName()
-                    );
+                
+                if (securityToken == null) {
+                    CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+                    cryptoType.setAlias(samlCallback.getIssuerKeyName());
+                    X509Certificate[] certificates = null;
+                    if (samlCallback.getIssuerCrypto() != null) {
+                        certificates = samlCallback.getIssuerCrypto().getX509Certificates(cryptoType);
+                    }
+                    if (certificates == null) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                                "empty", "No issuer certs were found to sign the SAML Assertion using issuer name: "
+                                + samlCallback.getIssuerKeyName()
+                        );
+                    }
+    
+                    PrivateKey privateKey;
+                    try {
+                        privateKey = samlCallback.getIssuerCrypto().getPrivateKey(
+                                samlCallback.getIssuerKeyName(), samlCallback.getIssuerKeyPassword());
+                    } catch (Exception ex) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
+                    }
+    
+                    final String binarySecurityTokenId = IDGenerator.generateID(null);
+    
+                    final GenericOutboundSecurityToken bstSecurityToken =
+                            new GenericOutboundSecurityToken(binarySecurityTokenId, WSSecurityTokenConstants.X509V3Token,
+                                    privateKey, certificates);
+                    
+                    SecurityTokenProvider<OutboundSecurityToken> securityTokenProvider =
+                        new SecurityTokenProvider<OutboundSecurityToken>() {
+
+                        @Override
+                        public OutboundSecurityToken getSecurityToken() throws WSSecurityException {
+                            return bstSecurityToken;
+                        }
+
+                        @Override
+                        public String getId() {
+                            return binarySecurityTokenId;
+                        }
+                    };
+
+                    outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(binarySecurityTokenId, securityTokenProvider);
+                    outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, binarySecurityTokenId);
+                    
+                    securityToken = bstSecurityToken;
                 }
-
-                PrivateKey privateKey;
-                try {
-                    privateKey = samlCallback.getIssuerCrypto().getPrivateKey(
-                            samlCallback.getIssuerKeyName(), samlCallback.getIssuerKeyPassword());
-                } catch (Exception ex) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
-                }
-
-                final String binarySecurityTokenId = IDGenerator.generateID(null);
-
-                final GenericOutboundSecurityToken securityToken =
-                        new GenericOutboundSecurityToken(binarySecurityTokenId, WSSecurityTokenConstants.X509V3Token,
-                                privateKey, certificates);
 
                 finalSAMLTokenOutputProcessor = new FinalSAMLTokenOutputProcessor(securityToken, samlAssertionWrapper,
                         securityTokenReferenceId, senderVouches);
 
                 securityToken.setProcessor(finalSAMLTokenOutputProcessor);
-
-                SecurityTokenProvider<OutboundSecurityToken> securityTokenProvider =
-                        new SecurityTokenProvider<OutboundSecurityToken>() {
-
-                    @Override
-                    public OutboundSecurityToken getSecurityToken() throws WSSecurityException {
-                        return securityToken;
-                    }
-
-                    @Override
-                    public String getId() {
-                        return binarySecurityTokenId;
-                    }
-                };
-
-                outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(binarySecurityTokenId, securityTokenProvider);
-                outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, binarySecurityTokenId);
 
             } else {
                 final SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo();
