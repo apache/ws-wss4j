@@ -45,7 +45,7 @@ public interface KerberosTokenDecoder {
      * Get the session key from the token
      * @return the session key from the token
      */
-    byte[] getSessionKey();
+    byte[] getSessionKey() throws KerberosTokenDecoderException;
     
     /**
      * Clear all internal information

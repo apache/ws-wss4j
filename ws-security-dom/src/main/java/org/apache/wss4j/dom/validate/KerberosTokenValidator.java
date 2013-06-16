@@ -29,6 +29,7 @@ import javax.security.auth.login.LoginException;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.kerberos.KerberosTokenDecoder;
+import org.apache.wss4j.common.kerberos.KerberosTokenDecoderException;
 import org.apache.wss4j.common.kerberos.KerberosTokenDecoderImpl;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.BinarySecurity;
@@ -203,8 +204,12 @@ public class KerberosTokenValidator implements Validator {
         kerberosTokenDecoder.clear();
         kerberosTokenDecoder.setToken(token);
         kerberosTokenDecoder.setSubject(subject);
-        byte[] sessionKey = kerberosTokenDecoder.getSessionKey();
-        credential.setSecretKey(sessionKey);
+        try {
+            byte[] sessionKey = kerberosTokenDecoder.getSessionKey();
+            credential.setSecretKey(sessionKey);
+        } catch (KerberosTokenDecoderException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        }
 
         if (log.isDebugEnabled()) {
             log.debug("Successfully validated a ticket");

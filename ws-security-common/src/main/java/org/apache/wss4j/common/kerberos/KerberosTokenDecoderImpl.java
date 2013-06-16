@@ -3,6 +3,7 @@ package org.apache.wss4j.common.kerberos;
 import org.apache.directory.server.kerberos.shared.crypto.encryption.CipherTextHandler;
 import org.apache.directory.server.kerberos.shared.crypto.encryption.EncryptionType;
 import org.apache.directory.server.kerberos.shared.crypto.encryption.KeyUsage;
+import org.apache.directory.server.kerberos.shared.exceptions.KerberosException;
 import org.apache.directory.server.kerberos.shared.io.decoder.ApplicationRequestDecoder;
 import org.apache.directory.server.kerberos.shared.messages.ApplicationRequest;
 import org.apache.directory.server.kerberos.shared.messages.components.EncTicketPart;
@@ -19,9 +20,6 @@ import java.util.Set;
 
 public class KerberosTokenDecoderImpl implements KerberosTokenDecoder {
     
-    private static org.slf4j.Logger log =
-        org.slf4j.LoggerFactory.getLogger(KerberosTokenDecoderImpl.class);
-
     private static final String KERBEROS_OID = "1.2.840.113554.1.2.2";
 
     private byte[] serviceTicket;
@@ -63,7 +61,7 @@ public class KerberosTokenDecoderImpl implements KerberosTokenDecoder {
      *
      * @return the session key from the token
      */
-    public byte[] getSessionKey() {
+    public byte[] getSessionKey() throws KerberosTokenDecoderException {
         if (!decoded) {
             decodeServiceTicket();
         }
@@ -78,7 +76,7 @@ public class KerberosTokenDecoderImpl implements KerberosTokenDecoder {
      *
      * @return the client principal name
      */
-    public String getClientPrincipalName() {
+    public String getClientPrincipalName() throws KerberosTokenDecoderException {
         if (!decoded) {
             decodeServiceTicket();
         }
@@ -86,60 +84,60 @@ public class KerberosTokenDecoderImpl implements KerberosTokenDecoder {
     }
 
     // Decode the service ticket.
-    private synchronized void decodeServiceTicket() {
-        try {
-            parseServiceTicket(serviceTicket);
-            decoded = true;
-        } catch (Exception e) {
-            log.debug("Error retrieving a service ticket", e);
-        }
+    private synchronized void decodeServiceTicket() throws KerberosTokenDecoderException {
+        parseServiceTicket(serviceTicket);
+        decoded = true;
     }
 
     // Parses the service ticket (GSS AP-REQ token)
-    private void parseServiceTicket(byte[] ticket) throws Exception {
-
-        // I didn't find a better way how to parse this Kerberos Message...
-
-        org.bouncycastle.asn1.ASN1InputStream asn1InputStream =
-                new org.bouncycastle.asn1.ASN1InputStream(new ByteArrayInputStream(ticket));
-        org.bouncycastle.asn1.DERApplicationSpecific derToken =
-                (org.bouncycastle.asn1.DERApplicationSpecific) asn1InputStream.readObject();
-        if (derToken == null || !derToken.isConstructed()) {
+    private void parseServiceTicket(byte[] ticket) throws KerberosTokenDecoderException {
+        try {
+            // I didn't find a better way how to parse this Kerberos Message...
+            org.bouncycastle.asn1.ASN1InputStream asn1InputStream =
+                    new org.bouncycastle.asn1.ASN1InputStream(new ByteArrayInputStream(ticket));
+            org.bouncycastle.asn1.DERApplicationSpecific derToken =
+                    (org.bouncycastle.asn1.DERApplicationSpecific) asn1InputStream.readObject();
+            if (derToken == null || !derToken.isConstructed()) {
+                asn1InputStream.close();
+                throw new KerberosTokenDecoderException("invalid kerberos token");
+            }
             asn1InputStream.close();
-            throw new IllegalArgumentException("invalid kerberos token");
+
+            asn1InputStream = new org.bouncycastle.asn1.ASN1InputStream(new ByteArrayInputStream(derToken.getContents()));
+            org.bouncycastle.asn1.DERObjectIdentifier kerberosOid =
+                    (org.bouncycastle.asn1.DERObjectIdentifier) asn1InputStream.readObject();
+            if (!kerberosOid.getId().equals(KERBEROS_OID)) {
+                asn1InputStream.close();
+                throw new KerberosTokenDecoderException("invalid kerberos token");
+            }
+
+            int readLowByte = asn1InputStream.read() & 0xff;
+            int readHighByte = asn1InputStream.read() & 0xff;
+            int read = (readHighByte << 8) + readLowByte;
+            if (read != 0x01) {
+                throw new KerberosTokenDecoderException("invalid kerberos token");
+            }
+
+            ApplicationRequestDecoder applicationRequestDecoder = new ApplicationRequestDecoder();
+            ApplicationRequest applicationRequest = applicationRequestDecoder.decode(toByteArray(asn1InputStream));
+
+            final int encryptionType = applicationRequest.getTicket().getEncPart().getEType().getOrdinal();
+            KerberosKey kerberosKey = getKrbKey(subject, encryptionType);
+
+            EncryptionKey encryptionKey =
+                    new EncryptionKey(EncryptionType.getTypeByOrdinal(encryptionType), kerberosKey.getEncoded());
+
+            CipherTextHandler cipherTextHandler = new CipherTextHandler();
+            this.encTicketPart = (EncTicketPart) cipherTextHandler.unseal(
+                    EncTicketPart.class, encryptionKey, applicationRequest.getTicket().getEncPart(), KeyUsage.NUMBER2);
+        } catch (KerberosException e) {
+            throw new KerberosTokenDecoderException(e);
+        } catch (IOException e) {
+            throw new KerberosTokenDecoderException(e);
         }
-        asn1InputStream.close();
-
-        asn1InputStream = new org.bouncycastle.asn1.ASN1InputStream(new ByteArrayInputStream(derToken.getContents()));
-        org.bouncycastle.asn1.DERObjectIdentifier kerberosOid =
-                (org.bouncycastle.asn1.DERObjectIdentifier) asn1InputStream.readObject();
-        if (!kerberosOid.getId().equals(KERBEROS_OID)) {
-            asn1InputStream.close();
-            throw new IllegalArgumentException("invalid kerberos token");
-        }
-
-        int readLowByte = asn1InputStream.read() & 0xff;
-        int readHighByte = asn1InputStream.read() & 0xff;
-        int read = (readHighByte << 8) + readLowByte;
-        if (read != 0x01) {
-            throw new IllegalArgumentException("invalid kerberos token");
-        }
-
-        ApplicationRequestDecoder applicationRequestDecoder = new ApplicationRequestDecoder();
-        ApplicationRequest applicationRequest = applicationRequestDecoder.decode(toByteArray(asn1InputStream));
-
-        final int encryptionType = applicationRequest.getTicket().getEncPart().getEType().getOrdinal();
-        KerberosKey kerberosKey = getKrbKey(subject, encryptionType);
-
-        EncryptionKey encryptionKey =
-                new EncryptionKey(EncryptionType.getTypeByOrdinal(encryptionType), kerberosKey.getEncoded());
-
-        CipherTextHandler cipherTextHandler = new CipherTextHandler();
-        this.encTicketPart = (EncTicketPart) cipherTextHandler.unseal(
-                EncTicketPart.class, encryptionKey, applicationRequest.getTicket().getEncPart(), KeyUsage.NUMBER2);
     }
 
-    private KerberosKey getKrbKey(Subject sub, int keyType) throws Exception {
+    private KerberosKey getKrbKey(Subject sub, int keyType) {
         Set<Object> creds = sub.getPrivateCredentials(Object.class);
         for (Iterator<Object> i = creds.iterator(); i.hasNext(); ) {
             Object cred = i.next();

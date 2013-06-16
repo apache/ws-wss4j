@@ -19,10 +19,7 @@
 package org.apache.wss4j.stax.impl.securityToken;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.kerberos.KerberosContextAndServiceNameCallback;
-import org.apache.wss4j.common.kerberos.KerberosServiceAction;
-import org.apache.wss4j.common.kerberos.KerberosTokenDecoder;
-import org.apache.wss4j.common.kerberos.KerberosTokenDecoderImpl;
+import org.apache.wss4j.common.kerberos.*;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.securityToken.KerberosServiceSecurityToken;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
@@ -139,7 +136,12 @@ public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityTok
             this.kerberosTokenDecoder = getTGT();
         }
 
-        byte[] sk = this.kerberosTokenDecoder.getSessionKey();
+        byte[] sk;
+        try {
+            sk = this.kerberosTokenDecoder.getSessionKey();
+        } catch (KerberosTokenDecoderException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
+        }
 
         String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
         int keyLength = JCEAlgorithmMapper.getKeyLengthFromURI(algorithmURI) / 8;
