@@ -807,7 +807,7 @@ public final class WSSecurityUtil {
         // Do an additional check on the keysize required by the encryption algorithm
         int size = 0;
         try {
-            size = JCEMapper.getKeyLengthFromURI(symEncAlgo) / 8;
+            size = WSSecurityUtil.getKeyLength(symEncAlgo);
         } catch (Exception e) {
             // ignore - some unknown (to JCEMapper) encryption algorithm
             if (log.isDebugEnabled()) {
@@ -1054,33 +1054,7 @@ public final class WSSecurityUtil {
      * @return the key length
      */
     public static int getKeyLength(String algorithm) throws WSSecurityException {
-        if (algorithm.equals(WSConstants.TRIPLE_DES)) {
-            return 24;
-        } else if (algorithm.equals(WSConstants.AES_128)) {
-            return 16;
-        } else if (algorithm.equals(WSConstants.AES_192)) {
-            return 24;
-        } else if (algorithm.equals(WSConstants.AES_256)) {
-            return 32;
-        } else if (algorithm.equals(WSConstants.AES_128_GCM)) {
-            return 16;
-        } else if (algorithm.equals(WSConstants.AES_192_GCM)) {
-            return 24;
-        } else if (algorithm.equals(WSConstants.AES_256_GCM)) {
-            return 32;
-        } else if (WSConstants.HMAC_SHA1.equals(algorithm)) {
-            return 20;
-        } else if (WSConstants.HMAC_SHA256.equals(algorithm)) {
-            return 32;
-        } else if (WSConstants.HMAC_SHA384.equals(algorithm)) {
-            return 48;
-        } else if (WSConstants.HMAC_SHA512.equals(algorithm)) {
-            return 64;
-        } else if (WSConstants.HMAC_MD5.equals(algorithm)) {
-            return 16;
-        } else {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM);
-        }
+        return JCEMapper.getKeyLengthFromURI(algorithm) / 8;
     }
 
     /**
