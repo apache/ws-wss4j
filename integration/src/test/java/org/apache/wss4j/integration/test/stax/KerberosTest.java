@@ -376,6 +376,7 @@ public class KerberosTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN};
             securityProperties.setOutAction(actions);
+            securityProperties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
             securityProperties.setCallbackHandler(new CallbackHandler() {
                 @Override
                 public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
@@ -472,7 +473,7 @@ public class KerberosTest extends AbstractTestBase {
             bst.setID("Id-" + bst.hashCode());
 
             WSSecEncrypt builder = new WSSecEncrypt();
-            builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
+            builder.setSymmetricEncAlgorithm(WSConstants.AES_256);
             SecretKey secretKey = bst.getSecretKey();
             builder.setSymmetricKey(secretKey);
             builder.setEncryptSymmKey(false);

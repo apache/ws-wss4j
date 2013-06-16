@@ -139,9 +139,20 @@ public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityTok
             this.kerberosTokenDecoder = getTGT();
         }
 
-        byte[] secretToken = this.kerberosTokenDecoder.getSessionKey();
+        byte[] sk = this.kerberosTokenDecoder.getSessionKey();
+
         String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
-        key = new SecretKeySpec(secretToken, algoFamily);
+        int keyLength = JCEAlgorithmMapper.getKeyLengthFromURI(algorithmURI) / 8;
+        if (sk.length < keyLength) {
+            //normally we should throw an exception here because we don't have
+            //enough key material for the requested algorithm
+            //but I haven't found any documentation about how this case should be handled
+            //and the second thing is that we would need a kerberos key with minimum 160 bits
+            //to be able to sign with a more or less secure algo like hmacsha1
+            keyLength = sk.length;
+        }
+
+        key = new SecretKeySpec(sk, 0, keyLength, algoFamily);
         setSecretKey(algorithmURI, key);
         return key;
     }

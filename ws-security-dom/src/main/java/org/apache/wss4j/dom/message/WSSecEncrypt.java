@@ -156,6 +156,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         
         if (symmetricKey == null) {
             symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, ephemeralKey);
+        } else {
+            symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, symmetricKey.getEncoded());
         }
         
         //

@@ -138,8 +138,21 @@ public class KerberosClientSecurityToken extends GenericOutboundSecurityToken {
         if (this.secretKey == null) {
             getTGT();
         }
+
+        byte[] sk = this.secretKey.getEncoded();
+
         String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
-        key = new SecretKeySpec(this.secretKey.getEncoded(), algoFamily);
+        int keyLength = JCEAlgorithmMapper.getKeyLengthFromURI(algorithmURI) / 8;
+        if (sk.length < keyLength) {
+            //normally we should throw an exception here because we don't have
+            //enough key material for the requested algorithm
+            //but I haven't found any documentation about how this case should be handled
+            //and the second thing is that we would need a kerberos key with minimum 160 bits
+            //to be able to sign with a more or less secure algo like hmacsha1
+            keyLength = sk.length;
+        }
+
+        key = new SecretKeySpec(sk, 0, keyLength, algoFamily);
         setSecretKey(algorithmURI, key);
         return key;
     }
