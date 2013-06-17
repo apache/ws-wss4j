@@ -23,9 +23,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 
 import org.apache.wss4j.binding.wss10.SecurityTokenReferenceType;
 import org.apache.wss4j.common.bsp.BSPRule;
@@ -194,7 +196,34 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
         TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent = WSSUtils.createTokenSecurityEvent(inboundSecurityToken, encryptedDataType.getId());
         inboundSecurityContext.registerSecurityEvent(tokenSecurityEvent);
     }
-    
+
+    @Override
+    public void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        //find already processed references by the EncryptedDataHandler
+        List<String> encryptedDataRefs = inputProcessorChain.getSecurityContext().getAsList(WSSConstants.PROP_ENCRYPTED_DATA_REFS);
+        if (encryptedDataRefs != null && !encryptedDataRefs.isEmpty()) {
+            Map<String, ReferenceType> references = getReferences();
+            List<ReferenceType> processedReferences = getProcessedReferences();
+            if (references != null) {
+                Iterator<Map.Entry<String,ReferenceType>> iterator = references.entrySet().iterator();
+                while(iterator.hasNext()){
+                    Map.Entry<String,ReferenceType> next = iterator.next();
+                    final ReferenceType referenceType = next.getValue();
+                    String uri = WSSUtils.dropReferenceMarker(referenceType.getURI());
+
+                    Iterator<String> encryptedDataIterator = encryptedDataRefs.iterator();
+                    while (encryptedDataIterator.hasNext()) {
+                        String s = encryptedDataIterator.next();
+                        if (s.equals(uri)) {
+                            processedReferences.add(referenceType);
+                        }
+                    }
+                }
+            }
+        }
+        super.doFinal(inputProcessorChain);
+    }
+
     /*
    <xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" Id="EncDataId-1612925417" Type="http://www.w3.org/2001/04/xmlenc#Content">
        <xenc:EncryptionMethod xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc" />

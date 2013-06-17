@@ -272,6 +272,8 @@ public class WSSConstants extends XMLSecurityConstants {
 
     public static final String PROP_TIMESTAMP_SECURITYEVENT = "PROP_TIMESTAMP";
 
+    public static final String PROP_ENCRYPTED_DATA_REFS = "PROP_ENCRYPTED_DATA_REFS";
+
     public static final Action TIMESTAMP = new Action(ConfigurationConstants.TIMESTAMP);
     public static final Action USERNAMETOKEN = new Action(ConfigurationConstants.USERNAME_TOKEN);
     public static final Action USERNAMETOKEN_SIGNED = new Action(ConfigurationConstants.USERNAME_TOKEN_SIGNATURE);
