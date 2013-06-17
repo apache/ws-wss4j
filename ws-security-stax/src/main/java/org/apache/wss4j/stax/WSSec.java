@@ -139,12 +139,14 @@ public class WSSec {
                 if (securityProperties.getEncryptionUseThisCertificate() == null
                         && securityProperties.getEncryptionKeyStore() == null
                         && securityProperties.getEncryptionCryptoProperties() == null
-                        && !securityProperties.isUseReqSigCertForEncryption()) {
+                        && !securityProperties.isUseReqSigCertForEncryption()
+                        && securityProperties.isEncryptSymmetricEncrytionKey()) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "encryptionKeyStoreNotSet");
                 }
                 if (securityProperties.getEncryptionUser() == null
                         && securityProperties.getEncryptionUseThisCertificate() == null
-                        && !securityProperties.isUseReqSigCertForEncryption()) {
+                        && !securityProperties.isUseReqSigCertForEncryption()
+                        && securityProperties.isEncryptSymmetricEncrytionKey()) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noEncryptionUser");
                 }
                 if (securityProperties.getEncryptionSymAlgorithm() == null) {

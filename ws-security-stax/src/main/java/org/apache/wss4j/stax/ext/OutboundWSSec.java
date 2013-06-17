@@ -152,12 +152,14 @@ public class OutboundWSSec {
                     initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
 
                 } else if (WSSConstants.ENCRYPT.equals(action)) {
-                    final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
+                    if (securityProperties.isEncryptSymmetricEncrytionKey()) {
+                        final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
                             new BinarySecurityTokenOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
+                        initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
 
-                    final EncryptedKeyOutputProcessor encryptedKeyOutputProcessor = new EncryptedKeyOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, encryptedKeyOutputProcessor, action);
+                        final EncryptedKeyOutputProcessor encryptedKeyOutputProcessor = new EncryptedKeyOutputProcessor();
+                        initializeOutputProcessor(outputProcessorChain, encryptedKeyOutputProcessor, action);
+                    }
 
                     final EncryptOutputProcessor encryptOutputProcessor = new EncryptOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, encryptOutputProcessor, action);

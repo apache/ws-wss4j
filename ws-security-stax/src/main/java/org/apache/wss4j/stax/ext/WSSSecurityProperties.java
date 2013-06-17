@@ -68,6 +68,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private Integer derivedKeyIterations = 1000;
     private boolean addUsernameTokenNonce;
     private boolean addUsernameTokenCreated;
+    private boolean encryptSymmetricEncrytionKey = true;
 
     /**
      * This variable controls whether types other than PasswordDigest or PasswordText
@@ -156,6 +157,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.addUsernameTokenNonce = wssSecurityProperties.addUsernameTokenNonce;
         this.addUsernameTokenCreated = wssSecurityProperties.addUsernameTokenCreated;
         this.validateSamlSubjectConfirmation = wssSecurityProperties.validateSamlSubjectConfirmation;
+        this.encryptSymmetricEncrytionKey = wssSecurityProperties.encryptSymmetricEncrytionKey;
     }
 
     /**
@@ -838,6 +840,14 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public void setEnableNonceReplayCache(boolean enableNonceReplayCache) {
         this.enableNonceReplayCache = enableNonceReplayCache;
+    }
+
+    public boolean isEncryptSymmetricEncrytionKey() {
+        return encryptSymmetricEncrytionKey;
+    }
+
+    public void setEncryptSymmetricEncrytionKey(boolean encryptSymmetricEncrytionKey) {
+        this.encryptSymmetricEncrytionKey = encryptSymmetricEncrytionKey;
     }
     
 }

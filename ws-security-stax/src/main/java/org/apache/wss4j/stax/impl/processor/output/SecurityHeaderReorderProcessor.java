@@ -111,7 +111,7 @@ public class SecurityHeaderReorderProcessor extends AbstractOutputProcessor {
                                 subOutputProcessorChain.reset();
                                 subOutputProcessorChain.processEvent(event);
                             }
-                            //remove the actual header so that it won't be outputted twice in the loop below
+                            //remove the actual header so that it won't be output twice in the loop below
                             entryIterator.remove();
                         }
                         //... the action is encryption and...

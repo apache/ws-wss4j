@@ -117,7 +117,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
     }
 
     /**
-     * Processor which handles the effective enryption of the data
+     * Processor which handles the effective encryption of the data
      */
     class InternalEncryptionOutputProcessor extends AbstractInternalEncryptionOutputProcessor {
 
@@ -207,12 +207,17 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
         @Override
         protected void createKeyInfoStructure(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
             createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_KeyInfo, true, null);
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, true, null);
 
             if (WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier.equals(
                     ((WSSSecurityProperties) getSecurityProperties()).getEncryptionKeyIdentifier())) {
+                List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
+                attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
+                createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
+                
                 WSSUtils.createEncryptedKeySha1IdentifierStructure(this, outputProcessorChain, getEncryptionPartDef().getSymmetricKey());
             } else {
+                createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, true, null);
+                
                 List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
                 attributes.add(createAttribute(WSSConstants.ATT_NULL_URI, "#" + getEncryptionPartDef().getKeyId()));
                 createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference, false, attributes);

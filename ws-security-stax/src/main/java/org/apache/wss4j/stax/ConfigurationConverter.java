@@ -421,6 +421,10 @@ public final class ConfigurationConverter {
         boolean enableNonceCache = 
             decodeBooleanConfigValue(ConfigurationConstants.ENABLE_NONCE_CACHE, true, config);
         properties.setEnableNonceReplayCache(enableNonceCache);
+        
+        boolean encryptSymmetricEncryptionKey = 
+            decodeBooleanConfigValue(ConfigurationConstants.ENC_SYM_ENC_KEY, true, config);
+        properties.setEncryptSymmetricEncrytionKey(encryptSymmetricEncryptionKey);
     }
     
     private static void parseNonBooleanProperties(
