@@ -161,6 +161,7 @@ public class SAMLTokenProcessor implements Processor {
                 // structure for testing the transform/digest algorithms etc.
                 XMLValidateContext context = new DOMValidateContext(key, sig.getDOM());
                 context.setProperty("org.apache.jcp.xml.dsig.secureValidation", Boolean.TRUE);
+                context.setProperty("org.jcp.xml.dsig.secureValidation", Boolean.TRUE);
 
                 XMLSignature xmlSignature;
                 try {
