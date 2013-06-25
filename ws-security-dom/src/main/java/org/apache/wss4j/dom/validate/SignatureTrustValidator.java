@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
 
@@ -151,7 +152,7 @@ public class SignatureTrustValidator implements Validator {
         //
         // FIRST step - Search the keystore for the transmitted certificate
         //
-        if (!enableRevocation && isCertificateInKeyStore(crypto, cert)) {
+        if (!enableRevocation && (crypto instanceof Merlin) && isCertificateInKeyStore(crypto, cert)) {
             return true;
         }
 
