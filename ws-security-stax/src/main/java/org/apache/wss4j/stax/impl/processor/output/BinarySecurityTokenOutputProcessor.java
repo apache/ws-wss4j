@@ -55,6 +55,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
         try {
             final String bstId;
             final X509Certificate[] x509Certificates;
+            String reference = null;
             Key key = null;
 
             XMLSecurityConstants.Action action = getAction();
@@ -74,6 +75,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                             (GenericOutboundSecurityToken)signatureTokenProvider.getSecurityToken();
                         if (securityToken != null) {
                             key = securityToken.getSecretKey(getSecurityProperties().getSignatureAlgorithm());
+                            reference = securityToken.getSha1Identifier();
                         }
                     }
                 }
@@ -147,6 +149,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
 
             final GenericOutboundSecurityToken binarySecurityToken =
                     new GenericOutboundSecurityToken(bstId, WSSecurityTokenConstants.X509V3Token, key, x509Certificates);
+            binarySecurityToken.setSha1Identifier(reference);
             final SecurityTokenProvider<OutboundSecurityToken> binarySecurityTokenProvider =
                     new SecurityTokenProvider<OutboundSecurityToken>() {
 

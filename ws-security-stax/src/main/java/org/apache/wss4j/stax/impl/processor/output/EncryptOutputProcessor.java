@@ -94,7 +94,8 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                             new InternalEncryptionOutputProcessor(
                                     encryptionPartDef,
                                     xmlSecStartElement,
-                                    outputProcessorChain.getDocumentContext().getEncoding()
+                                    outputProcessorChain.getDocumentContext().getEncoding(),
+                                    securityToken.getSha1Identifier()
                             );
                     internalEncryptionOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
                     internalEncryptionOutputProcessor.setAction(getAction());
@@ -122,14 +123,17 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
     class InternalEncryptionOutputProcessor extends AbstractInternalEncryptionOutputProcessor {
 
         private boolean doEncryptedHeader = false;
+        private final String sha1Identifier;
 
-        InternalEncryptionOutputProcessor(EncryptionPartDef encryptionPartDef, XMLSecStartElement xmlSecStartElement, String encoding)
+        InternalEncryptionOutputProcessor(EncryptionPartDef encryptionPartDef, XMLSecStartElement xmlSecStartElement, 
+                                          String encoding, String sha1Identifier)
                 throws XMLSecurityException, XMLStreamException {
 
             super(encryptionPartDef, xmlSecStartElement, encoding);
             this.addBeforeProcessor(EncryptEndingOutputProcessor.class.getName());
             this.addBeforeProcessor(InternalEncryptionOutputProcessor.class.getName());
             this.addAfterProcessor(EncryptOutputProcessor.class.getName());
+            this.sha1Identifier = sha1Identifier;
         }
 
         protected OutputStream applyTransforms(OutputStream outputStream) throws XMLSecurityException {
@@ -214,7 +218,11 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
                 createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
                 
-                WSSUtils.createEncryptedKeySha1IdentifierStructure(this, outputProcessorChain, getEncryptionPartDef().getSymmetricKey());
+                if (sha1Identifier != null) {
+                    WSSUtils.createEncryptedKeySha1IdentifierStructure(this, outputProcessorChain, sha1Identifier);
+                } else {
+                    WSSUtils.createEncryptedKeySha1IdentifierStructure(this, outputProcessorChain, getEncryptionPartDef().getSymmetricKey());
+                }
             } else {
                 createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, true, null);
                 

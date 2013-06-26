@@ -40,6 +40,7 @@ import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import java.security.cert.X509Certificate;
+import java.security.Key;
 import java.util.*;
 
 public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOutputProcessor {
@@ -121,8 +122,13 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
             } else if (WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier.equals(keyIdentifier)) {
                 WSSUtils.createThumbprintKeyIdentifierStructure(this, outputProcessorChain, x509Certificates);
             } else if (WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier.equals(keyIdentifier)) {
-                WSSUtils.createEncryptedKeySha1IdentifierStructure(this, outputProcessorChain,
-                        securityToken.getSecretKey(getSecurityProperties().getSignatureAlgorithm()));
+                String identifier = securityToken.getSha1Identifier();
+                if (identifier != null) {
+                    WSSUtils.createEncryptedKeySha1IdentifierStructure(this, outputProcessorChain, identifier);
+                } else {
+                    Key key = securityToken.getSecretKey(getSecurityProperties().getSignatureAlgorithm());
+                    WSSUtils.createEncryptedKeySha1IdentifierStructure(this, outputProcessorChain, key);
+                }
             } else if (WSSecurityTokenConstants.KeyIdentifier_EncryptedKey.equals(keyIdentifier)) {
                 String id = securityToken.getId();
                 WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, id, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE);

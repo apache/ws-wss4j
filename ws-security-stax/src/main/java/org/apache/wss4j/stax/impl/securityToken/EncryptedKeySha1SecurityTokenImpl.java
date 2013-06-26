@@ -39,7 +39,6 @@ public class EncryptedKeySha1SecurityTokenImpl
         extends AbstractInboundSecurityToken implements EncryptedKeySha1SecurityToken {
 
     private CallbackHandler callbackHandler;
-    private String sha1Identifier;
 
     public EncryptedKeySha1SecurityTokenImpl(
             WSInboundSecurityContext inboundSecurityContext, CallbackHandler callbackHandler,
@@ -47,7 +46,7 @@ public class EncryptedKeySha1SecurityTokenImpl
 
         super(inboundSecurityContext, id, WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier, false);
         this.callbackHandler = callbackHandler;
-        this.sha1Identifier = sha1Identifier;
+        setSha1Identifier(sha1Identifier);
     }
 
     @Override
@@ -65,11 +64,11 @@ public class EncryptedKeySha1SecurityTokenImpl
         }
 
         WSPasswordCallback secretKeyCallback =
-                new WSPasswordCallback(sha1Identifier, null,
+                new WSPasswordCallback(getSha1Identifier(), null,
                         WSSConstants.NS_ENCRYPTED_KEY_SHA1, WSPasswordCallback.Usage.SECRET_KEY);
-        WSSUtils.doSecretKeyCallback(callbackHandler, secretKeyCallback, sha1Identifier);
+        WSSUtils.doSecretKeyCallback(callbackHandler, secretKeyCallback, getSha1Identifier());
         if (secretKeyCallback.getKey() == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKey", sha1Identifier);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKey", getSha1Identifier());
         }
 
         String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);

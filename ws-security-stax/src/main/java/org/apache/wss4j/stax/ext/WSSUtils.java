@@ -336,17 +336,24 @@ public class WSSUtils extends XMLSecurityUtils {
                                                                  OutputProcessorChain outputProcessorChain, Key key)
             throws XMLStreamException, XMLSecurityException {
 
+        try {
+            MessageDigest sha = MessageDigest.getInstance("SHA-1");
+            byte[] data = sha.digest(key.getEncoded());
+            createEncryptedKeySha1IdentifierStructure(abstractOutputProcessor, outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(data));
+        } catch (NoSuchAlgorithmException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        }
+    }
+    
+    public static void createEncryptedKeySha1IdentifierStructure(AbstractOutputProcessor abstractOutputProcessor,
+                                                                 OutputProcessorChain outputProcessorChain, String identifier)
+            throws XMLStreamException, XMLSecurityException {
+
         List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
         attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
         attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_ENCRYPTED_KEY_SHA1));
         abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
-        try {
-            MessageDigest sha = MessageDigest.getInstance("SHA-1");
-            byte[] data = sha.digest(key.getEncoded());
-            abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(data));
-        } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-        }
+        abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, identifier);
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
     }
 
