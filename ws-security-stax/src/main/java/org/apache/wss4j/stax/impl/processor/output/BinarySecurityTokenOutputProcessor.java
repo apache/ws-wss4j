@@ -78,9 +78,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                         if (securityToken != null) {
                             key = securityToken.getSecretKey(getSecurityProperties().getSignatureAlgorithm());
                             reference = securityToken.getSha1Identifier();
-                            if (securityToken.getTokenType() != null) {
-                                tokenType = securityToken.getTokenType();
-                            }
+                            tokenType = securityToken.getTokenType();
                         }
                     }
                 }
@@ -107,7 +105,8 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                         x509Certificates = null;
                         String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(getSecurityProperties().getSignatureAlgorithm());
                         key = new SecretKeySpec(secretKey, algoFamily);
-                    } 
+                    }
+                    tokenType = null;
                 } else {
                     bstId = tokenId;
                     x509Certificates = null;
