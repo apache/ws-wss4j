@@ -46,6 +46,7 @@ import org.apache.xml.security.stax.impl.EncryptionPartDef;
 import org.apache.xml.security.stax.impl.processor.output.AbstractEncryptOutputProcessor;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenConstants.TokenType;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 /**
@@ -95,7 +96,8 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                                     encryptionPartDef,
                                     xmlSecStartElement,
                                     outputProcessorChain.getDocumentContext().getEncoding(),
-                                    securityToken.getSha1Identifier()
+                                    securityToken.getSha1Identifier(),
+                                    securityToken.getTokenType()
                             );
                     internalEncryptionOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
                     internalEncryptionOutputProcessor.setAction(getAction());
@@ -124,9 +126,10 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
 
         private boolean doEncryptedHeader = false;
         private final String sha1Identifier;
+        private final TokenType tokenType;
 
         InternalEncryptionOutputProcessor(EncryptionPartDef encryptionPartDef, XMLSecStartElement xmlSecStartElement, 
-                                          String encoding, String sha1Identifier)
+                                          String encoding, String sha1Identifier, TokenType tokenType)
                 throws XMLSecurityException, XMLStreamException {
 
             super(encryptionPartDef, xmlSecStartElement, encoding);
@@ -134,6 +137,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
             this.addBeforeProcessor(InternalEncryptionOutputProcessor.class.getName());
             this.addAfterProcessor(EncryptOutputProcessor.class.getName());
             this.sha1Identifier = sha1Identifier;
+            this.tokenType = tokenType;
         }
 
         protected OutputStream applyTransforms(OutputStream outputStream) throws XMLSecurityException {
@@ -224,10 +228,20 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                     WSSUtils.createEncryptedKeySha1IdentifierStructure(this, outputProcessorChain, getEncryptionPartDef().getSymmetricKey());
                 }
             } else {
-                createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, true, null);
+                if (WSSecurityTokenConstants.KerberosToken.equals(tokenType)) {
+                    List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
+                    attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
+                    attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_GSS_Kerberos5_AP_REQ));
+                    createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
+                } else {
+                    createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, true, null);
+                }
                 
                 List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
                 attributes.add(createAttribute(WSSConstants.ATT_NULL_URI, "#" + getEncryptionPartDef().getKeyId()));
+                if (WSSecurityTokenConstants.KerberosToken.equals(tokenType)) {
+                    attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_GSS_Kerberos5_AP_REQ));
+                }
                 createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference, false, attributes);
                 createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference);
             }

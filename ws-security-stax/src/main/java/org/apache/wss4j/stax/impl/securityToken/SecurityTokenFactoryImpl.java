@@ -258,7 +258,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                         return createSecurityTokenProxy(securityTokenProvider.getSecurityToken(),
                                 WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                     }
-
+                    
                     try {
                         //ok we have to find the token via digesting...
                         MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
@@ -280,8 +280,10 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
                     }
 
-                    throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", keyIdentifierType.getValue());
+                    // Finally, just delegate to a Callback as per EncryptedKeySHA1
+                    return new EncryptedKeySha1SecurityTokenImpl(
+                            (WSInboundSecurityContext) inboundSecurityContext, callbackHandler, 
+                            keyIdentifierType.getValue(), securityTokenReferenceType.getId());
                 } else {
                     //we do enforce BSP compliance here but will fail anyway since we cannot identify the referenced token
                     ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3063);
