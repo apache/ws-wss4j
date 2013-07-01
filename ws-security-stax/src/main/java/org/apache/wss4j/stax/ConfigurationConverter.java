@@ -542,6 +542,8 @@ public final class ConfigurationConverter {
             return WSSecurityTokenConstants.KeyIdentifier_EncryptedKey;
         } else if ("KeyValue".equals(keyIdentifier)) {
             return WSSecurityTokenConstants.KeyIdentifier_KeyValue;
+        } else if ("KerberosSHA1".equals(keyIdentifier)) {
+            return WSSecurityTokenConstants.KeyIdentifier_KerberosSha1Identifier;
         }
         return null;
     }

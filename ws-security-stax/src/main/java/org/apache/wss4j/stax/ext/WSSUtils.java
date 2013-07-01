@@ -356,6 +356,18 @@ public class WSSUtils extends XMLSecurityUtils {
         abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, identifier);
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
     }
+    
+    public static void createKerberosSha1IdentifierStructure(AbstractOutputProcessor abstractOutputProcessor,
+                                                                 OutputProcessorChain outputProcessorChain, String identifier)
+            throws XMLStreamException, XMLSecurityException {
+
+        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_Kerberos5_AP_REQ_SHA1));
+        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
+        abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, identifier);
+        abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
+    }
 
     public static void createBSTReferenceStructure(AbstractOutputProcessor abstractOutputProcessor,
                                                    OutputProcessorChain outputProcessorChain, String referenceId,

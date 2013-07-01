@@ -129,6 +129,9 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                     Key key = securityToken.getSecretKey(getSecurityProperties().getSignatureAlgorithm());
                     WSSUtils.createEncryptedKeySha1IdentifierStructure(this, outputProcessorChain, key);
                 }
+            } else if (WSSecurityTokenConstants.KeyIdentifier_KerberosSha1Identifier.equals(keyIdentifier)) {
+                String identifier = securityToken.getSha1Identifier();
+                WSSUtils.createKerberosSha1IdentifierStructure(this, outputProcessorChain, identifier);
             } else if (WSSecurityTokenConstants.KeyIdentifier_EncryptedKey.equals(keyIdentifier)) {
                 String id = securityToken.getId();
                 WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, id, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE);

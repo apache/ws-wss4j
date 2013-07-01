@@ -46,6 +46,7 @@ import org.apache.xml.security.stax.impl.EncryptionPartDef;
 import org.apache.xml.security.stax.impl.processor.output.AbstractEncryptOutputProcessor;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenConstants.KeyIdentifier;
 import org.apache.xml.security.stax.securityToken.SecurityTokenConstants.TokenType;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
@@ -216,8 +217,8 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
         protected void createKeyInfoStructure(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
             createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_KeyInfo, true, null);
 
-            if (WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier.equals(
-                    ((WSSSecurityProperties) getSecurityProperties()).getEncryptionKeyIdentifier())) {
+            KeyIdentifier keyIdentifier = ((WSSSecurityProperties) getSecurityProperties()).getEncryptionKeyIdentifier();
+            if (WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier.equals(keyIdentifier)) {
                 List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
                 createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
@@ -227,6 +228,12 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                 } else {
                     WSSUtils.createEncryptedKeySha1IdentifierStructure(this, outputProcessorChain, getEncryptionPartDef().getSymmetricKey());
                 }
+            } else if (WSSecurityTokenConstants.KeyIdentifier_KerberosSha1Identifier.equals(keyIdentifier)) {
+                List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
+                attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_Kerberos5_AP_REQ));
+                createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
+                
+                WSSUtils.createKerberosSha1IdentifierStructure(this, outputProcessorChain, sha1Identifier);
             } else {
                 if (WSSecurityTokenConstants.KerberosToken.equals(tokenType)) {
                     List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
