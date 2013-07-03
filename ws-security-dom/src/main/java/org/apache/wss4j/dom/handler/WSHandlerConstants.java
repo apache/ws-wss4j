@@ -606,6 +606,19 @@ public final class WSHandlerConstants {
     public static final String SIGNATURE_PARTS = ConfigurationConstants.SIGNATURE_PARTS;
     
     /**
+     * Parameter to define which parts of the request shall be signed, if they
+     * exist in the request. If they do not, then no error is thrown. This contrasts
+     * with the SIGNATURE_PARTS Identifier, which specifies elements that must be 
+     * signed in the request.
+     * <p/>
+     * Refer to {@link #ENCRYPTION_PARTS} for a detailed description of
+     * the format of the value string.
+     * <p/>
+     */
+    public static final String OPTIONAL_SIGNATURE_PARTS = 
+        ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS;
+    
+    /**
      * This parameter sets the number of iterations to use when deriving a key
      * from a Username Token. The default is 1000. 
      */
@@ -703,6 +716,19 @@ public final class WSHandlerConstants {
      * <code>Content</code> mode by default.
      */
     public static final String ENCRYPTION_PARTS = ConfigurationConstants.ENCRYPTION_PARTS;
+    
+    /**
+     * Parameter to define which parts of the request shall be encrypted, if they
+     * exist in the request. If they do not, then no error is thrown. This contrasts
+     * with the ENCRYPTION_PARTS Identifier, which specifies elements that must be 
+     * encrypted in the request.
+     * <p/>
+     * Refer to {@link #ENCRYPTION_PARTS} for a detailed description of
+     * the format of the value string.
+     * <p/>
+     */
+    public static final String OPTIONAL_ENCRYPTION_PARTS = 
+        ConfigurationConstants.OPTIONAL_ENCRYPTION_PARTS;
     
     /**
      * Defines which encryption digest algorithm to use with the RSA OAEP Key Transport 

@@ -528,7 +528,11 @@ public abstract class WSHandler {
 
         String parts = getString(WSHandlerConstants.SIGNATURE_PARTS, mc);
         if (parts != null) {
-            splitEncParts(parts, reqData.getSignatureParts(), reqData);
+            splitEncParts(true, parts, reqData.getSignatureParts(), reqData);
+        }
+        parts = getString(WSHandlerConstants.OPTIONAL_SIGNATURE_PARTS, mc);
+        if (parts != null) {
+            splitEncParts(false, parts, reqData.getSignatureParts(), reqData);
         }
         
         boolean useSingleCert = decodeUseSingleCertificate(reqData);
@@ -637,7 +641,11 @@ public abstract class WSHandler {
 
         String encParts = getString(WSHandlerConstants.ENCRYPTION_PARTS, mc);
         if (encParts != null) {
-            splitEncParts(encParts, reqData.getEncryptParts(), reqData);
+            splitEncParts(true, encParts, reqData.getEncryptParts(), reqData);
+        }
+        encParts = getString(WSHandlerConstants.OPTIONAL_ENCRYPTION_PARTS, mc);
+        if (encParts != null) {
+            splitEncParts(false, encParts, reqData.getEncryptParts(), reqData);
         }
     }
 
@@ -1146,7 +1154,8 @@ public abstract class WSHandler {
         return new WSPasswordCallback(username, reason);
     }
 
-    private void splitEncParts(String tmpS, List<WSEncryptionPart> parts, RequestData reqData)
+    private void splitEncParts(boolean required, String tmpS,
+                               List<WSEncryptionPart> parts, RequestData reqData)
         throws WSSecurityException {
         WSEncryptionPart encPart = null;
         String[] rawParts = StringUtil.split(tmpS, ';');
@@ -1189,6 +1198,7 @@ public abstract class WSHandler {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                         "empty", "WSHandler: wrong part definition: " + tmpS);
             }
+            encPart.setRequired(required);
             parts.add(encPart);
         }
     }

@@ -462,6 +462,16 @@ public final class ConfigurationConverter {
             }
         }
         
+        sigParts = getString(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS, config);
+        if (sigParts != null) {
+            List<SecurePart> parts = new ArrayList<SecurePart>();
+            splitEncParts(sigParts, parts, WSSConstants.NS_SOAP11);
+            for (SecurePart part : parts) {
+                part.setRequired(false);
+                properties.addSignaturePart(part);
+            }
+        }
+        
         String iterations = getString(ConfigurationConstants.DERIVED_KEY_ITERATIONS, config);
         if (iterations != null) {
             int iIterations = Integer.parseInt(iterations);
@@ -480,6 +490,16 @@ public final class ConfigurationConverter {
             List<SecurePart> parts = new ArrayList<SecurePart>();
             splitEncParts(encParts, parts, WSSConstants.NS_SOAP11);
             for (SecurePart part : parts) {
+                properties.addEncryptionPart(part);
+            }
+        }
+        
+        encParts = getString(ConfigurationConstants.OPTIONAL_ENCRYPTION_PARTS, config);
+        if (encParts != null) {
+            List<SecurePart> parts = new ArrayList<SecurePart>();
+            splitEncParts(encParts, parts, WSSConstants.NS_SOAP11);
+            for (SecurePart part : parts) {
+                part.setRequired(false);
                 properties.addEncryptionPart(part);
             }
         }

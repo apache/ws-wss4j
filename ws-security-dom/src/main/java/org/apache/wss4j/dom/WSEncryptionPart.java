@@ -30,6 +30,7 @@ public class WSEncryptionPart {
     private String encId;
     private String id;
     private Element element;
+    private boolean required = true;
     
     /**
      * An xpath expression pointing to the data element
@@ -176,6 +177,14 @@ public class WSEncryptionPart {
      */
     public Element getElement() {
         return element;
+    }
+
+    public boolean isRequired() {
+        return required;
+    }
+
+    public void setRequired(boolean required) {
+        this.required = required;
     }
     
 }

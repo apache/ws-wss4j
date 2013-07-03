@@ -381,6 +381,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             List<Element> elementsToEncrypt = 
                 WSSecurityUtil.findElements(encPart, callbackLookup, doc);
             if (elementsToEncrypt == null || elementsToEncrypt.size() == 0) {
+                if (!encPart.isRequired()) {
+                    continue;
+                }
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE,
                     "noEncElement",

@@ -146,6 +146,119 @@ public class EncryptionPartsTest extends org.junit.Assert {
         assertEquals(WSConstants.AES_128, wsDataRef.getAlgorithm());
     }
     
+    @org.junit.Test
+    public void testOptionalSOAPHeaderPresent() throws Exception {
+        WSSecEncrypt encrypt = new WSSecEncrypt();
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        WSEncryptionPart encP =
+            new WSEncryptionPart(
+                "foobar",
+                "urn:foo.bar",
+                "");
+        encP.setRequired(false);
+        parts.add(encP);
+        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+        encP = 
+            new WSEncryptionPart(
+                WSConstants.ELEM_BODY, 
+                soapNamespace, 
+                "Content"
+            );
+        parts.add(encP);
+        encrypt.setParts(parts);
+        
+        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(encryptedDoc);
+            LOG.debug(outputString);
+        }
+        
+        verify(encryptedDoc);
+    }
+    
+    @org.junit.Test
+    public void testOptionalSOAPHeaderNotPresent() throws Exception {
+        WSSecEncrypt encrypt = new WSSecEncrypt();
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        WSEncryptionPart encP =
+            new WSEncryptionPart(
+                "foobar",
+                "urn:foo.bar",
+                "");
+        encP.setRequired(false);
+        parts.add(encP);
+        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+        encP = 
+            new WSEncryptionPart(
+                WSConstants.ELEM_BODY, 
+                soapNamespace, 
+                "Content"
+            );
+        parts.add(encP);
+        encrypt.setParts(parts);
+        
+        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(encryptedDoc);
+            LOG.debug(outputString);
+        }
+        
+        verify(encryptedDoc);
+    }
+    
+    @org.junit.Test
+    public void testRequiredSOAPHeaderNotPresent() throws Exception {
+        WSSecEncrypt encrypt = new WSSecEncrypt();
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        WSEncryptionPart encP =
+            new WSEncryptionPart(
+                "foobar",
+                "urn:foo.bar",
+                "");
+        parts.add(encP);
+        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+        encP = 
+            new WSEncryptionPart(
+                WSConstants.ELEM_BODY, 
+                soapNamespace, 
+                "Content"
+            );
+        parts.add(encP);
+        encrypt.setParts(parts);
+        
+        try {
+            encrypt.build(doc, crypto, secHeader);
+            fail("Failure expected on not encrypting a required element");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+    }
+    
     
     /**
      * Test encrypting a custom SOAP header using wsse11:EncryptedHeader

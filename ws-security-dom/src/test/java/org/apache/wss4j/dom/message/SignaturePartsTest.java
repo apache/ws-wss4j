@@ -162,6 +162,122 @@ public class SignaturePartsTest extends org.junit.Assert {
         assertTrue(WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(transformAlgorithms.get(0)));
     }
     
+    @org.junit.Test
+    public void testOptionalSOAPHeaderPresent() throws Exception {
+        WSSecSignature sign = new WSSecSignature();
+        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        WSEncryptionPart encP =
+            new WSEncryptionPart(
+                "foobar",
+                "urn:foo.bar",
+                "");
+        encP.setRequired(false);
+        parts.add(encP);
+        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+        encP = 
+            new WSEncryptionPart(
+                WSConstants.ELEM_BODY, 
+                soapNamespace, 
+                "Content"
+            );
+        parts.add(encP);
+        sign.setParts(parts);
+        
+        Document signedDoc = sign.build(doc, crypto, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        
+        verify(signedDoc);
+    }
+    
+    @org.junit.Test
+    public void testOptionalSOAPHeaderNotPresent() throws Exception {
+        WSSecSignature sign = new WSSecSignature();
+        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        WSEncryptionPart encP =
+            new WSEncryptionPart(
+                "foobar",
+                "urn:foo.bar",
+                "");
+        encP.setRequired(false);
+        parts.add(encP);
+        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+        encP = 
+            new WSEncryptionPart(
+                WSConstants.ELEM_BODY, 
+                soapNamespace, 
+                "Content"
+            );
+        parts.add(encP);
+        sign.setParts(parts);
+        
+        Document signedDoc = sign.build(doc, crypto, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        
+        verify(signedDoc);
+    }
+    
+    @org.junit.Test
+    public void testRequiredSOAPHeaderNotPresent() throws Exception {
+        WSSecSignature sign = new WSSecSignature();
+        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        WSEncryptionPart encP =
+            new WSEncryptionPart(
+                "foobar",
+                "urn:foo.bar",
+                "");
+        parts.add(encP);
+        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+        encP = 
+            new WSEncryptionPart(
+                WSConstants.ELEM_BODY, 
+                soapNamespace, 
+                "Content"
+            );
+        parts.add(encP);
+        sign.setParts(parts);
+        
+        try {
+            sign.build(doc, crypto, secHeader);
+            fail("Failure expected on not signing a required element");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+    }
+    
     /**
      * Test signing of a header through a STR Dereference Transform
      */

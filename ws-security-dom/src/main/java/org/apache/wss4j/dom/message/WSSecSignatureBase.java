@@ -135,6 +135,8 @@ public class WSSecSignatureBase extends WSSecBase {
                     }
                     if (element != null) {
                         wsDocInfo.addTokenElement(element, false);
+                    } else if (!encPart.isRequired()) {
+                        continue;
                     }
                     javax.xml.crypto.dsig.Reference reference = 
                         signatureFactory.newReference(
@@ -158,6 +160,9 @@ public class WSSecSignatureBase extends WSSecBase {
                             WSSecurityUtil.findElements(encPart, callbackLookup, doc);
                     }
                     if (elementsToSign == null || elementsToSign.size() == 0) {
+                        if (!encPart.isRequired()) {
+                            continue;
+                        }
                         throw new WSSecurityException(
                             WSSecurityException.ErrorCode.FAILURE, 
                             "noEncElement",
