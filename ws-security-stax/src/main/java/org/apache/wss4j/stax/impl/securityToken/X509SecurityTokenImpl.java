@@ -28,6 +28,7 @@ import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.securityToken.X509SecurityToken;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.securityToken.SecurityTokenConstants.TokenType;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
@@ -133,5 +134,26 @@ public abstract class X509SecurityTokenImpl
             }
         }
         return this.principal;
+    }
+    
+    @Override
+    public TokenType getTokenType() {
+        TokenType storedTokenType = super.getTokenType();
+        // Just check to see whether the cert version is "1"
+        if (WSSecurityTokenConstants.X509V3Token.equals(storedTokenType)) {
+            X509Certificate[] certs;
+            try {
+                certs = super.getX509Certificates();
+                if (certs != null && certs.length > 0 && certs[0].getVersion() == 1) {
+                    return WSSecurityTokenConstants.X509V1Token;
+                }
+            } catch (XMLSecurityException e) {
+                return storedTokenType;
+            }
+        }
+        
+        return storedTokenType;
+        
+        
     }
 }
