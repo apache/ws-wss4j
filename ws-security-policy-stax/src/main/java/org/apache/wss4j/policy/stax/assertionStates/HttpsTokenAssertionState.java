@@ -75,7 +75,7 @@ public class HttpsTokenAssertionState extends TokenAssertionState {
                     break;
                 case RequireClientCertificate:
                     if (httpsTokenSecurityEvent.getAuthenticationType() != HttpsTokenSecurityEvent.AuthenticationType.HttpsClientCertificateAuthentication) {
-                        setErrorMessage("Policy enforces HttClientCertificateAuthentication but we got " + httpsTokenSecurityEvent.getAuthenticationType());
+                        setErrorMessage("Policy enforces HttpClientCertificateAuthentication but we got " + httpsTokenSecurityEvent.getAuthenticationType());
                         return false;
                     }
                     break;

@@ -111,7 +111,7 @@ public class HttpsTokenTest extends AbstractPolicyTestBase {
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
             Assert.assertEquals(e.getCause().getMessage(),
-                    "Policy enforces HttClientCertificateAuthentication but we got HttpBasicAuthentication");
+                    "Policy enforces HttpClientCertificateAuthentication but we got HttpBasicAuthentication");
             Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }

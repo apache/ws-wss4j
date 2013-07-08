@@ -288,7 +288,7 @@ public class PolicyEnforcer implements SecurityEventListener {
             assertableList.add(new SamlTokenAssertionState(abstractSecurityAssertion, false, initiator));
         } else if (abstractSecurityAssertion instanceof RelToken) {
             assertableList.add(new RelTokenAssertionState(abstractSecurityAssertion, false, initiator));
-        } else if (abstractSecurityAssertion instanceof HttpsToken) {
+        } else if (abstractSecurityAssertion instanceof HttpsToken && !initiator) {
             assertableList.add(new HttpsTokenAssertionState(abstractSecurityAssertion, false, initiator));
         } else if (abstractSecurityAssertion instanceof KeyValueToken) {
             assertableList.add(new KeyValueTokenAssertionState(abstractSecurityAssertion, false, initiator));
