@@ -59,6 +59,10 @@ public final class WSProviderConfig {
      */
     private static boolean staticallyInitialized = false;
     
+    private WSProviderConfig() {
+        // complete
+    }
+    
     public static synchronized void init() {
         if (!staticallyInitialized) {
             if (addJceProviders) {

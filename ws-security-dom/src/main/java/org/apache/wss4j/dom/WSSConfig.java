@@ -382,6 +382,10 @@ public class WSSConfig {
         });
     }
     
+    private WSSConfig() {
+        // complete
+    }
+    
     public static synchronized void init() {
         WSProviderConfig.init();
     }
