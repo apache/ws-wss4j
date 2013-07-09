@@ -31,6 +31,7 @@ import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.ext.WSSUtils;
+import org.apache.wss4j.stax.securityEvent.NoSecuritySecurityEvent;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.SecurityHeaderHandlerMapper;
 import org.apache.xml.security.stax.ext.AbstractInputProcessor;
@@ -41,6 +42,7 @@ import org.apache.xml.security.stax.ext.stax.XMLSecEndElement;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.processor.input.XMLEventReaderInputProcessor;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
 
 /**
  * Processor for the Security-Header XML Structure.
@@ -116,20 +118,10 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                     if (documentLevel == 3 && responsibleSecurityHeaderFound
                             && xmlSecEndElement.getName().equals(WSSConstants.TAG_wsse_Security)) {
 
-                        //subInputProcessorChain.getDocumentContext().setInSecurityHeader(false);
-                        subInputProcessorChain.removeProcessor(internalSecurityHeaderBufferProcessor);
-                        subInputProcessorChain.addProcessor(
-                                new InternalSecurityHeaderReplayProcessor(getSecurityProperties()));
+                        return finalizeHeaderProcessing(
+                                inputProcessorChain, subInputProcessorChain,
+                                internalSecurityHeaderBufferProcessor, xmlSecEventList);
 
-                        //remove this processor from chain now. the next events will go directly to the other processors
-                        subInputProcessorChain.removeProcessor(this);
-                        //since we cloned the inputProcessor list we have to add the processors from
-                        //the subChain to the main chain.
-                        inputProcessorChain.getProcessors().clear();
-                        inputProcessorChain.getProcessors().addAll(subInputProcessorChain.getProcessors());
-
-                        //return first event now;
-                        return xmlSecEventList.pollLast();
                     } else if (documentLevel == 4 && responsibleSecurityHeaderFound
                             && WSSUtils.isInSecurityHeader(xmlSecEndElement,
                             ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
@@ -157,7 +149,35 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                 WSSUtils.getSOAPMessageVersionNamespace(xmlSecEvent.asStartElement()))
         ));
         //if we reach this state we didn't find a security header
-        throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "missingSecurityHeader");
+        //issue a security event to notify about this fact:
+        NoSecuritySecurityEvent noSecuritySecurityEvent = new NoSecuritySecurityEvent();
+        noSecuritySecurityEvent.setCorrelationID(IDGenerator.generateID(null));
+        inputProcessorChain.getSecurityContext().registerSecurityEvent(noSecuritySecurityEvent);
+
+        return finalizeHeaderProcessing(
+                inputProcessorChain, subInputProcessorChain,
+                internalSecurityHeaderBufferProcessor, xmlSecEventList);
+    }
+
+    private XMLSecEvent finalizeHeaderProcessing(
+            InputProcessorChain originalInputProcessorChain,
+            InputProcessorChain subInputProcessorChain,
+            InternalSecurityHeaderBufferProcessor internalSecurityHeaderBufferProcessor,
+            Deque<XMLSecEvent> xmlSecEventList) {
+
+        subInputProcessorChain.removeProcessor(internalSecurityHeaderBufferProcessor);
+        subInputProcessorChain.addProcessor(
+                new InternalSecurityHeaderReplayProcessor(getSecurityProperties()));
+
+        //remove this processor from chain now. the next events will go directly to the other processors
+        subInputProcessorChain.removeProcessor(this);
+        //since we cloned the inputProcessor list we have to add the processors from
+        //the subChain to the main chain.
+        originalInputProcessorChain.getProcessors().clear();
+        originalInputProcessorChain.getProcessors().addAll(subInputProcessorChain.getProcessors());
+
+        //return first event now;
+        return xmlSecEventList.pollLast();
     }
 
     @SuppressWarnings("unchecked")

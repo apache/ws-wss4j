@@ -21,7 +21,8 @@ package org.apache.wss4j.stax.securityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 
 public abstract class WSSecurityEventConstants extends SecurityEventConstants {
-    
+
+    public static final Event NoSecurity = new Event("NoSecurity");
     public static final Event Operation = new Event("Operation");
     public static final Event Timestamp = new Event("Timestamp");
     public static final Event SignedPart = new Event("SignedPart");

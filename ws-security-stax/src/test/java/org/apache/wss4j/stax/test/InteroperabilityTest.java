@@ -973,24 +973,25 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
-        try {
-            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+        WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
+                WSSecurityEventConstants.NoSecurity,
+                WSSecurityEventConstants.Operation
+        };
+        final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
+        Document document = doInboundSecurity(
+                securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), securityEventListener);
 
-            //read the whole stream:
-            transformer = TRANSFORMER_FACTORY.newTransformer();
-            transformer.transform(new DOMSource(document), new StreamResult(
-                    new OutputStream() {
-                        @Override
-                        public void write(int b) throws IOException {
-                            // > /dev/null
-                        }
+        //read the whole stream:
+        transformer = TRANSFORMER_FACTORY.newTransformer();
+        transformer.transform(new DOMSource(document), new StreamResult(
+                new OutputStream() {
+                    @Override
+                    public void write(int b) throws IOException {
+                        // > /dev/null
                     }
-            ));
-            Assert.fail("XMLStreamException expected");
-        } catch (XMLStreamException e) {
-            Assert.assertEquals(e.getMessage(), "org.apache.wss4j.common.ext.WSSecurityException: Security header is missing");
-            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
-        }
+                }
+        ));
+        securityEventListener.compare();
     }
 
     @Test(invocationCount = 1)
