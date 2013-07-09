@@ -5,6 +5,17 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.6.11
+=============
+
+Improvement
+
+    [WSS-441] - Allow the date/time in the security headers to be spoofed
+
+Task
+
+    [WSS-434] - Add ValueType attribute to a Signature/Encryption Reference to a DerivedKeyToken
+
 Release 1.6.10
 =============
 
