@@ -50,7 +50,7 @@
         <junit.version>4.11</junit.version>
         <xml.apis.version>1.3.04</xml.apis.version>
         <wsdl4j.version>1.6.2</wsdl4j.version>
-        <xmlunit.version>1.3</xmlunit.version>
+        <xmlunit.version>1.4</xmlunit.version>
         
         <!-- OSGi related properties -->
         <wss4j.osgi.import />
