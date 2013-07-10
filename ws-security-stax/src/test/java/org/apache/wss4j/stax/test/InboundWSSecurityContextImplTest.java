@@ -127,7 +127,7 @@ public class InboundWSSecurityContextImplTest {
 
         UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent();
         UsernameSecurityTokenImpl usernameSecurityToken = new UsernameSecurityTokenImpl(
-                WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST,
+                WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT,
                 "username", "password", new Date().toString(), null, new byte[10], 10L,
                 null, IDGenerator.generateID(null), WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
         usernameSecurityToken.setElementPath(usernameTokenPath);
@@ -317,7 +317,7 @@ public class InboundWSSecurityContextImplTest {
 
         UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent();
         UsernameSecurityTokenImpl usernameSecurityToken = new UsernameSecurityTokenImpl(
-                WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST,
+                WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT,
                 "username", "password", new Date().toString(), null, new byte[10], 10L,
                 null, IDGenerator.generateID(null), WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
         usernameSecurityToken.setElementPath(usernameTokenPath);
@@ -560,7 +560,7 @@ public class InboundWSSecurityContextImplTest {
 
         UsernameTokenSecurityEvent usernameTokenSecurityEvent = new UsernameTokenSecurityEvent();
         UsernameSecurityTokenImpl usernameSecurityToken = new UsernameSecurityTokenImpl(
-                WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST,
+                WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT,
                 "username", "password", new Date().toString(), null, new byte[10], 10L,
                 null, IDGenerator.generateID(null), WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
         usernameSecurityToken.setElementPath(usernamePath);

@@ -30,6 +30,7 @@ import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.policy.stax.PolicyEnforcer;
 import org.apache.wss4j.policy.stax.PolicyInputProcessor;
 import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSConstants.UsernameTokenPasswordType;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.test.CallbackHandlerImpl;
 import org.apache.wss4j.stax.test.saml.SAMLCallbackHandlerImpl;
@@ -44,6 +45,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import java.io.*;
 import java.security.KeyStore;
 
@@ -2340,6 +2342,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
+        outSecurityProperties.setUsernameTokenPasswordType(UsernameTokenPasswordType.PASSWORD_TEXT);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
@@ -2464,6 +2467,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setEncryptionUser("receiver");
         outSecurityProperties.addEncryptionPart(new SecurePart(new QName("http://www.w3.org/1999/XMLSchema", "simpleType"), SecurePart.Modifier.Element));
+        outSecurityProperties.setUsernameTokenPasswordType(UsernameTokenPasswordType.PASSWORD_TEXT);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);

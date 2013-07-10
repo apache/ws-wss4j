@@ -77,6 +77,10 @@ public class UsernameTokenAssertionState extends TokenAssertionState {
             // We must have a password for the default case
             setErrorMessage("UsernameToken must contain a password");
             return false;
+        } else if (usernameTokenSecurityEvent.getUsernameTokenPasswordType() == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST) {
+            // We must have a plaintext password for the default case
+            setErrorMessage("UsernameToken password must not be hashed");
+            return false;
         }
         if (usernameToken.isCreated() && (usernameSecurityToken.getCreatedTime() == null || usernameTokenSecurityEvent.getUsernameTokenPasswordType() != WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT)) {
             setErrorMessage("UsernameToken does not contain a created timestamp or password is not plain text");
