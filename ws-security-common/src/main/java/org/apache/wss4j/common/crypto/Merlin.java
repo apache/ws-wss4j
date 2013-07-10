@@ -366,7 +366,7 @@ public class Merlin extends CryptoBase {
                         LOG.debug(e.getMessage(), e);
                     }
                     throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.FAILURE, "proxyNotFound", new Object[]{location}, e
+                            WSSecurityException.ErrorCode.FAILURE, "proxyNotFound", location, e
                     );
                 }
             }
