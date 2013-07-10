@@ -26,10 +26,14 @@ import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.impl.securityToken.X509SecurityTokenImpl;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.stax.securityEvent.EncryptedKeyTokenSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.X509TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenConstants;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -488,5 +492,216 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
                     "Main signature must sign the Signed*Supporting-Tokens.");
             Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
+    }
+
+    @Test
+    public void testPolicySymmetricBindingProtectSignatureToken() throws Exception {
+        String policyString =
+                "<sp:SymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
+                        "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
+                        "<sp:ProtectTokens/>\n" +
+                        "</wsp:Policy>\n" +
+                        "</sp:SymmetricBinding>";
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
+
+        List<QName> bstPath = new ArrayList<QName>();
+        bstPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        bstPath.add(WSSConstants.TAG_wsse_BinarySecurityToken);
+
+        List<QName> ekPath = new ArrayList<QName>();
+        ekPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        ekPath.add(WSSConstants.TAG_xenc_EncryptedKey);
+
+        List<QName> sigPath = new ArrayList<QName>();
+        sigPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        sigPath.add(WSSConstants.TAG_dsig_Signature);
+
+        X509SecurityTokenImpl x509SecurityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
+        x509SecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        x509SecurityToken.setElementPath(bstPath);
+
+        AbstractInboundSecurityToken ekSecurityToken = new AbstractInboundSecurityToken(
+                null, IDGenerator.generateID(null),
+                SecurityTokenConstants.KeyIdentifier_EncryptedKey, true) {
+            @Override
+            public SecurityTokenConstants.TokenType getTokenType() {
+                return SecurityTokenConstants.EncryptedKeyToken;
+            }
+        };
+        ekSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_Signature);
+        ekSecurityToken.setKeyWrappingToken(x509SecurityToken);
+        ekSecurityToken.setElementPath(ekPath);
+
+        x509SecurityToken.addWrappedToken(ekSecurityToken);
+
+        X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
+        x509TokenSecurityEvent.setSecurityToken(x509SecurityToken);
+        policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
+
+        EncryptedKeyTokenSecurityEvent encryptedKeyTokenSecurityEvent = new EncryptedKeyTokenSecurityEvent();
+        encryptedKeyTokenSecurityEvent.setSecurityToken(ekSecurityToken);
+        policyEnforcer.registerSecurityEvent(encryptedKeyTokenSecurityEvent);
+
+        SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(ekSecurityToken, true, protectionOrder);
+        signedElementSecurityEvent.setElementPath(ekPath);
+        policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+        policyEnforcer.doFinal();
+    }
+
+    @Test
+    public void testPolicySymmetricBindingProtectRootToken() throws Exception {
+        String policyString =
+                "<sp:SymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
+                        "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
+                        "<sp:ProtectTokens/>\n" +
+                        "</wsp:Policy>\n" +
+                        "</sp:SymmetricBinding>";
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
+
+        List<QName> bstPath = new ArrayList<QName>();
+        bstPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        bstPath.add(WSSConstants.TAG_wsse_BinarySecurityToken);
+
+        List<QName> ekPath = new ArrayList<QName>();
+        ekPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        ekPath.add(WSSConstants.TAG_xenc_EncryptedKey);
+
+        List<QName> sigPath = new ArrayList<QName>();
+        sigPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        sigPath.add(WSSConstants.TAG_dsig_Signature);
+
+        X509SecurityTokenImpl x509SecurityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
+        x509SecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        x509SecurityToken.setElementPath(bstPath);
+
+        AbstractInboundSecurityToken ekSecurityToken = new AbstractInboundSecurityToken(
+                null, IDGenerator.generateID(null),
+                SecurityTokenConstants.KeyIdentifier_EncryptedKey, true) {
+            @Override
+            public SecurityTokenConstants.TokenType getTokenType() {
+                return SecurityTokenConstants.EncryptedKeyToken;
+            }
+        };
+        ekSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_Signature);
+        ekSecurityToken.setKeyWrappingToken(x509SecurityToken);
+        ekSecurityToken.setElementPath(ekPath);
+
+        x509SecurityToken.addWrappedToken(ekSecurityToken);
+
+        X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
+        x509TokenSecurityEvent.setSecurityToken(x509SecurityToken);
+        policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
+
+        EncryptedKeyTokenSecurityEvent encryptedKeyTokenSecurityEvent = new EncryptedKeyTokenSecurityEvent();
+        encryptedKeyTokenSecurityEvent.setSecurityToken(ekSecurityToken);
+        policyEnforcer.registerSecurityEvent(encryptedKeyTokenSecurityEvent);
+
+        SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(x509SecurityToken, true, protectionOrder);
+        signedElementSecurityEvent.setElementPath(bstPath);
+        policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+
+        try {
+            policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+        } catch (WSSecurityException e) {
+            Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
+            Assert.assertEquals(e.getCause().getMessage(),
+                    "Token /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://www.w3.org/2001/04/xmlenc#}EncryptedKey must be signed by its signature.");
+            Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
+        }
+    }
+
+    @Test
+    public void testPolicySymmetricBindingProtectAllToken() throws Exception {
+        String policyString =
+                "<sp:SymmetricBinding xmlns:sp=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702\" xmlns:sp3=\"http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802\">\n" +
+                        "<wsp:Policy xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\">\n" +
+                        "   <sp:AlgorithmSuite>\n" +
+                        "       <wsp:Policy>\n" +
+                        "           <sp:Basic256/>\n" +
+                        "       </wsp:Policy>\n" +
+                        "   </sp:AlgorithmSuite>\n" +
+                        "<sp:ProtectTokens/>\n" +
+                        "</wsp:Policy>\n" +
+                        "</sp:SymmetricBinding>";
+        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
+
+        List<QName> bstPath = new ArrayList<QName>();
+        bstPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        bstPath.add(WSSConstants.TAG_wsse_BinarySecurityToken);
+
+        List<QName> ekPath = new ArrayList<QName>();
+        ekPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        ekPath.add(WSSConstants.TAG_xenc_EncryptedKey);
+
+        List<QName> sigPath = new ArrayList<QName>();
+        sigPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        sigPath.add(WSSConstants.TAG_dsig_Signature);
+
+        X509SecurityTokenImpl x509SecurityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
+        x509SecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        x509SecurityToken.setElementPath(bstPath);
+
+        AbstractInboundSecurityToken ekSecurityToken = new AbstractInboundSecurityToken(
+                null, IDGenerator.generateID(null),
+                SecurityTokenConstants.KeyIdentifier_EncryptedKey, true) {
+            @Override
+            public SecurityTokenConstants.TokenType getTokenType() {
+                return SecurityTokenConstants.EncryptedKeyToken;
+            }
+        };
+        ekSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_Signature);
+        ekSecurityToken.setKeyWrappingToken(x509SecurityToken);
+        ekSecurityToken.setElementPath(ekPath);
+
+        x509SecurityToken.addWrappedToken(ekSecurityToken);
+
+        X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
+        x509TokenSecurityEvent.setSecurityToken(x509SecurityToken);
+        policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
+
+        EncryptedKeyTokenSecurityEvent encryptedKeyTokenSecurityEvent = new EncryptedKeyTokenSecurityEvent();
+        encryptedKeyTokenSecurityEvent.setSecurityToken(ekSecurityToken);
+        policyEnforcer.registerSecurityEvent(encryptedKeyTokenSecurityEvent);
+
+        SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(x509SecurityToken, true, protectionOrder);
+        signedElementSecurityEvent.setElementPath(bstPath);
+        policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
+
+        signedElementSecurityEvent = new SignedElementSecurityEvent(ekSecurityToken, true, protectionOrder);
+        signedElementSecurityEvent.setElementPath(ekPath);
+        policyEnforcer.registerSecurityEvent(signedElementSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+        policyEnforcer.doFinal();
     }
 }

@@ -532,5 +532,13 @@ public class WSSUtils extends XMLSecurityUtils {
             stringBuilder.append(qName.toString());
         }
         return stringBuilder.toString();
-    }    
+    }
+
+    public static SecurityToken getRootToken(SecurityToken securityToken) throws XMLSecurityException {
+        SecurityToken tmp = securityToken;
+        while (tmp.getKeyWrappingToken() != null) {
+            tmp = tmp.getKeyWrappingToken();
+        }
+        return tmp;
+    }
 }

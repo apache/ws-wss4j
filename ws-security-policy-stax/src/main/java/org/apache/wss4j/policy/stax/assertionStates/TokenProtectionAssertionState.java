@@ -91,10 +91,7 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
             for (int i = 0; i < tokenSecurityEvents.size(); i++) {
                 TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent = tokenSecurityEvents.get(i);
 
-                SecurityToken securityToken = tokenSecurityEvent.getSecurityToken();
-                while (securityToken.getKeyWrappingToken() != null) {
-                    securityToken = securityToken.getKeyWrappingToken();
-                }
+                SecurityToken securityToken = getEffectiveSignatureToken(tokenSecurityEvent.getSecurityToken());
 
                 //a token can only be signed if it is included in the message:
                 if (securityToken.isIncludedInMessage() && isSignatureToken(securityToken)) {
@@ -142,8 +139,9 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
         return false;
     }
 
-    private boolean isEndorsingToken(SecurityToken securityToken) {
-        List<WSSecurityTokenConstants.TokenUsage> tokenUsages = securityToken.getTokenUsages();
+    private boolean isEndorsingToken(SecurityToken securityToken) throws XMLSecurityException {
+        SecurityToken rootToken = WSSUtils.getRootToken(securityToken);
+        List<WSSecurityTokenConstants.TokenUsage> tokenUsages = rootToken.getTokenUsages();
         for (int i = 0; i < tokenUsages.size(); i++) {
             WSSecurityTokenConstants.TokenUsage tokenUsage = tokenUsages.get(i);
             if (tokenUsage.getName().contains("Endorsing")) {
@@ -153,8 +151,9 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
         return false;
     }
 
-    private boolean isSignedSupportingToken(SecurityToken securityToken) {
-        List<WSSecurityTokenConstants.TokenUsage> tokenUsages = securityToken.getTokenUsages();
+    private boolean isSignedSupportingToken(SecurityToken securityToken) throws XMLSecurityException {
+        SecurityToken rootToken = WSSUtils.getRootToken(securityToken);
+        List<WSSecurityTokenConstants.TokenUsage> tokenUsages = rootToken.getTokenUsages();
         for (int i = 0; i < tokenUsages.size(); i++) {
             WSSecurityTokenConstants.TokenUsage tokenUsage = tokenUsages.get(i);
             if (tokenUsage.getName().contains("Signed")) {
@@ -164,8 +163,9 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
         return false;
     }
 
-    private boolean isMainSignatureToken(SecurityToken securityToken) {
-        List<WSSecurityTokenConstants.TokenUsage> tokenUsages = securityToken.getTokenUsages();
+    private boolean isMainSignatureToken(SecurityToken securityToken) throws XMLSecurityException {
+        SecurityToken rootToken = WSSUtils.getRootToken(securityToken);
+        List<WSSecurityTokenConstants.TokenUsage> tokenUsages = rootToken.getTokenUsages();
         return tokenUsages.contains(WSSecurityTokenConstants.TokenUsage_MainSignature);
     }
 
@@ -178,10 +178,7 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
         for (int i = 0; i < signedElementEvents.size(); i++) {
             SignedElementSecurityEvent signedElementSecurityEvent = signedElementEvents.get(i);
             if (WSSUtils.pathMatches(signedElementSecurityEvent.getElementPath(), signaturePath, true, false)) {
-                SecurityToken signingSecurityToken = signedElementSecurityEvent.getSecurityToken();
-                while (signingSecurityToken != null && signingSecurityToken.getKeyWrappingToken() != null) {
-                    signingSecurityToken = signingSecurityToken.getKeyWrappingToken();
-                }
+                SecurityToken signingSecurityToken = getEffectiveSignatureToken(signedElementSecurityEvent.getSecurityToken());
                 //todo ATM me just check if the token signs a signature but we don't know if it's the main signature
                 if (signingSecurityToken != null && signingSecurityToken.getId().equals(securityToken.getId())) {
                     return true;
@@ -197,19 +194,15 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
             if (WSSUtils.pathMatches(signedElementSecurityEvent.getElementPath(), securityToken.getElementPath(), false, false)) {
 
                 SecurityToken signingSecurityToken = signedElementSecurityEvent.getSecurityToken();
-                while (signingSecurityToken != null && signingSecurityToken.getKeyWrappingToken() != null) {
-                    signingSecurityToken = signingSecurityToken.getKeyWrappingToken();
-                }
+                signingSecurityToken = getEffectiveSignatureToken(signingSecurityToken);
 
-                if (signingSecurityToken != null && signingSecurityToken.getId().equals(securityToken.getId())) {
+                if (signingSecurityToken.getId().equals(securityToken.getId())) {
                     //ok we've found the correlating signedElementSecurityEvent. Now we have to find the Token that
                     //is covered by this signedElementSecurityEvent:
                     for (int j = 0; j < tokenSecurityEvents.size(); j++) {
                         TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent = tokenSecurityEvents.get(j);
-                        SecurityToken st = tokenSecurityEvent.getSecurityToken();
-                        while (st.getKeyWrappingToken() != null) {
-                            st = st.getKeyWrappingToken();
-                        }
+                        SecurityToken st = getEffectiveSignatureToken(tokenSecurityEvent.getSecurityToken());
+
                         if (signedElementSecurityEvent.getXmlSecEvent() == st.getXMLSecEvent()) {
                             //...and we got the covered token
                             //next we have to see if the token is the same:
@@ -243,10 +236,8 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                 for (int j = 0; j < signedElementEvents.size(); j++) {
                     SignedElementSecurityEvent signedElementSecurityEvent = signedElementEvents.get(j);
                     if (WSSUtils.pathMatches(signedElementSecurityEvent.getElementPath(), elementPath, false, false)) {
-                        SecurityToken elementSignatureToken = signedElementSecurityEvent.getSecurityToken();
-                        while (elementSignatureToken != null && elementSignatureToken.getKeyWrappingToken() != null) {
-                            elementSignatureToken = elementSignatureToken.getKeyWrappingToken();
-                        }
+                        SecurityToken elementSignatureToken = getEffectiveSignatureToken(signedElementSecurityEvent.getSecurityToken());
+
                         if (elementSignatureToken != null && elementSignatureToken.getId().equals(securityToken.getId())) {
                             if (!signedElements.contains(signedElementSecurityEvent)) {
                                 signedElements.add(signedElementSecurityEvent);
@@ -265,5 +256,22 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
         }
 
         return true;
+    }
+
+    private SecurityToken getEffectiveSignatureToken(SecurityToken securityToken) throws XMLSecurityException {
+        SecurityToken tmp = WSSUtils.getRootToken(securityToken);
+        List<? extends SecurityToken> wrappedTokens = tmp.getWrappedTokens();
+        for (int i = 0; i < wrappedTokens.size(); i++) {
+            SecurityToken token = wrappedTokens.get(i);
+            if (isSignatureToken(token)) {
+                //WSP 1.3, 6.5 [Token Protection] Property: Note that in cases where derived keys are used
+                //the 'main' token, and NOT the derived key token, is covered by the signature.
+                if (WSSecurityTokenConstants.DerivedKeyToken.equals(token.getTokenType())) {
+                    return tmp;
+                }
+                tmp = token;
+            }
+        }
+        return tmp;
     }
 }
