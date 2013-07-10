@@ -30,7 +30,7 @@ Build Instructions:
         <property name='product.version.level' value='11'/>
         <property name='product.version.qualifier' value=''/>
         <property name='product.version' value='${product.version.major}.${product.version.minor}.${product.version.level}${product.version.qualifier}'/>
-        <property name="year" value="2012"/>
+        <property name="year" value="2013"/>
         <property name="copyright" value="Copyright &#169; ${year} Apache WSS4J Project. All Rights Reserved."/>
 
         <!-- Give user a chance to override without editing this file
