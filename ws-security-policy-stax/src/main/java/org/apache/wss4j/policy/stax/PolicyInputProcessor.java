@@ -30,7 +30,6 @@ import org.apache.wss4j.stax.securityEvent.RequiredPartSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.*;
-import org.apache.xml.security.stax.ext.stax.XMLSecEndElement;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
@@ -115,18 +114,6 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
                     policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
                 }
                 break;
-            case XMLStreamConstants.END_ELEMENT:
-                XMLSecEndElement xmlSecEndElement = xmlSecEvent.asEndElement();
-                //ns mismatch should be detected by the xml parser so a local-name equality check should be enough
-                if (xmlSecEndElement.getDocumentLevel() == 1
-                        && xmlSecEvent.asEndElement().getName().getLocalPart().equals(WSSConstants.TAG_soap_Envelope_LocalName)) {
-                    try {
-                        policyEnforcer.doFinal();
-                    } catch (WSSPolicyException e) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
-                    }
-                }
-                break;
         }
 
         //if transport security is active, every element is encrypted/signed
@@ -154,6 +141,16 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
             }
         }
         return xmlSecEvent;
+    }
+
+    @Override
+    public void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        try {
+            policyEnforcer.doFinal();
+        } catch (WSSPolicyException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+        }
+        super.doFinal(inputProcessorChain);
     }
 
     private void testSignaturePolicy(XMLSecEvent xmlSecEvent, List<QName> elementPath) throws WSSecurityException {
