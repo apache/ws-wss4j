@@ -534,10 +534,11 @@ public class WSSUtils extends XMLSecurityUtils {
         return stringBuilder.toString();
     }
 
-    public static SecurityToken getRootToken(SecurityToken securityToken) throws XMLSecurityException {
-        SecurityToken tmp = securityToken;
+    @SuppressWarnings("unchecked")
+    public static <T extends SecurityToken> T getRootToken(T securityToken) throws XMLSecurityException {
+        T tmp = securityToken;
         while (tmp.getKeyWrappingToken() != null) {
-            tmp = tmp.getKeyWrappingToken();
+            tmp = (T)tmp.getKeyWrappingToken();
         }
         return tmp;
     }

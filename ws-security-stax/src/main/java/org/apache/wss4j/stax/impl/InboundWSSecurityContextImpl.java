@@ -81,11 +81,8 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
                         ((TokenSecurityEvent<? extends InboundSecurityToken>) securityEvent);
 
                 if (tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_Encryption)) {
-                    InboundSecurityToken securityToken = tokenSecurityEvent.getSecurityToken();
+                    InboundSecurityToken securityToken = WSSUtils.getRootToken(tokenSecurityEvent.getSecurityToken());
 
-                    while (securityToken.getKeyWrappingToken() != null) {
-                        securityToken = securityToken.getKeyWrappingToken();
-                    }
                     TokenSecurityEvent<? extends InboundSecurityToken> newTokenSecurityEvent =
                             WSSUtils.createTokenSecurityEvent(securityToken, tokenSecurityEvent.getCorrelationID());
                     setTokenUsage(newTokenSecurityEvent, WSSecurityTokenConstants.TokenUsage_MainEncryption);
@@ -185,10 +182,8 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
         //search the root tokens and create new TokenSecurityEvents if not already there...
         for (int i = 0; i < tokenSecurityEvents.size(); i++) {
             TokenSecurityEvent<? extends InboundSecurityToken> tokenSecurityEvent = tokenSecurityEvents.get(i);
-            InboundSecurityToken securityToken = tokenSecurityEvent.getSecurityToken();
-            while (securityToken.getKeyWrappingToken() != null) {
-                securityToken = securityToken.getKeyWrappingToken();
-            }
+            InboundSecurityToken securityToken = WSSUtils.getRootToken(tokenSecurityEvent.getSecurityToken());
+
             if (!containsSecurityToken(supportingTokens, securityToken)) {
                 TokenSecurityEvent<? extends InboundSecurityToken> newTokenSecurityEvent =
                         WSSUtils.createTokenSecurityEvent(securityToken, tokenSecurityEvent.getCorrelationID());
