@@ -664,12 +664,12 @@ public abstract class AbstractTestBase {
             System.out.println("expected events:");
             for (int i = 0; i < expectedEvents.length; i++) {
                 SecurityEventConstants.Event expectedEvent = expectedEvents[i];
-                System.out.println("SecurityEvent.Event." + expectedEvent + ",");
+                System.out.println("WSSecurityEventConstants." + expectedEvent + ",");
             }
             System.out.println("received events:");
             for (int i = 0; i < receivedSecurityEvents.size(); i++) {
                 SecurityEvent securityEvent = receivedSecurityEvents.get(i);
-                System.out.println("SecurityEvent.Event." + securityEvent.getSecurityEventType() + ",");
+                System.out.println("WSSecurityEventConstants." + securityEvent.getSecurityEventType() + ",");
             }
         }
     }

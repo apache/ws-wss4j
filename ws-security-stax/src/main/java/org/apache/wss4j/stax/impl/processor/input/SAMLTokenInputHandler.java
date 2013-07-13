@@ -29,6 +29,7 @@ import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.ext.WSSUtils;
+import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.wss4j.stax.securityToken.SamlSecurityToken;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
@@ -563,7 +564,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         private SecurityTokenProvider<InboundSecurityToken> securityTokenProvider;
         private InboundSecurityToken subjectSecurityToken;
         private List<SignedElementSecurityEvent> samlTokenSignedElementSecurityEvents = new ArrayList<SignedElementSecurityEvent>();
-        private SignedElementSecurityEvent bodySignedElementSecurityEvent;
+        private SignedPartSecurityEvent bodySignedPartSecurityEvent;
 
         SAMLTokenVerifierInputProcessor(XMLSecurityProperties securityProperties, SamlAssertionWrapper samlAssertionWrapper,
                                         SecurityTokenProvider<InboundSecurityToken> securityTokenProvider, InboundSecurityToken subjectSecurityToken) {
@@ -577,14 +578,20 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
         @Override
         public void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
-            if (WSSecurityEventConstants.SignedElement.equals(securityEvent.getSecurityEventType())) {
-                SignedElementSecurityEvent signedElementSecurityEvent = (SignedElementSecurityEvent) securityEvent;
+            if (WSSecurityEventConstants.SignedPart.equals(securityEvent.getSecurityEventType())) {
+                SignedPartSecurityEvent signedPartSecurityEvent = (SignedPartSecurityEvent) securityEvent;
 
-                List<QName> elementPath = signedElementSecurityEvent.getElementPath();
+                List<QName> elementPath = signedPartSecurityEvent.getElementPath();
                 if (elementPath.equals(WSSConstants.SOAP_11_BODY_PATH)) {
-                    bodySignedElementSecurityEvent = signedElementSecurityEvent;
-                } else if (elementPath.equals(saml2TokenPath) || elementPath.equals(saml1TokenPath)) {
-                    samlTokenSignedElementSecurityEvents.add(signedElementSecurityEvent);
+                    bodySignedPartSecurityEvent = signedPartSecurityEvent;
+                }
+            }
+            else if (WSSecurityEventConstants.SignedElement.equals(securityEvent.getSecurityEventType())) {
+                SignedElementSecurityEvent signedPartSecurityEvent = (SignedElementSecurityEvent) securityEvent;
+
+                List<QName> elementPath = signedPartSecurityEvent.getElementPath();
+                if (elementPath.equals(saml2TokenPath) || elementPath.equals(saml1TokenPath)) {
+                    samlTokenSignedElementSecurityEvents.add(signedPartSecurityEvent);
                 }
             }
         }
@@ -711,9 +718,9 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                                 samlTokenSignedElementSecurityEvent = signedElementSecurityEvent;
                             }
                         }
-                        if (bodySignedElementSecurityEvent != null &&
+                        if (bodySignedPartSecurityEvent != null &&
                                 samlTokenSignedElementSecurityEvent != null &&
-                                bodySignedElementSecurityEvent.getSecurityToken() ==
+                                bodySignedPartSecurityEvent.getSecurityToken() ==
                                         samlTokenSignedElementSecurityEvent.getSecurityToken()) {
                             return;
                         }

@@ -29,6 +29,7 @@ import org.apache.wss4j.dom.message.*;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.stax.securityEvent.EncryptedPartSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.InboundWSSec;
@@ -299,7 +300,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.SecurityContextToken,
                     WSSecurityEventConstants.SignatureValue,
-                    WSSecurityEventConstants.SignedElement,
+                    WSSecurityEventConstants.SignedPart,
                     WSSecurityEventConstants.Operation,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
@@ -310,10 +311,10 @@ public class SecurityContextTokenTest extends AbstractTestBase {
 
             securityEventListener.compare();
 
-            SignedElementSecurityEvent signedElementSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignedElement);
+            SignedPartSecurityEvent signedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignedPart);
             SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
             OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
-            String signedElementCorrelationID = signedElementSecurityEvent.getCorrelationID();
+            String signedElementCorrelationID = signedPartSecurityEvent.getCorrelationID();
             String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
@@ -450,7 +451,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.SecurityContextToken,
                     WSSecurityEventConstants.SignatureValue,
-                    WSSecurityEventConstants.SignedElement,
+                    WSSecurityEventConstants.SignedPart,
                     WSSecurityEventConstants.EncryptedPart,
                     WSSecurityEventConstants.Operation,
             };
@@ -465,11 +466,11 @@ public class SecurityContextTokenTest extends AbstractTestBase {
 
             securityEventListener.compare();
 
-            SignedElementSecurityEvent signedElementSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignedElement);
+            SignedPartSecurityEvent signedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignedPart);
             SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
             EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
             OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
-            String signedElementCorrelationID = signedElementSecurityEvent.getCorrelationID();
+            String signedElementCorrelationID = signedPartSecurityEvent.getCorrelationID();
             String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
             String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
@@ -564,7 +565,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.SecurityContextToken,
                     WSSecurityEventConstants.SignatureValue,
-                    WSSecurityEventConstants.SignedElement,
+                    WSSecurityEventConstants.SignedPart,
                     WSSecurityEventConstants.EncryptedPart,
                     WSSecurityEventConstants.Operation,
             };
@@ -579,11 +580,11 @@ public class SecurityContextTokenTest extends AbstractTestBase {
 
             securityEventListener.compare();
 
-            SignedElementSecurityEvent signedElementSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignedElement);
+            SignedPartSecurityEvent signedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignedPart);
             SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
             EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
             OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
-            String signedElementCorrelationID = signedElementSecurityEvent.getCorrelationID();
+            String signedElementCorrelationID = signedPartSecurityEvent.getCorrelationID();
             String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
             String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
@@ -666,7 +667,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.SecurityContextToken,
                     WSSecurityEventConstants.SignatureValue,
-                    WSSecurityEventConstants.SignedElement,
+                    WSSecurityEventConstants.SignedPart,
                     WSSecurityEventConstants.Operation,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
@@ -677,10 +678,10 @@ public class SecurityContextTokenTest extends AbstractTestBase {
 
             securityEventListener.compare();
 
-            SignedElementSecurityEvent signedElementSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignedElement);
+            SignedPartSecurityEvent signedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignedPart);
             SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
             OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
-            String signedElementCorrelationID = signedElementSecurityEvent.getCorrelationID();
+            String signedElementCorrelationID = signedPartSecurityEvent.getCorrelationID();
             String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 

@@ -161,7 +161,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
                     WSSecurityEventConstants.X509Token,
                     WSSecurityEventConstants.SignatureValue,
                     WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.SignedElement,
+                    WSSecurityEventConstants.SignedPart,
                     WSSecurityEventConstants.Operation,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
@@ -271,7 +271,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.SamlToken,
                     WSSecurityEventConstants.SignatureValue,
-                    WSSecurityEventConstants.SignedElement,
+                    WSSecurityEventConstants.SignedPart,
                     WSSecurityEventConstants.Operation,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
@@ -604,7 +604,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
                     WSSecurityEventConstants.X509Token,
                     WSSecurityEventConstants.SignatureValue,
                     WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.SignedElement,
+                    WSSecurityEventConstants.SignedPart,
                     WSSecurityEventConstants.Operation,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
@@ -715,7 +715,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.SamlToken,
                     WSSecurityEventConstants.SignatureValue,
-                    WSSecurityEventConstants.SignedElement,
+                    WSSecurityEventConstants.SignedPart,
                     WSSecurityEventConstants.Operation,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
@@ -840,7 +840,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.SamlToken,
                     WSSecurityEventConstants.SignatureValue,
-                    WSSecurityEventConstants.SignedElement,
+                    WSSecurityEventConstants.SignedPart,
                     WSSecurityEventConstants.Operation,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);

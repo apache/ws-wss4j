@@ -59,6 +59,7 @@ import org.apache.wss4j.stax.ext.OutboundWSSec;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
@@ -1318,7 +1319,7 @@ public class SignatureTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.KeyValueToken,
                     WSSecurityEventConstants.SignatureValue,
-                    WSSecurityEventConstants.SignedElement,
+                    WSSecurityEventConstants.SignedPart,
                     WSSecurityEventConstants.Operation,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
@@ -1327,10 +1328,10 @@ public class SignatureTest extends AbstractTestBase {
 
             securityEventListener.compare();
 
-            SignedElementSecurityEvent signedElementSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignedElement);
+            SignedPartSecurityEvent signedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignedPart);
             SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
             OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
-            String signedElementCorrelationID = signedElementSecurityEvent.getCorrelationID();
+            String signedElementCorrelationID = signedPartSecurityEvent.getCorrelationID();
             String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 

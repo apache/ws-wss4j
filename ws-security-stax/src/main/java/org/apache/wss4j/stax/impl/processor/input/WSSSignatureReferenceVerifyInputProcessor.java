@@ -140,7 +140,8 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             throws XMLSecurityException {
         //fire a SecurityEvent:
         final DocumentContext documentContext = inputProcessorChain.getDocumentContext();
-        if (elementPath.size() == 3 && WSSUtils.isInSOAPHeader(elementPath)) {
+        if ((elementPath.size() == 3 && WSSUtils.isInSOAPHeader(elementPath))
+                || (elementPath.size() == 2 && WSSUtils.isInSOAPBody(elementPath))) {
             SignedPartSecurityEvent signedPartSecurityEvent =
                     new SignedPartSecurityEvent(getInboundSecurityToken(), true, documentContext.getProtectionOrder());
             signedPartSecurityEvent.setElementPath(elementPath);

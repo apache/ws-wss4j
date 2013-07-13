@@ -25,6 +25,7 @@ import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.*;
 import org.apache.wss4j.stax.securityEvent.EncryptedPartSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
@@ -80,7 +81,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                 WSSecurityEventConstants.SignatureValue,
                 WSSecurityEventConstants.Timestamp,
                 WSSecurityEventConstants.SignedElement,
-                WSSecurityEventConstants.SignedElement,
+                WSSecurityEventConstants.SignedPart,
                 WSSecurityEventConstants.EncryptedPart,
                 WSSecurityEventConstants.Operation,
         };
@@ -102,12 +103,13 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityEventListener.compare();
 
         EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
-        List<SignedElementSecurityEvent>signedElementSecurityEventList = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SignedElement);
+        List<SignedElementSecurityEvent> signedElementSecurityEventList = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SignedElement);
+        List<SignedPartSecurityEvent> signedPartSecurityEventList = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SignedPart);
         SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
         OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
         String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
         String signedElementCorrelationID1 = signedElementSecurityEventList.get(0).getCorrelationID();
-        String signedElementCorrelationID2 = signedElementSecurityEventList.get(1).getCorrelationID();
+        String signedElementCorrelationID2 = signedPartSecurityEventList.get(0).getCorrelationID();
         String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
         String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
@@ -180,7 +182,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                 WSSecurityEventConstants.SignatureValue,
                 WSSecurityEventConstants.Timestamp,
                 WSSecurityEventConstants.SignedElement,
-                WSSecurityEventConstants.SignedElement,
+                WSSecurityEventConstants.SignedPart,
                 WSSecurityEventConstants.EncryptedPart,
                 WSSecurityEventConstants.Operation,
         };
@@ -238,7 +240,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                 WSSecurityEventConstants.SignatureValue,
                 WSSecurityEventConstants.Timestamp,
                 WSSecurityEventConstants.SignedElement,
-                WSSecurityEventConstants.SignedElement,
+                WSSecurityEventConstants.SignedPart,
                 WSSecurityEventConstants.EncryptedPart,
                 WSSecurityEventConstants.Operation,
         };
@@ -262,13 +264,14 @@ public class InteroperabilityTest extends AbstractTestBase {
 
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedElement);
         EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
-        List<SignedElementSecurityEvent>signedElementSecurityEventList = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SignedElement);
+        List<SignedElementSecurityEvent> signedElementSecurityEventList = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SignedElement);
+        List<SignedPartSecurityEvent> signedPartSecurityEventList = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SignedPart);
         SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
         OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
         String encryptedElementCorrelationID = encryptedElementSecurityEvent.getCorrelationID();
         String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
         String signedElementCorrelationID1 = signedElementSecurityEventList.get(0).getCorrelationID();
-        String signedElementCorrelationID2 = signedElementSecurityEventList.get(1).getCorrelationID();
+        String signedElementCorrelationID2 = signedPartSecurityEventList.get(0).getCorrelationID();
         String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
         String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
@@ -379,7 +382,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                 WSSecurityEventConstants.X509Token,
                 WSSecurityEventConstants.Timestamp,
                 WSSecurityEventConstants.SignatureValue,
-                WSSecurityEventConstants.SignedElement,
+                WSSecurityEventConstants.SignedPart,
                 WSSecurityEventConstants.EncryptedPart,
                 WSSecurityEventConstants.Operation,
         };
@@ -401,11 +404,11 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityEventListener.compare();
 
         EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
-        List<SignedElementSecurityEvent>signedElementSecurityEventList = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SignedElement);
+        List<SignedPartSecurityEvent> signedPartSecurityEvents = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SignedPart);
         SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
         OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
         String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
-        String signedElementCorrelationID1 = signedElementSecurityEventList.get(0).getCorrelationID();
+        String signedElementCorrelationID1 = signedPartSecurityEvents.get(0).getCorrelationID();
         String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
         String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
@@ -543,7 +546,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                 WSSecurityEventConstants.EncryptedElement,
                 WSSecurityEventConstants.Timestamp,
                 WSSecurityEventConstants.SignedElement,
-                WSSecurityEventConstants.SignedElement,
+                WSSecurityEventConstants.SignedPart,
                 WSSecurityEventConstants.EncryptedPart,
                 WSSecurityEventConstants.Operation,
         };
@@ -565,13 +568,14 @@ public class InteroperabilityTest extends AbstractTestBase {
 
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedElement);
         EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
-        List<SignedElementSecurityEvent>signedElementSecurityEventList = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SignedElement);
+        List<SignedElementSecurityEvent> signedElementSecurityEvents = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SignedElement);
+        List<SignedPartSecurityEvent> signedPartSecurityEvents = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SignedPart);
         SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
         OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
         String encryptedElementCorrelationID = encryptedElementSecurityEvent.getCorrelationID();
         String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
-        String signedElementCorrelationID1 = signedElementSecurityEventList.get(0).getCorrelationID();
-        String signedElementCorrelationID2 = signedElementSecurityEventList.get(1).getCorrelationID();
+        String signedElementCorrelationID1 = signedElementSecurityEvents.get(0).getCorrelationID();
+        String signedElementCorrelationID2 = signedPartSecurityEvents.get(0).getCorrelationID();
         String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
         String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
@@ -931,7 +935,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                 WSSecurityEventConstants.SignatureValue,
                 WSSecurityEventConstants.Timestamp,
                 WSSecurityEventConstants.SignedElement,
-                WSSecurityEventConstants.SignedElement,
+                WSSecurityEventConstants.SignedPart,
                 WSSecurityEventConstants.EncryptedPart,
                 WSSecurityEventConstants.Operation,
         };
@@ -1029,7 +1033,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                 WSSecurityEventConstants.SignatureValue,
                 WSSecurityEventConstants.Timestamp,
                 WSSecurityEventConstants.SignedElement,
-                WSSecurityEventConstants.SignedElement,
+                WSSecurityEventConstants.SignedPart,
                 WSSecurityEventConstants.EncryptedPart,
                 WSSecurityEventConstants.Operation,
         };

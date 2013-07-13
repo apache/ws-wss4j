@@ -32,6 +32,7 @@ import org.apache.wss4j.stax.ext.InboundWSSec;
 import org.apache.wss4j.stax.ext.OutboundWSSec;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.securityEvent.EncryptedPartSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
@@ -670,7 +671,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.X509Token,
                     WSSecurityEventConstants.SignatureValue,
-                    WSSecurityEventConstants.SignedElement,
+                    WSSecurityEventConstants.SignedPart,
                     WSSecurityEventConstants.EncryptedPart,
                     WSSecurityEventConstants.Operation,
             };
@@ -689,11 +690,11 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             securityEventListener.compare();
 
             EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
-            SignedElementSecurityEvent signedElementSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignedElement);
+            SignedPartSecurityEvent signedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignedPart);
             SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
             OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
             String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
-            String signedElementCorrelationID = signedElementSecurityEvent.getCorrelationID();
+            String signedElementCorrelationID = signedPartSecurityEvent.getCorrelationID();
             String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
