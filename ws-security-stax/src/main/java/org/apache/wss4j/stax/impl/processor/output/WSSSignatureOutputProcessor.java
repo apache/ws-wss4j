@@ -30,7 +30,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 
 import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.OutputProcessorChain;
@@ -57,17 +56,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
 
     @Override
     public void init(OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
-        //prepend signature-confirmation processor
-        if (((WSSSecurityProperties)getSecurityProperties()).isEnableSignatureConfirmation()) {
-            final SignatureConfirmationOutputProcessor signatureConfirmationOutputProcessor =
-                    new SignatureConfirmationOutputProcessor();
-            signatureConfirmationOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
-            signatureConfirmationOutputProcessor.setAction(getAction());
-            signatureConfirmationOutputProcessor.init(outputProcessorChain);
-        }
-
         super.init(outputProcessorChain);
-
         WSSSignatureEndingOutputProcessor signatureEndingOutputProcessor = new WSSSignatureEndingOutputProcessor(this);
         signatureEndingOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
         signatureEndingOutputProcessor.setAction(getAction());

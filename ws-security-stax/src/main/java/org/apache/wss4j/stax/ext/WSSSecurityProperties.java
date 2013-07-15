@@ -89,7 +89,6 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     private WSSCrypto signatureWSSCrypto;
     private String signatureUser;
-    private boolean enableSignatureConfirmation = false;
     private boolean enableSignatureConfirmationVerification = false;
     private boolean includeSignatureToken;
     private WSSCrypto signatureVerificationWSSCrypto;
@@ -135,7 +134,6 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.derivedKeyTokenReference = wssSecurityProperties.derivedKeyTokenReference;
         this.signatureWSSCrypto = wssSecurityProperties.signatureWSSCrypto;
         this.signatureUser = wssSecurityProperties.signatureUser;
-        this.enableSignatureConfirmation = wssSecurityProperties.enableSignatureConfirmation;
         this.enableSignatureConfirmationVerification = wssSecurityProperties.enableSignatureConfirmationVerification;
         this.includeSignatureToken = wssSecurityProperties.includeSignatureToken;
         this.signatureVerificationWSSCrypto = wssSecurityProperties.signatureVerificationWSSCrypto;
@@ -243,14 +241,6 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public void setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType) {
         this.usernameTokenPasswordType = usernameTokenPasswordType;
-    }
-
-    public boolean isEnableSignatureConfirmation() {
-        return enableSignatureConfirmation;
-    }
-
-    public void setEnableSignatureConfirmation(boolean enableSignatureConfirmation) {
-        this.enableSignatureConfirmation = enableSignatureConfirmation;
     }
 
     public boolean isEnableSignatureConfirmationVerification() {

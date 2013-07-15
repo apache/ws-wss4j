@@ -22,11 +22,14 @@ import java.net.URISyntaxException;
 
 import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.stax.ext.*;
+import org.apache.wss4j.stax.ext.InboundWSSec;
+import org.apache.wss4j.stax.ext.OutboundWSSec;
+import org.apache.wss4j.stax.ext.WSSConfigurationException;
+import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.Init;
-import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 
 /**
@@ -98,11 +101,6 @@ public class WSSec {
     public static WSSSecurityProperties validateAndApplyDefaultsToOutboundSecurityProperties(WSSSecurityProperties securityProperties) throws WSSConfigurationException {
         if (securityProperties.getOutAction() == null) {
             throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noOutputAction");
-        }
-
-        //todo encrypt sigconf when original signature was encrypted
-        if (securityProperties.isEnableSignatureConfirmation()) {
-            securityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse11_SignatureConfirmation, SecurePart.Modifier.Element));
         }
 
         for (int i = 0; i < securityProperties.getOutAction().length; i++) {

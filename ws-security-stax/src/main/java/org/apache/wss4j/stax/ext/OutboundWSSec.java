@@ -175,6 +175,11 @@ public class OutboundWSSec {
                     final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
 
+                } else if (WSSConstants.SIGNATURE_CONFIRMATION.equals(action)) {
+                    final SignatureConfirmationOutputProcessor signatureConfirmationOutputProcessor =
+                            new SignatureConfirmationOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, signatureConfirmationOutputProcessor, action);
+
                 } else if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
                     final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
                             new BinarySecurityTokenOutputProcessor();

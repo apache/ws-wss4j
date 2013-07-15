@@ -617,7 +617,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
         baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP};
+            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.SIGNATURE_CONFIRMATION, WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP};
             securityProperties.setOutAction(actions);
             securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
             securityProperties.addSignaturePart(
@@ -627,12 +627,14 @@ public class HeaderOrderingTest extends AbstractTestBase {
                     new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), SecurePart.Modifier.Element)
             );
             securityProperties.addSignaturePart(
+                    new SecurePart(WSSConstants.TAG_wsse11_SignatureConfirmation, SecurePart.Modifier.Element)
+            );
+            securityProperties.addSignaturePart(
                     new SecurePart(new QName(WSSConstants.NS_SOAP11, "Body"), SecurePart.Modifier.Element)
             );
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("receiver");
             securityProperties.setTokenUser("transmitter");
-            securityProperties.setEnableSignatureConfirmation(true);
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
@@ -649,8 +651,8 @@ public class HeaderOrderingTest extends AbstractTestBase {
             Assert.assertEquals(childs.getLength(), 5);
             Assert.assertEquals(childs.item(0).getLocalName(), "Timestamp");
             Assert.assertEquals(childs.item(1).getLocalName(), "UsernameToken");
-            Assert.assertEquals(childs.item(2).getLocalName(), "BinarySecurityToken");
-            Assert.assertEquals(childs.item(3).getLocalName(), "SignatureConfirmation");
+            Assert.assertEquals(childs.item(2).getLocalName(), "SignatureConfirmation");
+            Assert.assertEquals(childs.item(3).getLocalName(), "BinarySecurityToken");
             Assert.assertEquals(childs.item(4).getLocalName(), "Signature");
 
             NodeList sigReferences = document.getElementsByTagNameNS(WSConstants.SIG_NS, "Reference");

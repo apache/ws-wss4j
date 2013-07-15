@@ -277,6 +277,7 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final Action TIMESTAMP = new Action(ConfigurationConstants.TIMESTAMP);
     public static final Action USERNAMETOKEN = new Action(ConfigurationConstants.USERNAME_TOKEN);
     public static final Action USERNAMETOKEN_SIGNED = new Action(ConfigurationConstants.USERNAME_TOKEN_SIGNATURE);
+    public static final Action SIGNATURE_CONFIRMATION = new Action("SignatureConfirmation");
     public static final Action SIGNATURE_WITH_DERIVED_KEY = new Action("SignatureWithDerivedKey");
     public static final Action ENCRYPT_WITH_DERIVED_KEY = new Action("EncryptWithDerivedKey");
     public static final Action SAML_TOKEN_SIGNED = new Action(ConfigurationConstants.SAML_TOKEN_SIGNED);

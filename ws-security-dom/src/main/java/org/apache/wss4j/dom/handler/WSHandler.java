@@ -92,8 +92,9 @@ public abstract class WSHandler {
         }
 
         boolean enableSigConf = decodeEnableSignatureConfirmation(reqData);
-        wssConfig.setEnableSignatureConfirmation(enableSigConf);
-
+        wssConfig.setEnableSignatureConfirmation(
+            enableSigConf || ((doAction & WSConstants.SC) != 0)
+        );
         wssConfig.setPasswordsAreEncoded(decodeUseEncodedPasswords(reqData));
 
         wssConfig.setPrecisionInMilliSeconds(
@@ -273,7 +274,9 @@ public abstract class WSHandler {
             wssConfig = secEngine.getWssConfig();
         }
         boolean enableSigConf = decodeEnableSignatureConfirmation(reqData);
-        wssConfig.setEnableSignatureConfirmation(enableSigConf);
+        wssConfig.setEnableSignatureConfirmation(
+            enableSigConf || ((doAction & WSConstants.SC) != 0)
+        );
         wssConfig.setTimeStampStrict(decodeTimestampStrict(reqData));
         String passwordType = decodePasswordType(reqData);
         wssConfig.setRequiredPasswordType(passwordType);

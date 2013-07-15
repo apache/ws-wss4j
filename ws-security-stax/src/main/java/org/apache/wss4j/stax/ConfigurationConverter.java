@@ -112,6 +112,12 @@ public final class ConfigurationConverter {
                 actions.add(WSSConstants.KERBEROS_TOKEN);
             }
         }
+
+        boolean sigConf =
+                decodeBooleanConfigValue(ConfigurationConstants.ENABLE_SIGNATURE_CONFIRMATION, false, config);
+        if (sigConf) {
+            actions.add(WSSConstants.SIGNATURE_CONFIRMATION);
+        }
         
         Action[] actionArray = new Action[actions.size()];
         properties.setOutAction(actions.toArray(actionArray));
@@ -353,9 +359,9 @@ public final class ConfigurationConverter {
         Map<String, Object> config, 
         WSSSecurityProperties properties
     ) {
+        //outbound sigConf is configured as an Action, see parseActions()
         boolean sigConf = 
             decodeBooleanConfigValue(ConfigurationConstants.ENABLE_SIGNATURE_CONFIRMATION, false, config);
-        properties.setEnableSignatureConfirmation(sigConf);
         properties.setEnableSignatureConfirmationVerification(sigConf);
         
         boolean mustUnderstand = 
