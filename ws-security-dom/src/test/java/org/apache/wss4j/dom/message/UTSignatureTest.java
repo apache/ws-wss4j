@@ -25,6 +25,7 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -52,6 +53,11 @@ public class UTSignatureTest extends org.junit.Assert {
         org.slf4j.LoggerFactory.getLogger(UTSignatureTest.class);
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
     private Crypto crypto = null;
+    
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
     
     public UTSignatureTest() throws Exception {
         crypto = CryptoFactory.getInstance();

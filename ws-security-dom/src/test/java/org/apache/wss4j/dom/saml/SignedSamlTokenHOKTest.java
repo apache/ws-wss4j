@@ -29,6 +29,7 @@ import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -64,6 +65,11 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
     private Crypto trustCrypto = null;
     private Crypto issuerCrypto = null;
     private Crypto userCrypto = CryptoFactory.getInstance("wss40.properties");
+    
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
     
     public SignedSamlTokenHOKTest() throws Exception {
         WSSConfig.init();

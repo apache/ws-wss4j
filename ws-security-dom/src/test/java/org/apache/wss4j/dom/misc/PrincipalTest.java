@@ -27,7 +27,6 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
-
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -45,6 +44,7 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.WSSecHeader;
@@ -65,6 +65,11 @@ public class PrincipalTest extends org.junit.Assert {
     
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
+    
     /**
      * Test the principal that is created after processing a Username Token
      */

@@ -28,6 +28,7 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecretKeyCallbackHandler;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -80,6 +81,11 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         (byte)0x34, (byte)0x04,
     };
     private Crypto crypto = null;
+    
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
     
     public SignatureEncryptionTest() throws Exception {
         crypto = CryptoFactory.getInstance("wss40.properties");

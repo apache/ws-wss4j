@@ -30,6 +30,7 @@ import org.apache.wss4j.dom.common.CustomSamlAssertionValidator;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
@@ -48,6 +49,11 @@ public class SamlConditionsTest extends org.junit.Assert {
     private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(SamlConditionsTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
+    
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
 
     public SamlConditionsTest() {
         WSSConfig config = WSSConfig.getNewInstance();

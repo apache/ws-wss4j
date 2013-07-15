@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.message.token;
 
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 
 /**
  * Tests for DerivedKeyToken type.
@@ -48,6 +49,10 @@ public class DerivedKeyTokenTest extends org.junit.Assert {
     private DerivedKeyToken tokenEqual;
     private DerivedKeyToken tokenNotEqual;
     
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
     
     public DerivedKeyTokenTest() throws Exception {
         token = new DerivedKeyToken(createReferenceDocument(

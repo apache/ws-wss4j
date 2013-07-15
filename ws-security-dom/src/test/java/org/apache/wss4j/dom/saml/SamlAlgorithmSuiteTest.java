@@ -24,7 +24,6 @@ import java.util.List;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -35,6 +34,7 @@ import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
@@ -52,6 +52,11 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
     private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(SamlAlgorithmSuiteTest.class);
     private Crypto crypto = null;
+    
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
     
     public SamlAlgorithmSuiteTest() throws Exception {
         WSSConfig.init();

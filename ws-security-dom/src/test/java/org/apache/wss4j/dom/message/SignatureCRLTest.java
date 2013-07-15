@@ -27,6 +27,7 @@ import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.util.XMLUtils;
@@ -67,6 +68,11 @@ public class SignatureCRLTest extends org.junit.Assert {
         org.slf4j.LoggerFactory.getLogger(SignatureCRLTest.class);
     private Crypto crypto = null;
     private Crypto cryptoCA = null;
+    
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
     
     public SignatureCRLTest() throws Exception {
         WSSConfig.init();

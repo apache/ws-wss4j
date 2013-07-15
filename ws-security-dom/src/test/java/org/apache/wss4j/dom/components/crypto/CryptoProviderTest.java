@@ -23,6 +23,7 @@ import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.util.XMLUtils;
@@ -33,6 +34,7 @@ import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;
+
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
@@ -61,6 +63,11 @@ public class CryptoProviderTest extends org.junit.Assert {
         crypto = CryptoFactory.getInstance("wss86.properties");
     }
 
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
+    
     /**
      * Test signing a SOAP message using a cert with an OID
      */

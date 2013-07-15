@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.message.token;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 
 /**
  * unit test for the Reference type
@@ -49,6 +50,11 @@ public class ReferenceTest extends org.junit.Assert {
     private Reference ref;
     private Reference refEqual;
     private Reference refNotEqual;
+    
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
     
     public ReferenceTest() throws Exception{
         ref = new Reference (createReferenceDocument(TEST_REFERENCE_TEMPLATE, "test", "equalscheck").getDocumentElement());

@@ -25,6 +25,7 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.common.EncodedPasswordCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.common.bsp.BSPRule;
@@ -56,6 +57,11 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         org.slf4j.LoggerFactory.getLogger(UTDerivedKeyTest.class);
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
     private Crypto crypto = null;
+    
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
     
     public UTDerivedKeyTest() throws Exception {
         crypto = CryptoFactory.getInstance();

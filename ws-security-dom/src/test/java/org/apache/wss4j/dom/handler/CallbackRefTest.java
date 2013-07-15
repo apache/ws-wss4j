@@ -23,6 +23,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.w3c.dom.Document;
@@ -38,6 +39,11 @@ public class CallbackRefTest extends org.junit.Assert {
     private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(CallbackRefTest.class);
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
+    
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
     
     /**
      * A test for WSHandler.getPassword(...), where the password is obtained from a 

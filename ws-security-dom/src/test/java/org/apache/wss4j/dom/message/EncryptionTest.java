@@ -30,6 +30,7 @@ import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SecretKeyCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -70,6 +71,11 @@ public class EncryptionTest extends org.junit.Assert {
     private byte[] keyData;
     private SecretKey key;
     private Crypto crypto = null;
+    
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
     
     public EncryptionTest() throws Exception {
         crypto = CryptoFactory.getInstance("wss40.properties");

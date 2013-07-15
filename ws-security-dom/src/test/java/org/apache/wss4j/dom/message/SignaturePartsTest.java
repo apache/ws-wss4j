@@ -29,6 +29,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.Merlin;
@@ -48,6 +49,7 @@ import java.io.InputStream;
 import java.security.KeyStore;
 import java.util.List;
 import java.util.ArrayList;
+
 import javax.xml.namespace.QName;
 
 /**
@@ -79,6 +81,11 @@ public class SignaturePartsTest extends org.junit.Assert {
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = null;
+    
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
     
     public SignaturePartsTest() throws Exception {
         WSSConfig.init();

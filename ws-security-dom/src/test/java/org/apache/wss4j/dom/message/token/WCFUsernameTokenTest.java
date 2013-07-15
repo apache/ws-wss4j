@@ -32,6 +32,7 @@ import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.w3c.dom.Document;
@@ -65,6 +66,11 @@ public class WCFUsernameTokenTest extends org.junit.Assert {
         + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
     
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
+    
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
     
     /**
      * Test that adds a UserNameToken with a namespace qualified type. This should fail

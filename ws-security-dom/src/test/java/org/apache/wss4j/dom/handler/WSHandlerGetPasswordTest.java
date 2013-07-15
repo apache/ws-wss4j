@@ -23,6 +23,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.util.XMLUtils;
@@ -39,6 +40,11 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
         org.slf4j.LoggerFactory.getLogger(WSHandlerGetPasswordTest.class);
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
+    
     /**
      * A unit test for WSHandler.getPassword(...), where the password is obtained 
      * from the Message Context.

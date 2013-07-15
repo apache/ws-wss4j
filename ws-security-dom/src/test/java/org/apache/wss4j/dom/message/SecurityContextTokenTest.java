@@ -28,6 +28,7 @@ import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SecretKeyCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
@@ -50,6 +51,11 @@ public class SecurityContextTokenTest extends org.junit.Assert {
         crypto = CryptoFactory.getInstance("wss40.properties");
     }
 
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
+    
     @org.junit.Test
     public void testBuild() {
         try {

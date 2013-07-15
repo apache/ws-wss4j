@@ -24,6 +24,7 @@ import java.util.Collections;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
@@ -36,6 +37,11 @@ import org.w3c.dom.Element;
 public class SecurityTokenReferenceTest extends org.junit.Assert {
     private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(SecurityTokenReferenceTest.class);
+    
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
     
     /**
      * Test for a Reference with no URI

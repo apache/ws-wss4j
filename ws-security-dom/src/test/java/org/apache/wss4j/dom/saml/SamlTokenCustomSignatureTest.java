@@ -39,6 +39,7 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
 import org.apache.xml.security.signature.XMLSignature;
@@ -55,6 +56,11 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
         org.slf4j.LoggerFactory.getLogger(SamlTokenCustomSignatureTest.class);
     
     private Crypto crypto = null;
+    
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
     
     public SamlTokenCustomSignatureTest() throws Exception {
         WSSConfig.init();

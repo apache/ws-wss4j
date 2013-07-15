@@ -23,6 +23,7 @@ import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.WSSPolicyException;
 import org.apache.wss4j.policy.stax.PolicyEnforcer;
@@ -46,6 +47,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -60,6 +62,11 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
     public void setUp() throws Exception {
         WSProviderConfig.init();
         Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
+    }
+    
+    @org.testng.annotations.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
     }
 
     protected PolicyEnforcer buildAndStartPolicyEngine(String policyString)

@@ -21,6 +21,7 @@ package org.apache.wss4j.dom.message;
 
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.w3c.dom.Document;
@@ -31,6 +32,11 @@ import org.w3c.dom.Document;
  * "username" is used for encryption or signature. See WSS-137.
  */
 public class CertErrorTest extends org.junit.Assert {
+    
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
     
     public CertErrorTest() {
         WSSConfig.init();

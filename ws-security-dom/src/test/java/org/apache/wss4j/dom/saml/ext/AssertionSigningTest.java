@@ -24,6 +24,7 @@ import java.security.KeyStore;
 
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
@@ -54,6 +55,11 @@ public class AssertionSigningTest extends org.junit.Assert {
     // Custom Canonicalization algorithm
     private final String customCanonicalizationAlgorithm = SignatureConstants.ALGO_ID_C14N_OMIT_COMMENTS;
 
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
+    
     public AssertionSigningTest() throws Exception {
         WSSConfig.init();
         // Load the issuer keystore

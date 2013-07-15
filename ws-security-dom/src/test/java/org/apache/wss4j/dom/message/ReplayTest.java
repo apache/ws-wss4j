@@ -31,6 +31,7 @@ import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.common.cache.MemoryReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -51,6 +52,11 @@ public class ReplayTest extends org.junit.Assert {
     
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = null;
+    
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
     
     public ReplayTest() throws Exception {
         crypto = CryptoFactory.getInstance();

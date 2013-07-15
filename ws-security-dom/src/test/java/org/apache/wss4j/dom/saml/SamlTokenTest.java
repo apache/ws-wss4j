@@ -30,6 +30,7 @@ import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 import org.apache.wss4j.dom.common.SAMLElementCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
@@ -41,7 +42,6 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-
 import org.joda.time.DateTime;
 import org.opensaml.Configuration;
 import org.opensaml.common.SAMLObjectBuilder;
@@ -62,6 +62,11 @@ public class SamlTokenTest extends org.junit.Assert {
     private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(SamlTokenTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
+    
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
 
     public SamlTokenTest() {
         WSSConfig config = WSSConfig.getNewInstance();

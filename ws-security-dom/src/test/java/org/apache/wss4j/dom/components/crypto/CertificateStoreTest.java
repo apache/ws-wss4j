@@ -25,6 +25,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.CertificateStore;
@@ -55,6 +56,11 @@ public class CertificateStoreTest extends org.junit.Assert {
     private Crypto senderCrypto = CryptoFactory.getInstance("wss40.properties");
     private Crypto receiverCrypto = null;
     private CallbackHandler keystoreCallbackHandler = new KeystoreCallbackHandler();
+    
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
     
     public CertificateStoreTest() throws Exception {
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);

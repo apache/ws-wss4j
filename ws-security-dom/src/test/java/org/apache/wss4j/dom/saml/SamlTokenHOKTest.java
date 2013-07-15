@@ -28,6 +28,7 @@ import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.saml.SAMLCallback;
@@ -38,7 +39,6 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-
 import org.w3c.dom.Document;
 
 import java.util.List;
@@ -53,6 +53,11 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         org.slf4j.LoggerFactory.getLogger(SamlTokenHOKTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = null;
+    
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
     
     public SamlTokenHOKTest() throws Exception {
         WSSConfig config = WSSConfig.getNewInstance();

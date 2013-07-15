@@ -38,6 +38,7 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.token.Reference;
@@ -59,6 +60,11 @@ public class SignatureTest extends org.junit.Assert {
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = null;
+    
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
     
     public SignatureTest() throws Exception {
         WSSConfig.init();

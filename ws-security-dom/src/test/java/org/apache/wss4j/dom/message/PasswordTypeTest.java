@@ -24,6 +24,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
@@ -42,6 +43,11 @@ public class PasswordTypeTest extends org.junit.Assert {
         org.slf4j.LoggerFactory.getLogger(PasswordTypeTest.class);
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
+    
     /**
      * Test that adds a UserNameToken with password Digest to a WS-Security envelope
      */

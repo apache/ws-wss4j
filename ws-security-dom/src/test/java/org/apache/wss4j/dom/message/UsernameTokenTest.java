@@ -26,6 +26,7 @@ import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.EncodedPasswordCallbackHandler;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.common.bsp.BSPRule;
@@ -45,6 +46,7 @@ import org.w3c.dom.Element;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
+
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.text.DateFormat;
@@ -111,6 +113,11 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
+    
     /**
      * Test that adds a UserNameToken with password Digest to a WS-Security envelope
      */

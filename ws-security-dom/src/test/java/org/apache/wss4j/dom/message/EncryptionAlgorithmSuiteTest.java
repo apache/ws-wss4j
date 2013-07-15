@@ -26,7 +26,6 @@ import javax.crypto.SecretKey;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -39,6 +38,7 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecretKeyCallbackHandler;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
@@ -52,6 +52,11 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
         org.slf4j.LoggerFactory.getLogger(EncryptionAlgorithmSuiteTest.class);
     
     private Crypto crypto = null;
+    
+    @org.junit.AfterClass
+    public static void cleanup() throws Exception {
+        SecurityTestUtil.cleanup();
+    }
     
     public EncryptionAlgorithmSuiteTest() throws Exception {
         WSSConfig.init();
