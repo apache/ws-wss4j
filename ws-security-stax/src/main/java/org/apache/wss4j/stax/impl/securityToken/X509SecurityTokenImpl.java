@@ -32,6 +32,7 @@ import org.apache.xml.security.stax.securityToken.SecurityTokenConstants.TokenTy
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
+
 import java.security.Key;
 import java.security.Principal;
 import java.security.cert.CertificateExpiredException;
@@ -74,7 +75,16 @@ public abstract class X509SecurityTokenImpl
                       String correlationID) throws XMLSecurityException {
         WSPasswordCallback pwCb = new WSPasswordCallback(getAlias(), WSPasswordCallback.Usage.DECRYPT);
         WSSUtils.doPasswordCallback(getCallbackHandler(), pwCb);
-        return getCrypto().getPrivateKey(getAlias(), pwCb.getPassword());
+        try {
+            return getCrypto().getPrivateKey(getAlias(), pwCb.getPassword());
+        } catch (WSSecurityException ex) {
+            // Check to see if we are decrypting rather than signature verification
+            Crypto decCrypto = securityProperties.getDecryptionCrypto();
+            if (decCrypto != null && decCrypto != getCrypto()) {
+                return decCrypto.getPrivateKey(getAlias(), pwCb.getPassword());
+            }
+            throw ex;
+        }
     }
 
     @Override
