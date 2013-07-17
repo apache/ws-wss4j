@@ -318,21 +318,14 @@ public class WSSConfig {
      */
     private WSTimeSource currentTime;
     
-    /**
-     * The default wsu:Id allocator is a simple "start at 1 and increment up"
-     * thing that is very fast.
-     */
     public static final WsuIdAllocator DEFAULT_ID_ALLOCATOR = new WsuIdAllocator() {
-        int i;
-        private synchronized String next() {
-            return Integer.toString(++i);
-        }
+        
         public String createId(String prefix, Object o) {
             if (prefix == null) {
-                return "_" + next();
+                return IDGenerator.generateID("_");
             }
-            
-            return prefix + next();
+
+            return IDGenerator.generateID(prefix);
         }
 
         public String createSecureId(String prefix, Object o) {
