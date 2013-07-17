@@ -355,7 +355,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public Crypto getSignatureCrypto() throws WSSConfigurationException {
         if (signatureWSSCrypto == null) {
-            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureKeyStoreNotSet");
+            return null;
         }
 
         return signatureWSSCrypto.getCrypto();
@@ -426,7 +426,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     public Crypto getSignatureVerificationCrypto() throws WSSConfigurationException {
 
         if (signatureVerificationWSSCrypto == null) {
-            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureVerificationKeyStoreNotSet");
+            return null;
         }
         signatureVerificationWSSCrypto.setCrlCertStore(crlCertStore);
         return signatureVerificationWSSCrypto.getCrypto();
@@ -514,7 +514,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     public Crypto getDecryptionCrypto() throws WSSConfigurationException {
 
         if (decryptionWSSCrypto == null) {
-            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "decryptionKeyStoreNotSet");
+            return null;
         }
 
         return decryptionWSSCrypto.getCrypto();
@@ -602,7 +602,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     public Crypto getEncryptionCrypto() throws WSSConfigurationException {
 
         if (encryptionWSSCrypto == null) {
-            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "encryptionKeyStoreNotSet");
+            return null;
         }
 
         encryptionWSSCrypto.setCrlCertStore(this.getCrlCertStore());

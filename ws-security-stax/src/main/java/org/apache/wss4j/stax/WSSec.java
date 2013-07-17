@@ -111,7 +111,8 @@ public class WSSec {
                 }
             } else if (WSSConstants.SIGNATURE.equals(action)) {
                 if (securityProperties.getSignatureKeyStore() == null
-                    && securityProperties.getSignatureCryptoProperties() == null) {
+                    && securityProperties.getSignatureCryptoProperties() == null
+                    && securityProperties.getSignatureCrypto() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureKeyStoreNotSet");
                 }
                 if (securityProperties.getSignatureUser() == null) {
@@ -138,7 +139,8 @@ public class WSSec {
                         && securityProperties.getEncryptionKeyStore() == null
                         && securityProperties.getEncryptionCryptoProperties() == null
                         && !securityProperties.isUseReqSigCertForEncryption()
-                        && securityProperties.isEncryptSymmetricEncrytionKey()) {
+                        && securityProperties.isEncryptSymmetricEncrytionKey()
+                        && securityProperties.getEncryptionCrypto() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "encryptionKeyStoreNotSet");
                 }
                 if (securityProperties.getEncryptionUser() == null
