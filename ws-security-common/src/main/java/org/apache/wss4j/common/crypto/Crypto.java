@@ -183,10 +183,9 @@ public interface Crypto {
      *
      * @param certs Certificate chain to validate
      * @param enableRevocation whether to enable CRL verification or not
-     * @return true if the certificate chain is valid, false otherwise
-     * @throws WSSecurityException
+     * @throws WSSecurityException if the certificate chain is invalid
      */
-    boolean verifyTrust(
+    void verifyTrust(
         X509Certificate[] certs, boolean enableRevocation
     ) throws WSSecurityException;
     
@@ -194,8 +193,8 @@ public interface Crypto {
      * Evaluate whether a given public key should be trusted.
      * 
      * @param publicKey The PublicKey to be evaluated
-     * @return whether the PublicKey parameter is trusted or not
+     * @throws WSSecurityException if the PublicKey is invalid
      */
-    boolean verifyTrust(PublicKey publicKey) throws WSSecurityException;
+    void verifyTrust(PublicKey publicKey) throws WSSecurityException;
 
 }

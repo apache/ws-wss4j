@@ -267,7 +267,9 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
                 Assert.fail("XMLStreamException expected");
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
-                Assert.assertEquals(e.getCause().getMessage(), "Error during certificate path validation: Path does not chain with any of the trust anchors");
+                Assert.assertTrue(e.getCause().getMessage().contains(
+                    "Error during certificate path validation"
+                ));
             }
         }
     }

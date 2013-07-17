@@ -46,6 +46,9 @@ import org.apache.wss4j.common.ext.WSSecurityException;
  */
 public class CertificateStore extends CryptoBase {
     
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(CertificateStore.class);
+    
     private X509Certificate[] trustedCerts;
     
     /**
@@ -137,16 +140,83 @@ public class CertificateStore extends CryptoBase {
      *
      * @param certs Certificate chain to validate
      * @param enableRevocation whether to enable CRL verification or not
-     * @return true if the certificate chain is valid, false otherwise
-     * @throws WSSecurityException
+     * @throws WSSecurityException if the certificate chain is invalid
      */
-    public boolean verifyTrust(
+    public void verifyTrust(
         X509Certificate[] certs, 
         boolean enableRevocation
     ) throws WSSecurityException {
+        //
+        // FIRST step - Search the trusted certs for the transmitted certificate
+        //
+        if (!enableRevocation) {
+            String issuerString = certs[0].getIssuerX500Principal().getName();
+            BigInteger issuerSerial = certs[0].getSerialNumber();
+            
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
+            cryptoType.setIssuerSerial(issuerString, issuerSerial);
+            X509Certificate[] foundCerts = getX509Certificates(cryptoType);
+    
+            //
+            // If a certificate has been found, the certificates must be compared
+            // to ensure against phony DNs (compare encoded form including signature)
+            //
+            if (foundCerts != null && foundCerts[0] != null && foundCerts[0].equals(certs[0])) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(
+                        "Direct trust for certificate with " + certs[0].getSubjectX500Principal().getName()
+                    );
+                }
+                return;
+            }
+        }
+        
+        
+        //
+        // SECOND step - Search for the issuer cert (chain) of the transmitted certificate in the 
+        // keystore or the truststore
+        //
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.SUBJECT_DN);
+        String issuerString = certs[0].getIssuerX500Principal().getName();
+        cryptoType.setSubjectDN(issuerString);
+        X509Certificate[] foundCerts = getX509Certificates(cryptoType);
+
+        // If the certs have not been found, the issuer is not in the keystore/truststore
+        // As a direct result, do not trust the transmitted certificate
+        if (foundCerts == null || foundCerts.length < 1) {
+            String subjectString = certs[0].getSubjectX500Principal().getName();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(
+                    "No certs found in keystore for issuer " + issuerString 
+                    + " of certificate for " + subjectString
+                );
+            }
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILURE, "certpath", "No trusted certs found"
+            );
+        }
+        
+        //
+        // THIRD step
+        // Check the certificate trust path for the issuer cert chain
+        //
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(
+                "Preparing to validate certificate path for issuer " + issuerString
+            );
+        }
+        
+        //
+        // Form a certificate chain from the transmitted certificate
+        // and the certificate(s) of the issuer from the keystore/truststore
+        //
+        X509Certificate[] x509certs = new X509Certificate[foundCerts.length + 1];
+        x509certs[0] = certs[0];
+        System.arraycopy(foundCerts, 0, x509certs, 1, foundCerts.length);
+        
         try {
             // Generate cert path
-            List<X509Certificate> certList = Arrays.asList(certs);
+            List<X509Certificate> certList = Arrays.asList(x509certs);
             CertPath path = getCertificateFactory().generateCertPath(certList);
 
             Set<TrustAnchor> set = new HashSet<TrustAnchor>();
@@ -170,7 +240,6 @@ public class CertificateStore extends CryptoBase {
                 validator = CertPathValidator.getInstance("PKIX", provider);
             }
             validator.validate(path, param);
-            return true;
         } catch (java.security.NoSuchProviderException e) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "certpath",
@@ -203,14 +272,14 @@ public class CertificateStore extends CryptoBase {
      * Evaluate whether a given public key should be trusted.
      * 
      * @param publicKey The PublicKey to be evaluated
-     * @return whether the PublicKey parameter is trusted or not
+     * @throws WSSecurityException if the PublicKey is invalid
      */
-    public boolean verifyTrust(PublicKey publicKey) throws WSSecurityException {
+    public void verifyTrust(PublicKey publicKey) throws WSSecurityException {
         //
         // If the public key is null, do not trust the signature
         //
         if (publicKey == null) {
-            return false;
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
         
         //
@@ -218,10 +287,10 @@ public class CertificateStore extends CryptoBase {
         //
         for (X509Certificate trustedCert : trustedCerts) {
             if (publicKey.equals(trustedCert.getPublicKey())) {
-                return true;
+                return;
             }
         }
-        return false;
+        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
     }
     
     /**
