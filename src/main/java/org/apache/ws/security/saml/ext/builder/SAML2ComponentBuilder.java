@@ -280,6 +280,11 @@ public final class SAML2ComponentBuilder {
                 }
                 authnStatement.setAuthnInstant(authInstant);
                 
+                DateTime sessionNotOnOrAfter = statementBean.getSessionNotOnOrAfter();
+                if (sessionNotOnOrAfter != null) {
+                    authnStatement.setSessionNotOnOrAfter(sessionNotOnOrAfter);
+                }
+                
                 if (statementBean.getSessionIndex() != null) {
                     authnStatement.setSessionIndex(statementBean.getSessionIndex());
                 }

@@ -33,6 +33,7 @@ import org.apache.ws.security.saml.ext.bean.SubjectBean;
 import org.apache.ws.security.saml.ext.bean.SubjectConfirmationDataBean;
 import org.apache.ws.security.saml.ext.bean.SubjectLocalityBean;
 import org.apache.ws.security.saml.ext.bean.KeyInfoBean.CERT_IDENTIFIER;
+import org.joda.time.DateTime;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -65,6 +66,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     protected String subjectNameIDFormat = null;
     protected String subjectLocalityIpAddress = null;
     protected String subjectLocalityDnsAddress = null;
+    protected DateTime sessionNotOnOrAfter = null;
     protected String resource = null;
     protected List<?> customAttributeValues = null;
     protected ConditionsBean conditions = null;
@@ -80,6 +82,10 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     
     public void setConfirmationMethod(String confMethod) {
         confirmationMethod = confMethod;
+    }
+    
+    public void setSessionNotOnOrAfter(DateTime sessionNotOnOrAfter) {
+        this.sessionNotOnOrAfter = sessionNotOnOrAfter;
     }
     
     public void setStatement(Statement statement) {
@@ -135,6 +141,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
                 authBean.setSubjectLocality(subjectLocality);
             }
             authBean.setAuthenticationMethod("Password");
+            authBean.setSessionNotOnOrAfter(sessionNotOnOrAfter);
             callback.setAuthenticationStatementData(Collections.singletonList(authBean));
         } else if (statement == Statement.ATTR) {
             AttributeStatementBean attrBean = new AttributeStatementBean();
