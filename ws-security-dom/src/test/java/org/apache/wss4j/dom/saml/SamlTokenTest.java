@@ -579,6 +579,46 @@ public class SamlTokenTest extends org.junit.Assert {
     }
     
     /**
+     * Test that creates, sends and processes an unsigned SAML 2.0 authentication assertion with
+     * a user-specified SessionNotOnOrAfter DateTime.
+     */
+    @org.junit.Test
+    public void testSAML2SessionNotOnOrAfter() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
+        callbackHandler.setSessionNotOnOrAfter(new DateTime().plusHours(1));
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+
+        String outputString = 
+            XMLUtils.PrettyDocumentToString(unsignedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SAML 2.0 Authn Assertion (sender vouches):");
+            LOG.debug(outputString);
+        }
+        assertTrue(outputString.contains("SessionNotOnOrAfter"));
+        
+        List<WSSecurityEngineResult> results = verify(unsignedDoc);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertFalse(receivedSamlAssertion.isSigned());
+    }
+    
+    /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion with
      * a user-specified SubjectLocality statement.
      */

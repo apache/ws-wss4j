@@ -28,6 +28,7 @@ import org.joda.time.DateTime;
  */
 public class AuthenticationStatementBean {
     private SubjectBean subject;
+    private DateTime sessionNotOnOrAfter;
     private DateTime authenticationInstant;
     private String authenticationMethod;
     private SubjectLocalityBean subjectLocality;
@@ -45,15 +46,18 @@ public class AuthenticationStatementBean {
      * @param subject the Subject to set 
      * @param authenticationMethod the Authentication Method to set
      * @param authenticationInstant the Authentication Instant to set
+     * @param sessionNotOnOrAfter the Session NotOnOrAfter time to set
      */
     public AuthenticationStatementBean(
         SubjectBean subject, 
         String authenticationMethod,
-        DateTime authenticationInstant
+        DateTime authenticationInstant,
+        DateTime sessionNotOnOrAfter
     ) {
         this.subject = subject;
         this.authenticationMethod = authenticationMethod;
         this.authenticationInstant = authenticationInstant;
+        this.sessionNotOnOrAfter = sessionNotOnOrAfter;
     }
 
     /**
@@ -102,6 +106,22 @@ public class AuthenticationStatementBean {
      */
     public void setAuthenticationInstant(DateTime authenticationInstant) {
         this.authenticationInstant = authenticationInstant;
+    }
+    
+    /**
+     * Get the sessionNotOnOrAfter
+     * @return the sessionNotOnOrAfter
+     */
+    public DateTime getSessionNotOnOrAfter() {
+        return sessionNotOnOrAfter;
+    }
+
+    /**
+     * Set the sessionNotOnOrAfter
+     * @param sessionNotOnOrAfter the sessionNotOnOrAfter
+     */
+    public void setSessionNotOnOrAfter(DateTime sessionNotOnOrAfter) {
+        this.sessionNotOnOrAfter = sessionNotOnOrAfter;
     }
     
     /**
@@ -154,6 +174,13 @@ public class AuthenticationStatementBean {
             return false;
         }
         
+        if (sessionNotOnOrAfter == null && that.sessionNotOnOrAfter != null) {
+            return false;
+        } else if (sessionNotOnOrAfter != null 
+            && !sessionNotOnOrAfter.equals(that.sessionNotOnOrAfter)) {
+            return false;
+        }
+        
         if (authenticationMethod == null && that.authenticationMethod != null) {
             return false;
         } else if (authenticationMethod != null 
@@ -187,6 +214,7 @@ public class AuthenticationStatementBean {
     public int hashCode() {
         int result = subject != null ? subject.hashCode() : 0;
         result = 31 * result + (authenticationInstant != null ? authenticationInstant.hashCode() : 0);
+        result = 31 * result + (sessionNotOnOrAfter != null ? sessionNotOnOrAfter.hashCode() : 0);
         result = 31 * result + (authenticationMethod != null ? authenticationMethod.hashCode() : 0);
         result = 31 * result + (subjectLocality != null ? subjectLocality.hashCode() : 0);
         result = 31 * result + (sessionIndex != null ? sessionIndex.hashCode() : 0);
