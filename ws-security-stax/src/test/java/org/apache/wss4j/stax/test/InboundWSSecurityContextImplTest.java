@@ -66,7 +66,7 @@ public class InboundWSSecurityContextImplTest {
 
         final List<SecurityEvent> securityEventList = generateTransportBindingSecurityEvents();
 
-        Assert.assertEquals(securityEventList.size(), 9);
+        Assert.assertEquals(securityEventList.size(), 11);
 
         for (int i = 0; i < securityEventList.size(); i++) {
             SecurityEvent securityEvent = securityEventList.get(i);
@@ -135,6 +135,17 @@ public class InboundWSSecurityContextImplTest {
         usernameTokenSecurityEvent.setSecurityToken(usernameSecurityToken);
         inboundWSSecurityContext.registerSecurityEvent(usernameTokenSecurityEvent);
 
+        SignatureConfirmationSecurityEvent signatureConfirmationSecurityEvent = new SignatureConfirmationSecurityEvent();
+        inboundWSSecurityContext.registerSecurityEvent(signatureConfirmationSecurityEvent);
+
+        List<QName> scPath = new LinkedList<QName>();
+        scPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        scPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
+
+        RequiredElementSecurityEvent scRequiredElementSecurityEvent = new RequiredElementSecurityEvent();
+        scRequiredElementSecurityEvent.setElementPath(scPath);
+        inboundWSSecurityContext.registerSecurityEvent(scRequiredElementSecurityEvent);
+
         List<QName> bstPath = new LinkedList<QName>();
         bstPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         bstPath.add(WSSConstants.TAG_wsse_BinarySecurityToken);
@@ -183,7 +194,7 @@ public class InboundWSSecurityContextImplTest {
         boolean encryptedSupportingTokensOccured = false;
         boolean mainEncryptionTokenOccured = false;
         boolean usernameTokenOccured = false;
-        Assert.assertEquals(securityEventList.size(), 31);
+        Assert.assertEquals(securityEventList.size(), 34);
         int x509TokenIndex = 0;
         for (int i = 0; i < securityEventList.size(); i++) {
             SecurityEvent securityEvent = securityEventList.get(i);
@@ -263,6 +274,17 @@ public class InboundWSSecurityContextImplTest {
         RequiredElementSecurityEvent timestampRequiredElementSecurityEvent = new RequiredElementSecurityEvent();
         timestampRequiredElementSecurityEvent.setElementPath(timestampPath);
         inboundWSSecurityContext.registerSecurityEvent(timestampRequiredElementSecurityEvent);
+
+        SignatureConfirmationSecurityEvent signatureConfirmationSecurityEvent = new SignatureConfirmationSecurityEvent();
+        inboundWSSecurityContext.registerSecurityEvent(signatureConfirmationSecurityEvent);
+
+        List<QName> scPath = new LinkedList<QName>();
+        scPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        scPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
+
+        RequiredElementSecurityEvent scRequiredElementSecurityEvent = new RequiredElementSecurityEvent();
+        scRequiredElementSecurityEvent.setElementPath(scPath);
+        inboundWSSecurityContext.registerSecurityEvent(scRequiredElementSecurityEvent);
 
         List<QName> bstPath = new LinkedList<QName>();
         bstPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
@@ -375,6 +397,10 @@ public class InboundWSSecurityContextImplTest {
         signedTimestampElementSecurityEvent.setElementPath(timestampPath);
         inboundWSSecurityContext.registerSecurityEvent(signedTimestampElementSecurityEvent);
 
+        SignedElementSecurityEvent signedSCElementSecurityEvent = new SignedElementSecurityEvent(initiatorToken, true, protectionOrder);
+        signedSCElementSecurityEvent.setElementPath(scPath);
+        inboundWSSecurityContext.registerSecurityEvent(signedSCElementSecurityEvent);
+
         SignedElementSecurityEvent signedUsernameTokenElementSecurityEvent = new SignedElementSecurityEvent(initiatorToken, true, protectionOrder);
         signedUsernameTokenElementSecurityEvent.setElementPath(usernameTokenPath);
         signedUsernameTokenElementSecurityEvent.setXmlSecEvent(usernameTokenXmlEvent);
@@ -471,7 +497,7 @@ public class InboundWSSecurityContextImplTest {
 
         final List<SecurityEvent> securityEventList = generateSymmetricBindingSecurityEvents();
 
-        Assert.assertEquals(securityEventList.size(), 21);
+        Assert.assertEquals(securityEventList.size(), 24);
 
         for (int i = 0; i < securityEventList.size(); i++) {
             SecurityEvent securityEvent = securityEventList.get(i);
@@ -515,6 +541,17 @@ public class InboundWSSecurityContextImplTest {
         RequiredElementSecurityEvent timestampRequiredElementSecurityEvent = new RequiredElementSecurityEvent();
         timestampRequiredElementSecurityEvent.setElementPath(timestampPath);
         inboundWSSecurityContext.registerSecurityEvent(timestampRequiredElementSecurityEvent);
+
+        SignatureConfirmationSecurityEvent signatureConfirmationSecurityEvent = new SignatureConfirmationSecurityEvent();
+        inboundWSSecurityContext.registerSecurityEvent(signatureConfirmationSecurityEvent);
+
+        List<QName> scPath = new LinkedList<QName>();
+        scPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+        scPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
+
+        RequiredElementSecurityEvent scRequiredElementSecurityEvent = new RequiredElementSecurityEvent();
+        scRequiredElementSecurityEvent.setElementPath(scPath);
+        inboundWSSecurityContext.registerSecurityEvent(scRequiredElementSecurityEvent);
 
         List<QName> samlTokenPath = new LinkedList<QName>();
         samlTokenPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
@@ -587,6 +624,10 @@ public class InboundWSSecurityContextImplTest {
         SignedElementSecurityEvent signedTimestampElementSecurityEvent = new SignedElementSecurityEvent(samlSecurityToken, true, protectionOrder);
         signedTimestampElementSecurityEvent.setElementPath(timestampPath);
         inboundWSSecurityContext.registerSecurityEvent(signedTimestampElementSecurityEvent);
+
+        SignedElementSecurityEvent signedSCElementSecurityEvent = new SignedElementSecurityEvent(samlSecurityToken, true, protectionOrder);
+        signedSCElementSecurityEvent.setElementPath(scPath);
+        inboundWSSecurityContext.registerSecurityEvent(signedSCElementSecurityEvent);
 
         SignedElementSecurityEvent signedUsernameTokenElementSecurityEvent = new SignedElementSecurityEvent(samlSecurityToken, true, protectionOrder);
         signedUsernameTokenElementSecurityEvent.setElementPath(usernameTokenPath);

@@ -39,5 +39,6 @@ public abstract class WSSecurityEventConstants extends SecurityEventConstants {
     public static final Event UsernameToken = new Event("UsernameToken");
     public static final Event HttpsToken = new Event("HttpsToken");
     public static final Event DerivedKeyToken = new Event("DerivedKeyToken");
-    
+    public static final Event SignatureConfirmation = new Event("SignatureConfirmation");
+
 }

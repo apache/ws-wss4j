@@ -63,6 +63,7 @@ import org.apache.wss4j.policy.model.SpnegoContextToken;
 import org.apache.wss4j.policy.model.SupportingTokens;
 import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.X509Token;
+import org.apache.wss4j.policy.model.Wss11;
 import org.apache.wss4j.policy.stax.assertionStates.AlgorithmSuiteAssertionState;
 import org.apache.wss4j.policy.stax.assertionStates.ContentEncryptedElementsAssertionState;
 import org.apache.wss4j.policy.stax.assertionStates.EncryptedElementsAssertionState;
@@ -80,6 +81,7 @@ import org.apache.wss4j.policy.stax.assertionStates.RequiredPartsAssertionState;
 import org.apache.wss4j.policy.stax.assertionStates.SamlTokenAssertionState;
 import org.apache.wss4j.policy.stax.assertionStates.SecureConversationTokenAssertionState;
 import org.apache.wss4j.policy.stax.assertionStates.SecurityContextTokenAssertionState;
+import org.apache.wss4j.policy.stax.assertionStates.SignatureConfirmationAssertionState;
 import org.apache.wss4j.policy.stax.assertionStates.SignatureProtectionAssertionState;
 import org.apache.wss4j.policy.stax.assertionStates.SignedElementsAssertionState;
 import org.apache.wss4j.policy.stax.assertionStates.SignedPartsAssertionState;
@@ -201,6 +203,7 @@ public class PolicyEnforcer implements SecurityEventListener {
             }
         } else if (policyComponent instanceof AbstractSecurityAssertion) {
             AbstractSecurityAssertion abstractSecurityAssertion = (AbstractSecurityAssertion) policyComponent;
+
             List<Assertable> assertablesList = getAssertableForAssertion(abstractSecurityAssertion);
             Iterator<Assertable> assertableIterator = assertablesList.iterator();
             while (assertableIterator.hasNext()) {
@@ -302,7 +305,7 @@ public class PolicyEnforcer implements SecurityEventListener {
             assertableList.add(new LayoutAssertionState(abstractSecurityAssertion, true));
         }*/
 
-        if (abstractSecurityAssertion instanceof AbstractBinding) {
+        else if (abstractSecurityAssertion instanceof AbstractBinding) {
             AbstractBinding abstractBinding = (AbstractBinding) abstractSecurityAssertion;
             if (abstractBinding instanceof AbstractSymmetricAsymmetricBinding) {
                 AbstractSymmetricAsymmetricBinding abstractSymmetricAsymmetricBinding = (AbstractSymmetricAsymmetricBinding) abstractSecurityAssertion;
@@ -318,16 +321,35 @@ public class PolicyEnforcer implements SecurityEventListener {
             //WSP1.3, 6.2 Timestamp Property
             assertableList.add(new IncludeTimeStampAssertionState(abstractBinding, true));
             if (abstractBinding.isIncludeTimestamp()) {
-                RequiredElementsAssertionState requiredElementsAssertionState = new RequiredElementsAssertionState(abstractBinding, false);
                 List<QName> timestampElementPath = new LinkedList<QName>();
                 timestampElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
                 timestampElementPath.add(WSSConstants.TAG_wsu_Timestamp);
+                RequiredElementsAssertionState requiredElementsAssertionState = new RequiredElementsAssertionState(abstractBinding, false);
                 requiredElementsAssertionState.addElement(timestampElementPath);
                 assertableList.add(requiredElementsAssertionState);
 
                 SignedElementsAssertionState signedElementsAssertionState = new SignedElementsAssertionState(abstractSecurityAssertion, true);
                 signedElementsAssertionState.addElement(timestampElementPath);
                 assertableList.add(signedElementsAssertionState);
+            }
+        } else if (abstractSecurityAssertion instanceof Wss11) {
+            Wss11 wss11 = (Wss11)abstractSecurityAssertion;
+
+            if (initiator) {
+                //9 WSS: SOAP Message Security Options [Signature Confirmation]
+                assertableList.add(new SignatureConfirmationAssertionState(wss11, true));
+                if (wss11.isRequireSignatureConfirmation()) {
+                    List<QName> timestampElementPath = new LinkedList<QName>();
+                    timestampElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+                    timestampElementPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
+                    RequiredElementsAssertionState requiredElementsAssertionState = new RequiredElementsAssertionState(wss11, false);
+                    requiredElementsAssertionState.addElement(timestampElementPath);
+                    assertableList.add(requiredElementsAssertionState);
+
+                    SignedElementsAssertionState signedElementsAssertionState = new SignedElementsAssertionState(wss11, true);
+                    signedElementsAssertionState.addElement(timestampElementPath);
+                    assertableList.add(signedElementsAssertionState);
+                }
             }
         }
 
@@ -477,6 +499,8 @@ public class PolicyEnforcer implements SecurityEventListener {
                                 doAssert = true;
                             }
                         } else if (assertable instanceof TokenProtectionAssertionState) {
+                            doAssert = true;
+                        } else if (assertable instanceof SignatureConfirmationAssertionState) {
                             doAssert = true;
                         }
 

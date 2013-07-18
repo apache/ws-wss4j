@@ -22,6 +22,7 @@ import org.apache.wss4j.binding.wss11.SignatureConfirmationType;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
+import org.apache.wss4j.stax.securityEvent.SignatureConfirmationSecurityEvent;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.AbstractInputSecurityHeaderHandler;
 import org.apache.xml.security.stax.ext.InputProcessorChain;
@@ -47,6 +48,11 @@ public class SignatureConfirmationInputHandler extends AbstractInputSecurityHead
         checkBSPCompliance(inputProcessorChain, signatureConfirmationType);
 
         inputProcessorChain.getSecurityContext().putAsList(SignatureConfirmationType.class, signatureConfirmationType);
+
+        //emit a SignatureConfirmationSecurityEvent
+        SignatureConfirmationSecurityEvent signatureConfirmationSecurityEvent = new SignatureConfirmationSecurityEvent();
+        signatureConfirmationSecurityEvent.setSignatureValue(signatureConfirmationType.getValue());
+        inputProcessorChain.getSecurityContext().registerSecurityEvent(signatureConfirmationSecurityEvent);
     }
 
     private void checkBSPCompliance(InputProcessorChain inputProcessorChain, SignatureConfirmationType signatureConfirmationType) throws WSSecurityException {

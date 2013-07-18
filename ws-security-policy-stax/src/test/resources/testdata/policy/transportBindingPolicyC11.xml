@@ -42,6 +42,8 @@
         </wsp:Policy>
     </sp:SignedEndorsingSupportingTokens>
     <sp:Wss11>
-        <sp:RequireSignatureConfirmation xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802"/>
+        <wsp:Policy>
+            <sp:RequireSignatureConfirmation />
+        </wsp:Policy>
     </sp:Wss11>
 </wsp:Policy>

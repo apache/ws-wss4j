@@ -143,13 +143,13 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
         } catch (WSSPolicyException e) {
             //Exception for policyEnforcer.doFinal();
             if (ignoreEvent == null) {
-                Assert.fail("Unexpected WSSPolicyException");
+                Assert.fail("Unexpected WSSPolicyException", e);
             }
             Assert.assertEquals(e.getMessage(), expectedErrorMessage);
         } catch (WSSecurityException e) {
             //Exception for policyEnforcer.registerSecurityEvent(securityEvent);
             if (ignoreEvent == null) {
-                Assert.fail("Unexpected WSSPolicyException");
+                Assert.fail("Unexpected WSSPolicyException", e);
             }
             Assert.assertTrue(e.getCause() instanceof WSSPolicyException);
             Assert.assertEquals(e.getCause().getMessage(), expectedErrorMessage);
