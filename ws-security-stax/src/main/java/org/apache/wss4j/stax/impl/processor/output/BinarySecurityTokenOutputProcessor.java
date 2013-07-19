@@ -69,7 +69,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE);
                 SecurityTokenProvider<OutboundSecurityToken> signatureTokenProvider = null;
                 GenericOutboundSecurityToken securityToken = null;
-                if (tokenId != null && !WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(getAction())) {
+                if (tokenId != null) {
                     signatureTokenProvider = 
                         outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
                     if (signatureTokenProvider != null) {
