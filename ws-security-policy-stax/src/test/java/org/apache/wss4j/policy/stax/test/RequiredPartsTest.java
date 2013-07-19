@@ -18,7 +18,7 @@
  */
 package org.apache.wss4j.policy.stax.test;
 
-import org.apache.wss4j.policy.WSSPolicyException;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.policy.stax.PolicyEnforcer;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
@@ -40,24 +40,25 @@ public class RequiredPartsTest extends AbstractPolicyTestBase {
                         "</sp:RequiredParts>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
-        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
-        operationSecurityEvent.setOperation(new QName("definitions"));
-        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
-
         RequiredPartSecurityEvent requiredPartSecurityEvent = new RequiredPartSecurityEvent();
-        requiredPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
-        policyEnforcer.registerSecurityEvent(requiredPartSecurityEvent);
         List<QName> headerPath = new ArrayList<QName>();
         headerPath.addAll(WSSConstants.SOAP_11_HEADER_PATH);
         headerPath.add(new QName("http://example.org", "a"));
         requiredPartSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(requiredPartSecurityEvent);
-        //additional encryptedParts are also allowed!
+
+        //additional requiredParts are also allowed!
+        requiredPartSecurityEvent = new RequiredPartSecurityEvent();
         headerPath = new ArrayList<QName>();
         headerPath.addAll(WSSConstants.SOAP_11_HEADER_PATH);
         headerPath.add(new QName("http://example.org", "b"));
         requiredPartSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(requiredPartSecurityEvent);
+
+        OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
+        operationSecurityEvent.setOperation(new QName("definitions"));
+        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
+
         policyEnforcer.doFinal();
     }
 
@@ -69,17 +70,20 @@ public class RequiredPartsTest extends AbstractPolicyTestBase {
                         "</sp:RequiredParts>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
+        RequiredPartSecurityEvent requiredPartSecurityEvent = new RequiredPartSecurityEvent();
+        List<QName> headerPath = new ArrayList<QName>();
+        headerPath.addAll(WSSConstants.SOAP_11_HEADER_PATH);
+        headerPath.add(new QName("http://example.org", "b"));
+        requiredPartSecurityEvent.setElementPath(headerPath);
+        policyEnforcer.registerSecurityEvent(requiredPartSecurityEvent);
+
         OperationSecurityEvent operationSecurityEvent = new OperationSecurityEvent();
         operationSecurityEvent.setOperation(new QName("definitions"));
-        policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
-        RequiredPartSecurityEvent requiredPartSecurityEvent = new RequiredPartSecurityEvent();
-        requiredPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
-        policyEnforcer.registerSecurityEvent(requiredPartSecurityEvent);
         try {
-            policyEnforcer.doFinal();
+            policyEnforcer.registerSecurityEvent(operationSecurityEvent);
             Assert.fail("Exception expected");
-        } catch (WSSPolicyException e) {
+        } catch (WSSecurityException e) {
             Assert.assertEquals(e.getMessage(), "Element {http://example.org}a must be present");
         }
     }

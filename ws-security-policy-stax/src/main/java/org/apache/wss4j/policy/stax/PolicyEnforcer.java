@@ -495,16 +495,24 @@ public class PolicyEnforcer implements SecurityEventListener {
                             TokenAssertionState tokenAssertionState = (TokenAssertionState) assertable;
                             AbstractToken abstractToken = (AbstractToken) tokenAssertionState.getAssertion();
                             AbstractSecurityAssertion assertion = abstractToken.getParentAssertion();
-                            if (assertion instanceof SupportingTokens) {
+                            //Other tokens may not be resolved yet fully therefore we skip it here
+                            if (assertion instanceof SupportingTokens ||
+                                    assertable instanceof HttpsTokenAssertionState ||
+                                    assertable instanceof RelTokenAssertionState ||
+                                    assertable instanceof SecurityContextTokenAssertionState ||
+                                    assertable instanceof SpnegoContextTokenAssertionState ||
+                                    assertable instanceof UsernameTokenAssertionState) {
                                 doAssert = true;
                             }
-                        } else if (assertable instanceof TokenProtectionAssertionState) {
-                            doAssert = true;
-                        } else if (assertable instanceof SignatureConfirmationAssertionState) {
+                        } else if (assertable instanceof TokenProtectionAssertionState ||
+                                assertable instanceof SignatureConfirmationAssertionState ||
+                                assertable instanceof IncludeTimeStampAssertionState ||
+                                assertable instanceof RequiredPartsAssertionState ||
+                                assertable instanceof SignatureProtectionAssertionState) {
                             doAssert = true;
                         }
 
-                        if (doAssert && !assertable.isAsserted()) {
+                        if (!assertable.isAsserted() && (doAssert || assertable.isHardFailure())) {
                             assertionMessage = assertable.getErrorMessage();
                             failedAssertionStateMap.add(map);
                             assertionStateMapIterator.remove();

@@ -538,7 +538,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.USERNAMETOKEN, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
+        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
         outSecurityProperties.setOutAction(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -552,17 +552,15 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
 
-/*
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
         HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "transmitter");
         httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
-*/
 
         List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
-        //securityEventList.add(httpsTokenSecurityEvent);
+        securityEventList.add(httpsTokenSecurityEvent);
 
         try {
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);

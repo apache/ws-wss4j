@@ -83,6 +83,7 @@ public class RequiredPartsAssertionState extends AssertionState implements Asser
 
     @Override
     public boolean isAsserted() {
+        clearErrorMessage();
         Iterator<Map.Entry<Header, Boolean>> elementMapIterator = headers.entrySet().iterator();
         while (elementMapIterator.hasNext()) {
             Map.Entry<Header, Boolean> next = elementMapIterator.next();

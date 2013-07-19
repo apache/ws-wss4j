@@ -42,6 +42,10 @@ public class AssertionState {
         return assertion;
     }
 
+    public boolean isHardFailure() {
+        return this.state == State.HARD_FAILURE;
+    }
+
     public synchronized void setAsserted(boolean asserted) {
         //don't allow to toggle back once the assertion is explicitly marked as failed;
         if (this.state == State.HARD_FAILURE) {
@@ -70,6 +74,10 @@ public class AssertionState {
         } else {
             return errorMessage.toString();
         }
+    }
+
+    protected void clearErrorMessage() {
+        this.errorMessage.delete(0, this.errorMessage.length());
     }
 
     public boolean isLogged() {

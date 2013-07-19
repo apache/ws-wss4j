@@ -29,6 +29,8 @@ public interface Assertable {
 
     boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException, XMLSecurityException;
 
+    boolean isHardFailure();
+
     boolean isAsserted();
 
     String getErrorMessage();

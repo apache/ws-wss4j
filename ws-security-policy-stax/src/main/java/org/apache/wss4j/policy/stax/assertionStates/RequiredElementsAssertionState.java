@@ -87,6 +87,7 @@ public class RequiredElementsAssertionState extends AssertionState implements As
 
     @Override
     public boolean isAsserted() {
+        clearErrorMessage();
         Iterator<Map.Entry<List<QName>, Boolean>> elementMapIterator = pathElements.entrySet().iterator();
         while (elementMapIterator.hasNext()) {
             Map.Entry<List<QName>, Boolean> next = elementMapIterator.next();
