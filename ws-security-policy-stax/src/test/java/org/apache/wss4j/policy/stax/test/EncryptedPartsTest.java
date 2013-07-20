@@ -153,7 +153,7 @@ public class EncryptedPartsTest extends AbstractPolicyTestBase {
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
             Assert.assertEquals(e.getCause().getMessage(),
-                    "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Body must be encrypted");
+                    "SOAP-Body must be encrypted");
             Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }

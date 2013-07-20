@@ -183,7 +183,11 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
                             = new EncryptedPartSecurityEvent(null, false, null);
                     encryptedPartSecurityEvent.setElementPath(elementPath);
                     policyEnforcer.registerSecurityEvent(encryptedPartSecurityEvent);
-                } else if (documentLevel == 3 && WSSUtils.isInSOAPBody(elementPath)) {
+                }
+                //the body element has documentLevel 2 but we have to use 3 because
+                //the body element itself is never encrypted but child elements are. So we
+                //test for the body child element.
+                else if (documentLevel == 3 && WSSUtils.isInSOAPBody(elementPath)) {
 
                     EncryptedPartSecurityEvent encryptedPartSecurityEvent
                             = new EncryptedPartSecurityEvent(null, false, null);

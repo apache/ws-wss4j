@@ -59,14 +59,14 @@ public class EncryptedPartsAssertionState extends AssertionState implements Asse
         EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
         EncryptedParts encryptedParts = (EncryptedParts) getAssertion();
 
-        if (encryptedParts.isBody()
-                && (WSSUtils.pathMatches(WSSConstants.SOAP_11_BODY_PATH, encryptedPartSecurityEvent.getElementPath(), true, false))) {
+        //we'll never get events with the exact body path but child elements so we can just check if we are in the body
+        if (encryptedParts.isBody() && WSSUtils.isInSOAPBody(encryptedPartSecurityEvent.getElementPath())) {
             if (encryptedPartSecurityEvent.isEncrypted()) {
                 setAsserted(true);
                 return true;
             } else {
                 setAsserted(false);
-                setErrorMessage("Element " + WSSUtils.pathAsString(encryptedPartSecurityEvent.getElementPath()) + " must be encrypted");
+                setErrorMessage("SOAP-Body must be encrypted");
                 return false;
             }
         }
