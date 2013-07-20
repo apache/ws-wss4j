@@ -339,15 +339,15 @@ public class PolicyEnforcer implements SecurityEventListener {
                 //9 WSS: SOAP Message Security Options [Signature Confirmation]
                 assertableList.add(new SignatureConfirmationAssertionState(wss11, true));
                 if (wss11.isRequireSignatureConfirmation()) {
-                    List<QName> timestampElementPath = new LinkedList<QName>();
-                    timestampElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
-                    timestampElementPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
+                    List<QName> signatureConfirmationElementPath = new LinkedList<QName>();
+                    signatureConfirmationElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+                    signatureConfirmationElementPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
                     RequiredElementsAssertionState requiredElementsAssertionState = new RequiredElementsAssertionState(wss11, false);
-                    requiredElementsAssertionState.addElement(timestampElementPath);
+                    requiredElementsAssertionState.addElement(signatureConfirmationElementPath);
                     assertableList.add(requiredElementsAssertionState);
 
                     SignedElementsAssertionState signedElementsAssertionState = new SignedElementsAssertionState(wss11, true);
-                    signedElementsAssertionState.addElement(timestampElementPath);
+                    signedElementsAssertionState.addElement(signatureConfirmationElementPath);
                     assertableList.add(signedElementsAssertionState);
                 }
             }
