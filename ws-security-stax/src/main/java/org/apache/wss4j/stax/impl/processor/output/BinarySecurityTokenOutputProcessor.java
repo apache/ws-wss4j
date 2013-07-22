@@ -41,6 +41,7 @@ import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.stream.XMLStreamException;
+
 import java.security.Key;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -56,8 +57,9 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
         try {
             final String bstId;
             final X509Certificate[] x509Certificates;
-            String reference = null;
+            GenericOutboundSecurityToken securityToken = null;
             Key key = null;
+            String reference = null;
             TokenType tokenType = WSSecurityTokenConstants.X509V3Token;
 
             XMLSecurityConstants.Action action = getAction();
@@ -68,7 +70,6 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                 String tokenId = 
                     outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE);
                 SecurityTokenProvider<OutboundSecurityToken> signatureTokenProvider = null;
-                GenericOutboundSecurityToken securityToken = null;
                 if (tokenId != null) {
                     signatureTokenProvider = 
                         outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
@@ -151,8 +152,20 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                 key = null;
             }
 
+            final String signatureAlgorithm = getSecurityProperties().getSignatureAlgorithm();
+            final GenericOutboundSecurityToken secToken = securityToken;
             final GenericOutboundSecurityToken binarySecurityToken =
-                    new GenericOutboundSecurityToken(bstId, tokenType, key, x509Certificates);
+                    new GenericOutboundSecurityToken(bstId, tokenType, key, x509Certificates) {
+              
+                @Override
+                public Key getSecretKey(String algorithmURI) throws XMLSecurityException {
+                    if (secToken == null || signatureAlgorithm.equals(algorithmURI)) {
+                        return super.getSecretKey(algorithmURI);
+                    }
+                
+                    return secToken.getSecretKey(algorithmURI);
+                }
+            };
             binarySecurityToken.setSha1Identifier(reference);
             final SecurityTokenProvider<OutboundSecurityToken> binarySecurityTokenProvider =
                     new SecurityTokenProvider<OutboundSecurityToken>() {
@@ -175,7 +188,9 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     ((WSSSecurityProperties) getSecurityProperties()).isIncludeSignatureToken();
                 if ((includeSignatureToken 
                     || WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(getSecurityProperties().getSignatureKeyIdentifier()))
-                    && !WSSecurityTokenConstants.KerberosToken.equals(tokenType)) {
+                    && !WSSecurityTokenConstants.KerberosToken.equals(tokenType)
+                    && !WSSecurityTokenConstants.Saml11Token.equals(tokenType)
+                    && !WSSecurityTokenConstants.Saml20Token.equals(tokenType)) {
                     FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = new FinalBinarySecurityTokenOutputProcessor(binarySecurityToken);
                     finalBinarySecurityTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
                     finalBinarySecurityTokenOutputProcessor.setAction(getAction());
