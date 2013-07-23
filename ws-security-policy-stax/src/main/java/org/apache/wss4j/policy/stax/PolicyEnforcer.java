@@ -243,7 +243,9 @@ public class PolicyEnforcer implements SecurityEventListener {
             // Don't return a Token that is not required
             SPConstants.IncludeTokenType includeTokenType = 
                 ((AbstractToken)abstractSecurityAssertion).getIncludeTokenType();
-            if (initiator && includeTokenType == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT) {
+            if (includeTokenType == IncludeTokenType.INCLUDE_TOKEN_NEVER) {
+                return assertableList;
+            } else if (initiator && includeTokenType == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT) {
                 return assertableList;
             } else if (initiator && includeTokenType == IncludeTokenType.INCLUDE_TOKEN_ONCE) {
                 return assertableList;
