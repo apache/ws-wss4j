@@ -22,6 +22,8 @@ package org.apache.wss4j.dom.message;
 import java.util.Collections;
 import java.util.List;
 
+import javax.xml.crypto.dom.DOMCryptoContext;
+
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -42,7 +44,8 @@ public class DOMCallbackLookup implements CallbackLookup {
     /**
      * Get the DOM element that corresponds to the given id and ValueType reference. The Id can 
      * be a wsu:Id or else an Id attribute, or a SAML Id when the ValueType refers to a SAML
-     * Assertion.
+     * Assertion. 
+     * 
      * @param id The id of the element to locate
      * @param valueType The ValueType attribute of the element to locate (can be null)
      * @param checkMultipleElements If true then go through the entire tree and return 
@@ -53,6 +56,26 @@ public class DOMCallbackLookup implements CallbackLookup {
     public Element getElement(
         String id, String valueType, boolean checkMultipleElements
     ) throws WSSecurityException {
+        return getAndRegisterElement(id, valueType, checkMultipleElements, null);
+    }
+    
+    /**
+     * Get the DOM element that corresponds to the given id and ValueType reference. The Id can 
+     * be a wsu:Id or else an Id attribute, or a SAML Id when the ValueType refers to a SAML
+     * Assertion. The implementation is also responsible to register the retrieved Element on the
+     * DOMCryptoContext argument, so that the XML Signature implementation can find the Element.
+     * 
+     * @param id The id of the element to locate
+     * @param valueType The ValueType attribute of the element to locate (can be null)
+     * @param checkMultipleElements If true then go through the entire tree and return 
+     *        null if there are multiple elements with the same Id
+     * @param context The DOMCryptoContext to store the Element in
+     * @return the located element
+     * @throws WSSecurityException
+     */
+    public Element getAndRegisterElement(
+        String id, String valueType, boolean checkMultipleElements, DOMCryptoContext context
+    ) throws WSSecurityException {
         //
         // Try the SOAP Body first
         //
@@ -60,13 +83,30 @@ public class DOMCallbackLookup implements CallbackLookup {
         if (bodyElement != null) {
             String cId = bodyElement.getAttributeNS(WSConstants.WSU_NS, "Id");
             if (cId.equals(id)) {
-                 return bodyElement;
+                if (context != null) {
+                    context.setIdAttributeNS(bodyElement, WSConstants.WSU_NS, "Id");
+                }
+                return bodyElement;
             }
         }
         // Otherwise do a general search
         Element foundElement = 
             WSSecurityUtil.findElementById(doc.getDocumentElement(), id, checkMultipleElements);
         if (foundElement != null) {
+            if (context != null) {
+                String idToMatch = id;
+                if (idToMatch.charAt(0) == '#') {
+                    idToMatch = idToMatch.substring(1);
+                }
+                if (foundElement.hasAttributeNS(WSConstants.WSU_NS, "Id")
+                    && idToMatch.equals(foundElement.getAttributeNS(WSConstants.WSU_NS, "Id"))) {
+                    context.setIdAttributeNS(foundElement, WSConstants.WSU_NS, "Id");
+                }
+                if (foundElement.hasAttributeNS(null, "Id")
+                    && idToMatch.equals(foundElement.getAttributeNS(null, "Id"))) {
+                    context.setIdAttributeNS(foundElement, null, "Id");
+                }
+            }
             return foundElement;
         }
         
@@ -78,10 +118,27 @@ public class DOMCallbackLookup implements CallbackLookup {
             || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)
             || "".equals(valueType)
             || valueType == null) {
-            return 
+            foundElement = 
                 WSSecurityUtil.findSAMLAssertionElementById(
                     doc.getDocumentElement(), id
                 );
+            if (foundElement != null) {
+                String idToMatch = id;
+                if (idToMatch.charAt(0) == '#') {
+                    idToMatch = idToMatch.substring(1);
+                }
+                if (context != null) {
+                    if (foundElement.hasAttributeNS(null, "ID")
+                        && idToMatch.equals(foundElement.getAttributeNS(null, "ID"))) {
+                        context.setIdAttributeNS(foundElement, null, "ID");
+                    }
+                    if (foundElement.hasAttributeNS(null, "AssertionID")
+                        && idToMatch.equals(foundElement.getAttributeNS(null, "AssertionID"))) {
+                        context.setIdAttributeNS(foundElement, null, "AssertionID");
+                    }
+                }
+                return foundElement;
+            }
         }
         
         return null;

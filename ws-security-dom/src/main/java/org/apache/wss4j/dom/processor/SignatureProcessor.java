@@ -471,12 +471,12 @@ public class SignatureProcessor implements Processor {
         while (referenceIterator.hasNext()) {
             Reference reference = (Reference)referenceIterator.next();
             String uri = reference.getURI();
-            Element element = callbackLookup.getElement(uri, null, true);
+            Element element = callbackLookup.getAndRegisterElement(uri, null, true, context);
             if (element == null) {
                 element = wsDocInfo.getTokenElement(uri);
-            }
-            if (element != null) {
-                WSSecurityUtil.storeElementInContext(context, uri, element);
+                if (element != null) {
+                    WSSecurityUtil.storeElementInContext(context, element);
+                }
             }
         }
     }

@@ -21,6 +21,8 @@ package org.apache.wss4j.dom.message;
 
 import java.util.List;
 
+import javax.xml.crypto.dom.DOMCryptoContext;
+
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.w3c.dom.Element;
 
@@ -28,11 +30,12 @@ import org.w3c.dom.Element;
  * This interface defines a pluggable way of locating Elements that are referenced via an Id.
  */
 public interface CallbackLookup {
-
+    
     /**
      * Get the DOM element that corresponds to the given id and ValueType reference. The Id can 
      * be a wsu:Id or else an Id attribute, or a SAML Id when the ValueType refers to a SAML
-     * Assertion.
+     * Assertion. 
+     * 
      * @param id The id of the element to locate
      * @param valueType The ValueType attribute of the element to locate (can be null)
      * @param checkMultipleElements If true then go through the entire tree and return 
@@ -40,8 +43,24 @@ public interface CallbackLookup {
      * @return the located element
      * @throws WSSecurityException
      */
-    Element getElement(
-        String id, String valueType, boolean checkMultipleElements
+    Element getElement(String id, String valueType, boolean checkMultipleElements) throws WSSecurityException;
+
+    /**
+     * Get the DOM element that corresponds to the given id and ValueType reference. The Id can 
+     * be a wsu:Id or else an Id attribute, or a SAML Id when the ValueType refers to a SAML
+     * Assertion. The implementation is also responsible to register the retrieved Element on the
+     * DOMCryptoContext argument, so that the XML Signature implementation can find the Element.
+     * 
+     * @param id The id of the element to locate
+     * @param valueType The ValueType attribute of the element to locate (can be null)
+     * @param checkMultipleElements If true then go through the entire tree and return 
+     *        null if there are multiple elements with the same Id
+     * @param context The DOMCryptoContext to store the Element in
+     * @return the located element
+     * @throws WSSecurityException
+     */
+    Element getAndRegisterElement(
+        String id, String valueType, boolean checkMultipleElements, DOMCryptoContext context
     ) throws WSSecurityException;
     
     /**

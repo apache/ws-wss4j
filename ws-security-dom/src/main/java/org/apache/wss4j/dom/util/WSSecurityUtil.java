@@ -1273,38 +1273,6 @@ public final class WSSecurityUtil {
     
     /**
      * Store the element argument in the DOM Crypto Context if it has one of the standard
-     * "Id" attributes that matches the given uri
-     */
-    public static void storeElementInContext(
-        DOMCryptoContext context, 
-        String uri,
-        Element element
-    ) {
-        String id = uri;
-        if (uri.charAt(0) == '#') {
-            id = id.substring(1);
-        }
-        
-        if (element.hasAttributeNS(WSConstants.WSU_NS, "Id")
-            && id.equals(element.getAttributeNS(WSConstants.WSU_NS, "Id"))) {
-            context.setIdAttributeNS(element, WSConstants.WSU_NS, "Id");
-        }
-        if (element.hasAttributeNS(null, "Id")
-            && id.equals(element.getAttributeNS(null, "Id"))) {
-    	    context.setIdAttributeNS(element, null, "Id");
-        }
-        if (element.hasAttributeNS(null, "ID")
-            && id.equals(element.getAttributeNS(null, "ID"))) {
-            context.setIdAttributeNS(element, null, "ID");
-        }
-        if (element.hasAttributeNS(null, "AssertionID")
-            && id.equals(element.getAttributeNS(null, "AssertionID"))) {
-            context.setIdAttributeNS(element, null, "AssertionID");
-        }
-    }
-    
-    /**
-     * Store the element argument in the DOM Crypto Context if it has one of the standard
      * "Id" attributes.
      */
     public static void storeElementInContext(
