@@ -674,7 +674,11 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                             // Don't compare to the original SAML Token credentials...
                             if (securityToken == httpsSecurityToken || securityToken == subjectSecurityToken
                                 || !(securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_MainSignature)
-                                    || securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_Signature))) {
+                                    || securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_Signature)
+                                    || securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_EndorsingEncryptedSupportingTokens)
+                                    || securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_EndorsingSupportingTokens)
+                                    || securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_SignedEndorsingEncryptedSupportingTokens)
+                                    || securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_SignedEndorsingSupportingTokens))) {
                                 continue;
                             }
                             X509Certificate[] x509Certificates = securityToken.getX509Certificates();
