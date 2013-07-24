@@ -1310,6 +1310,14 @@ public final class WSSecurityUtil {
             && id.equals(element.getAttributeNS(null, "Id"))) {
     	    context.setIdAttributeNS(element, null, "Id");
         }
+        if (element.hasAttributeNS(null, "id")
+            && id.equals(element.getAttributeNS(null, "id"))) {
+            context.setIdAttributeNS(element, null, "id");
+        }
+        if (element.hasAttributeNS(WSConstants.XML_NS, "id")
+            && id.equals(element.getAttributeNS(WSConstants.XML_NS, "id"))) {
+            context.setIdAttributeNS(element, WSConstants.XML_NS, "id");
+        }
         if (element.hasAttributeNS(null, "ID")
             && id.equals(element.getAttributeNS(null, "ID"))) {
             context.setIdAttributeNS(element, null, "ID");
