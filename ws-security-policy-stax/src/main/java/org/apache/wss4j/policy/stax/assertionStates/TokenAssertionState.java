@@ -114,6 +114,11 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
                     WSSecurityTokenConstants.TokenUsage_EndorsingEncryptedSupportingTokens.equals(tokenUsage) ||
                     WSSecurityTokenConstants.TokenUsage_SignedEndorsingEncryptedSupportingTokens.equals(tokenUsage)
                     ) {
+
+                if (parentAssertion instanceof TransportToken) {
+                    continue loop;
+                }
+            	
                 if (!(parentAssertion instanceof SupportingTokens)) {
                     ignoreToken++;
                     continue loop;

@@ -391,6 +391,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
         //done signature; now test sig-verification:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.setValidateSamlSubjectConfirmation(false);
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
@@ -475,6 +476,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
          //done signature; now test sig-verification:
          {
              WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+             securityProperties.setValidateSamlSubjectConfirmation(false);
              securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
              securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
              CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();

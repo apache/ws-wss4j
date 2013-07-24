@@ -555,7 +555,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
     /**
      * Processor to check the holder-of-key or sender-vouches requirements against the received assertion
-     * which can not be done until the whole soap-header is processed and we now that the whole soap-body
+     * which can not be done until the whole soap-header is processed and we know that the whole soap-body
      * is signed.
      */
     class SAMLTokenVerifierInputProcessor extends AbstractInputProcessor implements SecurityEventListener {
@@ -671,7 +671,10 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                         for (int j = 0; j < securityTokenProviders.size(); j++) {
                             SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider = securityTokenProviders.get(j);
                             InboundSecurityToken securityToken = securityTokenProvider.getSecurityToken();
-                            if (securityToken == httpsSecurityToken) {
+                            // Don't compare to the original SAML Token credentials...
+                            if (securityToken == httpsSecurityToken || securityToken == subjectSecurityToken
+                                || !(securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_MainSignature)
+                                    || securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_Signature))) {
                                 continue;
                             }
                             X509Certificate[] x509Certificates = securityToken.getX509Certificates();
