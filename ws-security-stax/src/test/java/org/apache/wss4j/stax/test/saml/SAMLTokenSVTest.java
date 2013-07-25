@@ -363,7 +363,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
 
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(
                     xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())),
-                    requestSecurityEvents, null);
+                    requestSecurityEvents);
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 

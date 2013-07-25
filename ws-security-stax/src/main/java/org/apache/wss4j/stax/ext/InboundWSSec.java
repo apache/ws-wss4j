@@ -94,9 +94,32 @@ public class InboundWSSec {
      */
     public XMLStreamReader processInMessage(
             XMLStreamReader xmlStreamReader) throws XMLStreamException, WSSecurityException {
-        return this.processInMessage(xmlStreamReader, null, null);
+        return this.processInMessage(xmlStreamReader, null, (SecurityEventListener)null);
     }
 
+    /**
+     * Warning:
+     * configure your xmlStreamReader correctly. Otherwise you can create a security hole.
+     * At minimum configure the following properties:
+     * xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+     * xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+     * xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, false);
+     * xmlInputFactory.setProperty(WstxInputProperties.P_MIN_TEXT_SEGMENT, new Integer(8192));
+     * <p/>
+     * This method is the entry point for the incoming security-engine.
+     * Hand over the original XMLStreamReader and use the returned one for further processing
+     *
+     * @param xmlStreamReader       The original XMLStreamReader
+     * @return A new XMLStreamReader which does transparently the security processing.
+     * @throws XMLStreamException  thrown when a streaming error occurs
+     * @throws XMLSecurityException 
+     */
+    public XMLStreamReader processInMessage(
+            XMLStreamReader xmlStreamReader, List<SecurityEvent> requestSecurityEvents
+    ) throws XMLStreamException, WSSecurityException {
+        return this.processInMessage(xmlStreamReader, requestSecurityEvents, (SecurityEventListener)null);
+    }
+    
     /**
      * Warning:
      * configure your xmlStreamReader correctly. Otherwise you can create a security hole.
@@ -118,6 +141,30 @@ public class InboundWSSec {
     public XMLStreamReader processInMessage(
             XMLStreamReader xmlStreamReader, List<SecurityEvent> requestSecurityEvents,
             SecurityEventListener securityEventListener) throws XMLStreamException, WSSecurityException {
+        return this.processInMessage(xmlStreamReader, requestSecurityEvents, 
+                                     Collections.singletonList(securityEventListener));
+    }
+    /**
+     * Warning:
+     * configure your xmlStreamReader correctly. Otherwise you can create a security hole.
+     * At minimum configure the following properties:
+     * xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+     * xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+     * xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, false);
+     * xmlInputFactory.setProperty(WstxInputProperties.P_MIN_TEXT_SEGMENT, new Integer(8192));
+     * <p/>
+     * This method is the entry point for the incoming security-engine.
+     * Hand over the original XMLStreamReader and use the returned one for further processing
+     *
+     * @param xmlStreamReader       The original XMLStreamReader
+     * @param securityEventListeners A list of SecurityEventListeners to receive security-relevant events.
+     * @return A new XMLStreamReader which does transparently the security processing.
+     * @throws XMLStreamException  thrown when a streaming error occurs
+     * @throws XMLSecurityException 
+     */
+    public XMLStreamReader processInMessage(
+            XMLStreamReader xmlStreamReader, List<SecurityEvent> requestSecurityEvents,
+            List<SecurityEventListener> securityEventListeners) throws XMLStreamException, WSSecurityException {
 
         if (requestSecurityEvents == null) {
             requestSecurityEvents = Collections.emptyList();
@@ -125,7 +172,11 @@ public class InboundWSSec {
 
         final InboundWSSecurityContextImpl securityContextImpl = new InboundWSSecurityContextImpl();
         securityContextImpl.putList(SecurityEvent.class, requestSecurityEvents);
-        securityContextImpl.addSecurityEventListener(securityEventListener);
+        if (securityEventListeners != null) {
+            for (SecurityEventListener securityEventListener : securityEventListeners) {
+                securityContextImpl.addSecurityEventListener(securityEventListener);
+            }
+        }
         securityContextImpl.ignoredBSPRules(this.securityProperties.getIgnoredBSPRules());
         securityContextImpl.setDisableBSPEnforcement(this.securityProperties.isDisableBSPEnforcement());
         securityContextImpl.setAllowRSA15KeyTransportAlgorithm(this.securityProperties.isAllowRSA15KeyTransportAlgorithm());
