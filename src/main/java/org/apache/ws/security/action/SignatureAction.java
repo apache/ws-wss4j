@@ -68,6 +68,7 @@ public class SignatureAction implements Action {
             wsSign.prepare(doc, reqData.getSigCrypto(), reqData.getSecHeader());
 
             Element siblingElementToPrepend = null;
+            boolean signBST = false;
             for (WSEncryptionPart part : reqData.getSignatureParts()) {
                 if ("STRTransform".equals(part.getName()) && part.getId() == null) {
                     part.setId(wsSign.getSecurityTokenReferenceURI());
@@ -91,19 +92,28 @@ public class SignatureAction implements Action {
                             siblingElementToPrepend = (Element)lastChild;
                         }
                     }
+                } else if (WSConstants.WSSE_NS.equals(part.getNamespace())
+                    && WSConstants.BINARY_TOKEN_LN.equals(part.getName())) {
+                    signBST = true;
                 }
             }
 
-            List<javax.xml.crypto.dsig.Reference> referenceList = 
+            if (signBST) {
+                wsSign.prependBSTElementToHeader(reqData.getSecHeader());
+            }
+            List<javax.xml.crypto.dsig.Reference> referenceList =
                 wsSign.addReferencesToSign(reqData.getSignatureParts(), reqData.getSecHeader());
 
-            if (reqData.isAppendSignatureAfterTimestamp() && siblingElementToPrepend == null) {
+            if (signBST || 
+                (reqData.isAppendSignatureAfterTimestamp() && siblingElementToPrepend == null)) {
                 wsSign.computeSignature(referenceList, false, null);
             } else {
                 wsSign.computeSignature(referenceList, true, siblingElementToPrepend);
             }
 
-            wsSign.prependBSTElementToHeader(reqData.getSecHeader());
+            if (!signBST) {
+                wsSign.prependBSTElementToHeader(reqData.getSecHeader());
+            }
             reqData.getSignatureValues().add(wsSign.getSignatureValue());
         } catch (WSSecurityException e) {
             throw new WSSecurityException("Error during Signature: ", e);
