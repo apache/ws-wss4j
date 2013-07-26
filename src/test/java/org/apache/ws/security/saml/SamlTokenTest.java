@@ -39,7 +39,6 @@ import org.apache.ws.security.saml.ext.SAMLParms;
 import org.apache.ws.security.saml.ext.bean.SubjectConfirmationDataBean;
 import org.apache.ws.security.saml.ext.builder.SAML1Constants;
 import org.apache.ws.security.util.WSSecurityUtil;
-
 import org.joda.time.DateTime;
 import org.opensaml.Configuration;
 import org.opensaml.common.SAMLObjectBuilder;
@@ -52,6 +51,7 @@ import org.w3c.dom.Document;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Test-case for sending and processing an unsigned (sender vouches) SAML Assertion.
@@ -385,6 +385,58 @@ public class SamlTokenTest extends org.junit.Assert {
         actions.add(Integer.valueOf(action));
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
+        handler.send(
+            action, 
+            doc, 
+            reqData, 
+            actions,
+            true
+        );
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Unsigned SAML 1.1 authentication assertion via an Action:");
+            LOG.debug(outputString);
+        }
+        assertFalse (outputString.contains("Signature"));
+        
+        List<WSSecurityEngineResult> results = verify(doc);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        AssertionWrapper receivedAssertion = 
+            (AssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null);
+        assertTrue(!receivedAssertion.isSigned());
+    }
+    
+    /**
+     * This test checks that an unsigned SAML1 sender-vouches authentication assertion
+     * can be created by the WSHandler implementation 
+     */
+    @org.junit.Test
+    public void testSaml1ActionRef() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final int action = WSConstants.ST_UNSIGNED;
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        
+        Properties props = new Properties();
+        props.put("org.apache.ws.security.saml.issuerClass", 
+                  "org.apache.ws.security.saml.SAMLIssuerImpl");
+        props.put("org.apache.ws.security.saml.issuer",
+                  "www.example.com");
+        props.put("org.apache.ws.security.saml.callback",
+                  "org.apache.ws.security.common.SAML1CallbackHandler");
+        
+        config.put(WSHandlerConstants.SAML_PROP_REF_ID, "RefId-" + props.hashCode());
+        reqData.setMsgContext(config);
+        
+        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
+        actions.add(Integer.valueOf(action));
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        handler.setProperty(config, "RefId-" + props.hashCode(), props);
         handler.send(
             action, 
             doc, 

@@ -19,6 +19,8 @@
 
 package org.apache.ws.security.action;
 
+import java.util.Properties;
+
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.ws.security.WSPasswordCallback;
@@ -31,7 +33,6 @@ import org.apache.ws.security.saml.SAMLIssuer;
 import org.apache.ws.security.saml.SAMLIssuerFactory;
 import org.apache.ws.security.saml.WSSecSignatureSAML;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
-
 import org.w3c.dom.Document;
 
 public class SAMLTokenSignedAction implements Action {
@@ -110,9 +111,26 @@ public class SAMLTokenSignedAction implements Action {
         WSHandler handler, 
         RequestData reqData
     ) throws WSSecurityException {
-        String samlPropFile = 
-            handler.getString(WSHandlerConstants.SAML_PROP_FILE, reqData.getMsgContext());
-        SAMLIssuer samlIssuer = SAMLIssuerFactory.getInstance(samlPropFile);
+        SAMLIssuer samlIssuer = null;
+        // Try the Property Ref Id first
+        String refId = 
+            handler.getString(WSHandlerConstants.SAML_PROP_REF_ID, reqData.getMsgContext());
+        if (refId != null) {
+            Object obj = handler.getProperty(reqData.getMsgContext(), refId);
+            if (obj instanceof Properties) {
+                samlIssuer = SAMLIssuerFactory.getInstance((Properties)obj);
+            } else if (obj instanceof SAMLIssuer) {
+                samlIssuer = (SAMLIssuer)obj;
+            }
+        }
+        
+        // Now try the properties file
+        if (samlIssuer == null) {
+            String samlPropFile = 
+                handler.getString(WSHandlerConstants.SAML_PROP_FILE, reqData.getMsgContext());
+            samlIssuer = SAMLIssuerFactory.getInstance(samlPropFile);
+        }
+        
         CallbackHandler callbackHandler = 
             handler.getCallbackHandler(
                 WSHandlerConstants.SAML_CALLBACK_CLASS,

@@ -81,24 +81,7 @@ public abstract class SAMLIssuerFactory {
         return loadClass(samlClass, properties);
     }
 
-    /**
-     * getInstance
-     * <p/>
-     * Returns an instance of SAMLIssuer. This method uses the specified filename
-     * to load a property file. This file shall use the property
-     * <code>org.apache.ws.security.saml.issuerClass</code>
-     * to define the classname of the SAMLIssuer implementation. The file
-     * may contain other property definitions as well. These properties are
-     * handed over to the SAMLIssuer implementation. The specified file
-     * is loaded with the <code>Loader.getResource()</code> method.
-     * <p/>
-     *
-     * @param propFilename The name of the property file to load
-     * @return The SAMLIssuer implementation that was defined
-     * @throws WSSecurityException if there is an error in loading the crypto properties
-     */
-    public static SAMLIssuer getInstance(String propFilename) throws WSSecurityException {
-        Properties properties = getProperties(propFilename);
+    public static SAMLIssuer getInstance(Properties properties) throws WSSecurityException {
         String samlClassName = 
             properties.getProperty("org.apache.ws.security.saml.issuerClass");
         Class<? extends SAMLIssuer> samlIssuerClass = null;
@@ -118,6 +101,26 @@ public abstract class SAMLIssuerFactory {
         }
 
         return loadClass(samlIssuerClass, properties);
+    }
+    
+    /**
+     * getInstance
+     * <p/>
+     * Returns an instance of SAMLIssuer. This method uses the specified filename
+     * to load a property file. This file shall use the property
+     * <code>org.apache.ws.security.saml.issuerClass</code>
+     * to define the classname of the SAMLIssuer implementation. The file
+     * may contain other property definitions as well. These properties are
+     * handed over to the SAMLIssuer implementation. The specified file
+     * is loaded with the <code>Loader.getResource()</code> method.
+     * <p/>
+     *
+     * @param propFilename The name of the property file to load
+     * @return The SAMLIssuer implementation that was defined
+     * @throws WSSecurityException if there is an error in loading the crypto properties
+     */
+    public static SAMLIssuer getInstance(String propFilename) throws WSSecurityException {
+        return getInstance(getProperties(propFilename));
     }
 
     private static SAMLIssuer loadClass(

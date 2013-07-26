@@ -330,6 +330,15 @@ public final class WSHandlerConstants {
      */
     public static final String SAML_PROP_FILE = "samlPropFile";
     
+    /**
+     * The key that holds a reference to the object holding complete information about 
+     * the SAML Issuer configuration. This object can either be a SAMLIssuer instance or a
+     * <code>java.util.Properties</code> Object.
+     * 
+     * Refer to documentation of {@link #SAML_PROP_FILE}.
+     */
+    public static final String SAML_PROP_REF_ID = "samlPropRefId";
+    
     //
     // Boolean configuration tags, e.g. the value should be "true" or "false".
     //
