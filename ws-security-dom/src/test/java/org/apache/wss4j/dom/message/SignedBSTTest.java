@@ -28,8 +28,11 @@ import org.apache.wss4j.dom.WSEncryptionPart;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -119,6 +122,45 @@ public class SignedBSTTest extends org.junit.Assert {
         verify(doc);
     }
     
+    @org.junit.Test
+    public void testSignedBSTAction() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final int action = WSConstants.SIGN;
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        reqData.setUsername("wss40");
+        
+        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
+        config.put("password", "security");
+        config.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
+        config.put(
+            WSHandlerConstants.SIGNATURE_PARTS, 
+            "{}{" + WSConstants.WSSE_NS + "}BinarySecurityToken"
+        );
+        reqData.setMsgContext(config);
+        
+        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
+        actions.add(WSConstants.SIGN);
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        handler.send(
+            action, 
+            doc, 
+            reqData, 
+            actions,
+            true
+        );
+        String outputString = 
+            XMLUtils.PrettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message:");
+            LOG.debug(outputString);
+        }
+        
+        List<WSSecurityEngineResult> results = verify(doc);
+        assertTrue(handler.checkResults(results, actions));
+    }
 
     /**
      * Verifies the soap envelope
