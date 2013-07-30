@@ -217,8 +217,8 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
             boolean signsTimestamp = signsElement(tokenSecurityEvent, timestampElementPath, securityEventDeque);
 
             List<QName> usernameTokenElementPath = new ArrayList<QName>(4);
-            timestampElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
-            timestampElementPath.add(WSSConstants.TAG_wsse_UsernameToken);
+            usernameTokenElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+            usernameTokenElementPath.add(WSSConstants.TAG_wsse_UsernameToken);
             boolean encryptsUsernameToken = encryptsElement(tokenSecurityEvent, usernameTokenElementPath, securityEventDeque);
 
             boolean transportSecurityActive = Boolean.TRUE == get(WSSConstants.TRANSPORT_SECURITY_ACTIVE);
@@ -291,14 +291,14 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
             TokenSecurityEvent<? extends InboundSecurityToken> tokenSecurityEvent =
                     getTokenSecurityEvent(messageSignatureToken, tokenSecurityEvents);
             if (tokenSecurityEvent != null) {
-                supportingTokens.remove(tokenSecurityEvent);
-                signedSupportingTokens.remove(tokenSecurityEvent);
-                endorsingSupportingTokens.remove(tokenSecurityEvent);
-                signedEndorsingSupportingTokens.remove(tokenSecurityEvent);
-                signedEncryptedSupportingTokens.remove(tokenSecurityEvent);
-                encryptedSupportingTokens.remove(tokenSecurityEvent);
-                endorsingEncryptedSupportingTokens.remove(tokenSecurityEvent);
-                signedEndorsingEncryptedSupportingTokens.remove(tokenSecurityEvent);
+                removeTokenSecurityEvent(tokenSecurityEvent, supportingTokens);
+                removeTokenSecurityEvent(tokenSecurityEvent, signedSupportingTokens);
+                removeTokenSecurityEvent(tokenSecurityEvent, endorsingSupportingTokens);
+                removeTokenSecurityEvent(tokenSecurityEvent, signedEndorsingSupportingTokens);
+                removeTokenSecurityEvent(tokenSecurityEvent, signedEncryptedSupportingTokens);
+                removeTokenSecurityEvent(tokenSecurityEvent, encryptedSupportingTokens);
+                removeTokenSecurityEvent(tokenSecurityEvent, endorsingEncryptedSupportingTokens);
+                removeTokenSecurityEvent(tokenSecurityEvent, signedEndorsingEncryptedSupportingTokens);
                 messageSignatureTokens = addTokenSecurityEvent(tokenSecurityEvent, messageSignatureTokens);
             }
         }
@@ -339,6 +339,17 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
         setTokenUsage(encryptedSupportingTokens, WSSecurityTokenConstants.TokenUsage_EncryptedSupportingTokens);
         setTokenUsage(endorsingEncryptedSupportingTokens, WSSecurityTokenConstants.TokenUsage_EndorsingEncryptedSupportingTokens);
         setTokenUsage(signedEndorsingEncryptedSupportingTokens, WSSecurityTokenConstants.TokenUsage_SignedEndorsingEncryptedSupportingTokens);
+    }
+
+    private void removeTokenSecurityEvent(TokenSecurityEvent<? extends InboundSecurityToken> tokenSecurityEvent,
+                                          List<TokenSecurityEvent<? extends InboundSecurityToken>> tokenSecurityEventList) {
+        for (int i = 0; i < tokenSecurityEventList.size(); i++) {
+            TokenSecurityEvent<? extends InboundSecurityToken> securityEvent = tokenSecurityEventList.get(i);
+            if (securityEvent.getSecurityToken().getId().equals(tokenSecurityEvent.getSecurityToken().getId())) {
+                tokenSecurityEventList.remove(securityEvent);
+                return;
+            }
+        }
     }
 
     private List<TokenSecurityEvent<? extends InboundSecurityToken>> addTokenSecurityEvent(
