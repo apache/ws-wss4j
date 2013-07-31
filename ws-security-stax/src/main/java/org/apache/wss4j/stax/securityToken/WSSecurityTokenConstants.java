@@ -53,5 +53,4 @@ public class WSSecurityTokenConstants extends SecurityTokenConstants {
     public static final TokenType KerberosToken = new TokenType("KerberosToken");
     public static final TokenType SpnegoContextToken = new TokenType("SpnegoContextToken");
     public static final TokenType RelToken = new TokenType("RelToken");
-    public static final TokenType DerivedKeyToken = new TokenType("DerivedKeyToken");
 }
