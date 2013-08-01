@@ -18,13 +18,14 @@
  */
 package org.apache.wss4j.policy.model;
 
+import java.util.Iterator;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 import org.apache.wss4j.policy.SPConstants;
-
-import javax.xml.namespace.QName;
-import java.util.Iterator;
-import java.util.List;
 
 public class Trust13 extends Trust10 {
 
@@ -45,7 +46,7 @@ public class Trust13 extends Trust10 {
     }
 
     @Override
-    protected AbstractSecurityAssertion cloneAssertion(org.apache.neethi.Policy nestedPolicy) {
+    protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
         return new Trust13(getVersion(), nestedPolicy);
     }
 

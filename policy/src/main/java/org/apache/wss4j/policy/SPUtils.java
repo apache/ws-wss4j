@@ -18,11 +18,17 @@
  */
 package org.apache.wss4j.policy;
 
-import org.w3c.dom.*;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 
 public class SPUtils {
 
@@ -69,12 +75,20 @@ public class SPUtils {
     public static Element getFirstChildElement(Node parent, QName childNodeName) {
         Node node = parent.getFirstChild();
         while (node != null && (Node.ELEMENT_NODE != node.getNodeType()
-                || !(((node.getNamespaceURI() == null && childNodeName.getNamespaceURI() == null)
-                || (node.getNamespaceURI() != null && node.getNamespaceURI().equals(childNodeName.getNamespaceURI())))
-                && node.getLocalName().equals(childNodeName.getLocalPart())))) {
+                || !isNodeEqualToQName(node, childNodeName))) {
             node = node.getNextSibling();
         }
         return (Element) node;
+    }
+    
+    private static boolean isNodeEqualToQName(Node node, QName nodeName) {
+        if ((node.getNamespaceURI() == null && nodeName.getNamespaceURI() == null
+            || node.getNamespaceURI() != null 
+                && node.getNamespaceURI().equals(nodeName.getNamespaceURI()))
+            && node.getLocalName().equals(nodeName.getLocalPart())) {
+            return true;
+        }
+        return false;
     }
 
     public static String getFirstChildElementText(Node parent, QName childNodeName) {
@@ -161,7 +175,7 @@ public class SPUtils {
 
     public static void serialize(Node node, XMLStreamWriter xmlStreamWriter) throws XMLStreamException {
         if (node.getNodeType() == Node.DOCUMENT_NODE) {
-            Document document = (org.w3c.dom.Document) node;
+            Document document = (Document) node;
             serialize(document.getDocumentElement(), xmlStreamWriter);
         }
         if (node.getNodeType() == Node.ELEMENT_NODE) {
