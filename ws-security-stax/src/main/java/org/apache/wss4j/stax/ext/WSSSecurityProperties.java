@@ -24,12 +24,15 @@ import java.security.cert.CertStore;
 import java.security.cert.CertificateFactory;
 import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.X509CRL;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
@@ -105,6 +108,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private boolean enableTimestampReplayCache = true;
     private boolean enableNonceReplayCache = true;
     private boolean validateSamlSubjectConfirmation = true;
+    private Collection<Pattern> subjectDNPatterns = new ArrayList<Pattern>();
 
     public WSSSecurityProperties() {
         super();
@@ -156,6 +160,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.addUsernameTokenCreated = wssSecurityProperties.addUsernameTokenCreated;
         this.validateSamlSubjectConfirmation = wssSecurityProperties.validateSamlSubjectConfirmation;
         this.encryptSymmetricEncrytionKey = wssSecurityProperties.encryptSymmetricEncrytionKey;
+        this.subjectDNPatterns = wssSecurityProperties.subjectDNPatterns;
     }
 
     /**
@@ -838,6 +843,22 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public void setEncryptSymmetricEncrytionKey(boolean encryptSymmetricEncrytionKey) {
         this.encryptSymmetricEncrytionKey = encryptSymmetricEncrytionKey;
+    }
+    
+    /**
+     * Set the Signature Subject Cert Constraints
+     */
+    public void setSubjectCertConstraints(Collection<Pattern> subjectCertConstraints) {
+        if (subjectCertConstraints != null) {
+            subjectDNPatterns.addAll(subjectCertConstraints);
+        }
+    }
+    
+    /**
+     * Get the Signature Subject Cert Constraints
+     */
+    public Collection<Pattern> getSubjectCertConstraints() {
+        return subjectDNPatterns;
     }
     
 }

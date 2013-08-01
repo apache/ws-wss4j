@@ -19,9 +19,12 @@
 package org.apache.wss4j.stax;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
@@ -522,7 +525,24 @@ public final class ConfigurationConverter {
         String encMGFAlgo = getString(ConfigurationConstants.ENC_MGF_ALGO, config);
         properties.setEncryptionKeyTransportMGFAlgorithm(encMGFAlgo);
         
-        // TODO SIG_SUBJECT_CERT_CONSTRAINTS
+        // Subject Cert Constraints
+        String certConstraints = 
+            getString(ConfigurationConstants.SIG_SUBJECT_CERT_CONSTRAINTS, config);
+        if (certConstraints != null) {
+            String[] certConstraintsList = certConstraints.split(",");
+            if (certConstraintsList != null) {
+                Collection<Pattern> subjectCertConstraints = 
+                    new ArrayList<Pattern>(certConstraintsList.length);
+                for (String certConstraint : certConstraintsList) {
+                    try {
+                        subjectCertConstraints.add(Pattern.compile(certConstraint.trim()));
+                    } catch (PatternSyntaxException ex) {
+                        log.error(ex.getMessage(), ex);
+                    }
+                }
+                properties.setSubjectCertConstraints(subjectCertConstraints);
+            }
+        }
         
         properties.setUtTTL(decodeTimeToLive(config, false));
         properties.setUtFutureTTL(decodeFutureTimeToLive(config, false));

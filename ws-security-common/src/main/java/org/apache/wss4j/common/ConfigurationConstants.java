@@ -775,8 +775,7 @@ public final class ConfigurationConstants {
      * This configuration tag is a comma separated String of regular expressions which
      * will be applied to the subject DN of the certificate used for signature
      * validation, after trust verification of the certificate chain associated with the 
-     * certificate. These constraints are not used when the certificate is contained in
-     * the keystore (direct trust).
+     * certificate.
      */
     public static final String SIG_SUBJECT_CERT_CONSTRAINTS = "sigSubjectCertConstraints";
     

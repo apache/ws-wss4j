@@ -38,10 +38,16 @@ import java.security.Principal;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class X509SecurityTokenImpl
         extends org.apache.xml.security.stax.impl.securityToken.X509SecurityToken implements X509SecurityToken {
 
+    private static final transient org.slf4j.Logger LOG =
+        org.slf4j.LoggerFactory.getLogger(X509SecurityTokenImpl.class);
+    
     private CallbackHandler callbackHandler;
     private Crypto crypto;
     private WSSSecurityProperties securityProperties;
@@ -115,6 +121,11 @@ public abstract class X509SecurityTokenImpl
                     enableRevocation = securityProperties.isEnableRevocation();
                 }
                 getCrypto().verifyTrust(x509Certificates, enableRevocation);
+                
+                Collection<Pattern> subjectCertConstraints = securityProperties.getSubjectCertConstraints();
+                if (!matches(x509Certificates[0], subjectCertConstraints)) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+                }
             }
         } catch (CertificateExpiredException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
@@ -122,7 +133,43 @@ public abstract class X509SecurityTokenImpl
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
         }
     }
-
+    
+    /**
+     * @return      true if the certificate's SubjectDN matches the constraints defined in the
+     *              subject DNConstraints; false, otherwise. The certificate subject DN only
+     *              has to match ONE of the subject cert constraints (not all).
+     */
+    protected boolean
+    matches(
+        final java.security.cert.X509Certificate cert,
+        final Collection<Pattern> subjectDNPatterns
+    ) {
+        if (subjectDNPatterns.isEmpty()) {
+            LOG.warn("No Subject DN Certificate Constraints were defined. This could be a security issue");
+        }
+        if (!subjectDNPatterns.isEmpty()) {
+            if (cert == null) {
+                LOG.debug("The certificate is null so no constraints matching was possible");
+                return false;
+            }
+            String subjectName = cert.getSubjectX500Principal().getName();
+            boolean subjectMatch = false;
+            for (Pattern subjectDNPattern : subjectDNPatterns) {
+                final Matcher matcher = subjectDNPattern.matcher(subjectName);
+                if (matcher.matches()) {
+                    LOG.debug("Subject DN " + subjectName + " matches with pattern " + subjectDNPattern);
+                    subjectMatch = true;
+                    break;
+                }
+            }
+            if (!subjectMatch) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
     protected abstract String getAlias() throws XMLSecurityException;
 
     @Override
