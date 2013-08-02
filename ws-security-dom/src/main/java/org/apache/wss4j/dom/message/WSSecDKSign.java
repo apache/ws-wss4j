@@ -312,7 +312,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
      * @see org.apache.wss4j.dom.message.WSSecDerivedKeyBase#getDerivedKeyLength()
      */
     protected int getDerivedKeyLength() throws WSSecurityException {
-        return (derivedKeyLength > 0) ? derivedKeyLength : 
+        return derivedKeyLength > 0 ? derivedKeyLength : 
             WSSecurityUtil.getKeyLength(sigAlgo);
     }
     

@@ -399,7 +399,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 encDataRef.add("#" + id);
             }
                 
-            if (part != (references.size() - 1)) {
+            if (part != references.size() - 1) {
                 try {
                     keyInfo = new KeyInfo((Element) keyInfo.getElement().cloneNode(true), null);
                 } catch (Exception ex) {

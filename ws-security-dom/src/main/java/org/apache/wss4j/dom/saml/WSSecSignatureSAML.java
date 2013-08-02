@@ -512,7 +512,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                     getWsConfig().getIdAllocator().createId("SIG-", null),
                     null);
             
-            org.w3c.dom.Element securityHeaderElement = secHeader.getSecurityHeader();
+            Element securityHeaderElement = secHeader.getSecurityHeader();
             //
             // Prepend the signature element to the security header (after the assertion)
             //

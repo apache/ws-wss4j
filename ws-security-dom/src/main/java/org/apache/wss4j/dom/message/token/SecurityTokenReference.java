@@ -401,7 +401,7 @@ public class SecurityTokenReference {
         }
         try {
             byte[] encodedBytes = WSSecurityUtil.generateDigest(encodedCert);
-            org.w3c.dom.Text text = doc.createTextNode(Base64.encode(encodedBytes));
+            Text text = doc.createTextNode(Base64.encode(encodedBytes));
             createKeyIdentifier(doc, THUMB_URI, text, true);
         } catch (WSSecurityException e1) {
             throw new WSSecurityException(
@@ -412,7 +412,7 @@ public class SecurityTokenReference {
     
     public void setKeyIdentifierEncKeySHA1(String value) throws WSSecurityException {
         Document doc = element.getOwnerDocument();
-        org.w3c.dom.Text text = doc.createTextNode(value);
+        Text text = doc.createTextNode(value);
         createKeyIdentifier(doc, ENC_KEY_SHA1_URI, text, true);
     }
     
@@ -730,9 +730,9 @@ public class SecurityTokenReference {
             if (Node.ELEMENT_NODE == node.getNodeType()) {
                 String ns = node.getNamespaceURI();
                 String name = node.getLocalName();
-                if ((((namespace != null) && namespace.equals(ns))
-                    || ((namespace == null) && (ns == null)))
-                    && (localname.equals(name))
+                if ((namespace != null && namespace.equals(ns)
+                    || namespace == null && ns == null)
+                    && localname.equals(name)
                 ) {
                     result++;
                 }

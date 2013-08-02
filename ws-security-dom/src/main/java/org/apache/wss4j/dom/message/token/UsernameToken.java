@@ -642,7 +642,7 @@ public class UsernameToken {
      */
     private Text getFirstNode(Element e) {
         Node node = e.getFirstChild();
-        return (node != null && Node.TEXT_NODE == node.getNodeType()) ? (Text) node : null;
+        return node != null && Node.TEXT_NODE == node.getNodeType() ? (Text) node : null;
     }
 
     /**

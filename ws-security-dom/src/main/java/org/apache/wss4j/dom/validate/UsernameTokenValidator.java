@@ -97,7 +97,7 @@ public class UsernameTokenValidator implements Validator {
         if (usernameToken.isHashed()) {
             verifyDigestPassword(usernameToken, data);
         } else if (WSConstants.PASSWORD_TEXT.equals(pwType)
-            || (password != null && (pwType == null || "".equals(pwType.trim())))) {
+            || password != null && (pwType == null || "".equals(pwType.trim()))) {
             verifyPlaintextPassword(usernameToken, data);
         } else if (password != null) {
             if (!handleCustomPasswordTypes) {

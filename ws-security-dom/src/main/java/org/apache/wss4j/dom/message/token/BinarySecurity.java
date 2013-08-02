@@ -217,7 +217,7 @@ public class BinarySecurity {
      */
     protected Text getFirstNode() {
         Node node = element.getFirstChild();
-        return (node != null && Node.TEXT_NODE == node.getNodeType()) ? (Text) node : null;
+        return node != null && Node.TEXT_NODE == node.getNodeType() ? (Text) node : null;
     }
 
     /**

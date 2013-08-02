@@ -145,7 +145,7 @@ public class WSUsernameTokenPrincipalImpl implements java.io.Serializable, Usern
      * @return a string representation of this <code>WSUsernameTokenPrincipalImpl</code>.
      */
     public String toString() {
-        return ("WSUsernameTokenPrincipalImpl:  " + name);
+        return "WSUsernameTokenPrincipalImpl:  " + name;
     }
 
     /**

@@ -200,8 +200,8 @@ public class STRTransform extends TransformService {
             
             if (dereferencedToken != null) {
                 String type = dereferencedToken.getAttributeNS(null, "ValueType");
-                if ((X509Security.X509_V3_TYPE.equals(type) 
-                    || PKIPathSecurity.getType().equals(type))) {
+                if (X509Security.X509_V3_TYPE.equals(type) 
+                    || PKIPathSecurity.getType().equals(type)) {
                     //
                     // Add the WSSE/WSU namespaces to the element for C14n
                     //

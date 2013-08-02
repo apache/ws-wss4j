@@ -43,6 +43,7 @@ import org.opensaml.saml1.core.AttributeStatement;
 import org.opensaml.saml1.core.AuthenticationStatement;
 import org.opensaml.saml1.core.AuthorizationDecisionStatement;
 import org.opensaml.saml1.core.ConfirmationMethod;
+import org.opensaml.saml1.core.Statement;
 import org.opensaml.saml1.core.Subject;
 import org.opensaml.saml1.core.SubjectConfirmation;
 import org.opensaml.saml1.core.SubjectStatement;
@@ -330,19 +331,17 @@ public class SamlAssertionWrapper {
                 return subject.getNameID().getValue();
             }
         } else if (saml1 != null) {
-            org.opensaml.saml1.core.Subject samlSubject = null;
-            for (org.opensaml.saml1.core.Statement stmt : saml1.getStatements()) {
-                if (stmt instanceof org.opensaml.saml1.core.AttributeStatement) {
-                    org.opensaml.saml1.core.AttributeStatement attrStmt =
-                            (org.opensaml.saml1.core.AttributeStatement) stmt;
+            Subject samlSubject = null;
+            for (Statement stmt : saml1.getStatements()) {
+                if (stmt instanceof AttributeStatement) {
+                    AttributeStatement attrStmt = (AttributeStatement) stmt;
                     samlSubject = attrStmt.getSubject();
-                } else if (stmt instanceof org.opensaml.saml1.core.AuthenticationStatement) {
-                    org.opensaml.saml1.core.AuthenticationStatement authStmt =
-                            (org.opensaml.saml1.core.AuthenticationStatement) stmt;
+                } else if (stmt instanceof AuthenticationStatement) {
+                    AuthenticationStatement authStmt = (AuthenticationStatement) stmt;
                     samlSubject = authStmt.getSubject();
                 } else {
-                    org.opensaml.saml1.core.AuthorizationDecisionStatement authzStmt =
-                            (org.opensaml.saml1.core.AuthorizationDecisionStatement)stmt;
+                    AuthorizationDecisionStatement authzStmt = 
+                        (AuthorizationDecisionStatement)stmt;
                     samlSubject = authzStmt.getSubject();
                 }
                 if (samlSubject != null) {

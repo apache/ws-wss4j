@@ -127,11 +127,11 @@ public final class STRParserUtil {
         if (secRef.containsReference()) {
             // Check the ValueType attributes
             String valueType = secRef.getReference().getValueType();
-            if (((token instanceof X509Security) && !X509Security.X509_V3_TYPE.equals(valueType))
-                || ((token instanceof PKIPathSecurity) && !PKIPathSecurity.PKI_TYPE.equals(valueType))
-                || ((token instanceof KerberosSecurity) 
+            if (token instanceof X509Security && !X509Security.X509_V3_TYPE.equals(valueType)
+                || token instanceof PKIPathSecurity && !PKIPathSecurity.PKI_TYPE.equals(valueType)
+                || token instanceof KerberosSecurity 
                         && !(valueType == null || "".equals(valueType))
-                        && !WSConstants.WSS_GSS_KRB_V5_AP_REQ.equals(valueType))) {
+                        && !WSConstants.WSS_GSS_KRB_V5_AP_REQ.equals(valueType)) {
                 bspEnforcer.handleBSPRule(BSPRule.R3058);
             }
         } else if (secRef.containsKeyIdentifier()) {

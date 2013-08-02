@@ -32,6 +32,6 @@ public interface WSTimeSource {
     * Get the current date time
     * @return the current date/time as a date object
     */
-   public Date now();
+   Date now();
    
 }

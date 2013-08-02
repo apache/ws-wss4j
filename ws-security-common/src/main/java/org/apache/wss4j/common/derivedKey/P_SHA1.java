@@ -53,7 +53,7 @@ public class P_SHA1 implements DerivationAlgorithm {
         try {
             Mac mac = Mac.getInstance("HmacSHA1");
 
-            byte[] tempBytes = P_hash(secret, seed, mac, (offset + (int) length));
+            byte[] tempBytes = P_hash(secret, seed, mac, offset + (int) length);
 
             byte[] key = new byte[(int) length];
 

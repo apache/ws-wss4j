@@ -178,7 +178,7 @@ public class SignatureProcessor implements Processor {
                 if (trusted && LOG.isDebugEnabled()) {
                     LOG.debug("Direct Trust for SAML/BST credential");
                 }
-                if (!trusted && (publicKey != null || certs != null) && (validator != null)) {
+                if (!trusted && (publicKey != null || certs != null) && validator != null) {
                     Credential credential = new Credential();
                     credential.setPublicKey(publicKey);
                     credential.setCertificates(certs);
@@ -294,7 +294,7 @@ public class SignatureProcessor implements Processor {
             // Look for a KeyValue object
             //
             keyValue = getKeyValue(keyInfoElement);
-        } catch (javax.xml.crypto.MarshalException ex) {
+        } catch (MarshalException ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
         } 
 
@@ -682,7 +682,7 @@ public class SignatureProcessor implements Processor {
             Date rightNow = new Date();
             long currentTime = rightNow.getTime();
             long expiresTime = expires.getTime();
-            replayCache.add(identifier, ((expiresTime - currentTime) / 1000L));
+            replayCache.add(identifier, (expiresTime - currentTime) / 1000L);
         } else {
             replayCache.add(identifier);
         }
@@ -748,10 +748,10 @@ public class SignatureProcessor implements Processor {
                     bspEnforcer.handleBSPRule(BSPRule.R5423);
                 }
                 if (i == (reference.getTransforms().size() - 1)
-                    && (!(WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(algorithm)
+                    && !(WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(algorithm)
                         || STRTransform.TRANSFORM_URI.equals(algorithm)
                         || WSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(algorithm)
-                        || WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(algorithm)))) {
+                        || WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(algorithm))) {
                     bspEnforcer.handleBSPRule(BSPRule.R5412);
                 }
                 

@@ -149,8 +149,7 @@ public class SignatureTrustValidator implements Validator {
      */
     protected boolean
     matches(
-        final java.security.cert.X509Certificate cert,
-        final Collection<Pattern> subjectDNPatterns
+        final X509Certificate cert, final Collection<Pattern> subjectDNPatterns
     ) {
         if (subjectDNPatterns.isEmpty()) {
             LOG.warn("No Subject DN Certificate Constraints were defined. This could be a security issue");

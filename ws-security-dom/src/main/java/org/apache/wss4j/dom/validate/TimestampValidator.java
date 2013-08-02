@@ -57,7 +57,7 @@ public class TimestampValidator implements Validator {
         
         Timestamp timeStamp = credential.getTimestamp();
         // Validate whether the security semantics have expired
-        if ((timeStampStrict && timeStamp.isExpired()) 
+        if (timeStampStrict && timeStamp.isExpired()
             || !timeStamp.verifyCreated(timeStampTTL, futureTimeToLive)) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.MESSAGE_EXPIRED,

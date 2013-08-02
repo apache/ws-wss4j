@@ -93,7 +93,7 @@ public abstract class WSHandler {
 
         boolean enableSigConf = decodeEnableSignatureConfirmation(reqData);
         wssConfig.setEnableSignatureConfirmation(
-            enableSigConf || ((doAction & WSConstants.SC) != 0)
+            enableSigConf || (doAction & WSConstants.SC) != 0
         );
         wssConfig.setPasswordsAreEncoded(decodeUseEncodedPasswords(reqData));
 
@@ -188,7 +188,7 @@ public abstract class WSHandler {
         // Timestamp must appear in the security header first for signature creation to work.
         List<Integer> actionsToPerform = actions;
         if (actions.contains(WSConstants.SIGN) && actions.contains(WSConstants.TS)
-            && (actions.indexOf(WSConstants.SIGN) < actions.indexOf(WSConstants.TS))) {
+            && actions.indexOf(WSConstants.SIGN) < actions.indexOf(WSConstants.TS)) {
             boolean signTimestamp = false;
             for (WSEncryptionPart encP : reqData.getSignatureParts()) {
                 if (WSConstants.WSU_NS.equals(encP.getNamespace()) 
@@ -275,7 +275,7 @@ public abstract class WSHandler {
         }
         boolean enableSigConf = decodeEnableSignatureConfirmation(reqData);
         wssConfig.setEnableSignatureConfirmation(
-            enableSigConf || ((doAction & WSConstants.SC) != 0)
+            enableSigConf || (doAction & WSConstants.SC) != 0
         );
         wssConfig.setTimeStampStrict(decodeTimestampStrict(reqData));
         String passwordType = decodePasswordType(reqData);
@@ -304,9 +304,9 @@ public abstract class WSHandler {
         }
         reqData.setWssConfig(wssConfig);
 
-        if (((doAction & WSConstants.SIGN) == WSConstants.SIGN)
-            || ((doAction & WSConstants.ST_SIGNED) == WSConstants.ST_SIGNED)
-            || ((doAction & WSConstants.ST_UNSIGNED) == WSConstants.ST_UNSIGNED)) {
+        if ((doAction & WSConstants.SIGN) == WSConstants.SIGN
+            || (doAction & WSConstants.ST_SIGNED) == WSConstants.ST_SIGNED
+            || (doAction & WSConstants.ST_UNSIGNED) == WSConstants.ST_UNSIGNED) {
             decodeSignatureParameter2(reqData);
         }
         

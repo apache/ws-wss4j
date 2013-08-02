@@ -207,7 +207,7 @@ public class Timestamp {
         element.appendChild(elementCreated);
         if (ttl != 0) {
             expiresDate = timeSource.now();
-            expiresDate.setTime(createdDate.getTime() + ((long)ttl * 1000L));
+            expiresDate.setTime(createdDate.getTime() + (long)ttl * 1000L);
 
             Element elementExpires =
                 doc.createElementNS(

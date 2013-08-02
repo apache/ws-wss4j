@@ -35,8 +35,8 @@ public final class AlgoFactory {
      */
     public static DerivationAlgorithm getInstance(String algorithm) throws
             ConversationException {
-        if ((ConversationConstants.DerivationAlgorithm.P_SHA_1_2005_12).equals(algorithm)
-            || (ConversationConstants.DerivationAlgorithm.P_SHA_1).equals(algorithm)) {
+        if (ConversationConstants.DerivationAlgorithm.P_SHA_1_2005_12.equals(algorithm)
+            || ConversationConstants.DerivationAlgorithm.P_SHA_1.equals(algorithm)) {
             return new P_SHA1();
         } else {
             throw new ConversationException("No such algorithm");

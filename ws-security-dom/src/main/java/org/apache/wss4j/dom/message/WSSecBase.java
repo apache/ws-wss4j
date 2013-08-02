@@ -158,7 +158,7 @@ public class WSSecBase {
             newAttrNs = WSConstants.ENC_NS;
         }
         
-        if ((id == null) || (id.length() == 0)) {
+        if (id == null || id.length() == 0) {
             id = wssConfig.getIdAllocator().createId("id-", bodyElement);
             String prefix = 
                 WSSecurityUtil.setNamespace(bodyElement, newAttrNs, newAttrPrefix);

@@ -45,7 +45,7 @@ public final class DateUtil {
         Date validCreation = new Date();
         long currentTime = validCreation.getTime();
         if (futureTimeToLive > 0) {
-            validCreation.setTime(currentTime + ((long)futureTimeToLive * 1000L));
+            validCreation.setTime(currentTime + (long)futureTimeToLive * 1000L);
         }
         // Check to see if the created time is in the future
         if (createdDate.after(validCreation)) {
@@ -56,7 +56,7 @@ public final class DateUtil {
         }
         
         // Calculate the time that is allowed for the message to travel
-        currentTime -= ((long)timeToLive * 1000L);
+        currentTime -= (long)timeToLive * 1000L;
         validCreation.setTime(currentTime);
 
         // Validate the time it took the message to travel

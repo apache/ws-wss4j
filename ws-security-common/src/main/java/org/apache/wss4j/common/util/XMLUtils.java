@@ -68,7 +68,7 @@ public class XMLUtils {
     }
     
     public static String getNamespace(String prefix, Node e) {
-        while (e != null && (e.getNodeType() == Node.ELEMENT_NODE)) {
+        while (e != null && e.getNodeType() == Node.ELEMENT_NODE) {
             Attr attr = null;
             if (prefix == null) {
                 attr = ((Element) e).getAttributeNode("xmlns");

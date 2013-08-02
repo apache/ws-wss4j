@@ -106,7 +106,7 @@ public class SignatureAction implements Action {
                 wsSign.addReferencesToSign(reqData.getSignatureParts(), reqData.getSecHeader());
 
             if (signBST || 
-                (reqData.isAppendSignatureAfterTimestamp() && siblingElementToPrepend == null)) {
+                reqData.isAppendSignatureAfterTimestamp() && siblingElementToPrepend == null) {
                 wsSign.computeSignature(referenceList, false, null);
             } else {
                 wsSign.computeSignature(referenceList, true, siblingElementToPrepend);

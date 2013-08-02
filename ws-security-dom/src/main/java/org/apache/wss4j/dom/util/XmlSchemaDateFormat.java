@@ -73,7 +73,7 @@ public class XmlSchemaDateFormat extends DateFormat {
         int index = 0;
         try {
             if (src != null) {
-                if ((src.charAt(0) == '+') || (src.charAt(0) == '-')) {
+                if (src.charAt(0) == '+' || src.charAt(0) == '-') {
                     src = src.substring(1);
                 }
 
@@ -90,19 +90,19 @@ public class XmlSchemaDateFormat extends DateFormat {
 
             // convert what we have validated so far
             synchronized (DATEFORMAT_XSD_ZULU) {
-                date = DATEFORMAT_XSD_ZULU.parse((src == null) ? null
-                    : (src.substring(0, 19) + ".000Z"));
+                date = DATEFORMAT_XSD_ZULU.parse(src == null ? null
+                    : src.substring(0, 19) + ".000Z");
             }
 
             index = 19;
 
             // parse optional milliseconds
             if (src != null) {
-                if ((index < src.length()) && (src.charAt(index) == '.')) {
+                if (index < src.length() && src.charAt(index) == '.') {
                     int milliseconds = 0;
                     int start = ++index;
 
-                    while ((index < src.length())
+                    while (index < src.length()
                             && Character.isDigit(src.charAt(index))) {
                         index++;
                     }
@@ -112,11 +112,10 @@ public class XmlSchemaDateFormat extends DateFormat {
                     if (decimal.length() == 3) {
                         milliseconds = Integer.parseInt(decimal);
                     } else if (decimal.length() < 3) {
-                        milliseconds = Integer.parseInt((decimal + "000")
-                                .substring(0, 3));
+                        String substring = decimal + "000";
+                        milliseconds = Integer.parseInt(substring.substring(0, 3));
                     } else {
-                        milliseconds = Integer
-                                .parseInt(decimal.substring(0, 3));
+                        milliseconds = Integer.parseInt(decimal.substring(0, 3));
 
                         if (decimal.charAt(3) >= '5') {
                             ++milliseconds;
@@ -128,19 +127,19 @@ public class XmlSchemaDateFormat extends DateFormat {
                 }
 
                 // parse optional timezone
-                if (((index + 5) < src.length())
-                        && ((src.charAt(index) == '+') || (src.charAt(index) == '-'))) {
+                if (index + 5 < src.length()
+                        && (src.charAt(index) == '+' || src.charAt(index) == '-')) {
                     validateCharIsDigit(src, parsePos, index + 1, "EXPECTED_NUMERAL");
                     validateCharIsDigit(src, parsePos, index + 2, "EXPECTED_NUMERAL");
                     validateChar(src, parsePos, index + 3, ':', "EXPECTED_COLON_IN_TIMEZONE");
                     validateCharIsDigit(src, parsePos, index + 4, "EXPECTED_NUMERAL");
                     validateCharIsDigit(src, parsePos, index + 5, "EXPECTED_NUMERAL");
 
-                    final int hours = (((src.charAt(index + 1) - '0') * 10) + src
-                            .charAt(index + 2)) - '0';
-                    final int mins = (((src.charAt(index + 4) - '0') * 10) + src
-                            .charAt(index + 5)) - '0';
-                    int millisecs = ((hours * 60) + mins) * 60 * 1000;
+                    final int hours = (src.charAt(index + 1) - '0') * 10
+                        + src.charAt(index + 2) - '0';
+                    final int mins = (src.charAt(index + 4) - '0') * 10
+                        + src.charAt(index + 5) - '0';
+                    int millisecs = (hours * 60 + mins) * 60 * 1000;
 
                     // subtract millisecs from current date to obtain GMT
                     if (src.charAt(index) == '+') {
@@ -151,7 +150,7 @@ public class XmlSchemaDateFormat extends DateFormat {
                     index += 6;
                 }
 
-                if ((index < src.length()) && (src.charAt(index) == 'Z')) {
+                if (index < src.length() && src.charAt(index) == 'Z') {
                     index++;
                 }
 

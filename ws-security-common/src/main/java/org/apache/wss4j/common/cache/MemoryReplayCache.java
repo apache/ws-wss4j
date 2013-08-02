@@ -66,7 +66,7 @@ public class MemoryReplayCache implements ReplayCache {
         
         Date expires = new Date();
         long currentTime = expires.getTime();
-        expires.setTime(currentTime + (ttl * 1000L));
+        expires.setTime(currentTime + ttl * 1000L);
         
         synchronized (cache) {
             List<String> list = cache.get(expires);

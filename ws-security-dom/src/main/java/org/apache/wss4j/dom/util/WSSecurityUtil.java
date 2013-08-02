@@ -143,12 +143,12 @@ public final class WSSecurityUtil {
      * @return true is the actor arguments are equal
      */
     public static boolean isActorEqual(String actor, String hActor) {
-        if (((hActor == null) || (hActor.length() == 0)) 
-            && ((actor == null) || (actor.length() == 0))) {
+        if ((hActor == null || hActor.length() == 0) 
+            && (actor == null || actor.length() == 0)) {
             return true;
         }
         
-        if ((hActor != null) && (actor != null) && hActor.equalsIgnoreCase(actor)) {
+        if (hActor != null && actor != null && hActor.equalsIgnoreCase(actor)) {
             return true;
         }
         
@@ -403,9 +403,9 @@ public final class WSSecurityUtil {
             // start node processing at this point
             if (startNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element se = (Element) startNode;
-                if ((se.hasAttribute("ID") && value.equals(se.getAttributeNS(null, "ID")))
-                    || (se.hasAttribute("AssertionID") 
-                        && value.equals(se.getAttributeNS(null, "AssertionID")))) {
+                if (se.hasAttribute("ID") && value.equals(se.getAttributeNS(null, "ID"))
+                    || se.hasAttribute("AssertionID") 
+                        && value.equals(se.getAttributeNS(null, "AssertionID"))) {
                     if (foundElement == null) {
                         foundElement = se; // Continue searching to find duplicates
                     } else {
@@ -533,7 +533,7 @@ public final class WSSecurityUtil {
      * The following methods were copied over from axis.utils.XMLUtils and adapted
      */
     public static String getPrefixNS(String uri, Node e) {
-        while (e != null && (e.getNodeType() == Element.ELEMENT_NODE)) {
+        while (e != null && e.getNodeType() == Element.ELEMENT_NODE) {
             NamedNodeMap attrs = e.getAttributes();
             for (int n = 0; n < attrs.getLength(); n++) {
                 Attr a = (Attr) attrs.item(n);
@@ -548,7 +548,7 @@ public final class WSSecurityUtil {
     }
 
     public static String getNamespace(String prefix, Node e) {
-        while (e != null && (e.getNodeType() == Node.ELEMENT_NODE)) {
+        while (e != null && e.getNodeType() == Node.ELEMENT_NODE) {
             Attr attr = null;
             if (prefix == null) {
                 attr = ((Element) e).getAttributeNodeNS(null, "xmlns");
@@ -819,7 +819,7 @@ public final class WSSecurityUtil {
         if (size > 0) {
             keySpec = 
                 new SecretKeySpec(
-                    rawKey, 0, ((rawKey.length > size) ? size : rawKey.length), keyAlgorithm
+                    rawKey, 0, rawKey.length > size ? size : rawKey.length, keyAlgorithm
                 );
         } else {
             keySpec = new SecretKeySpec(rawKey, keyAlgorithm);
@@ -1254,12 +1254,12 @@ public final class WSSecurityUtil {
                 final String aln = anode.getLocalName();
                 final boolean nsmatch =
                     ans == null
-                    ? ((bns == null) ? true : false)
-                    : ((bns == null) ? false : ans.equals(bns));
+                    ? bns == null ? true : false
+                    : bns == null ? false : ans.equals(bns);
                 final boolean lnmatch =
                     aln == null
-                    ? ((bln == null) ? true : false)
-                    : ((bln == null) ? false : aln.equals(bln));
+                    ? bln == null ? true : false
+                    : bln == null ? false : aln.equals(bln);
                 if (nsmatch && lnmatch) {
                     found = true;
                 }
@@ -1323,7 +1323,7 @@ public final class WSSecurityUtil {
             return true;
         }
         attributeNS = elem.getAttributeNS(null, "Id");
-        return (!"".equals(attributeNS) && allIDs.contains(attributeNS));
+        return !"".equals(attributeNS) && allIDs.contains(attributeNS);
     }
     
     private static Set<String> getSignatureReferenceIDs(Element wsseHeader) throws WSSecurityException {

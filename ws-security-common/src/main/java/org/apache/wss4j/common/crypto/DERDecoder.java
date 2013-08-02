@@ -140,7 +140,7 @@ public class DERDecoder {
                     "Invalid DER format"
             );
         }
-        return (arr[pos] == val);
+        return arr[pos] == val;
     }
 
     /**

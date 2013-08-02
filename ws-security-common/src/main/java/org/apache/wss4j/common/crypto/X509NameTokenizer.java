@@ -41,7 +41,7 @@ public class X509NameTokenizer {
        int k;
        for (int j = 0; (k = normalizedDN.indexOf(',', j)) >= 0; j = k + 1) {
           l += countQuotes(normalizedDN, j, k);
-          if ((k > 0) && (normalizedDN.charAt(k - 1) != '\\') && (l % 2) == 0) {
+          if (k > 0 && normalizedDN.charAt(k - 1) != '\\' && (l % 2) == 0) {
              tokens.add(normalizedDN.substring(i, k).trim());
              i = k + 1;
              l = 0;
@@ -53,7 +53,7 @@ public class X509NameTokenizer {
     }
 
     public boolean hasMoreTokens() {
-        return (index < tokens.size());
+        return index < tokens.size();
     }
 
     public String nextToken() {
@@ -92,10 +92,10 @@ public class X509NameTokenizer {
     private static String trim(String str) {
        String trimed = str.trim();
        int i = str.indexOf(trimed) + trimed.length();
-       if ((str.length() > i) 
+       if (str.length() > i
            && trimed.endsWith("\\")
            && !trimed.endsWith("\\\\")
-           && (str.charAt(i) == ' ')) {
+           && str.charAt(i) == ' ') {
          trimed = trimed + " ";
        }
        return trimed;

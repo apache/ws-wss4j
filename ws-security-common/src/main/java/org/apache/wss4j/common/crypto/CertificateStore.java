@@ -245,7 +245,7 @@ public class CertificateStore extends CryptoBase {
                     WSSecurityException.ErrorCode.FAILURE, "certpath",
                     e.getMessage(), e
                 );
-        } catch (java.security.NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "certpath", 
                     e.getMessage(), e

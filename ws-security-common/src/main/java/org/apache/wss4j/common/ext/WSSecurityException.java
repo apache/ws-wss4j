@@ -176,7 +176,7 @@ public class WSSecurityException extends XMLSecurityException {
      *
      * @return the fault code QName of this exception
      */
-    public javax.xml.namespace.QName getFaultCode() {
+    public QName getFaultCode() {
         return this.errorCode.getQName();
     }
 }

@@ -393,7 +393,7 @@ public class Merlin extends CryptoBase {
                 ks = KeyStore.getInstance(type, provider);
             }
                     
-            ks.load(input, (storepass == null || storepass.length() == 0) 
+            ks.load(input, storepass == null || storepass.length() == 0
                 ? new char[0] : storepass.toCharArray());
         } catch (IOException e) {
             if (DO_DEBUG) {
@@ -904,18 +904,18 @@ public class Merlin extends CryptoBase {
                 validator = CertPathValidator.getInstance("PKIX", provider);
             }
             validator.validate(path, param);
-        } catch (java.security.NoSuchProviderException e) {
+        } catch (NoSuchProviderException e) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "certpath",
                     e
                 );
-        } catch (java.security.NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE,
                     "certpath", new Object[] { e.getMessage() },
                     e
                 );
-        } catch (java.security.cert.CertificateException e) {
+        } catch (CertificateException e) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "certpath", 
                     e
@@ -930,7 +930,7 @@ public class Merlin extends CryptoBase {
                     WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, "certpath",
                     e
                 );
-        } catch (java.security.KeyStoreException e) {
+        } catch (KeyStoreException e) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "certpath",
                     e
@@ -1005,7 +1005,7 @@ public class Merlin extends CryptoBase {
             certs = getCertificates(issuerName, serialNumber, truststore);
         }
         
-        if ((certs == null || certs.length == 0)) {
+        if (certs == null || certs.length == 0) {
             return null;
         }
         
@@ -1089,7 +1089,7 @@ public class Merlin extends CryptoBase {
             certs = getCertificates(thumbprint, truststore, sha);
         }
         
-        if ((certs == null || certs.length == 0)) {
+        if (certs == null || certs.length == 0) {
             return null;
         }
         
@@ -1169,7 +1169,7 @@ public class Merlin extends CryptoBase {
             certs = getCertificates(skiBytes, truststore);
         }
         
-        if ((certs == null || certs.length == 0)) {
+        if (certs == null || certs.length == 0) {
             return null;
         }
         
@@ -1256,7 +1256,7 @@ public class Merlin extends CryptoBase {
             certs = getCertificates(subject, truststore);
         }
         
-        if ((certs == null || certs.length == 0)) {
+        if (certs == null || certs.length == 0) {
             return null;
         }
         

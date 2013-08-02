@@ -420,7 +420,7 @@ public class DerivedKeyToken {
      */
     private Text getFirstNode(Element e) {
         Node node = e.getFirstChild();
-        return (node != null && Node.TEXT_NODE == node.getNodeType()) ? (Text) node : null;
+        return node != null && Node.TEXT_NODE == node.getNodeType() ? (Text) node : null;
     }
 
     /**
@@ -525,9 +525,9 @@ public class DerivedKeyToken {
             byte[] labelBytes = null;
             String label = getLabel();
             if (label == null || label.length() == 0) {
-                labelBytes = 
-                    (ConversationConstants.DEFAULT_LABEL 
-                        + ConversationConstants.DEFAULT_LABEL).getBytes("UTF-8");
+                String defaultLabel = ConversationConstants.DEFAULT_LABEL 
+                    + ConversationConstants.DEFAULT_LABEL;
+                labelBytes = defaultLabel.getBytes("UTF-8");
             } else {
                 labelBytes = label.getBytes("UTF-8");
             }

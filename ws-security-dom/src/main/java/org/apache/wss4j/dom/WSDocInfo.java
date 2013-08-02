@@ -156,9 +156,9 @@ public class WSDocInfo {
                 String cId = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
                 String samlId = elem.getAttributeNS(null, "AssertionID");
                 String samlId2 = elem.getAttributeNS(null, "ID");
-                if ((elem.hasAttributeNS(WSConstants.WSU_NS, "Id") && id.equals(cId)) 
-                    || (elem.hasAttribute("AssertionID") && id.equals(samlId))
-                    || (elem.hasAttribute("ID") && id.equals(samlId2))) {
+                if (elem.hasAttributeNS(WSConstants.WSU_NS, "Id") && id.equals(cId)
+                    || elem.hasAttribute("AssertionID") && id.equals(samlId)
+                    || elem.hasAttribute("ID") && id.equals(samlId2)) {
                     return elem;
                 }
             }
@@ -247,7 +247,7 @@ public class WSDocInfo {
                 if (result != null) {
                     Integer resultTag = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
                     String cId = (String)result.get(WSSecurityEngineResult.TAG_ID);
-                    if ((tag.intValue() == resultTag.intValue()) && id.equals(cId)) {
+                    if (tag.intValue() == resultTag.intValue() && id.equals(cId)) {
                         return result;
                     }
                 }
