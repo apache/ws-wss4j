@@ -99,7 +99,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
             if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier) && !useSingleCertificate) {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_X509PKIPathv1));
             } else if (WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier.equals(keyIdentifier)
-                || (WSSecurityTokenConstants.KeyIdentifier_EncryptedKey.equals(keyIdentifier))) {
+                || WSSecurityTokenConstants.KeyIdentifier_EncryptedKey.equals(keyIdentifier)) {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
             } else if (WSSecurityTokenConstants.Saml10Token.equals(securityToken.getTokenType())
                     || WSSecurityTokenConstants.Saml11Token.equals(securityToken.getTokenType())) {

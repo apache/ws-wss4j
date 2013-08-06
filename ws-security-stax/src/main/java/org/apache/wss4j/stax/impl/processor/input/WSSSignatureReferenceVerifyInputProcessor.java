@@ -84,11 +84,11 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                             && !WSSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(algorithm)
                             && !WSSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(algorithm)) {
                         securityContext.handleBSPRule(BSPRule.R5423);
-                        if ((j == transformTypes.size() - 1) &&
-                            (!WSSConstants.NS_C14N_EXCL.equals(algorithm)
+                        if (j == transformTypes.size() - 1 &&
+                            !WSSConstants.NS_C14N_EXCL.equals(algorithm)
                                 && !WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(algorithm)
                                 && !WSSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(algorithm)
-                                && !WSSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(algorithm))) {
+                                && !WSSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(algorithm)) {
                             securityContext.handleBSPRule(BSPRule.R5412);
                         }
                         InclusiveNamespaces inclusiveNamespacesType = XMLSecurityUtils.getQNameType(transformType.getContent(), XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
@@ -140,8 +140,8 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             throws XMLSecurityException {
         //fire a SecurityEvent:
         final DocumentContext documentContext = inputProcessorChain.getDocumentContext();
-        if ((elementPath.size() == 3 && WSSUtils.isInSOAPHeader(elementPath))
-                || (elementPath.size() == 2 && WSSUtils.isInSOAPBody(elementPath))) {
+        if (elementPath.size() == 3 && WSSUtils.isInSOAPHeader(elementPath)
+                || elementPath.size() == 2 && WSSUtils.isInSOAPBody(elementPath)) {
             SignedPartSecurityEvent signedPartSecurityEvent =
                     new SignedPartSecurityEvent(getInboundSecurityToken(), true, documentContext.getProtectionOrder());
             signedPartSecurityEvent.setElementPath(elementPath);
@@ -185,7 +185,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                 Date rightNow = new Date();
                 long currentTime = rightNow.getTime();
                 long expiresTime = expiresCal.getTimeInMillis();
-                replayCache.add(cacheKey, ((expiresTime - currentTime) / 1000L));
+                replayCache.add(cacheKey, (expiresTime - currentTime) / 1000L);
             } else {
                 replayCache.add(cacheKey);
             }

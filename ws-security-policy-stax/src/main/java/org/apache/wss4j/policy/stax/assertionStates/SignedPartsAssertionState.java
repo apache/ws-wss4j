@@ -60,7 +60,7 @@ public class SignedPartsAssertionState extends AssertionState implements Asserta
         SignedParts signedParts = (SignedParts) getAssertion();
 
         if (signedParts.isBody()
-                && (WSSUtils.pathMatches(WSSConstants.SOAP_11_BODY_PATH, signedPartSecurityEvent.getElementPath(), true, false))) {
+                && WSSUtils.pathMatches(WSSConstants.SOAP_11_BODY_PATH, signedPartSecurityEvent.getElementPath(), true, false)) {
             if (signedPartSecurityEvent.isSigned()) {
                 setAsserted(true);
                 return true;

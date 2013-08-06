@@ -75,7 +75,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
             }
             
             byte[] nonceValue = null;
-            if ((usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST)
+            if (usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
                 || ((WSSSecurityProperties) getSecurityProperties()).isAddUsernameTokenNonce()) {
                 nonceValue = new byte[16];
                 WSSConstants.secureRandom.nextBytes(nonceValue);
@@ -83,7 +83,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
             
             XMLGregorianCalendar created = null;
             String createdStr = "";
-            if ((usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST)
+            if (usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
                 || ((WSSSecurityProperties) getSecurityProperties()).isAddUsernameTokenCreated()) {
                 created = WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar());
                 createdStr = created.toXMLFormat();

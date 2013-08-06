@@ -113,7 +113,7 @@ public class KerberosTokenDecoderImpl implements KerberosTokenDecoder {
 
             int readLowByte = asn1InputStream.read() & 0xff;
             int readHighByte = asn1InputStream.read() & 0xff;
-            int read = (readHighByte << 8) + readLowByte;
+            int read = (readHighByte << 8) + readLowByte; //NOPMD
             if (read != 0x01) {
                 throw new KerberosTokenDecoderException("invalid kerberos token");
             }

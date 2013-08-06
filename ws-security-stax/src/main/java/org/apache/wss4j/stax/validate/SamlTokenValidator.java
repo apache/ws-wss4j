@@ -25,7 +25,7 @@ import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 public interface SamlTokenValidator extends SignatureTokenValidator {
 
-    public <T extends SamlSecurityToken & InboundSecurityToken> T validate(
+    <T extends SamlSecurityToken & InboundSecurityToken> T validate(
             SamlAssertionWrapper samlAssertionWrapper, InboundSecurityToken subjectSecurityToken,
             TokenContext tokenContext) throws WSSecurityException;
 }

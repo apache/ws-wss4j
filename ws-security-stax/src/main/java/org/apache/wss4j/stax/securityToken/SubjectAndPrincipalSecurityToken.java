@@ -26,7 +26,7 @@ import java.security.Principal;
 
 public interface SubjectAndPrincipalSecurityToken extends SecurityToken {
 
-    public Subject getSubject() throws WSSecurityException;
+    Subject getSubject() throws WSSecurityException;
 
-    public Principal getPrincipal() throws WSSecurityException;
+    Principal getPrincipal() throws WSSecurityException;
 }

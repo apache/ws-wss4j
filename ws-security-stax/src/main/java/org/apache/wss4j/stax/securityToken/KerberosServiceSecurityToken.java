@@ -20,7 +20,7 @@ package org.apache.wss4j.stax.securityToken;
 
 public interface KerberosServiceSecurityToken extends SubjectAndPrincipalSecurityToken {
 
-    public byte[] getBinaryContent();
+    byte[] getBinaryContent();
 
-    public String getKerberosTokenValueType();
+    String getKerberosTokenValueType();
 }

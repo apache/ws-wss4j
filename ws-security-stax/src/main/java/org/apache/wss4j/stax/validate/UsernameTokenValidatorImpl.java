@@ -114,9 +114,9 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
             }
 
             verifyDigestPassword(username.getValue(), passwordType, nonceVal, created, tokenContext);
-        } else if ((usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT)
-                || (passwordType != null && passwordType.getValue() != null
-                && usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE)) {
+        } else if (usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT
+                || passwordType != null && passwordType.getValue() != null
+                && usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE) {
             
             verifyPlaintextPassword(username.getValue(), passwordType, tokenContext);
         } else if (passwordType != null && passwordType.getValue() != null) {

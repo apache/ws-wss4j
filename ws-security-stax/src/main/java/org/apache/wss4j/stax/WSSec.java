@@ -281,7 +281,7 @@ public class WSSec {
                     securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                 }
             } else if (WSSConstants.SAML_TOKEN_UNSIGNED.equals(action) &&
-                    (securityProperties.getSamlCallbackHandler() == null)) {
+                    securityProperties.getSamlCallbackHandler() == null) {
                 throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noSAMLCallbackHandler");
             } else if (WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN.equals(action)) {
                 if (securityProperties.getCallbackHandler() == null) {

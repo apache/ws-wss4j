@@ -147,8 +147,8 @@ public class WSSUtils extends XMLSecurityUtils {
     public static boolean isInSOAPHeader(List<QName> elementPath) {
         if (elementPath.size() > 1) {
             final QName secondLevelElementName = elementPath.get(1);
-            return (WSSConstants.TAG_soap_Header_LocalName.equals(secondLevelElementName.getLocalPart())
-                    && elementPath.get(0).getNamespaceURI().equals(secondLevelElementName.getNamespaceURI()));
+            return WSSConstants.TAG_soap_Header_LocalName.equals(secondLevelElementName.getLocalPart())
+                    && elementPath.get(0).getNamespaceURI().equals(secondLevelElementName.getNamespaceURI());
         }
         return false;
     }
@@ -161,8 +161,8 @@ public class WSSUtils extends XMLSecurityUtils {
     public static boolean isInSOAPBody(List<QName> elementPath) {
         if (elementPath.size() > 1) {
             final QName secondLevelElementName = elementPath.get(1);
-            return (WSSConstants.TAG_soap_Body_LocalName.equals(secondLevelElementName.getLocalPart())
-                    && elementPath.get(0).getNamespaceURI().equals(secondLevelElementName.getNamespaceURI()));
+            return WSSConstants.TAG_soap_Body_LocalName.equals(secondLevelElementName.getLocalPart())
+                    && elementPath.get(0).getNamespaceURI().equals(secondLevelElementName.getNamespaceURI());
         }
         return false;
     }

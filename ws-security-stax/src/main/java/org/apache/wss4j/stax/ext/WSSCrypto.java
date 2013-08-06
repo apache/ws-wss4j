@@ -35,7 +35,7 @@ class WSSCrypto {
     protected static final transient org.slf4j.Logger log = 
         org.slf4j.LoggerFactory.getLogger(WSSCrypto.class);
 
-    private Class<? extends Merlin> cryptoClass = org.apache.wss4j.common.crypto.Merlin.class;
+    private Class<? extends Merlin> cryptoClass = Merlin.class;
     private Properties cryptoProperties;
     private Crypto cachedCrypto;
     private KeyStore cachedKeyStore;
@@ -44,7 +44,7 @@ class WSSCrypto {
     
     public Crypto getCrypto() throws WSSConfigurationException {
         
-        if ((keyStore == cachedKeyStore) && cachedCrypto != null) {
+        if (keyStore == cachedKeyStore && cachedCrypto != null) {
             return cachedCrypto;
         }
         

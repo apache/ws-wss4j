@@ -29,7 +29,7 @@ import java.util.List;
  */
 public interface WSInboundSecurityContext extends InboundSecurityContext {
 
-    public void handleBSPRule(BSPRule bspRule) throws WSSecurityException;
+    void handleBSPRule(BSPRule bspRule) throws WSSecurityException;
 
-    public void ignoredBSPRules(List<BSPRule> bspRules);
+    void ignoredBSPRules(List<BSPRule> bspRules);
 }

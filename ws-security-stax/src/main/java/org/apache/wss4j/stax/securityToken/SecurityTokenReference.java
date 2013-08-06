@@ -25,5 +25,5 @@ import java.util.Deque;
 
 public interface SecurityTokenReference extends SecurityToken {
 
-    public Deque<XMLSecEvent> getXmlSecEvents();
+    Deque<XMLSecEvent> getXmlSecEvents();
 }

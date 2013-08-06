@@ -348,7 +348,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         if (signatureWSSCrypto != null) {
             return signatureWSSCrypto.getCryptoClass();
         }
-        return org.apache.wss4j.common.crypto.Merlin.class;
+        return Merlin.class;
     }
 
     public void setSignatureCryptoClass(Class<? extends Merlin> signatureCryptoClass) {
@@ -417,7 +417,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         if (signatureVerificationWSSCrypto != null) {
             return signatureVerificationWSSCrypto.getCryptoClass();
         }
-        return org.apache.wss4j.common.crypto.Merlin.class;
+        return Merlin.class;
     }
 
     public void setSignatureVerificationCryptoClass(Class<? extends Merlin> signatureVerificationCryptoClass) {
@@ -495,7 +495,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         if (decryptionWSSCrypto != null) {
             return decryptionWSSCrypto.getCryptoClass();
         }
-        return org.apache.wss4j.common.crypto.Merlin.class;
+        return Merlin.class;
     }
 
     /**
@@ -583,7 +583,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         if (encryptionWSSCrypto != null) {
             return encryptionWSSCrypto.getCryptoClass();
         }
-        return org.apache.wss4j.common.crypto.Merlin.class;
+        return Merlin.class;
     }
 
     /**

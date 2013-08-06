@@ -34,7 +34,6 @@ import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.wss4j.stax.securityEvent.IssuedTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.opensaml.common.SAMLVersion;
-import org.opensaml.saml2.core.AttributeStatement;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -76,7 +75,7 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
         IssuedTokenSecurityEvent<? extends SecurityToken> issuedTokenSecurityEvent 
             = (IssuedTokenSecurityEvent<? extends SecurityToken>) tokenSecurityEvent;
         try {
-            if ((issuedToken.getIssuerName() != null) &&
+            if (issuedToken.getIssuerName() != null &&
                     !issuedToken.getIssuerName().equals(issuedTokenSecurityEvent.getIssuerName())) {
                 setErrorMessage("IssuerName in Policy (" + issuedToken.getIssuerName() +
                         ") didn't match with the one in the IssuedToken (" + issuedTokenSecurityEvent.getIssuerName() + ")");
@@ -216,7 +215,7 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
     }
 
     protected String findClaimInAssertion(org.opensaml.saml2.core.Assertion assertion, URI claimURI) {
-        List<AttributeStatement> attributeStatements =
+        List<org.opensaml.saml2.core.AttributeStatement> attributeStatements =
                 assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
             return "Attribute " + claimURI + " not found in the SAMLAssertion";

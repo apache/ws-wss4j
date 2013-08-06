@@ -84,7 +84,8 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
             byte[] label;
             try {
-                label = (WSSConstants.WS_SecureConversation_DEFAULT_LABEL + WSSConstants.WS_SecureConversation_DEFAULT_LABEL).getBytes("UTF-8");
+                String defaultLabel = WSSConstants.WS_SecureConversation_DEFAULT_LABEL + WSSConstants.WS_SecureConversation_DEFAULT_LABEL;
+                label = defaultLabel.getBytes("UTF-8");
             } catch (UnsupportedEncodingException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", "UTF-8 encoding is not supported", e);
             }

@@ -75,7 +75,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
 
         if (operationSecurityEventOccured) {
             if (!this.messageEncryptionTokenOccured
-                    && (securityEvent instanceof TokenSecurityEvent)) {
+                    && securityEvent instanceof TokenSecurityEvent) {
                 @SuppressWarnings("unchecked")
                 TokenSecurityEvent<? extends InboundSecurityToken> tokenSecurityEvent =
                         ((TokenSecurityEvent<? extends InboundSecurityToken>) securityEvent);

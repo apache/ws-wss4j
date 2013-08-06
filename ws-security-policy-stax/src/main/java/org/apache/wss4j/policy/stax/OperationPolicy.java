@@ -76,7 +76,7 @@ public class OperationPolicy {
     public int hashCode() {
         int hashcode = 17;
         if (getOperationName() != null) {
-            hashcode *= (31 * getOperationName().hashCode());
+            hashcode *= 31 * getOperationName().hashCode();
         }
         return hashcode;
     }

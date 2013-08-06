@@ -54,7 +54,7 @@ public class SpnegoContextTokenAssertionState extends TokenAssertionState {
 
         SpnegoContextToken spnegoContextToken = (SpnegoContextToken) abstractToken;
         SpnegoContextTokenSecurityEvent spnegoContextTokenSecurityEvent = (SpnegoContextTokenSecurityEvent) tokenSecurityEvent;
-        if ((spnegoContextToken.getIssuerName() != null)
+        if (spnegoContextToken.getIssuerName() != null
             && !spnegoContextToken.getIssuerName().equals(spnegoContextTokenSecurityEvent.getIssuerName())) {
             setErrorMessage("IssuerName in Policy (" + spnegoContextToken.getIssuerName() + ") didn't match with the one in the IssuedToken (" + spnegoContextTokenSecurityEvent.getIssuerName() + ")");
             return false;
