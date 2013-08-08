@@ -758,9 +758,77 @@ public class Merlin extends CryptoBase {
         X509Certificate[] certs, 
         boolean enableRevocation
     ) throws WSSecurityException {
+        //
+        // FIRST step - Search the keystore for the transmitted certificate
+        //
+        if (certs.length == 1 && !enableRevocation) {
+            String issuerString = certs[0].getIssuerX500Principal().getName();
+            BigInteger issuerSerial = certs[0].getSerialNumber();
+
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
+            cryptoType.setIssuerSerial(issuerString, issuerSerial);
+            X509Certificate[] foundCerts = getX509Certificates(cryptoType);
+
+            //
+            // If a certificate has been found, the certificates must be compared
+            // to ensure against phony DNs (compare encoded form including signature)
+            //
+            if (foundCerts != null && foundCerts[0] != null && foundCerts[0].equals(certs[0])) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(
+                        "Direct trust for certificate with " + certs[0].getSubjectX500Principal().getName()
+                    );
+                }
+                return true;
+            }
+        }
+        
+        //
+        // SECOND step - Search for the issuer cert (chain) of the transmitted certificate in the 
+        // keystore or the truststore
+        //
+        X509Certificate[] x509certs = certs;
+        String issuerString = certs[0].getIssuerX500Principal().getName();
+        if (certs.length == 1) {
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.SUBJECT_DN);
+            cryptoType.setSubjectDN(issuerString);
+            X509Certificate[] foundCerts = getX509Certificates(cryptoType);
+
+            // If the certs have not been found, the issuer is not in the keystore/truststore
+            // As a direct result, do not trust the transmitted certificate
+            if (foundCerts == null || foundCerts.length < 1) {
+                String subjectString = certs[0].getSubjectX500Principal().getName();
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(
+                        "No certs found in keystore for issuer " + issuerString 
+                        + " of certificate for " + subjectString
+                    );
+                }
+                return false;
+            }
+
+            //
+            // Form a certificate chain from the transmitted certificate
+            // and the certificate(s) of the issuer from the keystore/truststore
+            //
+            x509certs = new X509Certificate[foundCerts.length + 1];
+            x509certs[0] = certs[0];
+            System.arraycopy(foundCerts, 0, x509certs, 1, foundCerts.length);
+        }
+
+        //
+        // THIRD step
+        // Check the certificate trust path for the issuer cert chain
+        //
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(
+                "Preparing to validate certificate path for issuer " + issuerString
+            );
+        }
+        
         try {
             // Generate cert path
-            List<X509Certificate> certList = Arrays.asList(certs);
+            List<X509Certificate> certList = Arrays.asList(x509certs);
             CertPath path = getCertificateFactory().generateCertPath(certList);
 
             Set<TrustAnchor> set = new HashSet<TrustAnchor>();

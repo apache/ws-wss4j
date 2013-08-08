@@ -148,69 +148,12 @@ public class SignatureTrustValidator implements Validator {
         RequestData data,
         boolean enableRevocation
     ) throws WSSecurityException {
-        String subjectString = cert.getSubjectX500Principal().getName();
-        String issuerString = cert.getIssuerX500Principal().getName();
-        BigInteger issuerSerial = cert.getSerialNumber();
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Transmitted certificate has subject " + subjectString);
-            LOG.debug(
-                "Transmitted certificate has issuer " + issuerString + " (serial " 
-                + issuerSerial + ")"
-            );
-        }
-
-        //
-        // FIRST step - Search the keystore for the transmitted certificate
-        //
-        if (!enableRevocation && isCertificateInKeyStore(crypto, cert)) {
-            return true;
-        }
-
-        //
-        // SECOND step - Search for the issuer cert (chain) of the transmitted certificate in the 
-        // keystore or the truststore
-        //
-        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.SUBJECT_DN);
-        cryptoType.setSubjectDN(issuerString);
-        X509Certificate[] foundCerts = crypto.getX509Certificates(cryptoType);
-
-        // If the certs have not been found, the issuer is not in the keystore/truststore
-        // As a direct result, do not trust the transmitted certificate
-        if (foundCerts == null || foundCerts.length < 1) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(
-                    "No certs found in keystore for issuer " + issuerString 
-                    + " of certificate for " + subjectString
-                );
-            }
+        if (cert == null) {
             return false;
         }
-
-        //
-        // THIRD step
-        // Check the certificate trust path for the issuer cert chain
-        //
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(
-                "Preparing to validate certificate path for issuer " + issuerString
-            );
-        }
-        //
-        // Form a certificate chain from the transmitted certificate
-        // and the certificate(s) of the issuer from the keystore/truststore
-        //
-        X509Certificate[] x509certs = new X509Certificate[foundCerts.length + 1];
-        x509certs[0] = cert;
-        for (int j = 0; j < foundCerts.length; j++) {
-            x509certs[j + 1] = (X509Certificate)foundCerts[j];
-        }
-
-        //
-        // Use the validation method from the crypto to check whether the subjects' 
-        // certificate was really signed by the issuer stated in the certificate
-        //
-        if (crypto.verifyTrust(x509certs, enableRevocation)) {
+        
+        String subjectString = cert.getSubjectX500Principal().getName();
+        if (crypto.verifyTrust(new X509Certificate[]{cert}, enableRevocation)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(
                     "Certificate path has been verified for certificate with subject " 
@@ -239,6 +182,7 @@ public class SignatureTrustValidator implements Validator {
      * @return true if cert is in the keystore
      * @throws WSSecurityException
      */
+    @Deprecated
     protected boolean isCertificateInKeyStore(
         Crypto crypto,
         X509Certificate cert
