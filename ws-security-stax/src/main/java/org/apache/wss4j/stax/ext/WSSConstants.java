@@ -44,16 +44,16 @@ public class WSSConstants extends XMLSecurityConstants {
         try {
             setJaxbContext(
                     JAXBContext.newInstance(
-                            "org.apache.wss4j.binding.wss10:" +
-                                    "org.apache.wss4j.binding.wss11:" +
-                                    "org.apache.wss4j.binding.wsu10:" +
-                                    "org.apache.wss4j.binding.wssc13:" +
-                                    "org.apache.wss4j.binding.wssc200502:" +
-                                    "org.apache.xml.security.binding.xmlenc:" +
-                                    "org.apache.xml.security.binding.xmlenc11:" +
-                                    "org.apache.xml.security.binding.xmldsig:" +
-                                    "org.apache.xml.security.binding.xmldsig11:" +
-                                    "org.apache.xml.security.binding.excc14n"
+                            org.apache.wss4j.binding.wss10.ObjectFactory.class,
+                            org.apache.wss4j.binding.wss11.ObjectFactory.class,
+                            org.apache.wss4j.binding.wsu10.ObjectFactory.class,
+                            org.apache.wss4j.binding.wssc13.ObjectFactory.class,
+                            org.apache.wss4j.binding.wssc200502.ObjectFactory.class,
+                            org.apache.xml.security.binding.xmlenc.ObjectFactory.class,
+                            org.apache.xml.security.binding.xmlenc11.ObjectFactory.class,
+                            org.apache.xml.security.binding.xmldsig.ObjectFactory.class,
+                            org.apache.xml.security.binding.xmldsig11.ObjectFactory.class,
+                            org.apache.xml.security.binding.excc14n.ObjectFactory.class
                     )
             );
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
