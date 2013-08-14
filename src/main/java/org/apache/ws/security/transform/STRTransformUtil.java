@@ -81,7 +81,7 @@ public final class STRTransformUtil {
             if (certs == null || certs.length == 0 || certs[0] == null) {
                 throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
             }
-            return createBSTX509(doc, certs[0], secRef.getElement());
+            return createBSTX509(doc, certs[0], secRef.getElement(), secRef.getKeyIdentifierEncodingType());
         }
         //
         // third case: KeyIdentifier. For SKI, lookup in keystore, wrap in
@@ -108,6 +108,12 @@ public final class STRTransformUtil {
     
     public static Element createBSTX509(Document doc, X509Certificate cert, Element secRefE) 
         throws WSSecurityException {
+        return createBSTX509(doc, cert, secRefE, null);
+    }
+    
+    public static Element createBSTX509(Document doc, X509Certificate cert, Element secRefE, 
+                                        String secRefEncType) 
+        throws WSSecurityException {
         byte data[];
         try {
             data = cert.getEncoded();
@@ -124,6 +130,9 @@ public final class STRTransformUtil {
         WSSecurityUtil.setNamespace(elem, WSConstants.WSSE_NS, prefix);
         // elem.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", "");
         elem.setAttributeNS(null, "ValueType", X509Security.X509_V3_TYPE);
+        if (secRefEncType != null) {
+            elem.setAttributeNS(null, "EncodingType", secRefEncType);
+        }
         Text certText = doc.createTextNode(Base64.encode(data)); // no line wrap
         elem.appendChild(certText);
         return elem;
