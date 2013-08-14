@@ -60,6 +60,7 @@ public class RequestData {
     private String sigAlgorithm = null;
     private String signatureDigestAlgorithm = null;
     private String encryptionDigestAlgorithm = null;
+    private String signatureC14nAlgorithm;
     private List<WSEncryptionPart> signatureParts = new ArrayList<WSEncryptionPart>();
     private Crypto encCrypto = null;
     private int encKeyId = 0;
@@ -101,6 +102,7 @@ public class RequestData {
         wssConfig = null;
         signatureValues.clear();
         signatureDigestAlgorithm = null;
+        signatureC14nAlgorithm = null;
         encryptionDigestAlgorithm = null;
         encSymmetricEncryptionKey = true;
         secretKeyLength = WSConstants.WSE_DERIVED_KEY_LEN;
@@ -118,6 +120,14 @@ public class RequestData {
         algorithmSuite = null;
         samlAlgorithmSuite = null;
         setOriginalSignatureActionPosition(0);
+    }
+
+    public String getSignatureC14nAlgorithm() {
+        return signatureC14nAlgorithm;
+    }
+
+    public void setSignatureC14nAlgorithm(String signatureC14nAlgorithm) {
+        this.signatureC14nAlgorithm = signatureC14nAlgorithm;
     }
 
     public Object getMsgContext() {

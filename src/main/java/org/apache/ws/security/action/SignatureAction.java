@@ -53,7 +53,10 @@ public class SignatureAction implements Action {
         if (reqData.getSigDigestAlgorithm() != null) {
             wsSign.setDigestAlgo(reqData.getSigDigestAlgorithm());
         }
-
+        if (reqData.getSignatureC14nAlgorithm() != null) {
+            wsSign.setSigCanonicalization(reqData.getSignatureC14nAlgorithm());
+        }
+        
         wsSign.setUserInfo(reqData.getSignatureUser(), passwordCallback.getPassword());
         wsSign.setUseSingleCertificate(reqData.isUseSingleCert());
         if (reqData.getSignatureParts().size() > 0) {

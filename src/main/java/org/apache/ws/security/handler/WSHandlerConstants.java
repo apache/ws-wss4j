@@ -561,6 +561,12 @@ public final class WSHandlerConstants {
      * </pre>
      */
     public static final String SIG_DIGEST_ALGO = "signatureDigestAlgorithm";
+    
+    /**
+     * Defines which signature c14n (canonicalization) algorithm to use. The default is:
+     * "http://www.w3.org/2001/10/xml-exc-c14n#"
+     */
+    public static final String SIG_C14N_ALGO = "signatureC14nAlgorithm";
 
     /**
      * Parameter to define which parts of the request shall be signed.

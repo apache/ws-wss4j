@@ -81,6 +81,9 @@ public class SAMLTokenSignedAction implements Action {
         if (reqData.getSigDigestAlgorithm() != null) {
             wsSign.setDigestAlgo(reqData.getSigDigestAlgorithm());
         }
+        if (reqData.getSignatureC14nAlgorithm() != null) {
+            wsSign.setSigCanonicalization(reqData.getSignatureC14nAlgorithm());
+        }
 
          /*
          * required to add support for the 
