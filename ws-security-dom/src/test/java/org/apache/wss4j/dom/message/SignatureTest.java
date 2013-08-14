@@ -868,6 +868,53 @@ public class SignatureTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
     }
+    
+    @org.junit.Test
+    public void testWSHandlerSignatureCanonicalization() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final int action = WSConstants.SIGN;
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
+        
+        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
+        config.put(WSHandlerConstants.SIG_C14N_ALGO, WSConstants.C14N_WITH_COMMENTS);
+        config.put("password", "security");
+        reqData.setMsgContext(config);
+        
+        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
+        actions.add(WSConstants.SIGN);
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        handler.send(
+            action, 
+            doc, 
+            reqData, 
+            actions,
+            true
+        );
+        String outputString = 
+            XMLUtils.PrettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message:");
+            LOG.debug(outputString);
+        }
+        
+        RequestData data = new RequestData();
+        data.setWssConfig(WSSConfig.getNewInstance());
+        data.setSigVerCrypto(crypto);
+        
+        List<BSPRule> disabledRules = new ArrayList<BSPRule>();
+        disabledRules.add(BSPRule.R5404);
+        disabledRules.add(BSPRule.R5406);
+        data.setIgnoredBSPRules(disabledRules);
+        
+        WSSecurityEngine newSecEngine = new WSSecurityEngine();
+        List<WSSecurityEngineResult> results = 
+            newSecEngine.processSecurityHeader(doc, "", data);
+        assertTrue(handler.checkResults(results, actions));
+    }
 
     /**
      * Verifies the soap envelope.

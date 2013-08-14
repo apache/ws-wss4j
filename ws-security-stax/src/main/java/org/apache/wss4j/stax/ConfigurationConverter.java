@@ -462,6 +462,9 @@ public final class ConfigurationConverter {
         String sigDigestAlgo = getString(ConfigurationConstants.SIG_DIGEST_ALGO, config);
         properties.setSignatureDigestAlgorithm(sigDigestAlgo);
         
+        String sigC14nAlgo = getString(ConfigurationConstants.SIG_C14N_ALGO, config);
+        properties.setSignatureCanonicalizationAlgorithm(sigC14nAlgo);
+        
         String sigParts = getString(ConfigurationConstants.SIGNATURE_PARTS, config);
         if (sigParts != null) {
             List<SecurePart> parts = new ArrayList<SecurePart>();

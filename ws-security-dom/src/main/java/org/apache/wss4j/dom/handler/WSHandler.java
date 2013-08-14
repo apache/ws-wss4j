@@ -528,6 +528,9 @@ public abstract class WSHandler {
         
         String digestAlgo = getString(WSHandlerConstants.SIG_DIGEST_ALGO, mc);
         reqData.setSigDigestAlgorithm(digestAlgo);
+        
+        String c14nAlgo = getString(WSHandlerConstants.SIG_C14N_ALGO, mc);
+        reqData.setSignatureC14nAlgorithm(c14nAlgo);
 
         String parts = getString(WSHandlerConstants.SIGNATURE_PARTS, mc);
         if (parts != null) {
