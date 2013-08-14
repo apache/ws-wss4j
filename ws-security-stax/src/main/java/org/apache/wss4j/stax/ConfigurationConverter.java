@@ -470,6 +470,7 @@ public final class ConfigurationConverter {
             List<SecurePart> parts = new ArrayList<SecurePart>();
             splitEncParts(sigParts, parts, WSSConstants.NS_SOAP11);
             for (SecurePart part : parts) {
+                part.setDigestMethod(sigDigestAlgo);
                 properties.addSignaturePart(part);
             }
         }
@@ -480,6 +481,7 @@ public final class ConfigurationConverter {
             splitEncParts(sigParts, parts, WSSConstants.NS_SOAP11);
             for (SecurePart part : parts) {
                 part.setRequired(false);
+                part.setDigestMethod(sigDigestAlgo);
                 properties.addSignaturePart(part);
             }
         }

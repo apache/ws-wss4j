@@ -90,7 +90,15 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
     private void checkBSPCompliance(InputProcessorChain inputProcessorChain, SignatureType signatureType) throws WSSecurityException {
         String algorithm = signatureType.getSignedInfo().getSignatureMethod().getAlgorithm();
         final WSInboundSecurityContext securityContext = (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
-        if (!WSSConstants.NS_XMLDSIG_HMACSHA1.equals(algorithm) && !WSSConstants.NS_XMLDSIG_RSASHA1.equals(algorithm)) {
+        if (!(WSSConstants.NS_XMLDSIG_HMACSHA1.equals(algorithm) 
+            || WSSConstants.NS_XMLDSIG_RSASHA1.equals(algorithm)
+            || WSSConstants.NS_XMLDSIG_HMACSHA256.equals(algorithm) 
+            || WSSConstants.NS_XMLDSIG_HMACSHA384.equals(algorithm) 
+            || WSSConstants.NS_XMLDSIG_HMACSHA512.equals(algorithm) 
+            || WSSConstants.NS_XMLDSIG_RSASHA256.equals(algorithm)
+            || WSSConstants.NS_XMLDSIG_RSASHA384.equals(algorithm)
+            || WSSConstants.NS_XMLDSIG_RSASHA512.equals(algorithm))) {
+            // Weakening this rule a bit to allow > SHA-1
             securityContext.handleBSPRule(BSPRule.R5421);
         }
 

@@ -117,7 +117,10 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                     }
                 }
             }
-            if (!WSSConstants.NS_XMLDSIG_SHA1.equals(referenceType.getDigestMethod().getAlgorithm())) {
+            if (!(WSSConstants.NS_XMLDSIG_SHA1.equals(referenceType.getDigestMethod().getAlgorithm())
+                || WSSConstants.NS_XENC_SHA256.equals(referenceType.getDigestMethod().getAlgorithm())
+                || WSSConstants.NS_XENC_SHA512.equals(referenceType.getDigestMethod().getAlgorithm()))) {
+                // Weakening this a bit to allow SHA > 1
                 securityContext.handleBSPRule(BSPRule.R5420);
             }
         }
