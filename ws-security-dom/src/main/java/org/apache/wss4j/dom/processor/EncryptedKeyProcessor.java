@@ -75,6 +75,18 @@ public class EncryptedKeyProcessor implements Processor {
         if (log.isDebugEnabled()) {
             log.debug("Found encrypted key element");
         }
+        
+        // See if this key has already been processed. If so then just return the result
+        String id = elem.getAttributeNS(null, "Id");
+        if (!"".equals(id)) {
+             WSSecurityEngineResult result = wsDocInfo.getResult(id);
+             if (result != null && 
+                 WSConstants.ENCR == (Integer)result.get(WSSecurityEngineResult.TAG_ACTION)
+             ) {
+                 return java.util.Collections.singletonList(result);
+             }
+        }
+        
         if (data.getDecCrypto() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noDecCryptoFile");
         }
