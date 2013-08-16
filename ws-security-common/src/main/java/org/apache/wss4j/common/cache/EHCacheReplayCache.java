@@ -36,12 +36,17 @@ public class EHCacheReplayCache implements ReplayCache, Closeable {
     
     public static final long DEFAULT_TTL = 3600L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
-    private Ehcache cache;
-    private CacheManager cacheManager;
-    private long ttl = DEFAULT_TTL;
+    protected Ehcache cache;
+    protected CacheManager cacheManager;
+    protected long ttl = DEFAULT_TTL;
     
     public EHCacheReplayCache(String key, URL configFileURL) {
-        cacheManager = EHCacheManagerHolder.getCacheManager(configFileURL);
+        this(key, EHCacheManagerHolder.getCacheManager("", configFileURL));
+    }
+    
+    public EHCacheReplayCache(String key, CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
+        
         CacheConfiguration cc = EHCacheManagerHolder.getCacheConfiguration(key, cacheManager);
 
         Ehcache newCache = new Cache(cc);
@@ -95,7 +100,7 @@ public class EHCacheReplayCache implements ReplayCache, Closeable {
             }
         }
         
-        cache.put(new Element(identifier, identifier, false, parsedTTL, parsedTTL));
+        cache.put(new Element(identifier, identifier, parsedTTL, parsedTTL));
     }
     
     /**

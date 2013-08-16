@@ -102,6 +102,8 @@ public class RequestData {
     private boolean addUsernameTokenCreated;
     private Certificate[] tlsCerts;
     private boolean includeSignatureToken;
+    private boolean enableTimestampReplayCache = true;
+    private boolean enableNonceReplayCache = true;
 
     public void clear() {
         soapConstants = null;
@@ -136,10 +138,28 @@ public class RequestData {
         setAddUsernameTokenCreated(false);
         setTlsCerts(null);
         includeSignatureToken = false;
+        enableTimestampReplayCache = true;
+        enableNonceReplayCache = true;
     }
 
     public String getSignatureC14nAlgorithm() {
         return signatureC14nAlgorithm;
+    }
+
+    public boolean isEnableTimestampReplayCache() {
+        return enableTimestampReplayCache;
+    }
+
+    public void setEnableTimestampReplayCache(boolean enableTimestampReplayCache) {
+        this.enableTimestampReplayCache = enableTimestampReplayCache;
+    }
+
+    public boolean isEnableNonceReplayCache() {
+        return enableNonceReplayCache;
+    }
+
+    public void setEnableNonceReplayCache(boolean enableNonceReplayCache) {
+        this.enableNonceReplayCache = enableNonceReplayCache;
     }
 
     public void setSignatureC14nAlgorithm(String signatureC14nAlgorithm) {
@@ -499,7 +519,7 @@ public class RequestData {
      * @throws WSSecurityException 
      */
     public ReplayCache getTimestampReplayCache() throws WSSecurityException {
-        if (timestampReplayCache == null) {
+        if (enableTimestampReplayCache && timestampReplayCache == null) {
             timestampReplayCache = createCache("wss4j-timestamp-cache-");
         }
         
@@ -524,7 +544,7 @@ public class RequestData {
      * @throws WSSecurityException 
      */
     public ReplayCache getNonceReplayCache() throws WSSecurityException {
-        if (nonceReplayCache == null) {
+        if (enableNonceReplayCache && nonceReplayCache == null) {
             nonceReplayCache = createCache("wss4j-nonce-cache-");
         }
         

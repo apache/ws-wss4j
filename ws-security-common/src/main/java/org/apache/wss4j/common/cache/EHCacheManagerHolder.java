@@ -90,17 +90,17 @@ public final class EHCacheManagerHolder {
         return cc;
     }
     
-    public static CacheManager getCacheManager(URL configFileURL) {
+    public static CacheManager getCacheManager(String confName, URL configFileURL) {
         CacheManager cacheManager = null;
         if (configFileURL == null) {
             //using the default
-            cacheManager = findDefaultCacheManager();
+            cacheManager = findDefaultCacheManager(confName);
         }
         if (cacheManager == null) {
             if (configFileURL == null) {
                 cacheManager = createCacheManager();
             } else {
-                cacheManager = createCacheManager(configFileURL);
+                cacheManager = findDefaultCacheManager(confName, configFileURL);
             }
         }
         AtomicInteger a = COUNTS.get(cacheManager.getName());
@@ -115,11 +115,10 @@ public final class EHCacheManagerHolder {
         return cacheManager;
     }
     
-    private static CacheManager findDefaultCacheManager() {
+    private static CacheManager findDefaultCacheManager(String confName) {
 
         String defaultConfigFile = "wss4j-ehcache.xml";
         URL configFileURL = null;
-        String busId = "";
         try {
             configFileURL = Loader.getResource(defaultConfigFile);
             if (configFileURL == null) {
@@ -129,19 +128,16 @@ public final class EHCacheManagerHolder {
             // Do nothing
             LOG.debug(e.getMessage());
         }
+        return findDefaultCacheManager(confName, configFileURL);
+    }
+    
+    private static CacheManager findDefaultCacheManager(String confName, URL configFileURL) {
         try {
             Configuration conf = ConfigurationFactory.parseConfiguration(configFileURL);
-            /*
-            String perBus = (String)bus.getProperty("ws-security.cachemanager.per.bus");
-            if (perBus == null) {
-                perBus = "true";
-            }
-            if (Boolean.parseBoolean(perBus)) {
-            */
-            conf.setName(busId);
+            conf.setName(confName);
             if ("java.io.tmpdir".equals(conf.getDiskStoreConfiguration().getOriginalPath())) {
                 String path = conf.getDiskStoreConfiguration().getPath() + File.separator
-                    + busId;
+                    + confName;
                 conf.getDiskStoreConfiguration().setPath(path);
             }
             return createCacheManager(conf);

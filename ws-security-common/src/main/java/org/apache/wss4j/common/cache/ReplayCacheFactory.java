@@ -46,7 +46,7 @@ public abstract class ReplayCacheFactory {
         }
     }
     
-    protected static synchronized boolean isEhCacheInstalled() {
+    public static synchronized boolean isEhCacheInstalled() {
         return ehCacheInstalled;
     }
     
