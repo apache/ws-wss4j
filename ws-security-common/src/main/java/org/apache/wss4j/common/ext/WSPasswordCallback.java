@@ -45,11 +45,14 @@ import javax.security.auth.callback.Callback;
  * <li><code>USERNAME_TOKEN</code> - need the password to fill in or to
  * verify a <code>UsernameToken</code>.</li>
  * <li><code>SIGNATURE</code> - need the password to get the private key of
- * this identifier (username) from    the keystore. WSS4J uses this private
+ * this identifier (username) from the keystore. WSS4J uses this private
  * key to produce a signature. The signature verification uses the public
  * key to verify the signature.</li>
  * <li><code>SECURITY_CONTEXT_TOKEN</code> - need the key to to be associated
  * with a <code>wsc:SecurityContextToken</code>.</li>
+ * <li><code>PASSWORD_ENCRYPTOR_PASSWORD</code> - return the password used with a 
+ * PasswordEncryptor implementation to decrypt encrypted passwords stored in
+ * Crypto properties files</li>
  * </ul>
  */
 
@@ -64,6 +67,7 @@ public class WSPasswordCallback implements Callback {
         CUSTOM_TOKEN,
         ENCRYPTED_KEY_TOKEN,
         SECRET_KEY,
+        PASSWORD_ENCRYPTOR_PASSWORD
     }
 
     private String identifier;

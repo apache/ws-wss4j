@@ -24,7 +24,10 @@ import java.security.cert.CertStore;
 import java.util.Properties;
 
 import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.Merlin;
+import org.apache.wss4j.common.crypto.PasswordEncryptor;
+import org.apache.wss4j.common.util.Loader;
 import org.apache.xml.security.stax.config.ConfigurationProperties;
 
 
@@ -41,6 +44,7 @@ class WSSCrypto {
     private KeyStore cachedKeyStore;
     private KeyStore keyStore;
     private CertStore crlCertStore;
+    private PasswordEncryptor passwordEncryptor;
     
     public Crypto getCrypto() throws WSSConfigurationException {
         
@@ -51,8 +55,11 @@ class WSSCrypto {
         Merlin crypto = null;
         if (cryptoProperties != null) {
             try {
-                Constructor<?> ctor = cryptoClass.getConstructor(Properties.class);
-                crypto = (Merlin)ctor.newInstance(cryptoProperties);
+                Constructor<?> ctor = 
+                    cryptoClass.getConstructor(Properties.class, ClassLoader.class, PasswordEncryptor.class);
+                crypto = (Merlin)ctor.newInstance(cryptoProperties, 
+                                                  Loader.getClassLoader(CryptoFactory.class),
+                                                  passwordEncryptor);
                 keyStore = crypto.getKeyStore();
             } catch (Exception e) {
                 throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureCryptoFailure", e);
@@ -64,6 +71,7 @@ class WSSCrypto {
                 crypto.setCryptoProvider(ConfigurationProperties.getProperty("CertProvider"));
                 crypto.setKeyStore(this.getKeyStore());
                 crypto.setCRLCertStore(this.getCrlCertStore());
+                crypto.setPasswordEncryptor(passwordEncryptor);
             } catch (Exception e) {
                 throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureCryptoFailure", e);
             }
@@ -112,5 +120,13 @@ class WSSCrypto {
 
     public void setCrlCertStore(CertStore crlCertStore) {
         this.crlCertStore = crlCertStore;
+    }
+    
+    public PasswordEncryptor getPasswordEncryptor() {
+        return passwordEncryptor;
+    }
+
+    public void setPasswordEncryptor(PasswordEncryptor passwordEncryptor) {
+        this.passwordEncryptor = passwordEncryptor;
     }
 }

@@ -42,6 +42,7 @@ import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.cache.ReplayCacheFactory;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.Merlin;
+import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.validate.Validator;
@@ -338,10 +339,16 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     }
     
     public void setSignatureCryptoProperties(Properties cryptoProperties) {
+        this.setSignatureCryptoProperties(cryptoProperties, null);
+    }
+    
+    public void setSignatureCryptoProperties(Properties cryptoProperties,
+                                             PasswordEncryptor passwordEncryptor) {
         if (signatureWSSCrypto == null) {
             signatureWSSCrypto = new WSSCrypto();
         }
         signatureWSSCrypto.setCryptoProperties(cryptoProperties);
+        signatureWSSCrypto.setPasswordEncryptor(passwordEncryptor);
     }
 
     public Class<? extends Merlin> getSignatureCryptoClass() {
@@ -407,10 +414,16 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     }
     
     public void setSignatureVerificationCryptoProperties(Properties cryptoProperties) {
+        this.setSignatureVerificationCryptoProperties(cryptoProperties, null);
+    }
+    
+    public void setSignatureVerificationCryptoProperties(Properties cryptoProperties,
+                                                         PasswordEncryptor passwordEncryptor) {
         if (signatureVerificationWSSCrypto == null) {
             signatureVerificationWSSCrypto = new WSSCrypto();
         }
         signatureVerificationWSSCrypto.setCryptoProperties(cryptoProperties);
+        signatureVerificationWSSCrypto.setPasswordEncryptor(passwordEncryptor);
     }
 
     public Class<? extends Merlin> getSignatureVerificationCryptoClass() {
@@ -480,10 +493,16 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     }
     
     public void setDecryptionCryptoProperties(Properties cryptoProperties) {
+        this.setDecryptionCryptoProperties(cryptoProperties, null);
+    }
+    
+    public void setDecryptionCryptoProperties(Properties cryptoProperties,
+                                              PasswordEncryptor passwordEncryptor) {
         if (decryptionWSSCrypto == null) {
             decryptionWSSCrypto = new WSSCrypto();
         }
         decryptionWSSCrypto.setCryptoProperties(cryptoProperties);
+        decryptionWSSCrypto.setPasswordEncryptor(passwordEncryptor);
     }
 
     /**
@@ -568,10 +587,16 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     }
     
     public void setEncryptionCryptoProperties(Properties cryptoProperties) {
+        this.setEncryptionCryptoProperties(cryptoProperties, null);
+    }
+    
+    public void setEncryptionCryptoProperties(Properties cryptoProperties, 
+                                              PasswordEncryptor passwordEncryptor) {
         if (encryptionWSSCrypto == null) {
             encryptionWSSCrypto = new WSSCrypto();
         }
         encryptionWSSCrypto.setCryptoProperties(cryptoProperties);
+        encryptionWSSCrypto.setPasswordEncryptor(passwordEncryptor);
     }
 
     /**

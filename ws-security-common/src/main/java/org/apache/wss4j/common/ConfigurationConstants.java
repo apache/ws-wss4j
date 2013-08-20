@@ -824,5 +824,18 @@ public final class ConfigurationConstants {
      */
     public static final String TIMESTAMP_CACHE_INSTANCE = "timestampCacheInstance";
     
+    /**
+     * This holds a reference to a PasswordEncryptor instance, which is used to encrypt or 
+     * decrypt passwords in the Merlin Crypto implementation (or any custom Crypto implementations).
+     * 
+     * By default, WSS4J uses the StrongJasyptPasswordEncryptor, which must be instantiated with a 
+     * master password to use to decrypt keystore passwords in the Merlin Crypto properties file.
+     * This master password is obtained via the CallbackHandler defined via PW_CALLBACK_CLASS
+     * or PW_CALLBACK_REF.
+     * 
+     * The encrypted passwords must be stored in the format "ENC(encoded encrypted password)".
+     */
+    public static final String PASSWORD_ENCRYPTOR_INSTANCE = "passwordEncyptorInstance";
+    
 }
 

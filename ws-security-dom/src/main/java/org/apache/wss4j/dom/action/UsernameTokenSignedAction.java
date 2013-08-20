@@ -46,8 +46,10 @@ import org.w3c.dom.Document;
 public class UsernameTokenSignedAction implements Action {
     public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
             throws WSSecurityException {
-        CallbackHandler callbackHandler = 
-            handler.getPasswordCallbackHandler(reqData);
+        CallbackHandler callbackHandler = reqData.getCallbackHandler();
+        if (callbackHandler == null) {
+            callbackHandler = handler.getPasswordCallbackHandler(reqData);
+        }
         WSPasswordCallback passwordCallback = 
             handler.getPasswordCB(reqData.getUsername(), actionToDo, callbackHandler, reqData);
 

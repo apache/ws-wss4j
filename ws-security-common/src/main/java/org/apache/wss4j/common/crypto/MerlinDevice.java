@@ -45,7 +45,7 @@ public class MerlinDevice extends Merlin {
 
     
     @Override
-    public void loadProperties(Properties properties, ClassLoader loader) 
+    public void loadProperties(Properties properties, ClassLoader loader,  PasswordEncryptor passwordEncryptor) 
         throws WSSecurityException, IOException {
         if (properties == null) {
             return;
@@ -77,6 +77,7 @@ public class MerlinDevice extends Merlin {
         String keyStorePassword = properties.getProperty(KEYSTORE_PASSWORD, "security");
         if (keyStorePassword != null) {
             keyStorePassword = keyStorePassword.trim();
+            keyStorePassword = decryptPassword(keyStorePassword, passwordEncryptor);
         }
         String keyStoreType = properties.getProperty(KEYSTORE_TYPE, KeyStore.getDefaultType());
         if (keyStoreType != null) {
@@ -109,6 +110,7 @@ public class MerlinDevice extends Merlin {
         String trustStorePassword = properties.getProperty(TRUSTSTORE_PASSWORD, "changeit");
         if (trustStorePassword != null) {
             trustStorePassword = trustStorePassword.trim();
+            trustStorePassword = decryptPassword(trustStorePassword, passwordEncryptor);
         }
         String trustStoreType = properties.getProperty(TRUSTSTORE_TYPE, KeyStore.getDefaultType());
         if (trustStoreType != null) {
@@ -147,6 +149,7 @@ public class MerlinDevice extends Merlin {
                 String cacertsPasswd = properties.getProperty(TRUSTSTORE_PASSWORD, "changeit");
                 if (cacertsPasswd != null) {
                     cacertsPasswd = cacertsPasswd.trim();
+                    cacertsPasswd = decryptPassword(cacertsPasswd, passwordEncryptor);
                 }
                 truststore = load(is, cacertsPasswd, null, KeyStore.getDefaultType());
                 if (DO_DEBUG) {

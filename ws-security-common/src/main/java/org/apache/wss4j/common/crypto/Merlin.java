@@ -68,6 +68,9 @@ import org.apache.wss4j.common.util.Loader;
  */
 public class Merlin extends CryptoBase {
     
+    public static final String ENCRYPTED_PASSWORD_PREFIX = "ENC(";
+    public static final String ENCRYPTED_PASSWORD_SUFFIX = ")";
+    
     public static final String PREFIX = "org.apache.wss4j.crypto.merlin.";
     public static final String OLD_PREFIX = "org.apache.ws.security.crypto.merlin.";
     
@@ -114,6 +117,7 @@ public class Merlin extends CryptoBase {
     protected CertStore crlCertStore;
     protected boolean loadCACerts;
     protected boolean privatePasswordSet; 
+    protected PasswordEncryptor passwordEncryptor;
     
     public Merlin() {
         // default constructor
@@ -147,27 +151,21 @@ public class Merlin extends CryptoBase {
         }
     }
     
-    public Merlin(Properties properties) 
+    public Merlin(Properties properties, ClassLoader loader, PasswordEncryptor passwordEncryptor) 
         throws WSSecurityException, IOException {
-        this(properties, Loader.getClassLoader(Merlin.class));
-    }
-
-    public Merlin(Properties properties, ClassLoader loader) 
-        throws WSSecurityException, IOException {
-        loadProperties(properties, loader);
+        loadProperties(properties, loader, passwordEncryptor);
     }
     
-    public void loadProperties(Properties properties) 
-        throws WSSecurityException, IOException {
-        loadProperties(properties, Loader.getClassLoader(Merlin.class));
-    }
-    
-    public void loadProperties(Properties properties, ClassLoader loader) 
-        throws WSSecurityException, IOException {
+    public void loadProperties(
+        Properties properties, 
+        ClassLoader loader, 
+        PasswordEncryptor passwordEncryptor
+    ) throws WSSecurityException, IOException {
         if (properties == null) {
             return;
         }
         this.properties = properties;
+        this.passwordEncryptor = passwordEncryptor;
         
         String prefix = PREFIX;
         for (Object key : properties.keySet()) {
@@ -213,6 +211,7 @@ public class Merlin extends CryptoBase {
                 String passwd = properties.getProperty(prefix + KEYSTORE_PASSWORD, "security");
                 if (passwd != null) {
                     passwd = passwd.trim();
+                    passwd = decryptPassword(passwd, passwordEncryptor);
                 }
                 String type = properties.getProperty(prefix + KEYSTORE_TYPE, KeyStore.getDefaultType());
                 if (type != null) {
@@ -252,6 +251,7 @@ public class Merlin extends CryptoBase {
                 String passwd = properties.getProperty(prefix + TRUSTSTORE_PASSWORD, "changeit");
                 if (passwd != null) {
                     passwd = passwd.trim();
+                    passwd = decryptPassword(passwd, passwordEncryptor);
                 }
                 String type = properties.getProperty(prefix + TRUSTSTORE_TYPE, KeyStore.getDefaultType());
                 if (type != null) {
@@ -285,6 +285,7 @@ public class Merlin extends CryptoBase {
                     String cacertsPasswd = properties.getProperty(prefix + TRUSTSTORE_PASSWORD, "changeit");
                     if (cacertsPasswd != null) {
                         cacertsPasswd = cacertsPasswd.trim();
+                        cacertsPasswd = decryptPassword(cacertsPasswd, passwordEncryptor);
                     }
                     truststore = load(is, cacertsPasswd, null, KeyStore.getDefaultType());
                     if (DO_DEBUG) {
@@ -689,6 +690,7 @@ public class Merlin extends CryptoBase {
                 }
                 if (password != null) {
                     password = password.trim();
+                    password = decryptPassword(password, passwordEncryptor);
                 }
             }
             Key keyTmp = keystore.getKey(identifier, password == null 
@@ -1480,5 +1482,24 @@ public class Merlin extends CryptoBase {
         return pwCb.getPassword();
     }
     
+    protected String decryptPassword(String password, PasswordEncryptor passwordEncryptor) {
+        if (password.startsWith(ENCRYPTED_PASSWORD_PREFIX)
+            && password.endsWith(ENCRYPTED_PASSWORD_SUFFIX)) {
+            if (passwordEncryptor == null) {
+                String error = 
+                    "The Crypto properties has an encrypted password, but no PasswordEncryptor is configured!";
+                LOG.debug(error);
+                return password;
+            }
+            String substring = password.substring(ENCRYPTED_PASSWORD_PREFIX.length(), 
+                                                  password.length() - 1);
+            return passwordEncryptor.decrypt(substring);
+        }
+        
+        return password;
+    }
     
+    public void setPasswordEncryptor(PasswordEncryptor passwordEncryptor) {
+        this.passwordEncryptor = passwordEncryptor;
+    }
 }

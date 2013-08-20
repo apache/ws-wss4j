@@ -68,7 +68,6 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
-import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;

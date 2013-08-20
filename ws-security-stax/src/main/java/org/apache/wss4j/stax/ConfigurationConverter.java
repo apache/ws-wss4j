@@ -33,6 +33,8 @@ import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.PasswordEncryptor;
+import org.apache.wss4j.common.crypto.StrongJasyptPasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.StringUtil;
@@ -66,8 +68,8 @@ public final class ConfigurationConverter {
         
         parseActions(config, properties);
         parseUserProperties(config, properties);
-        parseCrypto(config, properties);
         parseCallback(config, properties);
+        parseCrypto(config, properties);
         parseBooleanProperties(config, properties);
         parseNonBooleanProperties(config, properties);
         
@@ -156,6 +158,19 @@ public final class ConfigurationConverter {
         Map<String, Object> config, 
         WSSSecurityProperties properties
     ) {
+        Object passwordEncryptorObj = 
+            config.get(ConfigurationConstants.PASSWORD_ENCRYPTOR_INSTANCE);
+        PasswordEncryptor passwordEncryptor = null;
+        if (passwordEncryptorObj instanceof PasswordEncryptor) {
+            passwordEncryptor = (PasswordEncryptor)passwordEncryptorObj;
+        }
+        if (passwordEncryptor == null) {
+            CallbackHandler callbackHandler = properties.getCallbackHandler();
+            if (callbackHandler != null) {
+                passwordEncryptor = new StrongJasyptPasswordEncryptor(callbackHandler);
+            }
+        }
+        
         String sigPropRef = getString(ConfigurationConstants.SIG_PROP_REF_ID, config);
         boolean foundSigRef = false;
         if (sigPropRef != null) {
@@ -165,7 +180,7 @@ public final class ConfigurationConverter {
                 properties.setSignatureCrypto((Crypto)sigRef);
             } else if (sigRef instanceof Properties) {
                 foundSigRef = true;
-                properties.setSignatureCryptoProperties((Properties)sigRef);
+                properties.setSignatureCryptoProperties((Properties)sigRef, passwordEncryptor);
             }
             if (foundSigRef && properties.getSignatureUser() == null) {
                 properties.setSignatureUser(getDefaultX509Identifier(properties));
@@ -178,7 +193,7 @@ public final class ConfigurationConverter {
                 try {
                     Properties sigProperties = 
                         CryptoFactory.getProperties(sigPropFile, getClassLoader());
-                    properties.setSignatureCryptoProperties(sigProperties);
+                    properties.setSignatureCryptoProperties(sigProperties, passwordEncryptor);
                     if (properties.getSignatureUser() == null) {
                         properties.setSignatureUser(getDefaultX509Identifier(properties));
                     }
@@ -197,7 +212,7 @@ public final class ConfigurationConverter {
                 properties.setSignatureVerificationCrypto((Crypto)sigVerRef);
             } else if (sigVerRef instanceof Properties) {
                 foundSigVerRef = true;
-                properties.setSignatureVerificationCryptoProperties((Properties)sigVerRef);
+                properties.setSignatureVerificationCryptoProperties((Properties)sigVerRef, passwordEncryptor);
             } 
         }
         
@@ -207,7 +222,7 @@ public final class ConfigurationConverter {
                 try {
                     Properties sigProperties = 
                         CryptoFactory.getProperties(sigPropFile, getClassLoader());
-                    properties.setSignatureVerificationCryptoProperties(sigProperties);
+                    properties.setSignatureVerificationCryptoProperties(sigProperties, passwordEncryptor);
                 } catch (WSSecurityException e) {
                     log.error(e.getMessage(), e);
                 }
@@ -223,7 +238,7 @@ public final class ConfigurationConverter {
                 properties.setEncryptionCrypto((Crypto)encRef);
             } else if (encRef instanceof Properties) {
                 foundEncRef = true;
-                properties.setEncryptionCryptoProperties((Properties)encRef);
+                properties.setEncryptionCryptoProperties((Properties)encRef, passwordEncryptor);
             } 
         }
         
@@ -233,7 +248,7 @@ public final class ConfigurationConverter {
                 try {
                     Properties encProperties = 
                         CryptoFactory.getProperties(encPropFile, getClassLoader());
-                    properties.setEncryptionCryptoProperties(encProperties);
+                    properties.setEncryptionCryptoProperties(encProperties, passwordEncryptor);
                 } catch (WSSecurityException e) {
                     log.error(e.getMessage(), e);
                 }
@@ -249,7 +264,7 @@ public final class ConfigurationConverter {
                 properties.setDecryptionCrypto((Crypto)decRef);
             } else if (decRef instanceof Properties) {
                 foundDecRef = true;
-                properties.setDecryptionCryptoProperties((Properties)decRef);
+                properties.setDecryptionCryptoProperties((Properties)decRef, passwordEncryptor);
             } 
         }
         
@@ -259,7 +274,7 @@ public final class ConfigurationConverter {
                 try {
                     Properties encProperties = 
                         CryptoFactory.getProperties(encPropFile, getClassLoader());
-                    properties.setDecryptionCryptoProperties(encProperties);
+                    properties.setDecryptionCryptoProperties(encProperties, passwordEncryptor);
                 } catch (WSSecurityException e) {
                     log.error(e.getMessage(), e);
                 }

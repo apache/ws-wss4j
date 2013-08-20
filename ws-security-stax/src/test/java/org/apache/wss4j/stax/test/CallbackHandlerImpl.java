@@ -70,6 +70,8 @@ public class CallbackHandlerImpl implements CallbackHandler {
             } else if (pc.getUsage() == WSPasswordCallback.Usage.SECRET_KEY
                     || pc.getUsage() == WSPasswordCallback.Usage.SECURITY_CONTEXT_TOKEN) {
                 pc.setKey(secret);
+            } else if (pc.getUsage() == WSPasswordCallback.Usage.PASSWORD_ENCRYPTOR_PASSWORD) {
+                pc.setPassword("this-is-a-secret");
             } else {
                 throw new UnsupportedCallbackException(pc, "Unrecognized CallbackHandlerImpl");
             }

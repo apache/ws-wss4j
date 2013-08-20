@@ -77,7 +77,7 @@ public abstract class CryptoFactory {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                     "empty", null, "Cannot load Crypto instance as properties object is null");
         }
-        return getInstance(properties, Loader.getClassLoader(CryptoFactory.class));
+        return getInstance(properties, Loader.getClassLoader(CryptoFactory.class), null);
     }
 
     /**
@@ -93,12 +93,14 @@ public abstract class CryptoFactory {
      *                        and the Crypto impl class name.
      *                        These properties are dependent on the crypto implementation
      * @param classLoader   The class loader to use
+     * @param passwordEncryptor The PasswordEncryptor to use to decrypt encrypted passwords
      * @return The crypto implementation or null if no cryptoClassName was defined
      * @throws WSSecurityException if there is an error in loading the crypto properties
      */
     public static Crypto getInstance(
         Properties properties, 
-        ClassLoader classLoader
+        ClassLoader classLoader,
+        PasswordEncryptor passwordEncryptor
     ) throws WSSecurityException {
         if (properties == null) {
             if (LOG.isDebugEnabled()) {
@@ -118,7 +120,7 @@ public abstract class CryptoFactory {
             || cryptoClassName.equals("org.apache.wss4j.common.crypto.Merlin")
             || cryptoClassName.equals("org.apache.ws.security.components.crypto.Merlin")) {
             try {
-                return new Merlin(properties, classLoader);
+                return new Merlin(properties, classLoader, passwordEncryptor);
             } catch (java.lang.Exception e) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Unable to instantiate Merlin", e);
@@ -190,7 +192,7 @@ public abstract class CryptoFactory {
         ClassLoader customClassLoader
     ) throws WSSecurityException {
         Properties properties = getProperties(propFilename, customClassLoader);
-        return getInstance(properties, customClassLoader);
+        return getInstance(properties, customClassLoader, null);
     }
 
     /**

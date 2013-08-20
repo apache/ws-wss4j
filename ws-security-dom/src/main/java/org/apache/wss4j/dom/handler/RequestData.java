@@ -41,6 +41,7 @@ import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.cache.ReplayCacheFactory;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.token.UsernameToken;
@@ -104,6 +105,7 @@ public class RequestData {
     private boolean includeSignatureToken;
     private boolean enableTimestampReplayCache = true;
     private boolean enableNonceReplayCache = true;
+    private PasswordEncryptor passwordEncryptor;
 
     public void clear() {
         soapConstants = null;
@@ -140,6 +142,7 @@ public class RequestData {
         includeSignatureToken = false;
         enableTimestampReplayCache = true;
         enableNonceReplayCache = true;
+        passwordEncryptor = null;
     }
 
     public String getSignatureC14nAlgorithm() {
@@ -661,6 +664,14 @@ public class RequestData {
 
     public void setIncludeSignatureToken(boolean includeSignatureToken) {
         this.includeSignatureToken = includeSignatureToken;
+    }
+
+    public PasswordEncryptor getPasswordEncryptor() {
+        return passwordEncryptor;
+    }
+
+    public void setPasswordEncryptor(PasswordEncryptor passwordEncryptor) {
+        this.passwordEncryptor = passwordEncryptor;
     }
         
 }

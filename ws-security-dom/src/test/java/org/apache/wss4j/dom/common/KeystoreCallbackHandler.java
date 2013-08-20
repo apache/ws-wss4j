@@ -49,7 +49,11 @@ public class KeystoreCallbackHandler implements CallbackHandler {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                pc.setPassword(users.get(pc.getIdentifier()));
+                if (users.containsKey(pc.getIdentifier())) {
+                    pc.setPassword(users.get(pc.getIdentifier()));
+                } else if (WSPasswordCallback.Usage.PASSWORD_ENCRYPTOR_PASSWORD == pc.getUsage()) {
+                    pc.setPassword("this-is-a-secret");
+                }
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
             }

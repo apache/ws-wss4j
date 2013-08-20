@@ -37,8 +37,10 @@ import org.w3c.dom.Node;
 public class SignatureAction implements Action {
     public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
             throws WSSecurityException {
-        CallbackHandler callbackHandler = 
-            handler.getPasswordCallbackHandler(reqData);
+        CallbackHandler callbackHandler = reqData.getCallbackHandler();
+        if (callbackHandler == null) {
+            callbackHandler = handler.getPasswordCallbackHandler(reqData);
+        }
         WSPasswordCallback passwordCallback = 
             handler.getPasswordCB(reqData.getSignatureUser(), actionToDo, callbackHandler, reqData);
         WSSecSignature wsSign = new WSSecSignature(reqData.getWssConfig());

@@ -43,6 +43,8 @@ import org.apache.wss4j.dom.action.Action;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.PasswordEncryptor;
+import org.apache.wss4j.common.crypto.StrongJasyptPasswordEncryptor;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
@@ -114,6 +116,14 @@ public abstract class WSHandler {
             WSSecurityUtil.getSOAPConstants(doc.getDocumentElement())
         );
         wssConfig.setAddInclusivePrefixes(decodeAddInclusivePrefixes(reqData));
+        
+        // Load CallbackHandler
+        if (reqData.getCallbackHandler() == null) {
+            CallbackHandler passwordCallbackHandler = 
+                getPasswordCallbackHandler(reqData);
+            reqData.setCallbackHandler(passwordCallbackHandler);
+        }
+        
         /*
          * Here we have action, username, password, and actor, mustUnderstand.
          * Now get the action specific parameters.
@@ -303,6 +313,13 @@ public abstract class WSHandler {
             reqData.setDisableBSPEnforcement(true);
         }
         reqData.setWssConfig(wssConfig);
+        
+        // Load CallbackHandler
+        if (reqData.getCallbackHandler() == null) {
+            CallbackHandler passwordCallbackHandler = 
+                getPasswordCallbackHandler(reqData);
+            reqData.setCallbackHandler(passwordCallbackHandler);
+        }
 
         if ((doAction & WSConstants.SIGN) == WSConstants.SIGN
             || (doAction & WSConstants.ST_SIGNED) == WSConstants.ST_SIGNED
@@ -931,7 +948,9 @@ public abstract class WSHandler {
             if (crypto == null) {
                 Object obj = getProperty(mc, refId);
                 if (obj instanceof Properties) {
-                    crypto = CryptoFactory.getInstance((Properties)obj);
+                    crypto = CryptoFactory.getInstance((Properties)obj,
+                                                       Loader.getClassLoader(CryptoFactory.class),
+                                                       getPasswordEncryptor(requestData));
                     cryptos.put(refId, crypto);
                 } else if (obj instanceof Crypto) {
                     crypto = (Crypto)obj;
@@ -979,9 +998,11 @@ public abstract class WSHandler {
         String propFilename, 
         RequestData reqData
     ) throws WSSecurityException {
+        ClassLoader classLoader = this.getClassLoader(reqData.getMsgContext());
+        Properties properties = CryptoFactory.getProperties(propFilename, classLoader);
         return 
             CryptoFactory.getInstance(
-                propFilename, this.getClassLoader(reqData.getMsgContext())
+                properties, classLoader, getPasswordEncryptor(reqData)
             );
     }
 
@@ -1065,6 +1086,19 @@ public abstract class WSHandler {
             );
         }
         return cbHandler;
+    }
+    
+    protected PasswordEncryptor getPasswordEncryptor(RequestData requestData) {
+        if (requestData.getPasswordEncryptor() != null) {
+            return requestData.getPasswordEncryptor();
+        }
+        
+        CallbackHandler callbackHandler = requestData.getCallbackHandler();
+        if (callbackHandler != null) {
+            return new StrongJasyptPasswordEncryptor(callbackHandler);
+        }
+        
+        return null;
     }
     
     /**
