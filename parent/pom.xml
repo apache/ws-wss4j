@@ -46,7 +46,7 @@
         <xalan.version>2.7.1</xalan.version>
         <xerces.version>2.11.0</xerces.version>
         <xmlsec.version>2.0.0-SNAPSHOT</xmlsec.version>
-        <opensaml.version>2.5.3</opensaml.version>
+        <opensaml.version>2.6.0</opensaml.version>
         <testng.version>6.5.2</testng.version>
         <junit.version>4.11</junit.version>
         <xml.apis.version>1.4.01</xml.apis.version>
