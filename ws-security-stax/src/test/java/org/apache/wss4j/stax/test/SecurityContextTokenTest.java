@@ -42,7 +42,6 @@ import org.apache.wss4j.stax.test.utils.SecretKeyCallbackHandler;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
-import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;

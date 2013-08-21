@@ -20,6 +20,8 @@ package org.apache.wss4j.common.kerberos;
 
 public class KerberosTokenDecoderException extends Exception {
 
+    private static final long serialVersionUID = 1L;
+
     public KerberosTokenDecoderException(String message) {
         super(message);
     }

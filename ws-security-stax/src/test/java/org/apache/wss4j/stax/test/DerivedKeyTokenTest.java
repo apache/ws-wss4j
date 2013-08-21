@@ -43,7 +43,6 @@ import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
-import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
