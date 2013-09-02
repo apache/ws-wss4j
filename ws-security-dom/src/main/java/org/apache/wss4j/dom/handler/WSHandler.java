@@ -43,8 +43,8 @@ import org.apache.wss4j.dom.action.Action;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.JasyptPasswordEncryptor;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
-import org.apache.wss4j.common.crypto.StrongJasyptPasswordEncryptor;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
@@ -1095,7 +1095,7 @@ public abstract class WSHandler {
         
         CallbackHandler callbackHandler = requestData.getCallbackHandler();
         if (callbackHandler != null) {
-            return new StrongJasyptPasswordEncryptor(callbackHandler);
+            return new JasyptPasswordEncryptor(callbackHandler);
         }
         
         return null;

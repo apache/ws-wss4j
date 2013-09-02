@@ -26,27 +26,39 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.wss4j.common.ext.WSPasswordCallback;
-import org.jasypt.util.text.StrongTextEncryptor;
+import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 
 
 /**
- * An implementation of PasswordEncryptor that relies on Jasypt's StrongTextEncryptor to encrypt
- * and decrypt passwords.
+ * An implementation of PasswordEncryptor that relies on Jasypt's StandardPBEStringEncryptor to 
+ * encrypt and decrypt passwords. The default algorithm that is used is "PBEWithMD5AndTripleDES".
  */
-public class StrongJasyptPasswordEncryptor implements PasswordEncryptor {
+public class JasyptPasswordEncryptor implements PasswordEncryptor {
+    
+    public static final String DEFAULT_ALGORITHM = "PBEWithMD5AndTripleDES";
     
     private static final org.slf4j.Logger LOG = 
-        org.slf4j.LoggerFactory.getLogger(StrongJasyptPasswordEncryptor.class);
+        org.slf4j.LoggerFactory.getLogger(JasyptPasswordEncryptor.class);
     
-    private final StrongTextEncryptor passwordEncryptor;
+    private final StandardPBEStringEncryptor passwordEncryptor;
     
-    public StrongJasyptPasswordEncryptor(String masterPassword) {
-        passwordEncryptor = new StrongTextEncryptor();
-        passwordEncryptor.setPassword(masterPassword);
+    public JasyptPasswordEncryptor(String masterPassword) {
+        this(masterPassword, DEFAULT_ALGORITHM);
     }
     
-    public StrongJasyptPasswordEncryptor(CallbackHandler callbackHandler) {
-        passwordEncryptor = new StrongTextEncryptor();
+    public JasyptPasswordEncryptor(String masterPassword, String algorithm) {
+        passwordEncryptor = new StandardPBEStringEncryptor();
+        passwordEncryptor.setPassword(masterPassword);
+        passwordEncryptor.setAlgorithm(algorithm);
+    }
+    
+    public JasyptPasswordEncryptor(CallbackHandler callbackHandler) {
+        this(callbackHandler, DEFAULT_ALGORITHM);
+    }
+    
+    public JasyptPasswordEncryptor(CallbackHandler callbackHandler, String algorithm) {
+        passwordEncryptor = new StandardPBEStringEncryptor();
+        passwordEncryptor.setAlgorithm(algorithm);
         
         WSPasswordCallback pwCb = 
             new WSPasswordCallback("", WSPasswordCallback.Usage.PASSWORD_ENCRYPTOR_PASSWORD);

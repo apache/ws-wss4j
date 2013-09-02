@@ -26,8 +26,8 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.JasyptPasswordEncryptor;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
-import org.apache.wss4j.common.crypto.StrongJasyptPasswordEncryptor;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
@@ -54,7 +54,7 @@ public class PasswordEncryptorTest extends org.junit.Assert {
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private PasswordEncryptor passwordEncryptor = 
-        new StrongJasyptPasswordEncryptor("this-is-a-secret");
+        new JasyptPasswordEncryptor("this-is-a-secret");
     private Crypto crypto = null;
     
     @org.junit.AfterClass

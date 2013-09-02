@@ -33,8 +33,8 @@ import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.JasyptPasswordEncryptor;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
-import org.apache.wss4j.common.crypto.StrongJasyptPasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.StringUtil;
@@ -167,7 +167,7 @@ public final class ConfigurationConverter {
         if (passwordEncryptor == null) {
             CallbackHandler callbackHandler = properties.getCallbackHandler();
             if (callbackHandler != null) {
-                passwordEncryptor = new StrongJasyptPasswordEncryptor(callbackHandler);
+                passwordEncryptor = new JasyptPasswordEncryptor(callbackHandler);
             }
         }
         

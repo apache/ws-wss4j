@@ -30,8 +30,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.JasyptPasswordEncryptor;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
-import org.apache.wss4j.common.crypto.StrongJasyptPasswordEncryptor;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.OutboundWSSec;
@@ -63,7 +63,7 @@ public class PasswordEncryptorTest extends AbstractTestBase {
             Properties properties = 
                 CryptoFactory.getProperties("transmitter-crypto-enc.properties", this.getClass().getClassLoader());
             PasswordEncryptor passwordEncryptor = 
-                new StrongJasyptPasswordEncryptor(new CallbackHandlerImpl());
+                new JasyptPasswordEncryptor(new CallbackHandlerImpl());
             securityProperties.setSignatureCryptoProperties(properties, passwordEncryptor);
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
@@ -110,7 +110,7 @@ public class PasswordEncryptorTest extends AbstractTestBase {
             Properties properties = 
                 CryptoFactory.getProperties("transmitter-crypto-enc.properties", this.getClass().getClassLoader());
             PasswordEncryptor passwordEncryptor = 
-                new StrongJasyptPasswordEncryptor(new CallbackHandlerImpl());
+                new JasyptPasswordEncryptor(new CallbackHandlerImpl());
             securityProperties.setEncryptionCryptoProperties(properties, passwordEncryptor);
             securityProperties.setEncryptionUser("receiver");
 

@@ -29,7 +29,7 @@ public class PasswordEncryptorTest extends org.junit.Assert {
     public void testStrongJasyptPasswordEncryptor() throws Exception {
         
         PasswordEncryptor passwordEncryptor = 
-            new StrongJasyptPasswordEncryptor("master-password");
+            new JasyptPasswordEncryptor("master-password");
         String encryptedPassword = passwordEncryptor.encrypt("password");
         assertNotEquals(encryptedPassword, "password");
         String decryptedPassword = passwordEncryptor.decrypt(encryptedPassword);
