@@ -5,6 +5,22 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.6.12
+=============
+
+Bug
+
+    [WSS-418] - Cannot configure SAML properties in WSS4JOutInterceptor without having to add that config file in the classpath
+    [WSS-473] - BST signature element
+    [WSS-474] - Missing the 'EncodingType' attribute in element built by STRTransformUtil#createBSTX509
+    [WSS-475] - Issue with multiple processing of ReferenceList in EncryptedKey element
+
+Improvement
+
+    [WSS-465] - Possible information leak: incremental IDs
+    [WSS-467] - Support creating SAML 2.0 Tokens with the AuthnStatement SessionNotOnOrAfter attribute.
+    [WSS-476] - Add the ability to configure the Signature Canonicalization Algorithm via WSHandler
+
 Release 1.6.11
 =============
 
