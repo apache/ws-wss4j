@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.saml;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.ws.security.WSConstants;
@@ -35,6 +36,7 @@ import org.apache.ws.security.message.WSSecSAMLToken;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.SAMLParms;
 import org.apache.ws.security.saml.ext.bean.ConditionsBean;
+import org.apache.ws.security.saml.ext.bean.ProxyRestrictionBean;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.joda.time.DateTime;
 import org.w3c.dom.Document;
@@ -217,6 +219,88 @@ public class SamlConditionsTest extends org.junit.Assert {
             LOG.debug("SAML 2 Authn Assertion (sender vouches):");
             String outputString = 
                 org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(unsignedDoc);
+            LOG.debug(outputString);
+        }
+        
+        verify(unsignedDoc);
+    }
+    
+    /**
+     * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
+     * with a OneTimeUse Element
+     */
+    @org.junit.Test
+    public void testSAML2OneTimeUse() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        
+        ConditionsBean conditions = new ConditionsBean();
+        conditions.setTokenPeriodMinutes(5);
+        conditions.setOneTimeUse(true);
+            
+        callbackHandler.setConditions(conditions);
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(unsignedDoc);
+        assertTrue(outputString.contains("OneTimeUse"));
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        verify(unsignedDoc);
+    }
+    
+    /**
+     * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
+     * with a ProxyRestriction Element
+     */
+    @org.junit.Test
+    public void testSAML2ProxyRestriction() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        
+        ConditionsBean conditions = new ConditionsBean();
+        conditions.setTokenPeriodMinutes(5);
+        ProxyRestrictionBean proxyRestriction = new ProxyRestrictionBean();
+        List<String> audiences = new ArrayList<String>();
+        audiences.add("http://apache.org/one");
+        audiences.add("http://apache.org/two");
+        proxyRestriction.getAudienceURIs().addAll(audiences);
+        proxyRestriction.setCount(5);
+        conditions.setProxyRestriction(proxyRestriction);
+        
+        callbackHandler.setConditions(conditions);
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(unsignedDoc);
+        assertTrue(outputString.contains("ProxyRestriction"));
+        if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
         
