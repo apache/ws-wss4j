@@ -655,11 +655,7 @@ public abstract class WSHandler {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                     "empty", "WSHandler: Encryption: no username");
         }
-        /*
-         * String msgType = msgContext.getCurrentMessage().getMessageType(); if
-         * (msgType != null && msgType.equals(Message.RESPONSE)) {
-         * handleSpecialUser(encUser); }
-         */
+
         handleSpecialUser(reqData);
 
         String encParts = getString(WSHandlerConstants.ENCRYPTION_PARTS, mc);

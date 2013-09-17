@@ -187,7 +187,7 @@ public final class ConfigurationConstants {
      * <p/>
      * The handler uses the public key of the sender's certificate. Using this
      * way to define an encryption key simplifies certificate management to
-     * a large extend.
+     * a large extent.
      */
     public static final String USE_REQ_SIG_CERT = "useReqSigCert";
     
