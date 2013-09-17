@@ -17,22 +17,23 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.handler;
+package org.apache.ws.security.handler;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.common.CustomHandler;
-import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
-import org.apache.wss4j.dom.common.SOAPUtil;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
+import org.apache.ws.security.WSSecurityEngine;
+import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.common.CustomHandler;
+import org.apache.ws.security.common.KeystoreCallbackHandler;
+import org.apache.ws.security.common.SOAPUtil;
+import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.ws.security.util.XMLUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**
@@ -42,11 +43,6 @@ import org.w3c.dom.Document;
 public class UseReqSigCertTest extends org.junit.Assert {
     private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(UseReqSigCertTest.class);
-    
-    @org.junit.AfterClass
-    public static void cleanup() throws Exception {
-        SecurityTestUtil.cleanup();
-    }
     
     public UseReqSigCertTest() throws Exception {
         WSSConfig.init();
@@ -203,14 +199,15 @@ public class UseReqSigCertTest extends org.junit.Assert {
         reqData.setWssConfig(cfg);
         
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
-        config.put(WSHandlerConstants.SIG_VER_PROP_FILE, "wss40.properties");
+        config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         reqData.setMsgContext(config);
         
         CustomHandler handler = new CustomHandler();
         handler.receive(action, reqData);
         
         WSSecurityEngine securityEngine = new WSSecurityEngine();
-        return securityEngine.processSecurityHeader(doc, "", reqData);
+        Element securityHeader = WSSecurityUtil.getSecurityHeader(doc, "");
+        return securityEngine.processSecurityHeader(securityHeader, reqData);
     }
     
     private void sendResponse(List<WSHandlerResult> handlerResults) throws Exception {
