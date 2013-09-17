@@ -27,16 +27,15 @@ import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
 import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean;
+import org.apache.wss4j.common.saml.bean.ProxyRestrictionBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
 import org.apache.wss4j.common.saml.bean.SubjectLocalityBean;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
-
 import org.joda.time.DateTime;
 import org.opensaml.Configuration;
 import org.opensaml.common.SAMLObjectBuilder;
 import org.opensaml.common.SAMLVersion;
-
 import org.opensaml.saml2.core.Action;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.saml2.core.Attribute;
@@ -54,11 +53,12 @@ import org.opensaml.saml2.core.Evidence;
 import org.opensaml.saml2.core.Issuer;
 import org.opensaml.saml2.core.KeyInfoConfirmationDataType;
 import org.opensaml.saml2.core.NameID;
+import org.opensaml.saml2.core.OneTimeUse;
+import org.opensaml.saml2.core.ProxyRestriction;
 import org.opensaml.saml2.core.Subject;
 import org.opensaml.saml2.core.SubjectConfirmation;
 import org.opensaml.saml2.core.SubjectConfirmationData;
 import org.opensaml.saml2.core.SubjectLocality;
-
 import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.XMLObjectBuilderFactory;
 import org.opensaml.xml.schema.XSString;
@@ -67,7 +67,6 @@ import org.opensaml.xml.signature.KeyInfo;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 /**
  * Class SAML2ComponentBuilder provides builder methods that can be used
@@ -83,6 +82,10 @@ public final class SAML2ComponentBuilder {
     private static volatile SAMLObjectBuilder<NameID> nameIdBuilder;
     
     private static volatile SAMLObjectBuilder<SubjectConfirmation> subjectConfirmationBuilder;
+    
+    private static volatile SAMLObjectBuilder<OneTimeUse> oneTimeUseBuilder;
+    
+    private static volatile SAMLObjectBuilder<ProxyRestriction> proxyRestrictionBuilder;
     
     private static volatile SAMLObjectBuilder<Conditions> conditionsBuilder;
     
@@ -213,6 +216,13 @@ public final class SAML2ComponentBuilder {
             conditions.getAudienceRestrictions().add(audienceRestriction);
         }
         
+        if (conditionsBean.isOneTimeUse()) {
+            conditions.getConditions().add(createOneTimeUse());
+        }
+        
+        if (conditionsBean.getProxyRestriction() != null) {
+            conditions.getConditions().add(createProxyRestriction(conditionsBean.getProxyRestriction()));
+        }
         return conditions;
     }
 
@@ -238,6 +248,53 @@ public final class SAML2ComponentBuilder {
         audience.setAudienceURI(audienceURI);
         audienceRestriction.getAudiences().add(audience);
         return audienceRestriction;
+    }
+    
+    /**
+     * Create a OneTimeUse object
+     *
+     * @return a OneTimeUse object
+     */
+    @SuppressWarnings("unchecked")
+    public static OneTimeUse createOneTimeUse() {
+        if (oneTimeUseBuilder == null) {
+            oneTimeUseBuilder = (SAMLObjectBuilder<OneTimeUse>) 
+                builderFactory.getBuilder(OneTimeUse.DEFAULT_ELEMENT_NAME);
+        }
+       
+        return oneTimeUseBuilder.buildObject();
+    }
+    
+    /**
+     * Create a ProxyRestriction object
+     *
+     * @return a ProxyRestriction object
+     */
+    @SuppressWarnings("unchecked")
+    public static ProxyRestriction createProxyRestriction(ProxyRestrictionBean proxyRestrictionBean) {
+        if (proxyRestrictionBuilder == null) {
+            proxyRestrictionBuilder = (SAMLObjectBuilder<ProxyRestriction>) 
+                builderFactory.getBuilder(ProxyRestriction.DEFAULT_ELEMENT_NAME);
+        }
+        
+        ProxyRestriction proxyRestriction = proxyRestrictionBuilder.buildObject();
+        if (proxyRestrictionBean.getCount() > 0) {
+            proxyRestriction.setProxyCount(proxyRestrictionBean.getCount());
+        }
+        
+        if (!proxyRestrictionBean.getAudienceURIs().isEmpty()) {
+            if (audienceBuilder == null) {
+                audienceBuilder = (SAMLObjectBuilder<Audience>) 
+                    builderFactory.getBuilder(Audience.DEFAULT_ELEMENT_NAME);
+            }
+            for (String audienceURI : proxyRestrictionBean.getAudienceURIs()) {
+                Audience audience = audienceBuilder.buildObject();
+                audience.setAudienceURI(audienceURI);
+                proxyRestriction.getAudiences().add(audience);
+            }
+        }
+        
+        return proxyRestriction;
     }
 
     /**

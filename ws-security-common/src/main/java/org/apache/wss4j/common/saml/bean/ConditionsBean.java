@@ -31,6 +31,8 @@ public class ConditionsBean {
     private DateTime notAfter;
     private int tokenPeriodMinutes;
     private String audienceURI;
+    private boolean oneTimeUse;
+    private ProxyRestrictionBean proxyRestriction;
 
     /**
      * Constructor ConditionsBean creates a new ConditionsBean instance.
@@ -136,6 +138,30 @@ public class ConditionsBean {
     }
 
     /**
+     * Get whether to include a OneTimeUse Element or not. Only applies to SAML2.
+     * @return whether to include a OneTimeUse Element or not.
+     */
+    public boolean isOneTimeUse() {
+        return oneTimeUse;
+    }
+
+    /**
+     * Set whether to include a OneTimeUse Element or not. Only applies to SAML2.
+     * @param oneTimeUse whether to include a OneTimeUse Element or not.
+     */
+    public void setOneTimeUse(boolean oneTimeUse) {
+        this.oneTimeUse = oneTimeUse;
+    }
+    
+    public ProxyRestrictionBean getProxyRestriction() {
+        return proxyRestriction;
+    }
+
+    public void setProxyRestriction(ProxyRestrictionBean proxyRestriction) {
+        this.proxyRestriction = proxyRestriction;
+    }
+    
+    /**
      * Method equals ...
      *
      * @param o of type Object
@@ -167,6 +193,15 @@ public class ConditionsBean {
         } else if (audienceURI != null && !audienceURI.equals(that.audienceURI)) {
             return false; 
         }
+        
+        if (oneTimeUse != that.oneTimeUse) return false;
+        
+        if (proxyRestriction == null && that.proxyRestriction != null) {
+            return false;
+        } else if (proxyRestriction != null 
+            && !proxyRestriction.equals(that.proxyRestriction)) {
+            return false; 
+        }
 
         return true;
     }
@@ -186,6 +221,11 @@ public class ConditionsBean {
         if (audienceURI != null) {
             result = 31 * result + audienceURI.hashCode();
         }
+        result = 31 * result + (oneTimeUse ? 1 : 0);
+        if (proxyRestriction != null) {
+            result = 31 * result + proxyRestriction.hashCode();
+        }
         return result;
     }
+
 }
