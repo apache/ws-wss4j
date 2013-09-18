@@ -49,6 +49,9 @@ import java.util.Map;
  */
 
 public class IssuedTokenAssertionState extends TokenAssertionState {
+    
+    private static final String DEFAULT_CLAIMS_NAMESPACE = 
+        "http://schemas.xmlsoap.org/ws/2005/05/identity";
 
     public IssuedTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, boolean initiator) {
         super(assertion, asserted, initiator);
@@ -96,6 +99,16 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
                         setErrorMessage(errorMsg);
                         return false;
                     }
+                }
+            }
+            
+            Element claims = issuedToken.getClaims();
+            if (claims != null && issuedTokenSecurityEvent instanceof SamlTokenSecurityEvent) {
+                String errorMsg = 
+                    validateClaims((Element) claims, (SamlTokenSecurityEvent)issuedTokenSecurityEvent);
+                if (errorMsg != null) {
+                    setErrorMessage(errorMsg);
+                    return false;
                 }
             }
         } catch (XMLSecurityException e) {
@@ -177,6 +190,11 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
     //todo I think the best is if we allow to set custom AssertionStates object on the policy-engine for
     //custom validation -> task for WSS4j V2.1 ?
     protected String validateClaims(Element claimsPolicy, SamlTokenSecurityEvent samlTokenSecurityEvent) throws WSSecurityException {
+        String dialect = claimsPolicy.getAttributeNS(null, "Dialect");
+        if (!DEFAULT_CLAIMS_NAMESPACE.equals(dialect)) {
+            return null;
+        }
+        
         Node child = claimsPolicy.getFirstChild();
         while (child != null) {
             if (child.getNodeType() != Node.ELEMENT_NODE) {
@@ -184,10 +202,6 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
                 continue;
             }
 
-            String dialect = claimsPolicy.getAttributeNS(null, "Dialect");
-            if (!"http://schemas.xmlsoap.org/ws/2005/05/identity".equals(dialect)) {
-                return "Unsupported claims dialect: " + dialect;
-            }
             if ("ClaimType".equals(child.getLocalName())) {
                 Element claimType = (Element) child;
                 String claimTypeUri = claimType.getAttributeNS(null, "Uri");
