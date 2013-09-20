@@ -85,6 +85,7 @@ public class RequestData {
     protected boolean requireSignedEncryptedDataElements = false;
     private ReplayCache timestampReplayCache;
     private ReplayCache nonceReplayCache;
+    private ReplayCache samlOneTimeUseReplayCache;
     private Collection<Pattern> subjectDNPatterns = new ArrayList<Pattern>();
     private boolean appendSignatureAfterTimestamp;
     private int originalSignatureActionPosition;
@@ -115,6 +116,7 @@ public class RequestData {
         enableRevocation = false;
         timestampReplayCache = null;
         nonceReplayCache = null;
+        samlOneTimeUseReplayCache = null;
         subjectDNPatterns.clear();
         appendSignatureAfterTimestamp = false;
         algorithmSuite = null;
@@ -516,6 +518,21 @@ public class RequestData {
     }
     
     /**
+     * Set the replay cache for SAML2 OneTimeUse Assertions
+     */
+    public void setSamlOneTimeUseReplayCache(ReplayCache newCache) {
+        samlOneTimeUseReplayCache = newCache;
+    }
+
+    /**
+     * Get the replay cache for SAML2 OneTimeUse Assertions
+     * @throws WSSecurityException 
+     */
+    public ReplayCache getSamlOneTimeUseReplayCache() throws WSSecurityException {
+        return samlOneTimeUseReplayCache;
+    }
+    
+    /**
      * Set the Signature Subject Cert Constraints
      */
     public void setSubjectCertConstraints(Collection<Pattern> subjectCertConstraints) {
@@ -562,5 +579,5 @@ public class RequestData {
     public void setOriginalSignatureActionPosition(int originalSignatureActionPosition) {
         this.originalSignatureActionPosition = originalSignatureActionPosition;
     }
-        
+
 }

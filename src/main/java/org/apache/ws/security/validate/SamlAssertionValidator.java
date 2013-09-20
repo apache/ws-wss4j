@@ -19,9 +19,11 @@
 
 package org.apache.ws.security.validate;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.cache.ReplayCache;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
@@ -97,6 +99,9 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         
         // Check conditions
         checkConditions(assertion);
+
+        // Check OneTimeUse Condition
+        checkOneTimeUse(assertion, data);
         
         // Validate the assertion against schemas/profiles
         validateAssertion(assertion);
@@ -157,7 +162,42 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
             throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
         }
     }
-    
+
+    /**
+     * Check the "OneTimeUse" Condition of the Assertion. If this is set then the Assertion
+     * is cached (if a cache is defined), and must not have been previously cached
+     */
+    protected void checkOneTimeUse(
+        AssertionWrapper samlAssertion, RequestData data
+    ) throws WSSecurityException {
+        if (data.getSamlOneTimeUseReplayCache() != null
+            && samlAssertion.getSamlVersion().equals(SAMLVersion.VERSION_20)
+            && samlAssertion.getSaml2().getConditions() != null
+            && samlAssertion.getSaml2().getConditions().getOneTimeUse() != null) {
+            String identifier = samlAssertion.getId();
+
+            ReplayCache replayCache = data.getSamlOneTimeUseReplayCache();
+            if (replayCache.contains(identifier)) {
+                throw new WSSecurityException(
+                    WSSecurityException.INVALID_SECURITY,
+                    "badSamlToken",
+                    new Object[] {"A replay attack has been detected"});
+            }
+
+            DateTime expires = samlAssertion.getSaml2().getConditions().getNotOnOrAfter();
+            if (expires != null) {
+                Date rightNow = new Date();
+                long currentTime = rightNow.getTime();
+                long expiresTime = expires.getMillis();
+                replayCache.add(identifier, 1L + (expiresTime - currentTime) / 1000L);
+            } else {
+                replayCache.add(identifier);
+            }
+
+            replayCache.add(identifier);
+        }
+    }
+
     /**
      * Validate the assertion against schemas/profiles
      */
