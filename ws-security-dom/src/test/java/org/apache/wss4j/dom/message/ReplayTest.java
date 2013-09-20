@@ -30,6 +30,7 @@ import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
+import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
@@ -37,6 +38,11 @@ import org.apache.wss4j.common.cache.MemoryReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.bean.ConditionsBean;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -432,6 +438,106 @@ public class ReplayTest extends org.junit.Assert {
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }   
+    }
+    
+    /**
+     * Test that creates, sends and processes an unsigned SAML 2 authentication assertion. This
+     * is just a sanity test to make sure that it is possible to send the SAML token twice, as
+     * no "OneTimeUse" Element is defined there is no problem with replaying it.
+     * with a OneTimeUse Element
+     */
+    @org.junit.Test
+    public void testEhCacheReplayedSAML2() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+        
+        ConditionsBean conditions = new ConditionsBean();
+        conditions.setTokenPeriodMinutes(5);
+            
+        callbackHandler.setConditions(conditions);
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            String outputString = XMLUtils.PrettyDocumentToString(unsignedDoc);
+            LOG.debug(outputString);
+        }
+        
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        RequestData data = new RequestData();
+        data.setWssConfig(wssConfig);
+        data.setCallbackHandler(callbackHandler);
+        
+        // Successfully verify SAML Token
+        verify(unsignedDoc, wssConfig, data);
+        
+        // Now try again - this should work fine as well
+        verify(unsignedDoc, wssConfig, data);
+    }
+    
+    /**
+     * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
+     * with a OneTimeUse Element
+     */
+    @org.junit.Test
+    public void testEhCacheReplayedSAML2OneTimeUse() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+        
+        ConditionsBean conditions = new ConditionsBean();
+        conditions.setTokenPeriodMinutes(5);
+        conditions.setOneTimeUse(true);
+            
+        callbackHandler.setConditions(conditions);
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+
+        String outputString = 
+            XMLUtils.PrettyDocumentToString(unsignedDoc);
+        assertTrue(outputString.contains("OneTimeUse"));
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        RequestData data = new RequestData();
+        data.setWssConfig(wssConfig);
+        data.setCallbackHandler(callbackHandler);
+        
+        // Successfully verify SAML Token
+        verify(unsignedDoc, wssConfig, data);
+        
+        // Now try again - a replay attack should be detected
+        try {
+            verify(unsignedDoc, wssConfig, data);
+            fail("Expected failure on a replay attack");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+        }
     }
     
     /**

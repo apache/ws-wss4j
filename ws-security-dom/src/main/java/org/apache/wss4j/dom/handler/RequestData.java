@@ -91,6 +91,7 @@ public class RequestData {
     protected boolean requireSignedEncryptedDataElements;
     private ReplayCache timestampReplayCache;
     private ReplayCache nonceReplayCache;
+    private ReplayCache samlOneTimeUseReplayCache;
     private Collection<Pattern> subjectDNPatterns = new ArrayList<Pattern>();
     private final List<BSPRule> ignoredBSPRules = new LinkedList<BSPRule>();
     private boolean appendSignatureAfterTimestamp;
@@ -105,6 +106,7 @@ public class RequestData {
     private boolean includeSignatureToken;
     private boolean enableTimestampReplayCache = true;
     private boolean enableNonceReplayCache = true;
+    private boolean enableSamlOneTimeUseReplayCache = true;
     private PasswordEncryptor passwordEncryptor;
 
     public void clear() {
@@ -128,6 +130,7 @@ public class RequestData {
         enableRevocation = false;
         timestampReplayCache = null;
         nonceReplayCache = null;
+        samlOneTimeUseReplayCache = null;
         subjectDNPatterns.clear();
         ignoredBSPRules.clear();
         appendSignatureAfterTimestamp = false;
@@ -142,6 +145,7 @@ public class RequestData {
         includeSignatureToken = false;
         enableTimestampReplayCache = true;
         enableNonceReplayCache = true;
+        setEnableSamlOneTimeUseReplayCache(true);
         passwordEncryptor = null;
     }
 
@@ -555,6 +559,25 @@ public class RequestData {
     }
     
     /**
+     * Set the replay cache for SAML2 OneTimeUse Assertions
+     */
+    public void setSamlOneTimeUseReplayCache(ReplayCache newCache) {
+        samlOneTimeUseReplayCache = newCache;
+    }
+
+    /**
+     * Get the replay cache for SAML2 OneTimeUse Assertions
+     * @throws WSSecurityException 
+     */
+    public ReplayCache getSamlOneTimeUseReplayCache() throws WSSecurityException {
+        if (enableSamlOneTimeUseReplayCache && samlOneTimeUseReplayCache == null) {
+            samlOneTimeUseReplayCache = createCache("wss4j-saml-one-time-use-cache-");
+        }
+        
+        return samlOneTimeUseReplayCache;
+    }
+    
+    /**
      * Set the Signature Subject Cert Constraints
      */
     public void setSubjectCertConstraints(Collection<Pattern> subjectCertConstraints) {
@@ -672,6 +695,14 @@ public class RequestData {
 
     public void setPasswordEncryptor(PasswordEncryptor passwordEncryptor) {
         this.passwordEncryptor = passwordEncryptor;
+    }
+
+    public boolean isEnableSamlOneTimeUseReplayCache() {
+        return enableSamlOneTimeUseReplayCache;
+    }
+
+    public void setEnableSamlOneTimeUseReplayCache(boolean enableSamlOneTimeUseReplayCache) {
+        this.enableSamlOneTimeUseReplayCache = enableSamlOneTimeUseReplayCache;
     }
         
 }

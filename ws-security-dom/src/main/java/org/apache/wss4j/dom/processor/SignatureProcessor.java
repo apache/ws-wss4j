@@ -682,7 +682,7 @@ public class SignatureProcessor implements Processor {
             Date rightNow = new Date();
             long currentTime = rightNow.getTime();
             long expiresTime = expires.getTime();
-            replayCache.add(identifier, (expiresTime - currentTime) / 1000L);
+            replayCache.add(identifier, 1L + (expiresTime - currentTime) / 1000L);
         } else {
             replayCache.add(identifier);
         }

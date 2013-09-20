@@ -512,6 +512,12 @@ public final class ConfigurationConstants {
      */
     public static final String ENABLE_TIMESTAMP_CACHE = "ws-security.enable.timestamp.cache";
     
+    /**
+     * Whether to cache SAML2 Token Identifiers, if the token contains a "OneTimeUse" Condition.
+     * The default value is "true".
+     */
+    public static final String ENABLE_SAML_ONE_TIME_USE_CACHE = "enableSamlOneTimeUseCache";
+    
     //
     // (Non-boolean) Configuration parameters for the actions/processors
     //
@@ -823,6 +829,13 @@ public final class ConfigurationConstants {
      * default instance that is used is the EHCacheReplayCache.
      */
     public static final String TIMESTAMP_CACHE_INSTANCE = "timestampCacheInstance";
+    
+    /**
+     * This holds a reference to a ReplayCache instance used to cache SAML2 Token Identifier 
+     * Strings (if the token contains a OneTimeUse Condition). The default instance that is 
+     * used is the EHCacheReplayCache.
+     */
+    public static final String SAML_ONE_TIME_USE_CACHE_INSTANCE = "samlOneTimeUseCacheInstance";
     
     /**
      * This holds a reference to a PasswordEncryptor instance, which is used to encrypt or 

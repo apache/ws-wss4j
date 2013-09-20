@@ -188,7 +188,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                 Date rightNow = new Date();
                 long currentTime = rightNow.getTime();
                 long expiresTime = expiresCal.getTimeInMillis();
-                replayCache.add(cacheKey, (expiresTime - currentTime) / 1000L);
+                replayCache.add(cacheKey, 1L + (expiresTime - currentTime) / 1000L);
             } else {
                 replayCache.add(cacheKey);
             }

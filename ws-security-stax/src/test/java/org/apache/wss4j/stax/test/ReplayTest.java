@@ -29,12 +29,15 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.wss4j.common.cache.ReplayCache;
+import org.apache.wss4j.common.saml.bean.ConditionsBean;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.InboundWSSec;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.test.saml.SAML2CallbackHandler;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.testng.Assert;
@@ -138,6 +141,115 @@ public class ReplayTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.setNonceReplayCache(replayCache);
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            try {
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                Assert.fail("Exception expected");
+            } catch (XMLStreamException e) {
+                org.junit.Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
+            }
+        }
+    }
+    
+    /**
+     * Test that creates, sends and processes an unsigned SAML 2 authentication assertion. This
+     * is just a sanity test to make sure that it is possible to send the SAML token twice, as
+     * no "OneTimeUse" Element is defined there is no problem with replaying it.
+     * with a OneTimeUse Element
+     */
+    @org.junit.Test
+    public void testEhCacheReplayedSAML2() throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+            callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+            callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+            callbackHandler.setIssuer("www.example.com");
+
+            ConditionsBean conditions = new ConditionsBean();
+            conditions.setTokenPeriodMinutes(5);
+            callbackHandler.setConditions(conditions);
+
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED;
+            Properties properties = new Properties();
+            properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
+
+        // process SAML Token
+        ReplayCache replayCache = null;
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            replayCache = securityProperties.getSamlOneTimeUseReplayCache();
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Assert.assertNotNull(document);
+        }
+        
+        // now process SAML Token again
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.setSamlOneTimeUseReplayCache(replayCache);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Assert.assertNotNull(document);
+        }
+    }
+    
+    /**
+     * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
+     * with a OneTimeUse Element
+     */
+    @org.junit.Test
+    public void testEhCacheReplayedSAML2OneTimeUse() throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+            callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+            callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+            callbackHandler.setIssuer("www.example.com");
+
+            ConditionsBean conditions = new ConditionsBean();
+            conditions.setTokenPeriodMinutes(5);
+            conditions.setOneTimeUse(true);
+            callbackHandler.setConditions(conditions);
+
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED;
+            Properties properties = new Properties();
+            properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
+
+        // process SAML Token
+        ReplayCache replayCache = null;
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            replayCache = securityProperties.getSamlOneTimeUseReplayCache();
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Assert.assertNotNull(document);
+        }
+        
+        // now process SAML Token again
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.setSamlOneTimeUseReplayCache(replayCache);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 

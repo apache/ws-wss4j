@@ -19,13 +19,17 @@
 
 package org.apache.wss4j.dom.validate;
 
+import java.util.Date;
 import java.util.List;
 
+import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.handler.RequestData;
+import org.joda.time.DateTime;
+import org.opensaml.common.SAMLVersion;
 
 /**
  * This class validates a SAML Assertion, which is wrapped in an "SamlAssertionWrapper" instance.
@@ -94,6 +98,9 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         // Check conditions
         checkConditions(samlAssertion);
         
+        // Check OneTimeUse Condition
+        checkOneTimeUse(samlAssertion, data);
+        
         // Validate the assertion against schemas/profiles
         validateAssertion(samlAssertion);
 
@@ -128,6 +135,41 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
      */
     protected void checkConditions(SamlAssertionWrapper samlAssertion) throws WSSecurityException {
         samlAssertion.checkConditions(futureTTL);
+    }
+    
+    /**
+     * Check the "OneTimeUse" Condition of the Assertion. If this is set then the Assertion
+     * is cached (if a cache is defined), and must not have been previously cached
+     */
+    protected void checkOneTimeUse(
+        SamlAssertionWrapper samlAssertion, RequestData data
+    ) throws WSSecurityException {
+        if (data.getSamlOneTimeUseReplayCache() != null
+            && samlAssertion.getSamlVersion().equals(SAMLVersion.VERSION_20)
+            && samlAssertion.getSaml2().getConditions() != null
+            && samlAssertion.getSaml2().getConditions().getOneTimeUse() != null) {
+            String identifier = samlAssertion.getId();
+            
+            ReplayCache replayCache = data.getSamlOneTimeUseReplayCache();
+            if (replayCache.contains(identifier)) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.INVALID_SECURITY,
+                    "badSamlToken",
+                    "A replay attack has been detected");
+            }
+            
+            DateTime expires = samlAssertion.getSaml2().getConditions().getNotOnOrAfter();
+            if (expires != null) {
+                Date rightNow = new Date();
+                long currentTime = rightNow.getTime();
+                long expiresTime = expires.getMillis();
+                replayCache.add(identifier, 1L + (expiresTime - currentTime) / 1000L);
+            } else {
+                replayCache.add(identifier);
+            }
+            
+            replayCache.add(identifier);
+        }
     }
     
     /**

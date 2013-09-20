@@ -446,6 +446,10 @@ public final class ConfigurationConverter {
             decodeBooleanConfigValue(ConfigurationConstants.ENABLE_NONCE_CACHE, true, config);
         properties.setEnableNonceReplayCache(enableNonceCache);
         
+        boolean enableSamlOneTimeUseCache = 
+            decodeBooleanConfigValue(ConfigurationConstants.ENABLE_SAML_ONE_TIME_USE_CACHE, true, config);
+        properties.setEnableSamlOneTimeUseReplayCache(enableSamlOneTimeUseCache);
+        
         boolean encryptSymmetricEncryptionKey = 
             decodeBooleanConfigValue(ConfigurationConstants.ENC_SYM_ENC_KEY, true, config);
         properties.setEncryptSymmetricEncrytionKey(encryptSymmetricEncryptionKey);
@@ -588,6 +592,12 @@ public final class ConfigurationConverter {
             (ReplayCache)config.get(ConfigurationConstants.TIMESTAMP_CACHE_INSTANCE);
         if (timestampCache != null) {
             properties.setTimestampReplayCache(timestampCache);
+        }
+        
+        ReplayCache samlOneTimeUseCache = 
+            (ReplayCache)config.get(ConfigurationConstants.SAML_ONE_TIME_USE_CACHE_INSTANCE);
+        if (samlOneTimeUseCache != null) {
+            properties.setSamlOneTimeUseReplayCache(samlOneTimeUseCache);
         }
     }
     

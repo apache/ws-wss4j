@@ -106,8 +106,10 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private boolean enableRevocation = false;
     private ReplayCache timestampReplayCache;
     private ReplayCache nonceReplayCache;
+    private ReplayCache samlOneTimeUseReplayCache;
     private boolean enableTimestampReplayCache = true;
     private boolean enableNonceReplayCache = true;
+    private boolean enableSamlOneTimeUseReplayCache = true;
     private boolean validateSamlSubjectConfirmation = true;
     private Collection<Pattern> subjectDNPatterns = new ArrayList<Pattern>();
 
@@ -152,8 +154,10 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.enableRevocation = wssSecurityProperties.enableRevocation;
         this.timestampReplayCache = wssSecurityProperties.timestampReplayCache;
         this.nonceReplayCache = wssSecurityProperties.nonceReplayCache;
+        this.samlOneTimeUseReplayCache = wssSecurityProperties.samlOneTimeUseReplayCache;
         this.enableTimestampReplayCache = wssSecurityProperties.enableTimestampReplayCache;
         this.enableNonceReplayCache = wssSecurityProperties.enableNonceReplayCache;
+        this.enableSamlOneTimeUseReplayCache = wssSecurityProperties.enableSamlOneTimeUseReplayCache;
         this.allowRSA15KeyTransportAlgorithm = wssSecurityProperties.allowRSA15KeyTransportAlgorithm;
         this.derivedKeyIterations = wssSecurityProperties.derivedKeyIterations;
         this.useDerivedKeyForMAC = wssSecurityProperties.useDerivedKeyForMAC;
@@ -765,6 +769,25 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         
         return nonceReplayCache;
     }
+    
+    /**
+     * Set the replay cache for SAML2 OneTimeUse Assertions
+     */
+    public void setSamlOneTimeUseReplayCache(ReplayCache newCache) {
+        samlOneTimeUseReplayCache = newCache;
+    }
+
+    /**
+     * Get the replay cache for SAML2 OneTimeUse Assertions
+     * @throws WSSecurityException 
+     */
+    public ReplayCache getSamlOneTimeUseReplayCache() throws WSSecurityException {
+        if (enableSamlOneTimeUseReplayCache && samlOneTimeUseReplayCache == null) {
+            samlOneTimeUseReplayCache = createCache("wss4j-saml-one-time-use-cache-");
+        }
+        
+        return samlOneTimeUseReplayCache;
+    }
 
     public boolean isDisableBSPEnforcement() {
         return disableBSPEnforcement;
@@ -860,6 +883,14 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public void setEnableNonceReplayCache(boolean enableNonceReplayCache) {
         this.enableNonceReplayCache = enableNonceReplayCache;
+    }
+    
+    public boolean isEnableSamlOneTimeUseReplayCache() {
+        return enableSamlOneTimeUseReplayCache;
+    }
+
+    public void setEnableSamlOneTimeUseReplayCache(boolean enableSamlOneTimeUseReplayCache) {
+        this.enableSamlOneTimeUseReplayCache = enableSamlOneTimeUseReplayCache;
     }
 
     public boolean isEncryptSymmetricEncrytionKey() {
