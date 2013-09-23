@@ -50,6 +50,7 @@ import org.opensaml.saml2.core.Conditions;
 import org.opensaml.xml.XMLObjectBuilder;
 import org.opensaml.xml.XMLObjectBuilderFactory;
 import org.opensaml.xml.schema.XSAny;
+import org.opensaml.xml.schema.XSInteger;
 import org.w3c.dom.Document;
 
 import java.util.Collections;
@@ -740,6 +741,54 @@ public class SamlTokenTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Attr Assertion (sender vouches):");
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(unsignedDoc);
+            LOG.debug(outputString);
+        }
+        
+        List<WSSecurityEngineResult> results = verify(unsignedDoc);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertFalse(receivedSamlAssertion.isSigned());
+    }
+    
+    /**
+     * Test that creates, sends and processes an unsigned SAML 2 attribute assertion. The attributeValue
+     * has a custom XMLObject (xsd:type="xsd:int") value.
+     */
+    @org.junit.Test
+    @SuppressWarnings("unchecked")
+    public void testSAML2AttrAssertionIntegerAttribute() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.ATTR);
+        callbackHandler.setIssuer("www.example.com");
+        
+        // Create and add a custom Attribute (Integer)
+        XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+        
+        XMLObjectBuilder<XSInteger> xsIntegerBuilder = builderFactory.getBuilder(XSInteger.TYPE_NAME);
+        XSInteger attributeValue = 
+            xsIntegerBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSInteger.TYPE_NAME);
+        attributeValue.setValue(5);
+        
+        callbackHandler.setCustomAttributeValues(Collections.singletonList(attributeValue));
+
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+
+        if (LOG.isDebugEnabled()) {
             String outputString = 
                 XMLUtils.PrettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
