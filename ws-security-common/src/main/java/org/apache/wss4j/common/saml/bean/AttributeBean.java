@@ -123,6 +123,13 @@ public class AttributeBean {
         this.attributeValues = attributeValues;
     }
     
+    public void addAttributeValue(Object attributeValue) {
+        if (attributeValues == null) {
+            attributeValues = new ArrayList<Object>();
+        }
+        attributeValues.add(attributeValue);
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
