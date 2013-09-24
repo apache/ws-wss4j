@@ -397,7 +397,7 @@ public final class SAML2ComponentBuilder {
      * @return a SAML2 Attribute
      */
     public static Attribute createAttribute(
-        String friendlyName, String name, String nameFormat, List<?> values
+        String friendlyName, String name, String nameFormat, List<Object> values
     ) {
         if (stringBuilder == null) {
             stringBuilder = (XSStringBuilder)builderFactory.getBuilder(XSString.TYPE_NAME);
@@ -585,10 +585,7 @@ public final class SAML2ComponentBuilder {
             for (AttributeStatementBean statementBean : attributeData) {
                 AttributeStatement attributeStatement = attributeStatementBuilder.buildObject();
                 for (AttributeBean values : statementBean.getSamlAttributes()) {
-                    List<?> attributeValues = values.getAttributeValues();
-                    if (attributeValues == null || attributeValues.isEmpty()) {
-                        attributeValues = values.getCustomAttributeValues();
-                    }
+                    List<Object> attributeValues = values.getAttributeValues();
                     Attribute samlAttribute = 
                         createAttribute(
                             values.getSimpleName(), 

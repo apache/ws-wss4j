@@ -29,14 +29,13 @@ public class AttributeBean {
     private String simpleName;
     private String qualifiedName;
     private String nameFormat;
-    private List<String> attributeValues;
-    private List<?> customAttributeValues;
+    private List<Object> attributeValues;
 
     /**
      * Constructor SamlAttribute creates a new SamlAttribute instance.
      */
     public AttributeBean() {
-        attributeValues = new ArrayList<String>();
+        attributeValues = new ArrayList<Object>();
     }
 
     /**
@@ -44,9 +43,9 @@ public class AttributeBean {
      * 
      * @param simpleName of type String
      * @param qualifiedName of type String
-     * @param attributeValues of type List<String>
+     * @param attributeValues of type List<Object>
      */
-    public AttributeBean(String simpleName, String qualifiedName, List<String> attributeValues) {
+    public AttributeBean(String simpleName, String qualifiedName, List<Object> attributeValues) {
         this.simpleName = simpleName;
         this.qualifiedName = qualifiedName;
         this.attributeValues = attributeValues;
@@ -111,7 +110,7 @@ public class AttributeBean {
      *
      * @return the attributeValues (type List) of this SamlAttribute object.
      */
-    public List<String> getAttributeValues() {
+    public List<Object> getAttributeValues() {
         return attributeValues;
     }
 
@@ -120,29 +119,10 @@ public class AttributeBean {
      *
      * @param attributeValues the attributeValues of this SamlAttribute object.
      */
-    public void setAttributeValues(List<String> attributeValues) {
+    public void setAttributeValues(List<Object> attributeValues) {
         this.attributeValues = attributeValues;
     }
     
-    /**
-     * Method setCustomAttributeValues sets the attributeValues of this SamlAttribute object.
-     * This method allows the user to specify OpenSAML XMLObject attributes.
-     *
-     * @param customAttributeValues the attributeValues of this SamlAttribute object.
-     */
-    public void setCustomAttributeValues(List<?> customAttributeValues) {
-        this.customAttributeValues = customAttributeValues;
-    }
-    
-    /**
-     * Method getCustomAttributeValues returns the attributeValues of this SamlAttribute object.
-     *
-     * @return the attributeValues (type List) of this SamlAttribute object.
-     */
-    public List<?> getCustomAttributeValues() {
-        return customAttributeValues;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -153,13 +133,6 @@ public class AttributeBean {
         if (attributeValues == null && that.attributeValues != null) {
             return false;
         } else if (attributeValues != null && !attributeValues.equals(that.attributeValues)) {
-            return false;
-        }
-        
-        if (customAttributeValues == null && that.customAttributeValues != null) {
-            return false;
-        } else if (customAttributeValues != null 
-                && !customAttributeValues.equals(that.customAttributeValues)) {
             return false;
         }
         
@@ -198,9 +171,6 @@ public class AttributeBean {
         }
         if (attributeValues != null) {
             result = 31 * result + attributeValues.hashCode();
-        }
-        if (customAttributeValues != null) {
-            result = 31 * result + customAttributeValues.hashCode();
         }
         return result;
     }

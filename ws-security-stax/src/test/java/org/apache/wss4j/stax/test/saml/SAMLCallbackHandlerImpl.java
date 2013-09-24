@@ -21,6 +21,7 @@ package org.apache.wss4j.stax.test.saml;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -69,7 +70,7 @@ public class SAMLCallbackHandlerImpl implements CallbackHandler {
     private String subjectLocalityIpAddress = null;
     private String subjectLocalityDnsAddress = null;
     private String resource = null;
-    private List<?> customAttributeValues = null;
+    private List<Object> customAttributeValues = null;
     private ConditionsBean conditions = null;
 
     private boolean signAssertion = true;
@@ -154,9 +155,11 @@ public class SAMLCallbackHandlerImpl implements CallbackHandler {
                 attributeBean.setQualifiedName("role");
             }
             if (customAttributeValues != null) {
-                attributeBean.setCustomAttributeValues(customAttributeValues);
+                attributeBean.setAttributeValues(customAttributeValues);
             } else {
-                attributeBean.setAttributeValues(Collections.singletonList("user"));
+                List<Object> attributes = new ArrayList<Object>();
+                attributes.add("user");
+                attributeBean.setAttributeValues(attributes);
             }
             attrBean.setSamlAttributes(Collections.singletonList(attributeBean));
             callback.setAttributeStatementData(Collections.singletonList(attrBean));
@@ -309,7 +312,7 @@ public class SAMLCallbackHandlerImpl implements CallbackHandler {
         this.resource = resource;
     }
 
-    public void setCustomAttributeValues(List<?> customAttributeValues) {
+    public void setCustomAttributeValues(List<Object> customAttributeValues) {
         this.customAttributeValues = customAttributeValues;
     }
 }

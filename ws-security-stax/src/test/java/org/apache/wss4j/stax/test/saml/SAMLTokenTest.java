@@ -49,12 +49,13 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -720,8 +721,10 @@ public class SAMLTokenTest extends AbstractTestBase {
             XSAny attributeValue = xsAnyBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             attributeValue.getUnknownXMLObjects().add(conditions);
 
-            callbackHandler.setCustomAttributeValues(Collections.singletonList(attributeValue));
-
+            List<Object> attributeValues = new ArrayList<Object>();
+            attributeValues.add(attributeValue);
+            callbackHandler.setCustomAttributeValues(attributeValues);
+            
             securityProperties.setSamlCallbackHandler(callbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);

@@ -44,7 +44,6 @@ import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -105,8 +104,12 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
 
         List<AttributeStatementBean> attributeStatementBeans = new ArrayList<AttributeStatementBean>();
         List<AttributeBean> attributeBeans = new ArrayList<AttributeBean>();
-        attributeBeans.add(new AttributeBean("email", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/email", Collections.singletonList("test@example.com")));
-        attributeBeans.add(new AttributeBean("surname", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname", Collections.singletonList("Proper")));
+        List<Object> attributeValues = new ArrayList<Object>();
+        attributeValues.add("test@example.com");
+        attributeBeans.add(new AttributeBean("email", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/email", attributeValues));
+        attributeValues.clear();
+        attributeValues.add("Proper");
+        attributeBeans.add(new AttributeBean("surname", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname", attributeValues));
         attributeStatementBeans.add(new AttributeStatementBean(subjectBean, attributeBeans));
         samlCallback.setAttributeStatementData(attributeStatementBeans);
 
@@ -168,8 +171,12 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
 
         List<AttributeStatementBean> attributeStatementBeans = new ArrayList<AttributeStatementBean>();
         List<AttributeBean> attributeBeans = new ArrayList<AttributeBean>();
-        attributeBeans.add(new AttributeBean("email", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/email", Collections.singletonList("test@example.com")));
-        attributeBeans.add(new AttributeBean("surname", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname", Collections.singletonList("Proper")));
+        List<Object> attributeValues = new ArrayList<Object>();
+        attributeValues.add("test@example.com");
+        attributeBeans.add(new AttributeBean("email", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/email", attributeValues));
+        attributeValues.clear();
+        attributeValues.add("Proper");
+        attributeBeans.add(new AttributeBean("surname", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname", attributeValues));
         attributeStatementBeans.add(new AttributeStatementBean(subjectBean, attributeBeans));
         samlCallback.setAttributeStatementData(attributeStatementBeans);
 
@@ -233,8 +240,12 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
 
         List<AttributeStatementBean> attributeStatementBeans = new ArrayList<AttributeStatementBean>();
         List<AttributeBean> attributeBeans = new ArrayList<AttributeBean>();
-        attributeBeans.add(new AttributeBean("email", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/email", Collections.singletonList("test@example.com")));
-        attributeBeans.add(new AttributeBean("surname", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname", Collections.singletonList("Proper")));
+        List<Object> attributeValues = new ArrayList<Object>();
+        attributeValues.add("test@example.com");
+        attributeBeans.add(new AttributeBean("email", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/email", attributeValues));
+        attributeValues.clear();
+        attributeValues.add("Proper");
+        attributeBeans.add(new AttributeBean("surname", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname", attributeValues));
         attributeStatementBeans.add(new AttributeStatementBean(subjectBean, attributeBeans));
         samlCallback.setAttributeStatementData(attributeStatementBeans);
 
@@ -301,8 +312,12 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
 
         List<AttributeStatementBean> attributeStatementBeans = new ArrayList<AttributeStatementBean>();
         List<AttributeBean> attributeBeans = new ArrayList<AttributeBean>();
-        attributeBeans.add(new AttributeBean("email", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/email", Collections.singletonList("test@example.com")));
-        attributeBeans.add(new AttributeBean("surname", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname", Collections.singletonList("Proper")));
+        List<Object> attributeValues = new ArrayList<Object>();
+        attributeValues.add("test@example.com");
+        attributeBeans.add(new AttributeBean("email", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/email", attributeValues));
+        attributeValues.clear();
+        attributeValues.add("Proper");
+        attributeBeans.add(new AttributeBean("surname", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname", attributeValues));
         attributeStatementBeans.add(new AttributeStatementBean(subjectBean, attributeBeans));
         samlCallback.setAttributeStatementData(attributeStatementBeans);
 
@@ -369,7 +384,9 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
 
         List<AttributeStatementBean> attributeStatementBeans = new ArrayList<AttributeStatementBean>();
         List<AttributeBean> attributeBeans = new ArrayList<AttributeBean>();
-        attributeBeans.add(new AttributeBean("email", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/email", Collections.singletonList("test@example.com")));
+        List<Object> attributeValues = new ArrayList<Object>();
+        attributeValues.add("test@example.com");
+        attributeBeans.add(new AttributeBean("email", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/email", attributeValues));
         attributeStatementBeans.add(new AttributeStatementBean(subjectBean, attributeBeans));
         samlCallback.setAttributeStatementData(attributeStatementBeans);
 

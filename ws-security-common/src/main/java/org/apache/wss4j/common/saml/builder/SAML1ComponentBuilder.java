@@ -418,10 +418,7 @@ public final class SAML1ComponentBuilder {
                 attributeStatement.setSubject(attributeSubject);
                 // Add the individual attributes
                 for (AttributeBean values : statementBean.getSamlAttributes()) {
-                    List<?> attributeValues = values.getAttributeValues();
-                    if (attributeValues == null || attributeValues.isEmpty()) {
-                        attributeValues = values.getCustomAttributeValues();
-                    }
+                    List<Object> attributeValues = values.getAttributeValues();
                     
                     Attribute samlAttribute = 
                         createSamlv1Attribute(
@@ -451,7 +448,7 @@ public final class SAML1ComponentBuilder {
     public static Attribute createSamlv1Attribute(
         String attributeName, 
         String attributeUrn,
-        List<?> values
+        List<Object> values
     ) {
         if (attributeV1Builder == null) {
             attributeV1Builder = (SAMLObjectBuilder<Attribute>) 

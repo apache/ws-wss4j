@@ -42,6 +42,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -68,7 +69,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     protected String subjectLocalityDnsAddress = null;
     protected DateTime sessionNotOnOrAfter = null;
     protected String resource = null;
-    protected List<?> customAttributeValues = null;
+    protected List<Object> customAttributeValues = null;
     protected ConditionsBean conditions = null;
     protected SubjectConfirmationDataBean subjectConfirmationData = null;
     
@@ -121,7 +122,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
         this.resource = resource;
     }
     
-    public void setCustomAttributeValues(List<?> customAttributeValues) {
+    public void setCustomAttributeValues(List<Object> customAttributeValues) {
         this.customAttributeValues = customAttributeValues;
     }
     
@@ -154,9 +155,11 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
                 attributeBean.setQualifiedName("role");
             }
             if (customAttributeValues != null) {
-                attributeBean.setCustomAttributeValues(customAttributeValues);   
+                attributeBean.setAttributeValues(customAttributeValues);   
             } else {
-                attributeBean.setAttributeValues(Collections.singletonList("user"));
+                List<Object> attributes = new ArrayList<Object>();
+                attributes.add("user");
+                attributeBean.setAttributeValues(attributes);
             }
             attrBean.setSamlAttributes(Collections.singletonList(attributeBean));
             callback.setAttributeStatementData(Collections.singletonList(attrBean));

@@ -53,7 +53,7 @@ import org.opensaml.xml.schema.XSAny;
 import org.opensaml.xml.schema.XSInteger;
 import org.w3c.dom.Document;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -725,7 +725,9 @@ public class SamlTokenTest extends org.junit.Assert {
         XSAny attributeValue = xsAnyBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
         attributeValue.getUnknownXMLObjects().add(conditions);
         
-        callbackHandler.setCustomAttributeValues(Collections.singletonList(attributeValue));
+        List<Object> attributeValues = new ArrayList<Object>();
+        attributeValues.add(attributeValue);
+        callbackHandler.setCustomAttributeValues(attributeValues);
 
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
@@ -774,7 +776,9 @@ public class SamlTokenTest extends org.junit.Assert {
             xsIntegerBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSInteger.TYPE_NAME);
         attributeValue.setValue(5);
         
-        callbackHandler.setCustomAttributeValues(Collections.singletonList(attributeValue));
+        List<Object> attributeValues = new ArrayList<Object>();
+        attributeValues.add(attributeValue);
+        callbackHandler.setCustomAttributeValues(attributeValues);
 
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
