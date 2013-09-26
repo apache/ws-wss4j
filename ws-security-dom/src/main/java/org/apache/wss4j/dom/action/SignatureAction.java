@@ -23,10 +23,12 @@ import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import org.apache.wss4j.common.SecurityActionToken;
+import org.apache.wss4j.common.SignatureActionToken;
+import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSEncryptionPart;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.message.WSSecSignature;
@@ -35,35 +37,45 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 public class SignatureAction implements Action {
-    public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
+    public void execute(WSHandler handler, SecurityActionToken actionToken,
+                        Document doc, RequestData reqData)
             throws WSSecurityException {
         CallbackHandler callbackHandler = reqData.getCallbackHandler();
         if (callbackHandler == null) {
             callbackHandler = handler.getPasswordCallbackHandler(reqData);
         }
-        WSPasswordCallback passwordCallback = 
-            handler.getPasswordCB(reqData.getSignatureUser(), actionToDo, callbackHandler, reqData);
-        WSSecSignature wsSign = new WSSecSignature(reqData.getWssConfig());
-
-        if (reqData.getSigKeyId() != 0) {
-            wsSign.setKeyIdentifierType(reqData.getSigKeyId());
+        
+        SignatureActionToken signatureToken = null;
+        if (actionToken instanceof SignatureActionToken) {
+            signatureToken = (SignatureActionToken)actionToken;
         }
-        if (reqData.getSigAlgorithm() != null) {
-            wsSign.setSignatureAlgorithm(reqData.getSigAlgorithm());
-        }
-        if (reqData.getSigDigestAlgorithm() != null) {
-            wsSign.setDigestAlgo(reqData.getSigDigestAlgorithm());
-        }
-        if (reqData.getSignatureC14nAlgorithm() != null) {
-            wsSign.setSigCanonicalization(reqData.getSignatureC14nAlgorithm());
+        if (signatureToken == null) {
+            signatureToken = reqData.getSignatureToken();
         }
         
-        wsSign.setIncludeSignatureToken(reqData.isIncludeSignatureToken());
+        WSPasswordCallback passwordCallback = 
+            handler.getPasswordCB(signatureToken.getUser(), WSConstants.SIGN, callbackHandler, reqData);
+        WSSecSignature wsSign = new WSSecSignature(reqData.getWssConfig());
 
-        wsSign.setUserInfo(reqData.getSignatureUser(), passwordCallback.getPassword());
-        wsSign.setUseSingleCertificate(reqData.isUseSingleCert());
-        if (reqData.getSignatureParts().size() > 0) {
-            wsSign.setParts(reqData.getSignatureParts());
+        if (signatureToken.getKeyIdentifierId() != 0) {
+            wsSign.setKeyIdentifierType(signatureToken.getKeyIdentifierId());
+        }
+        if (signatureToken.getSignatureAlgorithm() != null) {
+            wsSign.setSignatureAlgorithm(signatureToken.getSignatureAlgorithm());
+        }
+        if (signatureToken.getDigestAlgorithm() != null) {
+            wsSign.setDigestAlgo(signatureToken.getDigestAlgorithm());
+        }
+        if (signatureToken.getC14nAlgorithm() != null) {
+            wsSign.setSigCanonicalization(signatureToken.getC14nAlgorithm());
+        }
+        
+        wsSign.setIncludeSignatureToken(signatureToken.isIncludeSignatureToken());
+
+        wsSign.setUserInfo(signatureToken.getUser(), passwordCallback.getPassword());
+        wsSign.setUseSingleCertificate(signatureToken.isUseSingleCert());
+        if (signatureToken.getParts().size() > 0) {
+            wsSign.setParts(signatureToken.getParts());
         }
         
         if (passwordCallback.getKey() != null) {
@@ -71,11 +83,11 @@ public class SignatureAction implements Action {
         }
 
         try {
-            wsSign.prepare(doc, reqData.getSigCrypto(), reqData.getSecHeader());
+            wsSign.prepare(doc, signatureToken.getCrypto(), reqData.getSecHeader());
 
             Element siblingElementToPrepend = null;
             boolean signBST = false;
-            for (WSEncryptionPart part : reqData.getSignatureParts()) {
+            for (WSEncryptionPart part : signatureToken.getParts()) {
                 if ("STRTransform".equals(part.getName()) && part.getId() == null) {
                     part.setId(wsSign.getSecurityTokenReferenceURI());
                 } else if (reqData.isAppendSignatureAfterTimestamp()
@@ -108,7 +120,7 @@ public class SignatureAction implements Action {
                 wsSign.prependBSTElementToHeader(reqData.getSecHeader());
             }
             List<javax.xml.crypto.dsig.Reference> referenceList =
-                wsSign.addReferencesToSign(reqData.getSignatureParts(), reqData.getSecHeader());
+                wsSign.addReferencesToSign(signatureToken.getParts(), reqData.getSecHeader());
 
             if (signBST || 
                 reqData.isAppendSignatureAfterTimestamp() && siblingElementToPrepend == null) {

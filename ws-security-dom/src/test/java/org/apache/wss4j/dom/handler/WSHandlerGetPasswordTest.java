@@ -19,6 +19,8 @@
 
 package org.apache.wss4j.dom.handler;
 
+import java.util.Collections;
+
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.common.CustomHandler;
@@ -91,11 +93,11 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
         actions.add(WSConstants.UT);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.UT);
         handler.send(
-            WSConstants.UT, 
             doc, 
             reqData, 
-            actions,
+            Collections.singletonList(action),
             true
         );
         
@@ -132,11 +134,11 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
         actions.add(WSConstants.UT);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.UT);
         handler.send(
-            WSConstants.UT, 
             doc, 
             reqData, 
-            actions,
+            Collections.singletonList(action),
             true
         );
         

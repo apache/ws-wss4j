@@ -78,12 +78,14 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         reqData.setMsgContext(msgContext);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.SIGN);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.SIGN);
         handler.send(
-            WSConstants.SIGN, doc, reqData, actions, true
+            doc, 
+            reqData, 
+            Collections.singletonList(action),
+            true
         );
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -117,12 +119,14 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         reqData.setMsgContext(msgContext);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.SIGN);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.SIGN);
         handler.send(
-            WSConstants.SIGN, doc, reqData, actions, true
+            doc, 
+            reqData, 
+            Collections.singletonList(action),
+            true
         );
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -154,12 +158,14 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         reqData.setMsgContext(msgContext);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.SIGN);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.SIGN);
         handler.send(
-            WSConstants.SIGN, doc, reqData, actions, true
+            doc, 
+            reqData, 
+            Collections.singletonList(action),
+            true
         );
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -179,15 +185,18 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         // Verify the inbound request, and create a response with a Signature Confirmation
         //
         List<WSSecurityEngineResult> results = verify(doc);
-        actions.clear();
         doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
         WSHandlerResult handlerResult = new WSHandlerResult(null, results);
         List<WSHandlerResult> receivedResults = new ArrayList<WSHandlerResult>();
         receivedResults.add(handlerResult);
         msgContext.put(WSHandlerConstants.RECV_RESULTS, receivedResults);
+        action = new HandlerAction(WSConstants.NO_SECURITY);
         handler.send(
-            WSConstants.NO_SECURITY, doc, reqData, actions, false
+            doc, 
+            reqData, 
+            Collections.singletonList(action),
+            false
         );
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
@@ -215,12 +224,14 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         reqData.setMsgContext(msgContext);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.SIGN);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.SIGN);
         handler.send(
-            WSConstants.SIGN, doc, reqData, actions, true
+            doc, 
+            reqData, 
+            Collections.singletonList(action),
+            true
         );
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -233,7 +244,6 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         // Verify the inbound request, and create a response with a Signature Confirmation
         //
         List<WSSecurityEngineResult> results = verify(doc);
-        actions.clear();
         doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
         WSHandlerResult handlerResult = new WSHandlerResult(null, results);
@@ -241,7 +251,10 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         receivedResults.add(handlerResult);
         msgContext.put(WSHandlerConstants.RECV_RESULTS, receivedResults);
         handler.send(
-            WSConstants.NO_SECURITY, doc, reqData, actions, false
+            doc, 
+            reqData, 
+            Collections.singletonList(action),
+            false
         );
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);

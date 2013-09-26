@@ -19,6 +19,8 @@
 
 package org.apache.wss4j.dom.message;
 
+import java.util.Collections;
+
 import javax.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Document;
@@ -29,9 +31,11 @@ import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.common.EncryptionActionToken;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 
@@ -79,24 +83,23 @@ public class EncryptionCRLTest extends org.junit.Assert {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        reqData.setEncUser("wss40rev");
-        reqData.setEncKeyId(WSConstants.BST_DIRECT_REFERENCE);
-        reqData.setEncSymmAlgo(WSConstants.TRIPLE_DES);
-        reqData.setEncCrypto(crypto);
+        EncryptionActionToken actionToken = new EncryptionActionToken();
+        actionToken.setUser("wss40rev");
+        actionToken.setKeyIdentifierId(WSConstants.BST_DIRECT_REFERENCE);
+        actionToken.setSymmetricAlgorithm(WSConstants.TRIPLE_DES);
+        actionToken.setCrypto(crypto);
+        reqData.setEncryptionToken(actionToken);
         java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
         messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, keystoreCallbackHandler);
         reqData.setMsgContext(messageContext);
         reqData.setUsername("wss40rev");
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.ENCR);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
-            WSConstants.ENCR, 
             doc, 
             reqData, 
-            actions,
+            Collections.singletonList(new HandlerAction(WSConstants.ENCR)),
             true
         );
         
@@ -120,27 +123,26 @@ public class EncryptionCRLTest extends org.junit.Assert {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        reqData.setEncUser("wss40rev");
-        reqData.setEncKeyId(WSConstants.BST_DIRECT_REFERENCE);
-        reqData.setEncSymmAlgo(WSConstants.TRIPLE_DES);
-        reqData.setEncCrypto(crypto);
+        EncryptionActionToken actionToken = new EncryptionActionToken();
+        actionToken.setUser("wss40rev");
+        actionToken.setKeyIdentifierId(WSConstants.BST_DIRECT_REFERENCE);
+        actionToken.setSymmetricAlgorithm(WSConstants.TRIPLE_DES);
+        actionToken.setCrypto(crypto);
+        reqData.setEncryptionToken(actionToken);
         java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
         messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, keystoreCallbackHandler);
         reqData.setMsgContext(messageContext);
         reqData.setUsername("wss40rev");
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.ENCR);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.setOption(WSHandlerConstants.ENABLE_REVOCATION, "true");
         try {
             handler.send(
-                         WSConstants.ENCR, 
-                         doc, 
-                         reqData, 
-                         actions,
-                         true
+                doc, 
+                reqData, 
+                Collections.singletonList(new HandlerAction(WSConstants.ENCR)),
+                true
             );
             fail ("Failure expected on a revoked certificate");
         } catch (Exception ex) {

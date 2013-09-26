@@ -19,6 +19,8 @@
 
 package org.apache.wss4j.dom.message;
 
+import java.util.Collections;
+
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
@@ -28,6 +30,7 @@ import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.w3c.dom.Document;
@@ -163,10 +166,13 @@ public class PasswordTypeTest extends org.junit.Assert {
         reqData.setUsername("wernerd");
         reqData.setMsgContext(config);
         
-        java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.UT);
-        
-        handler.send(WSConstants.UT, doc, reqData, actions, true);
+        HandlerAction action = new HandlerAction(WSConstants.UT);
+        handler.send(
+            doc, 
+            reqData, 
+            Collections.singletonList(action),
+            true
+        );
         
         if (LOG.isDebugEnabled()) {
             LOG.debug("Username Token via WSHandler");
@@ -180,7 +186,7 @@ public class PasswordTypeTest extends org.junit.Assert {
         //
         config.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
         reqData.setMsgContext(config);
-        handler.receive(WSConstants.UT, reqData);
+        handler.receive(Collections.singletonList(WSConstants.UT), reqData);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(reqData.getWssConfig());
         

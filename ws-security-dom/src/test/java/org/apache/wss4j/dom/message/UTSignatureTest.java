@@ -31,6 +31,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -38,6 +39,7 @@ import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -167,16 +169,13 @@ public class UTSignatureTest extends org.junit.Assert {
         reqData.setMsgContext(messageContext);
         reqData.setUsername("bob");
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.UT_SIGN);
-        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.UT_SIGN);
         handler.send(
-            WSConstants.UT_SIGN, 
             doc, 
             reqData, 
-            actions,
+            Collections.singletonList(action),
             true
         );
         
@@ -213,16 +212,13 @@ public class UTSignatureTest extends org.junit.Assert {
         reqData.setMsgContext(messageContext);
         reqData.setUsername("bob");
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.UT_SIGN);
-        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.UT_SIGN);
         handler.send(
-            WSConstants.UT_SIGN, 
             doc, 
             reqData, 
-            actions,
+            Collections.singletonList(action),
             true
         );
         

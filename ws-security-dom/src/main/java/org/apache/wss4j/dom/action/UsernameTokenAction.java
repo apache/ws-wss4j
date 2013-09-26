@@ -21,8 +21,10 @@ package org.apache.wss4j.dom.action;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
@@ -30,7 +32,8 @@ import org.w3c.dom.Document;
 
 public class UsernameTokenAction implements Action {
     
-    public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
+    public void execute(WSHandler handler, SecurityActionToken actionToken,
+                        Document doc, RequestData reqData)
         throws WSSecurityException {
         String username = reqData.getUsername();
         String password = null;
@@ -38,7 +41,7 @@ public class UsernameTokenAction implements Action {
             CallbackHandler callbackHandler = 
                 handler.getPasswordCallbackHandler(reqData);
             WSPasswordCallback passwordCallback = 
-                handler.getPasswordCB(reqData.getUsername(), actionToDo, callbackHandler, reqData);
+                handler.getPasswordCB(reqData.getUsername(), WSConstants.UT, callbackHandler, reqData);
             username = passwordCallback.getIdentifier();
             password = passwordCallback.getPassword();
         }

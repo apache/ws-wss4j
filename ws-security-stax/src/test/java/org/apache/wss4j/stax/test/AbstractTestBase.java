@@ -27,6 +27,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
@@ -211,7 +212,6 @@ public abstract class AbstractTestBase {
 
         RequestData requestData = new RequestData();
         requestData.setMsgContext(messageContext);
-        requestData.setNoSerialization(true);
         requestData.setCallbackHandler(new WSS4JCallbackHandlerImpl());
         requestData.setWssConfig(WSSConfig.getNewInstance());
   
@@ -373,8 +373,6 @@ public abstract class AbstractTestBase {
         public boolean doSender(Map<String, Object> mc, RequestData reqData, boolean isRequest)
                 throws WSSecurityException, TransformerException {
 
-            reqData.getSignatureParts().clear();
-            reqData.getEncryptParts().clear();
             /*
              * Get the action first.
              */
@@ -382,9 +380,8 @@ public abstract class AbstractTestBase {
             if (action == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", "WSS4JHandler: No action defined");
             }
-            List<Integer> actions = new ArrayList<Integer>();
-            int doAction = WSSecurityUtil.decodeAction(action, actions);
-            if (doAction == WSConstants.NO_SECURITY) {
+            List<HandlerAction> actions = WSSecurityUtil.decodeHandlerAction(action, null);
+            if (actions.isEmpty()) {
                 return true;
             }
 
@@ -402,8 +399,16 @@ public abstract class AbstractTestBase {
             * functions. No need to do it for encryption only. Check if username
             * is available and then get a password.
             */
-            if (((doAction & (WSConstants.SIGN | WSConstants.UT | WSConstants.UT_SIGN)) != 0)
-                    && (reqData.getUsername() == null || reqData.getUsername().equals(""))) {
+            boolean usernameRequired = false;
+            for (HandlerAction handlerAction : actions) {
+                if (handlerAction.getAction() == WSConstants.SIGN
+                    || handlerAction.getAction() == WSConstants.UT
+                    || handlerAction.getAction() == WSConstants.UT_SIGN) {
+                    usernameRequired = true;
+                    break;
+                }
+            }
+            if (usernameRequired && (reqData.getUsername() == null || reqData.getUsername().equals(""))) {
                 /*
                  * We need a username - if none throw a WSSecurityException. For encryption
                  * there is a specific parameter to get a username.
@@ -413,7 +418,6 @@ public abstract class AbstractTestBase {
                 );
             }
             if (doDebug) {
-                log.debug("Action: " + doAction);
                 log.debug("Actor: " + reqData.getActor());
             }
             /*
@@ -432,7 +436,7 @@ public abstract class AbstractTestBase {
                 log.debug("WSS4JHandler: orginal SOAP request: ");
                 log.debug(XMLUtils.PrettyDocumentToString(doc));
             }
-            doSenderAction(doAction, doc, reqData, actions, isRequest);
+            doSenderAction(doc, reqData, actions, isRequest);
 
             mc.put(SECURED_DOCUMENT, doc);
 
@@ -446,8 +450,7 @@ public abstract class AbstractTestBase {
             if (action == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", "WSS4JHandler: No action defined");
             }
-            List<Integer> actions = new ArrayList<Integer>();
-            int doAction = WSSecurityUtil.decodeAction(action, actions);
+            List<Integer> actions = WSSecurityUtil.decodeAction(action);
 
             String actor = (String) mc.get(WSHandlerConstants.ACTOR);
 
@@ -475,7 +478,7 @@ public abstract class AbstractTestBase {
              * Get and check the Signature specific parameters first because they
              * may be used for encryption too.
              */
-            doReceiverAction(doAction, reqData);
+            doReceiverAction(actions, reqData);
 
             Element elem = WSSecurityUtil.getSecurityHeader(doc, actor);
 
@@ -492,7 +495,7 @@ public abstract class AbstractTestBase {
             }
             if (wsResult == null || wsResult.size() == 0) {
                 // no security header found
-                if (doAction == WSConstants.NO_SECURITY) {
+                if (actions.isEmpty()) {
                     return true;
                 } else {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "empty",

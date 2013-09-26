@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.action;
 
 import org.w3c.dom.Document;
+import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
@@ -31,7 +32,7 @@ public interface Action {
     
     void execute(
         WSHandler handler, 
-        int actionToDo, 
+        SecurityActionToken actionToken,
         Document doc,
         RequestData reqData
     ) throws WSSecurityException;

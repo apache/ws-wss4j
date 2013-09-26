@@ -34,6 +34,7 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.token.UsernameToken;
@@ -801,10 +802,13 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         reqData.setUsername("wernerd");
         reqData.setMsgContext(config);
         
-        java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.UT);
-        
-        handler.send(WSConstants.UT, doc, reqData, actions, true);
+        HandlerAction action = new HandlerAction(WSConstants.UT);
+        handler.send(
+            doc, 
+            reqData, 
+            Collections.singletonList(action),
+            true
+        );
         
         if (LOG.isDebugEnabled()) {
             LOG.debug("Username Token via WSHandler");
@@ -828,10 +832,13 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         reqData.setUsername("wernerd");
         reqData.setMsgContext(config);
         
-        java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.UT);
-        
-        handler.send(WSConstants.UT, doc, reqData, actions, true);
+        HandlerAction action = new HandlerAction(WSConstants.UT);
+        handler.send(
+            doc, 
+            reqData, 
+            Collections.singletonList(action),
+            true
+        );
         
         if (LOG.isDebugEnabled()) {
             LOG.debug("Username Token via WSHandler");
@@ -856,10 +863,13 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         reqData.setUsername("emptyuser");
         reqData.setMsgContext(config);
         
-        java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.UT);
-        
-        handler.send(WSConstants.UT, doc, reqData, actions, true);
+        HandlerAction action = new HandlerAction(WSConstants.UT);
+        handler.send(
+            doc, 
+            reqData, 
+            Collections.singletonList(action),
+            true
+        );
         
         if (LOG.isDebugEnabled()) {
             LOG.debug("Username Token with an empty password via WSHandler");
@@ -1056,10 +1066,13 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         reqData.setUsername("wernerd");
         reqData.setMsgContext(config);
         
-        java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.UT);
-        
-        handler.send(WSConstants.UT, doc, reqData, actions, true);
+        HandlerAction action = new HandlerAction(WSConstants.UT);
+        handler.send(
+            doc, 
+            reqData, 
+            Collections.singletonList(action),
+            true
+        );
         
         if (LOG.isDebugEnabled()) {
             LOG.debug("Username Token via WSHandler");

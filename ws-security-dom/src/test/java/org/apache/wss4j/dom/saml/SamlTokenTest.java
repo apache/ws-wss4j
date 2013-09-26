@@ -37,6 +37,7 @@ import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.WSSecHeader;
@@ -54,6 +55,7 @@ import org.opensaml.xml.schema.XSInteger;
 import org.w3c.dom.Document;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -347,22 +349,19 @@ public class SamlTokenTest extends org.junit.Assert {
     @org.junit.Test
     public void testSaml1Action() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
-        final int action = WSConstants.ST_UNSIGNED;
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put(WSHandlerConstants.SAML_CALLBACK_REF, new SAML1CallbackHandler());
         reqData.setMsgContext(config);
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(action);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.ST_UNSIGNED);
         handler.send(
-            action, 
             doc, 
             reqData, 
-            actions,
+            Collections.singletonList(action),
             true
         );
         String outputString = 

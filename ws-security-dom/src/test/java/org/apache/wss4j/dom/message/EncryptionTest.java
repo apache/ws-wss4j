@@ -23,7 +23,6 @@ import org.apache.wss4j.dom.SOAPConstants;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSEncryptionPart;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.common.CustomHandler;
@@ -31,12 +30,14 @@ import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SecretKeyCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.str.STRParser.REFERENCE_TYPE;
@@ -429,15 +430,13 @@ public class EncryptionTest extends org.junit.Assert {
         reqData.setMsgContext(messageContext);
         reqData.setUsername("");
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.ENCR);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.ENCR);
         handler.send(
-            WSConstants.ENCR, 
             doc, 
             reqData, 
-            actions,
+            Collections.singletonList(action),
             true
         );
         

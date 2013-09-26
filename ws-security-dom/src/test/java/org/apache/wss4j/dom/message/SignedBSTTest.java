@@ -21,18 +21,20 @@ package org.apache.wss4j.dom.message;
 
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSEncryptionPart;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -125,7 +127,6 @@ public class SignedBSTTest extends org.junit.Assert {
     @org.junit.Test
     public void testSignedBSTAction() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
-        final int action = WSConstants.SIGN;
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
@@ -140,15 +141,13 @@ public class SignedBSTTest extends org.junit.Assert {
         );
         reqData.setMsgContext(config);
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.SIGN);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.SIGN);
         handler.send(
-            action, 
             doc, 
             reqData, 
-            actions,
+            Collections.singletonList(action),
             true
         );
         String outputString = 
@@ -159,7 +158,7 @@ public class SignedBSTTest extends org.junit.Assert {
         }
         
         List<WSSecurityEngineResult> results = verify(doc);
-        assertTrue(handler.checkResults(results, actions));
+        assertTrue(handler.checkResults(results, Collections.singletonList(WSConstants.SIGN)));
     }
 
     /**

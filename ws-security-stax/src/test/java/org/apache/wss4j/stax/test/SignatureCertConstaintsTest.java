@@ -192,7 +192,6 @@ public class SignatureCertConstaintsTest extends AbstractTestBase {
 
         RequestData requestData = new RequestData();
         requestData.setMsgContext(messageContext);
-        requestData.setNoSerialization(true);
 
         wss4JHandler.doSender(messageContext, requestData, true);
 

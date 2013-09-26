@@ -21,6 +21,7 @@ package org.apache.wss4j.dom.action;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.SAMLCallback;
@@ -33,7 +34,8 @@ import org.w3c.dom.Document;
 
 public class SAMLTokenUnsignedAction implements Action {
 
-    public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
+    public void execute(WSHandler handler, SecurityActionToken actionToken,
+                        Document doc, RequestData reqData)
             throws WSSecurityException {
         WSSecSAMLToken builder = new WSSecSAMLToken(reqData.getWssConfig());
 

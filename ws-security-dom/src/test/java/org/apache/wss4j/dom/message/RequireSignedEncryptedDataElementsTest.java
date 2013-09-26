@@ -20,7 +20,6 @@
 package org.apache.wss4j.dom.message;
 
 import java.text.MessageFormat;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -242,7 +241,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         messageContext.put(WSHandlerConstants.REQUIRE_SIGNED_ENCRYPTED_DATA_ELEMENTS, Boolean.toString(reqSignedEncData));
         reqData.setMsgContext(messageContext);
         CustomHandler handler = new CustomHandler();
-        handler.receive(WSSecurityUtil.decodeAction("Encrypt Signature", new LinkedList<Integer>()), reqData);
+        handler.receive(WSSecurityUtil.decodeAction("Encrypt Signature"), reqData);
         reqData.setCallbackHandler(callbackHandler);
         reqData.setSigVerCrypto(crypto);
         reqData.setDecCrypto(crypto);

@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.handler;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.security.auth.callback.Callback;
@@ -80,13 +81,12 @@ public class SignatureUTAliasTest extends org.junit.Assert implements CallbackHa
         messageContext.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
         reqData.setMsgContext(messageContext);
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.UT);
-        actions.add(WSConstants.SIGN);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        actions.add(new HandlerAction(WSConstants.UT));
+        actions.add(new HandlerAction(WSConstants.SIGN));
         handler.send(
-            WSConstants.UT | WSConstants.SIGN, 
             doc, 
             reqData, 
             actions,

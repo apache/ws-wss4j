@@ -35,11 +35,14 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSEncryptionPart;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.action.Action;
+import org.apache.wss4j.common.EncryptionActionToken;
+import org.apache.wss4j.common.SignatureActionToken;
+import org.apache.wss4j.common.SignatureEncryptionActionToken;
+import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -69,20 +72,17 @@ public abstract class WSHandler {
     /**                                                             
      * Performs all defined security actions to set-up the SOAP request.
      * 
-     * 
-     * @param doAction a set defining the actions to do 
      * @param doc   the request as DOM document 
      * @param reqData a data storage to pass values around between methods
      * @param actions a list holding the actions to do in the order defined
-     *                in the deployment file or property
+     *                in the deployment file or property, plus an optional 
+     *                associated SecurityActionToken object for that Action
      * @throws WSSecurityException
      */
-    @SuppressWarnings("unchecked")
     protected void doSenderAction(
-            int doAction, 
             Document doc,
             RequestData reqData, 
-            List<Integer> actions, 
+            List<HandlerAction> actions,
             boolean isRequest
     ) throws WSSecurityException {
 
@@ -92,16 +92,8 @@ public abstract class WSHandler {
         if (wssConfig == null) {
             wssConfig = secEngine.getWssConfig();
         }
-
-        boolean enableSigConf = decodeEnableSignatureConfirmation(reqData);
-        wssConfig.setEnableSignatureConfirmation(
-            enableSigConf || (doAction & WSConstants.SC) != 0
-        );
         wssConfig.setPasswordsAreEncoded(decodeUseEncodedPasswords(reqData));
-
-        wssConfig.setPrecisionInMilliSeconds(
-            decodeTimestampPrecision(reqData)
-        );
+        wssConfig.setPrecisionInMilliSeconds(decodeTimestampPrecision(reqData));
         reqData.setWssConfig(wssConfig);
 
         Object mc = reqData.getMsgContext();
@@ -112,11 +104,9 @@ public abstract class WSHandler {
         secHeader.insertSecurityHeader(doc);
 
         reqData.setSecHeader(secHeader);
-        reqData.setSoapConstants(
-            WSSecurityUtil.getSOAPConstants(doc.getDocumentElement())
-        );
+        reqData.setSoapConstants(WSSecurityUtil.getSOAPConstants(doc.getDocumentElement()));
         wssConfig.setAddInclusivePrefixes(decodeAddInclusivePrefixes(reqData));
-        
+
         // Load CallbackHandler
         if (reqData.getCallbackHandler() == null) {
             CallbackHandler passwordCallbackHandler = 
@@ -124,60 +114,64 @@ public abstract class WSHandler {
             reqData.setCallbackHandler(passwordCallbackHandler);
         }
         
-        /*
-         * Here we have action, username, password, and actor, mustUnderstand.
-         * Now get the action specific parameters.
-         */
-        if ((doAction & WSConstants.UT) == WSConstants.UT) {
-            decodeUTParameter(reqData);
-        }
-        /*
-         * Here we have action, username, password, and actor, mustUnderstand.
-         * Now get the action specific parameters.
-         */
-        if ((doAction & WSConstants.UT_SIGN) == WSConstants.UT_SIGN) {
-            decodeUTParameter(reqData);
-            decodeSignatureParameter(reqData);
-        }
-        /*
-         * Get and check the Signature specific parameters first because they
-         * may be used for encryption too.
-         */
-        if ((doAction & WSConstants.SIGN) == WSConstants.SIGN) {
-            if (reqData.getSigCrypto() == null) {
-                reqData.setSigCrypto(loadSignatureCrypto(reqData));
+        boolean enableSigConf = decodeEnableSignatureConfirmation(reqData);
+        wssConfig.setEnableSignatureConfirmation(enableSigConf);
+
+        // Perform configuration
+        for (HandlerAction actionToDo : actions) {
+            if (actionToDo.getAction() == WSConstants.SC) {
+                wssConfig.setEnableSignatureConfirmation(true);
+            } else if (actionToDo.getAction() == WSConstants.UT 
+                && actionToDo.getActionToken() == null) {
+                decodeUTParameter(reqData);
+            } else if (actionToDo.getAction() == WSConstants.UT_SIGN 
+                && actionToDo.getActionToken() == null) {
+                decodeUTParameter(reqData);
+                decodeSignatureParameter(reqData);
+            } else if (actionToDo.getAction() == WSConstants.SIGN 
+                && actionToDo.getActionToken() == null) {
+                SignatureActionToken actionToken = reqData.getSignatureToken();
+                if (actionToken == null) {
+                    actionToken = new SignatureActionToken();
+                    reqData.setSignatureToken(actionToken);
+                }
+                if (actionToken.getCrypto() == null) {
+                    actionToken.setCrypto(loadSignatureCrypto(reqData));
+                }
+                decodeSignatureParameter(reqData);
+            } else if (actionToDo.getAction() == WSConstants.ST_SIGNED 
+                && actionToDo.getActionToken() == null) {
+                decodeSignatureParameter(reqData);
+            } else if (actionToDo.getAction() == WSConstants.ENCR 
+                && actionToDo.getActionToken() == null) {
+                EncryptionActionToken actionToken = reqData.getEncryptionToken();
+                if (actionToken == null) {
+                    actionToken = new EncryptionActionToken();
+                    reqData.setEncryptionToken(actionToken);
+                }
+                if (actionToken.getCrypto() == null) {
+                    actionToken.setCrypto(loadEncryptionCrypto(reqData));
+                }
+                decodeEncryptionParameter(reqData);
             }
-            decodeSignatureParameter(reqData);
         }
-        /*
-         * If we need to handle signed SAML token then we may need the
-         * Signature parameters. The handle procedure loads the signature crypto
-         * file on demand, thus don't do it here.
-         */
-        if ((doAction & WSConstants.ST_SIGNED) == WSConstants.ST_SIGNED) {
-            decodeSignatureParameter(reqData);
-        }
-        /*
-         * Set and check the encryption specific parameters, if necessary take
-         * over signature parameters username and crypto instance.
-         */
-        if ((doAction & WSConstants.ENCR) == WSConstants.ENCR) {
-            if (reqData.getEncCrypto() == null) {
-                reqData.setEncCrypto(loadEncryptionCrypto(reqData));
-            }
-            decodeEncryptionParameter(reqData);
-        }
+
         /*
          * If after all the parsing no Signature parts defined, set here a
          * default set. This is necessary because we add SignatureConfirmation
          * and therefore the default (Body) must be set here. The default setting
          * in WSSignEnvelope doesn't work because the vector is not empty anymore.
          */
-        if (reqData.getSignatureParts().isEmpty()) {
+        SignatureActionToken signatureToken = reqData.getSignatureToken();
+        if (signatureToken == null) {
+            signatureToken = new SignatureActionToken();
+            reqData.setSignatureToken(signatureToken);
+        }
+        if (signatureToken.getParts().isEmpty()) {
             WSEncryptionPart encP = new WSEncryptionPart(reqData.getSoapConstants()
                     .getBodyQName().getLocalPart(), reqData.getSoapConstants()
                     .getEnvelopeURI(), "Content");
-            reqData.getSignatureParts().add(encP);
+            signatureToken.getParts().add(encP);
         }
         /*
          * If SignatureConfirmation is enabled and this is a response then
@@ -189,44 +183,37 @@ public abstract class WSHandler {
             String done = 
                 (String)getProperty(reqData.getMsgContext(), WSHandlerConstants.SIG_CONF_DONE);
             if (done == null) {
-                wssConfig.getAction(WSConstants.SC).execute(this, WSConstants.SC, doc, reqData);
+                wssConfig.getAction(WSConstants.SC).execute(this, null, doc, reqData);
             }
         }
         
         // See if the Signature and Timestamp actions (in that order) are defined, and if
         // the Timestamp is to be signed. In this case we need to swap the actions, as the 
         // Timestamp must appear in the security header first for signature creation to work.
-        List<Integer> actionsToPerform = actions;
-        if (actions.contains(WSConstants.SIGN) && actions.contains(WSConstants.TS)
-            && actions.indexOf(WSConstants.SIGN) < actions.indexOf(WSConstants.TS)) {
-            boolean signTimestamp = false;
-            for (WSEncryptionPart encP : reqData.getSignatureParts()) {
-                if (WSConstants.WSU_NS.equals(encP.getNamespace()) 
-                    && "Timestamp".equals(encP.getName())) {
-                    signTimestamp = true;
-                }
-            }
-            if (signTimestamp) {
-                actionsToPerform = new ArrayList<Integer>(actions);
-                Collections.copy(actionsToPerform, actions);
-                int signatureIndex = actions.indexOf(WSConstants.SIGN);
-                actionsToPerform.remove(signatureIndex);
-                actionsToPerform.add(WSConstants.SIGN);
-                reqData.setAppendSignatureAfterTimestamp(true);
-                reqData.setOriginalSignatureActionPosition(signatureIndex);
-            }
+        List<HandlerAction> actionsToPerform = actions;
+        HandlerAction signingAction = getSignatureActionThatSignsATimestamp(actions, reqData);
+
+        if (signingAction != null) {
+            actionsToPerform = new ArrayList<HandlerAction>(actions);
+            Collections.copy(actionsToPerform, actions);
+
+            int signatureIndex = actions.indexOf(WSConstants.SIGN);
+            actionsToPerform.remove(signingAction);
+            actionsToPerform.add(signingAction);
+            reqData.setAppendSignatureAfterTimestamp(true);
+            reqData.setOriginalSignatureActionPosition(signatureIndex);
         }
         
         /*
          * Here we have all necessary information to perform the requested
          * action(s).
          */
-        for (Integer actionToDo : actionsToPerform) {
+        for (HandlerAction actionToDo : actionsToPerform) {
             if (doDebug) {
-                log.debug("Performing Action: " + actionToDo);
+                log.debug("Performing Action: " + actionToDo.getAction());
             }
 
-            switch (actionToDo) {
+            switch (actionToDo.getAction()) {
             case WSConstants.UT:
             case WSConstants.ENCR:
             case WSConstants.SIGN:
@@ -234,7 +221,8 @@ public abstract class WSHandler {
             case WSConstants.ST_UNSIGNED:
             case WSConstants.TS:
             case WSConstants.UT_SIGN:
-                wssConfig.getAction(actionToDo).execute(this, actionToDo, doc, reqData);
+                wssConfig.getAction(actionToDo.getAction()).execute(
+                    this, actionToDo.getActionToken(), doc, reqData);
                 break;
                 //
                 // Handle any "custom" actions, similarly,
@@ -244,7 +232,7 @@ public abstract class WSHandler {
             default:
                 Action doit = null;
             try {
-                doit = wssConfig.getAction(actionToDo);
+                doit = wssConfig.getAction(actionToDo.getAction());
             } catch (final WSSecurityException e) {
                 log.warn(
                         "Error trying to locate a custom action (" + actionToDo + ")", 
@@ -252,7 +240,7 @@ public abstract class WSHandler {
                 );
             }
             if (doit != null) {
-                doit.execute(this, actionToDo, doc, reqData);
+                doit.execute(this, actionToDo.getActionToken(), doc, reqData);
             }
             }
         }
@@ -264,6 +252,7 @@ public abstract class WSHandler {
          */
         if (wssConfig.isEnableSignatureConfirmation() 
             && isRequest && reqData.getSignatureValues().size() > 0) {
+            @SuppressWarnings("unchecked")
             List<byte[]> savedSignatures = 
                 (List<byte[]>)getProperty(reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV);
             if (savedSignatures == null) {
@@ -275,8 +264,38 @@ public abstract class WSHandler {
             savedSignatures.addAll(reqData.getSignatureValues());
         }
     }
+    
+    private HandlerAction getSignatureActionThatSignsATimestamp(
+        List<HandlerAction> actions, RequestData reqData
+    ) {
+        for (HandlerAction action : actions) {
+            // Only applies if a Signature is before a Timestamp
+            if (action.getAction() == WSConstants.TS) {
+                return null;
+            } else if (action.getAction() == WSConstants.SIGN) {
+                if (action.getActionToken() != null 
+                    && ((SignatureEncryptionActionToken)action.getActionToken()).getParts() != null) {
+                    for (WSEncryptionPart encP 
+                        : ((SignatureEncryptionActionToken)action.getActionToken()).getParts()) {
+                        if (WSConstants.WSU_NS.equals(encP.getNamespace()) 
+                            && "Timestamp".equals(encP.getName())) {
+                            return action;
+                        }
+                    }
+                } else {
+                    for (WSEncryptionPart encP : reqData.getSignatureToken().getParts()) {
+                        if (WSConstants.WSU_NS.equals(encP.getNamespace()) 
+                            && "Timestamp".equals(encP.getName())) {
+                            return action;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
 
-    protected void doReceiverAction(int doAction, RequestData reqData)
+    protected void doReceiverAction(List<Integer> actions, RequestData reqData)
         throws WSSecurityException {
 
         WSSConfig wssConfig = reqData.getWssConfig();
@@ -285,7 +304,7 @@ public abstract class WSHandler {
         }
         boolean enableSigConf = decodeEnableSignatureConfirmation(reqData);
         wssConfig.setEnableSignatureConfirmation(
-            enableSigConf || (doAction & WSConstants.SC) != 0
+            enableSigConf || actions.contains(WSConstants.SC)
         );
         wssConfig.setTimeStampStrict(decodeTimestampStrict(reqData));
         String passwordType = decodePasswordType(reqData);
@@ -321,13 +340,12 @@ public abstract class WSHandler {
             reqData.setCallbackHandler(passwordCallbackHandler);
         }
 
-        if ((doAction & WSConstants.SIGN) == WSConstants.SIGN
-            || (doAction & WSConstants.ST_SIGNED) == WSConstants.ST_SIGNED
-            || (doAction & WSConstants.ST_UNSIGNED) == WSConstants.ST_UNSIGNED) {
+        if (actions.contains(WSConstants.SIGN) || actions.contains(WSConstants.ST_SIGNED)
+            || actions.contains(WSConstants.ST_UNSIGNED)) {
             decodeSignatureParameter2(reqData);
         }
         
-        if ((doAction & WSConstants.ENCR) == WSConstants.ENCR) {
+        if (actions.contains(WSConstants.ENCR)) {
             decodeDecryptionParameter(reqData);
         }
         decodeRequireSignedEncryptedDataElements(reqData);
@@ -451,18 +469,12 @@ public abstract class WSHandler {
         }
 
         //
-        // This indicates this is the last handler: the list holding the
-        // stored Signature values must be empty, otherwise we have an error
+        // the list holding the stored Signature values must be empty, otherwise we have an error
         //
-        if (!reqData.isNoSerialization()) {
-            if (doDebug) {
-                log.debug("Check Signature confirmation - last handler");
-            }
-            if (savedSignatures != null && !savedSignatures.isEmpty()) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
-                        "Check Signature confirmation: the stored signature values list is not empty"
-                );
-            }
+        if (savedSignatures != null && !savedSignatures.isEmpty()) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
+                                          "Check Signature confirmation: the stored signature values list is not empty"
+            );
         }
     }
     
@@ -505,15 +517,23 @@ public abstract class WSHandler {
         }
     }
 
+    // Convert various Signature configuration into a single SignatureActionToken to be set on
+    // the RequestData object
     protected void decodeSignatureParameter(RequestData reqData) 
         throws WSSecurityException {
         Object mc = reqData.getMsgContext();
         String signatureUser = getString(WSHandlerConstants.SIGNATURE_USER, mc);
 
+        SignatureActionToken actionToken = reqData.getSignatureToken();
+        if (actionToken == null) {
+            actionToken = new SignatureActionToken();
+            reqData.setSignatureToken(actionToken);
+        }
+        
         if (signatureUser != null) {
-            reqData.setSignatureUser(signatureUser);
+            actionToken.setUser(signatureUser);
         } else {
-            reqData.setSignatureUser(reqData.getUsername());
+            actionToken.setUser(reqData.getUsername());
         }
         
         String keyId = getString(WSHandlerConstants.SIG_KEY_ID, mc);
@@ -538,31 +558,31 @@ public abstract class WSHandler {
                         "WSHandler: Signature: illegal key identification"
                 );
             }
-            reqData.setSigKeyId(tmp);
+            actionToken.setKeyIdentifierId(tmp);
         }
         String algo = getString(WSHandlerConstants.SIG_ALGO, mc);
-        reqData.setSigAlgorithm(algo);
+        actionToken.setSignatureAlgorithm(algo);
         
         String digestAlgo = getString(WSHandlerConstants.SIG_DIGEST_ALGO, mc);
-        reqData.setSigDigestAlgorithm(digestAlgo);
+        actionToken.setDigestAlgorithm(digestAlgo);
         
         String c14nAlgo = getString(WSHandlerConstants.SIG_C14N_ALGO, mc);
-        reqData.setSignatureC14nAlgorithm(c14nAlgo);
+        actionToken.setC14nAlgorithm(c14nAlgo);
 
         String parts = getString(WSHandlerConstants.SIGNATURE_PARTS, mc);
         if (parts != null) {
-            splitEncParts(true, parts, reqData.getSignatureParts(), reqData);
+            splitEncParts(true, parts, actionToken.getParts(), reqData);
         }
         parts = getString(WSHandlerConstants.OPTIONAL_SIGNATURE_PARTS, mc);
         if (parts != null) {
-            splitEncParts(false, parts, reqData.getSignatureParts(), reqData);
+            splitEncParts(false, parts, actionToken.getParts(), reqData);
         }
         
         boolean useSingleCert = decodeUseSingleCertificate(reqData);
-        reqData.setUseSingleCert(useSingleCert);
+        actionToken.setUseSingleCert(useSingleCert);
         
         boolean includeSignatureToken = decodeIncludeSignatureToken(reqData);
-        reqData.setIncludeSignatureToken(includeSignatureToken);
+        actionToken.setIncludeSignatureToken(includeSignatureToken);
     }
 
     protected void decodeAlgorithmSuite(RequestData reqData) throws WSSecurityException {
@@ -594,14 +614,21 @@ public abstract class WSHandler {
         reqData.setAlgorithmSuite(algorithmSuite);
     }
     
+    // Convert various Encryption configuration into a single EncryptionActionToken to be set on
+    // the RequestData object
     protected void decodeEncryptionParameter(RequestData reqData) 
         throws WSSecurityException {
         Object mc = reqData.getMsgContext();
 
-        /*
-         * If the following parameters are no used (they return null) then the
-         * default values of WSS4J are used.
-         */
+        EncryptionActionToken actionToken = reqData.getEncryptionToken();
+        if (actionToken == null) {
+            actionToken = new EncryptionActionToken();
+            reqData.setEncryptionToken(actionToken);
+        }
+        //
+        // If the following parameters are no used (they return null) then the
+        // default values of WSS4J are used.
+        //
         String encKeyId = getString(WSHandlerConstants.ENC_KEY_ID, mc);
         if (encKeyId != null) {
             Integer id = WSHandlerConstants.getKeyIdentifier(encKeyId);
@@ -612,7 +639,7 @@ public abstract class WSHandler {
                 );
             }
             int tmp = id;
-            reqData.setEncKeyId(tmp);
+            actionToken.setKeyIdentifierId(tmp);
             if (!(tmp == WSConstants.ISSUER_SERIAL
                     || tmp == WSConstants.X509_KEY_IDENTIFIER
                     || tmp == WSConstants.SKI_KEY_IDENTIFIER
@@ -627,31 +654,31 @@ public abstract class WSHandler {
             }
         }
         String encSymAlgo = getString(WSHandlerConstants.ENC_SYM_ALGO, mc);
-        reqData.setEncSymmAlgo(encSymAlgo);
+        actionToken.setSymmetricAlgorithm(encSymAlgo);
 
         String encKeyTransport = 
             getString(WSHandlerConstants.ENC_KEY_TRANSPORT, mc);
-        reqData.setEncKeyTransport(encKeyTransport);
+        actionToken.setKeyTransportAlgorithm(encKeyTransport);
         
         String digestAlgo = getString(WSHandlerConstants.ENC_DIGEST_ALGO, mc);
-        reqData.setEncDigestAlgorithm(digestAlgo);
+        actionToken.setDigestAlgorithm(digestAlgo);
 
         String mgfAlgo = getString(WSHandlerConstants.ENC_MGF_ALGO, mc);
-        reqData.setEncMGFAlgorithm(mgfAlgo);
+        actionToken.setMgfAlgorithm(mgfAlgo);
         
         String encSymEncKey = getString(WSHandlerConstants.ENC_SYM_ENC_KEY, mc);
         if (encSymEncKey != null) {
             boolean encSymEndKeyBoolean = Boolean.parseBoolean(encSymEncKey);
-            reqData.setEncryptSymmetricEncryptionKey(encSymEndKeyBoolean);
+            actionToken.setEncSymmetricEncryptionKey(encSymEndKeyBoolean);
         }
         
         String encUser = getString(WSHandlerConstants.ENCRYPTION_USER, mc);
         if (encUser != null) {
-            reqData.setEncUser(encUser);
+            actionToken.setUser(encUser);
         } else {
-            reqData.setEncUser(reqData.getUsername());
+            actionToken.setUser(reqData.getUsername());
         }
-        if (reqData.getEncryptSymmetricEncryptionKey() && reqData.getEncUser() == null) {
+        if (actionToken.isEncSymmetricEncryptionKey() && actionToken.getUser() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                     "empty", "WSHandler: Encryption: no username");
         }
@@ -660,11 +687,11 @@ public abstract class WSHandler {
 
         String encParts = getString(WSHandlerConstants.ENCRYPTION_PARTS, mc);
         if (encParts != null) {
-            splitEncParts(true, encParts, reqData.getEncryptParts(), reqData);
+            splitEncParts(true, encParts, actionToken.getParts(), reqData);
         }
         encParts = getString(WSHandlerConstants.OPTIONAL_ENCRYPTION_PARTS, mc);
         if (encParts != null) {
-            splitEncParts(false, encParts, reqData.getEncryptParts(), reqData);
+            splitEncParts(false, encParts, actionToken.getParts(), reqData);
         }
     }
 
@@ -1241,7 +1268,9 @@ public abstract class WSHandler {
 
     @SuppressWarnings("unchecked")
     private void handleSpecialUser(RequestData reqData) {
-        if (!WSHandlerConstants.USE_REQ_SIG_CERT.equals(reqData.getEncUser())) {
+        EncryptionActionToken actionToken = reqData.getEncryptionToken();
+        if (actionToken == null 
+            || !WSHandlerConstants.USE_REQ_SIG_CERT.equals(actionToken.getUser())) {
             return;
         }
         List<WSHandlerResult> results = 
@@ -1272,7 +1301,7 @@ public abstract class WSHandler {
                 if (wserAction == WSConstants.SIGN) {
                     X509Certificate cert = 
                         (X509Certificate)wser.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-                    reqData.setEncCert(cert);
+                    actionToken.setCertificate(cert);
                     return;
                 }
             }

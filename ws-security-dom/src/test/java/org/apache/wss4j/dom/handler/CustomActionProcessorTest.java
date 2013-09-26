@@ -37,8 +37,8 @@ import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.ArrayList;
 
 
 /**
@@ -168,17 +168,14 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         
-        final List<Integer> actions = new ArrayList<Integer>();
-        actions.add(action);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         reqData.setMsgContext("bread");
         assertEquals(reqData.getMsgContext(), "bread");
         handler.send(
-            action, 
             doc, 
             reqData, 
-            actions,
+            Collections.singletonList(new HandlerAction(action)),
             true
         );
         assertEquals(reqData.getMsgContext(), "crumb");
@@ -198,17 +195,14 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         
-        final List<Integer> actions = new ArrayList<Integer>();
-        actions.add(action);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         reqData.setMsgContext("bread");
         assertEquals(reqData.getMsgContext(), "bread");
         handler.send(
-            action, 
             doc, 
             reqData, 
-            actions,
+            Collections.singletonList(new HandlerAction(action)),
             true
         );
         assertEquals(reqData.getMsgContext(), "crumb");
@@ -227,28 +221,15 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         
         String actionString = 
             WSHandlerConstants.TIMESTAMP + " " + Integer.valueOf(customAction).toString();
-        List<Integer> actionList = new ArrayList<Integer>();
-        //
-        // This parsing will fail as it doesn't know what the custom action is
-        //
-        try {
-            WSSecurityUtil.decodeAction(actionString, actionList);
-            fail("Failure expected on unknown action");
-        } catch (WSSecurityException ex) {
-            // expected
-        }
-        actionList.clear();
-        
         //
         // This parsing will fail as WSSConfig doesn't know what the custom action is
         //
         try {
-            WSSecurityUtil.decodeAction(actionString, actionList, cfg);
+            WSSecurityUtil.decodeHandlerAction(actionString, cfg);
             fail("Failure expected on unknown action");
         } catch (WSSecurityException ex) {
             // expected
         }
-        actionList.clear();
         
         //
         // This parsing will fail as the action String is badly formed
@@ -256,18 +237,17 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         try {
             String badActionString = 
                 WSHandlerConstants.TIMESTAMP + " " + "NewCustomAction";
-            WSSecurityUtil.decodeAction(badActionString, actionList, cfg);
+            WSSecurityUtil.decodeHandlerAction(badActionString, cfg);
             fail("Failure expected on unknown action");
         } catch (WSSecurityException ex) {
             // expected
         }
-        actionList.clear();
         
         //
         // This parsing should pass as WSSConfig has been configured with the custom action
         //
         cfg.setAction(customAction, org.apache.wss4j.dom.common.CustomAction.class);
-        int actions = WSSecurityUtil.decodeAction(actionString, actionList, cfg);
+        List<HandlerAction> actionList = WSSecurityUtil.decodeHandlerAction(actionString, cfg);
         
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
@@ -277,7 +257,6 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         reqData.setMsgContext("bread");
         assertEquals(reqData.getMsgContext(), "bread");
         handler.send(
-            actions, 
             doc, 
             reqData, 
             actionList,

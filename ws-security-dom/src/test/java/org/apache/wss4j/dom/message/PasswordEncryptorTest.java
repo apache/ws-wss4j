@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.dom.message;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -38,6 +39,7 @@ import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.w3c.dom.Document;
@@ -102,7 +104,6 @@ public class PasswordEncryptorTest extends org.junit.Assert {
     @org.junit.Test
     public void testSignatureWSHandler() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
-        final int action = WSConstants.SIGN;
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
@@ -111,15 +112,13 @@ public class PasswordEncryptorTest extends org.junit.Assert {
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         reqData.setMsgContext(config);
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(action);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.SIGN);
         handler.send(
-            action, 
             doc, 
             reqData, 
-            actions,
+            Collections.singletonList(action),
             true
         );
         
@@ -156,7 +155,6 @@ public class PasswordEncryptorTest extends org.junit.Assert {
     @org.junit.Test
     public void testDecryptionWSHandler() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
-        final int action = WSConstants.ENCR;
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
@@ -165,15 +163,13 @@ public class PasswordEncryptorTest extends org.junit.Assert {
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         reqData.setMsgContext(config);
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(action);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.ENCR);
         handler.send(
-            action, 
             doc, 
             reqData, 
-            actions,
+            Collections.singletonList(action),
             true
         );
         

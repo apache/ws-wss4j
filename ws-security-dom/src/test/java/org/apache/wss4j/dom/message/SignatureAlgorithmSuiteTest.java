@@ -28,6 +28,7 @@ import javax.xml.crypto.dsig.SignatureMethod;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.apache.wss4j.common.SignatureActionToken;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -166,7 +167,9 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         
         WSSecurityEngine secEngine = new WSSecurityEngine();
         RequestData data = new RequestData();
-        data.setSigCrypto(crypto);
+        SignatureActionToken actionToken = new SignatureActionToken();
+        actionToken.setCrypto(crypto);
+        data.setSignatureToken(actionToken);
         data.setCallbackHandler(secretKeyCallbackHandler);
         data.setAlgorithmSuite(algorithmSuite);
         

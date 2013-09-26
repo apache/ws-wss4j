@@ -24,6 +24,8 @@ import java.security.cert.X509Certificate;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.EncryptionActionToken;
+import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
@@ -35,14 +37,23 @@ import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.w3c.dom.Document;
 
 public class EncryptionAction implements Action {
-    public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
+    public void execute(WSHandler handler, SecurityActionToken actionToken,
+                        Document doc, RequestData reqData)
             throws WSSecurityException {
         WSSecEncrypt wsEncrypt = new WSSecEncrypt(reqData.getWssConfig());
 
-        if (reqData.getEncKeyId() != 0) {
-            wsEncrypt.setKeyIdentifierType(reqData.getEncKeyId());
+        EncryptionActionToken encryptionToken = null;
+        if (actionToken instanceof EncryptionActionToken) {
+            encryptionToken = (EncryptionActionToken)actionToken;
         }
-        if (reqData.getEncKeyId() == WSConstants.EMBEDDED_KEYNAME) {
+        if (encryptionToken == null) {
+            encryptionToken = reqData.getEncryptionToken();
+        }
+        
+        if (encryptionToken.getKeyIdentifierId() != 0) {
+            wsEncrypt.setKeyIdentifierType(encryptionToken.getKeyIdentifierId());
+        }
+        if (encryptionToken.getKeyIdentifierId() == WSConstants.EMBEDDED_KEYNAME) {
             String encKeyName = handler.getString(WSHandlerConstants.ENC_KEY_NAME,
                     reqData.getMsgContext());
             wsEncrypt.setEmbeddedKeyName(encKeyName);
@@ -53,50 +64,50 @@ public class EncryptionAction implements Action {
                     reqData
                 );
             WSPasswordCallback passwordCallback = 
-                handler.getPasswordCB(reqData.getEncUser(), actionToDo, callbackHandler, reqData);
+                handler.getPasswordCB(encryptionToken.getUser(), WSConstants.ENCR, callbackHandler, reqData);
             byte[] embeddedKey = passwordCallback.getKey();
             wsEncrypt.setKey(embeddedKey);
             wsEncrypt.setDocument(doc);
         }
-        if (reqData.getEncSymmAlgo() != null) {
-            wsEncrypt.setSymmetricEncAlgorithm(reqData.getEncSymmAlgo());
+        if (encryptionToken.getSymmetricAlgorithm() != null) {
+            wsEncrypt.setSymmetricEncAlgorithm(encryptionToken.getSymmetricAlgorithm());
         }
-        if (reqData.getEncKeyTransport() != null) {
-            wsEncrypt.setKeyEnc(reqData.getEncKeyTransport());
+        if (encryptionToken.getKeyTransportAlgorithm() != null) {
+            wsEncrypt.setKeyEnc(encryptionToken.getKeyTransportAlgorithm());
         }
-        if (reqData.getEncDigestAlgorithm() != null) {
-            wsEncrypt.setDigestAlgorithm(reqData.getEncDigestAlgorithm());
+        if (encryptionToken.getDigestAlgorithm() != null) {
+            wsEncrypt.setDigestAlgorithm(encryptionToken.getDigestAlgorithm());
         }
 
-        if (reqData.getEncMGFAlgorithm() != null) {
-            wsEncrypt.setMGFAlgorithm(reqData.getEncMGFAlgorithm());
+        if (encryptionToken.getMgfAlgorithm() != null) {
+            wsEncrypt.setMGFAlgorithm(encryptionToken.getMgfAlgorithm());
         }
         
-        wsEncrypt.setUserInfo(reqData.getEncUser());
-        wsEncrypt.setUseThisCert(reqData.getEncCert());
-        Crypto crypto = reqData.getEncCrypto();
+        wsEncrypt.setUserInfo(encryptionToken.getUser());
+        wsEncrypt.setUseThisCert(encryptionToken.getCertificate());
+        Crypto crypto = encryptionToken.getCrypto();
         boolean enableRevocation = Boolean.valueOf(handler.getStringOption(WSHandlerConstants.ENABLE_REVOCATION));
         if (enableRevocation && crypto != null) {
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-            cryptoType.setAlias(reqData.getEncUser());
+            cryptoType.setAlias(encryptionToken.getUser());
             X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
             if (certs != null && certs.length > 0) {
                 crypto.verifyTrust(certs, enableRevocation);
             }
         }
-        if (reqData.getEncryptParts().size() > 0) {
-            wsEncrypt.setParts(reqData.getEncryptParts());
+        if (encryptionToken.getParts().size() > 0) {
+            wsEncrypt.setParts(encryptionToken.getParts());
         }
-        if (!reqData.getEncryptSymmetricEncryptionKey()) {
+        if (!encryptionToken.isEncSymmetricEncryptionKey()) {
             CallbackHandler callbackHandler = 
                 handler.getPasswordCallbackHandler(reqData);
             WSPasswordCallback passwordCallback = 
-                handler.getPasswordCB(reqData.getEncUser(), actionToDo, callbackHandler, reqData);
+                handler.getPasswordCB(encryptionToken.getUser(), WSConstants.ENCR, callbackHandler, reqData);
             wsEncrypt.setEphemeralKey(passwordCallback.getKey());
-            wsEncrypt.setEncryptSymmKey(reqData.getEncryptSymmetricEncryptionKey());
+            wsEncrypt.setEncryptSymmKey(encryptionToken.isEncSymmetricEncryptionKey());
         }
         try {
-            wsEncrypt.build(doc, reqData.getEncCrypto(), reqData.getSecHeader());
+            wsEncrypt.build(doc, encryptionToken.getCrypto(), reqData.getSecHeader());
         } catch (WSSecurityException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", e, "Error during encryption: ");
         }

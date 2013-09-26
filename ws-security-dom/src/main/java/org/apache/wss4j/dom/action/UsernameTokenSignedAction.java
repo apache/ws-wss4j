@@ -26,7 +26,9 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.dom.SOAPConstants;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSEncryptionPart;
+import org.apache.wss4j.common.SecurityActionToken;
+import org.apache.wss4j.common.SignatureActionToken;
+import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
@@ -44,14 +46,15 @@ import org.w3c.dom.Document;
  */
 
 public class UsernameTokenSignedAction implements Action {
-    public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
+    public void execute(WSHandler handler, SecurityActionToken actionToken,
+                        Document doc, RequestData reqData)
             throws WSSecurityException {
         CallbackHandler callbackHandler = reqData.getCallbackHandler();
         if (callbackHandler == null) {
             callbackHandler = handler.getPasswordCallbackHandler(reqData);
         }
         WSPasswordCallback passwordCallback = 
-            handler.getPasswordCB(reqData.getUsername(), actionToDo, callbackHandler, reqData);
+            handler.getPasswordCB(reqData.getUsername(), WSConstants.UT_SIGN, callbackHandler, reqData);
 
         WSSecUsernameToken builder = new WSSecUsernameToken(reqData.getWssConfig());
         
@@ -80,17 +83,25 @@ public class UsernameTokenSignedAction implements Action {
         // after "prepare" the Signature XML element is ready and may prepend
         // this to the security header.
         
+        SignatureActionToken signatureToken = null;
+        if (actionToken instanceof SignatureActionToken) {
+            signatureToken = (SignatureActionToken)actionToken;
+        }
+        if (signatureToken == null) {
+            signatureToken = reqData.getSignatureToken();
+        }
+        
         WSSecSignature sign = new WSSecSignature(reqData.getWssConfig());
         sign.setCustomTokenValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
         sign.setCustomTokenId(builder.getId());
         sign.setSecretKey(builder.getDerivedKey());
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
-        if (reqData.getSigDigestAlgorithm() != null) {
-            sign.setDigestAlgo(reqData.getSigDigestAlgorithm());
+        if (signatureToken.getDigestAlgorithm() != null) {
+            sign.setDigestAlgo(signatureToken.getDigestAlgorithm());
         }
         
-        if (reqData.getSigAlgorithm() != null) {
-            sign.setSignatureAlgorithm(reqData.getSigAlgorithm());
+        if (signatureToken.getSignatureAlgorithm() != null) {
+            sign.setSignatureAlgorithm(signatureToken.getSignatureAlgorithm());
         } else {
             sign.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         }
@@ -104,8 +115,8 @@ public class UsernameTokenSignedAction implements Action {
         // builder.prependToHeader(reqData.getSecHeader());
 
         List<WSEncryptionPart> parts = null;
-        if (reqData.getSignatureParts().size() > 0) {
-            parts = reqData.getSignatureParts();
+        if (signatureToken.getParts().size() > 0) {
+            parts = signatureToken.getParts();
         } else {
             SOAPConstants soapConstants = reqData.getSoapConstants();
             if (soapConstants == null) {

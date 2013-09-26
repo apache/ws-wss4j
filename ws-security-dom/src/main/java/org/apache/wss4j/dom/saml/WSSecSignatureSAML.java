@@ -33,10 +33,11 @@ import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 
+import org.apache.wss4j.common.SignatureActionToken;
+import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.WSEncryptionPart;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -254,12 +255,14 @@ public class WSSecSignatureSAML extends WSSecSignature {
             }
             if (secretKey == null) {
                 RequestData data = new RequestData();
-                data.setSigCrypto(userCrypto);
+                SignatureActionToken actionToken = new SignatureActionToken();
+                data.setSignatureToken(actionToken);
+                actionToken.setCrypto(userCrypto);
                 data.setWssConfig(getWsConfig());
                 SAMLKeyInfo samlKeyInfo = 
                     SAMLUtil.getCredentialFromSubject(
                             samlAssertion, new WSSSAMLKeyInfoProcessor(data, wsDocInfo),
-                        data.getSigCrypto(), data.getCallbackHandler()
+                            userCrypto, data.getCallbackHandler()
                     );
                 publicKey = samlKeyInfo.getPublicKey();
                 certs = samlKeyInfo.getCerts();

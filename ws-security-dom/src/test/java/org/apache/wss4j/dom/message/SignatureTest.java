@@ -25,13 +25,13 @@ import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSEncryptionPart;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
@@ -39,6 +39,7 @@ import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.token.Reference;
@@ -541,7 +542,6 @@ public class SignatureTest extends org.junit.Assert {
     public void
     testWSS170() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
-        final int action = WSConstants.SIGN;
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
@@ -558,15 +558,13 @@ public class SignatureTest extends org.junit.Assert {
         );
         reqData.setMsgContext(config);
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(action);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.SIGN);
         handler.send(
-            action, 
             doc, 
             reqData, 
-            actions,
+            Collections.singletonList(action),
             true
         );
         String outputString = 
@@ -755,7 +753,6 @@ public class SignatureTest extends org.junit.Assert {
     public void
     testWSS231() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
-        final int action = WSConstants.SIGN | WSConstants.TS;
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
@@ -768,13 +765,12 @@ public class SignatureTest extends org.junit.Assert {
         );
         reqData.setMsgContext(config);
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.SIGN);
-        actions.add(WSConstants.TS);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        actions.add(new HandlerAction(WSConstants.SIGN));
+        actions.add(new HandlerAction(WSConstants.TS));
         handler.send(
-            action, 
             doc, 
             reqData, 
             actions,
@@ -788,14 +784,17 @@ public class SignatureTest extends org.junit.Assert {
         }
         
         List<WSSecurityEngineResult> results = verify(doc);
-        assertTrue(handler.checkResults(results, actions));
+        
+        List<Integer> receivedActions = new ArrayList<Integer>();
+        receivedActions.add(WSConstants.SIGN);
+        receivedActions.add(WSConstants.TS);
+        assertTrue(handler.checkResults(results, receivedActions));
     }
     
     @org.junit.Test
     public void
     testSignatureEncryptTimestampOrder() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
-        final int action = WSConstants.SIGN | WSConstants.ENCR | WSConstants.TS;
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
@@ -809,14 +808,13 @@ public class SignatureTest extends org.junit.Assert {
         );
         reqData.setMsgContext(config);
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.SIGN);
-        actions.add(WSConstants.ENCR);
-        actions.add(WSConstants.TS);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        actions.add(new HandlerAction(WSConstants.SIGN));
+        actions.add(new HandlerAction(WSConstants.ENCR));
+        actions.add(new HandlerAction(WSConstants.TS));
         handler.send(
-            action, 
             doc, 
             reqData, 
             actions,
@@ -834,7 +832,6 @@ public class SignatureTest extends org.junit.Assert {
     public void
     testEncryptSignatureTimestampOrder() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
-        final int action = WSConstants.ENCR | WSConstants.SIGN | WSConstants.TS;
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
@@ -848,14 +845,13 @@ public class SignatureTest extends org.junit.Assert {
         );
         reqData.setMsgContext(config);
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.ENCR);
-        actions.add(WSConstants.SIGN);
-        actions.add(WSConstants.TS);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        actions.add(new HandlerAction(WSConstants.ENCR));
+        actions.add(new HandlerAction(WSConstants.SIGN));
+        actions.add(new HandlerAction(WSConstants.TS));
         handler.send(
-            action, 
             doc, 
             reqData, 
             actions,
@@ -872,7 +868,6 @@ public class SignatureTest extends org.junit.Assert {
     @org.junit.Test
     public void testWSHandlerSignatureCanonicalization() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
-        final int action = WSConstants.SIGN;
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
@@ -883,15 +878,13 @@ public class SignatureTest extends org.junit.Assert {
         config.put("password", "security");
         reqData.setMsgContext(config);
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.SIGN);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.SIGN);
         handler.send(
-            action, 
             doc, 
             reqData, 
-            actions,
+            Collections.singletonList(action),
             true
         );
         String outputString = 
@@ -913,7 +906,7 @@ public class SignatureTest extends org.junit.Assert {
         WSSecurityEngine newSecEngine = new WSSecurityEngine();
         List<WSSecurityEngineResult> results = 
             newSecEngine.processSecurityHeader(doc, "", data);
-        assertTrue(handler.checkResults(results, actions));
+        assertTrue(handler.checkResults(results, Collections.singletonList(WSConstants.SIGN)));
     }
 
     /**

@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.handler;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -55,7 +56,6 @@ public class UseReqSigCertTest extends org.junit.Assert {
     @org.junit.Test
     public void testIncludedCertificate() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
-        final int action = WSConstants.SIGN | WSConstants.TS;
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
@@ -69,15 +69,14 @@ public class UseReqSigCertTest extends org.junit.Assert {
         );
         reqData.setMsgContext(config);
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.SIGN);
-        actions.add(WSConstants.TS);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         
         // Send the request
         CustomHandler handler = new CustomHandler();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        actions.add(new HandlerAction(WSConstants.SIGN));
+        actions.add(new HandlerAction(WSConstants.TS));
         handler.send(
-            action, 
             doc, 
             reqData, 
             actions,
@@ -103,7 +102,6 @@ public class UseReqSigCertTest extends org.junit.Assert {
     @org.junit.Test
     public void testIssuerSerial() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
-        final int action = WSConstants.SIGN | WSConstants.TS;
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
@@ -117,15 +115,14 @@ public class UseReqSigCertTest extends org.junit.Assert {
         );
         reqData.setMsgContext(config);
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.SIGN);
-        actions.add(WSConstants.TS);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         
         // Send the request
         CustomHandler handler = new CustomHandler();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        actions.add(new HandlerAction(WSConstants.SIGN));
+        actions.add(new HandlerAction(WSConstants.TS));
         handler.send(
-            action, 
             doc, 
             reqData, 
             actions,
@@ -151,7 +148,6 @@ public class UseReqSigCertTest extends org.junit.Assert {
     @org.junit.Test
     public void testSKIKeyIdentifier() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
-        final int action = WSConstants.SIGN | WSConstants.TS;
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
@@ -165,15 +161,14 @@ public class UseReqSigCertTest extends org.junit.Assert {
         );
         reqData.setMsgContext(config);
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.SIGN);
-        actions.add(WSConstants.TS);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         
         // Send the request
         CustomHandler handler = new CustomHandler();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        actions.add(new HandlerAction(WSConstants.SIGN));
+        actions.add(new HandlerAction(WSConstants.TS));
         handler.send(
-            action, 
             doc, 
             reqData, 
             actions,
@@ -198,7 +193,6 @@ public class UseReqSigCertTest extends org.junit.Assert {
     
     private List<WSSecurityEngineResult> processRequest(Document doc) throws WSSecurityException {
         final WSSConfig cfg = WSSConfig.getNewInstance();
-        final int action = WSConstants.SIGN | WSConstants.TS;
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         
@@ -207,14 +201,16 @@ public class UseReqSigCertTest extends org.junit.Assert {
         reqData.setMsgContext(config);
         
         CustomHandler handler = new CustomHandler();
-        handler.receive(action, reqData);
+        List<Integer> receivedActions = new ArrayList<Integer>();
+        receivedActions.add(WSConstants.SIGN);
+        receivedActions.add(WSConstants.TS);
+        handler.receive(receivedActions, reqData);
         
         WSSecurityEngine securityEngine = new WSSecurityEngine();
         return securityEngine.processSecurityHeader(doc, "", reqData);
     }
     
     private void sendResponse(List<WSHandlerResult> handlerResults) throws Exception {
-        final int action = WSConstants.ENCR;
         final RequestData reqData = new RequestData();
         
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
@@ -228,11 +224,11 @@ public class UseReqSigCertTest extends org.junit.Assert {
         
         // Send message
         CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.ENCR);
         handler.send(
-            action, 
             doc, 
             reqData, 
-            actions,
+            Collections.singletonList(action),
             true
         );
     }

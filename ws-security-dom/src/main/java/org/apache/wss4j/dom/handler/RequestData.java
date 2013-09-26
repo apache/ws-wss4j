@@ -20,7 +20,6 @@
 package org.apache.wss4j.dom.handler;
 
 import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,11 +30,8 @@ import java.util.regex.Pattern;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
-import org.apache.wss4j.dom.SOAPConstants;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSEncryptionPart;
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.bsp.BSPEnforcer;
+import org.apache.wss4j.common.EncryptionActionToken;
+import org.apache.wss4j.common.SignatureActionToken;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.cache.ReplayCacheFactory;
@@ -43,6 +39,10 @@ import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.SOAPConstants;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -55,37 +55,20 @@ import org.apache.xml.security.utils.Base64;
 public class RequestData {
     
     private Object msgContext;
-    private boolean noSerialization ;
     private SOAPConstants soapConstants ;
     private String actor;
     private String username ;
     private String pwType = WSConstants.PASSWORD_DIGEST; // Make this the default when no password type is given.
-    private Crypto sigCrypto;
     private Crypto sigVerCrypto;
-    private Crypto encCrypto;
     private Crypto decCrypto;
-    private int sigKeyId;
-    private String sigAlgorithm;
-    private String signatureDigestAlgorithm;
-    private String signatureC14nAlgorithm;
-    private String encryptionDigestAlgorithm;
-    private String encryptionMGFAlgorithm;
-    private List<WSEncryptionPart> signatureParts = new ArrayList<WSEncryptionPart>();
-    private int encKeyId;
-    private String encSymmAlgo;
-    private String encKeyTransport;
-    private String encUser;
-    private String signatureUser ;
-    private List<WSEncryptionPart> encryptParts = new ArrayList<WSEncryptionPart>();
-    private X509Certificate encCert;
+    private SignatureActionToken signatureToken;
+    private EncryptionActionToken encryptionToken;
     private int timeToLive = 300;   // Timestamp: time in seconds between creation and expiry
     private WSSConfig wssConfig;
     private List<byte[]> signatureValues = new ArrayList<byte[]>();
     private WSSecHeader secHeader;
-    private boolean encSymmetricEncryptionKey = true;
     private int derivedKeyIterations = UsernameToken.DEFAULT_ITERATION;
     private boolean useDerivedKeyForMAC = true;
-    private boolean useSingleCert = true;
     private CallbackHandler callback;
     private boolean enableRevocation;
     protected boolean requireSignedEncryptedDataElements;
@@ -103,7 +86,6 @@ public class RequestData {
     private boolean addUsernameTokenNonce;
     private boolean addUsernameTokenCreated;
     private Certificate[] tlsCerts;
-    private boolean includeSignatureToken;
     private boolean enableTimestampReplayCache = true;
     private boolean enableNonceReplayCache = true;
     private boolean enableSamlOneTimeUseReplayCache = true;
@@ -111,21 +93,14 @@ public class RequestData {
 
     public void clear() {
         soapConstants = null;
-        actor = username = pwType = sigAlgorithm = encSymmAlgo = encKeyTransport = encUser = null;
-        sigCrypto = decCrypto = encCrypto = sigVerCrypto = null;
-        signatureParts.clear();
-        encryptParts.clear();
-        encCert = null;
+        actor = username = pwType = null;
+        decCrypto = sigVerCrypto = null;
+        signatureToken = null;
+        encryptionToken = null;
         wssConfig = null;
         signatureValues.clear();
-        signatureDigestAlgorithm = null;
-        signatureC14nAlgorithm = null;
-        encryptionDigestAlgorithm = null;
-        encSymmetricEncryptionKey = true;
-        signatureUser = null;
         derivedKeyIterations = UsernameToken.DEFAULT_ITERATION;
         useDerivedKeyForMAC = true;
-        useSingleCert = true;
         callback = null;
         enableRevocation = false;
         timestampReplayCache = null;
@@ -142,15 +117,10 @@ public class RequestData {
         setAddUsernameTokenNonce(false);
         setAddUsernameTokenCreated(false);
         setTlsCerts(null);
-        includeSignatureToken = false;
         enableTimestampReplayCache = true;
         enableNonceReplayCache = true;
         setEnableSamlOneTimeUseReplayCache(true);
         passwordEncryptor = null;
-    }
-
-    public String getSignatureC14nAlgorithm() {
-        return signatureC14nAlgorithm;
     }
 
     public boolean isEnableTimestampReplayCache() {
@@ -169,24 +139,12 @@ public class RequestData {
         this.enableNonceReplayCache = enableNonceReplayCache;
     }
 
-    public void setSignatureC14nAlgorithm(String signatureC14nAlgorithm) {
-        this.signatureC14nAlgorithm = signatureC14nAlgorithm;
-    }
-
     public Object getMsgContext() {
         return msgContext;
     }
 
     public void setMsgContext(Object msgContext) {
         this.msgContext = msgContext;
-    }
-
-    public boolean isNoSerialization() {
-        return noSerialization;
-    }
-
-    public void setNoSerialization(boolean noSerialization) {
-        this.noSerialization = noSerialization;
     }
 
     public SOAPConstants getSoapConstants() {
@@ -213,14 +171,6 @@ public class RequestData {
         this.username = username;
     }
     
-    public void setEncryptSymmetricEncryptionKey(boolean encrypt) {
-        encSymmetricEncryptionKey = encrypt;
-    }
-    
-    public boolean getEncryptSymmetricEncryptionKey() {
-        return encSymmetricEncryptionKey;
-    }
-
     public String getPwType() {
         return pwType;
     }
@@ -229,14 +179,6 @@ public class RequestData {
         this.pwType = pwType;
     }
 
-    public Crypto getSigCrypto() {
-        return sigCrypto;
-    }
-
-    public void setSigCrypto(Crypto sigCrypto) {
-        this.sigCrypto = sigCrypto;
-    }
-    
     public Crypto getSigVerCrypto() {
         return sigVerCrypto;
     }
@@ -251,110 +193,6 @@ public class RequestData {
 
     public void setDecCrypto(Crypto decCrypto) {
         this.decCrypto = decCrypto;
-    }
-
-    public int getSigKeyId() {
-        return sigKeyId;
-    }
-
-    public void setSigKeyId(int sigKeyId) {
-        this.sigKeyId = sigKeyId;
-    }
-
-    public String getSigAlgorithm() {
-        return sigAlgorithm;
-    }
-
-    public void setSigAlgorithm(String sigAlgorithm) {
-        this.sigAlgorithm = sigAlgorithm;
-    }
-    
-    public String getSigDigestAlgorithm() {
-        return signatureDigestAlgorithm;
-    }
-
-    public void setSigDigestAlgorithm(String sigDigestAlgorithm) {
-        this.signatureDigestAlgorithm = sigDigestAlgorithm;
-    }
-    
-    public String getEncDigestAlgorithm() {
-        return encryptionDigestAlgorithm;
-    }
-
-    public void setEncDigestAlgorithm(String encDigestAlgorithm) {
-        this.encryptionDigestAlgorithm = encDigestAlgorithm;
-    }
-
-    public String getEncMGFAlgorithm() {
-        return encryptionMGFAlgorithm;
-    }
-
-    public void setEncMGFAlgorithm(String encMGFAlgorithm) {
-        this.encryptionMGFAlgorithm = encMGFAlgorithm;
-    }
-
-    public List<WSEncryptionPart> getSignatureParts() {
-        return signatureParts;
-    }
-    
-    public String getSignatureUser() {
-        return signatureUser;
-    }
-
-    public void setSignatureUser(String signatureUser) {
-        this.signatureUser = signatureUser;
-    }
-
-    public Crypto getEncCrypto() {
-        return encCrypto;
-    }
-
-    public void setEncCrypto(Crypto encCrypto) {
-        this.encCrypto = encCrypto;
-    }
-
-    public int getEncKeyId() {
-        return encKeyId;
-    }
-
-    public void setEncKeyId(int encKeyId) {
-        this.encKeyId = encKeyId;
-    }
-
-    public String getEncSymmAlgo() {
-        return encSymmAlgo;
-    }
-
-    public void setEncSymmAlgo(String encSymmAlgo) {
-        this.encSymmAlgo = encSymmAlgo;
-    }
-
-    public String getEncKeyTransport() {
-        return encKeyTransport;
-    }
-
-    public void setEncKeyTransport(String encKeyTransport) {
-        this.encKeyTransport = encKeyTransport;
-    }
-
-    public String getEncUser() {
-        return encUser;
-    }
-
-    public void setEncUser(String encUser) {
-        this.encUser = encUser;
-    }
-
-    public List<WSEncryptionPart> getEncryptParts() {
-        return encryptParts;
-    }
-
-    public X509Certificate getEncCert() {
-        return encCert;
-    }
-
-    public void setEncCert(X509Certificate encCert) {
-        this.encCert = encCert;
     }
 
     public int getTimeToLive() {
@@ -432,24 +270,6 @@ public class RequestData {
         return useDerivedKeyForMAC;
     }
     
-    /**
-     * Whether to use a single certificate or a whole certificate chain when
-     * constructing a BinarySecurityToken used for direct reference in Signature.
-     * @param useSingleCert true if only to use a single certificate
-     */
-    public void setUseSingleCert(boolean useSingleCert) {
-        this.useSingleCert = useSingleCert;
-    }
-    
-    /**
-     * Whether to use a single certificate or a whole certificate chain when
-     * constructing a BinarySecurityToken used for direct reference in Signature.
-     * @return whether to use a single certificate
-     */
-    public boolean isUseSingleCert() {
-        return useSingleCert;
-    }
-
     /**
      * Set whether to enable CRL checking or not when verifying trust in a certificate.
      * @param enableRevocation whether to enable CRL checking 
@@ -681,14 +501,6 @@ public class RequestData {
         this.tlsCerts = tlsCerts;
     }
 
-    public boolean isIncludeSignatureToken() {
-        return includeSignatureToken;
-    }
-
-    public void setIncludeSignatureToken(boolean includeSignatureToken) {
-        this.includeSignatureToken = includeSignatureToken;
-    }
-
     public PasswordEncryptor getPasswordEncryptor() {
         return passwordEncryptor;
     }
@@ -703,6 +515,22 @@ public class RequestData {
 
     public void setEnableSamlOneTimeUseReplayCache(boolean enableSamlOneTimeUseReplayCache) {
         this.enableSamlOneTimeUseReplayCache = enableSamlOneTimeUseReplayCache;
+    }
+
+    public SignatureActionToken getSignatureToken() {
+        return signatureToken;
+    }
+
+    public void setSignatureToken(SignatureActionToken signatureToken) {
+        this.signatureToken = signatureToken;
+    }
+
+    public EncryptionActionToken getEncryptionToken() {
+        return encryptionToken;
+    }
+
+    public void setEncryptionToken(EncryptionActionToken encryptionToken) {
+        this.encryptionToken = encryptionToken;
     }
         
 }

@@ -21,17 +21,19 @@ package org.apache.wss4j.dom.action;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import org.apache.wss4j.common.SecurityActionToken;
+import org.apache.wss4j.common.SignatureActionToken;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.saml.WSSecSignatureSAML;
-
 import org.w3c.dom.Document;
 
 public class SAMLTokenSignedAction implements Action {
@@ -39,7 +41,8 @@ public class SAMLTokenSignedAction implements Action {
     private static org.slf4j.Logger log = 
         org.slf4j.LoggerFactory.getLogger(SAMLTokenSignedAction.class);
 
-    public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
+    public void execute(WSHandler handler, SecurityActionToken actionToken,
+                        Document doc, RequestData reqData)
             throws WSSecurityException {
         Crypto crypto = null;
         /*
@@ -92,20 +95,28 @@ public class SAMLTokenSignedAction implements Action {
         CallbackHandler callbackHandler = 
             handler.getPasswordCallbackHandler(reqData);
         WSPasswordCallback passwordCallback = 
-            handler.getPasswordCB(reqData.getUsername(), actionToDo, callbackHandler, reqData);
+            handler.getPasswordCB(reqData.getUsername(), WSConstants.ST_SIGNED, callbackHandler, reqData);
         wsSign.setUserInfo(reqData.getUsername(), passwordCallback.getPassword());
         
-        if (reqData.getSigKeyId() != 0) {
-            wsSign.setKeyIdentifierType(reqData.getSigKeyId());
+        SignatureActionToken signatureToken = null;
+        if (actionToken instanceof SignatureActionToken) {
+            signatureToken = (SignatureActionToken)actionToken;
         }
-        if (reqData.getSigAlgorithm() != null) {
-            wsSign.setSignatureAlgorithm(reqData.getSigAlgorithm());
+        if (signatureToken == null) {
+            signatureToken = reqData.getSignatureToken();
         }
-        if (reqData.getSigDigestAlgorithm() != null) {
-            wsSign.setDigestAlgo(reqData.getSigDigestAlgorithm());
+        
+        if (signatureToken.getKeyIdentifierId() != 0) {
+            wsSign.setKeyIdentifierType(signatureToken.getKeyIdentifierId());
         }
-        if (reqData.getSignatureC14nAlgorithm() != null) {
-            wsSign.setSigCanonicalization(reqData.getSignatureC14nAlgorithm());
+        if (signatureToken.getSignatureAlgorithm() != null) {
+            wsSign.setSignatureAlgorithm(signatureToken.getSignatureAlgorithm());
+        }
+        if (signatureToken.getDigestAlgorithm() != null) {
+            wsSign.setDigestAlgo(signatureToken.getDigestAlgorithm());
+        }
+        if (signatureToken.getC14nAlgorithm() != null) {
+            wsSign.setSigCanonicalization(signatureToken.getC14nAlgorithm());
         }
 
          /*
@@ -114,8 +125,8 @@ public class SAMLTokenSignedAction implements Action {
          * If not set WSSecSignatureSAML
          * defaults to only sign the body.
          */
-        if (reqData.getSignatureParts().size() > 0) {
-            wsSign.setParts(reqData.getSignatureParts());
+        if (signatureToken.getParts().size() > 0) {
+            wsSign.setParts(signatureToken.getParts());
         }
 
         try {

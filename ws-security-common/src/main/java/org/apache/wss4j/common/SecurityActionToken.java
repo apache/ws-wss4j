@@ -16,26 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.wss4j.common;
 
-package org.apache.wss4j.dom.action;
+import java.security.Key;
+import java.security.cert.X509Certificate;
 
-import org.apache.wss4j.common.SecurityActionToken;
+import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandler;
-import org.apache.wss4j.dom.message.WSSecTimestamp;
-import org.w3c.dom.Document;
 
-public class TimestampAction implements Action {
+
+/**
+ * This interface encapsulates configuration for Actions. This allows a user to use specific keys
+ * for different actions, rather than to use the generic keys etc. configured on the request.
+ */
+public interface SecurityActionToken {  
+
+    String getUser();
     
-    public void execute(WSHandler handler, SecurityActionToken actionToken,
-                        Document doc, RequestData reqData)
-        throws WSSecurityException {
-        //
-        // add the Timestamp to the SOAP Envelope
-        //
-        WSSecTimestamp timeStampBuilder = new WSSecTimestamp(reqData.getWssConfig());
-        timeStampBuilder.setTimeToLive(handler.decodeTimeToLive(reqData, true));
-        timeStampBuilder.build(doc, reqData.getSecHeader());
-    }
+    Key getKey();
+    
+    X509Certificate getCertificate();
+    
+    Crypto getCrypto() throws WSSecurityException;
+    
+    String getCryptoProperties();
+    
 }
+

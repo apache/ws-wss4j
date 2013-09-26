@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.message;
 
 import java.io.IOException;
+import java.util.Collections;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -40,6 +41,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -219,15 +221,13 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         reqData.setMsgContext(messageContext);
         reqData.setUsername("");
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        actions.add(WSConstants.SIGN);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.SIGN);
         handler.send(
-            WSConstants.SIGN, 
             doc, 
             reqData, 
-            actions,
+            Collections.singletonList(action),
             true
         );
         
@@ -244,7 +244,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         reqData.setMsgContext(messageContext);
         reqData.setUsername("");
         
-        handler.receive(WSConstants.SIGN, reqData);
+        handler.receive(Collections.singletonList(WSConstants.SIGN), reqData);
         
         secEngine.processSecurityHeader(doc, null, this, null, crypto);
     }

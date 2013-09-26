@@ -20,8 +20,10 @@
 package org.apache.wss4j.dom.action;
 
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSEncryptionPart;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.common.SecurityActionToken;
+import org.apache.wss4j.common.SignatureActionToken;
+import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
@@ -39,7 +41,8 @@ public class SignatureConfirmationAction implements Action {
         org.slf4j.LoggerFactory.getLogger(SignatureConfirmationAction.class);
 
     @SuppressWarnings("unchecked")
-    public void execute(WSHandler handler, int actionToDo, Document doc, RequestData reqData)
+    public void execute(WSHandler handler, SecurityActionToken actionToken,
+                        Document doc, RequestData reqData)
             throws WSSecurityException {
         if (log.isDebugEnabled()) {
             log.debug("Perform Signature confirmation");
@@ -72,7 +75,11 @@ public class SignatureConfirmationAction implements Action {
         // prepare a SignatureConfirmation token
         //
         WSSecSignatureConfirmation wsc = new WSSecSignatureConfirmation(reqData.getWssConfig());
-        List<WSEncryptionPart> signatureParts = reqData.getSignatureParts();
+        SignatureActionToken signatureToken = (SignatureActionToken)actionToken;
+        if (signatureToken == null) {
+            signatureToken = reqData.getSignatureToken();
+        }
+        List<WSEncryptionPart> signatureParts = signatureToken.getParts();
         if (signatureActions.size() > 0) {
             if (log.isDebugEnabled()) {
                 log.debug("Signature Confirmation: number of Signature results: "

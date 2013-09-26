@@ -17,31 +17,42 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.common;
+package org.apache.wss4j.dom.handler;
 
-import org.apache.wss4j.dom.action.Action;
 import org.apache.wss4j.common.SecurityActionToken;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.handler.WSHandler;
-import org.apache.wss4j.dom.handler.RequestData;
+
 
 /**
- * a custom action that leaves a breadcumb
+ * This class associates an "Action" Integer with a (optional) SecurityActionToken
  */
-public class CustomAction implements Action {
+public class HandlerAction {
     
-    public void 
-    execute(
-        WSHandler handler, 
-        SecurityActionToken action,
-        org.w3c.dom.Document doc,
-        RequestData reqData
-    ) throws WSSecurityException {
-        //
-        // leave a breadcrumb, if asked...
-        //
-        if (reqData.getMsgContext().equals("bread")) {
-            reqData.setMsgContext("crumb");
-        }
+    private Integer action;
+    private SecurityActionToken actionToken;
+    
+    public HandlerAction() {
+        
+    }
+    
+    public HandlerAction(Integer action) {
+        this(action, null);
+    }
+    
+    public HandlerAction(Integer action, SecurityActionToken actionToken) {
+        this.action = action;
+        this.actionToken = actionToken;
+    }
+    
+    public Integer getAction() {
+        return action;
+    }
+    public void setAction(Integer action) {
+        this.action = action;
+    }
+    public SecurityActionToken getActionToken() {
+        return actionToken;
+    }
+    public void setActionToken(SecurityActionToken actionToken) {
+        this.actionToken = actionToken;
     }
 }

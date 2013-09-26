@@ -21,6 +21,7 @@ package org.apache.wss4j.dom.common;
 
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.w3c.dom.Document;
@@ -78,14 +79,12 @@ public class CustomHandler extends WSHandler {
     }
 
     public void send(
-        int action, 
         Document doc,
         RequestData reqData, 
-        List<Integer> actions,
+        List<HandlerAction> actions,
         boolean request
     ) throws WSSecurityException {
         doSenderAction(
-            action, 
             doc, 
             reqData, 
             actions,
@@ -94,11 +93,11 @@ public class CustomHandler extends WSHandler {
     }
     
     public void receive(
-        int action, 
+        List<Integer> actions, 
         RequestData reqData
     ) throws WSSecurityException {
         doReceiverAction(
-            action, 
+            actions, 
             reqData
         );
     }

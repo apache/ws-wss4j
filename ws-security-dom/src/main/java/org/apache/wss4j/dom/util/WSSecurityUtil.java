@@ -24,12 +24,13 @@ import org.apache.wss4j.dom.SOAP12Constants;
 import org.apache.wss4j.dom.SOAPConstants;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
-import org.apache.wss4j.dom.WSEncryptionPart;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.StringUtil;
 import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.CallbackLookup;
 import org.apache.xml.security.algorithms.JCEMapper;
@@ -936,46 +937,32 @@ public final class WSSecurityUtil {
         return actionResultList;
     }
 
-    public static int decodeAction(
-        String action, 
-        List<Integer> actions
-    ) throws WSSecurityException {
-
-        int doAction = 0;
+    public static List<Integer> decodeAction(String action) throws WSSecurityException {
+        List<Integer> actions = new ArrayList<Integer>();
         if (action == null) {
-            return doAction;
+            return actions;
         }
         String single[] = StringUtil.split(action, ' ');
         for (int i = 0; i < single.length; i++) {
             if (single[i].equals(WSHandlerConstants.NO_SECURITY)) {
-                doAction = WSConstants.NO_SECURITY;
-                return doAction;
+                return actions;
             } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN)) {
-                doAction |= WSConstants.UT;
                 actions.add(WSConstants.UT);
             } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN_NO_PASSWORD)) {
-                doAction |= WSConstants.UT_NOPASSWORD;
                 actions.add(WSConstants.UT_NOPASSWORD);
             } else if (single[i].equals(WSHandlerConstants.SIGNATURE)) {
-                doAction |= WSConstants.SIGN;
                 actions.add(WSConstants.SIGN);
             } else if (single[i].equals(WSHandlerConstants.ENCRYPT)) {
-                doAction |= WSConstants.ENCR;
                 actions.add(WSConstants.ENCR);
             } else if (single[i].equals(WSHandlerConstants.SAML_TOKEN_UNSIGNED)) {
-                doAction |= WSConstants.ST_UNSIGNED;
                 actions.add(WSConstants.ST_UNSIGNED);
             } else if (single[i].equals(WSHandlerConstants.SAML_TOKEN_SIGNED)) {
-                doAction |= WSConstants.ST_SIGNED;
                 actions.add(WSConstants.ST_SIGNED);
             } else if (single[i].equals(WSHandlerConstants.TIMESTAMP)) {
-                doAction |= WSConstants.TS;
                 actions.add(WSConstants.TS);
             } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN_SIGNATURE)) {
-                doAction |= WSConstants.UT_SIGN;
                 actions.add(WSConstants.UT_SIGN);
             } else if (single[i].equals(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION)) {
-                doAction |= WSConstants.SC;
                 actions.add(WSConstants.SC);
             } else {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
@@ -983,57 +970,45 @@ public final class WSSecurityUtil {
                 );
             }
         }
-        return doAction;
+        return actions;
     }
     
     
     /**
      * Decode an action String. This method should only be called on the outbound side.
      * @param action The initial String of actions to perform
-     * @param actions The list of created actions that will be performed
      * @param wssConfig This object holds the list of custom actions to be performed.
-     * @return The or'd integer of all the actions (apart from the custom actions)
+     * @return The list of HandlerAction Objects
      * @throws WSSecurityException
      */
-    public static int decodeAction(
+    public static List<HandlerAction> decodeHandlerAction(
         String action, 
-        List<Integer> actions,
         WSSConfig wssConfig
     ) throws WSSecurityException {
-
-        int doAction = 0;
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         if (action == null) {
-            return doAction;
+            return actions;
         }
         String single[] = StringUtil.split(action, ' ');
         for (int i = 0; i < single.length; i++) {
             if (single[i].equals(WSHandlerConstants.NO_SECURITY)) {
-                doAction = WSConstants.NO_SECURITY;
-                return doAction;
+                return actions;
             } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN)) {
-                doAction |= WSConstants.UT;
-                actions.add(WSConstants.UT);
+                actions.add(new HandlerAction(WSConstants.UT));
             } else if (single[i].equals(WSHandlerConstants.SIGNATURE)) {
-                doAction |= WSConstants.SIGN;
-                actions.add(WSConstants.SIGN);
+                actions.add(new HandlerAction(WSConstants.SIGN));
             } else if (single[i].equals(WSHandlerConstants.ENCRYPT)) {
-                doAction |= WSConstants.ENCR;
-                actions.add(WSConstants.ENCR);
+                actions.add(new HandlerAction(WSConstants.ENCR));
             } else if (single[i].equals(WSHandlerConstants.SAML_TOKEN_UNSIGNED)) {
-                doAction |= WSConstants.ST_UNSIGNED;
-                actions.add(WSConstants.ST_UNSIGNED);
+                actions.add(new HandlerAction(WSConstants.ST_UNSIGNED));
             } else if (single[i].equals(WSHandlerConstants.SAML_TOKEN_SIGNED)) {
-                doAction |= WSConstants.ST_SIGNED;
-                actions.add(WSConstants.ST_SIGNED);
+                actions.add(new HandlerAction(WSConstants.ST_SIGNED));
             } else if (single[i].equals(WSHandlerConstants.TIMESTAMP)) {
-                doAction |= WSConstants.TS;
-                actions.add(WSConstants.TS);
+                actions.add(new HandlerAction(WSConstants.TS));
             } else if (single[i].equals(WSHandlerConstants.USERNAME_TOKEN_SIGNATURE)) {
-                doAction |= WSConstants.UT_SIGN;
-                actions.add(WSConstants.UT_SIGN);
+                actions.add(new HandlerAction(WSConstants.UT_SIGN));
             } else if (single[i].equals(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION)) {
-                doAction |= WSConstants.SC;
-                actions.add(WSConstants.SC);
+                actions.add(new HandlerAction(WSConstants.SC));
             } else {
                 try {
                     int parsedAction = Integer.parseInt(single[i]);
@@ -1042,7 +1017,7 @@ public final class WSSecurityUtil {
                                 "Unknown action defined: " + single[i]
                         );
                     }
-                    actions.add(parsedAction);
+                    actions.add(new HandlerAction(parsedAction));
                 } catch (NumberFormatException ex) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                             "Unknown action defined: " + single[i]
@@ -1050,7 +1025,7 @@ public final class WSSecurityUtil {
                 }
             }
         }
-        return doAction;
+        return actions;
     }
 
     /**

@@ -44,6 +44,7 @@ import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -349,7 +350,7 @@ public class SamlTokenSVTest extends org.junit.Assert {
         reqData.setMsgContext(msgContext);
         
         CustomHandler handler = new CustomHandler();
-        handler.receive(WSConstants.ST_SIGNED, reqData);
+        handler.receive(Collections.singletonList(WSConstants.ST_SIGNED), reqData);
         
         secEngine.processSecurityHeader(
             signedDoc, null, callbackHandler, reqData.getSigVerCrypto(), reqData.getDecCrypto()
