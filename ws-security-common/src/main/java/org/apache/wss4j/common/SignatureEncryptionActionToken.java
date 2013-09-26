@@ -18,7 +18,6 @@
  */
 package org.apache.wss4j.common;
 
-import java.security.Key;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +38,7 @@ public abstract class SignatureEncryptionActionToken implements SecurityActionTo
         org.slf4j.LoggerFactory.getLogger(SignatureEncryptionActionToken.class);
 
     private X509Certificate certificate;
-    private Key key;
+    private byte[] key;
     private String user;
     private Element keyInfoElement;
     private Crypto crypto;
@@ -56,10 +55,10 @@ public abstract class SignatureEncryptionActionToken implements SecurityActionTo
     public void setCertificate(X509Certificate certificate) {
         this.certificate = certificate;
     }
-    public Key getKey() {
+    public byte[] getKey() {
         return key;
     }
-    public void setKey(Key key) {
+    public void setKey(byte[] key) {
         this.key = key;
     }
     public Element getKeyInfoElement() {

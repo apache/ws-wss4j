@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.dom.action;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -74,12 +75,11 @@ public class SignatureAction implements Action {
 
         wsSign.setUserInfo(signatureToken.getUser(), passwordCallback.getPassword());
         wsSign.setUseSingleCertificate(signatureToken.isUseSingleCert());
-        if (signatureToken.getParts().size() > 0) {
-            wsSign.setParts(signatureToken.getParts());
-        }
         
         if (passwordCallback.getKey() != null) {
             wsSign.setSecretKey(passwordCallback.getKey());
+        } else if (signatureToken.getKey() != null) {
+            wsSign.setSecretKey(signatureToken.getKey());
         }
 
         try {
@@ -119,8 +119,18 @@ public class SignatureAction implements Action {
             if (signBST) {
                 wsSign.prependBSTElementToHeader(reqData.getSecHeader());
             }
+            
+            List<WSEncryptionPart> parts = signatureToken.getParts();
+            if (parts == null || parts.isEmpty()) {
+                WSEncryptionPart encP = new WSEncryptionPart(reqData.getSoapConstants()
+                        .getBodyQName().getLocalPart(), reqData.getSoapConstants()
+                        .getEnvelopeURI(), "Content");
+                parts = new ArrayList<WSEncryptionPart>();
+                parts.add(encP);
+            }
+            
             List<javax.xml.crypto.dsig.Reference> referenceList =
-                wsSign.addReferencesToSign(signatureToken.getParts(), reqData.getSecHeader());
+                wsSign.addReferencesToSign(parts, reqData.getSecHeader());
 
             if (signBST || 
                 reqData.isAppendSignatureAfterTimestamp() && siblingElementToPrepend == null) {

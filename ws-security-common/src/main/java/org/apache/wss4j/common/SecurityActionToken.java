@@ -18,7 +18,6 @@
  */
 package org.apache.wss4j.common;
 
-import java.security.Key;
 import java.security.cert.X509Certificate;
 
 import org.apache.wss4j.common.crypto.Crypto;
@@ -33,7 +32,7 @@ public interface SecurityActionToken {
 
     String getUser();
     
-    Key getKey();
+    byte[] getKey();
     
     X509Certificate getCertificate();
     
