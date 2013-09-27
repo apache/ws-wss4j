@@ -170,10 +170,10 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
     protected void checkOneTimeUse(
         AssertionWrapper samlAssertion, RequestData data
     ) throws WSSecurityException {
-        if (data.getSamlOneTimeUseReplayCache() != null
-            && samlAssertion.getSamlVersion().equals(SAMLVersion.VERSION_20)
+        if (samlAssertion.getSamlVersion().equals(SAMLVersion.VERSION_20)
             && samlAssertion.getSaml2().getConditions() != null
-            && samlAssertion.getSaml2().getConditions().getOneTimeUse() != null) {
+            && samlAssertion.getSaml2().getConditions().getOneTimeUse() != null 
+            && data.getSamlOneTimeUseReplayCache() != null) {
             String identifier = samlAssertion.getId();
 
             ReplayCache replayCache = data.getSamlOneTimeUseReplayCache();
