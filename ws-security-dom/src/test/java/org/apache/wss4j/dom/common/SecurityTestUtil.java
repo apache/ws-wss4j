@@ -38,7 +38,8 @@ public final class SecurityTestUtil {
                     if (tmpFile.exists() && (tmpFile.getName().startsWith("ws-security.nonce.cache")
                             || tmpFile.getName().startsWith("wss4j-nonce-cache")
                             || tmpFile.getName().startsWith("ws-security.timestamp.cache")
-                            || tmpFile.getName().startsWith("wss4j-timestamp-cache"))) {
+                            || tmpFile.getName().startsWith("wss4j-timestamp-cache")
+                            || tmpFile.getName().startsWith("wss4j-saml-one-time-use-cache"))) {
                         tmpFile.delete();
                     }
                 }
