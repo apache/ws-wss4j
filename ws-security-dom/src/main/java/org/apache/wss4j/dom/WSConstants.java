@@ -384,11 +384,13 @@ public final class WSConstants {
      * Embeds a keyinfo/key name into the EncryptedData element.
      * <p/>
      */
+    @Deprecated
     public static final int EMBEDDED_KEYNAME = 5;
     
     /**
      * Embeds a keyinfo/wsse:SecurityTokenReference into EncryptedData element.
      */
+    @Deprecated
     public static final int EMBED_SECURITY_TOKEN_REF = 6;
     
     /**

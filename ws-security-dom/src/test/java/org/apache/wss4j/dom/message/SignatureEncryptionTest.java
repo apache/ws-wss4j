@@ -26,11 +26,8 @@ import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
-import org.apache.wss4j.dom.common.SecretKeyCallbackHandler;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
-import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.common.WSEncryptionPart;
-import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.util.XMLUtils;
@@ -40,7 +37,6 @@ import org.w3c.dom.Document;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.crypto.dsig.SignatureMethod;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -66,20 +62,6 @@ public class SignatureEncryptionTest extends org.junit.Assert {
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     
-    private static final byte[] key = {
-        (byte)0x31, (byte)0xfd,
-        (byte)0xcb, (byte)0xda,
-        (byte)0xfb, (byte)0xcd,
-        (byte)0x6b, (byte)0xa8,
-        (byte)0xe6, (byte)0x19,
-        (byte)0xa7, (byte)0xbf,
-        (byte)0x51, (byte)0xf7,
-        (byte)0xc7, (byte)0x3e,
-        (byte)0x80, (byte)0xae,
-        (byte)0x98, (byte)0x51,
-        (byte)0xc8, (byte)0x51,
-        (byte)0x34, (byte)0x04,
-    };
     private Crypto crypto = null;
     
     @org.junit.AfterClass
@@ -323,58 +305,6 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         
         LOG.info("After Sign/Encryption....");
         verify(encryptedSignedDoc);
-    }
-    
-    /**
-     * Test that encrypts and signs a WS-Security envelope, then performs
-     * verification and decryption.
-     * <p/>
-     * 
-     * @throws Exception Thrown when there is any problem in signing, encryption,
-     *                   decryption, or verification
-     */
-    @org.junit.Test
-    public void testSigningEncryptionEmbedded() throws Exception {
-        WSSecEncrypt encrypt = new WSSecEncrypt();
-        WSSecSignature sign = new WSSecSignature();
-        
-        encrypt.setUserInfo("wss40");
-        encrypt.setKeyIdentifierType(WSConstants.EMBEDDED_KEYNAME);
-        encrypt.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);        
-        encrypt.setKey(key);
-
-        sign.setUserInfo("wss40", "security");
-        LOG.info("Before Encryption....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        encrypt.setDocument(doc);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);                
-        Document signedDoc = sign.build(doc, crypto, secHeader);
-        Document encryptedSignedDoc = encrypt.build(signedDoc, crypto, secHeader);
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
-            String outputString = 
-                XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
-            LOG.debug(outputString);
-        }
-        LOG.info("After Encryption....");
-        
-        SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
-        secretKeyCallbackHandler.setOutboundSecret(key);
-        WSSecurityEngine engine = new WSSecurityEngine();
-        RequestData data = new RequestData();
-        data.setCallbackHandler(secretKeyCallbackHandler);
-        data.setSigVerCrypto(crypto);
-        data.setDecCrypto(crypto);
-        data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R5426));
-        
-        engine.processSecurityHeader(doc, "", data);
-        if (LOG.isDebugEnabled()) {
-            String outputString = 
-                XMLUtils.PrettyDocumentToString(doc);
-            LOG.debug(outputString);
-        }
     }
     
     /**

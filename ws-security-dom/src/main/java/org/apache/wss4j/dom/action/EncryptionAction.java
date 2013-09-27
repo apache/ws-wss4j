@@ -53,22 +53,7 @@ public class EncryptionAction implements Action {
         if (encryptionToken.getKeyIdentifierId() != 0) {
             wsEncrypt.setKeyIdentifierType(encryptionToken.getKeyIdentifierId());
         }
-        if (encryptionToken.getKeyIdentifierId() == WSConstants.EMBEDDED_KEYNAME) {
-            String encKeyName = handler.getString(WSHandlerConstants.ENC_KEY_NAME,
-                    reqData.getMsgContext());
-            wsEncrypt.setEmbeddedKeyName(encKeyName);
-            CallbackHandler callbackHandler = 
-                handler.getCallbackHandler(
-                    WSHandlerConstants.ENC_CALLBACK_CLASS,
-                    WSHandlerConstants.ENC_CALLBACK_REF, 
-                    reqData
-                );
-            WSPasswordCallback passwordCallback = 
-                handler.getPasswordCB(encryptionToken.getUser(), WSConstants.ENCR, callbackHandler, reqData);
-            byte[] embeddedKey = passwordCallback.getKey();
-            wsEncrypt.setKey(embeddedKey);
-            wsEncrypt.setDocument(doc);
-        }
+
         if (encryptionToken.getSymmetricAlgorithm() != null) {
             wsEncrypt.setSymmetricEncAlgorithm(encryptionToken.getSymmetricAlgorithm());
         }
@@ -98,14 +83,27 @@ public class EncryptionAction implements Action {
         if (encryptionToken.getParts().size() > 0) {
             wsEncrypt.setParts(encryptionToken.getParts());
         }
-        if (!encryptionToken.isEncSymmetricEncryptionKey()) {
+        
+        wsEncrypt.setEncryptSymmKey(encryptionToken.isEncSymmetricEncryptionKey());
+        byte[] ephemeralKey = encryptionToken.getKey();
+        if (!encryptionToken.isEncSymmetricEncryptionKey() && ephemeralKey == null) {
             CallbackHandler callbackHandler = 
                 handler.getPasswordCallbackHandler(reqData);
-            WSPasswordCallback passwordCallback = 
-                handler.getPasswordCB(encryptionToken.getUser(), WSConstants.ENCR, callbackHandler, reqData);
-            wsEncrypt.setEphemeralKey(passwordCallback.getKey());
-            wsEncrypt.setEncryptSymmKey(encryptionToken.isEncSymmetricEncryptionKey());
+            if (ephemeralKey == null) {
+                WSPasswordCallback passwordCallback = 
+                    handler.getPasswordCB(encryptionToken.getUser(), WSConstants.ENCR, callbackHandler, reqData);
+                ephemeralKey = passwordCallback.getKey();
+            }
         }
+        wsEncrypt.setEphemeralKey(ephemeralKey);
+        
+        if (encryptionToken.getTokenId() != null) {
+            wsEncrypt.setEncKeyId(encryptionToken.getTokenId());
+        }
+        if (encryptionToken.getTokenType() != null) {
+            wsEncrypt.setCustomReferenceValue(encryptionToken.getTokenType());
+        }
+        
         try {
             wsEncrypt.build(doc, encryptionToken.getCrypto(), reqData.getSecHeader());
         } catch (WSSecurityException e) {

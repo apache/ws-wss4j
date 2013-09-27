@@ -841,8 +841,6 @@ public final class WSHandlerConstants {
      * </li>
      * <li><code>SKIKeyIdentifier</code> for {@link WSConstants#SKI_KEY_IDENTIFIER}
      * </li>
-     * <li><code>EmbeddedKeyName</code> for {@link WSConstants#EMBEDDED_KEYNAME}
-     * </li>
      * <li><code>Thumbprint</code> for {@link WSConstants#THUMBPRINT}
      * </li>
      * <li><code>EncryptedKeySHA1</code> for {@link WSConstants#ENCRYPTED_KEY_SHA1_IDENTIFIER}
@@ -857,7 +855,6 @@ public final class WSHandlerConstants {
         keyIdentifier.put("IssuerSerial", WSConstants.ISSUER_SERIAL);
         keyIdentifier.put("X509KeyIdentifier", WSConstants.X509_KEY_IDENTIFIER);
         keyIdentifier.put("SKIKeyIdentifier", WSConstants.SKI_KEY_IDENTIFIER);
-        keyIdentifier.put("EmbeddedKeyName", WSConstants.EMBEDDED_KEYNAME);
         keyIdentifier.put("Thumbprint", WSConstants.THUMBPRINT_IDENTIFIER);
         keyIdentifier.put("EncryptedKeySHA1", WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
         keyIdentifier.put("KeyValue", WSConstants.KEY_VALUE);

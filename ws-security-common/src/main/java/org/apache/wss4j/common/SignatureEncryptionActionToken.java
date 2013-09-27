@@ -48,6 +48,9 @@ public abstract class SignatureEncryptionActionToken implements SecurityActionTo
     private List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
     private String optionalParts;
     private String cryptoProperties;
+    private String tokenType;
+    private String tokenId;
+    private String sha1Value;
     
     public X509Certificate getCertificate() {
         return certificate;
@@ -131,6 +134,24 @@ public abstract class SignatureEncryptionActionToken implements SecurityActionTo
     }
     public void setCryptoProperties(String cryptoProperties) {
         this.cryptoProperties = cryptoProperties;
+    }
+    public String getTokenType() {
+        return tokenType;
+    }
+    public void setTokenType(String tokenType) {
+        this.tokenType = tokenType;
+    }
+    public String getTokenId() {
+        return tokenId;
+    }
+    public void setTokenId(String tokenId) {
+        this.tokenId = tokenId;
+    }
+    public String getSha1Value() {
+        return sha1Value;
+    }
+    public void setSha1Value(String sha1Value) {
+        this.sha1Value = sha1Value;
     }
 }
 

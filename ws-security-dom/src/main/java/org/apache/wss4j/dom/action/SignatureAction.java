@@ -81,6 +81,16 @@ public class SignatureAction implements Action {
         } else if (signatureToken.getKey() != null) {
             wsSign.setSecretKey(signatureToken.getKey());
         }
+        
+        if (signatureToken.getTokenId() != null) {
+            wsSign.setCustomTokenId(signatureToken.getTokenId());
+        }
+        if (signatureToken.getTokenType() != null) {
+            wsSign.setCustomTokenValueType(signatureToken.getTokenType());
+        }
+        if (signatureToken.getSha1Value() != null) {
+            wsSign.setEncrKeySha1value(signatureToken.getSha1Value());
+        }
 
         try {
             wsSign.prepare(doc, signatureToken.getCrypto(), reqData.getSecHeader());

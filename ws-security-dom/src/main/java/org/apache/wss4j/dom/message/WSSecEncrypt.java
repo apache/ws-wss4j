@@ -56,10 +56,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     private static org.slf4j.Logger log = 
         org.slf4j.LoggerFactory.getLogger(WSSecEncrypt.class);
     
-    private byte[] embeddedKey;
-
-    private String embeddedKeyName;
-
     /**
      * SecurityTokenReference to be inserted into EncryptedData/keyInfo element.
      */
@@ -92,16 +88,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     }
     
     /**
-     * Sets the key to use during embedded encryption.
-     * 
-     * @param key to use during encryption. The key must fit the selected
-     *            symmetrical encryption algorithm
-     */
-    public void setKey(byte[] key) {
-        embeddedKey = key;
-    }
-
-    /**
      * Sets the algorithm to encode the symmetric key.
      * 
      * Default is the <code>WSConstants.KEYTRANSPORT_RSAOEP</code> algorithm.
@@ -114,16 +100,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         keyEncAlgo = keyEnc;
     }
 
-    /**
-     * Set the key name for EMBEDDED_KEYNAME
-     * 
-     * @param embeddedKeyName
-     */
-    public void setEmbeddedKeyName(String embeddedKeyName) {
-        this.embeddedKeyName = embeddedKeyName;
-    }
-    
-    
     /**
      * Initialize a WSSec Encrypt.
      * 
@@ -154,11 +130,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             ephemeralKey = symmetricKey.getEncoded();
         }
         
-        if (symmetricKey == null) {
-            symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, ephemeralKey);
-        } else {
-            symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, symmetricKey.getEncoded());
-        }
+        symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, ephemeralKey);
         
         //
         // Get the certificate that contains the public key for the public key
@@ -204,23 +176,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         throws WSSecurityException {
         doDebug = log.isDebugEnabled();
 
-        if (keyIdentifierType == WSConstants.EMBEDDED_KEYNAME
-            || keyIdentifierType == WSConstants.EMBED_SECURITY_TOKEN_REF) {
-            encryptSymmKey = false;
-            document = doc;
-            //
-            // Generate a symmetric key from the specified key (password) for this
-            // algorithm, and set the cipher into encryption mode.
-            //
-            if (symmetricKey == null) {
-                if (embeddedKey == null) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKeySupplied");
-                }
-                symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, embeddedKey);
-            }
-        } else {
-            prepare(doc, crypto);
-        }
+        prepare(doc, crypto);
         
         if (envelope == null) {
             envelope = document.getDocumentElement();
@@ -504,8 +460,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             }
             secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
             keyInfo.addUnknownElement(secToken.getElement());
-        } else if (keyIdentifierType == WSConstants.EMBEDDED_KEYNAME) {
-            keyInfo.addKeyName(embeddedKeyName == null ? user : embeddedKeyName);
         } else if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customReferenceValue)) {
             SecurityTokenReference secToken = new SecurityTokenReference(document);
             secToken.addWSSENamespace();

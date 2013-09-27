@@ -644,7 +644,6 @@ public abstract class WSHandler {
                     || tmp == WSConstants.X509_KEY_IDENTIFIER
                     || tmp == WSConstants.SKI_KEY_IDENTIFIER
                     || tmp == WSConstants.BST_DIRECT_REFERENCE
-                    || tmp == WSConstants.EMBEDDED_KEYNAME
                     || tmp == WSConstants.THUMBPRINT_IDENTIFIER
                     || tmp == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER)) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,

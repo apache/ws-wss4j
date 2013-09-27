@@ -25,8 +25,10 @@ import java.util.List;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.security.auth.callback.CallbackHandler;
 import javax.xml.crypto.dsig.SignatureMethod;
 
+import org.apache.wss4j.common.EncryptionActionToken;
 import org.apache.wss4j.common.SignatureActionToken;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -37,12 +39,14 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.common.CombinedCallbackHandler;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecretKeyCallbackHandler;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 
@@ -107,7 +111,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        verify(doc);
+        verify(doc, null);
     }
     
     @org.junit.Test
@@ -148,8 +152,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         String identifier = Base64.encode(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
         
-        WSSecurityEngine symmetricSecEngine = new WSSecurityEngine();
-        symmetricSecEngine.processSecurityHeader(doc, null, secretKeyCallbackHandler, null, crypto);
+        verify(doc, secretKeyCallbackHandler);
     }
     
     @org.junit.Test
@@ -194,6 +197,8 @@ public class SecurityActionTokenTest extends org.junit.Assert {
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
+        
+        // Not verifying due to two separate Crypto instances...
     }
     
     @org.junit.Test
@@ -238,11 +243,331 @@ public class SecurityActionTokenTest extends org.junit.Assert {
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
+        
+        SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
+        byte[] encodedBytes = WSSecurityUtil.generateDigest(keyData);
+        String identifier = Base64.encode(encodedBytes);
+        secretKeyCallbackHandler.addSecretKey(identifier, keyData);
+        
+        verify(doc, secretKeyCallbackHandler);
     }
     
+    @org.junit.Test
+    public void testAsymmetricEncryption() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
+        messageContext.put(
+            WSHandlerConstants.PW_CALLBACK_REF, new KeystoreCallbackHandler()
+        );
+        reqData.setMsgContext(messageContext);
+        
+        EncryptionActionToken actionToken = new EncryptionActionToken();
+        actionToken.setUser("wss40");
+        actionToken.setCryptoProperties("wss40.properties");
+        
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        actions.add(new HandlerAction(WSConstants.ENCR, actionToken));
+        handler.send(
+            doc, 
+            reqData, 
+            actions,
+            true
+        );
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        
+        verify(doc, new KeystoreCallbackHandler());
+    }
+    
+    @org.junit.Test
+    public void testSymmetricEncryption() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
+        messageContext.put(
+            WSHandlerConstants.PW_CALLBACK_REF, new KeystoreCallbackHandler()
+        );
+        reqData.setMsgContext(messageContext);
+        
+        EncryptionActionToken actionToken = new EncryptionActionToken();
+        actionToken.setKeyIdentifierId(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
+        actionToken.setKey(keyData);
+        actionToken.setSymmetricAlgorithm(WSConstants.AES_128);
+        actionToken.setEncSymmetricEncryptionKey(false);
+        
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        actions.add(new HandlerAction(WSConstants.ENCR, actionToken));
+        handler.send(
+            doc, 
+            reqData, 
+            actions,
+            true
+        );
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        
+        SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
+        byte[] encodedBytes = WSSecurityUtil.generateDigest(keyData);
+        String identifier = Base64.encode(encodedBytes);
+        secretKeyCallbackHandler.addSecretKey(identifier, keyData);
+        
+        verify(doc, secretKeyCallbackHandler);
+    }
+    
+    @org.junit.Test
+    public void testAsymmetricDoubleEncryption() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
+        messageContext.put(
+            WSHandlerConstants.PW_CALLBACK_REF, new KeystoreCallbackHandler()
+        );
+        reqData.setMsgContext(messageContext);
+        
+        EncryptionActionToken actionToken = new EncryptionActionToken();
+        actionToken.setUser("wss40");
+        actionToken.setCryptoProperties("wss40.properties");
+        
+        EncryptionActionToken actionToken2 = new EncryptionActionToken();
+        actionToken2.setUser("16c73ab6-b892-458f-abf5-2f875f74882e");
+        actionToken2.setCryptoProperties("crypto.properties");
+        WSEncryptionPart encP =
+            new WSEncryptionPart("Timestamp", WSConstants.WSU_NS, "");
+        actionToken2.setParts(Collections.singletonList(encP));
+        
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        actions.add(new HandlerAction(WSConstants.ENCR, actionToken));
+        actions.add(new HandlerAction(WSConstants.TS, null));
+        actions.add(new HandlerAction(WSConstants.ENCR, actionToken2));
+        handler.send(
+            doc, 
+            reqData, 
+            actions,
+            true
+        );
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        
+        // Not verifying due to two separate Crypto instances...
+    }
+    
+    @org.junit.Test
+    public void testMixedDoubleEncryption() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
+        messageContext.put(
+            WSHandlerConstants.PW_CALLBACK_REF, new KeystoreCallbackHandler()
+        );
+        reqData.setMsgContext(messageContext);
+        
+        EncryptionActionToken actionToken = new EncryptionActionToken();
+        actionToken.setUser("wss40");
+        actionToken.setCryptoProperties("wss40.properties");
+        
+        EncryptionActionToken actionToken2 = new EncryptionActionToken();
+        actionToken2.setKeyIdentifierId(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
+        actionToken2.setKey(keyData);
+        actionToken2.setSymmetricAlgorithm(WSConstants.AES_128);
+        actionToken2.setEncSymmetricEncryptionKey(false);
+        WSEncryptionPart encP =
+            new WSEncryptionPart("Timestamp", WSConstants.WSU_NS, "");
+        actionToken2.setParts(Collections.singletonList(encP));
+        
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        actions.add(new HandlerAction(WSConstants.ENCR, actionToken));
+        actions.add(new HandlerAction(WSConstants.TS, null));
+        actions.add(new HandlerAction(WSConstants.ENCR, actionToken2));
+        handler.send(
+            doc, 
+            reqData, 
+            actions,
+            true
+        );
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        
+        SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
+        byte[] encodedBytes = WSSecurityUtil.generateDigest(keyData);
+        String identifier = Base64.encode(encodedBytes);
+        secretKeyCallbackHandler.addSecretKey(identifier, keyData);
+        
+        CombinedCallbackHandler combinedCallbackHandler = 
+            new CombinedCallbackHandler(secretKeyCallbackHandler, new KeystoreCallbackHandler());
+        
+        verify(doc, combinedCallbackHandler);
+    }
+    
+    // Using the same key for signature + encryption here for convenience...
+    @org.junit.Test
+    public void testAsymmetricSignatureEncryption() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
+        messageContext.put(
+            WSHandlerConstants.PW_CALLBACK_REF, new KeystoreCallbackHandler()
+        );
+        reqData.setMsgContext(messageContext);
+        
+        SignatureActionToken actionToken = new SignatureActionToken();
+        actionToken.setUser("wss40");
+        actionToken.setCryptoProperties("wss40.properties");
+        actionToken.setKeyIdentifierId(WSConstants.BST_DIRECT_REFERENCE);
+        
+        EncryptionActionToken actionToken2 = new EncryptionActionToken();
+        actionToken2.setUser("wss40");
+        actionToken2.setCryptoProperties("wss40.properties");
+        
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        actions.add(new HandlerAction(WSConstants.SIGN, actionToken));
+        actions.add(new HandlerAction(WSConstants.ENCR, actionToken2));
+        handler.send(
+            doc, 
+            reqData, 
+            actions,
+            true
+        );
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        
+        verify(doc, new KeystoreCallbackHandler());
+    }
+    
+    @org.junit.Test
+    public void testSymmetricSignatureEncryption() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
+        messageContext.put(
+            WSHandlerConstants.PW_CALLBACK_REF, new KeystoreCallbackHandler()
+        );
+        reqData.setMsgContext(messageContext);
+        
+        EncryptionActionToken actionToken = new EncryptionActionToken();
+        actionToken.setKey(keyData);
+        actionToken.setSymmetricAlgorithm(WSConstants.AES_128);
+        actionToken.setKeyIdentifierId(WSConstants.SKI_KEY_IDENTIFIER);
+        actionToken.setUser("wss40");
+        actionToken.setCryptoProperties("wss40.properties");
+        actionToken.setTokenId(IDGenerator.generateID("EK-"));
+        
+        SignatureActionToken actionToken2 = new SignatureActionToken();
+        actionToken2.setKeyIdentifierId(WSConstants.CUSTOM_SYMM_SIGNING);
+        actionToken2.setKey(keyData);
+        actionToken2.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
+        actionToken2.setTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+        actionToken2.setTokenId(actionToken.getTokenId());
+        
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        actions.add(new HandlerAction(WSConstants.SIGN, actionToken2));
+        actions.add(new HandlerAction(WSConstants.ENCR, actionToken));
+        handler.send(
+            doc, 
+            reqData, 
+            actions,
+            true
+        );
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        
+        verify(doc, new KeystoreCallbackHandler());
+    }
+    
+    @org.junit.Test
+    public void testSymmetricSignatureEncryptionResponse() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
+        messageContext.put(
+            WSHandlerConstants.PW_CALLBACK_REF, new KeystoreCallbackHandler()
+        );
+        reqData.setMsgContext(messageContext);
+        
+        EncryptionActionToken actionToken = new EncryptionActionToken();
+        actionToken.setKey(keyData);
+        actionToken.setSymmetricAlgorithm(WSConstants.AES_128);
+        actionToken.setKeyIdentifierId(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
+        actionToken.setEncSymmetricEncryptionKey(false);
+        
+        SignatureActionToken actionToken2 = new SignatureActionToken();
+        actionToken2.setKeyIdentifierId(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
+        actionToken2.setKey(keyData);
+        actionToken2.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
+        
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        actions.add(new HandlerAction(WSConstants.SIGN, actionToken2));
+        actions.add(new HandlerAction(WSConstants.ENCR, actionToken));
+        handler.send(
+            doc, 
+            reqData, 
+            actions,
+            true
+        );
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+            
+        SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
+        byte[] encodedBytes = WSSecurityUtil.generateDigest(keyData);
+        String identifier = Base64.encode(encodedBytes);
+        secretKeyCallbackHandler.addSecretKey(identifier, keyData);
+        
+        verify(doc, secretKeyCallbackHandler);
+    }
 
-    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
-        return secEngine.processSecurityHeader(doc, null, null, crypto);
+    private List<WSSecurityEngineResult> verify(
+        Document doc, CallbackHandler callbackHandler
+    ) throws Exception {
+        return secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
     }
 
     
