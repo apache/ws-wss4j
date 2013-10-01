@@ -37,7 +37,7 @@
 
     <properties>
         <bcprov.version>1.49</bcprov.version>
-        <ehcache.version>2.7.2</ehcache.version>
+        <ehcache.version>2.7.4</ehcache.version>
         <jasypt.version>1.9.0</jasypt.version>
         <log4j.version>1.2.17</log4j.version>
         <neethi.version>3.0.2</neethi.version>
