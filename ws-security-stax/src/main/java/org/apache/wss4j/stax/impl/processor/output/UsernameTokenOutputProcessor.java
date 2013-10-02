@@ -34,9 +34,11 @@ import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
+import javax.security.auth.callback.CallbackHandler;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -54,12 +56,22 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
     public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
 
         try {
-            WSPasswordCallback pwCb = new WSPasswordCallback(((WSSSecurityProperties) getSecurityProperties()).getTokenUser(), WSPasswordCallback.Usage.USERNAME_TOKEN);
-            WSSUtils.doPasswordCallback(((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler(), pwCb);
-            String password = pwCb.getPassword();
+            CallbackHandler callbackHandler = ((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler();
             WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType = ((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType();
+            
+            if (callbackHandler == null 
+                && WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE != usernameTokenPasswordType) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
+            }
+            
+            String password = null;
+            if (callbackHandler != null) {
+                WSPasswordCallback pwCb = new WSPasswordCallback(((WSSSecurityProperties) getSecurityProperties()).getTokenUser(), WSPasswordCallback.Usage.USERNAME_TOKEN);
+                WSSUtils.doPasswordCallback(callbackHandler, pwCb);
+                password = pwCb.getPassword();
+            }
 
-            if (password == null && usernameTokenPasswordType != null) {
+            if (password == null && WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE != usernameTokenPasswordType) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
             

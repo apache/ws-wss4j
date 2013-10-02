@@ -165,7 +165,8 @@ public class WSSec {
                 if (securityProperties.getTokenUser() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noTokenUser");
                 }
-                if (securityProperties.getCallbackHandler() == null) {
+                if (securityProperties.getCallbackHandler() == null
+                    && WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE != securityProperties.getUsernameTokenPasswordType()) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
                 }
                 if (securityProperties.getUsernameTokenPasswordType() == null) {

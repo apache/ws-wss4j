@@ -834,7 +834,7 @@ public class SamlAssertionWrapper {
     ) throws WSSecurityException {
         samlVersion = samlCallback.getSamlVersion();
         if (samlVersion == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSAMLVersion");
+            samlVersion = SAMLVersion.VERSION_20;
         }
         String issuer = samlCallback.getIssuer();
         
