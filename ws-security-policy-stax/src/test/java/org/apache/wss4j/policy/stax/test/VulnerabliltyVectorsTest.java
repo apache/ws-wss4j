@@ -48,8 +48,9 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
     /**
      * Tests what happens when an soapAction from an other operation is provided.
      * Can the policy framework be bypassed?
+     * @Ignoring as SOAP Action spoofing detection should be left to the SOAP stack
      */
-    @Test
+    @Test(enabled=false)
     public void testSOAPActionSpoofing() throws Exception {
         WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
         outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());

@@ -115,7 +115,8 @@ public class WSSec {
                     && securityProperties.getSignatureCrypto() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureKeyStoreNotSet");
                 }
-                if (securityProperties.getSignatureUser() == null) {
+                if (securityProperties.getSignatureUser() == null
+                    && !WSSConstants.NS_XMLDSIG_HMACSHA1.equals(securityProperties.getSignatureAlgorithm())) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noSignatureUser");
                 }
                 if (securityProperties.getCallbackHandler() == null

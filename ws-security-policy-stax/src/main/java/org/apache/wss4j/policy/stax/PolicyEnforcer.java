@@ -573,12 +573,7 @@ public class PolicyEnforcer implements SecurityEventListener {
         if (WSSecurityEventConstants.Operation.equals(securityEvent.getSecurityEventType())) {
             operationSecurityEventOccured = true;
             final OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
-            if (effectivePolicy != null) {
-                //soap-action spoofing detection
-                if (!effectivePolicy.getOperationName().equals(operationSecurityEvent.getOperation().getLocalPart())) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, new WSSPolicyException("SOAPAction (" + effectivePolicy.getOperationName() + ") does not match with the current Operation: " + operationSecurityEvent.getOperation()));
-                }
-            } else {
+            if (effectivePolicy == null) {
                 effectivePolicy = findPolicyBySOAPOperationName(operationPolicies, operationSecurityEvent.getOperation().getLocalPart());
                 if (effectivePolicy == null) {
                     //no policy to the operation given
