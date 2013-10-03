@@ -71,7 +71,7 @@ public class SamlTokenAssertionState extends TokenAssertionState {
             final SamlAssertionWrapper samlAssertionWrapper = samlTokenSecurityEvent.getSamlAssertionWrapper();
             switch (samlToken.getSamlTokenType()) {
                 case WssSamlV11Token10:
-                    if (samlAssertionWrapper.getSamlVersion() != SAMLVersion.VERSION_10) {
+                    if (samlAssertionWrapper.getSamlVersion() != SAMLVersion.VERSION_11) {
                         setErrorMessage("Policy enforces SamlVersion11Profile10 but we got " + samlAssertionWrapper.getSamlVersion());
                         return false;
                     }
