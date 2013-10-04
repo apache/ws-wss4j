@@ -110,18 +110,18 @@ public class WSSec {
                     securityProperties.setTimestampTTL(300);
                 }
             } else if (WSSConstants.SIGNATURE.equals(action)) {
-                if (securityProperties.getSignatureKeyStore() == null
-                    && securityProperties.getSignatureCryptoProperties() == null
-                    && securityProperties.getSignatureCrypto() == null) {
-                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureKeyStoreNotSet");
-                }
-                if (securityProperties.getSignatureUser() == null
-                    && !WSSConstants.NS_XMLDSIG_HMACSHA1.equals(securityProperties.getSignatureAlgorithm())) {
-                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noSignatureUser");
-                }
-                if (securityProperties.getCallbackHandler() == null
-                    && !WSSConstants.NS_XMLDSIG_HMACSHA1.equals(securityProperties.getSignatureAlgorithm())) {
-                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
+                if (!WSSConstants.NS_XMLDSIG_HMACSHA1.equals(securityProperties.getSignatureAlgorithm())) {
+                    if (securityProperties.getSignatureKeyStore() == null
+                        && securityProperties.getSignatureCryptoProperties() == null
+                        && securityProperties.getSignatureCrypto() == null) {
+                        throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureKeyStoreNotSet");
+                    }
+                    if (securityProperties.getSignatureUser() == null) {
+                        throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noSignatureUser");
+                    }
+                    if (securityProperties.getCallbackHandler() == null) {
+                        throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
+                    }
                 }
                 if (securityProperties.getSignatureAlgorithm() == null) {
                     securityProperties.setSignatureAlgorithm(WSSConstants.NS_XMLDSIG_RSASHA1);

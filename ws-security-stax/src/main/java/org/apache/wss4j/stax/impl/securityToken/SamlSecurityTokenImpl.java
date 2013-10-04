@@ -18,22 +18,7 @@
  */
 package org.apache.wss4j.stax.impl.securityToken;
 
-import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
-import org.apache.wss4j.common.saml.OpenSAMLUtil;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.securityToken.SamlSecurityToken;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
-import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
-import org.opensaml.common.SAMLVersion;
-
-import javax.security.auth.Subject;
+import java.io.IOException;
 import java.security.Key;
 import java.security.Principal;
 import java.security.PublicKey;
@@ -42,6 +27,31 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+import javax.crypto.spec.SecretKeySpec;
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.UnsupportedCallbackException;
+
+import org.w3c.dom.Element;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
+import org.apache.wss4j.common.saml.OpenSAMLUtil;
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.securityToken.SamlSecurityToken;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
+import org.opensaml.common.SAMLVersion;
+
 public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implements SamlSecurityToken {
 
     private final SamlAssertionWrapper samlAssertionWrapper;
@@ -49,6 +59,42 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
     private Crypto crypto;
     private WSSSecurityProperties securityProperties;
     private Principal principal;
+    private SAMLKeyInfo subjectKeyInfo;
+    
+    public SamlSecurityTokenImpl(WSInboundSecurityContext wsInboundSecurityContext, String id,
+                                 WSSecurityTokenConstants.KeyIdentifier keyIdentifier,
+                                 WSSSecurityProperties securityProperties) throws WSSecurityException {
+        super(wsInboundSecurityContext, id, keyIdentifier, false);
+        this.securityProperties = securityProperties;
+        if (securityProperties.getCallbackHandler() != null) {
+            // Try to get the Assertion from a CallbackHandler
+            WSPasswordCallback pwcb = 
+                new WSPasswordCallback(id, WSPasswordCallback.Usage.CUSTOM_TOKEN);
+            try {
+                securityProperties.getCallbackHandler().handle(new Callback[]{pwcb});
+            } catch (IOException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noPassword", e);
+            } catch (UnsupportedCallbackException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noPassword", e);
+            }
+            Element assertionElem = pwcb.getCustomToken();
+            if (assertionElem == null) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", id
+                );
+            }
+            this.samlAssertionWrapper = new SamlAssertionWrapper(assertionElem);
+            
+            subjectKeyInfo = 
+                SAMLUtil.getCredentialFromSubject(samlAssertionWrapper, null, 
+                                                  securityProperties.getSignatureVerificationCrypto(),
+                                                  securityProperties.getCallbackHandler());
+        } else {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", id
+            );
+        }
+    }
 
     public SamlSecurityTokenImpl(SamlAssertionWrapper samlAssertionWrapper, InboundSecurityToken subjectSecurityToken,
                                  WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto,
@@ -73,6 +119,11 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
     protected Key getKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage, String correlationID) throws XMLSecurityException {
         if (this.subjectSecurityToken != null) {
             return subjectSecurityToken.getSecretKey(algorithmURI, algorithmUsage, correlationID);
+        } else if (subjectKeyInfo != null && subjectKeyInfo.getSecret() != null) {
+            byte[] secret = subjectKeyInfo.getSecret();
+            
+            String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
+            return new SecretKeySpec(secret, algoFamily);
         }
         return super.getKey(algorithmURI, algorithmUsage, correlationID);
     }
@@ -81,6 +132,8 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
     protected PublicKey getPubKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage, String correlationID) throws XMLSecurityException {
         if (this.subjectSecurityToken != null) {
             return subjectSecurityToken.getPublicKey(algorithmURI, algorithmUsage, correlationID);
+        } else if (subjectKeyInfo != null && subjectKeyInfo.getPublicKey() != null) {
+            return subjectKeyInfo.getPublicKey();
         }
         return super.getPubKey(algorithmURI, algorithmUsage, correlationID);
     }
@@ -89,6 +142,8 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
     public PublicKey getPublicKey() throws XMLSecurityException {
         if (this.subjectSecurityToken != null) {
             return subjectSecurityToken.getPublicKey();
+        } else if (subjectKeyInfo != null && subjectKeyInfo.getPublicKey() != null) {
+            return subjectKeyInfo.getPublicKey();
         }
         return super.getPublicKey();
     }
@@ -97,6 +152,8 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
     public X509Certificate[] getX509Certificates() throws XMLSecurityException {
         if (this.subjectSecurityToken != null) {
             return subjectSecurityToken.getX509Certificates();
+        } else if (subjectKeyInfo != null && subjectKeyInfo.getCerts() != null) {
+            return subjectKeyInfo.getCerts();
         }
         return super.getX509Certificates();
     }

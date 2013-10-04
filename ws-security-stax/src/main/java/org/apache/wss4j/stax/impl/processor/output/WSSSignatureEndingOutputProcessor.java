@@ -94,26 +94,33 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
         if (WSSecurityTokenConstants.KeyIdentifier_KeyValue.equals(keyIdentifier)) {
             WSSUtils.createKeyValueTokenStructure(this, outputProcessorChain, x509Certificates);
         } else {
+            boolean isSAMLToken = false;
             List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
             attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
-            if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier) && !useSingleCertificate) {
+            if (WSSecurityTokenConstants.Saml10Token.equals(securityToken.getTokenType())
+                || WSSecurityTokenConstants.Saml11Token.equals(securityToken.getTokenType())) {
+                attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE));
+                isSAMLToken = true;
+            } else if (WSSecurityTokenConstants.Saml20Token.equals(securityToken.getTokenType())) {
+                attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE));
+                isSAMLToken = true;
+            } else if (WSSecurityTokenConstants.KerberosToken.equals(securityToken.getTokenType())) {
+                attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_GSS_Kerberos5_AP_REQ));
+            } else if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier) && !useSingleCertificate) {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_X509PKIPathv1));
             } else if (WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier.equals(keyIdentifier)
                 || WSSecurityTokenConstants.KeyIdentifier_EncryptedKey.equals(keyIdentifier)) {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
-            } else if (WSSecurityTokenConstants.Saml10Token.equals(securityToken.getTokenType())
-                    || WSSecurityTokenConstants.Saml11Token.equals(securityToken.getTokenType())) {
-                attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE));
-            } else if (WSSecurityTokenConstants.Saml20Token.equals(securityToken.getTokenType())) {
-                attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE));
-            } else if (WSSecurityTokenConstants.KerberosToken.equals(securityToken.getTokenType())) {
-                attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_GSS_Kerberos5_AP_REQ));
             }
+            
             createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
 
             String tokenId = securityToken.getId();
 
-            if (WSSecurityTokenConstants.KeyIdentifier_IssuerSerial.equals(keyIdentifier)) {
+            if (isSAMLToken) {
+                // Always use KeyIdentifier regardless of the configured KeyIdentifier value
+                WSSUtils.createSAMLKeyIdentifierStructure(this, outputProcessorChain, securityToken.getTokenType(), tokenId);
+            } else if (WSSecurityTokenConstants.KeyIdentifier_IssuerSerial.equals(keyIdentifier)) {
                 WSSUtils.createX509IssuerSerialStructure(this, outputProcessorChain, x509Certificates);
             } else if (WSSecurityTokenConstants.KeyIdentifier_SkiKeyIdentifier.equals(keyIdentifier)) {
                 WSSUtils.createX509SubjectKeyIdentifierStructure(this, outputProcessorChain, x509Certificates);

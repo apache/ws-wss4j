@@ -396,6 +396,21 @@ public class WSSUtils extends XMLSecurityUtils {
         abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, referenceId);
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
     }
+    
+    public static void createSAMLKeyIdentifierStructure(AbstractOutputProcessor abstractOutputProcessor,
+                                                            OutputProcessorChain outputProcessorChain,
+                                                            WSSecurityTokenConstants.TokenType tokenType, String referenceId)
+            throws XMLStreamException, XMLSecurityException {
+        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
+        if (WSSecurityTokenConstants.Saml10Token.equals(tokenType) || WSSecurityTokenConstants.Saml11Token.equals(tokenType)) {
+            attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML10_TYPE));
+        } else if (WSSecurityTokenConstants.Saml20Token.equals(tokenType)) {
+            attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML20_TYPE));
+        }
+        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
+        abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, referenceId);
+        abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
+    }
 
     public static void createUsernameTokenReferenceStructure(AbstractOutputProcessor abstractOutputProcessor,
                                                              OutputProcessorChain outputProcessorChain, String tokenId)

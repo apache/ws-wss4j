@@ -226,9 +226,11 @@ public final class SAMLUtil {
         //
         // First try to find an EncryptedKey, BinarySecret or a SecurityTokenReference via DOM
         //
-        SAMLKeyInfo samlKeyInfo = keyInfoProcessor.processSAMLKeyInfo(keyInfoElement);
-        if (samlKeyInfo != null) {
-            return samlKeyInfo;
+        if (keyInfoProcessor != null) {
+            SAMLKeyInfo samlKeyInfo = keyInfoProcessor.processSAMLKeyInfo(keyInfoElement);
+            if (samlKeyInfo != null) {
+                return samlKeyInfo;
+            }
         }
         
         return getCredentialDirectlyFromKeyInfo(keyInfoElement, sigCrypto);

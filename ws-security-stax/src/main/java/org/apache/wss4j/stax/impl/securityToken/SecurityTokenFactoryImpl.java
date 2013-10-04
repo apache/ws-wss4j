@@ -245,12 +245,16 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     }
                     SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider =
                             inboundSecurityContext.getSecurityTokenProvider(keyIdentifierType.getValue());
-                    if (securityTokenProvider == null) {
-                        throw new WSSecurityException(
-                                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", keyIdentifierType.getValue());
-                    }
-                    return createSecurityTokenProxy(securityTokenProvider.getSecurityToken(),
+                    if (securityTokenProvider != null) {
+                        return createSecurityTokenProxy(securityTokenProvider.getSecurityToken(),
                             WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
+                    }
+                    
+                    // Delegate to a CallbackHandler, in case the token is not in the request
+                    return new SamlSecurityTokenImpl((WSInboundSecurityContext) inboundSecurityContext, 
+                                                     keyIdentifierType.getValue(),
+                                                     WSSecurityTokenConstants.KeyIdentifier_ExternalReference, 
+                                                     securityProperties);
                 } else if (WSSConstants.NS_Kerberos5_AP_REQ_SHA1.equals(valueType)) {
                     SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider =
                             inboundSecurityContext.getSecurityTokenProvider(keyIdentifierType.getValue());
