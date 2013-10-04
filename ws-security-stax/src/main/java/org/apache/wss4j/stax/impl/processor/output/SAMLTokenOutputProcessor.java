@@ -273,7 +273,9 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 };
 
                 outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(tokenId, securityTokenProvider);
-                outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, tokenId);
+                if (WSSConstants.SAML_TOKEN_SIGNED.equals(action)) {
+                    outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, tokenId);
+                }
             }
 
             finalSAMLTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
