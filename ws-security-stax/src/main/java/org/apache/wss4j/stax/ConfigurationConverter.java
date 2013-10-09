@@ -484,24 +484,48 @@ public final class ConfigurationConverter {
         String sigC14nAlgo = getString(ConfigurationConstants.SIG_C14N_ALGO, config);
         properties.setSignatureCanonicalizationAlgorithm(sigC14nAlgo);
         
-        String sigParts = getString(ConfigurationConstants.SIGNATURE_PARTS, config);
+        Object sigParts = config.get(ConfigurationConstants.SIGNATURE_PARTS);
         if (sigParts != null) {
-            List<SecurePart> parts = new ArrayList<SecurePart>();
-            splitEncParts(sigParts, parts, WSSConstants.NS_SOAP11);
-            for (SecurePart part : parts) {
-                part.setDigestMethod(sigDigestAlgo);
-                properties.addSignaturePart(part);
+            if (sigParts instanceof String) {
+                List<SecurePart> parts = new ArrayList<SecurePart>();
+                splitEncParts((String)sigParts, parts, WSSConstants.NS_SOAP11);
+                for (SecurePart part : parts) {
+                    part.setDigestMethod(sigDigestAlgo);
+                    properties.addSignaturePart(part);
+                }
+            } else if (sigParts instanceof List<?>) {
+                List<?> sigPartsList = (List<?>)sigParts;
+                for (Object obj : sigPartsList) {
+                    if (obj instanceof SecurePart) {
+                        SecurePart securePart = (SecurePart)obj;
+                        System.out.println("ADDING SIG PART: " + securePart.getName());
+                        securePart.setDigestMethod(sigDigestAlgo);
+                        properties.addSignaturePart(securePart);
+                    }
+                }
             }
         }
         
-        sigParts = getString(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS, config);
+        sigParts = config.get(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS);
         if (sigParts != null) {
-            List<SecurePart> parts = new ArrayList<SecurePart>();
-            splitEncParts(sigParts, parts, WSSConstants.NS_SOAP11);
-            for (SecurePart part : parts) {
-                part.setRequired(false);
-                part.setDigestMethod(sigDigestAlgo);
-                properties.addSignaturePart(part);
+            if (sigParts instanceof String) {
+                List<SecurePart> parts = new ArrayList<SecurePart>();
+                splitEncParts((String)sigParts, parts, WSSConstants.NS_SOAP11);
+                for (SecurePart part : parts) {
+                    part.setRequired(false);
+                    part.setDigestMethod(sigDigestAlgo);
+                    properties.addSignaturePart(part);
+                }
+            } else if (sigParts instanceof List<?>) {
+                List<?> sigPartsList = (List<?>)sigParts;
+                for (Object obj : sigPartsList) {
+                    if (obj instanceof SecurePart) {
+                        SecurePart securePart = (SecurePart)obj;
+                        securePart.setDigestMethod(sigDigestAlgo);
+                        securePart.setRequired(false);
+                        properties.addSignaturePart(securePart);
+                    }
+                }
             }
         }
         
@@ -518,22 +542,43 @@ public final class ConfigurationConverter {
             properties.setEncryptionKeyIdentifier(convEncKeyIdentifier);
         }
         
-        String encParts = getString(ConfigurationConstants.ENCRYPTION_PARTS, config);
+        Object encParts = config.get(ConfigurationConstants.ENCRYPTION_PARTS);
         if (encParts != null) {
-            List<SecurePart> parts = new ArrayList<SecurePart>();
-            splitEncParts(encParts, parts, WSSConstants.NS_SOAP11);
-            for (SecurePart part : parts) {
-                properties.addEncryptionPart(part);
+            if (encParts instanceof String) {
+                List<SecurePart> parts = new ArrayList<SecurePart>();
+                splitEncParts((String)encParts, parts, WSSConstants.NS_SOAP11);
+                for (SecurePart part : parts) {
+                    properties.addEncryptionPart(part);
+                }
+            } else if (encParts instanceof List<?>) {
+                List<?> encPartsList = (List<?>)encParts;
+                for (Object obj : encPartsList) {
+                    if (obj instanceof SecurePart) {
+                        SecurePart securePart = (SecurePart)obj;
+                        properties.addEncryptionPart(securePart);
+                    }
+                }
             }
         }
         
-        encParts = getString(ConfigurationConstants.OPTIONAL_ENCRYPTION_PARTS, config);
+        encParts = config.get(ConfigurationConstants.OPTIONAL_ENCRYPTION_PARTS);
         if (encParts != null) {
-            List<SecurePart> parts = new ArrayList<SecurePart>();
-            splitEncParts(encParts, parts, WSSConstants.NS_SOAP11);
-            for (SecurePart part : parts) {
-                part.setRequired(false);
-                properties.addEncryptionPart(part);
+            if (encParts instanceof String) {
+                List<SecurePart> parts = new ArrayList<SecurePart>();
+                splitEncParts((String)encParts, parts, WSSConstants.NS_SOAP11);
+                for (SecurePart part : parts) {
+                    part.setRequired(false);
+                    properties.addEncryptionPart(part);
+                }
+            } else if (encParts instanceof List<?>) {
+                List<?> encPartsList = (List<?>)encParts;
+                for (Object obj : encPartsList) {
+                    if (obj instanceof SecurePart) {
+                        SecurePart securePart = (SecurePart)obj;
+                        securePart.setRequired(false);
+                        properties.addEncryptionPart(securePart);
+                    }
+                }
             }
         }
         

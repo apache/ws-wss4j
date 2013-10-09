@@ -78,8 +78,10 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             XMLSecurityConstants.Action action = getAction();
             if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
                 length = JCEAlgorithmMapper.getKeyLengthFromURI(getSecurityProperties().getSignatureAlgorithm()) / 8;
+                System.out.println("SIG LEN: " + length);
             } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
                 length = JCEAlgorithmMapper.getKeyLengthFromURI(getSecurityProperties().getEncryptionSymAlgorithm()) / 8;
+                System.out.println("ENC LEN: " + length);
             }
 
             byte[] label;
@@ -103,7 +105,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             } catch (ConversationException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
             }
-
+            
             final byte[] derivedKeyBytes;
             try {
                 byte[] secret;
@@ -161,7 +163,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                     return wsuIdDKT;
                 }
             };
-
+            
             if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, wsuIdDKT);
             } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {

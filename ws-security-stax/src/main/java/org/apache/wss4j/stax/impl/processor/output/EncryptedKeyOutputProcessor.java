@@ -18,35 +18,6 @@
  */
 package org.apache.wss4j.stax.impl.processor.output;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.wss4j.common.ext.WSPasswordCallback;
-import org.apache.wss4j.common.ext.WSPasswordCallback.Usage;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSUtils;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
-import org.apache.xml.security.stax.ext.*;
-import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
-import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
-import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
-import org.apache.xml.security.stax.impl.util.IDGenerator;
-import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
-import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
-
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.OAEPParameterSpec;
-import javax.crypto.spec.PSource;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -57,6 +28,36 @@ import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.MGF1ParameterSpec;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.OAEPParameterSpec;
+import javax.crypto.spec.PSource;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.ext.WSPasswordCallback.Usage;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.ext.WSSUtils;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
+import org.apache.xml.security.stax.ext.AbstractOutputProcessor;
+import org.apache.xml.security.stax.ext.OutputProcessorChain;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
+import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
@@ -86,7 +87,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                 outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION);
             SecurityTokenProvider<OutboundSecurityToken> encryptedKeySecurityTokenProvider = null;
             GenericOutboundSecurityToken encryptedKeySecurityToken = null;
-            if (encTokenId != null && !WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(getAction())) {
+            if (encTokenId != null) {
                 encryptedKeySecurityTokenProvider = 
                     outputProcessorChain.getSecurityContext().getSecurityTokenProvider(encTokenId);
                 if (encryptedKeySecurityTokenProvider != null) {
@@ -94,70 +95,24 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                         (GenericOutboundSecurityToken)encryptedKeySecurityTokenProvider.getSecurityToken();
                 }
             }
-            
-            if (encryptedKeySecurityToken == null) {
-                // Generate Key
-                //prepare the symmetric session key for all encryption parts
-                String keyAlgorithm = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(securityProperties.getEncryptionSymAlgorithm());
-                KeyGenerator keyGen;
-                try {
-                    keyGen = KeyGenerator.getInstance(keyAlgorithm);
-                } catch (NoSuchAlgorithmException e) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-                }
-                //the sun JCE provider expects the real key size for 3DES (112 or 168 bit)
-                //whereas bouncy castle expects the block size of 128 or 192 bits
-                if (keyAlgorithm.contains("AES")) {
-                    int keyLength = JCEAlgorithmMapper.getKeyLengthFromURI(securityProperties.getEncryptionSymAlgorithm());
-                    keyGen.init(keyLength);
-                }
-    
-                final Key symmetricKey = keyGen.generateKey();
-    
-                final String ekId = IDGenerator.generateID(null);
-    
-                final GenericOutboundSecurityToken securityToken = new GenericOutboundSecurityToken(ekId, WSSecurityTokenConstants.EncryptedKeyToken, symmetricKey);
-                final SecurityTokenProvider<OutboundSecurityToken> securityTokenProvider =
-                        new SecurityTokenProvider<OutboundSecurityToken>() {
-    
-                    @Override
-                    public OutboundSecurityToken getSecurityToken() throws XMLSecurityException {
-                        return securityToken;
-                    }
-    
-                    @Override
-                    public String getId() {
-                        return ekId;
-                    }
-                };
-                
-                encryptedKeySecurityTokenProvider = securityTokenProvider;
-                encryptedKeySecurityToken = securityToken;
-            }
-            
-            encryptedKeySecurityToken.setKeyWrappingToken(wrappingSecurityToken);
-            wrappingSecurityToken.addWrappedToken(encryptedKeySecurityToken);
 
             FinalEncryptedKeyOutputProcessor finalEncryptedKeyOutputProcessor = new FinalEncryptedKeyOutputProcessor(encryptedKeySecurityToken);
             finalEncryptedKeyOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
             finalEncryptedKeyOutputProcessor.setAction(getAction());
             XMLSecurityConstants.Action action = getAction();
             if (WSSConstants.ENCRYPT.equals(action)) {
-                outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, encryptedKeySecurityToken.getId());
                 if (wrappingSecurityToken.getProcessor() != null) {
                     finalEncryptedKeyOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
                 } else {
                     finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
                 }
             } else if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
-                outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, encryptedKeySecurityToken.getId());
                 if (wrappingSecurityToken.getProcessor() != null) {
                     finalEncryptedKeyOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
                 } else {
                     finalEncryptedKeyOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
                 }
             } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
-                outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, encryptedKeySecurityToken.getId());
                 if (wrappingSecurityToken.getProcessor() != null) {
                     finalEncryptedKeyOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
                 } else {
