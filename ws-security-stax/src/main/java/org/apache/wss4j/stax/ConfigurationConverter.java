@@ -453,6 +453,10 @@ public final class ConfigurationConverter {
         boolean encryptSymmetricEncryptionKey = 
             decodeBooleanConfigValue(ConfigurationConstants.ENC_SYM_ENC_KEY, true, config);
         properties.setEncryptSymmetricEncrytionKey(encryptSymmetricEncryptionKey);
+        
+        boolean use200512Namespace = 
+            decodeBooleanConfigValue(ConfigurationConstants.USE_2005_12_NAMESPACE, true, config);
+        properties.setUse200512Namespace(use200512Namespace);
     }
     
     private static void parseNonBooleanProperties(
@@ -644,6 +648,43 @@ public final class ConfigurationConverter {
         if (samlOneTimeUseCache != null) {
             properties.setSamlOneTimeUseReplayCache(samlOneTimeUseCache);
         }
+        
+        String derivedSignatureKeyLength = getString(ConfigurationConstants.DERIVED_SIGNATURE_KEY_LENGTH, config);
+        if (derivedSignatureKeyLength != null) {
+            int sigLength = Integer.parseInt(derivedSignatureKeyLength);
+            properties.setDerivedSignatureKeyLength(sigLength);
+        }
+        
+        String derivedEncryptionKeyLength = getString(ConfigurationConstants.DERIVED_ENCRYPTION_KEY_LENGTH, config);
+        if (derivedEncryptionKeyLength != null) {
+            int encLength = Integer.parseInt(derivedEncryptionKeyLength);
+            properties.setDerivedEncryptionKeyLength(encLength);
+        }
+        
+        String derivedTokenReference = getString(ConfigurationConstants.DERIVED_TOKEN_REFERENCE, config);
+        WSSConstants.DerivedKeyTokenReference convertedDerivedTokenReference = 
+            convertDerivedReference(derivedTokenReference);
+        if (convertedDerivedTokenReference != null) {
+            properties.setDerivedKeyTokenReference(convertedDerivedTokenReference);
+        }
+        
+        String derivedKeyIdentifier = getString(ConfigurationConstants.DERIVED_TOKEN_KEY_ID, config);
+        WSSecurityTokenConstants.KeyIdentifier convertedDerivedKeyIdentifier = 
+            convertKeyIdentifier(derivedKeyIdentifier);
+        if (convertedDerivedKeyIdentifier != null) {
+            properties.setDerivedKeyKeyIdentifier(convertedDerivedKeyIdentifier);
+        }
+    }
+    
+    private static WSSConstants.DerivedKeyTokenReference convertDerivedReference(String derivedTokenReference) {
+        if ("EncryptedKey".equals(derivedTokenReference)) {
+           return WSSConstants.DerivedKeyTokenReference.EncryptedKey;
+        } else if ("DirectReference".equals(derivedTokenReference)) {
+            return WSSConstants.DerivedKeyTokenReference.DirectReference;
+        } else if ("SecurityContextToken".equals(derivedTokenReference)) {
+            return WSSConstants.DerivedKeyTokenReference.SecurityContextToken;
+        }
+        return null;
     }
     
     private static WSSecurityTokenConstants.KeyIdentifier convertKeyIdentifier(String keyIdentifier) {
@@ -668,7 +709,7 @@ public final class ConfigurationConverter {
         }
         return null;
     }
-        
+    
     private static int decodeTimeToLive(Map<String, Object> config, boolean timestamp) {
         String tag = ConfigurationConstants.TTL_TIMESTAMP;
         if (!timestamp) {

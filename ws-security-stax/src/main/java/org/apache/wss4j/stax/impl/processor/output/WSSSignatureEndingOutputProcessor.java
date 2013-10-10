@@ -112,7 +112,6 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                 || WSSecurityTokenConstants.KeyIdentifier_EncryptedKey.equals(keyIdentifier)) {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
             }
-            
             createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
 
             String tokenId = securityToken.getId();
@@ -148,6 +147,13 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                     valueType = null;
                 } else if (WSSecurityTokenConstants.KerberosToken.equals(securityToken.getTokenType())) {
                     valueType = WSSConstants.NS_GSS_Kerberos5_AP_REQ;
+                } else if (WSSecurityTokenConstants.DerivedKeyToken.equals(securityToken.getTokenType())) {
+                    boolean use200512Namespace = ((WSSSecurityProperties)getSecurityProperties()).isUse200512Namespace();
+                    if (use200512Namespace) {
+                        valueType = WSSConstants.NS_WSC_05_12 + "/dk";
+                    } else {
+                        valueType = WSSConstants.NS_WSC_05_02 + "/dk";
+                    }
                 } else {
                     if (useSingleCertificate) {
                         valueType = WSSConstants.NS_X509_V3_TYPE;

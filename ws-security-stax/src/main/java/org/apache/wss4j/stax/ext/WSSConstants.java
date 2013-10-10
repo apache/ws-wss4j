@@ -248,17 +248,17 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final QName TAG_wsc0502_DerivedKeyToken = new QName(NS_WSC_05_02, "DerivedKeyToken", PREFIX_WSC);
     public static final QName TAG_wsc0512_DerivedKeyToken = new QName(NS_WSC_05_12, "DerivedKeyToken", PREFIX_WSC);
     public static final QName TAG_wsc0502_Properties = new QName(NS_WSC_05_02, "Properties", PREFIX_WSC);
-    public static final QName TAG_wsc0512_Properties = new QName(NS_WSC_05_02, "Properties", PREFIX_WSC);
+    public static final QName TAG_wsc0512_Properties = new QName(NS_WSC_05_12, "Properties", PREFIX_WSC);
     public static final QName TAG_wsc0502_Length = new QName(NS_WSC_05_02, "Length", PREFIX_WSC);
-    public static final QName TAG_wsc0512_Length = new QName(NS_WSC_05_02, "Length", PREFIX_WSC);
+    public static final QName TAG_wsc0512_Length = new QName(NS_WSC_05_12, "Length", PREFIX_WSC);
     public static final QName TAG_wsc0502_Generation = new QName(NS_WSC_05_02, "Generation", PREFIX_WSC);
-    public static final QName TAG_wsc0512_Generation = new QName(NS_WSC_05_02, "Generation", PREFIX_WSC);
+    public static final QName TAG_wsc0512_Generation = new QName(NS_WSC_05_12, "Generation", PREFIX_WSC);
     public static final QName TAG_wsc0502_Offset = new QName(NS_WSC_05_02, "Offset", PREFIX_WSC);
-    public static final QName TAG_wsc0512_Offset = new QName(NS_WSC_05_02, "Offset", PREFIX_WSC);
+    public static final QName TAG_wsc0512_Offset = new QName(NS_WSC_05_12, "Offset", PREFIX_WSC);
     public static final QName TAG_wsc0502_Label = new QName(NS_WSC_05_02, "Label", PREFIX_WSC);
-    public static final QName TAG_wsc0512_Label = new QName(NS_WSC_05_02, "Label", PREFIX_WSC);
+    public static final QName TAG_wsc0512_Label = new QName(NS_WSC_05_12, "Label", PREFIX_WSC);
     public static final QName TAG_wsc0502_Nonce = new QName(NS_WSC_05_02, "Nonce", PREFIX_WSC);
-    public static final QName TAG_wsc0512_Nonce = new QName(NS_WSC_05_02, "Nonce", PREFIX_WSC);
+    public static final QName TAG_wsc0512_Nonce = new QName(NS_WSC_05_12, "Nonce", PREFIX_WSC);
 
     public static final String P_SHA_1 = "http://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1";
     public static final String P_SHA_1_2005_12 = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512/dk/p_sha1";

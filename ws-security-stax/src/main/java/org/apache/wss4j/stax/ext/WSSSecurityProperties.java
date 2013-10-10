@@ -73,6 +73,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private boolean addUsernameTokenNonce;
     private boolean addUsernameTokenCreated;
     private boolean encryptSymmetricEncrytionKey = true;
+    private boolean use200512Namespace;
 
     /**
      * This variable controls whether types other than PasswordDigest or PasswordText
@@ -90,6 +91,8 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     private WSSecurityTokenConstants.KeyIdentifier derivedKeyKeyIdentifier;
     private WSSConstants.DerivedKeyTokenReference derivedKeyTokenReference;
+    private int derivedSignatureKeyLength;
+    private int derivedEncryptionKeyLength;
 
     private WSSCrypto signatureWSSCrypto;
     private String signatureUser;
@@ -137,8 +140,11 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.usernameTokenPasswordType = wssSecurityProperties.usernameTokenPasswordType;
         this.allowUsernameTokenNoPassword = wssSecurityProperties.allowUsernameTokenNoPassword;
         this.tokenUser = wssSecurityProperties.tokenUser;
+        this.use200512Namespace = wssSecurityProperties.use200512Namespace;
         this.derivedKeyKeyIdentifier = wssSecurityProperties.derivedKeyKeyIdentifier;
         this.derivedKeyTokenReference = wssSecurityProperties.derivedKeyTokenReference;
+        this.derivedSignatureKeyLength = wssSecurityProperties.derivedSignatureKeyLength;
+        this.derivedEncryptionKeyLength = wssSecurityProperties.derivedEncryptionKeyLength;
         this.signatureWSSCrypto = wssSecurityProperties.signatureWSSCrypto;
         this.signatureUser = wssSecurityProperties.signatureUser;
         this.enableSignatureConfirmationVerification = wssSecurityProperties.enableSignatureConfirmationVerification;
@@ -915,6 +921,30 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      */
     public Collection<Pattern> getSubjectCertConstraints() {
         return subjectDNPatterns;
+    }
+
+    public int getDerivedSignatureKeyLength() {
+        return derivedSignatureKeyLength;
+    }
+
+    public void setDerivedSignatureKeyLength(int derivedSignatureKeyLength) {
+        this.derivedSignatureKeyLength = derivedSignatureKeyLength;
+    }
+
+    public int getDerivedEncryptionKeyLength() {
+        return derivedEncryptionKeyLength;
+    }
+
+    public void setDerivedEncryptionKeyLength(int derivedEncryptionKeyLength) {
+        this.derivedEncryptionKeyLength = derivedEncryptionKeyLength;
+    }
+
+    public boolean isUse200512Namespace() {
+        return use200512Namespace;
+    }
+
+    public void setUse200512Namespace(boolean use200512Namespace) {
+        this.use200512Namespace = use200512Namespace;
     }
     
 }

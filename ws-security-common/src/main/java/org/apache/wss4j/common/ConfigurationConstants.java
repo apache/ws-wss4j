@@ -518,6 +518,15 @@ public final class ConfigurationConstants {
      */
     public static final String ENABLE_SAML_ONE_TIME_USE_CACHE = "enableSamlOneTimeUseCache";
     
+    /**
+     * Whether to use the "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512" 
+     * namespace for SecureConversation + Derived Keys. If set to "false", it will use the
+     * namespace "http://schemas.xmlsoap.org/ws/2005/02/sc".
+     * 
+     * The default is true.
+     */
+    public static final String USE_2005_12_NAMESPACE = "use200512Namespace";
+    
     //
     // (Non-boolean) Configuration parameters for the actions/processors
     //
@@ -849,6 +858,35 @@ public final class ConfigurationConstants {
      * The encrypted passwords must be stored in the format "ENC(encoded encrypted password)".
      */
     public static final String PASSWORD_ENCRYPTOR_INSTANCE = "passwordEncyptorInstance";
+    
+    /**
+     * This controls how deriving tokens are referenced. The valid values are:
+     * 
+     * <code>DirectReference</code>, <code>EncryptedKey</code>, 
+     * <code>SecurityContextToken</code>.
+     */
+    public static final String DERIVED_TOKEN_REFERENCE = "derivedTokenReference";
+    
+    /**
+     * This controls the key identifier of Derived Tokens.
+     */
+    public static final String DERIVED_TOKEN_KEY_ID = "derivedTokenKeyIdentifier";
+    
+    /**
+     * The length to use (in bytes) when deriving a key for Signature. If this is not specified,
+     * it defaults to a value based on the signature algorithm.
+     * 
+     * Currently only used in the streaming code.
+     */
+    public static final String DERIVED_SIGNATURE_KEY_LENGTH = "derivedSignatureKeyLength";
+    
+    /**
+     * The length to use (in bytes) when deriving a key for Encryption. If this is not specified,
+     * it defaults to a value based on the encryption algorithm.
+     * 
+     * Currently only used in the streaming code.
+     */
+    public static final String DERIVED_ENCRYPTION_KEY_LENGTH = "derivedEncryptionKeyLength";
     
 }
 

@@ -327,6 +327,10 @@ public class OutboundWSSec {
             if (derivedEncryption) {
                 String id = 
                     outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTED_KEY);
+                if (id == null) {
+                    // Maybe not encrypting the key here...
+                    id = outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION);
+                }
                 setDerivedIdentifier(outputProcessorChain, id);
             }
             
@@ -638,7 +642,7 @@ public class OutboundWSSec {
     
     private void setDerivedIdentifier(OutputProcessorChainImpl outputProcessorChain, String id) {
         WSSConstants.DerivedKeyTokenReference derivedKeyTokenReference = securityProperties.getDerivedKeyTokenReference();
-        switch (derivedKeyTokenReference) {
+            switch (derivedKeyTokenReference) {
 
             case DirectReference:
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY, id);
@@ -651,6 +655,6 @@ public class OutboundWSSec {
             case SecurityContextToken:
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SECURITYCONTEXTTOKEN, id);
                 break;
-        }
+            }
     }
 }

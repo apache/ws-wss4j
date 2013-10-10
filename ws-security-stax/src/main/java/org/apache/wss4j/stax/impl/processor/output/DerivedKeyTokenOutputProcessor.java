@@ -77,11 +77,17 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
             XMLSecurityConstants.Action action = getAction();
             if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
-                length = JCEAlgorithmMapper.getKeyLengthFromURI(getSecurityProperties().getSignatureAlgorithm()) / 8;
-                System.out.println("SIG LEN: " + length);
+                if (((WSSSecurityProperties)getSecurityProperties()).getDerivedSignatureKeyLength() > 0) {
+                    length = ((WSSSecurityProperties)getSecurityProperties()).getDerivedSignatureKeyLength();
+                } else {
+                    length = JCEAlgorithmMapper.getKeyLengthFromURI(getSecurityProperties().getSignatureAlgorithm()) / 8;
+                }
             } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
-                length = JCEAlgorithmMapper.getKeyLengthFromURI(getSecurityProperties().getEncryptionSymAlgorithm()) / 8;
-                System.out.println("ENC LEN: " + length);
+                if (((WSSSecurityProperties)getSecurityProperties()).getDerivedEncryptionKeyLength() > 0) {
+                    length = ((WSSSecurityProperties)getSecurityProperties()).getDerivedEncryptionKeyLength();
+                } else {
+                    length = JCEAlgorithmMapper.getKeyLengthFromURI(getSecurityProperties().getEncryptionSymAlgorithm()) / 8;
+                }
             }
 
             byte[] label;
@@ -171,7 +177,9 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             }
             outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(wsuIdDKT, derivedKeysecurityTokenProvider);
             FinalDerivedKeyTokenOutputProcessor finalDerivedKeyTokenOutputProcessor =
-                    new FinalDerivedKeyTokenOutputProcessor(derivedKeySecurityToken, offset, length, new String(Base64.encodeBase64(nonce)));
+                    new FinalDerivedKeyTokenOutputProcessor(derivedKeySecurityToken, offset, length, new String(Base64.encodeBase64(nonce)),
+                                                            ((WSSSecurityProperties)getSecurityProperties()).isUse200512Namespace(),
+                                                            wrappingSecurityToken.getSha1Identifier());
             finalDerivedKeyTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
             finalDerivedKeyTokenOutputProcessor.setAction(getAction());
             finalDerivedKeyTokenOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
@@ -189,14 +197,20 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
         private final int offset;
         private final int length;
         private final String nonce;
+        private final boolean use200512Namespace;
+        private final String sha1Identifier;
 
-        FinalDerivedKeyTokenOutputProcessor(OutboundSecurityToken securityToken, int offset, int length, String nonce) throws XMLSecurityException {
+        FinalDerivedKeyTokenOutputProcessor(OutboundSecurityToken securityToken, int offset, 
+                                            int length, String nonce, boolean use200512Namespace,
+                                            String sha1Identifier) throws XMLSecurityException {
 
             super();
             this.securityToken = securityToken;
             this.offset = offset;
             this.length = length;
             this.nonce = nonce;
+            this.use200512Namespace = use200512Namespace;
+            this.sha1Identifier = sha1Identifier;
         }
 
         @Override
@@ -207,7 +221,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
             if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
 
-                final QName headerElementName = WSSConstants.TAG_wsc0502_DerivedKeyToken;
+                final QName headerElementName = getHeaderElementName();
                 WSSUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
 
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
@@ -218,16 +232,17 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
                 createSecurityTokenReferenceStructureForDerivedKey(subOutputProcessorChain, securityToken,
                         ((WSSSecurityProperties) getSecurityProperties()).getDerivedKeyKeyIdentifier(),
-                        ((WSSSecurityProperties) getSecurityProperties()).getDerivedKeyTokenReference(), getSecurityProperties().isUseSingleCert());
-                createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Offset, false, null);
+                        ((WSSSecurityProperties) getSecurityProperties()).getDerivedKeyTokenReference(),
+                        getSecurityProperties().isUseSingleCert());
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, getOffsetName(), false, null);
                 createCharactersAndOutputAsEvent(subOutputProcessorChain, "" + offset);
-                createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Offset);
-                createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Length, false, null);
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, getOffsetName());
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, getLengthName(), false, null);
                 createCharactersAndOutputAsEvent(subOutputProcessorChain, "" + length);
-                createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Length);
-                createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Nonce, false, null);
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, getLengthName());
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, getNonceName(), false, null);
                 createCharactersAndOutputAsEvent(subOutputProcessorChain, nonce);
-                createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Nonce);
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, getNonceName());
                 createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);
 
                 outputProcessorChain.removeProcessor(this);
@@ -246,7 +261,8 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
             if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier) && !useSingleCertificate) {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_X509PKIPathv1));
-            } else if (derivedKeyTokenReference == WSSConstants.DerivedKeyTokenReference.EncryptedKey) {
+            } else if (derivedKeyTokenReference == WSSConstants.DerivedKeyTokenReference.EncryptedKey
+                || WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier.equals(keyIdentifier)) {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
             }
             createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
@@ -254,7 +270,10 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             X509Certificate[] x509Certificates = securityToken.getKeyWrappingToken().getX509Certificates();
             String tokenId = securityToken.getKeyWrappingToken().getId();
 
-            if (WSSecurityTokenConstants.KeyIdentifier_IssuerSerial.equals(keyIdentifier)) {
+            if (derivedKeyTokenReference == WSSConstants.DerivedKeyTokenReference.EncryptedKey) {
+                String valueType = WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE;
+                WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, tokenId, valueType);
+            } else if (WSSecurityTokenConstants.KeyIdentifier_IssuerSerial.equals(keyIdentifier)) {
                 WSSUtils.createX509IssuerSerialStructure(this, outputProcessorChain, x509Certificates);
             } else if (WSSecurityTokenConstants.KeyIdentifier_SkiKeyIdentifier.equals(keyIdentifier)) {
                 WSSUtils.createX509SubjectKeyIdentifierStructure(this, outputProcessorChain, x509Certificates);
@@ -270,10 +289,40 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                     valueType = WSSConstants.NS_X509PKIPathv1;
                 }
                 WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, tokenId, valueType);
+            } else if (WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier.equals(keyIdentifier)) {
+                WSSUtils.createEncryptedKeySha1IdentifierStructure(this, outputProcessorChain, sha1Identifier);
             } else {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unsupportedSecurityToken");
             }
             createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference);
+        }
+        
+        private QName getHeaderElementName() {
+            if (use200512Namespace) {
+                return WSSConstants.TAG_wsc0512_DerivedKeyToken;
+            }
+            return WSSConstants.TAG_wsc0502_DerivedKeyToken;
+        }
+        
+        private QName getOffsetName() {
+            if (use200512Namespace) {
+                return WSSConstants.TAG_wsc0512_Offset;
+            }
+            return WSSConstants.TAG_wsc0502_Offset;
+        }
+        
+        private QName getLengthName() {
+            if (use200512Namespace) {
+                return WSSConstants.TAG_wsc0512_Length;
+            }
+            return WSSConstants.TAG_wsc0502_Length;
+        }
+        
+        private QName getNonceName() {
+            if (use200512Namespace) {
+                return WSSConstants.TAG_wsc0512_Nonce;
+            }
+            return WSSConstants.TAG_wsc0502_Nonce;
         }
     }
 }
