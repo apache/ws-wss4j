@@ -27,7 +27,6 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -41,12 +40,13 @@ import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
+import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.SamlSecurityToken;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
@@ -60,6 +60,7 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
     private WSSSecurityProperties securityProperties;
     private Principal principal;
     private SAMLKeyInfo subjectKeyInfo;
+    private byte[] secret;
     
     public SamlSecurityTokenImpl(WSInboundSecurityContext wsInboundSecurityContext, String id,
                                  WSSecurityTokenConstants.KeyIdentifier keyIdentifier,
@@ -83,12 +84,21 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
                     WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", id
                 );
             }
-            this.samlAssertionWrapper = new SamlAssertionWrapper(assertionElem);
             
-            subjectKeyInfo = 
-                SAMLUtil.getCredentialFromSubject(samlAssertionWrapper, null, 
-                                                  securityProperties.getSignatureVerificationCrypto(),
-                                                  securityProperties.getCallbackHandler());
+            if ("Assertion".equals(assertionElem.getLocalName())
+                && (WSSConstants.NS_SAML.equals(assertionElem.getNamespaceURI())
+                || WSSConstants.NS_SAML2.equals(assertionElem))) {
+                this.samlAssertionWrapper = new SamlAssertionWrapper(assertionElem);
+                
+                subjectKeyInfo = 
+                    SAMLUtil.getCredentialFromSubject(samlAssertionWrapper, null, 
+                                                      securityProperties.getSignatureVerificationCrypto(),
+                                                      securityProperties.getCallbackHandler());
+            } else {
+                // Possibly an Encrypted Assertion...just get the key
+                this.samlAssertionWrapper = null;
+                secret = pwcb.getKey();
+            }
         } else {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", id
@@ -117,13 +127,12 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
 
     @Override
     protected Key getKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage, String correlationID) throws XMLSecurityException {
-        if (this.subjectSecurityToken != null) {
+        if (secret != null) {
+            return KeyUtils.prepareSecretKey(algorithmURI, secret);
+        } else if (this.subjectSecurityToken != null) {
             return subjectSecurityToken.getSecretKey(algorithmURI, algorithmUsage, correlationID);
         } else if (subjectKeyInfo != null && subjectKeyInfo.getSecret() != null) {
-            byte[] secret = subjectKeyInfo.getSecret();
-            
-            String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
-            return new SecretKeySpec(secret, algoFamily);
+            return KeyUtils.prepareSecretKey(algorithmURI, subjectKeyInfo.getSecret());
         }
         return super.getKey(algorithmURI, algorithmUsage, correlationID);
     }
@@ -162,6 +171,9 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
     public void verify() throws XMLSecurityException {
         //todo revisit verify for every security token incl. public-key
         //todo should we call verify implicit when accessing the keys?
+        if (samlAssertionWrapper == null) {
+            return;
+        }
         try {
             String confirmMethod = null;
             List<String> methods = samlAssertionWrapper.getConfirmationMethods();
@@ -195,9 +207,11 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
 
     @Override
     public WSSecurityTokenConstants.TokenType getTokenType() {
-        if (samlAssertionWrapper.getSamlVersion() == SAMLVersion.VERSION_10) {
+        if (samlAssertionWrapper != null 
+            && samlAssertionWrapper.getSamlVersion() == SAMLVersion.VERSION_10) {
             return WSSecurityTokenConstants.Saml10Token;
-        } else if (samlAssertionWrapper.getSamlVersion() == SAMLVersion.VERSION_11) {
+        } else if (samlAssertionWrapper != null 
+            && samlAssertionWrapper.getSamlVersion() == SAMLVersion.VERSION_11) {
             return WSSecurityTokenConstants.Saml11Token;
         }
         return WSSecurityTokenConstants.Saml20Token;
