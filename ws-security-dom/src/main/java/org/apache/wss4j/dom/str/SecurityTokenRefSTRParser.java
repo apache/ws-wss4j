@@ -34,6 +34,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSecurityEngine;
@@ -300,7 +301,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
             byte[] secret = 
                 (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
             String algorithm = (String)parameters.get(SIGNATURE_METHOD);
-            secretKey = dkt.deriveKey(WSSecurityUtil.getKeyLength(algorithm), secret);
+            secretKey = dkt.deriveKey(KeyUtils.getKeyLength(algorithm), secret);
             principal = dkt.createPrincipal();
         } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
             SamlAssertionWrapper samlAssertion =

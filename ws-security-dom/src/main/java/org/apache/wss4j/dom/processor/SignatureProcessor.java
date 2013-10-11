@@ -57,7 +57,6 @@ import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
@@ -66,6 +65,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSDocInfo;
@@ -389,7 +389,7 @@ public class SignatureProcessor implements Processor {
         } else if (publicKey != null) {
             key = publicKey;
         } else {
-            key = WSSecurityUtil.prepareSecretKey(signatureMethod, secretKey);
+            key = KeyUtils.prepareSecretKey(signatureMethod, secretKey);
         }
         
         XMLValidateContext context = new DOMValidateContext(key, elem);

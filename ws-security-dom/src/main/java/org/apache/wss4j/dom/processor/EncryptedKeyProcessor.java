@@ -36,11 +36,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
-
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSDocInfo;
@@ -247,7 +247,7 @@ public class EncryptedKeyProcessor implements Processor {
                 Element ee = ReferenceListProcessor.findEncryptedDataElement(doc, wsDocInfo, uri);
                 String algorithmURI = X509Util.getEncAlgo(ee);
                 alg = JCEMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
-                size = WSSecurityUtil.getKeyLength(algorithmURI);
+                size = KeyUtils.getKeyLength(algorithmURI);
             }
             KeyGenerator kgen = KeyGenerator.getInstance(alg);
             kgen.init(size * 8);
@@ -467,7 +467,7 @@ public class EncryptedKeyProcessor implements Processor {
         
         SecretKey symmetricKey = null;
         try {
-            symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, decryptedData);
+            symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, decryptedData);
         } catch (IllegalArgumentException ex) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "badEncAlgo", 

@@ -40,6 +40,7 @@ import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.x500.X500Principal;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -306,6 +307,15 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "badReferenceURI");
                 }
                 if (!uri.startsWith("#")) {
+                    // Delegate to a CallbackHandler, in case the token is not in the request
+                    try {
+                        return new ExternalSecurityTokenImpl((WSInboundSecurityContext) inboundSecurityContext, 
+                                                     uri,
+                                                     WSSecurityTokenConstants.KeyIdentifier_ExternalReference, 
+                                                     securityProperties);
+                    } catch (WSSecurityException ex) { //NOPMD
+                        // just continue
+                    }
                     ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R5204);
                 }
                 uri = WSSUtils.dropReferenceMarker(uri);
@@ -327,7 +337,12 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                 SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider =
                         inboundSecurityContext.getSecurityTokenProvider(uri);
                 if (securityTokenProvider == null) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", uri);
+                    // Delegate to a CallbackHandler, in case the token is not in the request
+                    return new ExternalSecurityTokenImpl((WSInboundSecurityContext) inboundSecurityContext, 
+                                                     uri,
+                                                     WSSecurityTokenConstants.KeyIdentifier_ExternalReference, 
+                                                     securityProperties);
+                    // throw new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", uri);
                 }
                 if (securityTokenProvider.getSecurityToken() instanceof SecurityTokenReference) {
                     ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3057);

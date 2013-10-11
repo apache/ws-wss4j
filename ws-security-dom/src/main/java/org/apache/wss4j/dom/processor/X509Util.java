@@ -22,6 +22,7 @@ package org.apache.wss4j.dom.processor;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -31,6 +32,7 @@ import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
+
 import java.io.IOException;
 
 public final class X509Util {
@@ -120,7 +122,7 @@ public final class X509Util {
                 "noPassword",
                 keyName);
         }
-        return WSSecurityUtil.prepareSecretKey(algorithm, decryptedData);
+        return KeyUtils.prepareSecretKey(algorithm, decryptedData);
     }
 
 }

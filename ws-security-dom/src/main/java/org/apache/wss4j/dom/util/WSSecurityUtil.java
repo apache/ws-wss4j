@@ -45,8 +45,6 @@ import org.w3c.dom.Text;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import javax.xml.crypto.dom.DOMCryptoContext;
 import javax.xml.namespace.QName;
 
@@ -800,35 +798,6 @@ public final class WSSecurityUtil {
         return getSOAPConstants(startElement).getEnvelopeURI();
     }
     
-    
-    /**
-     * Convert the raw key bytes into a SecretKey object of type symEncAlgo.
-     */
-    public static SecretKey prepareSecretKey(String symEncAlgo, byte[] rawKey) {
-        // Do an additional check on the keysize required by the encryption algorithm
-        int size = 0;
-        try {
-            size = WSSecurityUtil.getKeyLength(symEncAlgo);
-        } catch (Exception e) {
-            // ignore - some unknown (to JCEMapper) encryption algorithm
-            if (log.isDebugEnabled()) {
-                log.debug(e.getMessage());
-            }
-        }
-        String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(symEncAlgo);
-        SecretKeySpec keySpec;
-        if (size > 0) {
-            keySpec = 
-                new SecretKeySpec(
-                    rawKey, 0, rawKey.length > size ? size : rawKey.length, keyAlgorithm
-                );
-        } else {
-            keySpec = new SecretKeySpec(rawKey, keyAlgorithm);
-        }
-        return keySpec;
-    }
-
-
     /**
      * Translate the "cipherAlgo" URI to a JCE ID, and return a javax.crypto.Cipher instance
      * of this type. 
@@ -1026,16 +995,6 @@ public final class WSSecurityUtil {
             }
         }
         return actions;
-    }
-
-    /**
-     * Returns the length of the key in # of bytes
-     * 
-     * @param algorithm
-     * @return the key length
-     */
-    public static int getKeyLength(String algorithm) throws WSSecurityException {
-        return JCEMapper.getKeyLengthFromURI(algorithm) / 8;
     }
 
     /**

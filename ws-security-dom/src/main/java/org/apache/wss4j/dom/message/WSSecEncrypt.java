@@ -25,6 +25,7 @@ import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.dom.message.token.Reference;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
@@ -130,7 +131,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             ephemeralKey = symmetricKey.getEncoded();
         }
         
-        symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, ephemeralKey);
+        symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, ephemeralKey);
         
         //
         // Get the certificate that contains the public key for the public key

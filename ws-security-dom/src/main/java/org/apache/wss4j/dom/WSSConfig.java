@@ -101,6 +101,10 @@ public class WSSConfig {
                 WSConstants.SC,
                 org.apache.wss4j.dom.action.SignatureConfirmationAction.class
             );
+            tmp.put(
+                WSConstants.CUSTOM_TOKEN,
+                org.apache.wss4j.dom.action.CustomTokenAction.class
+            );
         } catch (final Exception ex) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(ex.getMessage(), ex);

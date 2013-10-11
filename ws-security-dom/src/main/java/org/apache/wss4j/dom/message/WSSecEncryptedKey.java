@@ -37,6 +37,7 @@ import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.message.token.DOMX509Data;
 import org.apache.wss4j.dom.message.token.DOMX509IssuerSerial;
@@ -48,7 +49,6 @@ import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.XMLUtils;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
@@ -196,7 +196,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         }
         
         if (symmetricKey == null) {
-            symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, ephemeralKey);
+            symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, ephemeralKey);
         }
 
         //

@@ -221,6 +221,7 @@ public abstract class WSHandler {
             case WSConstants.ST_UNSIGNED:
             case WSConstants.TS:
             case WSConstants.UT_SIGN:
+            case WSConstants.CUSTOM_TOKEN:
                 wssConfig.getAction(actionToDo.getAction()).execute(
                     this, actionToDo.getActionToken(), doc, reqData);
                 break;

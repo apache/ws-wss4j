@@ -305,6 +305,10 @@ public class OutboundWSSec {
                     final BinarySecurityTokenOutputProcessor kerberosTokenOutputProcessor =
                         new BinarySecurityTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, kerberosTokenOutputProcessor, action);
+                } else if (WSSConstants.CUSTOM_TOKEN.equals(action)) {
+                    final CustomTokenOutputProcessor unknownTokenOutputProcessor =
+                        new CustomTokenOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, unknownTokenOutputProcessor, action);
                 }
             }
             

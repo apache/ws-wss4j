@@ -475,6 +475,7 @@ public final class WSConstants {
     public static final int DKT = 0x800; //DerivedKeyToken
     public static final int BST = 0x1000; //BinarySecurityToken
     public static final int UT_NOPASSWORD = 0x2000; // perform UsernameToken
+    public static final int CUSTOM_TOKEN = 0x4000; // perform a Custom Token action
 
     private WSConstants() {
         // Complete

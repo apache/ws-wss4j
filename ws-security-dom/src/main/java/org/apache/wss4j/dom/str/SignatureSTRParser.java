@@ -32,7 +32,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.w3c.dom.Element;
-
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -42,6 +41,7 @@ import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSecurityEngine;
@@ -499,7 +499,7 @@ public class SignatureSTRParser implements STRParser {
             int keyLength = dkt.getLength();
             if (keyLength <= 0) {
                 String algorithm = (String)parameters.get(SIGNATURE_METHOD);
-                keyLength = WSSecurityUtil.getKeyLength(algorithm);
+                keyLength = KeyUtils.getKeyLength(algorithm);
             }
             byte[] secret = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
             secretKey = dkt.deriveKey(keyLength, secret); 

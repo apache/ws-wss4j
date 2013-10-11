@@ -31,12 +31,12 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSDocInfo;
@@ -174,7 +174,7 @@ public class ReferenceListProcessor implements Processor {
             );
             byte[] secretKey = strParser.getSecretKey();
             principal = strParser.getPrincipal();
-            symmetricKey = WSSecurityUtil.prepareSecretKey(symEncAlgo, secretKey);
+            symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, secretKey);
         }
         
         // Check for compliance against the defined AlgorithmSuite

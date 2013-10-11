@@ -269,6 +269,7 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final String PROP_USE_THIS_TOKEN_ID_FOR_KERBEROS = "PROP_USE_THIS_TOKEN_ID_FOR_KERBEROS";
     public static final String PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY = "PROP_USE_THIS_TOKEN_ID_FOR_DERIVED_KEY";
     public static final String PROP_USE_THIS_TOKEN_ID_FOR_SECURITYCONTEXTTOKEN = "PROP_USE_THIS_TOKEN_ID_FOR_SECURITYCONTEXTTOKEN";
+    public static final String PROP_USE_THIS_TOKEN_ID_FOR_CUSTOM_TOKEN = "PROP_USE_THIS_TOKEN_ID_FOR_CUSTOM_TOKEN";
 
     public static final String PROP_TIMESTAMP_SECURITYEVENT = "PROP_TIMESTAMP";
 
@@ -285,6 +286,7 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final Action SIGNATURE_WITH_KERBEROS_TOKEN = new Action("SignatureWithKerberosToken");
     public static final Action ENCRYPT_WITH_KERBEROS_TOKEN = new Action("EncryptWithKerberosToken");
     public static final Action KERBEROS_TOKEN = new Action("KerberosToken");
+    public static final Action CUSTOM_TOKEN = new Action("CustomToken");
 
     public static final AlgorithmUsage Comp_Key = new AlgorithmUsage("Comp_Key");
     public static final AlgorithmUsage Enc_KD = new AlgorithmUsage("Enc_KD");

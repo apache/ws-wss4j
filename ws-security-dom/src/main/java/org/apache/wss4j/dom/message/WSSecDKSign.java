@@ -24,6 +24,7 @@ import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.derivedKey.ConversationException;
 import org.apache.wss4j.dom.message.token.Reference;
@@ -250,7 +251,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     ) throws WSSecurityException {
         try {
             java.security.Key key = 
-                WSSecurityUtil.prepareSecretKey(sigAlgo, derivedKeyBytes);
+                KeyUtils.prepareSecretKey(sigAlgo, derivedKeyBytes);
             SignatureMethod signatureMethod = 
                 signatureFactory.newSignatureMethod(sigAlgo, null);
             SignedInfo signedInfo = 
@@ -312,7 +313,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
      */
     protected int getDerivedKeyLength() throws WSSecurityException {
         return derivedKeyLength > 0 ? derivedKeyLength : 
-            WSSecurityUtil.getKeyLength(sigAlgo);
+            KeyUtils.getKeyLength(sigAlgo);
     }
     
     /**

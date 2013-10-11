@@ -115,6 +115,8 @@ public final class ConfigurationConverter {
                 actions.add(WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN);
             } else if (single[i].equals(ConfigurationConstants.KERBEROS_TOKEN)) {
                 actions.add(WSSConstants.KERBEROS_TOKEN);
+            } else if (single[i].equals(ConfigurationConstants.CUSTOM_TOKEN)) {
+                actions.add(WSSConstants.CUSTOM_TOKEN);
             }
         }
 

@@ -31,12 +31,12 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSDocInfo;
@@ -107,13 +107,13 @@ public class EncryptedDataProcessor implements Processor {
             );
             byte[] secretKey = strParser.getSecretKey();
             principal = strParser.getPrincipal();
-            key = WSSecurityUtil.prepareSecretKey(symEncAlgo, secretKey);
+            key = KeyUtils.prepareSecretKey(symEncAlgo, secretKey);
         } else if (encryptedKeyElement != null) {
             EncryptedKeyProcessor encrKeyProc = new EncryptedKeyProcessor();
             encrKeyResults = encrKeyProc.handleToken(encryptedKeyElement, request, wsDocInfo);
             byte[] symmKey = 
                 (byte[])encrKeyResults.get(0).get(WSSecurityEngineResult.TAG_SECRET);
-            key = WSSecurityUtil.prepareSecretKey(symEncAlgo, symmKey);
+            key = KeyUtils.prepareSecretKey(symEncAlgo, symmKey);
         } else {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noEncKey"

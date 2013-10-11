@@ -45,6 +45,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
@@ -499,7 +500,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
             if (senderVouches) {
                 key = issuerCrypto.getPrivateKey(issuerKeyName, issuerKeyPW);
             } else if (secretKey != null) {
-                key = WSSecurityUtil.prepareSecretKey(sigAlgo, secretKey);
+                key = KeyUtils.prepareSecretKey(sigAlgo, secretKey);
             } else {
                 key = userCrypto.getPrivateKey(user, password);
             }

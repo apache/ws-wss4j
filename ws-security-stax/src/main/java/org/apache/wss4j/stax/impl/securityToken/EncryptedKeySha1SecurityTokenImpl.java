@@ -20,19 +20,19 @@ package org.apache.wss4j.stax.impl.securityToken;
 
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.securityToken.EncryptedKeySha1SecurityToken;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenConstants;
 
-import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.callback.CallbackHandler;
+
 import java.security.Key;
 
 public class EncryptedKeySha1SecurityTokenImpl
@@ -71,8 +71,7 @@ public class EncryptedKeySha1SecurityTokenImpl
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKey", getSha1Identifier());
         }
 
-        String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
-        key = new SecretKeySpec(secretKeyCallback.getKey(), algoFamily);
+        key = KeyUtils.prepareSecretKey(algorithmURI, secretKeyCallback.getKey());
         setSecretKey(algorithmURI, key);
         return key;
     }

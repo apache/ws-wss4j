@@ -23,6 +23,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.derivedKey.ConversationException;
 import org.apache.wss4j.dom.message.token.Reference;
@@ -110,7 +111,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         
         KeyInfo keyInfo = createKeyInfo();
 
-        SecretKey key = WSSecurityUtil.prepareSecretKey(symEncAlgo, derivedKeyBytes);
+        SecretKey key = KeyUtils.prepareSecretKey(symEncAlgo, derivedKeyBytes);
 
         List<String> encDataRefs = 
             WSSecEncrypt.doEncryption(
@@ -185,7 +186,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
      */
     protected int getDerivedKeyLength() throws WSSecurityException{
         return derivedKeyLength > 0 ? derivedKeyLength : 
-            WSSecurityUtil.getKeyLength(symEncAlgo);
+            KeyUtils.getKeyLength(symEncAlgo);
     }
     
 }

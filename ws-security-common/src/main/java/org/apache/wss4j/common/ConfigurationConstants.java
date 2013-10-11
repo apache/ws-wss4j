@@ -113,6 +113,12 @@ public final class ConfigurationConstants {
      */
     public static final String KERBEROS_TOKEN = "KerberosToken";
     
+    /**
+     * Add a "Custom" token. This token will be retrieved from a CallbackHandler via 
+     * WSPasswordCallback.Usage.CUSTOM_TOKEN and written out as is in the security header.
+     */
+    public static final String CUSTOM_TOKEN = "CustomToken";
+    
     //
     // User properties
     //

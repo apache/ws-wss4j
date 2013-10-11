@@ -26,6 +26,7 @@ import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.message.token.DOMX509Data;
 import org.apache.wss4j.dom.message.token.DOMX509IssuerSerial;
@@ -526,7 +527,7 @@ public class WSSecSignature extends WSSecSignatureBase {
             if (secretKey == null) {
                 key = crypto.getPrivateKey(user, password);
             } else {
-                key = WSSecurityUtil.prepareSecretKey(sigAlgo, secretKey);
+                key = KeyUtils.prepareSecretKey(sigAlgo, secretKey);
             }
             SignatureMethod signatureMethod = 
                 signatureFactory.newSignatureMethod(sigAlgo, null);
