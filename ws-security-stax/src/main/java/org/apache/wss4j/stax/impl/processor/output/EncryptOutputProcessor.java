@@ -273,6 +273,15 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                         } else {
                             attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_WSC_05_02 + "/dk"));
                         }
+                    } else if (WSSecurityTokenConstants.SpnegoContextToken.equals(tokenType)
+                        || WSSecurityTokenConstants.SecurityContextToken.equals(tokenType)
+                        || WSSecurityTokenConstants.SecureConversationToken.equals(tokenType)) {
+                        boolean use200512Namespace = ((WSSSecurityProperties)getSecurityProperties()).isUse200512Namespace();
+                        if (use200512Namespace) {
+                            attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_WSC_05_12 + "/sct"));
+                        } else {
+                            attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_WSC_05_12 + "/sct"));
+                        }
                     } 
                     createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference, false, attributes);
                     createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference);

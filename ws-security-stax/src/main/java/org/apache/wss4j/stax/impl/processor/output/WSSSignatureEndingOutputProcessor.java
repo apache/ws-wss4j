@@ -154,6 +154,15 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                     } else {
                         valueType = WSSConstants.NS_WSC_05_02 + "/dk";
                     }
+                } else if (WSSecurityTokenConstants.SpnegoContextToken.equals(securityToken.getTokenType())
+                    || WSSecurityTokenConstants.SecurityContextToken.equals(securityToken.getTokenType())
+                    || WSSecurityTokenConstants.SecureConversationToken.equals(securityToken.getTokenType())) {
+                    boolean use200512Namespace = ((WSSSecurityProperties)getSecurityProperties()).isUse200512Namespace();
+                    if (use200512Namespace) {
+                        valueType = WSSConstants.NS_WSC_05_12 + "/sct";
+                    } else {
+                        valueType = WSSConstants.NS_WSC_05_02 + "/sct";
+                    }
                 } else {
                     if (useSingleCertificate) {
                         valueType = WSSConstants.NS_X509_V3_TYPE;
