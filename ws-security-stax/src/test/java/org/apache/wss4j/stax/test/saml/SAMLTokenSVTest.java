@@ -328,6 +328,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
             callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHZ);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setResource("http://resource.org");
+            callbackHandler.setSignAssertion(false);
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED;

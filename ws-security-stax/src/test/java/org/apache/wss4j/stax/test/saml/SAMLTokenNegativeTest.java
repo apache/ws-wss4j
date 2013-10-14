@@ -197,6 +197,7 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
             callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
             callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
             callbackHandler.setIssuer("www.example.com");
+            callbackHandler.setSignAssertion(false);
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED;

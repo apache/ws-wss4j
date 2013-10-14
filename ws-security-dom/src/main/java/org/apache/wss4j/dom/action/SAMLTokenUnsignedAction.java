@@ -22,6 +22,7 @@ package org.apache.wss4j.dom.action;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.common.SecurityActionToken;
+import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.SAMLCallback;
@@ -55,6 +56,21 @@ public class SAMLTokenUnsignedAction implements Action {
         SAMLUtil.doSAMLCallback(samlCallbackHandler, samlCallback);
 
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+        if (samlCallback.isSignAssertion()) {
+            Crypto signingCrypto = samlCallback.getIssuerCrypto();
+            if (signingCrypto == null) {
+                signingCrypto = handler.loadSignatureCrypto(reqData);
+            }
+            
+            samlAssertion.signAssertion(
+                samlCallback.getIssuerKeyName(),
+                samlCallback.getIssuerKeyPassword(), 
+                samlCallback.getIssuerCrypto(),
+                samlCallback.isSendKeyValue(),
+                samlCallback.getCanonicalizationAlgorithm(),
+                samlCallback.getSignatureAlgorithm()
+            );
+        }
 
         // add the SAMLAssertion Token to the SOAP Envelope
         builder.build(doc, samlAssertion, reqData.getSecHeader());

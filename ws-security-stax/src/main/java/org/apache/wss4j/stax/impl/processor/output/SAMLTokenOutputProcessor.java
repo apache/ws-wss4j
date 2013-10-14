@@ -23,6 +23,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -68,6 +69,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
     public SAMLTokenOutputProcessor() throws XMLSecurityException {
         super();
+        addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
     }
 
     @Override
@@ -108,9 +110,11 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             final FinalSAMLTokenOutputProcessor finalSAMLTokenOutputProcessor;
             
             XMLSecurityConstants.Action action = getAction();
+            boolean includeSTR = false;
 
             if (WSSConstants.SAML_TOKEN_SIGNED.equals(action) && senderVouches) {
                 GenericOutboundSecurityToken securityToken = null;
+                includeSTR = true;
                 
                 // See if a token is already available
                 String sigTokenId = 
@@ -174,7 +178,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 }
 
                 finalSAMLTokenOutputProcessor = new FinalSAMLTokenOutputProcessor(securityToken, samlAssertionWrapper,
-                        securityTokenReferenceId, senderVouches);
+                        securityTokenReferenceId, senderVouches, includeSTR);
 
                 securityToken.setProcessor(finalSAMLTokenOutputProcessor);
 
@@ -215,7 +219,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 }
 
                 finalSAMLTokenOutputProcessor = new FinalSAMLTokenOutputProcessor(null, samlAssertionWrapper,
-                        securityTokenReferenceId, senderVouches);
+                        securityTokenReferenceId, senderVouches, includeSTR);
 
                 SecurityTokenProvider<OutboundSecurityToken> securityTokenProvider =
                         new SecurityTokenProvider<OutboundSecurityToken>() {
@@ -277,16 +281,44 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
                 outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(tokenId, securityTokenProvider);
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, tokenId);
+            } else if (WSSConstants.SAML_TOKEN_UNSIGNED.equals(getAction())) {
+                // Check to see whether this token is to be signed by the message signature. If so,
+                // output a STR to be signed instead, and remove this Assertion from the signature parts
+                // list
+                QName assertionName = new QName(WSSConstants.NS_SAML2, "Assertion");
+                if (samlAssertionWrapper.getSamlVersion() == SAMLVersion.VERSION_11) {
+                    assertionName = new QName(WSSConstants.NS_SAML, "Assertion");
+                }
+                
+                Iterator<SecurePart> signaturePartsIterator = 
+                    securityProperties.getSignatureSecureParts().iterator();
+                while (signaturePartsIterator.hasNext()) {
+                    SecurePart securePart = signaturePartsIterator.next();
+                    if (samlAssertionWrapper.getId().equals(securePart.getIdToSign())
+                        || assertionName.equals(securePart.getName())) {
+                        includeSTR = true;
+                        signaturePartsIterator.remove();
+                        break;
+                    }
+                }
+                
+                finalSAMLTokenOutputProcessor = new FinalSAMLTokenOutputProcessor(null, samlAssertionWrapper,
+                                                                                  securityTokenReferenceId, senderVouches,
+                                                                                  includeSTR);
+                if (includeSTR) {
+                    finalSAMLTokenOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
+                }
             } else {
                 finalSAMLTokenOutputProcessor = new FinalSAMLTokenOutputProcessor(null, samlAssertionWrapper,
-                                                                                  securityTokenReferenceId, senderVouches);
+                                                                                  securityTokenReferenceId, senderVouches,
+                                                                                  includeSTR);
             }
 
             finalSAMLTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
             finalSAMLTokenOutputProcessor.setAction(action);
             finalSAMLTokenOutputProcessor.init(outputProcessorChain);
 
-            if (WSSConstants.SAML_TOKEN_SIGNED.equals(action) && senderVouches) {
+            if (includeSTR) {
                 SecurePart securePart =
                         new SecurePart(
                                 new QName(WSSConstants.SOAPMESSAGE_NS10_STRTransform),
@@ -306,9 +338,11 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
         private final SamlAssertionWrapper samlAssertionWrapper;
         private final String securityTokenReferenceId;
         private boolean senderVouches = false;
+        private boolean includeSTR = false;
 
         FinalSAMLTokenOutputProcessor(OutboundSecurityToken securityToken, SamlAssertionWrapper samlAssertionWrapper,
-                                      String securityTokenReferenceId, boolean senderVouches) throws XMLSecurityException {
+                                      String securityTokenReferenceId, boolean senderVouches,
+                                      boolean includeSTR) throws XMLSecurityException {
             super();
             this.addAfterProcessor(UsernameTokenOutputProcessor.class.getName());
             this.addAfterProcessor(SAMLTokenOutputProcessor.class.getName());
@@ -316,6 +350,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             this.securityTokenReferenceId = securityTokenReferenceId;
             this.senderVouches = senderVouches;
             this.securityToken = securityToken;
+            this.includeSTR = includeSTR;
         }
 
         @Override
@@ -346,7 +381,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 WSSUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
 
                 outputSamlAssertion(samlAssertionWrapper.toDOM(null), subOutputProcessorChain);
-                if (senderVouches && WSSConstants.SAML_TOKEN_SIGNED.equals(getAction())) {                    
+                if (includeSTR) {
                     WSSUtils.updateSecurityHeaderOrder(
                             outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, getAction(), false);                    
                     outputSecurityTokenReference(subOutputProcessorChain, samlAssertionWrapper,
