@@ -381,10 +381,18 @@ public class OutboundWSSec {
             if (signatureAlgorithm.contains("hmac-sha")
                 && securityToken.getSecretKey(signatureAlgorithm) != null) {
                 return;
-            } else if (!signatureAlgorithm.contains("hmac-sha")
-                && (securityToken.getPublicKey() != null
-                    || securityToken.getX509Certificates() != null)) {
-                return;
+            } else if (!signatureAlgorithm.contains("hmac-sha") && securityToken.getX509Certificates() != null) {
+                if (securityToken.getSecretKey(signatureAlgorithm) != null) {
+                    return;
+                } else {
+                    // We have certs but no private key set. Use the CallbackHandler
+                    Key key = 
+                        securityProperties.getSignatureCrypto().getPrivateKey(
+                            securityToken.getX509Certificates()[0], securityProperties.getCallbackHandler()
+                        );
+                    securityToken.setSecretKey(signatureAlgorithm, key);
+                    return;
+                }
             }
         }
         
