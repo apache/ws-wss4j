@@ -792,6 +792,35 @@ public class TimestampTest extends org.junit.Assert {
         }
     }
     
+    @org.junit.Test
+    public void testTimestampNoMilliseconds() throws Exception {
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        wssConfig.setPrecisionInMilliSeconds(false);
+        WSSecTimestamp timestamp = new WSSecTimestamp();
+        timestamp.setWsConfig(wssConfig);
+        timestamp.setTimeToLive(300);
+        Document createdDoc = timestamp.build(doc, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(createdDoc);
+            LOG.debug(outputString);
+        }
+        
+        //
+        // Do some processing
+        //
+        List<WSSecurityEngineResult> wsResult = verify(createdDoc, WSSConfig.getNewInstance());
+        WSSecurityEngineResult actionResult = 
+            WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
+        assertTrue(actionResult != null);
+    }
+    
     /**
      * Verifies the soap envelope
      */
