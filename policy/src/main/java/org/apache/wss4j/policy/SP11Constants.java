@@ -53,10 +53,13 @@ public class SP11Constants extends SPConstants {
             SP11Constants.SP_NS + SPConstants.INCLUDE_TOKEN_ONCE_SUFFIX;
 
     public final static String INCLUDE_ALWAYS_TO_RECIPIENT =
-            SP11Constants.SP_NS + SPConstants.INCLUDE_TOEKN_ALWAYS_TO_RECIPIENT_SUFFIX;
+            SP11Constants.SP_NS + SPConstants.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT_SUFFIX;
+    
+    public final static String INCLUDE_ALWAYS_TO_INITIATOR =
+            SP11Constants.SP_NS + SPConstants.INCLUDE_TOKEN_ALWAYS_TO_INITIATOR_SUFFIX;
 
     public final static String INCLUDE_ALWAYS =
-            SP11Constants.SP_NS + SPConstants.INCLUDE_TOEKN_ALWAYS_SUFFIX;
+            SP11Constants.SP_NS + SPConstants.INCLUDE_TOKEN_ALWAYS_SUFFIX;
 
     public static final QName ATTR_XPATH_VERSION = new QName(
             SP11Constants.SP_NS, SPConstants.XPATH_VERSION, SP11Constants.SP_PREFIX);
@@ -337,6 +340,8 @@ public class SP11Constants extends SPConstants {
             return IncludeTokenType.INCLUDE_TOKEN_ALWAYS;
         } else if (INCLUDE_ALWAYS_TO_RECIPIENT.equals(value)) {
             return IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT;
+        } else if (INCLUDE_ALWAYS_TO_INITIATOR.equals(value)) {
+            return IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_INITIATOR;
         } else if (INCLUDE_NEVER.equals(value)) {
             return IncludeTokenType.INCLUDE_TOKEN_NEVER;
         } else if (INCLUDE_ONCE.equals(value)) {
@@ -352,6 +357,8 @@ public class SP11Constants extends SPConstants {
                 return SP11Constants.INCLUDE_ALWAYS;
             case INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT:
                 return SP11Constants.INCLUDE_ALWAYS_TO_RECIPIENT;
+            case INCLUDE_TOKEN_ALWAYS_TO_INITIATOR:
+                return SP11Constants.INCLUDE_ALWAYS_TO_INITIATOR;
             case INCLUDE_TOKEN_NEVER:
                 return SP11Constants.INCLUDE_NEVER;
             case INCLUDE_TOKEN_ONCE:

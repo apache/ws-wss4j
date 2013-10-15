@@ -361,21 +361,21 @@ public abstract class SPConstants {
 
     public static final String INCLUDE_TOKEN_ONCE_SUFFIX = "/IncludeToken/Once";
 
-    public static final String INCLUDE_TOEKN_ALWAYS_TO_RECIPIENT_SUFFIX = "/IncludeToken/AlwaysToRecipient";
+    public static final String INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT_SUFFIX = "/IncludeToken/AlwaysToRecipient";
 
-    public static final String INCLUDE_TOEKN_ALWAYS_TO_INITIATOR_SUFFIX = "/IncludeToken/AlwaysToInitiator";
+    public static final String INCLUDE_TOKEN_ALWAYS_TO_INITIATOR_SUFFIX = "/IncludeToken/AlwaysToInitiator";
 
-    public static final String INCLUDE_TOEKN_ALWAYS_SUFFIX = "/IncludeToken/Always";
+    public static final String INCLUDE_TOKEN_ALWAYS_SUFFIX = "/IncludeToken/Always";
 
     public static final int INCLUDE_TOKEN_NEVER = 1;
 
     public static final int INCLUDE_TOKEN_ONCE = 2;
 
-    public static final int INCLUDE_TOEKN_ALWAYS_TO_RECIPIENT = 3;
+    public static final int INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT = 3;
 
-    public static final int INCLUDE_TOEKN_ALWAYS_TO_INITIATOR = 4;
+    public static final int INCLUDE_TOKEN_ALWAYS_TO_INITIATOR = 4;
 
-    public static final int INCLUDE_TOEKN_ALWAYS = 5;
+    public static final int INCLUDE_TOKEN_ALWAYS = 5;
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

@@ -55,13 +55,13 @@ public class SP12Constants extends SPConstants {
             SP12Constants.SP_NS + SPConstants.INCLUDE_TOKEN_ONCE_SUFFIX;
 
     public static final String INCLUDE_ALWAYS_TO_RECIPIENT =
-            SP12Constants.SP_NS + SPConstants.INCLUDE_TOEKN_ALWAYS_TO_RECIPIENT_SUFFIX;
+            SP12Constants.SP_NS + SPConstants.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT_SUFFIX;
 
     public static final String INCLUDE_ALWAYS_TO_INITIATOR =
-            SP12Constants.SP_NS + SPConstants.INCLUDE_TOEKN_ALWAYS_TO_INITIATOR_SUFFIX;
+            SP12Constants.SP_NS + SPConstants.INCLUDE_TOKEN_ALWAYS_TO_INITIATOR_SUFFIX;
 
     public static final String INCLUDE_ALWAYS =
-            SP12Constants.SP_NS + SPConstants.INCLUDE_TOEKN_ALWAYS_SUFFIX;
+            SP12Constants.SP_NS + SPConstants.INCLUDE_TOKEN_ALWAYS_SUFFIX;
 
     public static final QName TRUST_13 = new QName(
             SP12Constants.SP_NS, SPConstants.TRUST_13, SP12Constants.SP_PREFIX);
