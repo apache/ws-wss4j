@@ -127,12 +127,17 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
 
     @Override
     protected Key getKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage, String correlationID) throws XMLSecurityException {
+        Key key = null;
         if (secret != null) {
-            return KeyUtils.prepareSecretKey(algorithmURI, secret);
+            key = KeyUtils.prepareSecretKey(algorithmURI, secret);
         } else if (this.subjectSecurityToken != null) {
-            return subjectSecurityToken.getSecretKey(algorithmURI, algorithmUsage, correlationID);
+            key = subjectSecurityToken.getSecretKey(algorithmURI, algorithmUsage, correlationID);
         } else if (subjectKeyInfo != null && subjectKeyInfo.getSecret() != null) {
-            return KeyUtils.prepareSecretKey(algorithmURI, subjectKeyInfo.getSecret());
+            key = KeyUtils.prepareSecretKey(algorithmURI, subjectKeyInfo.getSecret());
+        }
+        if (key != null) {
+            super.setSecretKey(algorithmURI, key);
+            return key;
         }
         return super.getKey(algorithmURI, algorithmUsage, correlationID);
     }

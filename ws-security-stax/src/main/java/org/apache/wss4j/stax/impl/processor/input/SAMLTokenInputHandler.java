@@ -410,7 +410,16 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                 keyInfoType.getContent().add(securityTokenReferenceTypeJAXBElement);
             } else if (object instanceof EncryptedKeyType) {
                 EncryptedKeyType encryptedKeyType = (EncryptedKeyType) object;
-                keyInfoType = encryptedKeyType.getKeyInfo();
+                
+                WSSEncryptedKeyInputHandler encryptedKeyInputHandler = new WSSEncryptedKeyInputHandler();
+                encryptedKeyInputHandler.handle(inputProcessorChain, encryptedKeyType, xmlSecStartElement, securityProperties);
+                
+                SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider =
+                    inputProcessorChain.getSecurityContext().getSecurityTokenProvider(encryptedKeyType.getId());
+                if (securityTokenProvider != null) {
+                    return securityTokenProvider.getSecurityToken();
+                }
+              
             } else if (object instanceof SecurityTokenReferenceType) {
                 JAXBElement<SecurityTokenReferenceType> securityTokenReferenceTypeJAXBElement =
                         new ObjectFactory().createSecurityTokenReference((SecurityTokenReferenceType) object);
