@@ -19,6 +19,8 @@
 
 package org.apache.wss4j.common.ext;
 
+import java.security.Key;
+
 import org.w3c.dom.Element;
 
 import javax.security.auth.callback.Callback;
@@ -72,7 +74,8 @@ public class WSPasswordCallback implements Callback {
 
     private String identifier;
     private String password;
-    private byte[] key;
+    private byte[] secret;
+    private Key key;
     private Usage usage;
     private String type;
     private Element customToken;
@@ -144,7 +147,11 @@ public class WSPasswordCallback implements Callback {
      *
      * @param key is the key associated to the identifier
      */
-    public void setKey(byte[] key) {
+    public void setKey(byte[] secret) {
+        this.secret = secret;
+    }
+    
+    public void setKey(Key key) {
         this.key = key;
     }
 
@@ -155,7 +162,11 @@ public class WSPasswordCallback implements Callback {
      * @return The key
      */
     public byte[] getKey() {
-        return this.key;
+        return this.secret;
+    }
+    
+    public Key getKeyObject() {
+        return key;
     }
 
     /**

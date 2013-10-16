@@ -32,9 +32,11 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
 
 import javax.xml.namespace.QName;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -94,16 +96,16 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                 SecurityToken securityToken = getEffectiveSignatureToken(tokenSecurityEvent.getSecurityToken());
 
                 //a token can only be signed if it is included in the message:
-                if (securityToken.isIncludedInMessage() && isSignatureToken(securityToken)) {
+                if (((InboundSecurityToken)securityToken).isIncludedInMessage() && isSignatureToken(securityToken)) {
                     //[WSP1.3_8.9]
                     boolean signsItsSignatureToken = signsItsSignatureToken(securityToken);
                     if (protectTokens && !signsItsSignatureToken) {
                         setAsserted(false);
-                        setErrorMessage("Token " + WSSUtils.pathAsString(securityToken.getElementPath()) + " must be signed by its signature.");
+                        setErrorMessage("Token " + WSSUtils.pathAsString(((InboundSecurityToken)securityToken).getElementPath()) + " must be signed by its signature.");
                         return false;
                     } else if (!protectTokens && signsItsSignatureToken) {
                         setAsserted(false);
-                        setErrorMessage("Token " + WSSUtils.pathAsString(securityToken.getElementPath()) + " must not be signed by its signature.");
+                        setErrorMessage("Token " + WSSUtils.pathAsString(((InboundSecurityToken)securityToken).getElementPath()) + " must not be signed by its signature.");
                         return false;
                     }
                 }
@@ -111,7 +113,7 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                 if (isEndorsingToken(securityToken) && !signsMainSignature(securityToken)) {
                     //[WSP1.3_8.9b]
                     setAsserted(false);
-                    setErrorMessage("Token " + WSSUtils.pathAsString(securityToken.getElementPath()) + " must sign the main signature.");
+                    setErrorMessage("Token " + WSSUtils.pathAsString(((InboundSecurityToken)securityToken).getElementPath()) + " must sign the main signature.");
                     return false;
                 }
 
@@ -191,7 +193,7 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
     private boolean signsItsSignatureToken(SecurityToken securityToken) throws XMLSecurityException {
         for (int i = 0; i < signedElementEvents.size(); i++) {
             SignedElementSecurityEvent signedElementSecurityEvent = signedElementEvents.get(i);
-            if (WSSUtils.pathMatches(signedElementSecurityEvent.getElementPath(), securityToken.getElementPath(), false, false)) {
+            if (WSSUtils.pathMatches(signedElementSecurityEvent.getElementPath(), ((InboundSecurityToken)securityToken).getElementPath(), false, false)) {
 
                 SecurityToken signingSecurityToken = signedElementSecurityEvent.getSecurityToken();
                 signingSecurityToken = getEffectiveSignatureToken(signingSecurityToken);
@@ -203,7 +205,7 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                         TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent = tokenSecurityEvents.get(j);
                         SecurityToken st = getEffectiveSignatureToken(tokenSecurityEvent.getSecurityToken());
 
-                        if (signedElementSecurityEvent.getXmlSecEvent() == st.getXMLSecEvent()) {
+                        if (signedElementSecurityEvent.getXmlSecEvent() == ((InboundSecurityToken)st).getXMLSecEvent()) {
                             //...and we got the covered token
                             //next we have to see if the token is the same:
                             if (st.getId().equals(securityToken.getId())) { //NOPMD
@@ -230,7 +232,7 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                     continue;
                 }
                 signedSupportingTokens.add(supportingToken);
-                List<QName> elementPath = supportingToken.getElementPath();
+                List<QName> elementPath = ((InboundSecurityToken)supportingToken).getElementPath();
 
                 boolean found = false;
                 for (int j = 0; j < signedElementEvents.size(); j++) {

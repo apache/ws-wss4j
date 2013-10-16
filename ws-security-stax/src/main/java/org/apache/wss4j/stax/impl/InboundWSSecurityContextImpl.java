@@ -438,7 +438,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
                 if (signedElementSecurityEvent.isSigned()
                         && WSSUtils.pathMatches(
                         signedElementSecurityEvent.getElementPath(),
-                        tokenSecurityEvent.getSecurityToken().getElementPath(), true, false)
+                        ((InboundSecurityToken)tokenSecurityEvent.getSecurityToken()).getElementPath(), true, false)
                         ) {
                     signingSecurityTokens.add((InboundSecurityToken)signedElementSecurityEvent.getSecurityToken());
                 }
@@ -476,7 +476,8 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
                 if (signedElementSecurityEvent.isSigned()
                         && tokenSecurityEvent.getSecurityToken() != null
                         && signedElementSecurityEvent.getXmlSecEvent() != null
-                        && signedElementSecurityEvent.getXmlSecEvent() == tokenSecurityEvent.getSecurityToken().getXMLSecEvent()
+                        && signedElementSecurityEvent.getXmlSecEvent() == 
+                            ((InboundSecurityToken)tokenSecurityEvent.getSecurityToken()).getXMLSecEvent()
                         && !securityTokenList.contains((InboundSecurityToken)signedElementSecurityEvent.getSecurityToken())) {
                     securityTokenList.add((InboundSecurityToken)signedElementSecurityEvent.getSecurityToken());
                 }
@@ -501,7 +502,8 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
                 if (encryptedElementSecurityEvent.isEncrypted()
                         && tokenSecurityEvent.getSecurityToken() != null
                         && encryptedElementSecurityEvent.getXmlSecEvent() != null
-                        && encryptedElementSecurityEvent.getXmlSecEvent() == tokenSecurityEvent.getSecurityToken().getXMLSecEvent()
+                        && encryptedElementSecurityEvent.getXmlSecEvent() == 
+                            ((InboundSecurityToken)tokenSecurityEvent.getSecurityToken()).getXMLSecEvent()
                         && !securityTokenList.contains((InboundSecurityToken)encryptedElementSecurityEvent.getSecurityToken())) {
                     securityTokenList.add((InboundSecurityToken)encryptedElementSecurityEvent.getSecurityToken());
                 }
@@ -541,7 +543,8 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
                 ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = (ContentEncryptedElementSecurityEvent) securityEvent;
                 if (contentEncryptedElementSecurityEvent.isEncrypted()
                         && contentEncryptedElementSecurityEvent.getSecurityToken().getId().equals(tokenSecurityEvent.getSecurityToken().getId())
-                        && contentEncryptedElementSecurityEvent.getXmlSecEvent() == tokenSecurityEvent.getSecurityToken().getXMLSecEvent()
+                        && contentEncryptedElementSecurityEvent.getXmlSecEvent() ==
+                            ((InboundSecurityToken)tokenSecurityEvent.getSecurityToken()).getXMLSecEvent()
                         && WSSUtils.pathMatches(elementPath, contentEncryptedElementSecurityEvent.getElementPath(), true, false)) {
                     return true;
                 }

@@ -43,6 +43,7 @@ import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.ext.WSSUtils;
+import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
@@ -55,6 +56,7 @@ import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecNamespace;
 import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 import org.opensaml.common.SAMLVersion;
@@ -66,6 +68,9 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
+    
+    private static final transient org.slf4j.Logger logger = 
+        org.slf4j.LoggerFactory.getLogger(SAMLTokenOutputProcessor.class);
 
     public SAMLTokenOutputProcessor() throws XMLSecurityException {
         super();
@@ -221,7 +226,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 finalSAMLTokenOutputProcessor = new FinalSAMLTokenOutputProcessor(null, samlAssertionWrapper,
                         securityTokenReferenceId, senderVouches, includeSTR);
 
-                SecurityTokenProvider<OutboundSecurityToken> securityTokenProvider =
+                final SecurityTokenProvider<OutboundSecurityToken> securityTokenProvider =
                         new SecurityTokenProvider<OutboundSecurityToken>() {
 
                     private GenericOutboundSecurityToken samlSecurityToken;
@@ -278,6 +283,21 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                         return tokenId;
                     }
                 };
+                
+                //fire a tokenSecurityEvent
+                TokenSecurityEvent<OutboundSecurityToken> tokenSecurityEvent = 
+                    new TokenSecurityEvent<OutboundSecurityToken>(WSSecurityEventConstants.SamlToken) {
+                    
+                    public OutboundSecurityToken getSecurityToken() {
+                        try {
+                            return securityTokenProvider.getSecurityToken();
+                        } catch (XMLSecurityException e) {
+                            logger.debug(e.getMessage(), e);
+                        }
+                        return null;
+                    }
+                };
+                outputProcessorChain.getSecurityContext().registerSecurityEvent(tokenSecurityEvent);
 
                 outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(tokenId, securityTokenProvider);
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, tokenId);

@@ -21,6 +21,7 @@ package org.apache.wss4j.stax.impl.securityToken;
 import java.io.IOException;
 import java.security.Key;
 import java.security.Principal;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
@@ -61,6 +62,7 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
     private Principal principal;
     private SAMLKeyInfo subjectKeyInfo;
     private byte[] secret;
+    private Key key;
     
     public SamlSecurityTokenImpl(WSInboundSecurityContext wsInboundSecurityContext, String id,
                                  WSSecurityTokenConstants.KeyIdentifier keyIdentifier,
@@ -79,13 +81,7 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noPassword", e);
             }
             Element assertionElem = pwcb.getCustomToken();
-            if (assertionElem == null) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", id
-                );
-            }
-            
-            if ("Assertion".equals(assertionElem.getLocalName())
+            if (assertionElem != null && "Assertion".equals(assertionElem.getLocalName())
                 && (WSSConstants.NS_SAML.equals(assertionElem.getNamespaceURI())
                 || WSSConstants.NS_SAML2.equals(assertionElem))) {
                 this.samlAssertionWrapper = new SamlAssertionWrapper(assertionElem);
@@ -98,6 +94,10 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
                 // Possibly an Encrypted Assertion...just get the key
                 this.samlAssertionWrapper = null;
                 secret = pwcb.getKey();
+                key = pwcb.getKeyObject();
+                if (this.key instanceof PrivateKey) {
+                    super.setAsymmetric(true);
+                }
             }
         } else {
             throw new WSSecurityException(
@@ -128,7 +128,9 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
     @Override
     protected Key getKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage, String correlationID) throws XMLSecurityException {
         Key key = null;
-        if (secret != null) {
+        if (this.key != null) {
+            key = this.key;
+        } else if (secret != null) {
             key = KeyUtils.prepareSecretKey(algorithmURI, secret);
         } else if (this.subjectSecurityToken != null) {
             key = subjectSecurityToken.getSecretKey(algorithmURI, algorithmUsage, correlationID);

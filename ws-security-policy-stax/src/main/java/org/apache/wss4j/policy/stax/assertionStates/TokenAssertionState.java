@@ -27,6 +27,7 @@ import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
 
 import java.util.Iterator;
@@ -154,7 +155,8 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
         //WSP1.3, 5.1 Token Inclusion
         //todo do we need a global token cache to fullfill ".../IncludeToken/Once" ?
         SPConstants.IncludeTokenType includeTokenType = abstractToken.getIncludeTokenType();
-        boolean isIncludedInMessage = tokenSecurityEvent.getSecurityToken().isIncludedInMessage();
+        boolean isIncludedInMessage = 
+            ((InboundSecurityToken)tokenSecurityEvent.getSecurityToken()).isIncludedInMessage();
         switch (includeTokenType) {
             case INCLUDE_TOKEN_NEVER:
                 if (isIncludedInMessage) {

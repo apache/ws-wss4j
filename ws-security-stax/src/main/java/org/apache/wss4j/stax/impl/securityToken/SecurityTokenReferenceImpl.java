@@ -89,7 +89,7 @@ public class SecurityTokenReferenceImpl extends AbstractInboundSecurityToken imp
 
     @Override
     public InboundSecurityToken getKeyWrappingToken() throws XMLSecurityException {
-        return inboundSecurityToken.getKeyWrappingToken();
+        return (InboundSecurityToken)inboundSecurityToken.getKeyWrappingToken();
     }
 
     @Override
