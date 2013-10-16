@@ -254,6 +254,11 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                     attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE));
                     createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
                     isSAMLToken = true;
+                } else if (WSSecurityTokenConstants.EncryptedKeyToken.equals(tokenType)) {
+                    List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
+                    attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
+                    attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
+                    createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
                 } else {
                     createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, true, null);
                 }
@@ -282,7 +287,9 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                         } else {
                             attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_WSC_05_12 + "/sct"));
                         }
-                    } 
+                    } else if (WSSecurityTokenConstants.EncryptedKeyToken.equals(tokenType)) {
+                        attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
+                    }
                     createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference, false, attributes);
                     createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference);
                 }
