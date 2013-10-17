@@ -131,7 +131,7 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final String NS_SAML = "urn:oasis:names:tc:SAML:1.0:assertion";
     public static final String NS_SAML2 = "urn:oasis:names:tc:SAML:2.0:assertion";
 
-    public static final String PREFIX_SOAPENV = "env";
+    public static final String PREFIX_SOAPENV = "soap";
     public static final String TAG_soap_Envelope_LocalName = "Envelope";
     public static final String TAG_soap_Header_LocalName = "Header";
     public static final String TAG_soap_Body_LocalName = "Body";
