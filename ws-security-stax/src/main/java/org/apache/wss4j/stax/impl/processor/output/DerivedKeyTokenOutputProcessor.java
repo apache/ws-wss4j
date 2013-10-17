@@ -36,6 +36,7 @@ import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -258,6 +259,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 boolean useSingleCertificate)
                 throws XMLStreamException, XMLSecurityException {
 
+            SecurityToken wrappingToken = securityToken.getKeyWrappingToken();
             List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
             attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
             if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier) && !useSingleCertificate) {
@@ -265,13 +267,13 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             } else if (derivedKeyTokenReference == WSSConstants.DerivedKeyTokenReference.EncryptedKey
                 || WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier.equals(keyIdentifier)) {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
-            } else if (WSSecurityTokenConstants.KerberosToken.equals(securityToken.getTokenType())) {
+            } else if (WSSecurityTokenConstants.KerberosToken.equals(wrappingToken.getTokenType())) {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_GSS_Kerberos5_AP_REQ));
             } 
             createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
 
-            X509Certificate[] x509Certificates = securityToken.getKeyWrappingToken().getX509Certificates();
-            String tokenId = securityToken.getKeyWrappingToken().getId();
+            X509Certificate[] x509Certificates = wrappingToken.getX509Certificates();
+            String tokenId = wrappingToken.getId();
 
             if (derivedKeyTokenReference == WSSConstants.DerivedKeyTokenReference.EncryptedKey) {
                 String valueType = WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE;
@@ -283,14 +285,23 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             } else if (WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier.equals(keyIdentifier)) {
                 WSSUtils.createX509KeyIdentifierStructure(this, outputProcessorChain, x509Certificates);
             } else if (WSSecurityTokenConstants.KeyIdentifier_KerberosSha1Identifier.equals(keyIdentifier)) {
-                String identifier = securityToken.getSha1Identifier();
+                String identifier = wrappingToken.getSha1Identifier();
                 WSSUtils.createKerberosSha1IdentifierStructure(this, outputProcessorChain, identifier);
             } else if (WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier.equals(keyIdentifier)) {
                 WSSUtils.createThumbprintKeyIdentifierStructure(this, outputProcessorChain, x509Certificates);
             } else if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier)) {
                 String valueType;
-                if (WSSecurityTokenConstants.KerberosToken.equals(securityToken.getTokenType())) {
+                if (WSSecurityTokenConstants.KerberosToken.equals(wrappingToken.getTokenType())) {
                     valueType = WSSConstants.NS_GSS_Kerberos5_AP_REQ;
+                } else if (WSSecurityTokenConstants.SpnegoContextToken.equals(wrappingToken.getTokenType())
+                    || WSSecurityTokenConstants.SecurityContextToken.equals(wrappingToken.getTokenType())
+                    || WSSecurityTokenConstants.SecureConversationToken.equals(wrappingToken.getTokenType())) {
+                    boolean use200512Namespace = ((WSSSecurityProperties)getSecurityProperties()).isUse200512Namespace();
+                    if (use200512Namespace) {
+                        valueType = WSSConstants.NS_WSC_05_12 + "/sct";
+                    } else {
+                        valueType = WSSConstants.NS_WSC_05_02 + "/sct";
+                    }
                 } else if (useSingleCertificate) {
                     valueType = WSSConstants.NS_X509_V3_TYPE;
                 } else {
