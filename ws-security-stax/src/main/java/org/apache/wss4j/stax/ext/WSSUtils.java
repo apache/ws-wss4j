@@ -371,10 +371,11 @@ public class WSSUtils extends XMLSecurityUtils {
 
     public static void createBSTReferenceStructure(AbstractOutputProcessor abstractOutputProcessor,
                                                    OutputProcessorChain outputProcessorChain, String referenceId,
-                                                   String valueType)
+                                                   String valueType, boolean includedInMessage)
             throws XMLStreamException, XMLSecurityException {
         List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
-        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_URI, "#" + referenceId));
+        String uri = includedInMessage ? "#" + referenceId : referenceId;
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_URI, uri));
         if (valueType != null) {
             attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, valueType));
         }

@@ -134,7 +134,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
             } else if (WSSecurityTokenConstants.EncryptedKeyToken.equals(securityToken.getTokenType())
                 || WSSecurityTokenConstants.KeyIdentifier_EncryptedKey.equals(keyIdentifier)) {
                 String id = securityToken.getId();
-                WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, id, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE);
+                WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, id, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE, true);
             } else if (WSSecurityTokenConstants.KeyIdentifier_IssuerSerial.equals(keyIdentifier)) {
                 WSSUtils.createX509IssuerSerialStructure(this, outputProcessorChain, x509Certificates);
             } else if (WSSecurityTokenConstants.KeyIdentifier_SkiKeyIdentifier.equals(keyIdentifier)) {
@@ -145,6 +145,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                 WSSUtils.createThumbprintKeyIdentifierStructure(this, outputProcessorChain, x509Certificates);
             } else if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier)) {
                 String valueType;
+                boolean included = true;
                 if (WSSecurityTokenConstants.Saml20Token.equals(securityToken.getTokenType())) {
                     valueType = null;
                 } else if (WSSecurityTokenConstants.KerberosToken.equals(securityToken.getTokenType())) {
@@ -156,6 +157,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                     } else {
                         valueType = WSSConstants.NS_WSC_05_02 + "/dk";
                     }
+                    included = ((WSSSecurityProperties)getSecurityProperties()).isIncludeSignatureToken();
                 } else if (WSSecurityTokenConstants.SpnegoContextToken.equals(securityToken.getTokenType())
                     || WSSecurityTokenConstants.SecurityContextToken.equals(securityToken.getTokenType())
                     || WSSecurityTokenConstants.SecureConversationToken.equals(securityToken.getTokenType())) {
@@ -165,6 +167,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                     } else {
                         valueType = WSSConstants.NS_WSC_05_02 + "/sct";
                     }
+                    included = ((WSSSecurityProperties)getSecurityProperties()).isIncludeSignatureToken();
                 } else {
                     if (useSingleCertificate) {
                         valueType = WSSConstants.NS_X509_V3_TYPE;
@@ -172,7 +175,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                         valueType = WSSConstants.NS_X509PKIPathv1;
                     }
                 }
-                WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, tokenId, valueType);
+                WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, tokenId, valueType, included);
             } else if (WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef.equals(keyIdentifier)) {
                 WSSUtils.createEmbeddedKeyIdentifierStructure(this, outputProcessorChain, securityToken.getTokenType(), tokenId);
             } else if (WSSecurityTokenConstants.KeyIdentifier_UsernameTokenReference.equals(keyIdentifier)) {

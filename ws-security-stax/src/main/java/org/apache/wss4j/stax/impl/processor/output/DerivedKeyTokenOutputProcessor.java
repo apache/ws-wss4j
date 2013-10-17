@@ -275,7 +275,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
             if (derivedKeyTokenReference == WSSConstants.DerivedKeyTokenReference.EncryptedKey) {
                 String valueType = WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE;
-                WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, tokenId, valueType);
+                WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, tokenId, valueType, true);
             } else if (WSSecurityTokenConstants.KeyIdentifier_IssuerSerial.equals(keyIdentifier)) {
                 WSSUtils.createX509IssuerSerialStructure(this, outputProcessorChain, x509Certificates);
             } else if (WSSecurityTokenConstants.KeyIdentifier_SkiKeyIdentifier.equals(keyIdentifier)) {
@@ -296,7 +296,8 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 } else {
                     valueType = WSSConstants.NS_X509PKIPathv1;
                 }
-                WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, tokenId, valueType);
+                boolean included = ((WSSSecurityProperties)getSecurityProperties()).isIncludeSignatureToken();
+                WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, tokenId, valueType, included);
             } else if (WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier.equals(keyIdentifier)) {
                 WSSUtils.createEncryptedKeySha1IdentifierStructure(this, outputProcessorChain, sha1Identifier);
             } else {

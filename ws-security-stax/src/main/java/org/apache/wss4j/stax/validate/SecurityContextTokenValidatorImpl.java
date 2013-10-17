@@ -40,7 +40,7 @@ public class SecurityContextTokenValidatorImpl implements SecurityContextTokenVa
             throws WSSecurityException {
 
         AbstractInboundSecurityToken securityContextToken = new AbstractInboundSecurityToken(
-                tokenContext.getWsSecurityContext(), securityContextTokenType.getId(),
+                tokenContext.getWsSecurityContext(), identifier,
                 WSSecurityTokenConstants.KeyIdentifier_ExternalReference, true) {
 
             @Override

@@ -339,7 +339,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                 } else {
                     valueType = WSSConstants.NS_X509PKIPathv1;
                 }
-                WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, tokenId, valueType);
+                WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, tokenId, valueType, true);
             } else {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unsupportedSecurityToken");
             }
