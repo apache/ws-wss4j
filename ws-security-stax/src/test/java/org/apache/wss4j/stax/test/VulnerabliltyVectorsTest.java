@@ -64,7 +64,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
         Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
-        XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey");
+        XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey");
         Element encryptedKeyElement = (Element) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
         encryptedKeyElement.removeAttribute("Id");
         encryptedKeyElement.setAttributeNS(null, "Id", "G2");
@@ -126,7 +126,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
         Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
-        XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedKey");
+        XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedKey");
         Element encryptedKeyElement = (Element) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
         encryptedKeyElement.removeAttribute("Id");
         encryptedKeyElement.setAttributeNS(null, "Id", "2");
@@ -219,7 +219,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         properties.setProperty(WSHandlerConstants.ENC_SYM_ALGO, "http://www.w3.org/2001/04/xmlenc#aes256-cbc");
         Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
-        XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header");
+        XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header");
         Element headerElement = (Element) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
         Element newElement = securedDocument.createElement("test");
         headerElement.appendChild(newElement);

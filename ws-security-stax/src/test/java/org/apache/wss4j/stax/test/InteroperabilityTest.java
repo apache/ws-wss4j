@@ -515,12 +515,12 @@ public class InteroperabilityTest extends AbstractTestBase {
         javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
         transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
 
-        XPathExpression xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/xenc:EncryptedData");
+        XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/xenc:EncryptedData");
         Element timeStamp = (Element) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
         Element securityHeaderNode = (Element) timeStamp.getParentNode();
         securityHeaderNode.removeChild(timeStamp);
 
-        xPathExpression = getXPath("/env:Envelope/env:Header/wsse:Security/dsig:Signature");
+        xPathExpression = getXPath("/soap:Envelope/soap:Header/wsse:Security/dsig:Signature");
         Element signature = (Element) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
 
         securityHeaderNode.insertBefore(timeStamp, signature);

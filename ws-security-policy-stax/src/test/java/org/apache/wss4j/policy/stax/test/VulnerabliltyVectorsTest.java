@@ -102,7 +102,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         properties.setProperty(WSHandlerConstants.ENC_SYM_ALGO, "http://www.w3.org/2001/04/xmlenc#aes256-cbc");
         Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
-        XPathExpression xPathExpression = getXPath("/env:Envelope/env:Body");
+        XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Body");
         Element bodyElement = (Element) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
         Element soapEnvElement = (Element) bodyElement.getParentNode();
         soapEnvElement.removeChild(bodyElement);
@@ -112,7 +112,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         newBody.appendChild(operationElement);
         soapEnvElement.appendChild(newBody);
 
-        xPathExpression = getXPath("/env:Envelope/env:Header");
+        xPathExpression = getXPath("/soap:Envelope/soap:Header");
         Element headerElement = (Element) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
         headerElement.appendChild(bodyElement);
 
