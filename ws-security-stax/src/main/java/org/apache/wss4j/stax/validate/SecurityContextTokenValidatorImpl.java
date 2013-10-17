@@ -41,7 +41,7 @@ public class SecurityContextTokenValidatorImpl implements SecurityContextTokenVa
 
         AbstractInboundSecurityToken securityContextToken = new AbstractInboundSecurityToken(
                 tokenContext.getWsSecurityContext(), securityContextTokenType.getId(),
-                WSSecurityTokenConstants.KeyIdentifier_ExternalReference, false) {
+                WSSecurityTokenConstants.KeyIdentifier_ExternalReference, true) {
 
             @Override
             public boolean isAsymmetric() {

@@ -65,7 +65,7 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         requiredElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
 
-        SecureConversationTokenSecurityEvent initiatorTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        SecurityContextTokenSecurityEvent initiatorTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         SecureConversationSecurityTokenImpl securityToken =
                 new SecureConversationSecurityTokenImpl(
                         null, "1", WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
@@ -73,7 +73,7 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
-        SecureConversationTokenSecurityEvent recipientTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        SecurityContextTokenSecurityEvent recipientTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         securityToken = new SecureConversationSecurityTokenImpl(
                 null, "1", WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
@@ -125,7 +125,7 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
                         "</sp:SymmetricBinding>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
-        SecureConversationTokenSecurityEvent initiatorTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        SecurityContextTokenSecurityEvent initiatorTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         SecureConversationSecurityTokenImpl securityToken =
                 new SecureConversationSecurityTokenImpl(
                         null, "1", WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
@@ -133,7 +133,7 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
-        SecureConversationTokenSecurityEvent recipientTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        SecurityContextTokenSecurityEvent recipientTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         securityToken = new SecureConversationSecurityTokenImpl(
                 null, "1", WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
@@ -174,13 +174,13 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
                         "</wsp:Policy>\n" +
                         "</sp:SymmetricBinding>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        SecureConversationTokenSecurityEvent secureConversationTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        SecurityContextTokenSecurityEvent SecurityContextTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         SecureConversationSecurityTokenImpl securityToken =
                 new SecureConversationSecurityTokenImpl(
                         null, "1", WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
-        secureConversationTokenSecurityEvent.setSecurityToken(securityToken);
-        policyEnforcer.registerSecurityEvent(secureConversationTokenSecurityEvent);
+        SecurityContextTokenSecurityEvent.setSecurityToken(securityToken);
+        policyEnforcer.registerSecurityEvent(SecurityContextTokenSecurityEvent);
 
         List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
@@ -222,7 +222,7 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
 
-        SecureConversationTokenSecurityEvent initiatorTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        SecurityContextTokenSecurityEvent initiatorTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         SecureConversationSecurityTokenImpl securityToken =
                 new SecureConversationSecurityTokenImpl(
                         null, "1", WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
@@ -230,7 +230,7 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
-        SecureConversationTokenSecurityEvent recipientTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        SecurityContextTokenSecurityEvent recipientTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         securityToken = new SecureConversationSecurityTokenImpl(
                 null, "1", WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
@@ -279,7 +279,7 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
 
-        SecureConversationTokenSecurityEvent initiatorTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        SecurityContextTokenSecurityEvent initiatorTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         SecureConversationSecurityTokenImpl securityToken =
                 new SecureConversationSecurityTokenImpl(
                         null, "1", WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
@@ -287,7 +287,7 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
-        SecureConversationTokenSecurityEvent recipientTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        SecurityContextTokenSecurityEvent recipientTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         securityToken = new SecureConversationSecurityTokenImpl(
                 null, "1", WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);

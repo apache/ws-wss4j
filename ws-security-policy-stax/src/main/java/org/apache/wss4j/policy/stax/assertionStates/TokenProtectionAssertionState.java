@@ -64,7 +64,6 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                 SecurityEventConstants.KeyValueToken,
                 WSSecurityEventConstants.RelToken,
                 WSSecurityEventConstants.SamlToken,
-                WSSecurityEventConstants.SecureConversationToken,
                 WSSecurityEventConstants.SecurityContextToken,
                 WSSecurityEventConstants.SpnegoContextToken,
                 WSSecurityEventConstants.UsernameToken,

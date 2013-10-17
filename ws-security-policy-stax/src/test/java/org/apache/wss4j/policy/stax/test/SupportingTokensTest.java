@@ -1015,14 +1015,14 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
-        SecureConversationTokenSecurityEvent tokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        SecurityContextTokenSecurityEvent tokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         tokenSecurityEvent.setIssuerName("CN=transmitter,OU=swssf,C=CH");
         X509SecurityTokenImpl x509SecurityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         x509SecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_SupportingTokens);
         tokenSecurityEvent.setSecurityToken(x509SecurityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
-        tokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        tokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         tokenSecurityEvent.setIssuerName("CN=transmitter,OU=swssf,C=CH");
         x509SecurityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         x509SecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_SupportingTokens);
@@ -1050,14 +1050,14 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
-        SecureConversationTokenSecurityEvent tokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        SecurityContextTokenSecurityEvent tokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         tokenSecurityEvent.setIssuerName("test");
         X509SecurityTokenImpl x509SecurityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         x509SecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_SupportingTokens);
         tokenSecurityEvent.setSecurityToken(x509SecurityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
-        tokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        tokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         tokenSecurityEvent.setIssuerName("test");
         x509SecurityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         x509SecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_SupportingTokens);
@@ -1089,14 +1089,14 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
-        SecureConversationTokenSecurityEvent tokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        SecurityContextTokenSecurityEvent tokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         tokenSecurityEvent.setIssuerName("CN=transmitter,OU=swssf,C=CH");
         X509SecurityTokenImpl x509SecurityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         x509SecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_SupportingTokens);
         tokenSecurityEvent.setSecurityToken(x509SecurityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
-        tokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        tokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         tokenSecurityEvent.setIssuerName("test");
         x509SecurityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         x509SecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_SupportingTokens);
@@ -1124,14 +1124,14 @@ public class SupportingTokensTest extends AbstractPolicyTestBase {
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
-        SecureConversationTokenSecurityEvent tokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        SecurityContextTokenSecurityEvent tokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         tokenSecurityEvent.setIssuerName("test");
         X509SecurityTokenImpl x509SecurityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         x509SecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_SupportingTokens);
         tokenSecurityEvent.setSecurityToken(x509SecurityToken);
         policyEnforcer.registerSecurityEvent(tokenSecurityEvent);
 
-        tokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        tokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         tokenSecurityEvent.setIssuerName("CN=transmitter,OU=swssf,C=CH");
         x509SecurityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         x509SecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_SupportingTokens);

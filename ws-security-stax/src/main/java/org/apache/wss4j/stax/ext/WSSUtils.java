@@ -484,8 +484,6 @@ public class WSSUtils extends XMLSecurityUtils {
             tokenSecurityEvent = new SpnegoContextTokenSecurityEvent();
         } else if (WSSecurityTokenConstants.SecurityContextToken.equals(tokenType)) {
             tokenSecurityEvent = new SecurityContextTokenSecurityEvent();
-        } else if (WSSecurityTokenConstants.SecureConversationToken.equals(tokenType)) {
-            tokenSecurityEvent = new SecureConversationTokenSecurityEvent();
         } else if (WSSecurityTokenConstants.Saml10Token.equals(tokenType) ||
                 WSSecurityTokenConstants.Saml11Token.equals(tokenType) ||
                 WSSecurityTokenConstants.Saml20Token.equals(tokenType)) {

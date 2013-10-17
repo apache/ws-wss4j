@@ -47,7 +47,6 @@ public class LayoutAssertionState extends AssertionState implements Assertable {
                 WSSecurityEventConstants.KerberosToken,
                 WSSecurityEventConstants.SpnegoContextToken,
                 WSSecurityEventConstants.SecurityContextToken,
-                WSSecurityEventConstants.SecureConversationToken,
                 WSSecurityEventConstants.SamlToken,
                 WSSecurityEventConstants.RelToken,
                 WSSecurityEventConstants.HttpsToken,

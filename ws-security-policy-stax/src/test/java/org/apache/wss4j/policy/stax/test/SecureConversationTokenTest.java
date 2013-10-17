@@ -25,7 +25,7 @@ import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.impl.securityToken.X509SecurityTokenImpl;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.SecureConversationTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.SecurityContextTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
@@ -34,6 +34,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -73,7 +74,7 @@ public class SecureConversationTokenTest extends AbstractPolicyTestBase {
                         "</sp:SymmetricBinding>";
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        SecureConversationTokenSecurityEvent initiatorTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        SecurityContextTokenSecurityEvent initiatorTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         initiatorTokenSecurityEvent.setIssuerName("xs:anyURI");
         initiatorTokenSecurityEvent.setExternalUriRef(true);
         X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
@@ -81,7 +82,7 @@ public class SecureConversationTokenTest extends AbstractPolicyTestBase {
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
-        SecureConversationTokenSecurityEvent recipientTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        SecurityContextTokenSecurityEvent recipientTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         recipientTokenSecurityEvent.setIssuerName("xs:anyURI");
         recipientTokenSecurityEvent.setExternalUriRef(true);
         securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
@@ -144,7 +145,7 @@ public class SecureConversationTokenTest extends AbstractPolicyTestBase {
                         "</wsp:Policy>\n" +
                         "</sp:SymmetricBinding>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        SecureConversationTokenSecurityEvent initiatorTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        SecurityContextTokenSecurityEvent initiatorTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         initiatorTokenSecurityEvent.setIssuerName("sss");
         initiatorTokenSecurityEvent.setExternalUriRef(true);
         InboundSecurityToken securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
@@ -152,7 +153,7 @@ public class SecureConversationTokenTest extends AbstractPolicyTestBase {
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
-        SecureConversationTokenSecurityEvent recipientTokenSecurityEvent = new SecureConversationTokenSecurityEvent();
+        SecurityContextTokenSecurityEvent recipientTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         recipientTokenSecurityEvent.setIssuerName("sss");
         recipientTokenSecurityEvent.setExternalUriRef(true);
         securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
@@ -184,7 +185,7 @@ public class SecureConversationTokenTest extends AbstractPolicyTestBase {
         } catch (WSSecurityException e) {
             Assert.assertTrue(e.getCause() instanceof PolicyViolationException);
             Assert.assertEquals(e.getCause().getMessage(),
-                    "IssuerName in Policy (xs:anyURI) didn't match with the one in the SecureConversationToken (sss)");
+                    "IssuerName in Policy (xs:anyURI) didn't match with the one in the SecurityContextToken (sss)");
             Assert.assertEquals(e.getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }

@@ -18,22 +18,19 @@
  */
 package org.apache.wss4j.policy.stax.assertionStates;
 
-import org.apache.wss4j.policy.WSSPolicyException;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
-import org.apache.wss4j.policy.model.AbstractToken;
-import org.apache.wss4j.policy.model.SecureConversationToken;
-import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
-import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
-import org.apache.xml.security.stax.securityToken.SecurityToken;
-import org.apache.wss4j.stax.securityEvent.SecureConversationTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 
 /**
  * WSP1.3, 5.4.7 SecureConversationToken Assertion
  */
 
-public class SecureConversationTokenAssertionState extends TokenAssertionState {
+public class SecureConversationTokenAssertionState extends SecurityContextTokenAssertionState {
 
+    //todo sp:SC13SecurityContextToken:
+    //todo MustNotSendCancel etc...
+    
     public SecureConversationTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, boolean initiator) {
         super(assertion, asserted, initiator);
     }
@@ -41,31 +38,8 @@ public class SecureConversationTokenAssertionState extends TokenAssertionState {
     @Override
     public SecurityEventConstants.Event[] getSecurityEventType() {
         return new SecurityEventConstants.Event[]{
-                WSSecurityEventConstants.SecureConversationToken
+                WSSecurityEventConstants.SecurityContextToken
         };
     }
 
-    @Override
-    public boolean assertToken(TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent,
-                               AbstractToken abstractToken) throws WSSPolicyException {
-        if (!(tokenSecurityEvent instanceof SecureConversationTokenSecurityEvent)) {
-            throw new WSSPolicyException("Expected a SecureConversationSecurityEvent but got " + tokenSecurityEvent.getClass().getName());
-        }
-        SecureConversationTokenSecurityEvent secureConversationSecurityEvent = (SecureConversationTokenSecurityEvent) tokenSecurityEvent;
-        SecureConversationToken secureConversationToken = (SecureConversationToken) abstractToken;
-
-        if (secureConversationToken.getIssuerName() != null && !secureConversationToken.getIssuerName().equals(secureConversationSecurityEvent.getIssuerName())) {
-            setErrorMessage("IssuerName in Policy (" + secureConversationToken.getIssuerName() + ") didn't match with the one in the SecureConversationToken (" + secureConversationSecurityEvent.getIssuerName() + ")");
-            return false;
-        }
-        if (secureConversationToken.isRequireExternalUriReference() && !secureConversationSecurityEvent.isExternalUriRef()) {
-            setErrorMessage("Policy enforces externalUriRef but we didn't got one");
-            return false;
-        }
-        //todo sp:SC13SecurityContextToken:
-        //todo MustNotSendCancel etc...
-        //always return true to prevent false alarm in case additional tokens with the same usage
-        //appears in the message but do not fulfill the policy and are also not needed to fulfil the policy.
-        return true;
-    }
 }
