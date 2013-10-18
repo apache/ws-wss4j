@@ -217,6 +217,7 @@ public class SecurityTokenReference {
         }
         if (log.isDebugEnabled()) {
             log.debug("Token reference uri: " + uri);
+            log.debug("Token reference ValueType: " + valueType);
         }
         
         if (uri == null) {
