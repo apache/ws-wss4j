@@ -90,7 +90,7 @@ public class SecurityTokenReference {
         element = elem;
         QName el = new QName(element.getNamespaceURI(), element.getLocalName());
         if (!STR_QNAME.equals(el)) {
-            throw new WSSecurityException(WSSecurityException.FAILURE, "badElement", null);
+            throw new WSSecurityException(WSSecurityException.FAILURE, "badElement",  new Object[] {STR_QNAME, el});
         }
         if (bspCompliant) {
             checkBSPCompliance();
