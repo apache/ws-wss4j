@@ -481,8 +481,6 @@ public class WSSUtils extends XMLSecurityUtils {
             tokenSecurityEvent = new UsernameTokenSecurityEvent();
         } else if (WSSecurityTokenConstants.KerberosToken.equals(tokenType)) {
             tokenSecurityEvent = new KerberosTokenSecurityEvent();
-        } else if (WSSecurityTokenConstants.SpnegoContextToken.equals(tokenType)) {
-            tokenSecurityEvent = new SpnegoContextTokenSecurityEvent();
         } else if (WSSecurityTokenConstants.SecurityContextToken.equals(tokenType)) {
             tokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         } else if (WSSecurityTokenConstants.Saml10Token.equals(tokenType) ||

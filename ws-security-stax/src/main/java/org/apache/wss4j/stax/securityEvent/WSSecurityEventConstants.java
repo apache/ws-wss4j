@@ -31,7 +31,6 @@ public abstract class WSSecurityEventConstants extends SecurityEventConstants {
     public static final Event RequiredPart = new Event("RequiredPart");
     public static final Event IssuedToken = new Event("IssuedToken");
     public static final Event KerberosToken = new Event("KerberosToken");
-    public static final Event SpnegoContextToken = new Event("SpnegoContextToken");
     public static final Event SamlToken = new Event("SamlToken");
     public static final Event SecurityContextToken = new Event("SecurityContextToken");
     public static final Event RelToken = new Event("RelToken");

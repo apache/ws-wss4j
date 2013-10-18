@@ -25,7 +25,7 @@ import org.apache.wss4j.policy.model.SpnegoContextToken;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
-import org.apache.wss4j.stax.securityEvent.SpnegoContextTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.SecurityContextTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 /**
@@ -41,19 +41,19 @@ public class SpnegoContextTokenAssertionState extends TokenAssertionState {
     @Override
     public SecurityEventConstants.Event[] getSecurityEventType() {
         return new SecurityEventConstants.Event[]{
-                WSSecurityEventConstants.SpnegoContextToken
+                WSSecurityEventConstants.SecurityContextToken
         };
     }
 
     @Override
     public boolean assertToken(TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent,
                                AbstractToken abstractToken) throws WSSPolicyException {
-        if (!(tokenSecurityEvent instanceof SpnegoContextTokenSecurityEvent)) {
-            throw new WSSPolicyException("Expected a SpnegoContextTokenSecurityEvent but got " + tokenSecurityEvent.getClass().getName());
+        if (!(tokenSecurityEvent instanceof SecurityContextTokenSecurityEvent)) {
+            throw new WSSPolicyException("Expected a SecurityContextTokenSecurityEvent but got " + tokenSecurityEvent.getClass().getName());
         }
 
         SpnegoContextToken spnegoContextToken = (SpnegoContextToken) abstractToken;
-        SpnegoContextTokenSecurityEvent spnegoContextTokenSecurityEvent = (SpnegoContextTokenSecurityEvent) tokenSecurityEvent;
+        SecurityContextTokenSecurityEvent spnegoContextTokenSecurityEvent = (SecurityContextTokenSecurityEvent) tokenSecurityEvent;
         if (spnegoContextToken.getIssuerName() != null
             && !spnegoContextToken.getIssuerName().equals(spnegoContextTokenSecurityEvent.getIssuerName())) {
             setErrorMessage("IssuerName in Policy (" + spnegoContextToken.getIssuerName() + ") didn't match with the one in the IssuedToken (" + spnegoContextTokenSecurityEvent.getIssuerName() + ")");

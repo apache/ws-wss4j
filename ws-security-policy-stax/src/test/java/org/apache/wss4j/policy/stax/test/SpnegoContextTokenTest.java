@@ -24,7 +24,7 @@ import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.impl.securityToken.X509SecurityTokenImpl;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.SpnegoContextTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.SecurityContextTokenSecurityEvent;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
@@ -70,14 +70,14 @@ public class SpnegoContextTokenTest extends AbstractPolicyTestBase {
                         "</sp:AsymmetricBinding>";
 
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-        SpnegoContextTokenSecurityEvent initiatorTokenSecurityEvent = new SpnegoContextTokenSecurityEvent();
+        SecurityContextTokenSecurityEvent initiatorTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         initiatorTokenSecurityEvent.setIssuerName("xs:anyURI");
         X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
-        SpnegoContextTokenSecurityEvent recipientTokenSecurityEvent = new SpnegoContextTokenSecurityEvent();
+        SecurityContextTokenSecurityEvent recipientTokenSecurityEvent = new SecurityContextTokenSecurityEvent();
         recipientTokenSecurityEvent.setIssuerName("xs:anyURI");
         securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
