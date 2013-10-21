@@ -184,7 +184,11 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                                                             wrappingSecurityToken.getSha1Identifier());
             finalDerivedKeyTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
             finalDerivedKeyTokenOutputProcessor.setAction(getAction());
-            finalDerivedKeyTokenOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
+            if (wrappingSecurityToken.getProcessor() != null) {
+                finalDerivedKeyTokenOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
+            } else {
+                finalDerivedKeyTokenOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
+            }
             finalDerivedKeyTokenOutputProcessor.init(outputProcessorChain);
             derivedKeySecurityToken.setProcessor(finalDerivedKeyTokenOutputProcessor);
         } finally {
