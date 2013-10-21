@@ -157,7 +157,6 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                     } else {
                         valueType = WSSConstants.NS_WSC_05_02 + "/dk";
                     }
-                    included = ((WSSSecurityProperties)getSecurityProperties()).isIncludeSignatureToken();
                 } else if (WSSecurityTokenConstants.SpnegoContextToken.equals(securityToken.getTokenType())
                     || WSSecurityTokenConstants.SecurityContextToken.equals(securityToken.getTokenType())
                     || WSSecurityTokenConstants.SecureConversationToken.equals(securityToken.getTokenType())) {
