@@ -306,13 +306,15 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3062);
                     throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "badReferenceURI");
                 }
+                boolean included = true;
                 if (!uri.startsWith("#")) {
+                    included = false;
                     // Delegate to a CallbackHandler, in case the token is not in the request
                     try {
                         return new ExternalSecurityTokenImpl((WSInboundSecurityContext) inboundSecurityContext, 
                                                      uri,
                                                      WSSecurityTokenConstants.KeyIdentifier_ExternalReference, 
-                                                     securityProperties);
+                                                     securityProperties, false);
                     } catch (WSSecurityException ex) { //NOPMD
                         // just continue
                     }
@@ -341,8 +343,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     return new ExternalSecurityTokenImpl((WSInboundSecurityContext) inboundSecurityContext, 
                                                      uri,
                                                      WSSecurityTokenConstants.KeyIdentifier_ExternalReference, 
-                                                     securityProperties);
-                    // throw new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", uri);
+                                                     securityProperties, included);
                 }
                 if (securityTokenProvider.getSecurityToken() instanceof SecurityTokenReference) {
                     ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3057);

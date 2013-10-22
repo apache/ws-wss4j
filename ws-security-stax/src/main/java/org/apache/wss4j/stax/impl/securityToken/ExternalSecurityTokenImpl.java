@@ -44,8 +44,9 @@ public class ExternalSecurityTokenImpl extends AbstractInboundSecurityToken {
     
     public ExternalSecurityTokenImpl(WSInboundSecurityContext wsInboundSecurityContext, String id,
                                  WSSecurityTokenConstants.KeyIdentifier keyIdentifier,
-                                 WSSSecurityProperties securityProperties) throws WSSecurityException {
-        super(wsInboundSecurityContext, id, keyIdentifier, false);
+                                 WSSSecurityProperties securityProperties,
+                                 boolean included) throws WSSecurityException {
+        super(wsInboundSecurityContext, id, keyIdentifier, included);
         if (securityProperties.getCallbackHandler() != null) {
             // Try to get the token from a CallbackHandler
             WSPasswordCallback pwcb = 
