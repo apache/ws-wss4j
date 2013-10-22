@@ -28,6 +28,7 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -41,12 +42,12 @@ import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.SamlSecurityToken;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
@@ -131,11 +132,13 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
         if (this.key != null) {
             key = this.key;
         } else if (secret != null) {
-            key = KeyUtils.prepareSecretKey(algorithmURI, secret);
+            String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
+            key = new SecretKeySpec(secret, keyAlgorithm);
         } else if (this.subjectSecurityToken != null) {
             key = subjectSecurityToken.getSecretKey(algorithmURI, algorithmUsage, correlationID);
         } else if (subjectKeyInfo != null && subjectKeyInfo.getSecret() != null) {
-            key = KeyUtils.prepareSecretKey(algorithmURI, subjectKeyInfo.getSecret());
+            String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
+            key = new SecretKeySpec(subjectKeyInfo.getSecret(), keyAlgorithm);
         }
         if (key != null) {
             super.setSecretKey(algorithmURI, key);

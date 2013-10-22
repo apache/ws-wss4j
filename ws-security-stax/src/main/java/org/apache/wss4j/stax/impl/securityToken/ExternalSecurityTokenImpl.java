@@ -21,15 +21,16 @@ package org.apache.wss4j.stax.impl.securityToken;
 import java.io.IOException;
 import java.security.Key;
 
+import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
@@ -69,7 +70,8 @@ public class ExternalSecurityTokenImpl extends AbstractInboundSecurityToken {
 
     @Override
     protected Key getKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage, String correlationID) throws XMLSecurityException {
-        return KeyUtils.prepareSecretKey(algorithmURI, key);
+        String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
+        return new SecretKeySpec(key, keyAlgorithm);
     }
 
     @Override

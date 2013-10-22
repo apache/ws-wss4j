@@ -21,15 +21,17 @@ package org.apache.wss4j.stax.validate;
 import org.apache.wss4j.binding.wssc.AbstractSecurityContextTokenType;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 import java.security.Key;
+
+import javax.crypto.spec.SecretKeySpec;
 
 public class SecurityContextTokenValidatorImpl implements SecurityContextTokenValidator {
 
@@ -64,7 +66,8 @@ public class SecurityContextTokenValidatorImpl implements SecurityContextTokenVa
                     throw new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE,
                             "noKey", securityContextTokenType.getId());
                 }
-                key = KeyUtils.prepareSecretKey(algorithmURI, passwordCallback.getKey());
+                String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
+                key = new SecretKeySpec(passwordCallback.getKey(), keyAlgorithm);
                 setSecretKey(algorithmURI, key);
                 return key;
             }
