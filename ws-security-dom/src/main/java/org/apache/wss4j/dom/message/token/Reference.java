@@ -112,7 +112,9 @@ public class Reference {
      * @param valueType the ValueType attribute to set
      */
     public void setValueType(String valueType) {
-        element.setAttributeNS(null, "ValueType", valueType);
+        if (valueType != null) {
+            element.setAttributeNS(null, "ValueType", valueType);
+        }
     }
 
     /**

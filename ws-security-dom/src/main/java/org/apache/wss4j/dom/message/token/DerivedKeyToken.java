@@ -510,7 +510,9 @@ public class DerivedKeyToken {
      *             DerivedKeyToken
      */
     public void setAlgorithm(String algo) {
-        element.setAttributeNS(ns, "Algorithm", algo);
+        if (algo != null) {
+            element.setAttributeNS(ns, "Algorithm", algo);
+        }
     }
     
     /**

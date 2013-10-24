@@ -130,12 +130,14 @@ public class SecurityTokenReference {
      * @param tokenType the wsse11:TokenType attribute to add
      */
     public void addTokenType(String tokenType) {
-        WSSecurityUtil.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
-        element.setAttributeNS(
-            WSConstants.WSSE11_NS, 
-            WSConstants.WSSE11_PREFIX + ":" + WSConstants.TOKEN_TYPE, 
-            tokenType
-        );
+        if (tokenType != null) {
+            WSSecurityUtil.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
+            element.setAttributeNS(
+                WSConstants.WSSE11_NS, 
+                WSConstants.WSSE11_PREFIX + ":" + WSConstants.TOKEN_TYPE, 
+                tokenType
+            );
+        }
     }
     
     /**
