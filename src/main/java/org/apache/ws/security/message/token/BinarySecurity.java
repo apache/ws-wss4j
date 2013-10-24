@@ -168,7 +168,9 @@ public class BinarySecurity {
      * @param type 
      */
     public void setValueType(String type) {
-        element.setAttributeNS(null, "ValueType", type);
+        if (type != null) {
+            element.setAttributeNS(null, "ValueType", type);
+        }
     }
 
     /**
@@ -186,7 +188,9 @@ public class BinarySecurity {
      * @param encoding 
      */
     public void setEncodingType(String encoding) {
-        element.setAttributeNS(null, "EncodingType", encoding);
+        if (encoding != null) {
+            element.setAttributeNS(null, "EncodingType", encoding);
+        }
     }
 
     /**
