@@ -100,6 +100,12 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
                     super.setAsymmetric(true);
                 }
             }
+            
+            if (this.samlAssertionWrapper == null && secret == null && key == null) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", id
+                );
+            }
         } else {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", id
