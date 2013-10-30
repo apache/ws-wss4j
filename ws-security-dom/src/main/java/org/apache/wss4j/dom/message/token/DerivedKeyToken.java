@@ -100,7 +100,7 @@ public class DerivedKeyToken {
      * This will create a DerivedKeyToken object with the given DerivedKeyToken element
      *
      * @param elem The DerivedKeyToken DOM element
-     * @param bspCompliant whether the DerivedKeyToken processing complies with the BSP spec 
+     * @param bspEnforcer a BSPEnforcer instance to enforce BSP rules
      * @throws WSSecurityException If the element is not a derived key token
      */
     public DerivedKeyToken(Element elem, BSPEnforcer bspEnforcer) throws WSSecurityException {

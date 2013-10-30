@@ -145,7 +145,7 @@ public class WSPasswordCallback implements Callback {
      * Set the Key.
      * <p/>
      *
-     * @param key is the key associated to the identifier
+     * @param secret
      */
     public void setKey(byte[] secret) {
         this.secret = secret;

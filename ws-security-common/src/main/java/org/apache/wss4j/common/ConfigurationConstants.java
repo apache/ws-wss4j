@@ -541,9 +541,9 @@ public final class ConfigurationConstants {
      * Specific parameter for UsernameTokens to define the encoding of the password. It can
      * be used on either the outbound or inbound side. The valid values are:
      * 
-     * - {@link WSConstants#PW_DIGEST}
-     * - {@link WSConstants#PW_TEXT}
-     * - {@link WSConstants#PW_NONE}
+     * - PasswordDigest
+     * - PasswordText
+     * - PasswordNone
      * 
      * On the Outbound side, the default value is PW_DIGEST. There is no default value on
      * the inbound side. If a value is specified on the inbound side, the password type of
@@ -554,8 +554,8 @@ public final class ConfigurationConstants {
     
     /**
      * Defines which key identifier type to use for signature. The WS-Security specifications
-     * recommends to use the identifier type <code>IssuerSerial</code>. For possible signature 
-     * key identifier types refer to {@link #getKeyIdentifier(String)}. 
+     * recommends to use the identifier type <code>IssuerSerial</code>.
+     * 
      * For signature <code>IssuerSerial</code>, <code>DirectReference</code>,
      * <code>X509KeyIdentifier</code>, <code>Thumbprint</code>, <code>SKIKeyIdentifier</code>
      * and <code>KeyValue</code> are valid only. 
@@ -650,10 +650,8 @@ public final class ConfigurationConstants {
 
     /**
      * Defines which key identifier type to use for encryption. The WS-Security specifications
-     * recommends to use the identifier type <code>IssuerSerial</code>. For
-     * possible encryption key identifier types refer to
-     * {@link #getKeyIdentifier(String)}. For encryption <code>IssuerSerial</code>,
-     * <code>DirectReference</code>, <code>X509KeyIdentifier</code>, 
+     * recommends to use the identifier type <code>IssuerSerial</code>. For encryption 
+     * <code>IssuerSerial</code>, <code>DirectReference</code>, <code>X509KeyIdentifier</code>, 
      * <code>Thumbprint</code>, <code>SKIKeyIdentifier</code>, <code>EncryptedKeySHA1</code>
      * and <code>EmbeddedKeyName</code> are valid only.
      * <p/>
@@ -668,11 +666,15 @@ public final class ConfigurationConstants {
 
     /**
      * Defines which symmetric encryption algorithm to use. WSS4J supports the
-     * following algorithms: {@link WSConstants#TRIPLE_DES},
-     * {@link WSConstants#AES_128}, {@link WSConstants#AES_256},
-     * and {@link WSConstants#AES_192}. Except for AES 192 all of these
-     * algorithms are required by the XML Encryption specification.
-     * The default algorithm is:
+     * following algorithms:
+     * 
+     * "http://www.w3.org/2001/04/xmlenc#tripledes-cbc";
+     * "http://www.w3.org/2001/04/xmlenc#aes128-cbc";
+     * "http://www.w3.org/2001/04/xmlenc#aes256-cbc";
+     * "http://www.w3.org/2001/04/xmlenc#aes192-cbc";
+     * 
+     * Except for AES 192 all of these algorithms are required by the XML Encryption 
+     * specification. The default algorithm is:
      * 
      * "http://www.w3.org/2001/04/xmlenc#aes128-cbc"
      * 

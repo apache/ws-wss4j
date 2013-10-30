@@ -257,7 +257,7 @@ public abstract class CryptoFactory {
      * This allows loading the resources with a custom class loader
      * @param propFilename
      * @param loader
-     * @return
+     * @return a Properties object loaded from the propFilename argument
      * @throws WSSecurityException if there is an error in loading the crypto properties
      */
     public static Properties getProperties(
