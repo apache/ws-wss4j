@@ -260,4 +260,9 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
         }
         return this.principal;
     }
+    
+    @Override
+    public SamlAssertionWrapper getSamlAssertionWrapper() {
+        return samlAssertionWrapper;
+    }
 }

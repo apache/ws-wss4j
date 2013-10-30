@@ -18,5 +18,9 @@
  */
 package org.apache.wss4j.stax.securityToken;
 
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+
 public interface SamlSecurityToken extends SubjectAndPrincipalSecurityToken {
+    
+    SamlAssertionWrapper getSamlAssertionWrapper();
 }
