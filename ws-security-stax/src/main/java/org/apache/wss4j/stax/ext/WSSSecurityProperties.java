@@ -177,7 +177,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     /**
      * returns the password callback handler
      *
-     * @return
+     * @return the password callback handler
      */
     public CallbackHandler getCallbackHandler() {
         return callbackHandler;
@@ -187,7 +187,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     /**
      * sets the password callback handler
      *
-     * @param callbackHandler
+     * @param callbackHandler the password callback handler
      */
     public void setCallbackHandler(CallbackHandler callbackHandler) {
         this.callbackHandler = callbackHandler;
@@ -518,7 +518,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     /**
      * Returns the decryption crypto class
      *
-     * @return
+     * @return the decryption crypto class
      */
     public Class<? extends Merlin> getDecryptionCryptoClass() {
         if (decryptionWSSCrypto != null) {
@@ -612,7 +612,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     /**
      * Returns the encryption crypto class
      *
-     * @return
+     * @return the encryption crypto class
      */
     public Class<? extends Merlin> getEncryptionCryptoClass() {
         if (encryptionWSSCrypto != null) {

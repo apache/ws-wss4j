@@ -84,7 +84,6 @@ public class WSSUtils extends XMLSecurityUtils {
      * Try to get the secret key from a CallbackHandler implementation
      *
      * @param callbackHandler a CallbackHandler implementation
-     * @return An array of bytes corresponding to the secret key (can be null)
      * @throws WSSecurityException
      */
     public static void doSecretKeyCallback(CallbackHandler callbackHandler, Callback callback, String id)

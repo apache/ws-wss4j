@@ -167,6 +167,7 @@ public class ReplayTest extends AbstractTestBase {
             callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
             callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
             callbackHandler.setIssuer("www.example.com");
+            callbackHandler.setSignAssertion(false);
 
             ConditionsBean conditions = new ConditionsBean();
             conditions.setTokenPeriodMinutes(5);
@@ -218,6 +219,7 @@ public class ReplayTest extends AbstractTestBase {
             callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
             callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
             callbackHandler.setIssuer("www.example.com");
+            callbackHandler.setSignAssertion(false);
 
             ConditionsBean conditions = new ConditionsBean();
             conditions.setTokenPeriodMinutes(5);
