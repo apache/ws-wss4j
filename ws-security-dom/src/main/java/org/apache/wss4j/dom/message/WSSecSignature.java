@@ -208,6 +208,7 @@ public class WSSecSignature extends WSSecSignatureBase {
                     bstToken = new X509Security(document);
                     ((X509Security) bstToken).setX509Certificate(certs[0]);
                 }
+                bstAddedToSecurityHeader = false;
                 ref.setValueType(bstToken.getValueType());
                 secRef.setReference(ref);
                 bstToken.setID(certUri);
@@ -455,6 +456,7 @@ public class WSSecSignature extends WSSecSignatureBase {
             bstToken = new X509Security(document);
             ((X509Security) bstToken).setX509Certificate(certs[0]);
         }
+        bstAddedToSecurityHeader = false;
         bstToken.setID(certUri);
         wsDocInfo.addTokenElement(bstToken.getElement(), false);
     }
