@@ -310,7 +310,7 @@ public class SecurityTokenReference {
             || KerberosSecurity.isKerberosToken(type))) {
             //try to find a custom token
             WSPasswordCallback pwcb = 
-                new WSPasswordCallback(id, WSPasswordCallback.Usage.CUSTOM_TOKEN);
+                new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
             try {
                 cb.handle(new Callback[]{pwcb});
                 Element assertionElem = pwcb.getCustomToken();

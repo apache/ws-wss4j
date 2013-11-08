@@ -58,7 +58,7 @@ public class CustomTokenOutputProcessor extends AbstractOutputProcessor {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
                 
-            WSPasswordCallback wsPasswordCallback = new WSPasswordCallback(tokenId, WSPasswordCallback.Usage.CUSTOM_TOKEN);
+            WSPasswordCallback wsPasswordCallback = new WSPasswordCallback(tokenId, WSPasswordCallback.CUSTOM_TOKEN);
             WSSUtils.doPasswordCallback(
                     ((WSSSecurityProperties) getSecurityProperties()).getCallbackHandler(),
                     wsPasswordCallback);

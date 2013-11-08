@@ -102,7 +102,7 @@ public class SecurityContextTokenProcessor implements Processor {
         }
 
         WSPasswordCallback callback = 
-            new WSPasswordCallback(identifier, WSPasswordCallback.Usage.SECURITY_CONTEXT_TOKEN);
+            new WSPasswordCallback(identifier, WSPasswordCallback.SECURITY_CONTEXT_TOKEN);
         try {
             Callback[] callbacks = new Callback[]{callback};
             cb.handle(callbacks);

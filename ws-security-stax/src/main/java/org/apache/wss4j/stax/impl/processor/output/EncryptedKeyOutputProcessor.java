@@ -41,7 +41,6 @@ import javax.xml.stream.XMLStreamException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
-import org.apache.wss4j.common.ext.WSPasswordCallback.Usage;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
@@ -268,7 +267,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     if (((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler() != null) {
                         // Store the Encrypted Key in the CallbackHandler for processing on the inbound side
                         WSPasswordCallback callback = 
-                            new WSPasswordCallback(securityToken.getId(), Usage.ENCRYPTED_KEY_TOKEN);
+                            new WSPasswordCallback(securityToken.getId(), WSPasswordCallback.ENCRYPTED_KEY_TOKEN);
                         callback.setKey(encryptedEphemeralKey);
                         try {
                             ((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler().handle(new Callback[]{callback});

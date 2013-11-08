@@ -1150,7 +1150,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                if (pc.getUsage() == WSPasswordCallback.Usage.USERNAME_TOKEN) {
+                if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN) {
                     if ("emptyuser".equals(pc.getIdentifier())) {
                         pc.setPassword("");
                     } else if ("customUser".equals(pc.getIdentifier())) {

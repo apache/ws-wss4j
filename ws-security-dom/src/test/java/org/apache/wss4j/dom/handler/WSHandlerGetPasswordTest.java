@@ -69,7 +69,7 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
             handler.getPasswordCB("alice", WSConstants.UT, callbackHandler, reqData);
         assertTrue("alice".equals(callback.getIdentifier()));
         assertTrue("securityPassword".equals(callback.getPassword()));
-        assertTrue(WSPasswordCallback.Usage.USERNAME_TOKEN == callback.getUsage());
+        assertTrue(WSPasswordCallback.USERNAME_TOKEN == callback.getUsage());
     }
     
     /**

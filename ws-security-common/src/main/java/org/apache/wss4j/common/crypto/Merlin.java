@@ -1459,7 +1459,7 @@ public class Merlin extends CryptoBase {
         CallbackHandler cb
     ) throws WSSecurityException {
         WSPasswordCallback pwCb = 
-            new WSPasswordCallback(identifier, WSPasswordCallback.Usage.DECRYPT);
+            new WSPasswordCallback(identifier, WSPasswordCallback.DECRYPT);
         try {
             Callback[] callbacks = new Callback[]{pwCb};
             cb.handle(callbacks);

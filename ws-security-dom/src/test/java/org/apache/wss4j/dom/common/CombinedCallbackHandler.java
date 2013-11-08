@@ -48,8 +48,8 @@ public class CombinedCallbackHandler implements CallbackHandler {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                if ((pc.getUsage() == WSPasswordCallback.Usage.SECRET_KEY)
-                    || (pc.getUsage() == WSPasswordCallback.Usage.SECURITY_CONTEXT_TOKEN)) {
+                if ((pc.getUsage() == WSPasswordCallback.SECRET_KEY)
+                    || (pc.getUsage() == WSPasswordCallback.SECURITY_CONTEXT_TOKEN)) {
                     secretCallbackHandler.handle(callbacks);
                 } else {
                     keystoreCallbackHandler.handle(callbacks);

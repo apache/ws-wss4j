@@ -51,7 +51,7 @@ public class KeystoreCallbackHandler implements CallbackHandler {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
                 if (users.containsKey(pc.getIdentifier())) {
                     pc.setPassword(users.get(pc.getIdentifier()));
-                } else if (WSPasswordCallback.Usage.PASSWORD_ENCRYPTOR_PASSWORD == pc.getUsage()) {
+                } else if (WSPasswordCallback.PASSWORD_ENCRYPTOR_PASSWORD == pc.getUsage()) {
                     pc.setPassword("this-is-a-secret");
                 }
             } else {

@@ -135,7 +135,7 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
             password = passwordType.getValue();
         } else if (salt != null) {
             WSPasswordCallback pwCb = new WSPasswordCallback(username.getValue(),
-                   WSPasswordCallback.Usage.USERNAME_TOKEN);
+                   WSPasswordCallback.USERNAME_TOKEN);
             try {
                 WSSUtils.doPasswordCallback(tokenContext.getWssSecurityProperties().getCallbackHandler(), pwCb);
             } catch (WSSecurityException e) {
@@ -172,7 +172,7 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
         WSPasswordCallback pwCb = new WSPasswordCallback(username,
                 null,
                 passwordType.getType(),
-                WSPasswordCallback.Usage.USERNAME_TOKEN);
+                WSPasswordCallback.USERNAME_TOKEN);
         try {
             WSSUtils.doPasswordCallback(tokenContext.getWssSecurityProperties().getCallbackHandler(), pwCb);
         } catch (WSSecurityException e) {
@@ -201,7 +201,7 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
         WSPasswordCallback pwCb = new WSPasswordCallback(username,
                 null,
                 passwordType.getType(),
-                WSPasswordCallback.Usage.USERNAME_TOKEN);
+                WSPasswordCallback.USERNAME_TOKEN);
         try {
             WSSUtils.doPasswordCallback(tokenContext.getWssSecurityProperties().getCallbackHandler(), pwCb);
         } catch (WSSecurityException e) {

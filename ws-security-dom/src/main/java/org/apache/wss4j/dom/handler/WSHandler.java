@@ -1200,18 +1200,18 @@ public abstract class WSHandler {
         int doAction
     ) throws WSSecurityException {
 
-        WSPasswordCallback.Usage reason = WSPasswordCallback.Usage.UNKNOWN;
+        int reason = WSPasswordCallback.UNKNOWN;
 
         switch (doAction) {
         case WSConstants.UT:
         case WSConstants.UT_SIGN:
-            reason = WSPasswordCallback.Usage.USERNAME_TOKEN;
+            reason = WSPasswordCallback.USERNAME_TOKEN;
             break;
         case WSConstants.SIGN:
-            reason = WSPasswordCallback.Usage.SIGNATURE;
+            reason = WSPasswordCallback.SIGNATURE;
             break;
         case WSConstants.ENCR:
-            reason = WSPasswordCallback.Usage.SECRET_KEY;
+            reason = WSPasswordCallback.SECRET_KEY;
             break;
         }
         return new WSPasswordCallback(username, reason);

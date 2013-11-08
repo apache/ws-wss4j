@@ -310,7 +310,7 @@ public class SignatureSTRParser implements STRParser {
             id = id.substring(1);
         }
         WSPasswordCallback pwcb = 
-            new WSPasswordCallback(id, null, type, WSPasswordCallback.Usage.SECRET_KEY);
+            new WSPasswordCallback(id, null, type, WSPasswordCallback.SECRET_KEY);
         try {
             Callback[] callbacks = new Callback[]{pwcb};
             if (data.getCallbackHandler() != null) {

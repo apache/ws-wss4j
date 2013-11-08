@@ -47,7 +47,7 @@ public class UsernamePasswordCallbackHandler implements CallbackHandler {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                if (pc.getUsage() == WSPasswordCallback.Usage.USERNAME_TOKEN) {
+                if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN) {
                     pc.setPassword(users.get(pc.getIdentifier()));
                     break;
                 }

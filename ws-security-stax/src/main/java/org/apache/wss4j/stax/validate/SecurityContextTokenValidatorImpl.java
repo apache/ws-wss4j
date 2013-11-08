@@ -59,7 +59,7 @@ public class SecurityContextTokenValidatorImpl implements SecurityContextTokenVa
                 }
 
                 WSPasswordCallback passwordCallback = new WSPasswordCallback(
-                        identifier, WSPasswordCallback.Usage.SECURITY_CONTEXT_TOKEN);
+                        identifier, WSPasswordCallback.SECURITY_CONTEXT_TOKEN);
                 WSSUtils.doSecretKeyCallback(
                         tokenContext.getWssSecurityProperties().getCallbackHandler(), passwordCallback, null);
                 if (passwordCallback.getKey() == null) {

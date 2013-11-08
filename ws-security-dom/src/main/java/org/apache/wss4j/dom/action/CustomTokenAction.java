@@ -48,7 +48,7 @@ public class CustomTokenAction implements Action {
         }
         
         WSPasswordCallback wsPasswordCallback = 
-            new WSPasswordCallback(reqData.getUsername(), WSPasswordCallback.Usage.CUSTOM_TOKEN);
+            new WSPasswordCallback(reqData.getUsername(), WSPasswordCallback.CUSTOM_TOKEN);
         
         try {
             callbackHandler.handle(new Callback[]{wsPasswordCallback});

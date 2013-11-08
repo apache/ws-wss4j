@@ -79,7 +79,7 @@ public abstract class X509SecurityTokenImpl
     @Override
     public Key getKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage,
                       String correlationID) throws XMLSecurityException {
-        WSPasswordCallback pwCb = new WSPasswordCallback(getAlias(), WSPasswordCallback.Usage.DECRYPT);
+        WSPasswordCallback pwCb = new WSPasswordCallback(getAlias(), WSPasswordCallback.DECRYPT);
         WSSUtils.doPasswordCallback(getCallbackHandler(), pwCb);
         try {
             return getCrypto().getPrivateKey(getAlias(), pwCb.getPassword());

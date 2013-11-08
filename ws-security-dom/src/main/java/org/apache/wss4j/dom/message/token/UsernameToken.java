@@ -554,7 +554,7 @@ public class UsernameToken {
         WSPasswordCallback pwCb = 
             new WSPasswordCallback(
                 getName(), getPassword(), getPasswordType(), 
-                WSPasswordCallback.Usage.USERNAME_TOKEN
+                WSPasswordCallback.USERNAME_TOKEN
             );
         
         if (data.getCallbackHandler() == null) {

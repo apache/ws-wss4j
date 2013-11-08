@@ -61,7 +61,7 @@ public class JasyptPasswordEncryptor implements PasswordEncryptor {
         passwordEncryptor.setAlgorithm(algorithm);
         
         WSPasswordCallback pwCb = 
-            new WSPasswordCallback("", WSPasswordCallback.Usage.PASSWORD_ENCRYPTOR_PASSWORD);
+            new WSPasswordCallback("", WSPasswordCallback.PASSWORD_ENCRYPTOR_PASSWORD);
         try {
             callbackHandler.handle(new Callback[]{pwCb});
         } catch (IOException e) {

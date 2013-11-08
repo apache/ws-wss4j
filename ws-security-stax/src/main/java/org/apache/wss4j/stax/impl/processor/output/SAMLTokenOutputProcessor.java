@@ -201,7 +201,8 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                             if (alias == null) {
                                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "aliasIsNull");
                             }
-                            WSPasswordCallback wsPasswordCallback = new WSPasswordCallback(alias, WSPasswordCallback.Usage.SIGNATURE);
+                            WSPasswordCallback wsPasswordCallback = 
+                                new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE);
                             WSSUtils.doPasswordCallback(
                                     ((WSSSecurityProperties) getSecurityProperties()).getCallbackHandler(),
                                     wsPasswordCallback);

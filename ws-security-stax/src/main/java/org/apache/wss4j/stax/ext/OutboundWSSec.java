@@ -398,7 +398,7 @@ public class OutboundWSSec {
         
         // We have no supplied key. So use the PasswordCallback to get a secret key or password
         String alias = securityProperties.getSignatureUser();
-        WSPasswordCallback pwCb = new WSPasswordCallback(alias, WSPasswordCallback.Usage.SIGNATURE);
+        WSPasswordCallback pwCb = new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE);
             WSSUtils.doPasswordCallback(securityProperties.getCallbackHandler(), pwCb);
       
         String password = pwCb.getPassword();

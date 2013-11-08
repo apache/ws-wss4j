@@ -120,7 +120,7 @@ public class CustomTokenTest extends org.junit.Assert {
             for (Callback callback : callbacks) {
                 if (callback instanceof WSPasswordCallback) {
                     WSPasswordCallback passwordCallback = (WSPasswordCallback)callback;
-                    if (passwordCallback.getUsage() == WSPasswordCallback.Usage.CUSTOM_TOKEN) {
+                    if (passwordCallback.getUsage() == WSPasswordCallback.CUSTOM_TOKEN) {
                         passwordCallback.setCustomToken(customElement);
                         return;
                     }

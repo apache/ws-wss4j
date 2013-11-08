@@ -132,10 +132,10 @@ public class SignatureUTAliasTest extends org.junit.Assert implements CallbackHa
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-                if (pc.getUsage() == WSPasswordCallback.Usage.USERNAME_TOKEN
+                if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN
                         && "alice".equals(pc.getIdentifier())) {
                     pc.setPassword("verySecret");
-                } else if (pc.getUsage() == WSPasswordCallback.Usage.SIGNATURE
+                } else if (pc.getUsage() == WSPasswordCallback.SIGNATURE
                         && "wss40".equals(pc.getIdentifier())) {
                     pc.setPassword("security");
                 } else {

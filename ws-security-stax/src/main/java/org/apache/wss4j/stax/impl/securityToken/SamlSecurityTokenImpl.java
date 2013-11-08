@@ -73,7 +73,7 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
         if (securityProperties.getCallbackHandler() != null) {
             // Try to get the Assertion from a CallbackHandler
             WSPasswordCallback pwcb = 
-                new WSPasswordCallback(id, WSPasswordCallback.Usage.CUSTOM_TOKEN);
+                new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
             try {
                 securityProperties.getCallbackHandler().handle(new Callback[]{pwcb});
             } catch (IOException e) {

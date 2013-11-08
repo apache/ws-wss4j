@@ -164,7 +164,7 @@ public class UsernameTokenValidator implements Validator {
         boolean passwordsAreEncoded = usernameToken.getPasswordsAreEncoded();
         
         WSPasswordCallback pwCb = 
-            new WSPasswordCallback(user, null, pwType, WSPasswordCallback.Usage.USERNAME_TOKEN);
+            new WSPasswordCallback(user, null, pwType, WSPasswordCallback.USERNAME_TOKEN);
         try {
             data.getCallbackHandler().handle(new Callback[]{pwCb});
         } catch (IOException e) {

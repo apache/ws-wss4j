@@ -99,7 +99,7 @@ public final class X509Util {
             log.debug("No Key Name available");
         }
         WSPasswordCallback pwCb = 
-                new WSPasswordCallback(keyName, WSPasswordCallback.Usage.SECRET_KEY);
+                new WSPasswordCallback(keyName, WSPasswordCallback.SECRET_KEY);
         try {
             cb.handle(new Callback[]{pwCb});
         } catch (IOException e) {
