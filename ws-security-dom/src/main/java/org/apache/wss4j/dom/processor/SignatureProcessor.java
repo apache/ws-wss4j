@@ -723,11 +723,11 @@ public class SignatureProcessor implements Processor {
             bspEnforcer.handleBSPRule(BSPRule.R5401);
         }
         
-        // Must have InclusiveNamespaces with a PrefixList
+        // Must have exclusive C14N without comments
         parameterSpec = 
             xmlSignature.getSignedInfo().getCanonicalizationMethod().getParameterSpec();
         if (!(parameterSpec instanceof ExcC14NParameterSpec)) {
-            bspEnforcer.handleBSPRule(BSPRule.R5406);
+            bspEnforcer.handleBSPRule(BSPRule.R5404);
         }
         
         // Check References
@@ -760,12 +760,7 @@ public class SignatureProcessor implements Processor {
                     if (!(parameterSpec instanceof ExcC14NParameterSpec)) {
                         bspEnforcer.handleBSPRule(BSPRule.R5407);
                     }
-                } /*else if (STRTransform.TRANSFORM_URI.equals(algorithm)) {
-                    parameterSpec = transform.getParameterSpec();
-                    if (!(parameterSpec instanceof ExcC14NParameterSpec)) {
-                        bspEnforcer.handleBSPRule(BSPRule.R5413);
-                    }
-                }*/
+                }
             }
         }
     }
