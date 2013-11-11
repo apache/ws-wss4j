@@ -33,8 +33,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.crypto.Data;
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.NodeSetData;
+import javax.xml.crypto.OctetStreamData;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.Manifest;
@@ -52,11 +54,6 @@ import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 import javax.xml.crypto.dsig.spec.HMACParameterSpec;
 
-import org.apache.wss4j.common.principal.PublicKeyPrincipalImpl;
-import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
@@ -64,6 +61,8 @@ import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.principal.PublicKeyPrincipalImpl;
+import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
@@ -80,12 +79,16 @@ import org.apache.wss4j.dom.message.token.Timestamp;
 import org.apache.wss4j.dom.str.STRParser;
 import org.apache.wss4j.dom.str.STRParser.REFERENCE_TYPE;
 import org.apache.wss4j.dom.str.SignatureSTRParser;
+import org.apache.wss4j.dom.transform.AttachmentContentSignatureTransform;
 import org.apache.wss4j.dom.transform.STRTransform;
 import org.apache.wss4j.dom.transform.STRTransformUtil;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 public class SignatureProcessor implements Processor {
     private static final org.slf4j.Logger LOG = 
@@ -357,10 +360,6 @@ public class SignatureProcessor implements Processor {
      * </ul>
      * 
      * @param elem        the XMLSignature DOM Element.
-     * @param crypto      the object that implements the access to the keystore and the
-     *                    handling of certificates.
-     * @param protectedRefs A list of (references) to the signed elements
-     * @param cb CallbackHandler instance to extract key passwords
      * @return the subject principal of the validated X509 certificate (the
      *         authenticated subject). The calling function may use this
      *         principal for further authentication or authorization.
@@ -372,7 +371,7 @@ public class SignatureProcessor implements Processor {
         PublicKey publicKey,
         byte[] secretKey,
         String signatureMethod,
-        RequestData data,
+        final RequestData data,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         if (LOG.isDebugEnabled()) {
@@ -397,6 +396,9 @@ public class SignatureProcessor implements Processor {
         context.setProperty("org.apache.jcp.xml.dsig.secureValidation", Boolean.TRUE);
         context.setProperty("org.jcp.xml.dsig.secureValidation", Boolean.TRUE);
         context.setProperty(STRTransform.TRANSFORM_WS_DOC_INFO, wsDocInfo);
+        
+        context.setProperty(AttachmentContentSignatureTransform.ATTACHMENT_CALLBACKHANDLER, 
+                            data.getAttachmentCallbackHandler());
         
         try {
             XMLSignature xmlSignature = signatureFactory.unmarshalXMLSignature(context);
@@ -517,7 +519,6 @@ public class SignatureProcessor implements Processor {
      * @param doc The owning document
      * @param signedInfo The SignedInfo object
      * @param requestData A RequestData instance
-     * @param protectedRefs A list of protected references
      * @return A list of protected references
      * @throws WSSecurityException
      */
@@ -537,10 +538,11 @@ public class SignatureProcessor implements Processor {
                 Element se = dereferenceSTR(doc, siRef, requestData, wsDocInfo);
                 // If an STR Transform is not used then just find the cached element
                 if (se == null) {
-                    NodeSetData data = (NodeSetData)siRef.getDereferencedData();
-                    if (data != null) {
+                    Data dereferencedData = siRef.getDereferencedData();
+                    if (dereferencedData instanceof NodeSetData) {
+                        NodeSetData data = (NodeSetData)dereferencedData;
                         java.util.Iterator<?> iter = data.iterator();
-                        
+
                         while (iter.hasNext()) {
                             Node n = (Node)iter.next();
                             if (n instanceof Element) {
@@ -548,6 +550,8 @@ public class SignatureProcessor implements Processor {
                                 break;
                             }
                         }
+                    } else if (dereferencedData instanceof OctetStreamData) {
+                        se = doc.createElementNS("http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1", "attachment");
                     }
                 }
                 if (se == null) {

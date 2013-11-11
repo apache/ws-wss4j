@@ -50,7 +50,7 @@ public final class X509Util {
                  return typeStr.equals(WSConstants.ENC_NS + "Content");
             }
         }
-        return true;
+        return false;
     }
 
     public static String getEncAlgo(Node encBodyData) throws WSSecurityException {

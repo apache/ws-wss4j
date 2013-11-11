@@ -213,7 +213,10 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                     attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, transform));
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform, false, attributes);
 
-                    if (getSecurityProperties().isAddExcC14NInclusivePrefixes()) {
+                    if (getSecurityProperties().isAddExcC14NInclusivePrefixes()
+                            && !WSSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(transform)
+                            && !WSSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(transform))
+                    {
                         attributes = new ArrayList<XMLSecAttribute>(1);
                         attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_PrefixList, signaturePartDef.getInclusiveNamespacesPrefixes()));
                         createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces, true, attributes);

@@ -104,6 +104,8 @@ public class EncryptionAction implements Action {
             wsEncrypt.setCustomReferenceValue(encryptionToken.getTokenType());
         }
         
+        wsEncrypt.setAttachmentCallbackHandler(reqData.getAttachmentCallbackHandler());
+        
         try {
             wsEncrypt.build(doc, encryptionToken.getCrypto(), reqData.getSecHeader());
         } catch (WSSecurityException e) {

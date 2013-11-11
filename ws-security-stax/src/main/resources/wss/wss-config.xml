@@ -5,6 +5,7 @@
         <Property NAME="securityTokenFactory" VAL="org.apache.wss4j.stax.impl.securityToken.SecurityTokenFactoryImpl"/>
         <Property NAME="MaximumAllowedDecompressedBytes" VAL="104857600"/>
         <xi:include href="security-config.xml" xpointer="xmlns(c=http://www.xmlsecurity.org/NS/configuration)xpointer(/c:Configuration/c:Properties/c:Property[@NAME!='securityTokenFactory'])"/>
+        <Property NAME="AllowNotSameDocumentReferences" VAL="true"/>
     </Properties>
     <SecurityHeaderHandlers>
         <Handler NAME="BinarySecurityToken"
@@ -58,6 +59,11 @@
        <TransformAlgorithm URI="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#STR-Transform"
                           JAVACLASS="org.apache.wss4j.stax.impl.transformer.STRTransformer" />
 
+       <TransformAlgorithm URI="http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Content-Signature-Transform"
+                           JAVACLASS="org.apache.wss4j.stax.impl.transformer.AttachmentContentSignatureTransform" />
+       <TransformAlgorithm URI="http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Complete-Signature-Transform"
+                           JAVACLASS="org.apache.wss4j.stax.impl.transformer.AttachmentCompleteSignatureTransform" />
+
        <!-- The compress-transformations are disabled by default because its not standard
        and could introduce potential security issues -->
        <!--
@@ -89,6 +95,8 @@
                   DESCRIPTION="A simple resolver for requests of same-document URIs"/>
         <Resolver JAVACLASS="org.apache.wss4j.stax.impl.resourceResolvers.ResolverXPointer"
                   DESCRIPTION="A simple resolver for requests of XPointer fragents"/>
+        <Resolver JAVACLASS="org.apache.wss4j.stax.impl.resourceResolvers.ResolverAttachment"
+                  DESCRIPTION="A simple resolver for SwA"/>
         <xi:include href="security-config.xml"
                     xpointer="xmlns(c=http://www.xmlsecurity.org/NS/configuration)xpointer(/c:Configuration/c:ResourceResolvers/c:Resolver[@JAVACLASS!='org.apache.xml.security.stax.impl.resourceResolvers.ResolverSameDocument' and @JAVACLASS!='org.apache.xml.security.stax.impl.resourceResolvers.ResolverXPointer'])"/>
     </ResourceResolvers>

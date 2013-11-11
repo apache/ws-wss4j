@@ -18,23 +18,31 @@
  */
 package org.apache.wss4j.stax.impl.processor.output;
 
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 
+import org.apache.wss4j.common.ext.Attachment;
+import org.apache.wss4j.common.ext.AttachmentRequestCallback;
+import org.apache.wss4j.common.ext.AttachmentResultCallback;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.config.TransformerAlgorithmMapper;
 import org.apache.xml.security.stax.ext.OutputProcessorChain;
 import org.apache.xml.security.stax.ext.SecurePart;
@@ -118,6 +126,122 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
         }
 
         outputProcessorChain.processEvent(xmlSecEvent);
+    }
+
+    @Override
+    public void doFinalInternal(OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
+        setupAttachmentEncryptionStreams(outputProcessorChain);
+        super.doFinalInternal(outputProcessorChain);
+    }
+
+    protected void setupAttachmentEncryptionStreams(OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
+
+        SecurePart attachmentSecurePart = null;
+
+        Map<Object, SecurePart> dynamicSecureParts = outputProcessorChain.getSecurityContext().getAsMap(XMLSecurityConstants.ENCRYPTION_PARTS);
+        Iterator<Map.Entry<Object, SecurePart>> securePartsMapIterator = dynamicSecureParts.entrySet().iterator();
+        while (securePartsMapIterator.hasNext()) {
+            Map.Entry<Object, SecurePart> securePartEntry = securePartsMapIterator.next();
+            final SecurePart securePart = securePartEntry.getValue();
+            final String externalReference = securePart.getExternalReference();
+            if (externalReference != null && "cid:Attachments".equals(externalReference)) {
+                attachmentSecurePart = securePart;
+                break;
+            }
+        }
+        if (attachmentSecurePart == null) {
+            return;
+        }
+
+        CallbackHandler attachmentCallbackHandler =
+                ((WSSSecurityProperties) getSecurityProperties()).getAttachmentCallbackHandler();
+        if (attachmentCallbackHandler == null) {
+            throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE,
+                    "empty", "no attachment callbackhandler supplied"
+            );
+        }
+
+        AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
+        try {
+            attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
+        } catch (Exception e) {
+            throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, e
+            );
+        }
+        List<Attachment> attachments = attachmentRequestCallback.getAttachments();
+        if (attachments == null || attachments.isEmpty()) {
+            throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE,
+                    "noEncElement"
+            );
+        }
+
+        for (int i = 0; i < attachments.size(); i++) {
+            final Attachment attachment = attachments.get(i);
+            final String attachmentId = attachment.getId();
+
+            String tokenId = outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION);
+            SecurityTokenProvider<OutboundSecurityToken> securityTokenProvider =
+                    outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
+            OutboundSecurityToken securityToken = securityTokenProvider.getSecurityToken();
+            EncryptionPartDef encryptionPartDef = new EncryptionPartDef();
+            encryptionPartDef.setSecurePart(attachmentSecurePart);
+            encryptionPartDef.setModifier(attachmentSecurePart.getModifier());
+            encryptionPartDef.setCipherReferenceId(attachment.getId());
+            encryptionPartDef.setMimeType(attachment.getMimeType());
+            encryptionPartDef.setEncRefId(IDGenerator.generateID(null));
+            encryptionPartDef.setKeyId(securityTokenProvider.getId());
+            encryptionPartDef.setSymmetricKey(securityToken.getSecretKey(getSecurityProperties().getEncryptionSymAlgorithm()));
+            outputProcessorChain.getSecurityContext().putAsList(EncryptionPartDef.class, encryptionPartDef);
+
+            final Attachment resultAttachment = new Attachment();
+            resultAttachment.setId(attachmentId);
+            resultAttachment.setMimeType("application/octet-stream");
+
+            String encryptionSymAlgorithm = getSecurityProperties().getEncryptionSymAlgorithm();
+            String jceAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(encryptionSymAlgorithm);
+            if (jceAlgorithm == null) {
+                throw new XMLSecurityException("algorithms.NoSuchMap", encryptionSymAlgorithm);
+            }
+            //initialize the cipher
+            Cipher cipher = null;
+            try {
+                cipher = Cipher.getInstance(jceAlgorithm);
+
+                // The Spec mandates a 96-bit IV for GCM algorithms
+                if ("AES/GCM/NoPadding".equals(cipher.getAlgorithm())) {
+                    byte[] temp = new byte[12];
+                    XMLSecurityConstants.secureRandom.nextBytes(temp);
+                    IvParameterSpec ivParameterSpec = new IvParameterSpec(temp);
+                    cipher.init(Cipher.ENCRYPT_MODE, encryptionPartDef.getSymmetricKey(), ivParameterSpec);
+                } else {
+                    cipher.init(Cipher.ENCRYPT_MODE, encryptionPartDef.getSymmetricKey());
+                }
+            } catch (Exception e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
+            }
+
+            final Map<String, String> headers = new HashMap<String, String>();
+            headers.putAll(attachment.getHeaders());
+            resultAttachment.setSourceStream(
+                    AttachmentUtils.setupAttachmentEncryptionStream(
+                            cipher,
+                            SecurePart.Modifier.Element == encryptionPartDef.getModifier(),
+                            attachment, headers
+                    ));
+            resultAttachment.addHeaders(headers);
+
+            final AttachmentResultCallback attachmentResultCallback = new AttachmentResultCallback();
+            attachmentResultCallback.setAttachmentId(attachmentId);
+            attachmentResultCallback.setAttachment(resultAttachment);
+            try {
+                attachmentCallbackHandler.handle(new Callback[]{attachmentResultCallback});
+            } catch (Exception e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
+            }
+        }
     }
 
     /**

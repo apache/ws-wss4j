@@ -21,7 +21,11 @@ package org.apache.wss4j.stax.impl.processor.input;
 import org.apache.wss4j.binding.wss10.TransformationParametersType;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.cache.ReplayCache;
+import org.apache.wss4j.common.ext.Attachment;
+import org.apache.wss4j.common.ext.AttachmentRequestCallback;
+import org.apache.wss4j.common.ext.AttachmentResultCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.impl.transformer.AttachmentContentSignatureTransform;
 import org.apache.wss4j.stax.securityToken.SecurityTokenReference;
 import org.apache.xml.security.binding.excc14n.InclusiveNamespaces;
 import org.apache.xml.security.binding.xmldsig.CanonicalizationMethodType;
@@ -33,6 +37,9 @@ import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.processor.input.AbstractSignatureReferenceVerifyInputProcessor;
+import org.apache.xml.security.stax.impl.transformer.canonicalizer.Canonicalizer20010315_Excl;
+import org.apache.xml.security.stax.impl.util.DigestOutputStream;
+import org.apache.xml.security.stax.impl.util.UnsynchronizedBufferedOutputStream;
 import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.apache.wss4j.stax.ext.*;
@@ -42,14 +49,15 @@ import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignatureReferenceVerifyInputProcessor {
 
@@ -62,6 +70,108 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
         this.addAfterProcessor(WSSSignatureReferenceVerifyInputProcessor.class.getName());
 
         checkBSPCompliance((WSInboundSecurityContext)inputProcessorChain.getSecurityContext());
+    }
+
+    @Override
+    protected void verifyExternalReference(
+            InputProcessorChain inputProcessorChain, InputStream inputStream,
+            final ReferenceType referenceType) throws XMLSecurityException, XMLStreamException {
+
+        if (referenceType.getURI().startsWith("cid:")) {
+
+            CallbackHandler attachmentCallbackHandler =
+                    ((WSSSecurityProperties) getSecurityProperties()).getAttachmentCallbackHandler();
+            if (attachmentCallbackHandler == null) {
+                throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.INVALID_SECURITY,
+                        "empty", "no attachment callbackhandler supplied"
+                );
+            }
+
+            String attachmentId = referenceType.getURI().substring(4);
+
+            AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
+            attachmentRequestCallback.setAttachmentId(attachmentId);
+            try {
+                attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
+            } catch (Exception e) {
+                throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+            }
+            List<Attachment> attachments = attachmentRequestCallback.getAttachments();
+            if (attachments == null || attachments.isEmpty() || !attachmentId.equals(attachments.get(0).getId())) {
+                throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.INVALID_SECURITY,
+                        "empty", "Attachment not found"
+                );
+            }
+
+            final Attachment attachment = attachments.get(0);
+
+            InputStream attachmentInputStream = attachment.getSourceStream();
+            if (!attachmentInputStream.markSupported()) {
+                attachmentInputStream = new BufferedInputStream(attachmentInputStream);
+            }
+            //todo workaround 2GB limit somehow?
+            attachmentInputStream.mark(Integer.MAX_VALUE); //we can process at maximum 2G with the standard jdk streams
+
+            try {
+                DigestOutputStream digestOutputStream =
+                        createMessageDigestOutputStream(referenceType, inputProcessorChain.getSecurityContext());
+                UnsynchronizedBufferedOutputStream bufferedDigestOutputStream =
+                        new UnsynchronizedBufferedOutputStream(digestOutputStream);
+
+                if (referenceType.getTransforms() != null) {
+                    Transformer transformer =
+                            buildTransformerChain(referenceType, bufferedDigestOutputStream, inputProcessorChain, null);
+                    if (!(transformer instanceof AttachmentContentSignatureTransform)) {
+                        throw new WSSecurityException(
+                                WSSecurityException.ErrorCode.INVALID_SECURITY,
+                                "empty", "First transform must be Attachment[Content|Complete]SignatureTransform"
+                        );
+                    }
+                    Map<String, Object> transformerProperties = new HashMap<String, Object>(2);
+                    transformerProperties.put(
+                            AttachmentContentSignatureTransform.ATTACHMENT, attachment);
+                    transformer.setProperties(transformerProperties);
+
+                    transformer.transform(attachmentInputStream);
+
+                    bufferedDigestOutputStream.close();
+                } else {
+                    XMLSecurityUtils.copy(attachmentInputStream, bufferedDigestOutputStream);
+                    bufferedDigestOutputStream.close();
+                }
+                compareDigest(digestOutputStream.getDigestValue(), referenceType);
+
+                //reset the inputStream to be able to reuse it
+                attachmentInputStream.reset();
+
+            } catch (IOException e) {
+                throw new XMLSecurityException(e);
+            }
+
+            //create a new attachment and do the result callback
+            final Attachment resultAttachment = new Attachment();
+            resultAttachment.setId(attachmentId);
+            resultAttachment.setMimeType(attachment.getMimeType());
+            resultAttachment.addHeaders(attachment.getHeaders());
+            resultAttachment.setSourceStream(attachmentInputStream);
+
+            AttachmentResultCallback attachmentResultCallback = new AttachmentResultCallback();
+            attachmentResultCallback.setAttachmentId(attachmentId);
+            attachmentResultCallback.setAttachment(resultAttachment);
+            try {
+                attachmentCallbackHandler.handle(new Callback[]{attachmentResultCallback});
+            } catch (Exception e) {
+                throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+            }
+
+        } else {
+            super.verifyExternalReference(
+                    inputProcessorChain, inputStream, referenceType);
+        }
     }
 
     private void checkBSPCompliance(WSInboundSecurityContext securityContext) throws WSSecurityException {
@@ -225,11 +335,20 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                         XMLSecurityUtils.getQNameType(transformationParametersType.getAny(), WSSConstants.TAG_dsig_CanonicalizationMethod);
                 if (canonicalizationMethodType != null) {
 
+                    algorithm = canonicalizationMethodType.getAlgorithm();
+
                     InclusiveNamespaces inclusiveNamespacesType =
                             XMLSecurityUtils.getQNameType(canonicalizationMethodType.getContent(), XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
-                    List<String> inclusiveNamespaces = inclusiveNamespacesType != null ? inclusiveNamespacesType.getPrefixList() : null;
-                    algorithm = canonicalizationMethodType.getAlgorithm();
-                    parentTransformer = WSSUtils.getTransformer(inclusiveNamespaces, outputStream, algorithm, XMLSecurityConstants.DIRECTION.IN);
+
+                    Map<String, Object> transformerProperties = null;
+                    if (inclusiveNamespacesType != null) {
+                        transformerProperties = new HashMap<String, Object>();
+                        transformerProperties.put(
+                                Canonicalizer20010315_Excl.INCLUSIVE_NAMESPACES_PREFIX_LIST,
+                                inclusiveNamespacesType.getPrefixList());
+                    }
+                    parentTransformer = WSSUtils.getTransformer(
+                            null, outputStream, transformerProperties, algorithm, XMLSecurityConstants.DIRECTION.IN);
                 }
             }
             algorithm = transformType.getAlgorithm();
@@ -239,13 +358,23 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             algorithmSuiteSecurityEvent.setCorrelationID(referenceType.getId());
             inputProcessorChain.getSecurityContext().registerSecurityEvent(algorithmSuiteSecurityEvent);
 
-            InclusiveNamespaces inclusiveNamespacesType = XMLSecurityUtils.getQNameType(transformType.getContent(), XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
-            List<String> inclusiveNamespaces = inclusiveNamespacesType != null ? inclusiveNamespacesType.getPrefixList() : null;
+            InclusiveNamespaces inclusiveNamespacesType =
+                    XMLSecurityUtils.getQNameType(transformType.getContent(), XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
+
+            Map<String, Object> transformerProperties = null;
+            if (inclusiveNamespacesType != null) {
+                transformerProperties = new HashMap<String, Object>();
+                transformerProperties.put(
+                        Canonicalizer20010315_Excl.INCLUSIVE_NAMESPACES_PREFIX_LIST,
+                        inclusiveNamespacesType.getPrefixList());
+            }
 
             if (parentTransformer != null) {
-                parentTransformer = WSSUtils.getTransformer(parentTransformer, inclusiveNamespaces, algorithm, XMLSecurityConstants.DIRECTION.IN);
+                parentTransformer = WSSUtils.getTransformer(
+                        parentTransformer, null, transformerProperties, algorithm, XMLSecurityConstants.DIRECTION.IN);
             } else {
-                parentTransformer = WSSUtils.getTransformer(inclusiveNamespaces, outputStream, algorithm, XMLSecurityConstants.DIRECTION.IN);
+                parentTransformer = WSSUtils.getTransformer(
+                        null, outputStream, transformerProperties, algorithm, XMLSecurityConstants.DIRECTION.IN);
             }
         }
 

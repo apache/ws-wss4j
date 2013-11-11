@@ -26,6 +26,7 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import javax.security.auth.callback.CallbackHandler;
 import java.util.List;
 
 /**
@@ -47,6 +48,8 @@ public class WSSecBase {
     protected CallbackLookup callbackLookup;
 
     private WSSConfig wssConfig;
+
+    protected CallbackHandler attachmentCallbackHandler;
     
     public WSSecBase() {
     }
@@ -120,7 +123,10 @@ public class WSSecBase {
         }
         return wssConfig;
     }
-     
+
+    public void setAttachmentCallbackHandler(CallbackHandler attachmentCallbackHandler) {
+        this.attachmentCallbackHandler = attachmentCallbackHandler;
+    }
 
     /**
      * Looks up or adds a body id. <p/> First try to locate the

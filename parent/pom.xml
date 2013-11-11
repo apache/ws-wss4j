@@ -36,6 +36,7 @@
     <properties>
         <bcprov.version>1.49</bcprov.version>
         <ehcache.version>2.7.4</ehcache.version>
+        <geronimo.javamail.version>1.7.1</geronimo.javamail.version>
         <jasypt.version>1.9.0</jasypt.version>
         <log4j.version>1.2.17</log4j.version>
         <neethi.version>3.0.2</neethi.version>
@@ -90,6 +91,11 @@
                 <groupId>org.opensaml</groupId>
                 <artifactId>opensaml</artifactId>
                 <version>${opensaml.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                <version>${geronimo.javamail.version}</version>
             </dependency>
             <dependency>
                 <groupId>log4j</groupId>

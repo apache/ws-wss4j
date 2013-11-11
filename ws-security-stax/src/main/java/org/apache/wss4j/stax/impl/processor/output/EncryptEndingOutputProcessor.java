@@ -22,6 +22,7 @@ import org.apache.wss4j.stax.impl.SecurityHeaderOrder;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.OutputProcessorChain;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.impl.EncryptionPartDef;
 import org.apache.xml.security.stax.impl.processor.output.AbstractEncryptEndingOutputProcessor;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
@@ -49,6 +50,9 @@ public class EncryptEndingOutputProcessor extends AbstractEncryptEndingOutputPro
             || !((WSSSecurityProperties)getSecurityProperties()).isEncryptSymmetricEncrytionKey()) {
             WSSUtils.createReferenceListStructureForEncryption(this, subOutputProcessorChain);
         }
+        if (attachmentCount(outputProcessorChain) > 0) {
+            WSSUtils.createEncryptedDataStructureForAttachments(this, subOutputProcessorChain);
+        }
     }
 
     @Override
@@ -70,6 +74,11 @@ public class EncryptEndingOutputProcessor extends AbstractEncryptEndingOutputPro
                             || !((WSSSecurityProperties)getSecurityProperties()).isEncryptSymmetricEncrytionKey()) {
                             WSSUtils.updateSecurityHeaderOrder(
                                     outputProcessorChain, WSSConstants.TAG_xenc_ReferenceList, getAction(), true);                            
+                        }
+                        int attachmentCount = attachmentCount(outputProcessorChain);
+                        for (int i = 0; i < attachmentCount; i++) {
+                            WSSUtils.updateSecurityHeaderOrder(
+                                    outputProcessorChain, WSSConstants.TAG_xenc_EncryptedData, getAction(), true);
                         }
                         List<SecurityHeaderOrder> securityHeaderOrderList = 
                                 outputProcessorChain.getSecurityContext().getAsList(SecurityHeaderOrder.class);
@@ -93,5 +102,24 @@ public class EncryptEndingOutputProcessor extends AbstractEncryptEndingOutputPro
             outputProcessorChain.processEvent(xmlSecEvent);
         }
         super.flushBufferAndCallbackAfterHeader(outputProcessorChain, xmlSecEventDeque);
+    }
+
+    private int attachmentCount(OutputProcessorChain outputProcessorChain) {
+        List<EncryptionPartDef> encryptionPartDefs =
+                outputProcessorChain.getSecurityContext().getAsList(EncryptionPartDef.class);
+        if (encryptionPartDefs == null) {
+            return 0;
+        }
+
+        int count = 0;
+        Iterator<EncryptionPartDef> encryptionPartDefIterator = encryptionPartDefs.iterator();
+        while (encryptionPartDefIterator.hasNext()) {
+            EncryptionPartDef encryptionPartDef = encryptionPartDefIterator.next();
+
+            if (encryptionPartDef.getCipherReferenceId() != null) {
+                count++;
+            }
+        }
+        return count;
     }
 }

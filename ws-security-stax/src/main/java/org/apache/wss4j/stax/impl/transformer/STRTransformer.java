@@ -25,7 +25,9 @@ import org.apache.xml.security.stax.impl.transformer.TransformIdentity;
 import org.apache.xml.security.stax.impl.transformer.canonicalizer.Canonicalizer20010315_Excl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class STRTransformer extends TransformIdentity {
 
@@ -34,15 +36,14 @@ public class STRTransformer extends TransformIdentity {
         if (!(transformer instanceof Canonicalizer20010315_Excl)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        ((Canonicalizer20010315_Excl) transformer).setPropagateDefaultNamespace(true);
         List<String> inclusiveNamespacesPrefixList = new ArrayList<String>();
         inclusiveNamespacesPrefixList.add("#default");
-        transformer.setList(inclusiveNamespacesPrefixList);
+        Map<String, Object> transformerProperties = new HashMap<String, Object>();
+        transformerProperties.put(
+            Canonicalizer20010315_Excl.INCLUSIVE_NAMESPACES_PREFIX_LIST, inclusiveNamespacesPrefixList);
+        transformerProperties.put(Canonicalizer20010315_Excl.PROPAGATE_DEFAULT_NAMESPACE, Boolean.TRUE);
+        transformer.setProperties(transformerProperties);
         super.setTransformer(transformer);
     }
 
-    @Override
-    public void setList(@SuppressWarnings("rawtypes") List list) throws XMLSecurityException {
-        throw new UnsupportedOperationException();
-    }
 }

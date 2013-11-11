@@ -209,8 +209,16 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final QName TAG_wst0512_BinarySecret = new QName(NS_WST_05_12, "BinarySecret");
 
     public static final String SOAPMESSAGE_NS10_STRTransform = NS10_SOAPMESSAGE_SECURITY + "#STR-Transform";
-    public static final String SWA_ATTACHMENT_CONTENT_SIG_TRANS = "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Content-Signature-Transform";
-    public static final String SWA_ATTACHMENT_COMPLETE_SIG_TRANS = "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Complete-Signature-Transform";
+    public static final String SWA_ATTACHMENT_CONTENT_SIG_TRANS =
+            "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Content-Signature-Transform";
+    public static final String SWA_ATTACHMENT_COMPLETE_SIG_TRANS =
+            "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Complete-Signature-Transform";
+    public static final String SWA_ATTACHMENT_CIPHERTEXT_TRANS =
+            "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Ciphertext-Transform";
+    public static final String SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY =
+            "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Content-Only";
+    public static final String SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE =
+            "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Complete";
 
     public static final QName TAG_saml_Assertion = new QName(NS_SAML, "Assertion");
     public static final QName TAG_saml2_Assertion = new QName(NS_SAML2, "Assertion");

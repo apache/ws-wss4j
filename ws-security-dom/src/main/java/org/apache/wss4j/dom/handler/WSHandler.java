@@ -1234,6 +1234,10 @@ public abstract class WSHandler {
                     new WSEncryptionPart(partDef[0].trim(),
                             reqData.getSoapConstants().getEnvelopeURI(),
                             "Content");
+            } else if (partDef.length == 2) {
+                String mode = partDef[0].trim().substring(1);
+                String element = partDef[1].trim();
+                encPart = new WSEncryptionPart(element, mode);
             } else if (partDef.length == 3) {
                 String mode = partDef[0].trim();
                 if (mode.length() <= 1) {

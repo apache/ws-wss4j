@@ -70,6 +70,7 @@ public class RequestData {
     private int derivedKeyIterations = UsernameToken.DEFAULT_ITERATION;
     private boolean useDerivedKeyForMAC = true;
     private CallbackHandler callback;
+    private CallbackHandler attachmentCallbackHandler;
     private boolean enableRevocation;
     protected boolean requireSignedEncryptedDataElements;
     private ReplayCache timestampReplayCache;
@@ -102,6 +103,7 @@ public class RequestData {
         derivedKeyIterations = UsernameToken.DEFAULT_ITERATION;
         useDerivedKeyForMAC = true;
         callback = null;
+        attachmentCallbackHandler = null;
         enableRevocation = false;
         timestampReplayCache = null;
         nonceReplayCache = null;
@@ -319,6 +321,14 @@ public class RequestData {
      */
     public CallbackHandler getCallbackHandler() {
         return callback;
+    }
+
+    public CallbackHandler getAttachmentCallbackHandler() {
+        return attachmentCallbackHandler;
+    }
+
+    public void setAttachmentCallbackHandler(CallbackHandler attachmentCallbackHandler) {
+        this.attachmentCallbackHandler = attachmentCallbackHandler;
     }
 
     /**

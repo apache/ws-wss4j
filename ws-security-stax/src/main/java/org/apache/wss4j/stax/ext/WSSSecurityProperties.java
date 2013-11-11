@@ -116,6 +116,8 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private boolean validateSamlSubjectConfirmation = true;
     private Collection<Pattern> subjectDNPatterns = new ArrayList<Pattern>();
 
+    private CallbackHandler attachmentCallbackHandler;
+
     public WSSSecurityProperties() {
         super();
         setAddExcC14NInclusivePrefixes(true);
@@ -172,6 +174,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.validateSamlSubjectConfirmation = wssSecurityProperties.validateSamlSubjectConfirmation;
         this.encryptSymmetricEncrytionKey = wssSecurityProperties.encryptSymmetricEncrytionKey;
         this.subjectDNPatterns = wssSecurityProperties.subjectDNPatterns;
+        this.attachmentCallbackHandler = wssSecurityProperties.attachmentCallbackHandler;
     }
 
     /**
@@ -728,7 +731,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public void setUtFutureTTL(Integer utFutureTTL) {
         this.utFutureTTL = utFutureTTL;
-    }
+    }    
     
     /**
      * Set the replay cache for Timestamps
@@ -946,5 +949,12 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     public void setUse200512Namespace(boolean use200512Namespace) {
         this.use200512Namespace = use200512Namespace;
     }
-    
+
+    public CallbackHandler getAttachmentCallbackHandler() {
+        return attachmentCallbackHandler;
+    }
+
+    public void setAttachmentCallbackHandler(CallbackHandler attachmentCallbackHandler) {
+        this.attachmentCallbackHandler = attachmentCallbackHandler;
+    }
 }

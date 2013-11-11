@@ -96,6 +96,12 @@ public final class WSConstants {
         "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Content-Signature-Transform";
     public static final String SWA_ATTACHMENT_COMPLETE_SIG_TRANS = 
         "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Complete-Signature-Transform";
+    public static final String SWA_ATTACHMENT_CIPHERTEXT_TRANS =
+        "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Ciphertext-Transform";
+    public static final String SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY =
+        "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Content-Only";
+    public static final String SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE =
+        "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Complete";
     
     public static final String KEYTRANSPORT_RSA15 = 
         "http://www.w3.org/2001/04/xmlenc#rsa-1_5";

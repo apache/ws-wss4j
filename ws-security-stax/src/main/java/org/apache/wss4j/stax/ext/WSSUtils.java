@@ -465,6 +465,103 @@ public class WSSUtils extends XMLSecurityUtils {
                 outputProcessorChain, XMLSecurityConstants.TAG_xenc_ReferenceList);
     }
 
+    public static void createEncryptedDataStructureForAttachments(
+            AbstractOutputProcessor abstractOutputProcessor, OutputProcessorChain outputProcessorChain)
+            throws XMLStreamException, XMLSecurityException {
+        
+        List<EncryptionPartDef> encryptionPartDefs =
+                outputProcessorChain.getSecurityContext().getAsList(EncryptionPartDef.class);
+        if (encryptionPartDefs == null) {
+            return;
+        }
+
+        Iterator<EncryptionPartDef> encryptionPartDefIterator = encryptionPartDefs.iterator();
+        while (encryptionPartDefIterator.hasNext()) {
+            EncryptionPartDef encryptionPartDef = encryptionPartDefIterator.next();
+
+            if (encryptionPartDef.getCipherReferenceId() == null) {
+                continue;
+            }
+
+            List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(3);
+            attributes.add(abstractOutputProcessor.createAttribute(XMLSecurityConstants.ATT_NULL_Id,
+                    encryptionPartDef.getEncRefId()));
+            if (encryptionPartDef.getModifier() == SecurePart.Modifier.Element) {
+                attributes.add(
+                        abstractOutputProcessor.createAttribute(XMLSecurityConstants.ATT_NULL_Type,
+                                WSSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE));
+            } else {
+                attributes.add(
+                        abstractOutputProcessor.createAttribute(XMLSecurityConstants.ATT_NULL_Type,
+                                WSSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY));
+            }
+            attributes.add(
+                    abstractOutputProcessor.createAttribute(XMLSecurityConstants.ATT_NULL_MimeType,
+                            encryptionPartDef.getMimeType()));
+            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain,
+                    XMLSecurityConstants.TAG_xenc_EncryptedData, true, attributes);
+
+            attributes = new ArrayList<XMLSecAttribute>(1);
+            attributes.add(abstractOutputProcessor.createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm,
+                    abstractOutputProcessor.getSecurityProperties().getEncryptionSymAlgorithm()));
+            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain,
+                    XMLSecurityConstants.TAG_xenc_EncryptionMethod, false, attributes);
+
+            abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain,
+                    XMLSecurityConstants.TAG_xenc_EncryptionMethod);
+
+            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain,
+                    XMLSecurityConstants.TAG_dsig_KeyInfo, true, null);
+
+            attributes = new ArrayList<XMLSecAttribute>(1);
+            attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_wsse11_TokenType,
+                    WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
+            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain,
+                    WSSConstants.TAG_wsse_SecurityTokenReference, true, attributes);
+
+            attributes = new ArrayList<XMLSecAttribute>(1);
+            attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_URI,
+                    "#" + encryptionPartDef.getKeyId()));
+            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain,
+                    WSSConstants.TAG_wsse_Reference, false, attributes);
+            abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain,
+                    WSSConstants.TAG_wsse_Reference);
+            abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain,
+                    WSSConstants.TAG_wsse_SecurityTokenReference);
+            abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain,
+                    XMLSecurityConstants.TAG_dsig_KeyInfo);
+
+            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain,
+                    XMLSecurityConstants.TAG_xenc_CipherData, false, null);
+
+            attributes = new ArrayList<XMLSecAttribute>(1);
+            attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_URI,
+                    "cid:" + encryptionPartDef.getCipherReferenceId()));
+            abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain,
+                    XMLSecurityConstants.TAG_xenc_CipherReference, false, attributes);
+
+            abstractOutputProcessor.createStartElementAndOutputAsEvent(
+                    outputProcessorChain, XMLSecurityConstants.TAG_xenc_Transforms, false, null);
+
+            attributes = new ArrayList<XMLSecAttribute>(1);
+            attributes.add(abstractOutputProcessor.createAttribute(
+                    XMLSecurityConstants.ATT_NULL_Algorithm, WSSConstants.SWA_ATTACHMENT_CIPHERTEXT_TRANS));
+            abstractOutputProcessor.createStartElementAndOutputAsEvent(
+                    outputProcessorChain, XMLSecurityConstants.TAG_dsig_Transform, true, attributes);
+            abstractOutputProcessor.createEndElementAndOutputAsEvent(
+                    outputProcessorChain, XMLSecurityConstants.TAG_dsig_Transform);
+            abstractOutputProcessor.createEndElementAndOutputAsEvent(
+                    outputProcessorChain, XMLSecurityConstants.TAG_dsig_Transforms);
+
+            abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain,
+                    XMLSecurityConstants.TAG_xenc_CipherReference);
+            abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain,
+                    XMLSecurityConstants.TAG_xenc_CipherData);
+            abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain,
+                    XMLSecurityConstants.TAG_xenc_EncryptedData);
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public static TokenSecurityEvent<? extends InboundSecurityToken> 
         createTokenSecurityEvent(final InboundSecurityToken inboundSecurityToken, String correlationID) throws WSSecurityException {

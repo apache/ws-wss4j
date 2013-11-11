@@ -181,7 +181,11 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
     }
     
     private SecurePart convertSecurePart(SecurePart securePart, String soapVersion) {
-        QName secureName = securePart.getName();
+        final QName secureName = securePart.getName();
+        if (secureName == null) {
+            return securePart;
+        }
+
         QName newName = secureName;
         
         if (WSSConstants.NS_SOAP11.equals(secureName.getNamespaceURI())

@@ -30,7 +30,6 @@ import javax.crypto.SecretKey;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
@@ -47,8 +46,6 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.str.STRParser;
 import org.apache.wss4j.dom.str.SecurityTokenRefSTRParser;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.xml.security.encryption.XMLCipher;
-import org.apache.xml.security.encryption.XMLEncryptionException;
 
 /**
  * This will process incoming <code>xenc:EncryptedData</code> elements.
@@ -68,7 +65,28 @@ public class EncryptedDataProcessor implements Processor {
         if (log.isDebugEnabled()) {
             log.debug("Found EncryptedData element");
         }
-        Element kiElem = 
+
+        final String encryptedDataId = elem.getAttributeNS(null, "Id");
+
+        if (encryptedDataId != null) {
+            List<WSSecurityEngineResult> decryptionResults = wsDocInfo.getResultsByTag(WSConstants.ENCR);
+            for (int i = 0; i < decryptionResults.size(); i++) {
+                WSSecurityEngineResult wsSecurityEngineResult = decryptionResults.get(i);
+                @SuppressWarnings("unchecked")
+                List<WSDataRef> dataRefUris = (List<WSDataRef>)wsSecurityEngineResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+                if (dataRefUris == null) {
+                    continue;
+                }
+                for (int j = 0; j < dataRefUris.size(); j++) {
+                    WSDataRef wsDataRef = dataRefUris.get(j);
+                    if (encryptedDataId.equals(wsDataRef.getWsuId())) {
+                        return new ArrayList<WSSecurityEngineResult>();
+                    }
+                }
+            }
+        }
+
+        Element kiElem =
             WSSecurityUtil.getDirectChildElement(elem, "KeyInfo", WSConstants.SIG_NS);
         // KeyInfo cannot be null
         if (kiElem == null) {
@@ -108,6 +126,7 @@ public class EncryptedDataProcessor implements Processor {
             byte[] secretKey = strParser.getSecretKey();
             principal = strParser.getPrincipal();
             key = KeyUtils.prepareSecretKey(symEncAlgo, secretKey);
+            encrKeyResults = new ArrayList<WSSecurityEngineResult>();
         } else if (encryptedKeyElement != null) {
             EncryptedKeyProcessor encrKeyProc = new EncryptedKeyProcessor();
             encrKeyResults = encrKeyProc.handleToken(encryptedKeyElement, request, wsDocInfo);
@@ -137,76 +156,37 @@ public class EncryptedDataProcessor implements Processor {
             algorithmSuiteValidator.checkSymmetricKeyLength(key.getEncoded().length);
             algorithmSuiteValidator.checkSymmetricEncryptionAlgorithm(symEncAlgo);
         }
-        
-        // initialize Cipher ....
-        XMLCipher xmlCipher = null;
-        try {
-            xmlCipher = XMLCipher.getInstance(symEncAlgo);
-            xmlCipher.setSecureValidation(true);
-            xmlCipher.init(XMLCipher.DECRYPT_MODE, key);
-        } catch (XMLEncryptionException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex
-            );
-        }
-        Node previousSibling = elem.getPreviousSibling();
-        Node parent = elem.getParentNode();
-        try {
-            xmlCipher.doFinal(elem.getOwnerDocument(), elem, false);
-        } catch (Exception e) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_CHECK, e
-            );
-        }
-        
-        WSDataRef dataRef = new WSDataRef();
-        dataRef.setWsuId(elem.getAttributeNS(null, "Id"));
-        dataRef.setAlgorithm(symEncAlgo);
-        dataRef.setContent(false);
-        
-        Node decryptedNode;
-        if (previousSibling == null) {
-            decryptedNode = parent.getFirstChild();
-        } else {
-            decryptedNode = previousSibling.getNextSibling();
-        }
-        if (decryptedNode != null && Node.ELEMENT_NODE == decryptedNode.getNodeType()) {
-            dataRef.setProtectedElement((Element)decryptedNode);
-        }
-        dataRef.setXpath(ReferenceListProcessor.getXPath(decryptedNode));
-        
-        WSSecurityEngineResult result = 
+
+        WSDataRef dataRef = ReferenceListProcessor.decryptEncryptedData(
+                elem.getOwnerDocument(), encryptedDataId, elem, key, symEncAlgo, request);
+
+        WSSecurityEngineResult result =
                 new WSSecurityEngineResult(WSConstants.ENCR, Collections.singletonList(dataRef));
-        result.put(WSSecurityEngineResult.TAG_ID, elem.getAttributeNS(null, "Id"));
+        result.put(WSSecurityEngineResult.TAG_ID, encryptedDataId);
         wsDocInfo.addResult(result);
         wsDocInfo.addTokenElement(elem);
         
         List<WSSecurityEngineResult> completeResults = 
             new ArrayList<WSSecurityEngineResult>();
-        if (encrKeyResults != null) {
-            completeResults.addAll(encrKeyResults);
-        }
+        completeResults.addAll(encrKeyResults);
         completeResults.add(result);
         
         WSSConfig wssConfig = request.getWssConfig();
         if (wssConfig != null) {
             // Get hold of the plain text element
-            Element decryptedElem;
-            if (previousSibling == null) {
-                decryptedElem = (Element)parent.getFirstChild();
-            } else {
-                decryptedElem = (Element)previousSibling.getNextSibling();
-            }
-            QName el = new QName(decryptedElem.getNamespaceURI(), decryptedElem.getLocalName());
-            Processor proc = request.getWssConfig().getProcessor(el);
-            if (proc != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Processing decrypted element with: " + proc.getClass().getName());
+            Element decryptedElem = dataRef.getProtectedElement();
+            if (decryptedElem != null) { //is null if we processed an attachment
+                QName el = new QName(decryptedElem.getNamespaceURI(), decryptedElem.getLocalName());
+                Processor proc = request.getWssConfig().getProcessor(el);
+                if (proc != null) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Processing decrypted element with: " + proc.getClass().getName());
+                    }
+                    List<WSSecurityEngineResult> results =
+                            proc.handleToken(decryptedElem, request, wsDocInfo);
+                    completeResults.addAll(0, results);
+                    return completeResults;
                 }
-                List<WSSecurityEngineResult> results = 
-                    proc.handleToken(decryptedElem, request, wsDocInfo);
-                completeResults.addAll(0, results);
-                return completeResults;
             }
         }
         return completeResults;
@@ -233,5 +213,4 @@ public class EncryptedDataProcessor implements Processor {
             bspEnforcer.handleBSPRule(BSPRule.R5620);
         }
     }
-
 }

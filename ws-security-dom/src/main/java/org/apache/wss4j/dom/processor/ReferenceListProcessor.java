@@ -19,14 +19,27 @@
 
 package org.apache.wss4j.dom.processor;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 
+import org.apache.wss4j.common.ext.Attachment;
+import org.apache.wss4j.common.ext.AttachmentRequestCallback;
+import org.apache.wss4j.common.ext.AttachmentResultCallback;
+import org.apache.wss4j.common.util.AttachmentUtils;
+import org.apache.xml.security.algorithms.JCEMapper;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -78,8 +91,6 @@ public class ReferenceListProcessor implements Processor {
      * 
      * @param elem contains the <code>ReferenceList</code> to the encrypted
      *             data elements
-     * @param cb the callback handler to get the key for a key name stored if
-     *           <code>KeyInfo</code> inside the encrypted data elements
      */
     private List<WSDataRef> handleReferenceList(
         Element elem, 
@@ -198,7 +209,7 @@ public class ReferenceListProcessor implements Processor {
 
         return 
             decryptEncryptedData(
-                doc, dataRefURI, encryptedDataElement, symmetricKey, symEncAlgo
+                doc, dataRefURI, encryptedDataElement, symmetricKey, symEncAlgo, data
             );
     }
     
@@ -301,22 +312,99 @@ public class ReferenceListProcessor implements Processor {
         String dataRefURI,
         Element encData,
         SecretKey symmetricKey,
-        String symEncAlgo
+        String symEncAlgo,
+        RequestData requestData
     ) throws WSSecurityException {
-        XMLCipher xmlCipher = null;
-        try {
-            xmlCipher = XMLCipher.getInstance(symEncAlgo);
-            xmlCipher.setSecureValidation(true);
-            xmlCipher.init(XMLCipher.DECRYPT_MODE, symmetricKey);
-        } catch (XMLEncryptionException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex
-            );
-        }
 
         WSDataRef dataRef = new WSDataRef();
         dataRef.setWsuId(dataRefURI);
         dataRef.setAlgorithm(symEncAlgo);
+
+        String typeStr = encData.getAttribute("Type");
+        if (typeStr != null &&
+            (WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY.equals(typeStr) ||
+            WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE.equals(typeStr))) {
+
+            try {
+                Element cipherData = WSSecurityUtil.getDirectChildElement(encData, "CipherData", WSConstants.ENC_NS);
+                if (cipherData == null) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+                }
+                Element cipherReference = WSSecurityUtil.getDirectChildElement(cipherData, "CipherReference", WSConstants.ENC_NS);
+                if (cipherReference == null) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+                }
+                String uri = cipherReference.getAttributeNS(null, "URI");
+                if (uri == null || uri.length() < 5) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+                }
+                if (!uri.startsWith("cid:")) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+                }
+
+                CallbackHandler attachmentCallbackHandler = requestData.getAttachmentCallbackHandler();
+                if (attachmentCallbackHandler == null) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+                }
+
+                final String attachmentId = uri.substring(4);
+
+                AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
+                attachmentRequestCallback.setAttachmentId(attachmentId);
+
+                attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
+                List<Attachment> attachments = attachmentRequestCallback.getAttachments();
+                if (attachments == null || attachments.isEmpty() || !attachmentId.equals(attachments.get(0).getId())) {
+                    throw new WSSecurityException(
+                            WSSecurityException.ErrorCode.INVALID_SECURITY,
+                            "empty", "Attachment not found"
+                    );
+                }
+                Attachment attachment = attachments.get(0);
+
+                final String encAlgo = X509Util.getEncAlgo(encData);
+                final String jceAlgorithm =
+                        JCEMapper.translateURItoJCEID(encAlgo);
+                final Cipher cipher = Cipher.getInstance(jceAlgorithm);
+
+                InputStream attachmentInputStream =
+                        AttachmentUtils.setupAttachmentDecryptionStream(
+                                encAlgo, cipher, symmetricKey, attachment.getSourceStream());
+
+                Attachment resultAttachment = new Attachment();
+                resultAttachment.setId(attachment.getId());
+                resultAttachment.setMimeType(encData.getAttributeNS(null, "MimeType"));
+                resultAttachment.setSourceStream(attachmentInputStream);
+                resultAttachment.addHeaders(attachment.getHeaders());
+
+                if (WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE.equals(typeStr)) {
+                    AttachmentUtils.readAndReplaceEncryptedAttachmentHeaders(
+                            resultAttachment.getHeaders(), attachmentInputStream);
+                }
+
+                AttachmentResultCallback attachmentResultCallback = new AttachmentResultCallback();
+                attachmentResultCallback.setAttachment(resultAttachment);
+                attachmentResultCallback.setAttachmentId(resultAttachment.getId());
+                attachmentCallbackHandler.handle(new Callback[]{attachmentResultCallback});
+
+            } catch (UnsupportedCallbackException e) {
+                throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILED_CHECK, e);
+            } catch (IOException e) {
+                throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILED_CHECK, e);
+            } catch (NoSuchAlgorithmException e) {
+                throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILED_CHECK, e);
+            } catch (NoSuchPaddingException e) {
+                throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILED_CHECK, e);
+            }
+
+            dataRef.setContent(true);
+            return dataRef;
+        }
+
         boolean content = X509Util.isContent(encData);
         dataRef.setContent(content);
         
@@ -325,6 +413,17 @@ public class ReferenceListProcessor implements Processor {
         if (content) {
             encData = (Element) encData.getParentNode();
             parent = encData.getParentNode();
+        }
+
+        XMLCipher xmlCipher = null;
+        try {
+            xmlCipher = XMLCipher.getInstance(symEncAlgo);
+            xmlCipher.setSecureValidation(true);
+            xmlCipher.init(XMLCipher.DECRYPT_MODE, symmetricKey);
+        } catch (XMLEncryptionException ex) {
+            throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex
+            );
         }
         
         try {

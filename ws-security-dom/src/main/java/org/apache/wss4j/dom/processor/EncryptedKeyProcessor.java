@@ -485,7 +485,7 @@ public class EncryptedKeyProcessor implements Processor {
         }
 
         return ReferenceListProcessor.decryptEncryptedData(
-            doc, dataRefURI, encryptedDataElement, symmetricKey, symEncAlgo
+            doc, dataRefURI, encryptedDataElement, symmetricKey, symEncAlgo, data
         );
     }
     

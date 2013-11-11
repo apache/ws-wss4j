@@ -18,42 +18,59 @@
  */
 package org.apache.wss4j.stax.impl.processor.input;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.security.Key;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.crypto.Cipher;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.wss4j.binding.wss10.SecurityTokenReferenceType;
 import org.apache.wss4j.common.bsp.BSPRule;
+import org.apache.wss4j.common.ext.Attachment;
+import org.apache.wss4j.common.ext.AttachmentRequestCallback;
+import org.apache.wss4j.common.ext.AttachmentResultCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
+import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.ext.WSSUtils;
+import org.apache.wss4j.stax.securityEvent.EncryptedPartSecurityEvent;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.binding.xmldsig.KeyInfoType;
 import org.apache.xml.security.binding.xmldsig.TransformType;
 import org.apache.xml.security.binding.xmldsig.TransformsType;
+import org.apache.xml.security.binding.xmlenc.CipherReferenceType;
 import org.apache.xml.security.binding.xmlenc.EncryptedDataType;
 import org.apache.xml.security.binding.xmlenc.ReferenceList;
 import org.apache.xml.security.binding.xmlenc.ReferenceType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.ConfigurationProperties;
 import org.apache.xml.security.stax.config.TransformerAlgorithmMapper;
-import org.apache.xml.security.stax.ext.*;
+import org.apache.xml.security.stax.ext.DocumentContext;
+import org.apache.xml.security.stax.ext.InboundSecurityContext;
+import org.apache.xml.security.stax.ext.InputProcessorChain;
+import org.apache.xml.security.stax.ext.SecurePart;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.XMLSecurityProperties;
+import org.apache.xml.security.stax.ext.XMLSecurityUtils;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.processor.input.AbstractDecryptInputProcessor;
 import org.apache.xml.security.stax.impl.util.LimitingInputStream;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.EncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSUtils;
-import org.apache.wss4j.stax.securityEvent.EncryptedPartSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
 
@@ -67,6 +84,8 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
         
     private static final Long maximumAllowedDecompressedBytes =
             Long.valueOf(ConfigurationProperties.getProperty("MaximumAllowedDecompressedBytes"));
+
+    private List<DeferredAttachment> attachmentReferences = new ArrayList<DeferredAttachment>();
 
     public DecryptInputProcessor(KeyInfoType keyInfoType, ReferenceList referenceList,
                                  WSSSecurityProperties securityProperties, WSInboundSecurityContext securityContext)
@@ -162,6 +181,37 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
     }
 
     @Override
+    protected void handleCipherReference(InputProcessorChain inputProcessorChain, EncryptedDataType encryptedDataType,
+                                         Cipher cipher, InboundSecurityToken inboundSecurityToken) throws XMLSecurityException {
+
+        String typeStr = encryptedDataType.getType();
+        if (typeStr != null &&
+                (WSSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY.equals(typeStr) ||
+                        WSSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE.equals(typeStr))) {
+
+            CipherReferenceType cipherReferenceType = encryptedDataType.getCipherData().getCipherReference();
+            if (cipherReferenceType == null) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+            }
+
+            final String uri = cipherReferenceType.getURI();
+            if (uri == null || uri.length() < 5) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+            }
+            if (!uri.startsWith("cid:")) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+            }
+
+            //we need to do a deferred processing of the attachments for two reasons:
+            //1.) if an attachment is encrypted and signed the order is preserved
+            //2.) the attachments are processed after the SOAP-Document which allows us to stream everything
+            attachmentReferences.add(
+                    new DeferredAttachment(encryptedDataType, cipher, inboundSecurityToken)
+            );
+        }
+    }
+
+    @Override
     protected AbstractDecryptedEventReaderInputProcessor newDecryptedEventReaderInputProcessor(
             boolean encryptedHeader, XMLSecStartElement xmlSecStartElement, EncryptedDataType encryptedDataType,
             InboundSecurityToken inboundSecurityToken, InboundSecurityContext inboundSecurityContext) throws XMLSecurityException {
@@ -222,6 +272,102 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
             }
         }
         super.doFinal(inputProcessorChain);
+
+        //now process the (deferred-) attachments:
+        for (int i = 0; i < attachmentReferences.size(); i++) {
+            DeferredAttachment deferredAttachment = attachmentReferences.get(i);
+
+            final EncryptedDataType encryptedDataType = deferredAttachment.getEncryptedDataType();
+            final InboundSecurityToken inboundSecurityToken = deferredAttachment.getInboundSecurityToken();
+            final Cipher cipher = deferredAttachment.getCipher();
+            final String uri = encryptedDataType.getCipherData().getCipherReference().getURI();
+            final String attachmentId = uri.substring(4);
+
+            CallbackHandler attachmentCallbackHandler =
+                ((WSSSecurityProperties) getSecurityProperties()).getAttachmentCallbackHandler();
+            if (attachmentCallbackHandler == null) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.INVALID_SECURITY,
+                    "empty", "no attachment callbackhandler supplied"
+                );
+            }
+
+            AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
+            attachmentRequestCallback.setAttachmentId(attachmentId);
+            try {
+                attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
+            } catch (Exception e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+            }
+            List<Attachment> attachments = attachmentRequestCallback.getAttachments();
+            if (attachments == null || attachments.isEmpty() || !attachmentId.equals(attachments.get(0).getId())) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.INVALID_SECURITY,
+                    "empty", "Attachment not found"
+                );
+            }
+
+            final Attachment attachment = attachments.get(0);
+
+            final String encAlgo = encryptedDataType.getEncryptionMethod().getAlgorithm();
+            final Key symmetricKey =
+                inboundSecurityToken.getSecretKey(encAlgo, XMLSecurityConstants.Enc, encryptedDataType.getId());
+
+            InputStream attachmentInputStream =
+                AttachmentUtils.setupAttachmentDecryptionStream(encAlgo, cipher, symmetricKey, attachment.getSourceStream());
+
+            Attachment resultAttachment = new Attachment();
+            resultAttachment.setId(attachment.getId());
+            resultAttachment.setMimeType(encryptedDataType.getMimeType());
+            resultAttachment.setSourceStream(attachmentInputStream);
+            resultAttachment.addHeaders(attachment.getHeaders());
+
+            if (WSSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE.equals(encryptedDataType.getType())) {
+                try {
+                    AttachmentUtils.readAndReplaceEncryptedAttachmentHeaders(
+                        resultAttachment.getHeaders(), attachmentInputStream);
+                } catch (IOException e) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+                }
+            }
+
+            AttachmentResultCallback attachmentResultCallback = new AttachmentResultCallback();
+            attachmentResultCallback.setAttachment(resultAttachment);
+            attachmentResultCallback.setAttachmentId(resultAttachment.getId());
+            try {
+                attachmentCallbackHandler.handle(new Callback[]{attachmentResultCallback});
+            } catch (Exception e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+            }
+        }
+    }
+    
+    private class DeferredAttachment {
+
+        private EncryptedDataType encryptedDataType;
+        private Cipher cipher;
+        private InboundSecurityToken inboundSecurityToken;
+
+        private DeferredAttachment(
+            EncryptedDataType encryptedDataType, Cipher cipher,
+            InboundSecurityToken inboundSecurityToken) {
+
+            this.encryptedDataType = encryptedDataType;
+            this.cipher = cipher;
+            this.inboundSecurityToken = inboundSecurityToken;
+        }
+
+        private EncryptedDataType getEncryptedDataType() {
+            return encryptedDataType;
+        }
+
+        private Cipher getCipher() {
+            return cipher;
+        }
+
+        private InboundSecurityToken getInboundSecurityToken() {
+            return inboundSecurityToken;
+        }
     }
 
     /*
