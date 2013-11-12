@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,27 +101,15 @@ public class AttachmentTest extends org.junit.Assert {
         builder.setParts(parts);
 
         final String attachmentId = UUID.randomUUID().toString();
-        final Attachment[] attachment = new Attachment[1];
-        attachment[0] = new Attachment();
-        attachment[0].setMimeType("text/xml");
-        attachment[0].addHeaders(getHeaders(attachmentId));
-        attachment[0].setId(attachmentId);
-        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        final Attachment attachment = new Attachment();
+        attachment.setMimeType("text/xml");
+        attachment.addHeaders(getHeaders(attachmentId));
+        attachment.setId(attachmentId);
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
 
-        builder.setAttachmentCallbackHandler(new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachments.add(attachment[0]);
-                    attachmentRequestCallback.setAttachments(attachments);
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    attachment[0] = attachmentResultCallback.getAttachment();
-                }
-            }
-        });
+        AttachmentCallbackHandler attachmentCallbackHandler = 
+            new AttachmentCallbackHandler(Collections.singletonList(attachment));
+        builder.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
         LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -137,29 +126,15 @@ public class AttachmentTest extends org.junit.Assert {
         NodeList sigReferences = signedDoc.getElementsByTagNameNS(WSConstants.SIG_NS, "Reference");
         Assert.assertEquals(2, sigReferences.getLength());
 
-        verify(signedDoc, new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
+        attachmentCallbackHandler = 
+            new AttachmentCallbackHandler(Collections.singletonList(attachment));
+        verify(signedDoc, attachmentCallbackHandler);
 
-                    if (!attachment[0].getId().equals(attachmentRequestCallback.getAttachmentId())) {
-                        throw new RuntimeException("wrong attachment requested");
-                    }
-
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachments.add(attachment[0]);
-                    attachmentRequestCallback.setAttachments(attachments);
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    attachment[0] = attachmentResultCallback.getAttachment();
-                }
-            }
-        });
-
-        byte[] attachmentBytes = readInputStream(attachment[0].getSourceStream());
+        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
+        byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
         Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
-        Assert.assertEquals("text/xml", attachment[0].getMimeType());
+        Assert.assertEquals("text/xml", responseAttachment.getMimeType());
     }
 
     @org.junit.Test
@@ -173,27 +148,15 @@ public class AttachmentTest extends org.junit.Assert {
         builder.setParts(parts);
 
         final String attachmentId = UUID.randomUUID().toString();
-        final Attachment[] attachment = new Attachment[1];
-        attachment[0] = new Attachment();
-        attachment[0].setMimeType("text/xml");
-        attachment[0].addHeaders(getHeaders(attachmentId));
-        attachment[0].setId(attachmentId);
-        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        final Attachment attachment = new Attachment();
+        attachment.setMimeType("text/xml");
+        attachment.addHeaders(getHeaders(attachmentId));
+        attachment.setId(attachmentId);
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
 
-        builder.setAttachmentCallbackHandler(new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachments.add(attachment[0]);
-                    attachmentRequestCallback.setAttachments(attachments);
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    attachment[0] = attachmentResultCallback.getAttachment();
-                }
-            }
-        });
+        AttachmentCallbackHandler attachmentCallbackHandler = 
+            new AttachmentCallbackHandler(Collections.singletonList(attachment));
+        builder.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
         LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -214,18 +177,15 @@ public class AttachmentTest extends org.junit.Assert {
                     if (callbacks[0] instanceof AttachmentRequestCallback) {
                         AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
 
-                        if (!attachment[0].getId().equals(attachmentRequestCallback.getAttachmentId())) {
+                        if (!attachment.getId().equals(attachmentRequestCallback.getAttachmentId())) {
                             throw new RuntimeException("wrong attachment requested");
                         }
 
                         List<Attachment> attachments = new ArrayList<Attachment>();
-                        attachment[0].setSourceStream(new ByteArrayInputStream(
+                        attachment.setSourceStream(new ByteArrayInputStream(
                                 SOAPUtil.SAMPLE_SOAP_MSG.replace("15", "16").getBytes("UTF-8")));
-                        attachments.add(attachment[0]);
+                        attachments.add(attachment);
                         attachmentRequestCallback.setAttachments(attachments);
-                    } else {
-                        AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                        attachment[0] = attachmentResultCallback.getAttachment();
                     }
                 }
             });
@@ -246,27 +206,15 @@ public class AttachmentTest extends org.junit.Assert {
         builder.setParts(parts);
 
         final String attachmentId = UUID.randomUUID().toString();
-        final Attachment[] attachment = new Attachment[1];
-        attachment[0] = new Attachment();
-        attachment[0].setMimeType("text/xml");
-        attachment[0].addHeaders(getHeaders(attachmentId));
-        attachment[0].setId(attachmentId);
-        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        final Attachment attachment = new Attachment();
+        attachment.setMimeType("text/xml");
+        attachment.addHeaders(getHeaders(attachmentId));
+        attachment.setId(attachmentId);
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
 
-        builder.setAttachmentCallbackHandler(new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachments.add(attachment[0]);
-                    attachmentRequestCallback.setAttachments(attachments);
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    attachment[0] = attachmentResultCallback.getAttachment();
-                }
-            }
-        });
+        AttachmentCallbackHandler attachmentCallbackHandler = 
+            new AttachmentCallbackHandler(Collections.singletonList(attachment));
+        builder.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
         LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -283,29 +231,15 @@ public class AttachmentTest extends org.junit.Assert {
         NodeList sigReferences = signedDoc.getElementsByTagNameNS(WSConstants.SIG_NS, "Reference");
         Assert.assertEquals(2, sigReferences.getLength());
 
-        verify(signedDoc, new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
+        attachmentCallbackHandler = 
+            new AttachmentCallbackHandler(Collections.singletonList(attachment));
+        verify(signedDoc, attachmentCallbackHandler);
 
-                    if (!attachment[0].getId().equals(attachmentRequestCallback.getAttachmentId())) {
-                        throw new RuntimeException("wrong attachment requested");
-                    }
-
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachments.add(attachment[0]);
-                    attachmentRequestCallback.setAttachments(attachments);
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    attachment[0] = attachmentResultCallback.getAttachment();
-                }
-            }
-        });
-
-        byte[] attachmentBytes = readInputStream(attachment[0].getSourceStream());
+        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
+        byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
         Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
-        Assert.assertEquals("text/xml", attachment[0].getMimeType());
+        Assert.assertEquals("text/xml", responseAttachment.getMimeType());
     }
 
     @org.junit.Test
@@ -319,27 +253,15 @@ public class AttachmentTest extends org.junit.Assert {
         builder.setParts(parts);
 
         final String attachmentId = UUID.randomUUID().toString();
-        final Attachment[] attachment = new Attachment[1];
-        attachment[0] = new Attachment();
-        attachment[0].setMimeType("text/xml");
-        attachment[0].addHeaders(getHeaders(attachmentId));
-        attachment[0].setId(attachmentId);
-        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        final Attachment attachment = new Attachment();
+        attachment.setMimeType("text/xml");
+        attachment.addHeaders(getHeaders(attachmentId));
+        attachment.setId(attachmentId);
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
 
-        builder.setAttachmentCallbackHandler(new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachments.add(attachment[0]);
-                    attachmentRequestCallback.setAttachments(attachments);
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    attachment[0] = attachmentResultCallback.getAttachment();
-                }
-            }
-        });
+        AttachmentCallbackHandler attachmentCallbackHandler = 
+            new AttachmentCallbackHandler(Collections.singletonList(attachment));
+        builder.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
         LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -354,23 +276,20 @@ public class AttachmentTest extends org.junit.Assert {
         }
 
         try {
-            attachment[0].addHeader(AttachmentUtils.MIME_HEADER_CONTENT_DESCRIPTION, "Kaputt");
+            attachment.addHeader(AttachmentUtils.MIME_HEADER_CONTENT_DESCRIPTION, "Kaputt");
             verify(signedDoc, new CallbackHandler() {
                 @Override
                 public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
                     if (callbacks[0] instanceof AttachmentRequestCallback) {
                         AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
 
-                        if (!attachment[0].getId().equals(attachmentRequestCallback.getAttachmentId())) {
+                        if (!attachment.getId().equals(attachmentRequestCallback.getAttachmentId())) {
                             throw new RuntimeException("wrong attachment requested");
                         }
 
                         List<Attachment> attachments = new ArrayList<Attachment>();
-                        attachments.add(attachment[0]);
+                        attachments.add(attachment);
                         attachmentRequestCallback.setAttachments(attachments);
-                    } else {
-                        AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                        attachment[0] = attachmentResultCallback.getAttachment();
                     }
                 }
             });
@@ -405,26 +324,10 @@ public class AttachmentTest extends org.junit.Assert {
         attachment[1].setId(attachment2Id);
         attachment[1].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
 
-        builder.setAttachmentCallbackHandler(new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachments.add(attachment[0]);
-                    attachments.add(attachment[1]);
-                    attachmentRequestCallback.setAttachments(attachments);
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    if (attachmentResultCallback.getAttachmentId().equals(attachment[0].getId())) {
-                        attachment[0] = attachmentResultCallback.getAttachment();
-                    } else {
-                        attachment[1] = attachmentResultCallback.getAttachment();
-                    }
-                }
-            }
-        });
-
+        AttachmentCallbackHandler attachmentCallbackHandler = 
+            new AttachmentCallbackHandler(Arrays.asList(attachment));
+        builder.setAttachmentCallbackHandler(attachmentCallbackHandler);
+        
         LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -440,40 +343,19 @@ public class AttachmentTest extends org.junit.Assert {
         NodeList sigReferences = signedDoc.getElementsByTagNameNS(WSConstants.SIG_NS, "Reference");
         Assert.assertEquals(3, sigReferences.getLength());
 
-        verify(signedDoc, new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
+        attachmentCallbackHandler = new AttachmentCallbackHandler(Arrays.asList(attachment));
+        verify(signedDoc, attachmentCallbackHandler);
 
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachmentRequestCallback.setAttachments(attachments);
-
-                    if (attachment[0].getId().equals(attachmentRequestCallback.getAttachmentId())) {
-                        attachments.add(attachment[0]);
-                    } else if (attachment[1].getId().equals(attachmentRequestCallback.getAttachmentId())) {
-                        attachments.add(attachment[1]);
-                    } else {
-                        throw new RuntimeException("invalid attachment requested");
-                    }
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    if (attachmentResultCallback.getAttachmentId().equals(attachment[0].getId())) {
-                        attachment[0] = attachmentResultCallback.getAttachment();
-                    } else {
-                        attachment[1] = attachmentResultCallback.getAttachment();
-                    }
-                }
-            }
-        });
-
-        byte[] attachment1Bytes = readInputStream(attachment[0].getSourceStream());
+        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
+        byte[] attachment1Bytes = readInputStream(responseAttachment.getSourceStream());
         Assert.assertTrue(Arrays.equals(attachment1Bytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
-        Assert.assertEquals("text/xml", attachment[0].getMimeType());
+        Assert.assertEquals("text/xml", responseAttachment.getMimeType());
 
-        byte[] attachment2Bytes = readInputStream(attachment[1].getSourceStream());
+        responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(1);
+        byte[] attachment2Bytes = readInputStream(responseAttachment.getSourceStream());
         Assert.assertTrue(Arrays.equals(attachment2Bytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
-        Assert.assertEquals("text/plain", attachment[1].getMimeType());
+        Assert.assertEquals("text/plain", responseAttachment.getMimeType());
     }
 
     @org.junit.Test
@@ -492,27 +374,16 @@ public class AttachmentTest extends org.junit.Assert {
         encrypt.setParts(parts);
 
         String attachmentId = UUID.randomUUID().toString();
-        final Attachment[] attachment = new Attachment[1];
-        attachment[0] = new Attachment();
-        attachment[0].setMimeType("text/xml");
-        attachment[0].addHeaders(getHeaders(attachmentId));
-        attachment[0].setId(attachmentId);
-        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        final Attachment attachment = new Attachment();
+        attachment.setMimeType("text/xml");
+        attachment.addHeaders(getHeaders(attachmentId));
+        attachment.setId(attachmentId);
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
 
-        encrypt.setAttachmentCallbackHandler(new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachments.add(attachment[0]);
-                    attachmentRequestCallback.setAttachments(attachments);
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    attachment[0] = attachmentResultCallback.getAttachment();
-                }
-            }
-        });
+        AttachmentCallbackHandler attachmentCallbackHandler = 
+            new AttachmentCallbackHandler(Collections.singletonList(attachment));
+        encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
+        List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
 
@@ -535,31 +406,16 @@ public class AttachmentTest extends org.junit.Assert {
         Assert.assertEquals(childs.item(0).getLocalName(), "EncryptedKey");
         Assert.assertEquals(childs.item(1).getLocalName(), "EncryptedData");
 
-        verify(encryptedDoc, new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
+        attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
+        verify(encryptedDoc, attachmentCallbackHandler);
 
-                    if (!attachment[0].getId().equals(attachmentRequestCallback.getAttachmentId())) {
-                        throw new RuntimeException("wrong attachment requested");
-                    }
-
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachments.add(attachment[0]);
-                    attachmentRequestCallback.setAttachments(attachments);
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    attachment[0] = attachmentResultCallback.getAttachment();
-                }
-            }
-        });
-
-        byte[] attachmentBytes = readInputStream(attachment[0].getSourceStream());
+        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
+        byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
         Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
-        Assert.assertEquals("text/xml", attachment[0].getMimeType());
+        Assert.assertEquals("text/xml", responseAttachment.getMimeType());
 
-        Map<String, String> attHeaders = attachment[0].getHeaders();
+        Map<String, String> attHeaders = responseAttachment.getHeaders();
         Assert.assertEquals(6, attHeaders.size());
     }
 
@@ -579,27 +435,16 @@ public class AttachmentTest extends org.junit.Assert {
         encrypt.setParts(parts);
 
         String attachmentId = UUID.randomUUID().toString();
-        final Attachment[] attachment = new Attachment[1];
-        attachment[0] = new Attachment();
-        attachment[0].setMimeType("text/xml");
-        attachment[0].addHeaders(getHeaders(attachmentId));
-        attachment[0].setId(attachmentId);
-        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        final Attachment attachment = new Attachment();
+        attachment.setMimeType("text/xml");
+        attachment.addHeaders(getHeaders(attachmentId));
+        attachment.setId(attachmentId);
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
 
-        encrypt.setAttachmentCallbackHandler(new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachments.add(attachment[0]);
-                    attachmentRequestCallback.setAttachments(attachments);
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    attachment[0] = attachmentResultCallback.getAttachment();
-                }
-            }
-        });
+        AttachmentCallbackHandler attachmentCallbackHandler = 
+            new AttachmentCallbackHandler(Collections.singletonList(attachment));
+        encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
+        List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
 
@@ -608,34 +453,21 @@ public class AttachmentTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
 
-        final PushbackInputStream pis = new PushbackInputStream(attachment[0].getSourceStream(), 1);
+        final PushbackInputStream pis = 
+            new PushbackInputStream(encryptedAttachments.get(0).getSourceStream(), 1);
         pis.unread('K');
-        attachment[0].setSourceStream(pis);
-        verify(encryptedDoc, new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
+        encryptedAttachments.get(0).setSourceStream(pis);
+        
+        attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
+        verify(encryptedDoc, attachmentCallbackHandler);
 
-                    if (!attachment[0].getId().equals(attachmentRequestCallback.getAttachmentId())) {
-                        throw new RuntimeException("wrong attachment requested");
-                    }
-
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachments.add(attachment[0]);
-                    attachmentRequestCallback.setAttachments(attachments);
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    attachment[0] = attachmentResultCallback.getAttachment();
-                }
-            }
-        });
-
-        byte[] attachmentBytes = readInputStream(attachment[0].getSourceStream());
+        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
+        byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
         Assert.assertFalse(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
-        Assert.assertEquals("text/xml", attachment[0].getMimeType());
+        Assert.assertEquals("text/xml", responseAttachment.getMimeType());
 
-        Map<String, String> attHeaders = attachment[0].getHeaders();
+        Map<String, String> attHeaders = responseAttachment.getHeaders();
         Assert.assertEquals(6, attHeaders.size());
     }
 
@@ -655,27 +487,16 @@ public class AttachmentTest extends org.junit.Assert {
         encrypt.setParts(parts);
 
         String attachmentId = UUID.randomUUID().toString();
-        final Attachment[] attachment = new Attachment[1];
-        attachment[0] = new Attachment();
-        attachment[0].setMimeType("text/xml");
-        attachment[0].addHeaders(getHeaders(attachmentId));
-        attachment[0].setId(attachmentId);
-        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        final Attachment attachment = new Attachment();
+        attachment.setMimeType("text/xml");
+        attachment.addHeaders(getHeaders(attachmentId));
+        attachment.setId(attachmentId);
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
 
-        encrypt.setAttachmentCallbackHandler(new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachments.add(attachment[0]);
-                    attachmentRequestCallback.setAttachments(attachments);
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    attachment[0] = attachmentResultCallback.getAttachment();
-                }
-            }
-        });
+        AttachmentCallbackHandler attachmentCallbackHandler = 
+            new AttachmentCallbackHandler(Collections.singletonList(attachment));
+        encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
+        List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
         encrypt.prepare(doc, crypto);
         Element refs = encrypt.encryptForRef(null, parts);
@@ -703,31 +524,17 @@ public class AttachmentTest extends org.junit.Assert {
         Assert.assertEquals(childs.item(1).getLocalName(), "ReferenceList");
         Assert.assertEquals(childs.item(2).getLocalName(), "EncryptedData");
 
-        verify(doc, new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
+        attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
+        verify(doc, attachmentCallbackHandler);
 
-                    if (!attachment[0].getId().equals(attachmentRequestCallback.getAttachmentId())) {
-                        throw new RuntimeException("wrong attachment requested");
-                    }
-
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachments.add(attachment[0]);
-                    attachmentRequestCallback.setAttachments(attachments);
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    attachment[0] = attachmentResultCallback.getAttachment();
-                }
-            }
-        });
-
-        byte[] attachmentBytes = readInputStream(attachment[0].getSourceStream());
+        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
+        
+        byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
         Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
-        Assert.assertEquals("text/xml", attachment[0].getMimeType());
+        Assert.assertEquals("text/xml", responseAttachment.getMimeType());
 
-        Map<String, String> attHeaders = attachment[0].getHeaders();
+        Map<String, String> attHeaders = responseAttachment.getHeaders();
         Assert.assertEquals(6, attHeaders.size());
     }
 
@@ -747,27 +554,16 @@ public class AttachmentTest extends org.junit.Assert {
         encrypt.setParts(parts);
 
         String attachmentId = UUID.randomUUID().toString();
-        final Attachment[] attachment = new Attachment[1];
-        attachment[0] = new Attachment();
-        attachment[0].setMimeType("text/xml");
-        attachment[0].addHeaders(getHeaders(attachmentId));
-        attachment[0].setId(attachmentId);
-        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        final Attachment attachment =  new Attachment();
+        attachment.setMimeType("text/xml");
+        attachment.addHeaders(getHeaders(attachmentId));
+        attachment.setId(attachmentId);
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
 
-        encrypt.setAttachmentCallbackHandler(new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachments.add(attachment[0]);
-                    attachmentRequestCallback.setAttachments(attachments);
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    attachment[0] = attachmentResultCallback.getAttachment();
-                }
-            }
-        });
+        AttachmentCallbackHandler attachmentCallbackHandler = 
+            new AttachmentCallbackHandler(Collections.singletonList(attachment));
+        encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
+        List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
         encrypt.prepare(doc, crypto);
         encrypt.encryptForRef(null, parts);
@@ -794,31 +590,17 @@ public class AttachmentTest extends org.junit.Assert {
         Assert.assertEquals(childs.item(0).getLocalName(), "EncryptedKey");
         Assert.assertEquals(childs.item(1).getLocalName(), "EncryptedData");
 
-        verify(doc, new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
+        attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
+        verify(doc, attachmentCallbackHandler);
 
-                    if (!attachment[0].getId().equals(attachmentRequestCallback.getAttachmentId())) {
-                        throw new RuntimeException("wrong attachment requested");
-                    }
+        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
 
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachments.add(attachment[0]);
-                    attachmentRequestCallback.setAttachments(attachments);
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    attachment[0] = attachmentResultCallback.getAttachment();
-                }
-            }
-        });
-
-        byte[] attachmentBytes = readInputStream(attachment[0].getSourceStream());
+        byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
         Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
-        Assert.assertEquals("text/xml", attachment[0].getMimeType());
+        Assert.assertEquals("text/xml", responseAttachment.getMimeType());
 
-        Map<String, String> attHeaders = attachment[0].getHeaders();
+        Map<String, String> attHeaders = responseAttachment.getHeaders();
         Assert.assertEquals(6, attHeaders.size());
     }
 
@@ -838,62 +620,37 @@ public class AttachmentTest extends org.junit.Assert {
         encrypt.setParts(parts);
 
         String attachmentId = UUID.randomUUID().toString();
-        final Attachment[] attachment = new Attachment[1];
-        attachment[0] = new Attachment();
-        attachment[0].setMimeType("text/xml");
-        attachment[0].addHeaders(getHeaders(attachmentId));
-        attachment[0].setId(attachmentId);
-        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        final Attachment attachment = new Attachment();
+        attachment.setMimeType("text/xml");
+        attachment.addHeaders(getHeaders(attachmentId));
+        attachment.setId(attachmentId);
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
 
-        encrypt.setAttachmentCallbackHandler(new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachments.add(attachment[0]);
-                    attachmentRequestCallback.setAttachments(attachments);
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    attachment[0] = attachmentResultCallback.getAttachment();
-                }
-            }
-        });
+        AttachmentCallbackHandler attachmentCallbackHandler = 
+            new AttachmentCallbackHandler(Collections.singletonList(attachment));
+        encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
+        List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
 
-        Assert.assertEquals(1, attachment[0].getHeaders().size());
+        Assert.assertEquals(1, encryptedAttachments.get(0).getHeaders().size());
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
 
-        verify(encryptedDoc, new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
+        attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
+        verify(encryptedDoc, attachmentCallbackHandler);
 
-                    if (!attachment[0].getId().equals(attachmentRequestCallback.getAttachmentId())) {
-                        throw new RuntimeException("wrong attachment requested");
-                    }
+        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
 
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachments.add(attachment[0]);
-                    attachmentRequestCallback.setAttachments(attachments);
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    attachment[0] = attachmentResultCallback.getAttachment();
-                }
-            }
-        });
-
-        byte[] attachmentBytes = readInputStream(attachment[0].getSourceStream());
+        byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
         Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
-        Assert.assertEquals("text/xml", attachment[0].getMimeType());
+        Assert.assertEquals("text/xml", responseAttachment.getMimeType());
 
-        Map<String, String> attHeaders = attachment[0].getHeaders();
+        Map<String, String> attHeaders = responseAttachment.getHeaders();
         Assert.assertEquals(6, attHeaders.size());
     }
 
@@ -913,27 +670,16 @@ public class AttachmentTest extends org.junit.Assert {
         encrypt.setParts(parts);
 
         String attachmentId = UUID.randomUUID().toString();
-        final Attachment[] attachment = new Attachment[1];
-        attachment[0] = new Attachment();
-        attachment[0].setMimeType("text/xml");
-        attachment[0].addHeaders(getHeaders(attachmentId));
-        attachment[0].setId(attachmentId);
-        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        final Attachment attachment = new Attachment();
+        attachment.setMimeType("text/xml");
+        attachment.addHeaders(getHeaders(attachmentId));
+        attachment.setId(attachmentId);
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
 
-        encrypt.setAttachmentCallbackHandler(new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachments.add(attachment[0]);
-                    attachmentRequestCallback.setAttachments(attachments);
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    attachment[0] = attachmentResultCallback.getAttachment();
-                }
-            }
-        });
+        AttachmentCallbackHandler attachmentCallbackHandler = 
+            new AttachmentCallbackHandler(Collections.singletonList(attachment));
+        encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
+        List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
 
@@ -943,40 +689,23 @@ public class AttachmentTest extends org.junit.Assert {
         }
 
         try {
-            final PushbackInputStream pis = new PushbackInputStream(attachment[0].getSourceStream(), 1);
+            final PushbackInputStream pis = 
+                new PushbackInputStream(encryptedAttachments.get(0).getSourceStream(), 1);
             pis.unread('K');
-            attachment[0].setSourceStream(pis);
-            verify(encryptedDoc, new CallbackHandler() {
-                @Override
-                public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                    if (callbacks[0] instanceof AttachmentRequestCallback) {
-                        AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
-
-                        if (!attachment[0].getId().equals(attachmentRequestCallback.getAttachmentId())) {
-                            throw new RuntimeException("wrong attachment requested");
-                        }
-
-                        List<Attachment> attachments = new ArrayList<Attachment>();
-                        attachments.add(attachment[0]);
-                        attachmentRequestCallback.setAttachments(attachments);
-                    } else {
-                        AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                        if (attachmentResultCallback.getAttachmentId().equals(attachment[0].getId())) {
-                            attachment[0] = attachmentResultCallback.getAttachment();
-                        } else {
-                            attachment[1] = attachmentResultCallback.getAttachment();
-                        }
-                    }
-                }
-            });
+            encryptedAttachments.get(0).setSourceStream(pis);
+            
+            attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
+            verify(encryptedDoc, attachmentCallbackHandler);
         } catch (WSSecurityException e) {
             Assert.assertEquals(e.getMessage(), "The signature or decryption was invalid");
             return;
         }
 
-        byte[] attachmentBytes = readInputStream(attachment[0].getSourceStream());
+        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
+        byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
         Assert.assertFalse(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
-        Assert.assertEquals("text/xml", attachment[0].getMimeType());
+        Assert.assertEquals("text/xml", responseAttachment.getMimeType());
     }
 
     @org.junit.Test
@@ -1009,25 +738,10 @@ public class AttachmentTest extends org.junit.Assert {
         attachment[1].setId(attachment2Id);
         attachment[1].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
 
-        encrypt.setAttachmentCallbackHandler(new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachments.add(attachment[0]);
-                    attachments.add(attachment[1]);
-                    attachmentRequestCallback.setAttachments(attachments);
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    if (attachmentResultCallback.getAttachmentId().equals(attachment[0].getId())) {
-                        attachment[0] = attachmentResultCallback.getAttachment();
-                    } else {
-                        attachment[1] = attachmentResultCallback.getAttachment();
-                    }
-                }
-            }
-        });
+        AttachmentCallbackHandler attachmentCallbackHandler = 
+            new AttachmentCallbackHandler(Arrays.asList(attachment));
+        encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
+        List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
 
@@ -1036,45 +750,24 @@ public class AttachmentTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
 
-        verify(encryptedDoc, new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
+        attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
+        verify(encryptedDoc, attachmentCallbackHandler);
 
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachmentRequestCallback.setAttachments(attachments);
+        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
 
-                    if (attachment[0].getId().equals(attachmentRequestCallback.getAttachmentId())) {
-                        attachments.add(attachment[0]);
-                    } else if (attachment[1].getId().equals(attachmentRequestCallback.getAttachmentId())) {
-                        attachments.add(attachment[1]);
-                    } else {
-                        throw new RuntimeException("invalid attachment requested");
-                    }
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    if (attachmentResultCallback.getAttachmentId().equals(attachment[0].getId())) {
-                        attachment[0] = attachmentResultCallback.getAttachment();
-                    } else {
-                        attachment[1] = attachmentResultCallback.getAttachment();
-                    }
-                }
-            }
-        });
-
-        byte[] attachment1Bytes = readInputStream(attachment[0].getSourceStream());
+        byte[] attachment1Bytes = readInputStream(responseAttachment.getSourceStream());
         Assert.assertTrue(Arrays.equals(attachment1Bytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
-        Assert.assertEquals("text/xml", attachment[0].getMimeType());
-
-        byte[] attachment2Bytes = readInputStream(attachment[1].getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachment2Bytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
-        Assert.assertEquals("text/plain", attachment[1].getMimeType());
-
-        Map<String, String> att1Headers = attachment[0].getHeaders();
+        Assert.assertEquals("text/xml", responseAttachment.getMimeType());
+        Map<String, String> att1Headers = responseAttachment.getHeaders();
         Assert.assertEquals(6, att1Headers.size());
 
-        Map<String, String> att2Headers = attachment[1].getHeaders();
+        responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(1);
+        byte[] attachment2Bytes = readInputStream(responseAttachment.getSourceStream());
+        Assert.assertTrue(Arrays.equals(attachment2Bytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        Assert.assertEquals("text/plain", responseAttachment.getMimeType());
+
+        Map<String, String> att2Headers = responseAttachment.getHeaders();
         Assert.assertEquals(6, att2Headers.size());
     }
 
@@ -1094,28 +787,15 @@ public class AttachmentTest extends org.junit.Assert {
         signature.setParts(parts);
 
         String attachmentId = UUID.randomUUID().toString();
-        final Attachment[] attachment = new Attachment[1];
-        attachment[0] = new Attachment();
-        attachment[0].setMimeType("text/xml");
-        attachment[0].addHeaders(getHeaders(attachmentId));
-        attachment[0].setId(attachmentId);
-        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        final Attachment attachment = new Attachment();
+        attachment.setMimeType("text/xml");
+        attachment.addHeaders(getHeaders(attachmentId));
+        attachment.setId(attachmentId);
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
 
-        signature.setAttachmentCallbackHandler(new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
-
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachments.add(attachment[0]);
-                    attachmentRequestCallback.setAttachments(attachments);
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    attachment[0] = attachmentResultCallback.getAttachment();
-                }
-            }
-        });
+        AttachmentCallbackHandler attachmentCallbackHandler = 
+            new AttachmentCallbackHandler(Collections.singletonList(attachment));
+        signature.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
         doc = signature.build(doc, crypto, secHeader);
 
@@ -1124,21 +804,10 @@ public class AttachmentTest extends org.junit.Assert {
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         encrypt.setParts(parts);
 
-        encrypt.setAttachmentCallbackHandler(new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
-
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachments.add(attachment[0]);
-                    attachmentRequestCallback.setAttachments(attachments);
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    attachment[0] = attachmentResultCallback.getAttachment();
-                }
-            }
-        });
+        attachmentCallbackHandler = 
+            new AttachmentCallbackHandler(Collections.singletonList(attachment));
+        encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
+        List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
 
@@ -1155,32 +824,17 @@ public class AttachmentTest extends org.junit.Assert {
         Assert.assertEquals(childs.item(1).getLocalName(), "EncryptedData");
         Assert.assertEquals(childs.item(2).getLocalName(), "Signature");
 
-        verify(encryptedDoc, new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
+        attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
+        verify(encryptedDoc, attachmentCallbackHandler);
 
-                    if (!attachment[0].getId().equals(attachmentRequestCallback.getAttachmentId())) {
-                        throw new RuntimeException("wrong attachment requested");
-                    }
+        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(1);
 
-                    List<Attachment> attachmentList = new ArrayList<Attachment>();
-                    attachmentList.add(attachment[0]);
-                    attachmentRequestCallback.setAttachments(attachmentList);
-
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    attachment[0] = attachmentResultCallback.getAttachment();
-                }
-            }
-        });
-
-        byte[] attachmentBytes = readInputStream(attachment[0].getSourceStream());
+        byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
         Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
-        Assert.assertEquals("text/xml", attachment[0].getMimeType());
+        Assert.assertEquals("text/xml", responseAttachment.getMimeType());
 
-        Map<String, String> attHeaders = attachment[0].getHeaders();
+        Map<String, String> attHeaders = responseAttachment.getHeaders();
         Assert.assertEquals(6, attHeaders.size());
     }
 
@@ -1302,28 +956,16 @@ public class AttachmentTest extends org.junit.Assert {
         encrypt.setParts(parts);
 
         String attachmentId = UUID.randomUUID().toString();
-        final Attachment[] attachment = new Attachment[1];
-        attachment[0] = new Attachment();
-        attachment[0].setMimeType("text/xml");
-        attachment[0].addHeaders(getHeaders(attachmentId));
-        attachment[0].setId(attachmentId);
-        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        final Attachment attachment = new Attachment();
+        attachment.setMimeType("text/xml");
+        attachment.addHeaders(getHeaders(attachmentId));
+        attachment.setId(attachmentId);
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
 
-        encrypt.setAttachmentCallbackHandler(new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
-
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachments.add(attachment[0]);
-                    attachmentRequestCallback.setAttachments(attachments);
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    attachment[0] = attachmentResultCallback.getAttachment();
-                }
-            }
-        });
+        AttachmentCallbackHandler attachmentCallbackHandler = 
+            new AttachmentCallbackHandler(Collections.singletonList(attachment));
+        encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
+        List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
         doc = encrypt.build(doc, crypto, secHeader);
 
@@ -1331,21 +973,9 @@ public class AttachmentTest extends org.junit.Assert {
         signature.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         signature.setParts(parts);
 
-        signature.setAttachmentCallbackHandler(new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
-
-                    List<Attachment> attachments = new ArrayList<Attachment>();
-                    attachments.add(attachment[0]);
-                    attachmentRequestCallback.setAttachments(attachments);
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    attachment[0] = attachmentResultCallback.getAttachment();
-                }
-            }
-        });
+        attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
+        signature.setAttachmentCallbackHandler(attachmentCallbackHandler);
+        encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
         doc = signature.build(doc, crypto, secHeader);
 
@@ -1362,32 +992,17 @@ public class AttachmentTest extends org.junit.Assert {
         Assert.assertEquals(childs.item(1).getLocalName(), "EncryptedKey");
         Assert.assertEquals(childs.item(2).getLocalName(), "EncryptedData");
 
-        verify(doc, new CallbackHandler() {
-            @Override
-            public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                if (callbacks[0] instanceof AttachmentRequestCallback) {
-                    AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
+        attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
+        verify(doc, attachmentCallbackHandler);
 
-                    if (!attachment[0].getId().equals(attachmentRequestCallback.getAttachmentId())) {
-                        throw new RuntimeException("wrong attachment requested");
-                    }
+        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(1);
 
-                    List<Attachment> attachmentList = new ArrayList<Attachment>();
-                    attachmentList.add(attachment[0]);
-                    attachmentRequestCallback.setAttachments(attachmentList);
-
-                } else {
-                    AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callbacks[0];
-                    attachment[0] = attachmentResultCallback.getAttachment();
-                }
-            }
-        });
-
-        byte[] attachmentBytes = readInputStream(attachment[0].getSourceStream());
+        byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
         Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
-        Assert.assertEquals("text/xml", attachment[0].getMimeType());
+        Assert.assertEquals("text/xml", responseAttachment.getMimeType());
 
-        Map<String, String> attHeaders = attachment[0].getHeaders();
+        Map<String, String> attHeaders = responseAttachment.getHeaders();
         Assert.assertEquals(6, attHeaders.size());
     }
 
