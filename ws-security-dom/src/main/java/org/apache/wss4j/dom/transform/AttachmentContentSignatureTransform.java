@@ -178,7 +178,7 @@ public class AttachmentContentSignatureTransform extends TransformService {
             if (lowerCaseMimeType != null 
                 && (lowerCaseMimeType.startsWith("text/xml")
                     || lowerCaseMimeType.startsWith("application/xml")
-                    || lowerCaseMimeType.matches("application/.*xml.*"))) {
+                    || lowerCaseMimeType.matches("(application|image)/.*\\+xml.*"))) {
                 /* 5.4.2:
                  * Content of an XML Content-Type MUST be XML canonicalized using
                  * Exclusive XML Canonicalization without comments,as specified by
