@@ -27,6 +27,7 @@ import org.apache.xml.security.stax.impl.transformer.TransformIdentity;
 import org.apache.xml.security.stax.impl.transformer.canonicalizer.Canonicalizer20010315_ExclOmitCommentsTransformer;
 
 import javax.xml.stream.XMLStreamException;
+
 import java.io.InputStream;
 import java.util.Map;
 
@@ -73,19 +74,25 @@ public class AttachmentContentSignatureTransform extends TransformIdentity {
     @Override
     public void transform(InputStream inputStream) throws XMLStreamException {
         String mimeType = getAttachment().getMimeType();
-        if ("text/xml".equalsIgnoreCase(mimeType) ||
-                "application/xml".equals(mimeType) ||
-                mimeType != null && mimeType.endsWith("+xml")) {    //e.g. Application/mathml+xml
-                   /* 5.4.2:
-                    * Content of an XML Content-Type MUST be XML canonicalized using
-                    * Exclusive XML Canonicalization without comments,as specified by
-                    * the URI http://www.w3.org/2001/10/xml-exc-c14n# [Excl-Canon].
-                    * The reason for requiring Exclusive Canonicalization is that many
-                    * implementations will support Exclusive Canonicalization for other
-                    * XML Signature purposes, since this form of canonicalization
-                    * supports context changes. The InclusiveNamespace PrefixList
-                    * attribute SHOULD be empty or not present.
-                    */
+        String lowerCaseMimeType = null;
+        if (mimeType != null) {
+            lowerCaseMimeType = mimeType.toLowerCase();
+        }
+        
+        if (lowerCaseMimeType != null 
+            && (lowerCaseMimeType.startsWith("text/xml")
+                || lowerCaseMimeType.startsWith("application/xml")
+                || lowerCaseMimeType.matches("application/.*xml.*"))) {
+            /* 5.4.2:
+             * Content of an XML Content-Type MUST be XML canonicalized using
+             * Exclusive XML Canonicalization without comments,as specified by
+             * the URI http://www.w3.org/2001/10/xml-exc-c14n# [Excl-Canon].
+             * The reason for requiring Exclusive Canonicalization is that many
+             * implementations will support Exclusive Canonicalization for other
+             * XML Signature purposes, since this form of canonicalization
+             * supports context changes. The InclusiveNamespace PrefixList
+             * attribute SHOULD be empty or not present.
+             */
             Canonicalizer20010315_ExclOmitCommentsTransformer canon =
                     new Canonicalizer20010315_ExclOmitCommentsTransformer();
             try {
@@ -95,7 +102,7 @@ public class AttachmentContentSignatureTransform extends TransformIdentity {
             }
             canon.transform(inputStream);
 
-        } else if (mimeType != null && mimeType.startsWith("text/")) {
+        } else if (lowerCaseMimeType != null && lowerCaseMimeType.startsWith("text/")) {
             CRLFOutputStream crlfOutputStream = new CRLFOutputStream(getOutputStream());
             try {
                 setOutputStream(crlfOutputStream);
