@@ -5,6 +5,16 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.6.13
+=============
+
+Improvement
+
+    [WSS-428] - It should be possible to use the useReqSigCert even when the certificate is not sent in the request
+    [WSS-477] - Support the ability to create SAML2 Assertions with OneTimeUse + ProxyRestriction Conditions
+    [WSS-478] - Support the ability to cache SAML2 Assertions with "OneTimeUse" Conditions
+    [WSS-483] - wsse:Reference without ValueType
+
 Release 1.6.12
 =============
 
