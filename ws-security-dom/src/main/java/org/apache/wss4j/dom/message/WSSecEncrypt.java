@@ -371,7 +371,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         for (int part = 0; part < references.size(); part++) {
             WSEncryptionPart encPart = references.get(part);
 
-            if ("cid:Attachments".equals(encPart.getId())) {
+            if (encPart.getId() != null && encPart.getId().startsWith("cid:")) {
                 continue;
             }
 
@@ -415,7 +415,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         for (int part = 0; part < references.size(); part++) {
             WSEncryptionPart encPart = references.get(part);
 
-            if ("cid:Attachments".equals(encPart.getId())) {
+            if (encPart.getId() != null && encPart.getId().startsWith("cid:")) {
 
                 if (attachmentCallbackHandler == null) {
                     throw new WSSecurityException(
@@ -425,6 +425,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 }
 
                 AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
+                String id = encPart.getId().substring(4);
+                attachmentRequestCallback.setAttachmentId(id);
                 try {
                     attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
                 } catch (Exception e) {

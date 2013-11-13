@@ -140,12 +140,14 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
 
         Map<Object, SecurePart> dynamicSecureParts = outputProcessorChain.getSecurityContext().getAsMap(XMLSecurityConstants.ENCRYPTION_PARTS);
         Iterator<Map.Entry<Object, SecurePart>> securePartsMapIterator = dynamicSecureParts.entrySet().iterator();
+        String externalId = "";
         while (securePartsMapIterator.hasNext()) {
             Map.Entry<Object, SecurePart> securePartEntry = securePartsMapIterator.next();
             final SecurePart securePart = securePartEntry.getValue();
             final String externalReference = securePart.getExternalReference();
-            if (externalReference != null && "cid:Attachments".equals(externalReference)) {
+            if (externalReference != null && externalReference.startsWith("cid:")) {
                 attachmentSecurePart = securePart;
+                externalId = externalReference.substring(4);
                 break;
             }
         }
@@ -163,6 +165,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
         }
 
         AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
+        attachmentRequestCallback.setAttachmentId(externalId);
         try {
             attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
         } catch (Exception e) {

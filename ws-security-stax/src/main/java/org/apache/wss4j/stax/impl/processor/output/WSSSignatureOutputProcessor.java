@@ -148,7 +148,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
             OutputProcessorChain outputProcessorChain, SecurePart securePart)
             throws XMLSecurityException, XMLStreamException {
 
-        if ("cid:Attachments".equals(securePart.getExternalReference())) {
+        if (securePart.getExternalReference() != null && securePart.getExternalReference().startsWith("cid:")) {
 
             CallbackHandler attachmentCallbackHandler =
                     ((WSSSecurityProperties) getSecurityProperties()).getAttachmentCallbackHandler();
@@ -160,6 +160,8 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
             }
 
             AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
+            String id = securePart.getExternalReference().substring(4);
+            attachmentRequestCallback.setAttachmentId(id);
             try {
                 attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
             } catch (Exception e) {

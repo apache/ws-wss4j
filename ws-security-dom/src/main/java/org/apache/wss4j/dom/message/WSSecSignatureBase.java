@@ -102,7 +102,7 @@ public class WSSecSignatureBase extends WSSecBase {
         List<javax.xml.crypto.dsig.Reference> attachmentReferenceList = new ArrayList<javax.xml.crypto.dsig.Reference>();
 
         for (WSEncryptionPart encPart : references) {
-            if ("cid:Attachments".equals(encPart.getId())) {
+            if (encPart.getId() != null && encPart.getId().startsWith("cid:")) {
 
                 if (attachmentCallbackHandler == null) {
                     throw new WSSecurityException(
@@ -114,6 +114,8 @@ public class WSSecSignatureBase extends WSSecBase {
                 AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
                 //no mime type must be set for signature:
                 //attachmentCallback.setResultingMimeType(null);
+                String id = encPart.getId().substring(4);
+                attachmentRequestCallback.setAttachmentId(id);
                 try {
                     attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
                 } catch (Exception e) {
