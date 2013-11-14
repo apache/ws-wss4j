@@ -173,14 +173,8 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                     WSSecurityException.ErrorCode.FAILURE, e
             );
         }
+        
         List<Attachment> attachments = attachmentRequestCallback.getAttachments();
-        if (attachments == null || attachments.isEmpty()) {
-            throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE,
-                    "noEncElement"
-            );
-        }
-
         for (int i = 0; i < attachments.size(); i++) {
             final Attachment attachment = attachments.get(i);
             final String attachmentId = attachment.getId();

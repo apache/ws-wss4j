@@ -434,14 +434,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                             WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e
                     );
                 }
-                List<Attachment> attachments = attachmentRequestCallback.getAttachments();
-                if (attachments == null || attachments.isEmpty()) {
-                    throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.FAILURE,
-                            "noEncElement"
-                    );
-                }
-
                 String attachmentEncryptedDataType;
                 if ("Element".equals(encPart.getEncModifier())) {
                     attachmentEncryptedDataType = WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE;
@@ -449,6 +441,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                     attachmentEncryptedDataType = WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY;
                 }
 
+                List<Attachment> attachments = attachmentRequestCallback.getAttachments();
                 for (int i = 0; i < attachments.size(); i++) {
                     Attachment attachment = attachments.get(i);
 
@@ -744,4 +737,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     public boolean isEmbedEncryptedKey() {
         return embedEncryptedKey;
     }
+
+    public List<Element> getAttachmentEncryptedDataElements() {
+        return attachmentEncryptedDataElements;
+    }
+
 }
