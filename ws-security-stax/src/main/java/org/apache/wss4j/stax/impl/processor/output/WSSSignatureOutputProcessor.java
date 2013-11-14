@@ -170,13 +170,6 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                 );
             }
             List<Attachment> attachments = attachmentRequestCallback.getAttachments();
-            if (attachments == null || attachments.isEmpty()) {
-                throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILED_SIGNATURE,
-                        "noEncElement"
-                );
-            }
-
             for (int i = 0; i < attachments.size(); i++) {
                 final Attachment attachment = attachments.get(i);
 

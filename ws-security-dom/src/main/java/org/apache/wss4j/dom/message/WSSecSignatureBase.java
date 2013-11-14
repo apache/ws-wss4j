@@ -124,13 +124,6 @@ public class WSSecSignatureBase extends WSSecBase {
                     );
                 }
                 List<Attachment> attachments = attachmentRequestCallback.getAttachments();
-                if (attachments == null || attachments.isEmpty()) {
-                    throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.FAILURE,
-                            "noEncElement"
-                    );
-                }
-
                 for (int i = 0; i < attachments.size(); i++) {
                     Attachment attachment = attachments.get(i);
 
