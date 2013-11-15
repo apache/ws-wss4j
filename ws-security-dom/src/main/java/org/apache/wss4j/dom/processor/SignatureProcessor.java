@@ -537,6 +537,7 @@ public class SignatureProcessor implements Processor {
             if (!"".equals(uri)) {
                 Element se = dereferenceSTR(doc, siRef, requestData, wsDocInfo);
                 // If an STR Transform is not used then just find the cached element
+                boolean attachment = false;
                 if (se == null) {
                     Data dereferencedData = siRef.getDereferencedData();
                     if (dereferencedData instanceof NodeSetData) {
@@ -552,6 +553,7 @@ public class SignatureProcessor implements Processor {
                         }
                     } else if (dereferencedData instanceof OctetStreamData) {
                         se = doc.createElementNS("http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1", "attachment");
+                        attachment = true;
                     }
                 }
                 if (se == null) {
@@ -563,6 +565,7 @@ public class SignatureProcessor implements Processor {
                 ref.setProtectedElement(se);
                 ref.setAlgorithm(signedInfo.getSignatureMethod().getAlgorithm());
                 ref.setDigestAlgorithm(siRef.getDigestMethod().getAlgorithm());
+                ref.setAttachment(attachment);
                 
                 // Set the Transform algorithms as well
                 @SuppressWarnings("unchecked")

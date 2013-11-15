@@ -71,6 +71,11 @@ public class WSDataRef {
      * The protected DOM element
      */
     private Element protectedElement;
+    
+    /**
+     * Whether the protected Reference is an Attachment or not
+     */
+    private boolean attachment;
 
     /**
      * @return Id of the protected element
@@ -196,6 +201,14 @@ public class WSDataRef {
      */
     public List<String> getTransformAlgorithms() {
         return transformAlgorithms;
+    }
+
+    public boolean isAttachment() {
+        return attachment;
+    }
+
+    public void setAttachment(boolean attachment) {
+        this.attachment = attachment;
     }
 
 }

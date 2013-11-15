@@ -435,7 +435,8 @@ public class WSSecurityEngine {
             // of the current node is null. In that case, go on to the previously stored next
             // sibling
             //
-            if (node.getNextSibling() == null && nextSibling != null) {
+            if (node.getNextSibling() == null && nextSibling != null 
+                && nextSibling.getParentNode() != null) {
                 node = nextSibling;
             } else {
                 node = node.getNextSibling();

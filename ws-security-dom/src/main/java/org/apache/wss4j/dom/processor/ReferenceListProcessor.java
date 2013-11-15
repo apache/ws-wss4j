@@ -341,6 +341,8 @@ public class ReferenceListProcessor implements Processor {
                 if (!uri.startsWith("cid:")) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
                 }
+                dataRef.setWsuId(uri);
+                dataRef.setAttachment(true);
 
                 CallbackHandler attachmentCallbackHandler = requestData.getAttachmentCallbackHandler();
                 if (attachmentCallbackHandler == null) {
@@ -402,6 +404,9 @@ public class ReferenceListProcessor implements Processor {
             }
 
             dataRef.setContent(true);
+            // Remove this EncryptedData from the security header to avoid processing it again
+            encData.getParentNode().removeChild(encData);
+            
             return dataRef;
         }
 

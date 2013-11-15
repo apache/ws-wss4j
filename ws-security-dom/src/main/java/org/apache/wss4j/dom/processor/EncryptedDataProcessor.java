@@ -68,24 +68,6 @@ public class EncryptedDataProcessor implements Processor {
 
         final String encryptedDataId = elem.getAttributeNS(null, "Id");
 
-        if (encryptedDataId != null) {
-            List<WSSecurityEngineResult> decryptionResults = wsDocInfo.getResultsByTag(WSConstants.ENCR);
-            for (int i = 0; i < decryptionResults.size(); i++) {
-                WSSecurityEngineResult wsSecurityEngineResult = decryptionResults.get(i);
-                @SuppressWarnings("unchecked")
-                List<WSDataRef> dataRefUris = (List<WSDataRef>)wsSecurityEngineResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
-                if (dataRefUris == null) {
-                    continue;
-                }
-                for (int j = 0; j < dataRefUris.size(); j++) {
-                    WSDataRef wsDataRef = dataRefUris.get(j);
-                    if (encryptedDataId.equals(wsDataRef.getWsuId())) {
-                        return new ArrayList<WSSecurityEngineResult>();
-                    }
-                }
-            }
-        }
-
         Element kiElem =
             WSSecurityUtil.getDirectChildElement(elem, "KeyInfo", WSConstants.SIG_NS);
         // KeyInfo cannot be null
