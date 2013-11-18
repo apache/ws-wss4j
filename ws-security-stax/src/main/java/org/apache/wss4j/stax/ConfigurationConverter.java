@@ -787,6 +787,15 @@ public final class ConfigurationConverter {
             if (partDef.length == 1) {
                 QName qname = new QName(soapNS, partDef[0].trim());
                 encPart = new SecurePart(qname, SecurePart.Modifier.Content);
+            } else if (partDef.length == 2) {
+                String mode = partDef[0].trim().substring(1);
+                String element = partDef[1].trim();
+                
+                if ("Content".equals(mode)) {
+                    encPart = new SecurePart(element, SecurePart.Modifier.Content);
+                } else {
+                    encPart = new SecurePart(element, SecurePart.Modifier.Element);
+                }
             } else if (partDef.length == 3) {
                 String mode = partDef[0].trim();
                 if (mode.length() <= 1) {
