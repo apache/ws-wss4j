@@ -27,8 +27,10 @@ import java.security.Principal;
  * The principal's name will be the <code>wsu:Id</code> value of the 
  * <code>DerivedKeyToken</code>
  */
-public class WSDerivedKeyTokenPrincipal implements Principal {
+public class WSDerivedKeyTokenPrincipal implements java.io.Serializable, Principal {
 
+    private static final long serialVersionUID = -8576876885462234466L;
+    
     private String algorithm;
     private String id;
     private String nonce;
