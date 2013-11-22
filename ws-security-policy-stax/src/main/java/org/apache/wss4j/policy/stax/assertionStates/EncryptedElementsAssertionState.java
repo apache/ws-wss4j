@@ -23,7 +23,7 @@ import org.apache.wss4j.policy.WSSPolicyException;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.EncryptedElements;
 import org.apache.wss4j.policy.model.XPath;
-import org.apache.xml.security.stax.securityEvent.EncryptedElementSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.AbstractSecuredElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.wss4j.policy.stax.Assertable;
@@ -32,6 +32,7 @@ import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 import javax.xml.namespace.QName;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -57,13 +58,15 @@ public class EncryptedElementsAssertionState extends AssertionState implements A
     @Override
     public SecurityEventConstants.Event[] getSecurityEventType() {
         return new SecurityEventConstants.Event[]{
-                WSSecurityEventConstants.EncryptedElement
+                WSSecurityEventConstants.EncryptedElement,
+                WSSecurityEventConstants.EncryptedPart
         };
     }
 
     @Override
     public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
-        EncryptedElementSecurityEvent encryptedElementSecurityEvent = (EncryptedElementSecurityEvent) securityEvent;
+        AbstractSecuredElementSecurityEvent encryptedElementSecurityEvent = 
+            (AbstractSecuredElementSecurityEvent) securityEvent;
 
         Iterator<List<QName>> pathElementIterator = pathElements.iterator();
         while (pathElementIterator.hasNext()) {

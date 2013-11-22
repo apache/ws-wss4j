@@ -23,14 +23,16 @@ import org.apache.wss4j.policy.WSSPolicyException;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.SignedElements;
 import org.apache.wss4j.policy.model.XPath;
+import org.apache.xml.security.stax.securityEvent.AbstractSecuredElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
-import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.apache.wss4j.policy.stax.Assertable;
 import org.apache.wss4j.policy.stax.PolicyUtils;
 import org.apache.wss4j.stax.ext.WSSUtils;
+import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 import javax.xml.namespace.QName;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -58,7 +60,8 @@ public class SignedElementsAssertionState extends AssertionState implements Asse
     @Override
     public SecurityEventConstants.Event[] getSecurityEventType() {
         return new SecurityEventConstants.Event[]{
-                SecurityEventConstants.SignedElement
+                SecurityEventConstants.SignedElement,
+                WSSecurityEventConstants.SignedPart
         };
     }
 
@@ -68,19 +71,19 @@ public class SignedElementsAssertionState extends AssertionState implements Asse
 
     @Override
     public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
-        SignedElementSecurityEvent signedElementSecurityEvent = (SignedElementSecurityEvent) securityEvent;
+        AbstractSecuredElementSecurityEvent signedSecurityEvent = (AbstractSecuredElementSecurityEvent) securityEvent;
 
         Iterator<List<QName>> pathElementIterator = pathElements.iterator();
         while (pathElementIterator.hasNext()) {
             List<QName> pathElements = pathElementIterator.next();
-            if (WSSUtils.pathMatches(pathElements, signedElementSecurityEvent.getElementPath(), true, false)) {
-                if (signedElementSecurityEvent.isSigned()) {
+            if (WSSUtils.pathMatches(pathElements, signedSecurityEvent.getElementPath(), true, false)) {
+                if (signedSecurityEvent.isSigned()) {
                     setAsserted(true);
                     return true;
                 } else {
                     //an element must be signed but isn't
                     setAsserted(false);
-                    setErrorMessage("Element " + WSSUtils.pathAsString(signedElementSecurityEvent.getElementPath()) + " must be signed");
+                    setErrorMessage("Element " + WSSUtils.pathAsString(signedSecurityEvent.getElementPath()) + " must be signed");
                     return false;
                 }
             }
