@@ -145,12 +145,13 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
 
     @Override
     public void doFinal(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+        super.doFinal(inputProcessorChain);
+
         try {
             policyEnforcer.doFinal();
         } catch (WSSPolicyException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
         }
-        super.doFinal(inputProcessorChain);
     }
 
     private void testSignaturePolicy(XMLSecEvent xmlSecEvent, List<QName> elementPath) throws WSSecurityException {
