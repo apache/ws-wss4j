@@ -54,7 +54,6 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
         org.slf4j.LoggerFactory.getLogger(SecurityHeaderInputProcessor.class);
 
     private final ArrayDeque<XMLSecEvent> xmlSecEventList = new ArrayDeque<XMLSecEvent>();
-    private int eventCount = 0;
     private int startIndexForProcessor = 0;
 
     public SecurityHeaderInputProcessor(WSSSecurityProperties securityProperties) {
@@ -85,7 +84,6 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
         do {
             subInputProcessorChain.reset();
             xmlSecEvent = subInputProcessorChain.processHeaderEvent();
-            eventCount++;
 
             switch (xmlSecEvent.getEventType()) {
                 case XMLStreamConstants.START_ELEMENT:
@@ -109,7 +107,15 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                     } else if (documentLevel == 4 && responsibleSecurityHeaderFound
                             && WSSUtils.isInSecurityHeader(xmlSecStartElement,
                             ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
-                        startIndexForProcessor = eventCount - 1;
+                        startIndexForProcessor = xmlSecEventList.size() - 1;
+
+                        //special handling for EncryptedData in the SecurityHeader. This way, if for example
+                        // a token was encrypted we have the possibility to decrypt it before so that we
+                        // are able to engage the appropriate processor for the token.
+                        if (WSSConstants.TAG_xenc_EncryptedData.equals(xmlSecStartElement.getName())) {
+                            engageSecurityHeaderHandler(subInputProcessorChain, getSecurityProperties(),
+                                    xmlSecEventList, startIndexForProcessor, xmlSecStartElement.getName());
+                        }
                     }
                     break;
                 case XMLStreamConstants.END_ELEMENT:
@@ -126,9 +132,12 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                             && WSSUtils.isInSecurityHeader(xmlSecEndElement,
                             ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
                         //we are in the security header and the depth is +1, so every child
-                        //element should have a responsible handler:
-                        engageSecurityHeaderHandler(subInputProcessorChain, getSecurityProperties(),
-                                xmlSecEventList, startIndexForProcessor, xmlSecEndElement.getName());
+                        //element should have a responsible handler with the exception of an EncryptedData SecurityHeader
+                        //which is already handled in the above StartElement logic (@see comment above).
+                        if (!WSSConstants.TAG_xenc_EncryptedData.equals(xmlSecEndElement.getName())) {
+                            engageSecurityHeaderHandler(subInputProcessorChain, getSecurityProperties(),
+                                    xmlSecEventList, startIndexForProcessor, xmlSecEndElement.getName());
+                        }
                         
                         // Check for multiple timestamps
                         if (xmlSecEndElement.getName().equals(WSSConstants.TAG_wsu_Timestamp)) {

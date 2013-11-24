@@ -25,19 +25,18 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.xml.security.binding.xmlenc.ReferenceList;
 import org.apache.xml.security.binding.xmlenc.ReferenceType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.ext.AbstractInputSecurityHeaderHandler;
-import org.apache.xml.security.stax.ext.InputProcessorChain;
-import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.stax.ext.XMLSecurityProperties;
+import org.apache.xml.security.stax.ext.*;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import java.util.Deque;
-import java.util.Iterator;
 
 /**
- * Processor for the EncryptedData XML Structure in the security header
+ * Processor for the EncryptedData XML Structure in the security header.
+ * Note, this handler is special in respect to when it is called: it is triggered by the
+ * EncryptedData StartElement and not when the EndElement occurs. @see comments in SecurityHeaderInputProcessort
  */
 public class EncryptedDataInputHandler extends AbstractInputSecurityHeaderHandler {
 
@@ -45,12 +44,7 @@ public class EncryptedDataInputHandler extends AbstractInputSecurityHeaderHandle
     public void handle(final InputProcessorChain inputProcessorChain, final XMLSecurityProperties securityProperties,
                        final Deque<XMLSecEvent> eventQueue, final Integer index) throws XMLSecurityException {
 
-        XMLSecEvent xmlSecEvent = null;
-        final Iterator<XMLSecEvent> xmlSecEventIterator = eventQueue.descendingIterator();
-        int curIdx = 0;
-        while (curIdx++ <= index) {
-            xmlSecEvent = xmlSecEventIterator.next();
-        }
+        XMLSecEvent xmlSecEvent = eventQueue.pollFirst();
         if (!(xmlSecEvent instanceof XMLSecStartElement)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
         }
@@ -70,12 +64,28 @@ public class EncryptedDataInputHandler extends AbstractInputSecurityHeaderHandle
                                 referenceType.setURI("#" + uri);
                                 inputProcessorChain.getSecurityContext().putAsList(WSSConstants.PROP_ENCRYPTED_DATA_REFS, uri);
                             }
-                            inputProcessorChain.removeProcessor(this);
                             return referenceType;
                         }
                         return null;
                     }
                 };
         inputProcessorChain.addProcessor(decryptInputProcessor);
+
+        //replay the EncryptedData event for the DecryptInputProcessor:
+        InputProcessor tmpProcessor = new AbstractInputProcessor(securityProperties) {
+            @Override
+            public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+                inputProcessorChain.removeProcessor(this);
+                return encryptedDataElement;
+            }
+
+            @Override
+            public XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+                inputProcessorChain.removeProcessor(this);
+                return encryptedDataElement;
+            }
+        };
+        tmpProcessor.addBeforeProcessor(decryptInputProcessor);
+        inputProcessorChain.addProcessor(tmpProcessor);
     }
 }

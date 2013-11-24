@@ -24,14 +24,24 @@ import java.io.InputStream;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.crypto.KeyGenerator;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
+import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.message.WSSecEncrypt;
+import org.apache.wss4j.dom.message.WSSecHeader;
+import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.OutboundWSSec;
 import org.apache.wss4j.stax.ext.WSSConstants;
@@ -47,7 +57,11 @@ import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
+import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 public class SignatureEncryptionTest extends AbstractTestBase {
 
@@ -249,4 +263,54 @@ public class SignatureEncryptionTest extends AbstractTestBase {
         }
     }
 
+    @Test
+    public void testEncryptedDataTokenSecurityHeaderWithoutReferenceInbound() throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+
+            Document doc = documentBuilderFactory.newDocumentBuilder().parse(sourceDocument);
+
+            WSSecHeader secHeader = new WSSecHeader();
+            secHeader.insertSecurityHeader(doc);
+
+            WSSecSignature sign = new WSSecSignature();
+            sign.setUserInfo("transmitter", "default");
+            sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+
+            Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
+
+            sign.build(doc, crypto, secHeader);
+
+            WSSecEncrypt builder = new WSSecEncrypt();
+            builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
+            builder.setUserInfo("receiver");
+            builder.prepare(doc, crypto);
+
+            WSEncryptionPart bst = new WSEncryptionPart("BinarySecurityToken", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Element");
+            WSEncryptionPart def = new WSEncryptionPart("definitions", "http://schemas.xmlsoap.org/wsdl/", "Element");
+            List<WSEncryptionPart> encryptionParts = new ArrayList<WSEncryptionPart>();
+            encryptionParts.add(bst);
+            encryptionParts.add(def);
+            Element ref = builder.encryptForRef(null, encryptionParts);
+            ref.removeChild(ref.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#", "DataReference").item(0));
+            builder.addExternalRefElement(ref, secHeader);
+            builder.prependToHeader(secHeader);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(doc), new StreamResult(baos));
+        }
+
+        //done encryption; now test decryption:
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            Document document = doInboundSecurity(securityProperties, xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            //no encrypted content
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+        }
+    }
 }
