@@ -54,7 +54,7 @@ public class OnlySignEntireHeadersAndBodyAssertionState extends AssertionState i
     @Override
     public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
         AbstractSecuredElementSecurityEvent abstractSecuredElementSecurityEvent = (AbstractSecuredElementSecurityEvent) securityEvent;
-        if (abstractSecuredElementSecurityEvent.isSigned()) {
+        if (abstractSecuredElementSecurityEvent.isSigned() && !abstractSecuredElementSecurityEvent.isAttachment()) {
             List<QName> elementPath = abstractSecuredElementSecurityEvent.getElementPath();
             if (elementPath.size() == 4 && WSSUtils.isInSecurityHeader(abstractSecuredElementSecurityEvent.getXmlSecEvent(), elementPath, roleOrActor)) {
                 setAsserted(true);

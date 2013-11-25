@@ -126,12 +126,14 @@ public class PolicyEnforcer implements SecurityEventListener {
     private boolean operationSecurityEventOccured = false;
     private boolean initiator;
     private String actorOrRole;
+    private int attachmentCount;
 
     public PolicyEnforcer(List<OperationPolicy> operationPolicies, String soapAction, boolean initiator,
-                          String actorOrRole) throws WSSPolicyException {
+                          String actorOrRole, int attachmentCount) throws WSSPolicyException {
         this.operationPolicies = operationPolicies;
         this.initiator = initiator;
         this.actorOrRole = actorOrRole;
+        this.attachmentCount = attachmentCount;
         assertionStateMap = new LinkedList<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>>();
         failedAssertionStateMap = new LinkedList<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>>();
 
@@ -260,14 +262,14 @@ public class PolicyEnforcer implements SecurityEventListener {
             assertableList.add(new ContentEncryptedElementsAssertionState(abstractSecurityAssertion, true));
         } else if (abstractSecurityAssertion instanceof EncryptedParts) {
             //initialized with asserted=true with the same reason as by the EncryptedParts above
-            assertableList.add(new EncryptedPartsAssertionState(abstractSecurityAssertion, true));
+            assertableList.add(new EncryptedPartsAssertionState(abstractSecurityAssertion, true, attachmentCount));
         } else if (abstractSecurityAssertion instanceof EncryptedElements) {
             //initialized with asserted=true with the same reason as by the EncryptedParts above
             assertableList.add(new EncryptedElementsAssertionState(abstractSecurityAssertion, true));
         } else if (abstractSecurityAssertion instanceof SignedParts) {
             //initialized with asserted=true because it could be that parent elements are signed and therefore these element are also signed
             //the test if it is really signed is done via the PolicyInputProcessor which emits SignedElementEvents for unsigned elements with the unsigned flag
-            assertableList.add(new SignedPartsAssertionState(abstractSecurityAssertion, true));
+            assertableList.add(new SignedPartsAssertionState(abstractSecurityAssertion, true, attachmentCount));
         } else if (abstractSecurityAssertion instanceof SignedElements) {
             //initialized with asserted=true with the same reason as by the SignedParts above
             assertableList.add(new SignedElementsAssertionState(abstractSecurityAssertion, true));
@@ -514,7 +516,7 @@ public class PolicyEnforcer implements SecurityEventListener {
                             doAssert = true;
                         }
 
-                        if (!assertable.isAsserted() && (doAssert || assertable.isHardFailure())) {
+                        if ((doAssert || assertable.isHardFailure()) && !assertable.isAsserted()) {
                             assertionMessage = assertable.getErrorMessage();
                             failedAssertionStateMap.add(map);
                             assertionStateMapIterator.remove();

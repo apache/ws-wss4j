@@ -421,10 +421,12 @@ public class PolicyEnforcerFactory {
      * @param soapAction The requested soapAction of the actual request
      * @param initiator Boolean flag to tell the engine if it is running in client or server mode
      * @param roleOrActor The actor or role of the security processing. Must be set to the same value as WSSSecurityProperties#setActor()
+     * @param attachmentCount The number of Attachments received in the message
      * @return the newly created PolicyEnforcer instance
      * @throws WSSPolicyException
      */
-    public PolicyEnforcer newPolicyEnforcer(String soapAction, boolean initiator, String roleOrActor) throws WSSPolicyException {
-        return new PolicyEnforcer(this.operationPolicies, soapAction, initiator, roleOrActor);
+    public PolicyEnforcer newPolicyEnforcer(String soapAction, boolean initiator, 
+                                            String roleOrActor, int attachmentCount) throws WSSPolicyException {
+        return new PolicyEnforcer(this.operationPolicies, soapAction, initiator, roleOrActor, attachmentCount);
     }
 }

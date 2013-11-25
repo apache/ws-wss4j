@@ -339,6 +339,14 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
             } catch (Exception e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
+            
+            // Create a security event for this encrypted Attachment
+            final DocumentContext documentContext = inputProcessorChain.getDocumentContext();
+            EncryptedPartSecurityEvent encryptedPartSecurityEvent =
+                new EncryptedPartSecurityEvent(inboundSecurityToken, true, documentContext.getProtectionOrder());
+            encryptedPartSecurityEvent.setAttachment(true);
+            encryptedPartSecurityEvent.setCorrelationID(encryptedDataType.getId());
+            inputProcessorChain.getSecurityContext().registerSecurityEvent(encryptedPartSecurityEvent);
         }
     }
     

@@ -89,7 +89,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             }
 
             String attachmentId = referenceType.getURI().substring(4);
-
+            
             AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
             attachmentRequestCallback.setAttachmentId(attachmentId);
             try {
@@ -168,6 +168,13 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                         WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
 
+            // Create a security event for this signed Attachment
+            final DocumentContext documentContext = inputProcessorChain.getDocumentContext();
+            SignedPartSecurityEvent signedPartSecurityEvent =
+                new SignedPartSecurityEvent(getInboundSecurityToken(), true, documentContext.getProtectionOrder());
+            signedPartSecurityEvent.setAttachment(true);
+            signedPartSecurityEvent.setCorrelationID(referenceType.getId());
+            inputProcessorChain.getSecurityContext().registerSecurityEvent(signedPartSecurityEvent);
         } else {
             super.verifyExternalReference(
                     inputProcessorChain, inputStream, referenceType);

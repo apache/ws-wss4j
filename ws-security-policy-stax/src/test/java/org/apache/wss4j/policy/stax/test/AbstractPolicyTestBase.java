@@ -99,7 +99,7 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
             element.appendChild(policyNode);
         }
         PolicyEnforcerFactory policyEnforcerFactory = PolicyEnforcerFactory.newInstance(document, customAssertionBuilders);
-        PolicyEnforcer policyEnforcer = policyEnforcerFactory.newPolicyEnforcer("", false, null);
+        PolicyEnforcer policyEnforcer = policyEnforcerFactory.newPolicyEnforcer("", false, null, 0);
 
         return policyEnforcer;
     }

@@ -32,6 +32,7 @@ import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 import javax.xml.namespace.QName;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -39,9 +40,16 @@ import java.util.List;
  * WSP1.3, 4.1.1 SignedParts Assertion
  */
 public class SignedPartsAssertionState extends AssertionState implements Assertable {
+    
+    private int attachmentCount;
+    private int signedAttachmentCount;
+    private boolean signedAttachmentRequired;
 
-    public SignedPartsAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
+    public SignedPartsAssertionState(
+        AbstractSecurityAssertion assertion, boolean asserted, int attachmentCount
+    ) {
         super(assertion, asserted);
+        this.attachmentCount = attachmentCount;
     }
 
     @Override
@@ -54,10 +62,17 @@ public class SignedPartsAssertionState extends AssertionState implements Asserta
     @Override
     public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
 
-        //todo attachments
-
         SignedPartSecurityEvent signedPartSecurityEvent = (SignedPartSecurityEvent) securityEvent;
         SignedParts signedParts = (SignedParts) getAssertion();
+        
+        if (signedParts.getAttachments() != null) {
+            signedAttachmentRequired = true;
+            if (signedPartSecurityEvent.isAttachment()) {
+                signedAttachmentCount++;
+                setAsserted(true);
+                return true;
+            }
+        }
 
         if (signedParts.isBody()
                 && WSSUtils.pathMatches(WSSConstants.SOAP_11_BODY_PATH, signedPartSecurityEvent.getElementPath(), true, false)) {
@@ -104,5 +119,13 @@ public class SignedPartsAssertionState extends AssertionState implements Asserta
 
         //if we return false here other signed elements will trigger a PolicyViolationException
         return true;
+    }
+    
+    @Override
+    public boolean isAsserted() {
+        if (signedAttachmentRequired && signedAttachmentCount < attachmentCount) {
+            return false;
+        }
+        return super.isAsserted();
     }
 }

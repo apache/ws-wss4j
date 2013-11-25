@@ -32,6 +32,7 @@ import org.apache.wss4j.stax.securityEvent.EncryptedPartSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 import javax.xml.namespace.QName;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -39,9 +40,15 @@ import java.util.List;
  * WSP1.3, 4.2.1 EncryptedParts Assertion
  */
 public class EncryptedPartsAssertionState extends AssertionState implements Assertable {
+    
+    private int attachmentCount;
+    private int encryptedAttachmentCount;
+    private boolean encryptedAttachmentRequired;
 
-    public EncryptedPartsAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
+    public EncryptedPartsAssertionState(
+        AbstractSecurityAssertion assertion, boolean asserted, int attachmentCount) {
         super(assertion, asserted);
+        this.attachmentCount = attachmentCount;
     }
 
     @Override
@@ -54,10 +61,17 @@ public class EncryptedPartsAssertionState extends AssertionState implements Asse
     @Override
     public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
 
-        //todo attachments
-
         EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
         EncryptedParts encryptedParts = (EncryptedParts) getAssertion();
+        
+        if (encryptedParts.getAttachments() != null) {
+            encryptedAttachmentRequired = true;
+            if (encryptedPartSecurityEvent.isAttachment()) {
+                encryptedAttachmentCount++;
+                setAsserted(true);
+                return true;
+            }
+        }
 
         //we'll never get events with the exact body path but child elements so we can just check if we are in the body
         if (encryptedParts.isBody() && WSSUtils.isInSOAPBody(encryptedPartSecurityEvent.getElementPath())) {
@@ -93,5 +107,13 @@ public class EncryptedPartsAssertionState extends AssertionState implements Asse
 
         //if we return false here other encrypted elements will trigger a PolicyViolationException
         return true;
+    }
+    
+    @Override
+    public boolean isAsserted() {
+        if (encryptedAttachmentRequired && encryptedAttachmentCount < attachmentCount) {
+            return false;
+        }
+        return super.isAsserted();
     }
 }
