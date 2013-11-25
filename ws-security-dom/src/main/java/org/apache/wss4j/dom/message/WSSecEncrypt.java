@@ -151,8 +151,14 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         if (encryptSymmKey) {
             X509Certificate remoteCert = useThisCert;
             if (remoteCert == null) {
-                CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-                cryptoType.setAlias(user);
+                CryptoType cryptoType = null;
+                if (keyIdentifierType == WSConstants.ENDPOINT_KEY_IDENTIFIER) {
+                    cryptoType = new CryptoType(CryptoType.TYPE.ENDPOINT);
+                    cryptoType.setEndpoint(user);
+                } else {
+                    cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+                    cryptoType.setAlias(user);
+                }
                 X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
                 if (certs == null || certs.length <= 0) {
                     throw new WSSecurityException(

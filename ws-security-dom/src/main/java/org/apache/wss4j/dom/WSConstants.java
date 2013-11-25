@@ -459,6 +459,15 @@ public final class WSConstants {
      */
     public static final int KEY_VALUE = 13;
     
+    /**
+     * <code>ENDPOINT_KEY_IDENTIFIER</code> is used to specify service endpoint as public key 
+     * identifier.
+     * 
+     * Constant is useful in case of symmetric holder of key, where token service can determine 
+     * target service public key to encrypt shared secret. 
+     */
+    public static final int ENDPOINT_KEY_IDENTIFIER = 14;
+
     /*
      * The following values are bits that can be combined to for a set.
      * Be careful when selecting new values.

@@ -37,7 +37,7 @@ public class CryptoType {
      * specific, for example - it could be a java KeyStore alias.
      */
     public enum TYPE {
-        ISSUER_SERIAL, THUMBPRINT_SHA1, SKI_BYTES, SUBJECT_DN, ALIAS
+        ISSUER_SERIAL, THUMBPRINT_SHA1, SKI_BYTES, SUBJECT_DN, ALIAS, ENDPOINT
     }
     
     private TYPE type;
@@ -46,6 +46,7 @@ public class CryptoType {
     private byte[] bytes;
     private String subjectDN;
     private String alias;
+    private String endpoint;
     
     /**
      * Default constructor
@@ -150,6 +151,22 @@ public class CryptoType {
      */
     public String getAlias() {
         return alias;
+    }
+
+    /**
+     * Set the endpoint to locate certificate.
+     * @param endpoint to locate.
+     */
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
+    }
+
+    /**
+     * Get the endpoint to locate certificate.
+     * @return endpoint to locate certificate.
+     */
+    public String getEndpoint() {
+        return endpoint;
     }
     
 }
