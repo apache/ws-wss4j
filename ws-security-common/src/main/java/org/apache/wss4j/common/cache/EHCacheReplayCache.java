@@ -100,7 +100,9 @@ public class EHCacheReplayCache implements ReplayCache, Closeable {
             }
         }
         
-        cache.put(new Element(identifier, identifier, parsedTTL, parsedTTL));
+        Element cacheElement = new Element(identifier, identifier, parsedTTL, parsedTTL);
+        cacheElement.resetAccessStatistics();
+        cache.put(cacheElement);
     }
     
     /**
