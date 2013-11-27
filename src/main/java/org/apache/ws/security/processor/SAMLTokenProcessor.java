@@ -138,8 +138,8 @@ public class SAMLTokenProcessor implements Processor {
             KeyInfo keyInfo = sig.getKeyInfo();
             if (keyInfo == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
-                    "cannot get certificate or key"
+                    WSSecurityException.FAILURE, "invalidSAMLsecurity",
+                    new Object[]{"cannot get certificate or key"}
                 );
             }
             SAMLKeyInfo samlKeyInfo = 
