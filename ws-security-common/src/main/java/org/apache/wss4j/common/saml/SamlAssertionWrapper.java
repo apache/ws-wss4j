@@ -542,6 +542,12 @@ public class SamlAssertionWrapper {
         Signature sig = getSignature();
         if (sig != null) {
             KeyInfo keyInfo = sig.getKeyInfo();
+            if (keyInfo == null) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
+                    "cannot get certificate or key"
+                );
+            }
             SAMLKeyInfo samlKeyInfo = 
                 SAMLUtil.getCredentialDirectlyFromKeyInfo(keyInfo.getDOM(), sigCrypto);
             verifySignature(samlKeyInfo);

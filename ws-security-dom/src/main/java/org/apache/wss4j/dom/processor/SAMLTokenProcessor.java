@@ -137,6 +137,12 @@ public class SAMLTokenProcessor implements Processor {
             
             Signature sig = samlAssertion.getSignature();
             KeyInfo keyInfo = sig.getKeyInfo();
+            if (keyInfo == null) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
+                    "cannot get certificate or key"
+                );
+            }
             SAMLKeyInfo samlKeyInfo = 
                 SAMLUtil.getCredentialDirectlyFromKeyInfo(
                     keyInfo.getDOM(), data.getSigVerCrypto()
