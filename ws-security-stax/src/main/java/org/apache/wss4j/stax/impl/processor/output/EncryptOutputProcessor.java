@@ -46,6 +46,7 @@ import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.config.TransformerAlgorithmMapper;
 import org.apache.xml.security.stax.ext.OutputProcessorChain;
 import org.apache.xml.security.stax.ext.SecurePart;
+import org.apache.xml.security.stax.ext.SecurePart.Modifier;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
@@ -295,7 +296,8 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
             List<QName> elementPath = xmlSecStartElement.getElementPath();
 
             //WSS 1.1 EncryptedHeader Element:
-            if (elementPath.size() == 3 && WSSUtils.isInSOAPHeader(elementPath)) {
+            if (elementPath.size() == 3 && WSSUtils.isInSOAPHeader(elementPath)
+                && Modifier.Content != super.getEncryptionPartDef().getModifier()) {
                 doEncryptedHeader = true;
 
                 List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
