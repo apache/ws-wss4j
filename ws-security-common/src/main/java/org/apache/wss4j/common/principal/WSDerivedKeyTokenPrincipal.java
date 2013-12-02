@@ -38,7 +38,7 @@ public class WSDerivedKeyTokenPrincipal implements java.io.Serializable, Princip
     private int length;
     private int offset;
     private String basetokenId;
-    private byte[] secret;
+    private transient byte[] secret;
 
     public WSDerivedKeyTokenPrincipal(String id) {
         this.id = id;
