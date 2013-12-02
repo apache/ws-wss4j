@@ -38,7 +38,7 @@ public class WSDerivedKeyTokenPrincipal implements Principal {
     private int length;
     private int offset;
     private String basetokenId;
-    private byte[] secret;
+    private transient byte[] secret;
     
     public String getLabel() {
         return label;

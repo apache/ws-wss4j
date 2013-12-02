@@ -52,7 +52,7 @@ public class WSUsernameTokenPrincipal implements Principal, java.io.Serializable
     private static final long serialVersionUID = 5608648208455259722L;
     private String name;
     private String nonce;
-    private String password;
+    private transient String password;
     private String createdTime;
     private String passwordType;
     private boolean digest = false;
