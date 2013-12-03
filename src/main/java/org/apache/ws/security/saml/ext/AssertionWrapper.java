@@ -540,7 +540,7 @@ public class AssertionWrapper {
                 );
             }
             SAMLKeyInfo samlKeyInfo = 
-                SAMLUtil.getCredentialDirectlyFromKeyInfo(keyInfo.getDOM(), data);
+                SAMLUtil.getCredentialFromKeyInfo(keyInfo.getDOM(), data, docInfo, data.getWssConfig().isWsiBSPCompliant());
             verifySignature(samlKeyInfo);
         } else {
             LOG.debug("AssertionWrapper: no signature to validate");
