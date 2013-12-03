@@ -117,6 +117,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private Collection<Pattern> subjectDNPatterns = new ArrayList<Pattern>();
 
     private CallbackHandler attachmentCallbackHandler;
+    private Object msgContext;
 
     public WSSSecurityProperties() {
         super();
@@ -175,6 +176,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.encryptSymmetricEncrytionKey = wssSecurityProperties.encryptSymmetricEncrytionKey;
         this.subjectDNPatterns = wssSecurityProperties.subjectDNPatterns;
         this.attachmentCallbackHandler = wssSecurityProperties.attachmentCallbackHandler;
+        this.msgContext = wssSecurityProperties.msgContext;
     }
 
     /**
@@ -956,5 +958,13 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public void setAttachmentCallbackHandler(CallbackHandler attachmentCallbackHandler) {
         this.attachmentCallbackHandler = attachmentCallbackHandler;
+    }
+
+    public Object getMsgContext() {
+        return msgContext;
+    }
+
+    public void setMsgContext(Object msgContext) {
+        this.msgContext = msgContext;
     }
 }

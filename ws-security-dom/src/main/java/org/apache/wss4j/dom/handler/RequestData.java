@@ -55,7 +55,7 @@ import org.apache.xml.security.utils.Base64;
 public class RequestData {
     
     private Object msgContext;
-    private SOAPConstants soapConstants ;
+    private SOAPConstants soapConstants;
     private String actor;
     private String username ;
     private String pwType = WSConstants.PASSWORD_DIGEST; // Make this the default when no password type is given.
