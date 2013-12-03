@@ -549,7 +549,7 @@ public class SamlAssertionWrapper {
                 );
             }
             SAMLKeyInfo samlKeyInfo = 
-                SAMLUtil.getCredentialDirectlyFromKeyInfo(keyInfo.getDOM(), sigCrypto);
+                SAMLUtil.getCredentialFromKeyInfo(keyInfo.getDOM(), keyInfoProcessor, sigCrypto);
             verifySignature(samlKeyInfo);
         } else {
             LOG.debug("SamlAssertionWrapper: no signature to validate");
