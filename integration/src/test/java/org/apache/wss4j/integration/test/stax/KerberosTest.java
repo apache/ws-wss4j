@@ -61,6 +61,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -111,8 +112,9 @@ public class KerberosTest extends AbstractTestBase {
         Document document;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN);
+            securityProperties.setActions(actions);
             securityProperties.setCallbackHandler(new CallbackHandler() {
                 @Override
                 public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
@@ -376,8 +378,9 @@ public class KerberosTest extends AbstractTestBase {
         Document document;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN);
+            securityProperties.setActions(actions);
             securityProperties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES128);
             securityProperties.setCallbackHandler(new CallbackHandler() {
                 @Override

@@ -33,17 +33,20 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 public class OutputChainTest extends AbstractTestBase {
 
     @Test
     public void testEncryptionAction() throws Exception {
         WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-        securityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.ENCRYPT);
+        securityProperties.setActions(actions);
         securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.setEncryptionUser("receiver");
 
@@ -84,8 +87,9 @@ public class OutputChainTest extends AbstractTestBase {
     @Test
     public void testSignatureAction() throws Exception {
         WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE};
-        securityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.SIGNATURE);
+        securityProperties.setActions(actions);
         securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
         securityProperties.setSignatureUser("receiver");
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
@@ -119,8 +123,9 @@ public class OutputChainTest extends AbstractTestBase {
     @Test
     public void testTimeStampAction() throws Exception {
         WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP};
-        securityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.TIMESTAMP);
+        securityProperties.setActions(actions);
 
         OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

@@ -42,6 +42,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -55,8 +56,9 @@ public class TimestampTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.TIMESTAMP);
+            securityProperties.setActions(actions);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
@@ -130,8 +132,9 @@ public class TimestampTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.TIMESTAMP);
+            securityProperties.setActions(actions);
             securityProperties.setTimestampTTL(3600);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);

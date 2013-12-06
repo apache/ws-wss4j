@@ -39,6 +39,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -100,8 +101,10 @@ public class SignatureConfirmationTest extends AbstractTestBase {
         baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE_CONFIRMATION, WSSConstants.SIGNATURE};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE_CONFIRMATION);
+            actions.add(WSSConstants.SIGNATURE);
+            securityProperties.setActions(actions);
             securityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
             securityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse11_SignatureConfirmation, SecurePart.Modifier.Element));
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
@@ -194,8 +197,9 @@ public class SignatureConfirmationTest extends AbstractTestBase {
         baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE_CONFIRMATION};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE_CONFIRMATION);
+            securityProperties.setActions(actions);
             securityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
             securityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse11_SignatureConfirmation, SecurePart.Modifier.Element));
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
@@ -236,8 +240,9 @@ public class SignatureConfirmationTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
@@ -331,8 +336,9 @@ public class SignatureConfirmationTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());

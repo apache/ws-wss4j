@@ -67,8 +67,9 @@ public class SAMLTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
+            securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setIssuer("www.example.com");
@@ -140,8 +141,9 @@ public class SAMLTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
+            securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.ATTR);
             callbackHandler.setIssuer("www.example.com");
@@ -213,8 +215,9 @@ public class SAMLTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
+            securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHZ);
             callbackHandler.setIssuer("www.example.com");
@@ -288,8 +291,9 @@ public class SAMLTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
+            securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
@@ -362,8 +366,9 @@ public class SAMLTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
+            securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.ATTR);
@@ -436,8 +441,9 @@ public class SAMLTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
+            securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHZ);
@@ -516,8 +522,9 @@ public class SAMLTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
+            securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setIssuer("www.example.com");
@@ -553,8 +560,9 @@ public class SAMLTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
+            securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
@@ -591,8 +599,9 @@ public class SAMLTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
+            securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setIssuer("www.example.com");
@@ -628,8 +637,9 @@ public class SAMLTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
+            securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setIssuer("www.example.com");
@@ -666,8 +676,9 @@ public class SAMLTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
+            securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHZ);
             callbackHandler.setIssuer("www.example.com");
@@ -705,8 +716,9 @@ public class SAMLTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_UNSIGNED};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
+            securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.ATTR);
             callbackHandler.setIssuer("www.example.com");

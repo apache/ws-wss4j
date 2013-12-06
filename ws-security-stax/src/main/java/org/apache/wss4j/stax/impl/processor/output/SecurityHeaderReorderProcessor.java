@@ -61,9 +61,9 @@ public class SecurityHeaderReorderProcessor extends AbstractOutputProcessor {
     public void init(OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
         super.init(outputProcessorChain);
 
-        XMLSecurityConstants.Action[] outActions = getSecurityProperties().getOutAction();
-        for (int i = outActions.length - 1; i >= 0; i--) {
-            XMLSecurityConstants.Action outAction = outActions[i];
+        List<XMLSecurityConstants.Action> outActions = getSecurityProperties().getActions();
+        for (int i = outActions.size() - 1; i >= 0; i--) {
+            XMLSecurityConstants.Action outAction = outActions.get(i);
             actionEventMap.put(outAction, new TreeMap<SecurityHeaderOrder, Deque<XMLSecEvent>>(new Comparator<SecurityHeaderOrder>() {
                 @Override
                 public int compare(SecurityHeaderOrder o1, SecurityHeaderOrder o2) {

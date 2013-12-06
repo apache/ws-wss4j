@@ -21,6 +21,8 @@ package org.apache.wss4j.stax.test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -47,8 +49,9 @@ public class EncryptionCRLTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("wss40rev.jks"), "security".toCharArray());
             securityProperties.setEncryptionUser("wss40rev");
             securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
@@ -93,9 +96,10 @@ public class EncryptionCRLTest extends AbstractTestBase {
     public void testEncryptionWithRevocationCheck() throws Exception {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
             securityProperties.setEnableRevocation(true);
-            securityProperties.setOutAction(actions);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("wss40rev.jks"), "security".toCharArray());
             securityProperties.setEncryptionUser("wss40rev");
             securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);

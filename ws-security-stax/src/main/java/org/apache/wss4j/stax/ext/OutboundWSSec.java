@@ -169,8 +169,7 @@ public class OutboundWSSec {
             // an encrypted key reference (as we only want one encrypted key here...)
             boolean derivedSignatureButNotDerivedEncryption = false;
             if (securityProperties.getDerivedKeyTokenReference() == WSSConstants.DerivedKeyTokenReference.EncryptedKey) {
-                for (int i = 0; i < securityProperties.getOutAction().length; i++) {
-                    XMLSecurityConstants.Action action = securityProperties.getOutAction()[i];
+                for (XMLSecurityConstants.Action action : securityProperties.getActions()) {
                     if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
                         derivedSignatureButNotDerivedEncryption = true;
                     } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
@@ -180,8 +179,7 @@ public class OutboundWSSec {
                 }
             }
             
-            for (int i = 0; i < securityProperties.getOutAction().length; i++) {
-                XMLSecurityConstants.Action action = securityProperties.getOutAction()[i];
+            for (XMLSecurityConstants.Action action : securityProperties.getActions()) {
                 if (WSSConstants.TIMESTAMP.equals(action)) {
                     final TimestampOutputProcessor timestampOutputProcessor = new TimestampOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, timestampOutputProcessor, action);
@@ -527,7 +525,7 @@ public class OutboundWSSec {
             x509Certificates = crypto.getX509Certificates(cryptoType);
             if (x509Certificates == null || x509Certificates.length == 0) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, "noUserCertsFound",
-                                              securityProperties.getEncryptionUser());
+                                              securityProperties.getEncryptionUser(), "encryption");
             }
         }
         

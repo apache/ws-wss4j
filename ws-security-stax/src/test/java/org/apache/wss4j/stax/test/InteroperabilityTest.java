@@ -43,6 +43,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
+
 import java.io.*;
 import java.util.*;
 
@@ -452,8 +453,11 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         securityProperties.setSignatureUser("transmitter");
         securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-        securityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.TIMESTAMP);
+        actions.add(WSSConstants.SIGNATURE);
+        actions.add(WSSConstants.ENCRYPT);
+        securityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(securityProperties, sourceDocument);
@@ -471,8 +475,11 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         securityProperties.setSignatureUser("transmitter");
         securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT, WSSConstants.SIGNATURE, WSSConstants.TIMESTAMP};
-        securityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.ENCRYPT);
+        actions.add(WSSConstants.SIGNATURE);
+        actions.add(WSSConstants.TIMESTAMP);
+        securityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(securityProperties, sourceDocument);
@@ -490,8 +497,9 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         securityProperties.setSignatureUser("transmitter");
         securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE};
-        securityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.SIGNATURE);
+        securityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(securityProperties, sourceDocument);
@@ -670,8 +678,11 @@ public class InteroperabilityTest extends AbstractTestBase {
         baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.TIMESTAMP);
+            actions.add(WSSConstants.SIGNATURE);
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("receiver");
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
@@ -711,8 +722,10 @@ public class InteroperabilityTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
@@ -761,8 +774,10 @@ public class InteroperabilityTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
@@ -1105,8 +1120,11 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         securityProperties.setSignatureUser("transmitter");
         securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-        securityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.TIMESTAMP);
+        actions.add(WSSConstants.SIGNATURE);
+        actions.add(WSSConstants.ENCRYPT);
+        securityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(securityProperties, sourceDocument);
@@ -1127,8 +1145,11 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         securityProperties.setSignatureUser("transmitter");
         securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-        securityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.TIMESTAMP);
+        actions.add(WSSConstants.SIGNATURE);
+        actions.add(WSSConstants.ENCRYPT);
+        securityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(securityProperties, sourceDocument);
@@ -1154,8 +1175,11 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         securityProperties.setSignatureUser("transmitter");
         securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-        securityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.TIMESTAMP);
+        actions.add(WSSConstants.SIGNATURE);
+        actions.add(WSSConstants.ENCRYPT);
+        securityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.2.xml");
 
@@ -1176,8 +1200,11 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         securityProperties.setSignatureUser("transmitter");
         securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-        securityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.TIMESTAMP);
+        actions.add(WSSConstants.SIGNATURE);
+        actions.add(WSSConstants.ENCRYPT);
+        securityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.2.xml");
 

@@ -282,8 +282,11 @@ public class PerformanceMemoryTest extends AbstractTestBase {
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.TIMESTAMP);
+            actions.add(WSSConstants.SIGNATURE);
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.setTimestampTTL(60 * 60 * 24 * 7); //a week for testing:)
             outboundWSSec = WSSec.getOutboundWSSec(securityProperties);
         }
@@ -306,8 +309,11 @@ public class PerformanceMemoryTest extends AbstractTestBase {
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.TIMESTAMP);
+            actions.add(WSSConstants.SIGNATURE);
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.setTimestampTTL(60 * 60 * 24 * 7); //a week for testing:)
             securityProperties.setEncryptionCompressionAlgorithm(compress);
             outboundWSSecCompressed = WSSec.getOutboundWSSec(securityProperties);

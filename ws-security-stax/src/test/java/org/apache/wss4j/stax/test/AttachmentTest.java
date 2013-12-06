@@ -107,8 +107,9 @@ public class AttachmentTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.addSignaturePart(new SecurePart(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"), SecurePart.Modifier.Element));
@@ -162,8 +163,9 @@ public class AttachmentTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.addSignaturePart(new SecurePart(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"), SecurePart.Modifier.Element));
@@ -229,8 +231,9 @@ public class AttachmentTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.addSignaturePart(new SecurePart(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"), SecurePart.Modifier.Element));
@@ -285,8 +288,9 @@ public class AttachmentTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.addSignaturePart(new SecurePart(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"), SecurePart.Modifier.Element));
@@ -360,8 +364,9 @@ public class AttachmentTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.addSignaturePart(new SecurePart(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"), SecurePart.Modifier.Element));
@@ -419,8 +424,9 @@ public class AttachmentTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.addEncryptionPart(new SecurePart(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"), SecurePart.Modifier.Content));
@@ -488,8 +494,9 @@ public class AttachmentTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.addEncryptionPart(new SecurePart(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"), SecurePart.Modifier.Content));
@@ -636,8 +643,9 @@ public class AttachmentTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.addEncryptionPart(new SecurePart(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"), SecurePart.Modifier.Content));
@@ -708,8 +716,9 @@ public class AttachmentTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.addEncryptionPart(new SecurePart(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"), SecurePart.Modifier.Content));
@@ -794,8 +803,9 @@ public class AttachmentTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.addEncryptionPart(new SecurePart(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"), SecurePart.Modifier.Content));
@@ -853,8 +863,10 @@ public class AttachmentTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.addSignaturePart(new SecurePart(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"), SecurePart.Modifier.Element));
@@ -952,8 +964,10 @@ public class AttachmentTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.addSignaturePart(new SecurePart(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"), SecurePart.Modifier.Element));
@@ -1043,8 +1057,10 @@ public class AttachmentTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT, WSSConstants.SIGNATURE};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.SIGNATURE);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.addSignaturePart(new SecurePart(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"), SecurePart.Modifier.Element));
@@ -1142,8 +1158,10 @@ public class AttachmentTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT, WSSConstants.SIGNATURE};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.SIGNATURE);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.addSignaturePart(new SecurePart(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"), SecurePart.Modifier.Element));

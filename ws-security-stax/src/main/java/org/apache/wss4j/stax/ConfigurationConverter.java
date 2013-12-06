@@ -76,7 +76,7 @@ public final class ConfigurationConverter {
         return properties;
     }
     
-    private static void parseActions(
+    public static void parseActions(
         Map<String, Object> config, 
         WSSSecurityProperties properties
     ) {
@@ -126,11 +126,10 @@ public final class ConfigurationConverter {
             actions.add(WSSConstants.SIGNATURE_CONFIRMATION);
         }
         
-        Action[] actionArray = new Action[actions.size()];
-        properties.setOutAction(actions.toArray(actionArray));
+        properties.setActions(actions);
     }
     
-    private static void parseUserProperties(
+    public static void parseUserProperties(
         Map<String, Object> config, 
         WSSSecurityProperties properties
     ) {
@@ -156,7 +155,7 @@ public final class ConfigurationConverter {
         properties.setSignatureUser(sigUser);
     }
     
-    private static void parseCrypto(
+    public static void parseCrypto(
         Map<String, Object> config, 
         WSSSecurityProperties properties
     ) {
@@ -185,7 +184,7 @@ public final class ConfigurationConverter {
                 properties.setSignatureCryptoProperties((Properties)sigRef, passwordEncryptor);
             }
             if (foundSigRef && properties.getSignatureUser() == null) {
-                properties.setSignatureUser(getDefaultX509Identifier(properties));
+                properties.setSignatureUser(getDefaultX509Identifier(properties, true));
             }
         }
         
@@ -197,7 +196,7 @@ public final class ConfigurationConverter {
                         CryptoFactory.getProperties(sigPropFile, getClassLoader());
                     properties.setSignatureCryptoProperties(sigProperties, passwordEncryptor);
                     if (properties.getSignatureUser() == null) {
-                        properties.setSignatureUser(getDefaultX509Identifier(properties));
+                        properties.setSignatureUser(getDefaultX509Identifier(properties, true));
                     }
                 } catch (WSSecurityException e) {
                     log.error(e.getMessage(), e);
@@ -284,12 +283,17 @@ public final class ConfigurationConverter {
         }
     }
     
-    private static String getDefaultX509Identifier(
-        WSSSecurityProperties properties
+    public static String getDefaultX509Identifier(
+        WSSSecurityProperties properties, boolean signature
     ) {
         try {
-            Crypto sigCrypto = properties.getSignatureCrypto();
-            return sigCrypto.getDefaultX509Identifier();
+            Crypto crypto = null;
+            if (signature) {
+                crypto = properties.getSignatureCrypto();
+            } else {
+                crypto = properties.getEncryptionCrypto();
+            }
+            return crypto.getDefaultX509Identifier();
         } catch (WSSConfigurationException e) {
             log.debug(e.getMessage(), e);
         } catch (WSSecurityException e) {
@@ -298,7 +302,7 @@ public final class ConfigurationConverter {
         return null;
     }
     
-    private static void parseCallback(
+    public static void parseCallback(
         Map<String, Object> config, 
         WSSSecurityProperties properties
     ) {
@@ -339,7 +343,7 @@ public final class ConfigurationConverter {
      * @return a CallbackHandler instance
      * @throws WSSecurityException
      */
-    private static CallbackHandler loadCallbackHandler(
+    public static CallbackHandler loadCallbackHandler(
         String callbackHandlerClass
     ) throws WSSecurityException {
 
@@ -375,7 +379,7 @@ public final class ConfigurationConverter {
         }
     }
     
-    private static void parseBooleanProperties(
+    public static void parseBooleanProperties(
         Map<String, Object> config, 
         WSSSecurityProperties properties
     ) {
@@ -461,7 +465,7 @@ public final class ConfigurationConverter {
         properties.setUse200512Namespace(use200512Namespace);
     }
     
-    private static void parseNonBooleanProperties(
+    public static void parseNonBooleanProperties(
         Map<String, Object> config, 
         WSSSecurityProperties properties
     ) {
@@ -504,7 +508,6 @@ public final class ConfigurationConverter {
                 for (Object obj : sigPartsList) {
                     if (obj instanceof SecurePart) {
                         SecurePart securePart = (SecurePart)obj;
-                        System.out.println("ADDING SIG PART: " + securePart.getName());
                         securePart.setDigestMethod(sigDigestAlgo);
                         properties.addSignaturePart(securePart);
                     }
@@ -678,7 +681,7 @@ public final class ConfigurationConverter {
         }
     }
     
-    private static WSSConstants.DerivedKeyTokenReference convertDerivedReference(String derivedTokenReference) {
+    public static WSSConstants.DerivedKeyTokenReference convertDerivedReference(String derivedTokenReference) {
         if ("EncryptedKey".equals(derivedTokenReference)) {
            return WSSConstants.DerivedKeyTokenReference.EncryptedKey;
         } else if ("DirectReference".equals(derivedTokenReference)) {
@@ -689,7 +692,7 @@ public final class ConfigurationConverter {
         return null;
     }
     
-    private static WSSecurityTokenConstants.KeyIdentifier convertKeyIdentifier(String keyIdentifier) {
+    public static WSSecurityTokenConstants.KeyIdentifier convertKeyIdentifier(String keyIdentifier) {
         if ("IssuerSerial".equals(keyIdentifier)) {
            return WSSecurityTokenConstants.KeyIdentifier_IssuerSerial;
         } else if ("DirectReference".equals(keyIdentifier)) {

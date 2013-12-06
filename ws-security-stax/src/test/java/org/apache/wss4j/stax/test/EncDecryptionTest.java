@@ -90,8 +90,9 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
 
@@ -231,8 +232,9 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             Properties properties = 
                 CryptoFactory.getProperties("transmitter-crypto.properties", this.getClass().getClassLoader());
             securityProperties.setEncryptionCryptoProperties(properties);
@@ -376,8 +378,9 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.addEncryptionPart(new SecurePart(new QName("http://www.w3.org/1999/XMLSchema", "complexType"), SecurePart.Modifier.Content));
@@ -662,8 +665,9 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.addEncryptionPart(new SecurePart(new QName("http://www.w3.org/1999/XMLSchema", "complexType"), SecurePart.Modifier.Element));
@@ -699,8 +703,9 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.addEncryptionPart(new SecurePart(new QName("http://www.w3.org/1999/XMLSchema", "complexType"), SecurePart.Modifier.Element));
@@ -943,8 +948,9 @@ public class EncDecryptionTest extends AbstractTestBase {
 
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.addEncryptionPart(new SecurePart(new QName("http://www.wrongnamespace.org", "complexType"), SecurePart.Modifier.Content));
@@ -966,8 +972,9 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
 
             KeyStore keyStore = KeyStore.getInstance("jks");
             keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
@@ -1025,8 +1032,9 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_IssuerSerial);
@@ -1101,8 +1109,9 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
@@ -1223,7 +1232,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifierType(WSSConstants.WSSKeyIdentifierType.BST_EMBEDDED);
@@ -1271,8 +1280,9 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier);
@@ -1347,8 +1357,9 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SkiKeyIdentifier);
@@ -1423,8 +1434,9 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier);
@@ -1499,8 +1511,9 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier);
@@ -1584,8 +1597,9 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_IssuerSerial);
@@ -1693,8 +1707,9 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionCompressionAlgorithm("http://www.apache.org/2012/04/xmlsec/gzip");
@@ -1812,8 +1827,9 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2009/xmlenc11#aes128-gcm");
@@ -1912,8 +1928,9 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2009/xmlenc11#aes192-gcm");
@@ -2021,8 +2038,9 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2009/xmlenc11#aes192-gcm");
@@ -2140,8 +2158,9 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setEncryptionSymAlgorithm("http://www.w3.org/2009/xmlenc11#aes192-gcm");
@@ -2476,8 +2495,9 @@ public class EncDecryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.setTokenUser("transmitter");

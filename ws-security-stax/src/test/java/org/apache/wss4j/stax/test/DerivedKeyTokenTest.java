@@ -82,8 +82,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT_WITH_DERIVED_KEY};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT_WITH_DERIVED_KEY);
+            securityProperties.setActions(actions);
             byte[] secret = new byte[192 / 8];
             WSSConstants.secureRandom.nextBytes(secret);
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(secret);
@@ -206,8 +207,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT_WITH_DERIVED_KEY};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT_WITH_DERIVED_KEY);
+            securityProperties.setActions(actions);
             byte[] secret = new byte[128 / 8];
             WSSConstants.secureRandom.nextBytes(secret);
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(secret);
@@ -292,8 +294,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE_WITH_DERIVED_KEY};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE_WITH_DERIVED_KEY);
+            securityProperties.setActions(actions);
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
             securityProperties.setCallbackHandler(callbackHandler);
             securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier);
@@ -377,8 +380,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE_WITH_DERIVED_KEY};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE_WITH_DERIVED_KEY);
+            securityProperties.setActions(actions);
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
             securityProperties.setCallbackHandler(callbackHandler);
             securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#hmac-sha1");
@@ -468,8 +472,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE_WITH_DERIVED_KEY};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE_WITH_DERIVED_KEY);
+            securityProperties.setActions(actions);
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
             securityProperties.setCallbackHandler(callbackHandler);
             securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#hmac-sha1");
@@ -559,8 +564,10 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE_WITH_DERIVED_KEY, WSSConstants.ENCRYPT_WITH_DERIVED_KEY};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE_WITH_DERIVED_KEY);
+            actions.add(WSSConstants.ENCRYPT_WITH_DERIVED_KEY);
+            securityProperties.setActions(actions);
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
             securityProperties.setCallbackHandler(callbackHandler);
             securityProperties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#hmac-sha1");

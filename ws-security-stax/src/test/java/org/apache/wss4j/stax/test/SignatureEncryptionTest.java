@@ -71,9 +71,11 @@ public class SignatureEncryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = 
-                new WSSConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.ENCRYPT, WSSConstants.TIMESTAMP};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.TIMESTAMP);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
@@ -106,9 +108,10 @@ public class SignatureEncryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = 
-                new WSSConstants.Action[]{WSSConstants.ENCRYPT, WSSConstants.TIMESTAMP};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.TIMESTAMP);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             
@@ -179,9 +182,11 @@ public class SignatureEncryptionTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = 
-                new WSSConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.ENCRYPT, WSSConstants.TIMESTAMP};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.TIMESTAMP);
+            securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
             

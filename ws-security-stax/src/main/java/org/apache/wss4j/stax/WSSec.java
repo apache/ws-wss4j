@@ -99,12 +99,11 @@ public class WSSec {
      *          if the configuration is invalid
      */
     public static WSSSecurityProperties validateAndApplyDefaultsToOutboundSecurityProperties(WSSSecurityProperties securityProperties) throws WSSConfigurationException {
-        if (securityProperties.getOutAction() == null) {
+        if (securityProperties.getActions() == null) {
             throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noOutputAction");
         }
 
-        for (int i = 0; i < securityProperties.getOutAction().length; i++) {
-            XMLSecurityConstants.Action action = securityProperties.getOutAction()[i];
+        for (XMLSecurityConstants.Action action : securityProperties.getActions()) {
             if (WSSConstants.TIMESTAMP.equals(action)) {
                 if (securityProperties.getTimestampTTL() == null) {
                     securityProperties.setTimestampTTL(300);

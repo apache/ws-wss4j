@@ -43,8 +43,11 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
+
 import java.io.*;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -386,8 +389,11 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         outboundSecurityProperties.setSignatureUser("transmitter");
         outboundSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outboundSecurityProperties.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-md5");
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-        outboundSecurityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.TIMESTAMP);
+        actions.add(WSSConstants.SIGNATURE);
+        actions.add(WSSConstants.ENCRYPT);
+        outboundSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outboundSecurityProperties, sourceDocument);
@@ -428,8 +434,11 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         outboundSecurityProperties.setSignatureUser("transmitter");
         outboundSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outboundSecurityProperties.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-md5");
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-        outboundSecurityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.TIMESTAMP);
+        actions.add(WSSConstants.SIGNATURE);
+        actions.add(WSSConstants.ENCRYPT);
+        outboundSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outboundSecurityProperties, sourceDocument);
@@ -559,8 +568,11 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             outboundSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             outboundSecurityProperties.setSignatureUser("transmitter");
             outboundSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-            outboundSecurityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.TIMESTAMP);
+            actions.add(WSSConstants.SIGNATURE);
+            actions.add(WSSConstants.ENCRYPT);
+            outboundSecurityProperties.setActions(actions);
             outboundSecurityProperties.setEncryptionCompressionAlgorithm("http://www.apache.org/2012/04/xmlsec/xz");
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -643,8 +655,11 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         outboundSecurityProperties.setSignatureUser("transmitter");
         outboundSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outboundSecurityProperties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2001/04/xmlenc#rsa-1_5");
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-        outboundSecurityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.TIMESTAMP);
+        actions.add(WSSConstants.SIGNATURE);
+        actions.add(WSSConstants.ENCRYPT);
+        outboundSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outboundSecurityProperties, sourceDocument);

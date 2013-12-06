@@ -58,8 +58,10 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.USERNAMETOKEN};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            actions.add(WSSConstants.USERNAMETOKEN);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setTokenUser("transmitter");
@@ -104,8 +106,10 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.USERNAMETOKEN, WSSConstants.SIGNATURE};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.USERNAMETOKEN);
+            actions.add(WSSConstants.SIGNATURE);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setTokenUser("transmitter");
@@ -150,8 +154,10 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.USERNAMETOKEN};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            actions.add(WSSConstants.USERNAMETOKEN);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setTokenUser("transmitter");
@@ -198,8 +204,10 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.TIMESTAMP};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            actions.add(WSSConstants.TIMESTAMP);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setTokenUser("transmitter");
@@ -244,8 +252,10 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.TIMESTAMP);
+            actions.add(WSSConstants.SIGNATURE);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setTokenUser("transmitter");
@@ -290,8 +300,11 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            actions.add(WSSConstants.USERNAMETOKEN);
+            actions.add(WSSConstants.TIMESTAMP);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setTokenUser("transmitter");
@@ -340,8 +353,11 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.TIMESTAMP, WSSConstants.USERNAMETOKEN};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            actions.add(WSSConstants.TIMESTAMP);
+            actions.add(WSSConstants.USERNAMETOKEN);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setTokenUser("transmitter");
@@ -390,8 +406,11 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            actions.add(WSSConstants.USERNAMETOKEN);
+            actions.add(WSSConstants.TIMESTAMP);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setTokenUser("transmitter");
@@ -442,8 +461,12 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.ENCRYPT, WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.USERNAMETOKEN);
+            actions.add(WSSConstants.TIMESTAMP);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setTokenUser("transmitter");
@@ -505,8 +528,12 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.ENCRYPT, WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.USERNAMETOKEN);
+            actions.add(WSSConstants.TIMESTAMP);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setTokenUser("transmitter");
@@ -617,8 +644,12 @@ public class HeaderOrderingTest extends AbstractTestBase {
         baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.SIGNATURE_CONFIRMATION, WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            actions.add(WSSConstants.SIGNATURE_CONFIRMATION);
+            actions.add(WSSConstants.USERNAMETOKEN);
+            actions.add(WSSConstants.TIMESTAMP);
+            securityProperties.setActions(actions);
             securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
             securityProperties.addSignaturePart(
                     new SecurePart(new QName(WSSConstants.NS_WSSE10, "UsernameToken"), SecurePart.Modifier.Element)
@@ -674,8 +705,12 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.ENCRYPT, WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.USERNAMETOKEN);
+            actions.add(WSSConstants.TIMESTAMP);
+            securityProperties.setActions(actions);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setTokenUser("transmitter");

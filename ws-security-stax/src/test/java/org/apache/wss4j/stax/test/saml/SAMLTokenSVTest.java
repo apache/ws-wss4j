@@ -44,6 +44,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -59,8 +60,9 @@ public class SAMLTokenSVTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SAML_TOKEN_SIGNED);
+            securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setConfirmationMethod(SAML1Constants.CONF_SENDER_VOUCHES);
@@ -146,8 +148,9 @@ public class SAMLTokenSVTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SAML_TOKEN_SIGNED);
+            securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setConfirmationMethod(SAML1Constants.CONF_SENDER_VOUCHES);
@@ -238,8 +241,9 @@ public class SAMLTokenSVTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SAML_TOKEN_SIGNED);
+            securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.ATTR);
             callbackHandler.setConfirmationMethod(SAML1Constants.CONF_SENDER_VOUCHES);
@@ -380,8 +384,9 @@ public class SAMLTokenSVTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SAML_TOKEN_SIGNED);
+            securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
@@ -469,8 +474,9 @@ public class SAMLTokenSVTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SAML_TOKEN_SIGNED);
+            securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.ATTR);

@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.xml.stream.XMLStreamReader;
@@ -58,8 +59,9 @@ public class PasswordEncryptorTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SIGNATURE);
+            securityProperties.setActions(actions);
             Properties properties = 
                 CryptoFactory.getProperties("transmitter-crypto-enc.properties", this.getClass().getClassLoader());
             PasswordEncryptor passwordEncryptor = 
@@ -105,8 +107,9 @@ public class PasswordEncryptorTest extends AbstractTestBase {
         ByteArrayOutputStream baos;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.ENCRYPT};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
             Properties properties = 
                 CryptoFactory.getProperties("transmitter-crypto-enc.properties", this.getClass().getClassLoader());
             PasswordEncryptor passwordEncryptor = 

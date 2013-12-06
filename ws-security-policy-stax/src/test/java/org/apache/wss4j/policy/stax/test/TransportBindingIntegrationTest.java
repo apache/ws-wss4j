@@ -109,8 +109,11 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-        outSecurityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.TIMESTAMP);
+        actions.add(WSSConstants.SIGNATURE);
+        actions.add(WSSConstants.ENCRYPT);
+        outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
@@ -209,8 +212,10 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-        outSecurityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.SIGNATURE);
+        actions.add(WSSConstants.ENCRYPT);
+        outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
@@ -328,8 +333,12 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-        outSecurityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.USERNAMETOKEN);
+        actions.add(WSSConstants.TIMESTAMP);
+        actions.add(WSSConstants.SIGNATURE);
+        actions.add(WSSConstants.ENCRYPT);
+        outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
@@ -439,8 +448,11 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-        outSecurityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.TIMESTAMP);
+        actions.add(WSSConstants.SIGNATURE);
+        actions.add(WSSConstants.ENCRYPT);
+        outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
@@ -538,8 +550,10 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-        outSecurityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.SIGNATURE);
+        actions.add(WSSConstants.ENCRYPT);
+        outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
@@ -657,8 +671,12 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-        outSecurityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.USERNAMETOKEN);
+        actions.add(WSSConstants.TIMESTAMP);
+        actions.add(WSSConstants.SIGNATURE);
+        actions.add(WSSConstants.ENCRYPT);
+        outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
@@ -761,8 +779,11 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP, WSSConstants.ENCRYPT};
-        outSecurityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.USERNAMETOKEN);
+        actions.add(WSSConstants.TIMESTAMP);
+        actions.add(WSSConstants.ENCRYPT);
+        outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
@@ -890,8 +911,12 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
 
         outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-        outSecurityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.USERNAMETOKEN);
+        actions.add(WSSConstants.TIMESTAMP);
+        actions.add(WSSConstants.SIGNATURE);
+        actions.add(WSSConstants.ENCRYPT);
+        outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
@@ -1006,8 +1031,12 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
 
         outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.USERNAMETOKEN, WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-        outSecurityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.USERNAMETOKEN);
+        actions.add(WSSConstants.TIMESTAMP);
+        actions.add(WSSConstants.SIGNATURE);
+        actions.add(WSSConstants.ENCRYPT);
+        outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
@@ -1120,8 +1149,11 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Created.getNamespaceURI(), WSSConstants.TAG_wsu_Created.getLocalPart()), SecurePart.Modifier.Element));
         outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Expires.getNamespaceURI(), WSSConstants.TAG_wsu_Expires.getLocalPart()), SecurePart.Modifier.Content));
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-        outSecurityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.TIMESTAMP);
+        actions.add(WSSConstants.SIGNATURE);
+        actions.add(WSSConstants.ENCRYPT);
+        outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
@@ -1235,8 +1267,11 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Created.getNamespaceURI(), WSSConstants.TAG_wsu_Created.getLocalPart()), SecurePart.Modifier.Element));
         outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Expires.getNamespaceURI(), WSSConstants.TAG_wsu_Expires.getLocalPart()), SecurePart.Modifier.Content));
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-        outSecurityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.TIMESTAMP);
+        actions.add(WSSConstants.SIGNATURE);
+        actions.add(WSSConstants.ENCRYPT);
+        outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
@@ -1352,8 +1387,11 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Created.getNamespaceURI(), WSSConstants.TAG_wsu_Created.getLocalPart()), SecurePart.Modifier.Element));
         outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Expires.getNamespaceURI(), WSSConstants.TAG_wsu_Expires.getLocalPart()), SecurePart.Modifier.Content));
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-        outSecurityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.TIMESTAMP);
+        actions.add(WSSConstants.SIGNATURE);
+        actions.add(WSSConstants.ENCRYPT);
+        outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
@@ -1471,8 +1509,11 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Created.getNamespaceURI(), WSSConstants.TAG_wsu_Created.getLocalPart()), SecurePart.Modifier.Element));
         outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Expires.getNamespaceURI(), WSSConstants.TAG_wsu_Expires.getLocalPart()), SecurePart.Modifier.Content));
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
-        WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-        outSecurityProperties.setOutAction(actions);
+        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        actions.add(WSSConstants.TIMESTAMP);
+        actions.add(WSSConstants.SIGNATURE);
+        actions.add(WSSConstants.ENCRYPT);
+        outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);
@@ -1586,7 +1627,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Expires.getNamespaceURI(), WSSConstants.TAG_wsu_Expires.getLocalPart()), SecurePart.Modifier.Content));
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap12_Body, SecurePart.Modifier.Content));
         WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
-        outSecurityProperties.setOutAction(actions);
+        outSecurityProperties.setActions(actions);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
         ByteArrayOutputStream baos = doOutboundSecurity(outSecurityProperties, sourceDocument);

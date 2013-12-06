@@ -44,10 +44,12 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 public class SamlConditionsTest extends AbstractTestBase {
@@ -62,8 +64,9 @@ public class SamlConditionsTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.SAML_TOKEN_SIGNED};
-            securityProperties.setOutAction(actions);
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SAML_TOKEN_SIGNED);
+            securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setIssuer("www.example.com");
