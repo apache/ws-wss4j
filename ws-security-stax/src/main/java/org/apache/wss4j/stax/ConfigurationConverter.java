@@ -458,7 +458,7 @@ public final class ConfigurationConverter {
         
         boolean encryptSymmetricEncryptionKey = 
             decodeBooleanConfigValue(ConfigurationConstants.ENC_SYM_ENC_KEY, true, config);
-        properties.setEncryptSymmetricEncrytionKey(encryptSymmetricEncryptionKey);
+        properties.setEncryptSymmetricEncryptionKey(encryptSymmetricEncryptionKey);
         
         boolean use200512Namespace = 
             decodeBooleanConfigValue(ConfigurationConstants.USE_2005_12_NAMESPACE, true, config);

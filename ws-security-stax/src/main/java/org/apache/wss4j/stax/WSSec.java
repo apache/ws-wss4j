@@ -139,14 +139,14 @@ public class WSSec {
                         && securityProperties.getEncryptionKeyStore() == null
                         && securityProperties.getEncryptionCryptoProperties() == null
                         && !securityProperties.isUseReqSigCertForEncryption()
-                        && securityProperties.isEncryptSymmetricEncrytionKey()
+                        && securityProperties.isEncryptSymmetricEncryptionKey()
                         && securityProperties.getEncryptionCrypto() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "encryptionKeyStoreNotSet");
                 }
                 if (securityProperties.getEncryptionUser() == null
                         && securityProperties.getEncryptionUseThisCertificate() == null
                         && !securityProperties.isUseReqSigCertForEncryption()
-                        && securityProperties.isEncryptSymmetricEncrytionKey()) {
+                        && securityProperties.isEncryptSymmetricEncryptionKey()) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noEncryptionUser");
                 }
                 if (securityProperties.getEncryptionSymAlgorithm() == null) {
@@ -237,14 +237,14 @@ public class WSSec {
                         && securityProperties.getEncryptionKeyStore() == null
                         && securityProperties.getEncryptionCryptoProperties() == null
                         && !securityProperties.isUseReqSigCertForEncryption()
-                        && securityProperties.isEncryptSymmetricEncrytionKey()
+                        && securityProperties.isEncryptSymmetricEncryptionKey()
                         && securityProperties.getEncryptionCrypto() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "encryptionKeyStoreNotSet");
                 }
                 if (securityProperties.getEncryptionUser() == null
                         && securityProperties.getEncryptionUseThisCertificate() == null
                         && !securityProperties.isUseReqSigCertForEncryption()
-                        && securityProperties.isEncryptSymmetricEncrytionKey()) {
+                        && securityProperties.isEncryptSymmetricEncryptionKey()) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noEncryptionUser");
                 }
                 if (securityProperties.getEncryptionSymAlgorithm() == null) {

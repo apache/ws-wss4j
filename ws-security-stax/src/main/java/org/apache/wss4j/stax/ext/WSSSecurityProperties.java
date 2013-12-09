@@ -904,11 +904,11 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.enableSamlOneTimeUseReplayCache = enableSamlOneTimeUseReplayCache;
     }
 
-    public boolean isEncryptSymmetricEncrytionKey() {
+    public boolean isEncryptSymmetricEncryptionKey() {
         return encryptSymmetricEncrytionKey;
     }
 
-    public void setEncryptSymmetricEncrytionKey(boolean encryptSymmetricEncrytionKey) {
+    public void setEncryptSymmetricEncryptionKey(boolean encryptSymmetricEncrytionKey) {
         this.encryptSymmetricEncrytionKey = encryptSymmetricEncrytionKey;
     }
     

@@ -195,7 +195,7 @@ public class OutboundWSSec {
 
                 } else if (WSSConstants.ENCRYPT.equals(action)) {
                     encryptionAction = true;
-                    if (securityProperties.isEncryptSymmetricEncrytionKey()) {
+                    if (securityProperties.isEncryptSymmetricEncryptionKey()) {
                         final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
                             new BinarySecurityTokenOutputProcessor();
                         initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
@@ -500,7 +500,7 @@ public class OutboundWSSec {
             outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, symmId);
         }
         
-        if (!securityProperties.isEncryptSymmetricEncrytionKey()) {
+        if (!securityProperties.isEncryptSymmetricEncryptionKey()) {
             // No EncryptedKey Token required here, so return
             return;
         }
