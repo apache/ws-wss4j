@@ -250,41 +250,39 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
 
     @Override
     protected SecurePart securePartMatches(XMLSecStartElement xmlSecStartElement, Map<Object, SecurePart> secureParts) {
-        SecurePart securePart = secureParts.get(xmlSecStartElement.getName());
-        if (securePart == null) {
-            if (xmlSecStartElement.getOnElementDeclaredAttributes().size() == 0) {
-                return null;
-            }
+    
+        if (xmlSecStartElement.getOnElementDeclaredAttributes().size() >= 0) {
             Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_wsu_Id);
             if (attribute != null) {
-                securePart = secureParts.get(attribute.getValue());
+                SecurePart securePart = secureParts.get(attribute.getValue());
                 if (securePart != null) {
                     return securePart;
                 }
             }
             attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_NULL_Id);
             if (attribute != null) {
-                securePart = secureParts.get(attribute.getValue());
+                SecurePart securePart = secureParts.get(attribute.getValue());
                 if (securePart != null) {
                     return securePart;
                 }
             }
             attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_NULL_ID);
             if (attribute != null) {
-                securePart = secureParts.get(attribute.getValue());
+                SecurePart securePart = secureParts.get(attribute.getValue());
                 if (securePart != null) {
                     return securePart;
                 }
             }
             attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_NULL_AssertionID);
             if (attribute != null) {
-                securePart = secureParts.get(attribute.getValue());
+                SecurePart securePart = secureParts.get(attribute.getValue());
                 if (securePart != null) {
                     return securePart;
                 }
             }
         }
-        return securePart;
+        
+        return secureParts.get(xmlSecStartElement.getName());
     }
 
     class InternalWSSSignatureOutputProcessor extends InternalSignatureOutputProcessor {

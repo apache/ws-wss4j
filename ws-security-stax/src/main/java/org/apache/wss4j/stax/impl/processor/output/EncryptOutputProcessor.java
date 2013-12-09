@@ -128,6 +128,43 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
 
         outputProcessorChain.processEvent(xmlSecEvent);
     }
+    
+    @Override
+    protected SecurePart securePartMatches(XMLSecStartElement xmlSecStartElement, Map<Object, SecurePart> secureParts) {
+    
+        if (xmlSecStartElement.getOnElementDeclaredAttributes().size() >= 0) {
+            Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_wsu_Id);
+            if (attribute != null) {
+                SecurePart securePart = secureParts.get(attribute.getValue());
+                if (securePart != null) {
+                    return securePart;
+                }
+            }
+            attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_NULL_Id);
+            if (attribute != null) {
+                SecurePart securePart = secureParts.get(attribute.getValue());
+                if (securePart != null) {
+                    return securePart;
+                }
+            }
+            attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_NULL_ID);
+            if (attribute != null) {
+                SecurePart securePart = secureParts.get(attribute.getValue());
+                if (securePart != null) {
+                    return securePart;
+                }
+            }
+            attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_NULL_AssertionID);
+            if (attribute != null) {
+                SecurePart securePart = secureParts.get(attribute.getValue());
+                if (securePart != null) {
+                    return securePart;
+                }
+            }
+        }
+        
+        return secureParts.get(xmlSecStartElement.getName());
+    }
 
     @Override
     public void doFinalInternal(OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
