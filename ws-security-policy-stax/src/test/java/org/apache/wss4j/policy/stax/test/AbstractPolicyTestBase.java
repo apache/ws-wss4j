@@ -44,6 +44,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -54,6 +55,7 @@ import java.io.InputStreamReader;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 import java.util.List;
 
 public class AbstractPolicyTestBase extends AbstractTestBase {
@@ -120,6 +122,15 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
             @Override
             protected String getAlias() throws XMLSecurityException {
                 return keyAlias;
+            }
+            
+            @Override
+            public List<QName> getElementPath() {
+                List<QName> elementPath = super.getElementPath();
+                if (elementPath != null) {
+                    return elementPath;
+                }
+                return Collections.emptyList();
             }
         };
         x509SecurityToken.setSecretKey("", keyStore.getKey(keyAlias, "default".toCharArray()));

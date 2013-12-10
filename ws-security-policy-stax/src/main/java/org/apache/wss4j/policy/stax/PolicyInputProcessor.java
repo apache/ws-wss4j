@@ -39,6 +39,8 @@ import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
+
 import java.util.List;
 
 /**
@@ -198,6 +200,7 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
 
                     EncryptedElementSecurityEvent encryptedElementSecurityEvent
                             = new EncryptedElementSecurityEvent(null, false, null);
+                    encryptedElementSecurityEvent.setCorrelationID(getId(xmlSecEvent));
                     encryptedElementSecurityEvent.setElementPath(elementPath);
                     policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
@@ -218,6 +221,29 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
                 policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
                 break;
         }
+    }
+    
+    protected String getId(XMLSecEvent xmlSecEvent) {
+        XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
+        if (xmlSecStartElement.getOnElementDeclaredAttributes().size() >= 0) {
+            Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_wsu_Id);
+            if (attribute != null) {
+                return attribute.getValue();
+            }
+            attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_NULL_Id);
+            if (attribute != null) {
+                return attribute.getValue();
+            }
+            attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_NULL_ID);
+            if (attribute != null) {
+                return attribute.getValue();
+            }
+            attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_NULL_AssertionID);
+            if (attribute != null) {
+                return attribute.getValue();
+            }
+        }
+        return null;
     }
 
     protected void init(InputProcessorChain inputProcessorChain) {
