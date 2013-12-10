@@ -166,6 +166,7 @@
                               org.bouncycastle.*;resolution:=optional,
                               org.apache.jcp.xml.dsig.internal.dom.*,
                               org.opensaml.*;resolution:=optional,
+                              org.joda.time;version="[1.6,3)";resolution:=optional,
                               *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>
