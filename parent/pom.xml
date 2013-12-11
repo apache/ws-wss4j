@@ -46,7 +46,6 @@
         <xerces.version>2.11.0</xerces.version>
         <xmlsec.version>2.0.0-SNAPSHOT</xmlsec.version>
         <opensaml.version>2.6.0</opensaml.version>
-        <testng.version>6.5.2</testng.version>
         <junit.version>4.11</junit.version>
         <xml.apis.version>1.4.01</xml.apis.version>
         <wsdl4j.version>1.6.2</wsdl4j.version>
@@ -111,11 +110,6 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>${slf4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.testng</groupId>
-                <artifactId>testng</artifactId>
-                <version>${testng.version}</version>
             </dependency>
             <dependency>
                 <groupId>xalan</groupId>

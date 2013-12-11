@@ -40,8 +40,8 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.test.saml.SAML2CallbackHandler;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 

@@ -43,10 +43,11 @@ import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -60,21 +61,30 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class DerivedKeyTokenTest extends AbstractTestBase {
+    
+    final int version;
+    
+    public DerivedKeyTokenTest(int version) {
+        this.version = version;
+    }
 
     @BeforeClass
-    public void setUp() throws Exception {
+    public static void setUp() throws Exception {
         WSSConfig.init();
     }
 
-    @DataProvider(name = "versionProvider")
-    public Object[][] versionProvider() {
-        return new Object[][]{
-                {ConversationConstants.VERSION_05_02},
-                {ConversationConstants.VERSION_05_12}
-        };
+    @Parameters(name = "{0}")
+    public static Collection<Object[]> data() {
+       
+        return Arrays.asList(new Object[][] {{ConversationConstants.VERSION_05_02},
+                                             {ConversationConstants.VERSION_05_12}
+        });
     }
 
     @Test
@@ -110,8 +120,8 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test(dataProvider = "versionProvider")
-    public void testEncryptionDecryptionTRIPLEDESInbound(int version) throws Exception {
+    @Test
+    public void testEncryptionDecryptionTRIPLEDESInbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -235,8 +245,8 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test(dataProvider = "versionProvider")
-    public void testEncryptionDecryptionAES128Inbound(int version) throws Exception {
+    @Test
+    public void testEncryptionDecryptionAES128Inbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -323,8 +333,8 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test(dataProvider = "versionProvider")
-    public void testSignatureInbound(int version) throws Exception {
+    @Test
+    public void testSignatureInbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -420,8 +430,8 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test(dataProvider = "versionProvider")
-    public void testSignatureThumbprintSHA1Inbound(int version) throws Exception {
+    @Test
+    public void testSignatureThumbprintSHA1Inbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -512,8 +522,8 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test(dataProvider = "versionProvider")
-    public void testSignatureSKIInbound(int version) throws Exception {
+    @Test
+    public void testSignatureSKIInbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -603,8 +613,8 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test(dataProvider = "versionProvider")
-    public void testSignatureEncryptInbound(int version) throws Exception {
+    @Test
+    public void testSignatureEncryptInbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -726,8 +736,8 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test(dataProvider = "versionProvider")
-    public void testEncryptSignatureInbound(int version) throws Exception {
+    @Test
+    public void testEncryptSignatureInbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {

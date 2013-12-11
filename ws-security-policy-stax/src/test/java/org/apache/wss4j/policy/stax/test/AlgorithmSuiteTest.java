@@ -31,8 +31,8 @@ import org.apache.wss4j.policy.stax.PolicyViolationException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 import javax.xml.namespace.QName;
 

@@ -37,7 +37,8 @@ import org.apache.xml.security.binding.xmldsig11.NamedCurveType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.Init;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
-import org.testng.annotations.BeforeClass;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -61,12 +62,12 @@ import java.util.List;
 public class AbstractPolicyTestBase extends AbstractTestBase {
 
     @BeforeClass
-    public void setUp() throws Exception {
+    public static void setUp() throws Exception {
         WSProviderConfig.init();
         Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
     }
     
-    @org.testng.annotations.AfterClass
+    @AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }

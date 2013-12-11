@@ -25,9 +25,8 @@ import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.wss4j.policy.stax.PolicyEnforcer;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.wss4j.stax.test.InboundWSSecurityContextImplTest;
-import org.testng.Assert;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.List;
 
@@ -35,87 +34,172 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
 
     private InboundWSSecurityContextImplTest inboundWSSecurityContextImplTest = new InboundWSSecurityContextImplTest();
 
-    @DataProvider(name = "ignoreEventsTransportBindingC11a")
-    public Object[][] ignoreEventsTransportBindingC11a() {
-        return new Object[][]{
-                {null, null, null},
-                {WSSecurityEventConstants.HttpsToken, 2, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}HttpsToken not satisfied"},
-                {WSSecurityEventConstants.RequiredElement, 4, "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present"},
-                {WSSecurityEventConstants.UsernameToken, 0, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied"},
-                {SecurityEventConstants.X509Token, 1, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}X509Token not satisfied"},
-        };
+    @Test
+    public void testTransportBindingC11a() throws Exception {
+        {
+            String policyString = loadResourceAsString("testdata/policy/transportBindingPolicyC11.xml", "UTF-8");
+    
+            PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+    
+            List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateTransportBindingSecurityEvents();
+            applyPolicy(null, null, null, policyEnforcer, securityEventList);
+        }
+        {
+            String policyString = loadResourceAsString("testdata/policy/transportBindingPolicyC11.xml", "UTF-8");
+
+            PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+
+            List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateTransportBindingSecurityEvents();
+            applyPolicy(WSSecurityEventConstants.HttpsToken, 2, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}HttpsToken not satisfied", policyEnforcer, securityEventList);
+        }
+        {
+            String policyString = loadResourceAsString("testdata/policy/transportBindingPolicyC11.xml", "UTF-8");
+
+            PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+
+            List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateTransportBindingSecurityEvents();
+            applyPolicy(WSSecurityEventConstants.RequiredElement, 4, "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present", policyEnforcer, securityEventList);
+            }
+        {
+            String policyString = loadResourceAsString("testdata/policy/transportBindingPolicyC11.xml", "UTF-8");
+
+            PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+
+            List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateTransportBindingSecurityEvents();
+            applyPolicy(WSSecurityEventConstants.UsernameToken, 0, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied", policyEnforcer, securityEventList);
+        }
+        {
+            String policyString = loadResourceAsString("testdata/policy/transportBindingPolicyC11.xml", "UTF-8");
+
+            PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+
+            List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateTransportBindingSecurityEvents();
+            applyPolicy(SecurityEventConstants.X509Token, 1, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}X509Token not satisfied", policyEnforcer, securityEventList);
+        }
     }
 
-    @Test(dataProvider = "ignoreEventsTransportBindingC11a")
-    public void testTransportBindingC11a(SecurityEventConstants.Event ignoreEvent, Integer eventIndex, String expectedErrorMessage) throws Exception {
-        String policyString = loadResourceAsString("testdata/policy/transportBindingPolicyC11.xml", "UTF-8");
-
-        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-
-        List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateTransportBindingSecurityEvents();
-        applyPolicy(ignoreEvent, eventIndex, expectedErrorMessage, policyEnforcer, securityEventList);
+    @Test
+    public void testAsymmetricBindingC31a() throws Exception {
+        {
+            String policyString = loadResourceAsString("testdata/policy/asymmetricBindingPolicyC31.xml", "UTF-8");
+    
+            PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+    
+            List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateAsymmetricBindingSecurityEvents();
+            applyPolicy(null, null, null, policyEnforcer, securityEventList);
+        }
+        {
+            String policyString = loadResourceAsString("testdata/policy/asymmetricBindingPolicyC31.xml", "UTF-8");
+    
+            PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+    
+            List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateAsymmetricBindingSecurityEvents();
+            applyPolicy(WSSecurityEventConstants.RequiredElement, 8, "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present", policyEnforcer, securityEventList);
+        }
+        {
+            String policyString = loadResourceAsString("testdata/policy/asymmetricBindingPolicyC31.xml", "UTF-8");
+    
+            PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+    
+            List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateAsymmetricBindingSecurityEvents();
+            applyPolicy(SecurityEventConstants.X509Token, 0, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}X509Token not satisfied", policyEnforcer, securityEventList);
+        }
+        {
+            String policyString = loadResourceAsString("testdata/policy/asymmetricBindingPolicyC31.xml", "UTF-8");
+    
+            PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+    
+            List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateAsymmetricBindingSecurityEvents();
+            applyPolicy(WSSecurityEventConstants.UsernameToken, 1, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied", policyEnforcer, securityEventList);
+        }
     }
 
-    @DataProvider(name = "ignoreEventsAsymmetricBindingC31a")
-    public Object[][] ignoreEventsAsymmetricBindingC31a() {
-        return new Object[][]{
-                {null, null, null},
-                {WSSecurityEventConstants.RequiredElement, 8, "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present"},
-                {SecurityEventConstants.X509Token, 0, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}X509Token not satisfied"},
-                {WSSecurityEventConstants.UsernameToken, 1, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied"},
-        };
+    @Test
+    public void testSymmetricBindingC21a() throws Exception {
+        {
+            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21a.xml", "UTF-8");
+    
+            PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+    
+            List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateSymmetricBindingSecurityEvents();
+            applyPolicy(null, null, null, policyEnforcer, securityEventList);
+        }
+        {
+            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21a.xml", "UTF-8");
+    
+            PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+    
+            List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateSymmetricBindingSecurityEvents();
+            applyPolicy(WSSecurityEventConstants.RequiredElement, 4, "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present", policyEnforcer, securityEventList);
+        }
+        {
+            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21a.xml", "UTF-8");
+    
+            PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+    
+            List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateSymmetricBindingSecurityEvents();
+            applyPolicy(WSSecurityEventConstants.SamlToken, -1, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}IssuedToken not satisfied", policyEnforcer, securityEventList);
+        }
+        {
+            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21a.xml", "UTF-8");
+    
+            PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+    
+            List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateSymmetricBindingSecurityEvents();
+            applyPolicy(WSSecurityEventConstants.UsernameToken, 0, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied", policyEnforcer, securityEventList);
+        }
+        {
+            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21a.xml", "UTF-8");
+    
+            PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+    
+            List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateSymmetricBindingSecurityEvents();
+            applyPolicy(SecurityEventConstants.X509Token, 2, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}X509Token not satisfied", policyEnforcer, securityEventList);
+        }
     }
 
-    @Test(dataProvider = "ignoreEventsAsymmetricBindingC31a")
-    public void testAsymmetricBindingC31a(SecurityEventConstants.Event ignoreEvent, Integer eventIndex, String expectedErrorMessage) throws Exception {
-        String policyString = loadResourceAsString("testdata/policy/asymmetricBindingPolicyC31.xml", "UTF-8");
-
-        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-
-        List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateAsymmetricBindingSecurityEvents();
-        applyPolicy(ignoreEvent, eventIndex, expectedErrorMessage, policyEnforcer, securityEventList);
-    }
-
-    @DataProvider(name = "ignoreEventsSymmetricBindingC21a")
-    public Object[][] ignoreEventsSymmetricBindingC21a() {
-        return new Object[][]{
-                {null, null, null},
-                {WSSecurityEventConstants.RequiredElement, 4, "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present"},
-                {WSSecurityEventConstants.SamlToken, -1, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}IssuedToken not satisfied"},
-                {WSSecurityEventConstants.UsernameToken, 0, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied"},
-                {SecurityEventConstants.X509Token, 2, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}X509Token not satisfied"},
-        };
-    }
-
-    @Test(dataProvider = "ignoreEventsSymmetricBindingC21a")
-    public void testSymmetricBindingC21a(SecurityEventConstants.Event ignoreEvent, Integer eventIndex, String expectedErrorMessage) throws Exception {
-        String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21a.xml", "UTF-8");
-
-        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-
-        List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateSymmetricBindingSecurityEvents();
-        applyPolicy(ignoreEvent, eventIndex, expectedErrorMessage, policyEnforcer, securityEventList);
-    }
-
-    @DataProvider(name = "ignoreEventsSymmetricBindingC21b")
-    public Object[][] ignoreEventsSymmetricBindingC21b() {
-        return new Object[][]{
-                {null, null, null},
-                {WSSecurityEventConstants.RequiredElement, 4, "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present"},
-                {WSSecurityEventConstants.SamlToken, -1, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}IssuedToken not satisfied"},
-                {WSSecurityEventConstants.UsernameToken, 0, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied"},
-                {SecurityEventConstants.X509Token, 2, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}X509Token not satisfied"},
-        };
-    }
-
-    @Test(dataProvider = "ignoreEventsSymmetricBindingC21b")
-    public void testSymmetricBindingC21b(SecurityEventConstants.Event ignoreEvent, Integer eventIndex, String expectedErrorMessage) throws Exception {
-        String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21b.xml", "UTF-8");
-
-        PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
-
-        List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateSymmetricBindingSecurityEvents();
-        applyPolicy(ignoreEvent, eventIndex, expectedErrorMessage, policyEnforcer, securityEventList);
+    @Test
+    public void testSymmetricBindingC21b() throws Exception {
+        {
+            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21b.xml", "UTF-8");
+    
+            PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+    
+            List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateSymmetricBindingSecurityEvents();
+            applyPolicy(null, null, null, policyEnforcer, securityEventList);
+        }
+        {
+            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21b.xml", "UTF-8");
+    
+            PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+    
+            List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateSymmetricBindingSecurityEvents();
+            applyPolicy(WSSecurityEventConstants.RequiredElement, 4, "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present", policyEnforcer, securityEventList);
+        }
+        {
+            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21b.xml", "UTF-8");
+    
+            PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+    
+            List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateSymmetricBindingSecurityEvents();
+            applyPolicy(WSSecurityEventConstants.SamlToken, -1, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}IssuedToken not satisfied", policyEnforcer, securityEventList);
+        }
+        {
+            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21b.xml", "UTF-8");
+    
+            PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+    
+            List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateSymmetricBindingSecurityEvents();
+            applyPolicy(WSSecurityEventConstants.UsernameToken, 0, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied", policyEnforcer, securityEventList);
+        }
+        {
+            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21b.xml", "UTF-8");
+    
+            PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
+    
+            List<SecurityEvent> securityEventList = inboundWSSecurityContextImplTest.generateSymmetricBindingSecurityEvents();
+            applyPolicy(SecurityEventConstants.X509Token, 2, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}X509Token not satisfied", policyEnforcer, securityEventList);
+        }
     }
 
     private void applyPolicy(SecurityEventConstants.Event ignoreEvent, Integer eventIndex, String expectedErrorMessage, PolicyEnforcer policyEnforcer, List<SecurityEvent> securityEventList) throws WSSecurityException {
@@ -143,13 +227,13 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
         } catch (WSSPolicyException e) {
             //Exception for policyEnforcer.doFinal();
             if (ignoreEvent == null) {
-                Assert.fail("Unexpected WSSPolicyException", e);
+                Assert.fail("Unexpected WSSPolicyException: " + e.getMessage());
             }
             Assert.assertEquals(e.getMessage(), expectedErrorMessage);
         } catch (WSSecurityException e) {
             //Exception for policyEnforcer.registerSecurityEvent(securityEvent);
             if (ignoreEvent == null) {
-                Assert.fail("Unexpected WSSPolicyException", e);
+                Assert.fail("Unexpected WSSPolicyException: " + e.getMessage());
             }
             Assert.assertTrue(e.getCause() instanceof WSSPolicyException);
             Assert.assertEquals(e.getCause().getMessage(), expectedErrorMessage);

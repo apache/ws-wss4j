@@ -28,10 +28,11 @@ import org.apache.wss4j.stax.securityEvent.*;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 import javax.xml.namespace.QName;
+
 import java.util.LinkedList;
 import java.util.List;
 

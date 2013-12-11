@@ -26,14 +26,15 @@ import org.apache.wss4j.policy.WSSPolicyException;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.impl.securityToken.*;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.junit.Assert;
+import org.junit.Test;
 import org.opensaml.common.SAMLVersion;
 import org.apache.wss4j.policy.stax.PolicyEnforcer;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityEvent.*;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
+
 import java.util.Date;
 
 public class SupportingTokensTest extends AbstractPolicyTestBase {

@@ -110,6 +110,7 @@
         <module>ws-security-stax</module>
         <module>integration</module>
         <module>ws-security-policy-stax</module>
+        <!-- <module>performance</module>-->
     </modules>
 
     <build>

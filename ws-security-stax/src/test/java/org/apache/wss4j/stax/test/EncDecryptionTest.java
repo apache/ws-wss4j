@@ -49,8 +49,8 @@ import org.apache.xml.security.stax.securityEvent.EncryptedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.utils.Base64;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -2222,7 +2222,8 @@ public class EncDecryptionTest extends AbstractTestBase {
         }
     }
 
-    @Test(enabled = false) //WSS4J does not support OAEPParams atm
+    @Test
+    @org.junit.Ignore //WSS4J does not support OAEPParams atm
     public void testKeyWrappingRSAOAEPAESGCM192SHA384MGF1SHA384PSourceInbound() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

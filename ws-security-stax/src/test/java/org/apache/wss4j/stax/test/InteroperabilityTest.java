@@ -31,8 +31,8 @@ import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.securityEvent.*;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.Test;
 import org.w3c.dom.*;
 
 import javax.xml.namespace.QName;
@@ -49,7 +49,7 @@ import java.util.*;
 
 public class InteroperabilityTest extends AbstractTestBase {
 
-    @Test(invocationCount = 1)
+    @Test
     public void testInteroperabilityInbound() throws Exception {
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -150,7 +150,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         );
     }
 
-    @Test(invocationCount = 1)
+    @Test
     public void testInteroperabilityInboundSOAP12() throws Exception {
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.2.xml");
@@ -205,7 +205,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityEventListener.compare();
     }
 
-    @Test(invocationCount = 1)
+    @Test
     public void testInteroperabilityEncryptedSignatureInbound() throws Exception {
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -355,7 +355,7 @@ public class InteroperabilityTest extends AbstractTestBase {
     }
 */
 
-    @Test(invocationCount = 1)
+    @Test
     public void testInteroperabilityInboundReverseOrder() throws Exception {
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -508,7 +508,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
     }
 
-    @Test(invocationCount = 1)
+    @Test
     public void testInteroperabilityInboundSecurityHeaderTimestampOrder() throws Exception {
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -768,154 +768,157 @@ public class InteroperabilityTest extends AbstractTestBase {
      *
      * @throws Exception
      */
-    @Test(invocationCount = 100) //retest 100 times to make sure we don't have a threading issue
+    @Test
     public void testSignatureC14NInclusivePartsInbound() throws Exception {
-        Document securedDocument;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        {
-            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
-            actions.add(WSSConstants.SIGNATURE);
-            actions.add(WSSConstants.ENCRYPT);
-            securityProperties.setActions(actions);
-            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-            securityProperties.setSignatureUser("transmitter");
-            securityProperties.setEncryptionUser("receiver");
-            securityProperties.addSignaturePart(new SecurePart(new QName("http://www.w3.org/1999/XMLSchema", "complexType"), SecurePart.Modifier.Element));
-            securityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments");
-            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-
-            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
-            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
-            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
-            xmlStreamWriter.close();
-
-            securedDocument = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
-            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
-        }
-
-        {
-            String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
-            Properties properties = new Properties();
-            doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
-        }
-
-        //done signature; now test sig-verification:
-        {
-            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            securityProperties.addIgnoreBSPRule(BSPRule.R5404);
-            securityProperties.addIgnoreBSPRule(BSPRule.R5423);
-            securityProperties.addIgnoreBSPRule(BSPRule.R5412);
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-
-            WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.X509Token,
-                    WSSecurityEventConstants.X509Token,
-                    WSSecurityEventConstants.SignatureValue,
-                    WSSecurityEventConstants.EncryptedPart,
-                    WSSecurityEventConstants.Operation,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SignedElement,
-            };
-            final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(
-                    xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
-
-            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-
-            //header element must still be there
-            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
-
-            securityEventListener.compare();
+        //retest 100 times to make sure we don't have a threading issue
+        for (int i = 0; i < 100; i++) {
+            Document securedDocument;
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            {
+                WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+                List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+                actions.add(WSSConstants.SIGNATURE);
+                actions.add(WSSConstants.ENCRYPT);
+                securityProperties.setActions(actions);
+                securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+                securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+                securityProperties.setSignatureUser("transmitter");
+                securityProperties.setEncryptionUser("receiver");
+                securityProperties.addSignaturePart(new SecurePart(new QName("http://www.w3.org/1999/XMLSchema", "complexType"), SecurePart.Modifier.Element));
+                securityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments");
+                securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+    
+                OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+                XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+                XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+                XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+                xmlStreamWriter.close();
+    
+                securedDocument = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+                NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
+                Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            }
+    
+            {
+                String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
+                Properties properties = new Properties();
+                doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
+            }
+    
+            //done signature; now test sig-verification:
+            {
+                WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+                securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+                securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+                securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+                securityProperties.addIgnoreBSPRule(BSPRule.R5404);
+                securityProperties.addIgnoreBSPRule(BSPRule.R5423);
+                securityProperties.addIgnoreBSPRule(BSPRule.R5412);
+                InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+    
+                WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.X509Token,
+                        WSSecurityEventConstants.X509Token,
+                        WSSecurityEventConstants.SignatureValue,
+                        WSSecurityEventConstants.EncryptedPart,
+                        WSSecurityEventConstants.Operation,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.AlgorithmSuite,
+                        WSSecurityEventConstants.SignedElement,
+                };
+                final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
+                XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(
+                        xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
+    
+                Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+    
+                //header element must still be there
+                NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
+                Assert.assertEquals(nodeList.getLength(), 1);
+                Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+    
+                securityEventListener.compare();
+            }
         }
     }
 
-    @Test(invocationCount = 1)
+    @Test
     public void testInteroperabilitySOAPActionInbound() throws Exception {
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -971,7 +974,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityEventListener.compare();
     }
 
-    @Test(invocationCount = 1)
+    @Test
     public void testInteroperabilityInvalidSOAPActionInbound() throws Exception {
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -1013,7 +1016,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityEventListener.compare();
     }
 
-    @Test(invocationCount = 1)
+    @Test
     public void testInteroperabilitySOAPRoleInbound() throws Exception {
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.2.xml");
@@ -1069,7 +1072,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityEventListener.compare();
     }
 
-    @Test(invocationCount = 1)
+    @Test
     public void testInteroperabilityTwoSecurityHeadersSOAPRoleInbound() throws Exception {
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.2.xml");
@@ -1110,7 +1113,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         ));
     }
 
-    @Test(invocationCount = 1)
+    @Test
     public void testInteroperabilitySOAPActionOutbound() throws Exception {
 
         WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -1135,7 +1138,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
     }
 
-    @Test(invocationCount = 1)
+    @Test
     public void testInteroperabilityInvalidSOAPActionOutbound() throws Exception {
 
         WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -1165,7 +1168,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         }
     }
 
-    @Test(invocationCount = 1)
+    @Test
     public void testInteroperabilitySOAPRoleOutbound() throws Exception {
 
         WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -1191,7 +1194,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
     }
 
-    @Test(invocationCount = 1)
+    @Test
     public void testInteroperabilityTwoSecurityHeadersSOAPRoleOutbound() throws Exception {
 
         WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -1219,7 +1222,7 @@ public class InteroperabilityTest extends AbstractTestBase {
         doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
     }
 
-    @Test(invocationCount = 1)
+    @Test
     public void testInvalidXML() throws Exception {
 
         int i = 0;
@@ -1280,7 +1283,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                     StringWriter stringWriter = new StringWriter();
                     PrintWriter pw = new PrintWriter(stringWriter);
                     ex.printStackTrace(pw);
-                    Assert.assertFalse((t instanceof NullPointerException), stringWriter.toString());
+                    Assert.assertFalse(stringWriter.toString(), (t instanceof NullPointerException));
                     t = t.getCause();
                 }
             }

@@ -186,8 +186,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -208,10 +208,6 @@
                         <log4j.configuration>log4j-wss.xml</log4j.configuration>
                     </systemPropertyVariables>
                     <!--<debugForkedProcess>true</debugForkedProcess>-->
-                    <excludes>
-                        <exclude>**/PerformanceMemoryTest.java</exclude>
-                        <exclude>**/PerformanceTimingTest.java</exclude>
-                    </excludes>
                 </configuration>
             </plugin>
             <plugin>

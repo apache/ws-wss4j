@@ -40,12 +40,13 @@ import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecEventFactory;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.*;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.opensaml.common.SAMLVersion;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
+
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -56,7 +57,7 @@ import java.util.List;
 public class InboundWSSecurityContextImplTest {
 
     @BeforeClass
-    public void setUp() throws Exception {
+    public static void setUp() throws Exception {
         WSProviderConfig.init();
         Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
     }

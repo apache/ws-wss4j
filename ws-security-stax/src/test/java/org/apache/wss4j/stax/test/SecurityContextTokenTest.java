@@ -42,10 +42,11 @@ import org.apache.wss4j.stax.test.utils.SecretKeyCallbackHandler;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
@@ -54,25 +55,35 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class SecurityContextTokenTest extends AbstractTestBase {
 
-    @BeforeClass
-    public void setUp() throws Exception {
-        WSSConfig.init();
+    final int version;
+    
+    public SecurityContextTokenTest(int version) {
+        this.version = version;
     }
-
-    @DataProvider(name = "versionProvider")
-    public Object[][] versionProvider() {
-        return new Object[][]{
-                {ConversationConstants.VERSION_05_02},
-                {ConversationConstants.VERSION_05_12}
-        };
+    
+    @Parameters(name = "{0}")
+    public static Collection<Object[]> data() {
+       
+        return Arrays.asList(new Object[][] {{ConversationConstants.VERSION_05_02},
+                                             {ConversationConstants.VERSION_05_12}
+        });
+    }
+    
+    @BeforeClass
+    public static void setUp() throws Exception {
+        WSSConfig.init();
     }
 
     @Test
@@ -120,8 +131,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test(dataProvider = "versionProvider")
-    public void testSCTDKTEncryptInbound(int version) throws Exception {
+    @Test
+    public void testSCTDKTEncryptInbound() throws Exception {
 
         byte[] tempSecret = WSSecurityUtil.generateNonce(16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -250,8 +261,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test(dataProvider = "versionProvider")
-    public void testSCTKDKTSignInbound(int version) throws Exception {
+    @Test
+    public void testSCTKDKTSignInbound() throws Exception {
 
         byte[] tempSecret = WSSecurityUtil.generateNonce(16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -344,8 +355,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test(dataProvider = "versionProvider")
-    public void testSCTKDKTSignAbsoluteInbound(int version) throws Exception {
+    @Test
+    public void testSCTKDKTSignAbsoluteInbound() throws Exception {
 
         byte[] tempSecret = WSSecurityUtil.generateNonce(16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -391,8 +402,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test(dataProvider = "versionProvider")
-    public void testSCTKDKTSignEncrypt(int version) throws Exception {
+    @Test()
+    public void testSCTKDKTSignEncrypt() throws Exception {
 
         byte[] tempSecret = WSSecurityUtil.generateNonce(16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -505,8 +516,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test(dataProvider = "versionProvider")
-    public void testSCTKDKTEncryptSign(int version) throws Exception {
+    @Test
+    public void testSCTKDKTEncryptSign() throws Exception {
 
         byte[] tempSecret = WSSecurityUtil.generateNonce(16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -619,8 +630,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         }
     }
 
-    @Test(dataProvider = "versionProvider")
-    public void testSCTSign(int version) throws Exception {
+    @Test
+    public void testSCTSign() throws Exception {
 
         byte[] tempSecret = WSSecurityUtil.generateNonce(16);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

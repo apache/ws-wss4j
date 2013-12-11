@@ -21,6 +21,8 @@ package org.apache.wss4j.policy.stax.test;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.config.Init;
+import org.junit.Assert;
+import org.junit.Test;
 import org.opensaml.common.SAMLVersion;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
@@ -35,8 +37,6 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.test.CallbackHandlerImpl;
 import org.apache.wss4j.stax.test.saml.SAMLCallbackHandlerImpl;
 import org.apache.xml.security.stax.ext.SecurePart;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 
 import javax.xml.namespace.QName;

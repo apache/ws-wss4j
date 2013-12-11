@@ -28,8 +28,8 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.test.AbstractTestBase;
 import org.apache.wss4j.stax.test.CallbackHandlerImpl;
 import org.apache.xml.security.stax.ext.SecurePart;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -53,7 +53,8 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
      * Can the policy framework be bypassed?
      * @Ignoring as SOAP Action spoofing detection should be left to the SOAP stack
      */
-    @Test(enabled=false)
+    @Test
+    @org.junit.Ignore
     public void testSOAPActionSpoofing() throws Exception {
         WSSSecurityProperties outSecurityProperties = new WSSSecurityProperties();
         outSecurityProperties.setCallbackHandler(new CallbackHandlerImpl());
