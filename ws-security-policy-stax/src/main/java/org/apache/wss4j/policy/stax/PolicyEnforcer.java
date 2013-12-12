@@ -91,6 +91,7 @@ import org.apache.wss4j.policy.stax.assertionStates.TokenProtectionAssertionStat
 import org.apache.wss4j.policy.stax.assertionStates.UsernameTokenAssertionState;
 import org.apache.wss4j.policy.stax.assertionStates.X509TokenAssertionState;
 import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.securityEvent.NoSecuritySecurityEvent;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -116,6 +117,9 @@ public class PolicyEnforcer implements SecurityEventListener {
 
     protected static final transient org.slf4j.Logger log = 
         org.slf4j.LoggerFactory.getLogger(PolicyEnforcer.class);
+    
+    private static final QName SOAP11_FAULT = new QName(WSSConstants.NS_SOAP11, "Fault");
+    private static final QName SOAP12_FAULT = new QName(WSSConstants.NS_SOAP12, "Fault");
 
     private final List<OperationPolicy> operationPolicies;
     private OperationPolicy effectivePolicy;
@@ -127,6 +131,8 @@ public class PolicyEnforcer implements SecurityEventListener {
     private boolean initiator;
     private String actorOrRole;
     private int attachmentCount;
+    private boolean noSecurityHeader;
+    private boolean faultOccurred;
 
     public PolicyEnforcer(List<OperationPolicy> operationPolicies, String soapAction, boolean initiator,
                           String actorOrRole, int attachmentCount) throws WSSPolicyException {
@@ -426,7 +432,7 @@ public class PolicyEnforcer implements SecurityEventListener {
         }
         //if the assertionStateMap is empty (the size of the list is equal to the alternatives)
         //then we could not satisfy any alternative
-        if (assertionStateMap.isEmpty()) {
+        if (assertionStateMap.isEmpty() && !(faultOccurred && noSecurityHeader && initiator)) {
             logFailedAssertions();
             throw new PolicyViolationException(assertionMessage);
         }
@@ -464,7 +470,7 @@ public class PolicyEnforcer implements SecurityEventListener {
                 }
             }
         }
-        if (assertionStateMap.isEmpty()) {
+        if (assertionStateMap.isEmpty() && !(faultOccurred && noSecurityHeader && initiator)) {
             logFailedAssertions();
             throw new WSSPolicyException(assertionMessage);
         }
@@ -526,7 +532,7 @@ public class PolicyEnforcer implements SecurityEventListener {
                 }
             }
         }
-        if (assertionStateMap.isEmpty()) {
+        if (assertionStateMap.isEmpty() && !(faultOccurred && noSecurityHeader && initiator)) {
             logFailedAssertions();
             throw new WSSPolicyException(assertionMessage);
         }
@@ -562,6 +568,10 @@ public class PolicyEnforcer implements SecurityEventListener {
     @Override
     public synchronized void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
 
+        if (securityEvent instanceof NoSecuritySecurityEvent) {
+            noSecurityHeader = true;
+        }
+        
         if (operationSecurityEventOccured) {
             try {
                 verifyPolicy(securityEvent);
@@ -575,6 +585,11 @@ public class PolicyEnforcer implements SecurityEventListener {
         if (WSSecurityEventConstants.Operation.equals(securityEvent.getSecurityEventType())) {
             operationSecurityEventOccured = true;
             final OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
+            if (SOAP11_FAULT.equals(operationSecurityEvent.getOperation())
+                || SOAP12_FAULT.equals(operationSecurityEvent.getOperation())) {
+                faultOccurred = true;
+            }
+            
             if (effectivePolicy == null) {
                 effectivePolicy = findPolicyBySOAPOperationName(operationPolicies, operationSecurityEvent.getOperation().getLocalPart());
                 if (effectivePolicy == null) {
