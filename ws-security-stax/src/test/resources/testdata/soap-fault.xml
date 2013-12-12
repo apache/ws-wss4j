@@ -1,0 +1,8 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Body>
+        <soap:Fault>
+            <faultcode>soap:Server</faultcode>
+            <faultstring>These policy alternatives can not be satisfied: {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}EncryptedParts: {http://schemas.xmlsoap.org/soap/envelope/}Body not ENCRYPTED</faultstring>
+        </soap:Fault>
+    </soap:Body>
+</soap:Envelope>
