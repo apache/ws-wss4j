@@ -20,11 +20,17 @@
 package org.apache.ws.security.saml.ext;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.XMLConstants;
 
 import org.opensaml.Configuration;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.xml.ConfigurationException;
 import org.opensaml.xml.XMLConfigurator;
+import org.opensaml.xml.parse.StaticBasicParserPool;
+import org.opensaml.xml.parse.XMLParserException;
 
 /**
  * This class intializes the Opensaml library. It is necessary to override DefaultBootstrap
@@ -98,5 +104,23 @@ public class OpenSAMLBootstrap extends DefaultBootstrap {
             }
             configurator.load(ins);
         }
+    }
+    
+    protected static void initializeParserPool() throws ConfigurationException {
+        StaticBasicParserPool pp = new StaticBasicParserPool();
+        pp.setMaxPoolSize(50);
+        
+        Map<String, Boolean> features = new HashMap<String, Boolean>();
+        features.put(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        features.put("http://apache.org/xml/features/disallow-doctype-decl", true);
+        pp.setBuilderFeatures(features);
+        pp.setExpandEntityReferences(false);
+        
+        try {
+            pp.initialize();
+        } catch (XMLParserException e) {
+            throw new ConfigurationException("Error initializing parser pool", e);
+        }
+        Configuration.setParserPool(pp);
     }
 }
