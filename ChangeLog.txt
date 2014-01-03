@@ -5,6 +5,13 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.6.14
+=============
+
+Bug
+
+    [WSS-488] - Regression in parsing SecurityTokenReferences inside of a SAML Signature KeyInfo
+
 Release 1.6.13
 =============
 
