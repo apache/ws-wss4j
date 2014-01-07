@@ -190,6 +190,14 @@ public interface Crypto {
     ) throws WSSecurityException;
     
     /**
+     * Evaluate whether a given public key should be trusted directly (located inside trust repository).
+     * 
+     * @param certs Certificate chain to validate
+     * @throws WSSecurityException if the certificate chain is invalid
+     */
+    void verifyDirectTrust(X509Certificate[] certs) throws WSSecurityException;
+
+    /**
      * Evaluate whether a given public key should be trusted.
      * 
      * @param publicKey The PublicKey to be evaluated
