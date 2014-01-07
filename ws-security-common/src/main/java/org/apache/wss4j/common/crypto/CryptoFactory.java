@@ -34,6 +34,10 @@ import org.apache.wss4j.common.util.Loader;
 public abstract class CryptoFactory {
     private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(CryptoFactory.class);
+    
+    static {
+        WSProviderConfig.init();
+    }
 
     /**
      * getInstance
@@ -126,7 +130,8 @@ public abstract class CryptoFactory {
                     LOG.debug("Unable to instantiate Merlin", e);
                 }
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                                              "empty", e, cryptoClass + " cannot create instance");
+                                              "empty", e, "Cannot create Crypto class "
+                                              + cryptoClassName);
             }
         } else {
             try {
