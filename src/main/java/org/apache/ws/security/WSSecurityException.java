@@ -46,7 +46,7 @@ public class WSSecurityException extends Exception {
     public static final int MESSAGE_EXPIRED = 8;
     public static final int FAILED_ENCRYPTION = 9;
     public static final int FAILED_SIGNATURE = 10;
-    private static ResourceBundle resources;
+    private static final ResourceBundle resources;
     /*
      * This is an Integer -> QName map. Its function is to map the integer error codes
      * given above to the QName fault codes as defined in the SOAP Message Security 1.1

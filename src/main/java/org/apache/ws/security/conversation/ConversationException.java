@@ -33,7 +33,7 @@ public class ConversationException extends Exception {
     public static final String RENEW_NEEDED = "RenewNeeded";
     public static final String UNABLE_TO_REVIEW = "UnableToRenew";
     
-    private static ResourceBundle resources;
+    private static final ResourceBundle resources;
 
     private String faultCode;
     private String faultString;

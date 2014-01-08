@@ -39,7 +39,7 @@ public class CredentialException extends Exception {
     public static final int DEFECTIVE = 2;
     public static final int IO_ERROR = 3;
     public static final int SEC_ERROR = 4;
-    private static ResourceBundle resources;
+    private static final ResourceBundle resources;
     private int errorCode;
 
     static {
