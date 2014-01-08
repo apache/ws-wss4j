@@ -32,11 +32,11 @@ public class SOAP11Constants implements SOAPConstants {
      * 
      */
     private static final long serialVersionUID = 3809268485386395322L;
-    private static QName headerQName = new QName(WSConstants.URI_SOAP11_ENV,
+    private static final QName headerQName = new QName(WSConstants.URI_SOAP11_ENV,
             WSConstants.ELEM_HEADER);
-    private static QName bodyQName = new QName(WSConstants.URI_SOAP11_ENV,
+    private static final QName bodyQName = new QName(WSConstants.URI_SOAP11_ENV,
             WSConstants.ELEM_BODY);
-    private static QName roleQName = new QName(WSConstants.URI_SOAP11_ENV,
+    private static final QName roleQName = new QName(WSConstants.URI_SOAP11_ENV,
             WSConstants.ATTR_ACTOR);
 
     public String getEnvelopeURI() {
