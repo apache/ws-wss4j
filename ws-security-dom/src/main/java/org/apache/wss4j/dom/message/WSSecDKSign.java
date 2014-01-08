@@ -57,7 +57,7 @@ import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
  */
 public class WSSecDKSign extends WSSecDerivedKeyBase {
 
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(WSSecDKSign.class);
 
     private String sigAlgo = WSConstants.HMAC_SHA1;
@@ -154,7 +154,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
             
            c14nMethod = signatureFactory.newCanonicalizationMethod(canonAlgo, c14nSpec);
         } catch (Exception ex) {
-            log.error("", ex);
+            LOG.error("", ex);
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", ex
             );
@@ -301,7 +301,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
             
             signatureValue = sig.getSignatureValue().getValue();
         } catch (Exception ex) {
-            log.error(ex.getMessage(), ex);
+            LOG.error(ex.getMessage(), ex);
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILED_SIGNATURE, ex
             );

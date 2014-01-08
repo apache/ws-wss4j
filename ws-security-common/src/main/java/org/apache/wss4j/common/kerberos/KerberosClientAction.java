@@ -34,7 +34,7 @@ import org.ietf.jgss.Oid;
  * Key Distribution Center.
  */
 public class KerberosClientAction implements PrivilegedAction<byte[]> {
-    private static org.slf4j.Logger log =
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(KerberosClientAction.class);
     
     private Principal clientPrincipal;
@@ -68,8 +68,8 @@ public class KerberosClientAction implements PrivilegedAction<byte[]> {
             secContext.dispose();
             return returnedToken;
         } catch (GSSException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Error in obtaining a Kerberos token", e);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Error in obtaining a Kerberos token", e);
             }
         }
 

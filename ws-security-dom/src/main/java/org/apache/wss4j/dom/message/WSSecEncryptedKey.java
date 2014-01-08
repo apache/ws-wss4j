@@ -64,7 +64,7 @@ import org.w3c.dom.Text;
  */
 public class WSSecEncryptedKey extends WSSecBase {
 
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(WSSecEncryptedKey.class);
 
     protected Document document;
@@ -281,7 +281,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         }
         int blockSize = cipher.getBlockSize();
         if (doDebug) {
-            log.debug(
+            LOG.debug(
                 "cipher blksize: " + blockSize + ", symm key: " + secretKey.toString()
             );
         }

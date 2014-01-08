@@ -36,7 +36,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.IOException;
 
 public final class X509Util {
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(X509Util.class);
     
     private X509Util() {
@@ -67,8 +67,8 @@ public final class X509Util {
                 );
             }
         }
-        if (log.isDebugEnabled()) {
-            log.debug("Sym Enc Algo: " + symEncAlgo);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Sym Enc Algo: " + symEncAlgo);
         }
         return symEncAlgo;
     }
@@ -96,7 +96,7 @@ public final class X509Util {
             keyName = builder.toString();
         }
         if (keyName == null || keyName.length() <= 0) {
-            log.debug("No Key Name available");
+            LOG.debug("No Key Name available");
         }
         WSPasswordCallback pwCb = 
                 new WSPasswordCallback(keyName, WSPasswordCallback.SECRET_KEY);

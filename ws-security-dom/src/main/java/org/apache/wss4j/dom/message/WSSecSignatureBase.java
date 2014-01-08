@@ -55,7 +55,7 @@ import org.w3c.dom.Node;
  */
 public class WSSecSignatureBase extends WSSecBase {
     
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(WSSecSignatureBase.class);
     
     public WSSecSignatureBase() {
@@ -91,7 +91,7 @@ public class WSSecSignatureBase extends WSSecBase {
         try {
             digestMethod = signatureFactory.newDigestMethod(digestAlgo, null);
         } catch (Exception ex) {
-            log.error("", ex);
+            LOG.error("", ex);
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", ex
             );
@@ -272,7 +272,7 @@ public class WSSecSignatureBase extends WSSecBase {
                     }
                 }
             } catch (Exception ex) {
-                log.error("", ex);
+                LOG.error("", ex);
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", ex
                 );

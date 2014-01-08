@@ -75,7 +75,7 @@ import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
  */
 public class WSSecSignature extends WSSecSignatureBase {
 
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(WSSecSignature.class);
 
     protected boolean useSingleCert = true;
@@ -177,7 +177,7 @@ public class WSSecSignature extends WSSecSignatureBase {
             
            c14nMethod = signatureFactory.newCanonicalizationMethod(canonAlgo, c14nSpec);
         } catch (Exception ex) {
-            log.error("", ex);
+            LOG.error("", ex);
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", ex
             );
@@ -327,7 +327,7 @@ public class WSSecSignature extends WSSecSignatureBase {
                             java.util.Collections.singletonList(keyValue), keyInfoUri
                         );
                 } catch (java.security.KeyException ex) {
-                    log.error("", ex);
+                    LOG.error("", ex);
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", ex
                     );
@@ -366,10 +366,10 @@ public class WSSecSignature extends WSSecSignatureBase {
      */
     public Document build(Document doc, Crypto cr, WSSecHeader secHeader)
         throws WSSecurityException {
-        doDebug = log.isDebugEnabled();
+        doDebug = LOG.isDebugEnabled();
 
         if (doDebug) {
-            log.debug("Beginning signing...");
+            LOG.debug("Beginning signing...");
         }
 
         prepare(doc, cr, secHeader);
@@ -584,7 +584,7 @@ public class WSSecSignature extends WSSecSignatureBase {
             signatureValue = sig.getSignatureValue().getValue();
         } catch (Exception ex) {
             ex.printStackTrace();
-            log.error(ex.getMessage(), ex);
+            LOG.error(ex.getMessage(), ex);
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILED_SIGNATURE, ex
             );
@@ -832,7 +832,7 @@ public class WSSecSignature extends WSSecSignatureBase {
             //
             if (sigAlgo == null) {
                 String pubKeyAlgo = certs[0].getPublicKey().getAlgorithm();
-                log.debug("Automatic signature algorithm detection: " + pubKeyAlgo);
+                LOG.debug("Automatic signature algorithm detection: " + pubKeyAlgo);
                 if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
                     sigAlgo = WSConstants.DSA;
                 } else if (pubKeyAlgo.equalsIgnoreCase("RSA")) {

@@ -55,7 +55,7 @@ import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.utils.Base64;
 
 public class EncryptedKeyProcessor implements Processor {
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(EncryptedKeyProcessor.class);
     
     public List<WSSecurityEngineResult> handleToken(
@@ -72,8 +72,8 @@ public class EncryptedKeyProcessor implements Processor {
         WSDocInfo wsDocInfo,
         AlgorithmSuite algorithmSuite
     ) throws WSSecurityException {
-        if (log.isDebugEnabled()) {
-            log.debug("Found encrypted key element");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Found encrypted key element");
         }
         
         // See if this key has already been processed. If so then just return the result
@@ -106,7 +106,7 @@ public class EncryptedKeyProcessor implements Processor {
         if (WSConstants.KEYTRANSPORT_RSA15.equals(encryptedKeyTransportMethod)
             && !data.isAllowRSA15KeyTransportAlgorithm()
             && !algorithmSuite.getKeyWrapAlgorithms().contains(WSConstants.KEYTRANSPORT_RSA15)) {
-            log.debug(
+            LOG.debug(
                 "The Key transport method does not match the requirement"
             );
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
@@ -436,8 +436,8 @@ public class EncryptedKeyProcessor implements Processor {
         byte[] decryptedData,
         RequestData data
     ) throws WSSecurityException {
-        if (log.isDebugEnabled()) {
-            log.debug("found data reference: " + dataRefURI);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("found data reference: " + dataRefURI);
         }
         //
         // Find the encrypted data element referenced by dataRefURI

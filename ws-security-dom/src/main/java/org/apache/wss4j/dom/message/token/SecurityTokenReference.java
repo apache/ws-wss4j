@@ -62,7 +62,7 @@ public class SecurityTokenReference {
         WSConstants.SOAPMESSAGE_NS11 + "#" + WSConstants.THUMBPRINT;
     public static final String ENC_KEY_SHA1_URI = 
         WSConstants.SOAPMESSAGE_NS11 + "#" + WSConstants.ENC_KEY_SHA1_URI;
-    private static org.slf4j.Logger log =
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SecurityTokenReference.class);
     
     private Element element;
@@ -208,9 +208,9 @@ public class SecurityTokenReference {
             uri = getKeyIdentifierValue();
             valueType = getKeyIdentifierValueType();
         }
-        if (log.isDebugEnabled()) {
-            log.debug("Token reference uri: " + uri);
-            log.debug("Token reference ValueType: " + valueType);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Token reference uri: " + uri);
+            LOG.debug("Token reference ValueType: " + valueType);
         }
         
         if (uri == null) {
@@ -318,7 +318,7 @@ public class SecurityTokenReference {
                     return (Element)doc.importNode(assertionElem, true);
                 }
             } catch (Exception e) {
-                log.debug(e.getMessage(), e);
+                LOG.debug(e.getMessage(), e);
                 // Consume this failure
             }
         }
@@ -564,7 +564,7 @@ public class SecurityTokenReference {
             try {
                 skiBytes = Base64.decode(((Text) node).getData());
             } catch (Exception e) {
-                log.debug(e.getMessage(), e);
+                LOG.debug(e.getMessage(), e);
                 return null;
             }
         }
@@ -849,7 +849,7 @@ public class SecurityTokenReference {
                 result = 31 * result + reference.hashCode();
             }
         } catch (WSSecurityException e) {
-            log.error(e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
         String keyIdentifierEncodingType = getKeyIdentifierEncodingType();
         if (keyIdentifierEncodingType != null) {
@@ -878,7 +878,7 @@ public class SecurityTokenReference {
             issuer = getIssuerSerial().getIssuer();
             serialNumber = getIssuerSerial().getSerialNumber();
         } catch (WSSecurityException e) {
-           log.error(e.getMessage(), e);
+           LOG.error(e.getMessage(), e);
         }
         if (issuer != null) {
             result = 31 * result + issuer.hashCode();
@@ -900,7 +900,7 @@ public class SecurityTokenReference {
                 return false;
             }
         } catch (WSSecurityException e) {
-           log.error(e.getMessage(), e);
+           LOG.error(e.getMessage(), e);
            return false;
         }
         if (!compare(getKeyIdentifierEncodingType(), tokenReference.getKeyIdentifierEncodingType())) {
@@ -928,7 +928,7 @@ public class SecurityTokenReference {
                 } 
             }
         } catch (WSSecurityException e) {
-           log.error(e.getMessage(), e);
+           LOG.error(e.getMessage(), e);
            return false;
         }
             

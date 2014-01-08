@@ -43,7 +43,7 @@ import org.w3c.dom.Element;
  */
 public final class DOMSAMLUtil  {
     
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(DOMSAMLUtil.class);
     
     private DOMSAMLUtil() {
@@ -76,11 +76,11 @@ public final class DOMSAMLUtil  {
                 (SamlAssertionWrapper)samlResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
 
             if (!checkHolderOfKey(assertionWrapper, signedResults, tlsCerts)) {
-                log.warn("Assertion fails holder-of-key requirements");
+                LOG.warn("Assertion fails holder-of-key requirements");
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
             }
             if (!checkSenderVouches(assertionWrapper, tlsCerts, body, signedResults)) {
-                log.warn("Assertion fails sender-vouches requirements");
+                LOG.warn("Assertion fails sender-vouches requirements");
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
             }
         }

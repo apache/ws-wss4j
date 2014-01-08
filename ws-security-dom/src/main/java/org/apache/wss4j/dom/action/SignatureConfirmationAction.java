@@ -37,15 +37,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SignatureConfirmationAction implements Action {
-    private static final org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(SignatureConfirmationAction.class);
 
     @SuppressWarnings("unchecked")
     public void execute(WSHandler handler, SecurityActionToken actionToken,
                         Document doc, RequestData reqData)
             throws WSSecurityException {
-        if (log.isDebugEnabled()) {
-            log.debug("Perform Signature confirmation");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Perform Signature confirmation");
         }
 
         List<WSHandlerResult> results = 
@@ -81,8 +81,8 @@ public class SignatureConfirmationAction implements Action {
         }
         List<WSEncryptionPart> signatureParts = signatureToken.getParts();
         if (signatureActions.size() > 0) {
-            if (log.isDebugEnabled()) {
-                log.debug("Signature Confirmation: number of Signature results: "
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Signature Confirmation: number of Signature results: "
                         + signatureActions.size());
             }
             for (int i = 0; i < signatureActions.size(); i++) {

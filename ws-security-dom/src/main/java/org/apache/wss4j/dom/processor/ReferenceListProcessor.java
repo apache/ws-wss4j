@@ -66,7 +66,7 @@ import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 
 public class ReferenceListProcessor implements Processor {
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(ReferenceListProcessor.class);
     
     public List<WSSecurityEngineResult> handleToken(
@@ -74,8 +74,8 @@ public class ReferenceListProcessor implements Processor {
         RequestData data, 
         WSDocInfo wsDocInfo 
     ) throws WSSecurityException {
-        if (log.isDebugEnabled()) {
-            log.debug("Found reference list element");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Found reference list element");
         }
         List<WSDataRef> dataRefs = handleReferenceList(elem, data, wsDocInfo);
         WSSecurityEngineResult result = 
@@ -137,8 +137,8 @@ public class ReferenceListProcessor implements Processor {
         WSDocInfo wsDocInfo,
         boolean asymBinding
     ) throws WSSecurityException {
-        if (log.isDebugEnabled()) {
-            log.debug("Found data reference: " + dataRefURI);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Found data reference: " + dataRefURI);
         }
         //
         // Find the encrypted data element referenced by dataRefURI

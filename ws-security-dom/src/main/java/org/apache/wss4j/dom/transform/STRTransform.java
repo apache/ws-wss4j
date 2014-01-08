@@ -66,7 +66,7 @@ public class STRTransform extends TransformService {
     
     private Element transformElement;
     
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(STRTransform.class);
 
     public final AlgorithmParameterSpec getParameterSpec() {
@@ -191,7 +191,7 @@ public class STRTransform extends TransformService {
                 wsDocInfo = (WSDocInfo)wsDocInfoObject;
             }
             if (wsDocInfo == null) {
-                log.debug("STRTransform: no WSDocInfo found");
+                LOG.debug("STRTransform: no WSDocInfo found");
             }
 
             Document doc = str.getOwnerDocument();
@@ -218,8 +218,8 @@ public class STRTransform extends TransformService {
             // C14n with specified algorithm. According to WSS Specification.
             //
             buf = canon.canonicalizeSubtree(dereferencedToken, "#default", true);
-            if (log.isDebugEnabled()) {
-                log.debug("after c14n: " + new String(buf, "UTF-8"));
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("after c14n: " + new String(buf, "UTF-8"));
             }
 
             if (os != null) {

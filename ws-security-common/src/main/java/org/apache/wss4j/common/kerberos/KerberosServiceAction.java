@@ -35,7 +35,7 @@ import org.ietf.jgss.Oid;
  * This class represents a PrivilegedAction implementation to validate a received ticket to a KDC.
  */
 public class KerberosServiceAction implements PrivilegedAction<Principal> {
-    private static org.slf4j.Logger log =
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(KerberosServiceAction.class);
     
     private byte[] ticket;
@@ -65,8 +65,8 @@ public class KerberosServiceAction implements PrivilegedAction<Principal> {
             secContext.dispose();
             return new KerberosPrincipal(clientName.toString());
         } catch (GSSException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Error in validating a Kerberos token", e);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Error in validating a Kerberos token", e);
             }
         }
 

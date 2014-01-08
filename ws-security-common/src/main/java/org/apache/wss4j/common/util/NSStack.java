@@ -41,7 +41,7 @@ import java.util.List;
  *
  */
 public class NSStack {
-    private static final org.slf4j.Logger log =
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(NSStack.class);
 
     private Mapping[] stack;
@@ -51,7 +51,7 @@ public class NSStack {
     // invariant member variable to track low-level logging requirements
     // we cache this once per instance lifecycle to avoid repeated lookups
     // in heavily used code.
-    private final boolean traceEnabled = log.isTraceEnabled();
+    private final boolean traceEnabled = LOG.isTraceEnabled();
 
     public NSStack() {
         stack = new Mapping[32];
@@ -69,7 +69,7 @@ public class NSStack {
             stack = newstack;
         }
         if (traceEnabled) {
-            log.trace("NSPush (" + stack.length + ")");
+            LOG.trace("NSPush (" + stack.length + ")");
         }
         stack[top] = null;
     }
@@ -96,12 +96,12 @@ public class NSStack {
         }
         if (top == 0) {
             if (traceEnabled) {
-                log.trace("NSPop (empty)");
+                LOG.trace("NSPop (empty)");
             }
             return;
         }
         if (traceEnabled) {
-            log.trace("NSPop (" + stack.length + ")");
+            LOG.trace("NSPop (" + stack.length + ")");
         }
     }
 
@@ -278,9 +278,9 @@ public class NSStack {
         for (int cursor = top; cursor > 0; cursor--) {
             Mapping map = stack[cursor];
             if (map == null) {
-                log.trace(dumpPrefix + "stackFrame00");
+                LOG.trace(dumpPrefix + "stackFrame00");
             } else {
-                log.trace(dumpPrefix + map.getNamespaceURI() + " -> " + map.getPrefix());
+                LOG.trace(dumpPrefix + map.getNamespaceURI() + " -> " + map.getPrefix());
             }
         }
     }

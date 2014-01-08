@@ -38,7 +38,7 @@ import org.w3c.dom.Document;
 
 public class SAMLTokenSignedAction implements Action {
     
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(SAMLTokenSignedAction.class);
 
     public void execute(WSHandler handler, SecurityActionToken actionToken,
@@ -54,8 +54,8 @@ public class SAMLTokenSignedAction implements Action {
         try {
             crypto = handler.loadSignatureCrypto(reqData);
         } catch (Exception ex) {
-            if (log.isDebugEnabled()) {
-                log.debug(ex.getMessage(), ex);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(ex.getMessage(), ex);
             }
         }
 

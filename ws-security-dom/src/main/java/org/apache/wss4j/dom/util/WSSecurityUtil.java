@@ -61,7 +61,7 @@ import java.util.Set;
  * WS-Security Utility methods. <p/>
  */
 public final class WSSecurityUtil {
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(WSSecurityUtil.class);
 
     /**
@@ -118,8 +118,8 @@ public final class WSSecurityUtil {
 
                 if (WSSecurityUtil.isActorEqual(actor, hActor)) {
                     if (foundSecurityHeader != null) {
-                        if (log.isDebugEnabled()) {
-                            log.debug(
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug(
                                 "Two or more security headers have the same actor name: " + actor
                             );
                         }
@@ -408,7 +408,7 @@ public final class WSSecurityUtil {
                     if (foundElement == null) {
                         foundElement = se; // Continue searching to find duplicates
                     } else {
-                        log.warn("Multiple elements with the same 'ID' attribute value!");
+                        LOG.warn("Multiple elements with the same 'ID' attribute value!");
                         return null;
                     }
                 }
@@ -444,7 +444,7 @@ public final class WSSecurityUtil {
      * It's somewhat faster than XPath, and we do not deal with prefixes, just with the real
      * namespace URI
      * 
-     * If checkMultipleElements is true and there are multiple elements, we log a 
+     * If checkMultipleElements is true and there are multiple elements, we LOG.a 
      * warning and return null as this can be used to get around the signature checking.
      * 
      * @param startNode Where to start the search
@@ -480,7 +480,7 @@ public final class WSSecurityUtil {
                     } else if (foundElement == null) {
                         foundElement = se; // Continue searching to find duplicates
                     } else {
-                        log.warn("Multiple elements with the same 'Id' attribute value!");
+                        LOG.warn("Multiple elements with the same 'Id' attribute value!");
                         return null;
                     }
                 }
@@ -753,8 +753,8 @@ public final class WSSecurityUtil {
 
                 if (WSSecurityUtil.isActorEqual(actor, hActor)) {
                     if (foundSecurityHeader != null) {
-                        if (log.isDebugEnabled()) {
-                            log.debug(
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug(
                                 "Two or more security headers have the same actor name: " + actor
                             );
                         }
@@ -1082,7 +1082,7 @@ public final class WSSecurityUtil {
                         requiredPart);
                 }
             }
-            log.debug("All required elements are protected");
+            LOG.debug("All required elements are protected");
         }
     }
 
@@ -1113,7 +1113,7 @@ public final class WSSecurityUtil {
             );
         }
 
-        log.debug("Checking required elements are in the signature...");
+        LOG.debug("Checking required elements are in the signature...");
         for (int i = 0; i < requiredIDs.length; i++) {
             boolean found = false;
             for (int j = 0; j < signedElemsRefList.size(); j++) {
@@ -1132,9 +1132,9 @@ public final class WSSecurityUtil {
                     "requiredElementNotSigned",
                     requiredIDs[i]);
             }
-            log.debug("Element with ID " + requiredIDs[i] + " was correctly signed");
+            LOG.debug("Element with ID " + requiredIDs[i] + " was correctly signed");
         }
-        log.debug("All required elements are signed");
+        LOG.debug("All required elements are signed");
     }
     
     
@@ -1271,7 +1271,7 @@ public final class WSSecurityUtil {
                 if (!"".equals(uri)) {
                     boolean added = refs.add(WSSecurityUtil.getIDFromReference(uri));
                     if (!added) {
-                        log.warn("Duplicated reference uri: " + uri);
+                        LOG.warn("Duplicated reference uri: " + uri);
                     }
                 }
             }

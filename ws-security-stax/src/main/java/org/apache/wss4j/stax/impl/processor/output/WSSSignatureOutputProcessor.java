@@ -56,7 +56,7 @@ import org.apache.xml.security.utils.Base64;
 
 public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcessor {
 
-    private static final transient org.slf4j.Logger logger = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(WSSSignatureOutputProcessor.class);
 
     public WSSSignatureOutputProcessor() throws XMLSecurityException {
@@ -81,7 +81,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
             if (getActiveInternalSignatureOutputProcessor() == null) {
                 SecurePart securePart = securePartMatches(xmlSecStartElement, outputProcessorChain, WSSConstants.SIGNATURE_PARTS);
                 if (securePart != null) {
-                    logger.debug("Matched securePart for signature");
+                    LOG.debug("Matched securePart for signature");
 
                     SignaturePartDef signaturePartDef = new SignaturePartDef();
                     signaturePartDef.setSecurePart(securePart);
@@ -219,8 +219,8 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                 }
 
                 String calculatedDigest = new String(Base64.encode(digestOutputStream.getDigestValue()));
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Calculated Digest: " + calculatedDigest);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Calculated Digest: " + calculatedDigest);
                 }
 
                 signaturePartDef.setDigestValue(calculatedDigest);

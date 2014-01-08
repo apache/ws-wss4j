@@ -37,7 +37,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
  * </pre>
  */
 public class DERDecoder {
-    private static org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DERDecoder.class);
+    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(DERDecoder.class);
 
     /** DER type identifier for a bit string value */
     public static final byte TYPE_BIT_STRING = 0x03;
@@ -114,7 +114,7 @@ public class DERDecoder {
      */
     public void expect(byte val) throws WSSecurityException {
         if (!test(val)) {
-            log.debug("DER mismatch: expected " + val + ", got " + arr[pos]);
+            LOG.debug("DER mismatch: expected " + val + ", got " + arr[pos]);
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                     "noSKIHandling",

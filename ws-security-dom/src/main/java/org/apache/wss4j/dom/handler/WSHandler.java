@@ -62,12 +62,12 @@ import org.w3c.dom.Document;
  * Extended to all passwordless UsernameTokens and configurable identities.
  */
 public abstract class WSHandler {
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(WSHandler.class);
     protected WSSecurityEngine secEngine = new WSSecurityEngine();
     protected Map<String, Crypto> cryptos = new ConcurrentHashMap<String, Crypto>();
 
-    private boolean doDebug = log.isDebugEnabled();
+    private boolean doDebug = LOG.isDebugEnabled();
 
     /**                                                             
      * Performs all defined security actions to set-up the SOAP request.
@@ -210,7 +210,7 @@ public abstract class WSHandler {
          */
         for (HandlerAction actionToDo : actionsToPerform) {
             if (doDebug) {
-                log.debug("Performing Action: " + actionToDo.getAction());
+                LOG.debug("Performing Action: " + actionToDo.getAction());
             }
 
             switch (actionToDo.getAction()) {
@@ -228,14 +228,14 @@ public abstract class WSHandler {
                 //
                 // Handle any "custom" actions, similarly,
                 // but to preserve behavior from previous
-                // versions, consume (but log) action lookup failures.
+                // versions, consume (but LOG. action lookup failures.
                 //
             default:
                 Action doit = null;
             try {
                 doit = wssConfig.getAction(actionToDo.getAction());
             } catch (final WSSecurityException e) {
-                log.warn(
+                LOG.warn(
                         "Error trying to locate a custom action (" + actionToDo + ")", 
                         e
                 );
@@ -409,7 +409,7 @@ public abstract class WSHandler {
         List<WSSecurityEngineResult> resultList
     ) throws WSSecurityException{
         if (doDebug) {
-            log.debug("Check Signature confirmation");
+            LOG.debug("Check Signature confirmation");
         }
         //
         // First get all Signature values stored during sending the request
@@ -981,7 +981,7 @@ public abstract class WSHandler {
                 }
             }
             if (crypto == null) {
-                log.warn("The Crypto reference " + refId + " specified by "
+                LOG.warn("The Crypto reference " + refId + " specified by "
                     + cryptoPropertyRefId + " could not be loaded"
                 );
             }
@@ -999,7 +999,7 @@ public abstract class WSHandler {
                     cryptos.put(propFile, crypto);
                 }
                 if (crypto == null) {
-                    log.warn(
+                    LOG.warn(
                          "The Crypto properties file " + propFile + " specified by "
                          + cryptoPropertyFile + " could not be loaded or found"
                     );
@@ -1228,7 +1228,7 @@ public abstract class WSHandler {
 
             if (partDef.length == 1) {
                 if (doDebug) {
-                    log.debug("single partDef: '" + partDef[0] + "'");
+                    LOG.debug("single partDef: '" + partDef[0] + "'");
                 }
                 encPart =
                     new WSEncryptionPart(partDef[0].trim(),
@@ -1256,7 +1256,7 @@ public abstract class WSHandler {
                 }
                 String element = partDef[2].trim();
                 if (doDebug) {
-                    log.debug(
+                    LOG.debug(
                         "partDefs: '" + mode + "' ,'" + nmSpace + "' ,'" + element + "'"
                     );
                 }
@@ -1337,7 +1337,7 @@ public abstract class WSHandler {
                     try {
                         subjectCertConstraints.add(Pattern.compile(certConstraint.trim()));
                     } catch (PatternSyntaxException ex) {
-                        log.debug(ex.getMessage(), ex);
+                        LOG.debug(ex.getMessage(), ex);
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
                     }
                 }

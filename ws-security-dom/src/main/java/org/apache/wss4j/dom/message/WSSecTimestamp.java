@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
  */
 
 public class WSSecTimestamp extends WSSecBase {
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(WSSecTimestamp.class);
 
     private Timestamp ts;
@@ -100,7 +100,7 @@ public class WSSecTimestamp extends WSSecBase {
      * @throws Exception
      */
     public Document build(Document doc, WSSecHeader secHeader) {
-        log.debug("Begin add timestamp...");
+        LOG.debug("Begin add timestamp...");
 
         prepare(doc);
         prependToHeader(secHeader);

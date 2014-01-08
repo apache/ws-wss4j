@@ -34,10 +34,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
 /**
- * Utility class exposing the dereferencing logic of the {@link STRTransform} implementation.
+ * Utility class exposing the dereferencing LOG.c of the {@link STRTransform} implementation.
  */
 public final class STRTransformUtil {
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(STRTransformUtil.class);
     
     /**
@@ -63,8 +63,8 @@ public final class STRTransformUtil {
         // reference to the BST or Assertion. Copying is done by the caller.
         //
         if (secRef.containsReference()) {
-            if (log.isDebugEnabled()) {
-                log.debug("STR: Reference");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("STR: Reference");
             }
             return secRef.getTokenElement(doc, wsDocInfo, null);
         }
@@ -73,8 +73,8 @@ public final class STRTransformUtil {
         // to specification
         //
         else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
-            if (log.isDebugEnabled()) {
-                log.debug("STR: IssuerSerial");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("STR: IssuerSerial");
             }
             X509Certificate[] certs = 
                 secRef.getX509IssuerSerial(wsDocInfo.getCrypto());
@@ -89,8 +89,8 @@ public final class STRTransformUtil {
         // be a SAML assertion, so try and find the referenced element.
         //
         else if (secRef.containsKeyIdentifier()) {
-            if (log.isDebugEnabled()) {
-                log.debug("STR: KeyIdentifier");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("STR: KeyIdentifier");
             }
             if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {

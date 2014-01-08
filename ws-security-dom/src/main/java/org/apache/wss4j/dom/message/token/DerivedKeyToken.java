@@ -55,7 +55,7 @@ import org.w3c.dom.Text;
 
 public class DerivedKeyToken {
 
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(DerivedKeyToken.class);
 
     // These are the elements that are used to create the SecurityContextToken
@@ -87,7 +87,7 @@ public class DerivedKeyToken {
      * @param doc The DOM document
      */
     public DerivedKeyToken(int version, Document doc) throws ConversationException {
-        log.debug("DerivedKeyToken: created");
+        LOG.debug("DerivedKeyToken: created");
         
         ns = ConversationConstants.getWSCNs(version);
         element = 
@@ -104,7 +104,7 @@ public class DerivedKeyToken {
      * @throws WSSecurityException If the element is not a derived key token
      */
     public DerivedKeyToken(Element elem, BSPEnforcer bspEnforcer) throws WSSecurityException {
-        log.debug("DerivedKeyToken: created : element constructor");
+        LOG.debug("DerivedKeyToken: created : element constructor");
         element = elem;
         this.bspEnforcer = bspEnforcer;
         QName el = new QName(element.getNamespaceURI(), element.getLocalName());
@@ -564,7 +564,7 @@ public class DerivedKeyToken {
                 result = 31 * result + tokenReference.hashCode();
             }
         } catch (WSSecurityException e) {
-            log.error(e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
         
         Map<String, String> properties = getProperties();
@@ -609,7 +609,7 @@ public class DerivedKeyToken {
                 return false;
             }
         } catch (WSSecurityException e) {
-            log.error(e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
             return false;
         }
         if (!compare(getProperties(), token.getProperties())) {

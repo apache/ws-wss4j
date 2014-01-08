@@ -40,7 +40,7 @@ import org.apache.wss4j.common.kerberos.KerberosServiceAction;
  */
 public class KerberosTokenValidator implements Validator {
     
-    private static org.slf4j.Logger log =
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(KerberosTokenValidator.class);
     
     private String serviceName;
@@ -133,14 +133,14 @@ public class KerberosTokenValidator implements Validator {
             return credential;
         }
         
-        if (log.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             try {
                 String jaasAuth = System.getProperty("java.security.auth.login.config");
                 String krbConf = System.getProperty("java.security.krb5.conf");
-                log.debug("KerberosTokenValidator - Using JAAS auth login file: " + jaasAuth);
-                log.debug("KerberosTokenValidator - Using KRB conf file: " + krbConf);
+                LOG.debug("KerberosTokenValidator - Using JAAS auth login file: " + jaasAuth);
+                LOG.debug("KerberosTokenValidator - Using KRB conf file: " + krbConf);
             } catch (SecurityException ex) {
-                log.debug(ex.getMessage(), ex);
+                LOG.debug(ex.getMessage(), ex);
             }
         }
         
@@ -156,8 +156,8 @@ public class KerberosTokenValidator implements Validator {
             }
             loginContext.login();
         } catch (LoginException ex) {
-            if (log.isDebugEnabled()) {
-                log.debug(ex.getMessage(), ex);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(ex.getMessage(), ex);
             }
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,
@@ -165,8 +165,8 @@ public class KerberosTokenValidator implements Validator {
                 ex,
                 ex.getMessage());
         }
-        if (log.isDebugEnabled()) {
-            log.debug("Successfully authenticated to the TGT");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully authenticated to the TGT");
         }
         
         byte[] token = binarySecurity.getToken();
@@ -211,8 +211,8 @@ public class KerberosTokenValidator implements Validator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Successfully validated a ticket");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully validated a ticket");
         }
         
         return credential;

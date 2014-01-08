@@ -42,7 +42,7 @@ import org.w3c.dom.Node;
  * WS-Security Engine.
  */
 public class WSSecurityEngine {
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(WSSecurityEngine.class);
 
     /**
@@ -231,9 +231,9 @@ public class WSSecurityEngine {
         Crypto sigVerCrypto,
         Crypto decCrypto
     ) throws WSSecurityException {
-        doDebug = log.isDebugEnabled();
+        doDebug = LOG.isDebugEnabled();
         if (doDebug) {
-            log.debug("enter processSecurityHeader()");
+            LOG.debug("enter processSecurityHeader()");
         }
 
         if (actor == null) {
@@ -243,7 +243,7 @@ public class WSSecurityEngine {
         Element elem = WSSecurityUtil.getSecurityHeader(doc, actor);
         if (elem != null) {
             if (doDebug) {
-                log.debug("Processing WS-Security header for '" + actor + "' actor.");
+                LOG.debug("Processing WS-Security header for '" + actor + "' actor.");
             }
             wsResult = processSecurityHeader(elem, cb, sigVerCrypto, decCrypto);
         }
@@ -330,7 +330,7 @@ public class WSSecurityEngine {
         Element elem = WSSecurityUtil.getSecurityHeader(doc, actor);
         if (elem != null) {
             if (doDebug) {
-                log.debug("Processing WS-Security header for '" + actor + "' actor.");
+                LOG.debug("Processing WS-Security header for '" + actor + "' actor.");
             }
             wsResult = processSecurityHeader(elem, requestData);
         }
@@ -423,7 +423,7 @@ public class WSSecurityEngine {
                     returnResults.addAll(0, results);
                 } else {
                     if (doDebug) {
-                        log.debug(
+                        LOG.debug(
                             "Unknown Element: " + node.getLocalName() + " " + node.getNamespaceURI()
                         );
                     }

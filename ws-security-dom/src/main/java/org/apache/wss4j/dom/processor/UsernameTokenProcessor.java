@@ -40,7 +40,7 @@ import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
 
 public class UsernameTokenProcessor implements Processor {
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(UsernameTokenProcessor.class);
     
     public List<WSSecurityEngineResult> handleToken(
@@ -48,8 +48,8 @@ public class UsernameTokenProcessor implements Processor {
         RequestData data,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
-        if (log.isDebugEnabled()) {
-            log.debug("Found UsernameToken list element");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Found UsernameToken list element");
         }
         // See if the token has been previously processed
         String id = elem.getAttributeNS(WSConstants.WSU_NS, "Id");

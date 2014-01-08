@@ -46,7 +46,7 @@ import org.w3c.dom.Element;
  */
 public class KerberosSecurity extends BinarySecurity {
     
-    private static org.slf4j.Logger log =
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(KerberosSecurity.class);
     private SecretKey secretKey;
     
@@ -155,16 +155,16 @@ public class KerberosSecurity extends BinarySecurity {
             }
             loginContext.login();
         } catch (LoginException ex) {
-            if (log.isDebugEnabled()) {
-                log.debug(ex.getMessage(), ex);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(ex.getMessage(), ex);
             }
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,
                 "kerberosLoginError", 
                 ex, ex.getMessage());
         }
-        if (log.isDebugEnabled()) {
-            log.debug("Successfully authenticated to the TGT");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully authenticated to the TGT");
         }
         
         Subject clientSubject = loginContext.getSubject();
@@ -187,8 +187,8 @@ public class KerberosSecurity extends BinarySecurity {
                 WSSecurityException.ErrorCode.FAILURE, "kerberosServiceTicketError"
             );
         }
-        if (log.isDebugEnabled()) {
-            log.debug("Successfully retrieved a service ticket");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully retrieved a service ticket");
         }
         
         // Get the Service Ticket (private credential)
@@ -211,8 +211,8 @@ public class KerberosSecurity extends BinarySecurity {
     private KerberosTicket getKerberosTicket(Subject clientSubject, KerberosTicket previousTicket) {
         Set<KerberosTicket> privateCredentials = clientSubject.getPrivateCredentials(KerberosTicket.class);
         if (privateCredentials == null || privateCredentials.isEmpty()) {
-            if (log.isDebugEnabled()) {
-                log.debug("Kerberos client subject private credentials are null");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Kerberos client subject private credentials are null");
             }
             return null;
         }

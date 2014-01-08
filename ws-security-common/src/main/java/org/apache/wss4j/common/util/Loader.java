@@ -29,7 +29,7 @@ import java.security.PrivilegedAction;
  * <p/>
  */
 public class Loader {
-    private static org.slf4j.Logger log =
+    private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(Loader.class);
 
     /**
@@ -53,7 +53,7 @@ public class Loader {
         try {
             ClassLoader classLoader = getTCL();
             if (classLoader != null) {
-                log.debug("Trying to find [" + resource + "] using " + classLoader + " class loader.");
+                LOG.debug("Trying to find [" + resource + "] using " + classLoader + " class loader.");
                 url = classLoader.getResource(resource);
                 if (url == null && resource.startsWith("/")) {
                     //certain classloaders need it without the leading /
@@ -64,7 +64,7 @@ public class Loader {
                 } 
             }
         } catch (Exception e) {
-            log.warn("Caught Exception while in Loader.getResource. This may be innocuous.", e);
+            LOG.warn("Caught Exception while in Loader.getResource. This may be innocuous.", e);
         }
     
         ClassLoader cluClassloader = Loader.class.getClassLoader();
@@ -84,7 +84,7 @@ public class Loader {
         // may be the case that clazz was loaded by the Extension class
         // loader which the parent of the system class loader. Hence the
         // code below.
-        log.debug("Trying to find [" + resource + "] using ClassLoader.getSystemResource().");
+        LOG.debug("Trying to find [" + resource + "] using ClassLoader.getSystemResource().");
         return ClassLoader.getSystemResource(resource);
     }
 
@@ -110,7 +110,7 @@ public class Loader {
         URL url = null;
         try {
             if (loader != null) {
-                log.debug("Trying to find [" + resource + "] using " + loader + " class loader.");
+                LOG.debug("Trying to find [" + resource + "] using " + loader + " class loader.");
                 url = loader.getResource(resource);
                 if (url == null && resource.startsWith("/")) {
                     //certain classloaders need it without the leading /
@@ -121,7 +121,7 @@ public class Loader {
                 }
             }
         } catch (Exception e) {
-            log.warn("Caught Exception while in Loader.getResource. This may be innocuous.", e);
+            LOG.warn("Caught Exception while in Loader.getResource. This may be innocuous.", e);
         }
         return getResource(resource);
     }
@@ -174,7 +174,7 @@ public class Loader {
                 }
             }
         } catch (Exception e) {
-            log.warn(e.getMessage(), e);
+            LOG.warn(e.getMessage(), e);
         }
         return loadClass(clazz, true);
     }
@@ -200,7 +200,7 @@ public class Loader {
                 }
             }
         } catch (Exception e) {
-            log.warn(e.getMessage(), e);
+            LOG.warn(e.getMessage(), e);
         }
         return loadClass(clazz, true, type);
     }
@@ -253,9 +253,9 @@ public class Loader {
             }
         } catch (Exception e) {
             if (warn) {
-                log.warn(e.getMessage(), e);
+                LOG.warn(e.getMessage(), e);
             } else {
-                log.debug(e.getMessage(), e);
+                LOG.debug(e.getMessage(), e);
             }
         }
 

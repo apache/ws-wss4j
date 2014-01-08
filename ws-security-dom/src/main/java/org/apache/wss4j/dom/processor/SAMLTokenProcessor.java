@@ -51,7 +51,7 @@ import org.opensaml.xml.signature.KeyInfo;
 import org.opensaml.xml.signature.Signature;
 
 public class SAMLTokenProcessor implements Processor {
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(SAMLTokenProcessor.class);
     private XMLSignatureFactory signatureFactory;
 
@@ -70,17 +70,17 @@ public class SAMLTokenProcessor implements Processor {
         RequestData data, 
         WSDocInfo wsDocInfo 
     ) throws WSSecurityException {
-        if (log.isDebugEnabled()) {
-            log.debug("Found SAML Assertion element");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Found SAML Assertion element");
         }
         
         Validator validator = 
             data.getValidator(new QName(elem.getNamespaceURI(), elem.getLocalName()));
         Credential credential = handleSAMLToken(elem, data, validator, wsDocInfo);
         SamlAssertionWrapper samlAssertion = credential.getSamlAssertion();
-        if (log.isDebugEnabled()) {
-            log.debug("SAML Assertion issuer " + samlAssertion.getIssuerString());
-            log.debug(DOM2Writer.nodeToString(elem));
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SAML Assertion issuer " + samlAssertion.getIssuerString());
+            LOG.debug(DOM2Writer.nodeToString(elem));
         }
         
         // See if the token has been previously processed

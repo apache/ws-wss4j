@@ -29,7 +29,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 public class NamePasswordCallbackHandler implements CallbackHandler {  
 
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(NamePasswordCallbackHandler.class);
     
     private static final String PASSWORD_CALLBACK_NAME = "setObject";
@@ -62,7 +62,7 @@ public class NamePasswordCallbackHandler implements CallbackHandler {
                 PasswordCallback pwCallback = (PasswordCallback) callback;  
                 pwCallback.setPassword(password.toCharArray());
             } else if (!invokePasswordCallback(callback)) {
-                log.error("Unsupported callback type " + callbacks[i].getClass().getName());
+                LOG.error("Unsupported callback type " + callbacks[i].getClass().getName());
                 throw new UnsupportedCallbackException(callbacks[i], "Unsupported callback type " + callbacks[i].getClass().getName());  
             }  
         }  
@@ -89,7 +89,7 @@ public class NamePasswordCallbackHandler implements CallbackHandler {
                 return true;
             } catch (Exception e) {
                 // ignore and continue
-                log.warn(e.toString());
+                LOG.warn(e.toString());
             }
         }
         return false;

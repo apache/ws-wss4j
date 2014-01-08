@@ -69,7 +69,7 @@ import org.w3c.dom.Text;
 
 public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
     
-    private static final transient org.slf4j.Logger logger = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(SAMLTokenOutputProcessor.class);
 
     public SAMLTokenOutputProcessor() throws XMLSecurityException {
@@ -293,7 +293,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                         try {
                             return securityTokenProvider.getSecurityToken();
                         } catch (XMLSecurityException e) {
-                            logger.debug(e.getMessage(), e);
+                            LOG.debug(e.getMessage(), e);
                         }
                         return null;
                     }

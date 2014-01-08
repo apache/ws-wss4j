@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
  * Refer to the WS specification, UsernameToken profile
  */
 public class WSSecUsernameToken extends WSSecBase {
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(WSSecUsernameToken.class);
 
     private String passwordType = WSConstants.PASSWORD_DIGEST;
@@ -230,7 +230,7 @@ public class WSSecUsernameToken extends WSSecBase {
      * @return Document with UsernameToken added
      */
     public Document build(Document doc, WSSecHeader secHeader) {
-        log.debug("Begin add username token...");
+        LOG.debug("Begin add username token...");
 
         prepare(doc);
         prependToHeader(secHeader);

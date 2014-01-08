@@ -33,7 +33,7 @@ import org.apache.wss4j.dom.validate.Validator;
 import org.w3c.dom.Element;
 
 public class TimestampProcessor implements Processor {
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(TimestampProcessor.class);
 
     public List<WSSecurityEngineResult> handleToken(
@@ -41,8 +41,8 @@ public class TimestampProcessor implements Processor {
         RequestData data,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
-        if (log.isDebugEnabled()) {
-            log.debug("Found Timestamp list element");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Found Timestamp list element");
         }
         //
         // Decode Timestamp, add the found time (created/expiry) to result

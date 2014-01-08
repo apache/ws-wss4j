@@ -64,7 +64,7 @@ import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
  */
 public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
 
-    private static final transient org.slf4j.Logger logger = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(EncryptOutputProcessor.class);
 
     public EncryptOutputProcessor() throws XMLSecurityException {
@@ -89,7 +89,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
             if (getActiveInternalEncryptionOutputProcessor() == null) {
                 SecurePart securePart = securePartMatches(xmlSecStartElement, outputProcessorChain, WSSConstants.ENCRYPTION_PARTS);
                 if (securePart != null) {
-                    logger.debug("Matched encryptionPart for encryption");
+                    LOG.debug("Matched encryptionPart for encryption");
                     InternalEncryptionOutputProcessor internalEncryptionOutputProcessor;
                     String tokenId = outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION);
                     SecurityTokenProvider<OutboundSecurityToken> securityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);

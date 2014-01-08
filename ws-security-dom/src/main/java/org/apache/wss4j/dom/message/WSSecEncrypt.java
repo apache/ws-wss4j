@@ -61,7 +61,7 @@ import java.util.*;
  * and adds the encryption data.
  */
 public class WSSecEncrypt extends WSSecEncryptedKey {
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(WSSecEncrypt.class);
     
     /**
@@ -192,7 +192,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      */
     public Document build(Document doc, Crypto crypto, WSSecHeader secHeader)
         throws WSSecurityException {
-        doDebug = log.isDebugEnabled();
+        doDebug = LOG.isDebugEnabled();
 
         prepare(doc, crypto);
         
@@ -213,7 +213,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         }
 
         if (doDebug) {
-            log.debug("Beginning Encryption...");
+            LOG.debug("Beginning Encryption...");
         }
         
         Element refs = encryptForRef(null, parts);
@@ -230,7 +230,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             prependBSTElementToHeader(secHeader);
         }
 
-        log.debug("Encryption complete.");
+        LOG.debug("Encryption complete.");
         return doc;
     }
     

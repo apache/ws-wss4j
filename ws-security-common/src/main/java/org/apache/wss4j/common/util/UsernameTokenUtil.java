@@ -28,7 +28,7 @@ import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 public final class UsernameTokenUtil {
     public static final int DEFAULT_ITERATION = 1000;
     
-    private static org.slf4j.Logger LOG =
+    private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(UsernameTokenUtil.class);
     
     /**

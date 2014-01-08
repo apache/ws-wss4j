@@ -52,7 +52,7 @@ import org.apache.xml.security.stax.securityToken.SecurityToken;
  */
 public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl implements WSInboundSecurityContext {
 
-    private static final transient org.slf4j.Logger logger =
+    private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(InboundWSSecurityContextImpl.class);
 
     private final Deque<SecurityEvent> securityEventQueue = new ArrayDeque<SecurityEvent>();
@@ -564,7 +564,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
                     "empty",
                     "BSP:" + bspRule.name() + ": " + bspRule.getMsg());
         } else {
-            logger.warn("BSP:" + bspRule.name() + ": " + bspRule.getMsg());
+            LOG.warn("BSP:" + bspRule.name() + ": " + bspRule.getMsg());
         }
     }
 

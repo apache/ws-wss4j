@@ -26,7 +26,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.xml.security.algorithms.JCEMapper;
 
 public final class KeyUtils {
-    private static org.slf4j.Logger LOG =
+    private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(KeyUtils.class);
 
     /**

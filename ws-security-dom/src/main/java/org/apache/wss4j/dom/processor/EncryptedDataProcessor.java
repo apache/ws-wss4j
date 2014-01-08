@@ -54,7 +54,7 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
  */
 public class EncryptedDataProcessor implements Processor {
     
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(EncryptedDataProcessor.class);
     
     public List<WSSecurityEngineResult> handleToken(
@@ -62,8 +62,8 @@ public class EncryptedDataProcessor implements Processor {
         RequestData request,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
-        if (log.isDebugEnabled()) {
-            log.debug("Found EncryptedData element");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Found EncryptedData element");
         }
 
         final String encryptedDataId = elem.getAttributeNS(null, "Id");
@@ -161,8 +161,8 @@ public class EncryptedDataProcessor implements Processor {
                 QName el = new QName(decryptedElem.getNamespaceURI(), decryptedElem.getLocalName());
                 Processor proc = request.getWssConfig().getProcessor(el);
                 if (proc != null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Processing decrypted element with: " + proc.getClass().getName());
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Processing decrypted element with: " + proc.getClass().getName());
                     }
                     List<WSSecurityEngineResult> results =
                             proc.handleToken(decryptedElem, request, wsDocInfo);

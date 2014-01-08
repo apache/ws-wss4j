@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
  */
 public class WSSecSAMLToken extends WSSecBase {
 
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(WSSecSAMLToken.class);
     
     private Document document;
@@ -111,7 +111,7 @@ public class WSSecSAMLToken extends WSSecBase {
      * @return Document with UsernameToken added
      */
     public Document build(Document doc, SamlAssertionWrapper samlAssertion, WSSecHeader secHeader) {
-        log.debug("Begin add SAMLAssertion token...");
+        LOG.debug("Begin add SAMLAssertion token...");
         
         prepare(doc, samlAssertion);
         prependToHeader(secHeader);

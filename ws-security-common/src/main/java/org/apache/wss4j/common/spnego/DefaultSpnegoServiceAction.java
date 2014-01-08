@@ -30,7 +30,7 @@ import org.ietf.jgss.Oid;
  * to a KDC.
  */
 public class DefaultSpnegoServiceAction implements SpnegoServiceAction {
-    private static org.slf4j.Logger log =
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(DefaultSpnegoServiceAction.class);
     
     private byte[] ticket;
@@ -64,8 +64,8 @@ public class DefaultSpnegoServiceAction implements SpnegoServiceAction {
 
             return secContext.acceptSecContext(ticket, 0, ticket.length);
         } catch (GSSException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Error in obtaining a Kerberos token", e);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Error in obtaining a Kerberos token", e);
             }
         }
 

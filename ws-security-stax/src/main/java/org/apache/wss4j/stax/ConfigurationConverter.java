@@ -52,7 +52,7 @@ import org.apache.xml.security.stax.ext.XMLSecurityConstants.Action;
  */
 public final class ConfigurationConverter {
     
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(ConfigurationConverter.class);
                                           
     private ConfigurationConverter() {
@@ -199,7 +199,7 @@ public final class ConfigurationConverter {
                         properties.setSignatureUser(getDefaultX509Identifier(properties, true));
                     }
                 } catch (WSSecurityException e) {
-                    log.error(e.getMessage(), e);
+                    LOG.error(e.getMessage(), e);
                 }
             }
         }
@@ -225,7 +225,7 @@ public final class ConfigurationConverter {
                         CryptoFactory.getProperties(sigPropFile, getClassLoader());
                     properties.setSignatureVerificationCryptoProperties(sigProperties, passwordEncryptor);
                 } catch (WSSecurityException e) {
-                    log.error(e.getMessage(), e);
+                    LOG.error(e.getMessage(), e);
                 }
             }
         }
@@ -251,7 +251,7 @@ public final class ConfigurationConverter {
                         CryptoFactory.getProperties(encPropFile, getClassLoader());
                     properties.setEncryptionCryptoProperties(encProperties, passwordEncryptor);
                 } catch (WSSecurityException e) {
-                    log.error(e.getMessage(), e);
+                    LOG.error(e.getMessage(), e);
                 }
             }
         }
@@ -277,7 +277,7 @@ public final class ConfigurationConverter {
                         CryptoFactory.getProperties(encPropFile, getClassLoader());
                     properties.setDecryptionCryptoProperties(encProperties, passwordEncryptor);
                 } catch (WSSecurityException e) {
-                    log.error(e.getMessage(), e);
+                    LOG.error(e.getMessage(), e);
                 }
             }
         }
@@ -295,9 +295,9 @@ public final class ConfigurationConverter {
             }
             return crypto.getDefaultX509Identifier();
         } catch (WSSConfigurationException e) {
-            log.debug(e.getMessage(), e);
+            LOG.debug(e.getMessage(), e);
         } catch (WSSecurityException e) {
-            log.debug(e.getMessage(), e);
+            LOG.debug(e.getMessage(), e);
         }
         return null;
     }
@@ -316,7 +316,7 @@ public final class ConfigurationConverter {
                     CallbackHandler pwCallbackHandler = loadCallbackHandler(pwCallback);
                     properties.setCallbackHandler(pwCallbackHandler);
                 } catch (WSSecurityException e) {
-                    log.error(e.getMessage(), e);
+                    LOG.error(e.getMessage(), e);
                 }
             }
         }
@@ -331,7 +331,7 @@ public final class ConfigurationConverter {
                     CallbackHandler samlCallbackHandler = loadCallbackHandler(samlCallback);
                     properties.setSamlCallbackHandler(samlCallbackHandler);
                 } catch (WSSecurityException e) {
-                    log.error(e.getMessage(), e);
+                    LOG.error(e.getMessage(), e);
                 }
             }
         }
@@ -615,7 +615,7 @@ public final class ConfigurationConverter {
                     try {
                         subjectCertConstraints.add(Pattern.compile(certConstraint.trim()));
                     } catch (PatternSyntaxException ex) {
-                        log.error(ex.getMessage(), ex);
+                        LOG.error(ex.getMessage(), ex);
                     }
                 }
                 properties.setSubjectCertConstraints(subjectCertConstraints);

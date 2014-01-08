@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
 import java.util.List;
 
 public class SignatureConfirmationProcessor implements Processor {
-    private static org.slf4j.Logger log = 
+    private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(SignatureConfirmationProcessor.class);
     
     public List<WSSecurityEngineResult> handleToken(
@@ -38,8 +38,8 @@ public class SignatureConfirmationProcessor implements Processor {
         RequestData data,
         WSDocInfo wsDocInfo 
     ) throws WSSecurityException {
-        if (log.isDebugEnabled()) {
-            log.debug("Found SignatureConfirmation list element");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Found SignatureConfirmation list element");
         }
         //
         // Decode SignatureConfirmation, just store in result
