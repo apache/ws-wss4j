@@ -39,7 +39,7 @@ import org.opensaml.xml.parse.XMLParserException;
 public class OpenSAMLBootstrap extends DefaultBootstrap {
     
     /** List of default XMLTooling configuration files. */
-    private static String[] xmlToolingConfigs = { 
+    private static final String[] xmlToolingConfigs = { 
         "/default-config.xml", 
         "/schema-config.xml", 
         "/signature-config.xml",

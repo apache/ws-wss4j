@@ -29,11 +29,11 @@ public class SOAP12Constants implements SOAPConstants {
      * 
      */
     private static final long serialVersionUID = 3784866613259361834L;
-    private static QName headerQName = new QName(WSConstants.URI_SOAP12_ENV,
+    private static final QName headerQName = new QName(WSConstants.URI_SOAP12_ENV,
             WSConstants.ELEM_HEADER);
-    private static QName bodyQName = new QName(WSConstants.URI_SOAP12_ENV,
+    private static final QName bodyQName = new QName(WSConstants.URI_SOAP12_ENV,
             WSConstants.ELEM_BODY);
-    private static QName roleQName = new QName(WSConstants.URI_SOAP12_ENV,
+    private static final QName roleQName = new QName(WSConstants.URI_SOAP12_ENV,
             WSConstants.ATTR_ROLE);
     
     // Public constants for SOAP 1.2
