@@ -361,7 +361,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             algorithm = transformType.getAlgorithm();
             AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
             algorithmSuiteSecurityEvent.setAlgorithmURI(algorithm);
-            algorithmSuiteSecurityEvent.setAlgorithmUsage(WSSConstants.C14n);
+            algorithmSuiteSecurityEvent.setAlgorithmUsage(WSSConstants.SigTransform);
             algorithmSuiteSecurityEvent.setCorrelationID(referenceType.getId());
             inputProcessorChain.getSecurityContext().registerSecurityEvent(algorithmSuiteSecurityEvent);
 

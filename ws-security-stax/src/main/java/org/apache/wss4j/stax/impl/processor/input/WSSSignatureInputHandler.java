@@ -80,7 +80,7 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
 
         AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
         algorithmSuiteSecurityEvent.setAlgorithmURI(signatureType.getSignedInfo().getCanonicalizationMethod().getAlgorithm());
-        algorithmSuiteSecurityEvent.setAlgorithmUsage(WSSConstants.C14n);
+        algorithmSuiteSecurityEvent.setAlgorithmUsage(WSSConstants.SigC14n);
         algorithmSuiteSecurityEvent.setCorrelationID(signatureType.getId());
         securityContext.registerSecurityEvent(algorithmSuiteSecurityEvent);
 

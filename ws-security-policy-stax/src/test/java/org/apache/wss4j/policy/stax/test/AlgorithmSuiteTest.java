@@ -85,7 +85,7 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
         algorithmSuiteSecurityEvent.setAlgorithmUsage(WSSConstants.Enc);
         policyEnforcer.registerSecurityEvent(algorithmSuiteSecurityEvent);
         algorithmSuiteSecurityEvent.setAlgorithmURI("http://www.w3.org/2001/04/xmlenc#sha256");
-        algorithmSuiteSecurityEvent.setAlgorithmUsage(WSSConstants.Dig);
+        algorithmSuiteSecurityEvent.setAlgorithmUsage(WSSConstants.SigDig);
         try {
             policyEnforcer.registerSecurityEvent(algorithmSuiteSecurityEvent);
             Assert.fail("Exception expected");
