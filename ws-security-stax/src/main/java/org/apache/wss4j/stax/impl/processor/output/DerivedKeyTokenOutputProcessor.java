@@ -187,7 +187,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             if (wrappingSecurityToken.getProcessor() != null) {
                 finalDerivedKeyTokenOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
             } else {
-                finalDerivedKeyTokenOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
+                finalDerivedKeyTokenOutputProcessor.addAfterProcessor(ReferenceListOutputProcessor.class.getName());
             }
             finalDerivedKeyTokenOutputProcessor.init(outputProcessorChain);
             derivedKeySecurityToken.setProcessor(finalDerivedKeyTokenOutputProcessor);

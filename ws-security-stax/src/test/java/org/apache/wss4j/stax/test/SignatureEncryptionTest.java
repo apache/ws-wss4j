@@ -258,12 +258,124 @@ public class SignatureEncryptionTest extends AbstractTestBase {
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
 
-            documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+
+            NodeList securityHeaderElement = document.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
+            Assert.assertEquals(1, securityHeaderElement.getLength());
+            NodeList childs = securityHeaderElement.item(0).getChildNodes();
+
+            Assert.assertEquals(childs.getLength(), 4);
+            Assert.assertEquals(childs.item(0).getLocalName(), "Timestamp");
+            Assert.assertEquals(childs.item(1).getLocalName(), "EncryptedKey");
+            Assert.assertEquals(childs.item(2).getLocalName(), "ReferenceList");
+            Assert.assertEquals(childs.item(3).getLocalName(), "Signature");
         }
 
         //done encryption; now test decryption:
         {
             String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT + " " + WSHandlerConstants.TIMESTAMP;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+
+    @Test
+    public void testEncryptionSignatureSymmetricOutbound() throws Exception {
+
+        ByteArrayOutputStream baos;
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            actions.add(WSSConstants.SIGNATURE);
+            actions.add(WSSConstants.TIMESTAMP);
+            securityProperties.setActions(actions);
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setEncryptionUser("receiver");
+
+            securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setSignatureUser("transmitter");
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+
+            securityProperties.setSignatureAlgorithm(WSSConstants.NS_XMLDSIG_HMACSHA1);
+            securityProperties.setSignatureKeyIdentifier(
+                    WSSecurityTokenConstants.KeyIdentifier_EncryptedKey
+            );
+
+            securityProperties.addSignaturePart(
+                    new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), SecurePart.Modifier.Element)
+            );
+            securityProperties.addSignaturePart(
+                    new SecurePart(new QName(WSSConstants.NS_SOAP11, "Body"), SecurePart.Modifier.Element)
+            );
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+
+            // Symmetric Key
+            String keyAlgorithm =
+                    JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(WSSConstants.NS_XENC_AES128);
+            KeyGenerator keyGen;
+            try {
+                keyGen = KeyGenerator.getInstance(keyAlgorithm);
+            } catch (NoSuchAlgorithmException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+            }
+            int keyLength = JCEAlgorithmMapper.getKeyLengthFromURI(WSSConstants.NS_XENC_AES128);
+            keyGen.init(keyLength);
+
+            final Key symmetricKey = keyGen.generateKey();
+
+            final String ekId = IDGenerator.generateID(null);
+
+            final GenericOutboundSecurityToken encryptedKeySecurityToken =
+                    new GenericOutboundSecurityToken(ekId, WSSecurityTokenConstants.EncryptedKeyToken, symmetricKey);
+
+            final SecurityTokenProvider<OutboundSecurityToken> encryptedKeySecurityTokenProvider =
+                    new SecurityTokenProvider<OutboundSecurityToken>() {
+
+                        @Override
+                        public OutboundSecurityToken getSecurityToken() throws XMLSecurityException {
+                            return encryptedKeySecurityToken;
+                        }
+
+                        @Override
+                        public String getId() {
+                            return ekId;
+                        }
+                    };
+
+            final OutboundSecurityContextImpl outboundSecurityContext = new OutboundSecurityContextImpl();
+            outboundSecurityContext.putList(SecurityEvent.class, new ArrayList<SecurityEvent>());
+
+            // Save Token on the security context
+            outboundSecurityContext.registerSecurityTokenProvider(encryptedKeySecurityTokenProvider.getId(), encryptedKeySecurityTokenProvider);
+            outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, encryptedKeySecurityTokenProvider.getId());
+            outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, encryptedKeySecurityTokenProvider.getId());
+
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+
+            baos = new ByteArrayOutputStream();
+            XMLStreamWriter xmlStreamWriter =
+                    wsSecOut.processOutMessage(baos, "UTF-8", outboundSecurityContext);
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+
+            NodeList securityHeaderElement = document.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
+            Assert.assertEquals(1, securityHeaderElement.getLength());
+            NodeList childs = securityHeaderElement.item(0).getChildNodes();
+
+            Assert.assertEquals(childs.getLength(), 4);
+            Assert.assertEquals(childs.item(0).getLocalName(), "Timestamp");
+            Assert.assertEquals(childs.item(1).getLocalName(), "EncryptedKey");
+            Assert.assertEquals(childs.item(2).getLocalName(), "Signature");
+            Assert.assertEquals(childs.item(3).getLocalName(), "ReferenceList");
+        }
+
+        //done encryption; now test decryption:
+        {
+            String action = WSHandlerConstants.ENCRYPT + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.TIMESTAMP;
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }

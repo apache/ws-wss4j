@@ -72,7 +72,8 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
             if (tokenId == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
-            SecurityTokenProvider<OutboundSecurityToken> wrappingSecurityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
+            SecurityTokenProvider<OutboundSecurityToken> wrappingSecurityTokenProvider =
+                    outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
             if (wrappingSecurityTokenProvider == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
@@ -81,19 +82,27 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
             
-            // See if a Symmetric Key is already available
-            String encTokenId = 
-                outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION);
             SecurityTokenProvider<OutboundSecurityToken> encryptedKeySecurityTokenProvider = null;
             GenericOutboundSecurityToken encryptedKeySecurityToken = null;
-            if (encTokenId != null) {
-                encryptedKeySecurityTokenProvider = 
-                    outputProcessorChain.getSecurityContext().getSecurityTokenProvider(encTokenId);
-                if (encryptedKeySecurityTokenProvider != null) {
-                    encryptedKeySecurityToken = 
-                        (GenericOutboundSecurityToken)encryptedKeySecurityTokenProvider.getSecurityToken();
-                }
+
+            String sigTokenId =
+                    outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE);
+            // See if a Symmetric Key is already available
+            String encTokenId =
+                    outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION);
+            if (encTokenId == null) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
+
+            encryptedKeySecurityTokenProvider =
+                outputProcessorChain.getSecurityContext().getSecurityTokenProvider(encTokenId);
+            if (encryptedKeySecurityTokenProvider == null) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
+            }
+            encryptedKeySecurityToken =
+                    (GenericOutboundSecurityToken)encryptedKeySecurityTokenProvider.getSecurityToken();
+
+            boolean sharedToken = encTokenId.equals(sigTokenId);
 
             FinalEncryptedKeyOutputProcessor finalEncryptedKeyOutputProcessor = new FinalEncryptedKeyOutputProcessor(encryptedKeySecurityToken);
             finalEncryptedKeyOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
@@ -102,8 +111,27 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
             if (WSSConstants.ENCRYPT.equals(action)) {
                 if (wrappingSecurityToken.getProcessor() != null) {
                     finalEncryptedKeyOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
+                    finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
+                } else if (sharedToken) {
+                    finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
+
+                    //hint for the headerReordering processor where to place the EncryptedKey
+                    if (getSecurityProperties().getActions().indexOf(WSSConstants.ENCRYPT) <
+                            getSecurityProperties().getActions().indexOf(WSSConstants.SIGNATURE)) {
+                        finalEncryptedKeyOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
+                        finalEncryptedKeyOutputProcessor.setAction(WSSConstants.SIGNATURE);
+                    }
+                    finalEncryptedKeyOutputProcessor.setOutputReferenceList(false);
+                    finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
+
+                    ReferenceListOutputProcessor referenceListOutputProcessor = new ReferenceListOutputProcessor();
+                    referenceListOutputProcessor.addBeforeProcessor(finalEncryptedKeyOutputProcessor);
+                    referenceListOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
+                    referenceListOutputProcessor.setAction(getAction());
+                    referenceListOutputProcessor.init(outputProcessorChain);
                 } else {
                     finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
+                    finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
                 }
             } else if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
                 if (wrappingSecurityToken.getProcessor() != null) {
@@ -111,15 +139,37 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                 } else {
                     finalEncryptedKeyOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
                 }
+                finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
             } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
                 if (wrappingSecurityToken.getProcessor() != null) {
                     finalEncryptedKeyOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
+                    finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
+                } else if (sharedToken) {
+                    finalEncryptedKeyOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
+                    finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
+
+                    //hint for the headerReordering processor where to place the EncryptedKey
+                    if (getSecurityProperties().getActions().indexOf(WSSConstants.ENCRYPT_WITH_DERIVED_KEY) <
+                            getSecurityProperties().getActions().indexOf(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
+                        finalEncryptedKeyOutputProcessor.setAction(WSSConstants.SIGNATURE_WITH_DERIVED_KEY);
+                    }
+                    finalEncryptedKeyOutputProcessor.setOutputReferenceList(false);
+                    finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
                 } else {
                     finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
+                    finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
                 }
+                ReferenceListOutputProcessor referenceListOutputProcessor = new ReferenceListOutputProcessor();
+                referenceListOutputProcessor.addBeforeProcessor(finalEncryptedKeyOutputProcessor);
+                referenceListOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
+                referenceListOutputProcessor.setAction(getAction());
+                referenceListOutputProcessor.init(outputProcessorChain);
+            } else {
+                finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
             }
-            finalEncryptedKeyOutputProcessor.init(outputProcessorChain);
-            outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(encryptedKeySecurityToken.getId(), encryptedKeySecurityTokenProvider);
+
+            outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(
+                    encryptedKeySecurityToken.getId(), encryptedKeySecurityTokenProvider);
             encryptedKeySecurityToken.setProcessor(finalEncryptedKeyOutputProcessor);
         } finally {
             outputProcessorChain.removeProcessor(this);
@@ -130,11 +180,16 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
     class FinalEncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
         private final OutboundSecurityToken securityToken;
+        private boolean outputReferenceList = true;
 
         FinalEncryptedKeyOutputProcessor(OutboundSecurityToken securityToken) throws XMLSecurityException {
             super();
             this.addAfterProcessor(FinalEncryptedKeyOutputProcessor.class.getName());
             this.securityToken = securityToken;
+        }
+
+        protected void setOutputReferenceList(boolean outputReferenceList) {
+            this.outputReferenceList = outputReferenceList;
         }
 
         /*
@@ -295,7 +350,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                 createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_CipherValue);
                 createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_CipherData);
 
-                if (WSSConstants.ENCRYPT.equals(getAction())) {
+                if (outputReferenceList && WSSConstants.ENCRYPT.equals(getAction())) {
                     WSSUtils.createReferenceListStructureForEncryption(this, subOutputProcessorChain);
                 }
                 createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);

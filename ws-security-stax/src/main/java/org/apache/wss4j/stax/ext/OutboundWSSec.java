@@ -195,17 +195,25 @@ public class OutboundWSSec {
 
                 } else if (WSSConstants.ENCRYPT.equals(action)) {
                     encryptionAction = true;
+
+                    EncryptedKeyOutputProcessor encryptedKeyOutputProcessor = null;
                     if (securityProperties.isEncryptSymmetricEncryptionKey()) {
                         final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
                             new BinarySecurityTokenOutputProcessor();
                         initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
 
-                        final EncryptedKeyOutputProcessor encryptedKeyOutputProcessor = new EncryptedKeyOutputProcessor();
+                        encryptedKeyOutputProcessor = new EncryptedKeyOutputProcessor();
                         initializeOutputProcessor(outputProcessorChain, encryptedKeyOutputProcessor, action);
                     }
 
                     final EncryptOutputProcessor encryptOutputProcessor = new EncryptOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, encryptOutputProcessor, action);
+
+                    if (encryptedKeyOutputProcessor == null) {
+                        final ReferenceListOutputProcessor referenceListOutputProcessor = new ReferenceListOutputProcessor();
+                        referenceListOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
+                        initializeOutputProcessor(outputProcessorChain, referenceListOutputProcessor, action);
+                    }
 
                 } else if (WSSConstants.USERNAMETOKEN.equals(action)) {
                     final UsernameTokenOutputProcessor usernameTokenOutputProcessor = new UsernameTokenOutputProcessor();
@@ -252,15 +260,16 @@ public class OutboundWSSec {
                     encryptionAction = true;
                     derivedEncryption = true;
 
+                    EncryptedKeyOutputProcessor encryptedKeyOutputProcessor = null;
+
                     if (securityProperties.getDerivedKeyTokenReference() == WSSConstants.DerivedKeyTokenReference.EncryptedKey) {
-                        final EncryptedKeyOutputProcessor encryptedKeyOutputProcessor = new EncryptedKeyOutputProcessor();
+                        encryptedKeyOutputProcessor = new EncryptedKeyOutputProcessor();
                         initializeOutputProcessor(outputProcessorChain, encryptedKeyOutputProcessor, action);
 
                     } else if (securityProperties.getDerivedKeyTokenReference() == WSSConstants.DerivedKeyTokenReference.SecurityContextToken) {
                         final SecurityContextTokenOutputProcessor securityContextTokenOutputProcessor =
                                 new SecurityContextTokenOutputProcessor();
                         initializeOutputProcessor(outputProcessorChain, securityContextTokenOutputProcessor, action);
-
                     }
                     final DerivedKeyTokenOutputProcessor derivedKeyTokenOutputProcessor = new DerivedKeyTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, derivedKeyTokenOutputProcessor, action);
@@ -268,6 +277,11 @@ public class OutboundWSSec {
                     final EncryptOutputProcessor encryptOutputProcessor = new EncryptOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, encryptOutputProcessor, action);
 
+                    if (encryptedKeyOutputProcessor == null) {
+                        final ReferenceListOutputProcessor referenceListOutputProcessor = new ReferenceListOutputProcessor();
+                        referenceListOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
+                        initializeOutputProcessor(outputProcessorChain, referenceListOutputProcessor, action);
+                    }
                 } else if (WSSConstants.SAML_TOKEN_SIGNED.equals(action)) {
                     signatureAction = true;
                     signedSAML = true;

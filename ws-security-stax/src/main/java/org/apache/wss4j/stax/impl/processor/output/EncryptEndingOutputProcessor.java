@@ -46,10 +46,6 @@ public class EncryptEndingOutputProcessor extends AbstractEncryptEndingOutputPro
     @Override
     public void processHeaderEvent(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
         OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
-        if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(getAction())
-            || !((WSSSecurityProperties)getSecurityProperties()).isEncryptSymmetricEncryptionKey()) {
-            WSSUtils.createReferenceListStructureForEncryption(this, subOutputProcessorChain);
-        }
         if (attachmentCount(outputProcessorChain) > 0) {
             WSSUtils.createEncryptedDataStructureForAttachments(this, subOutputProcessorChain);
         }
@@ -70,11 +66,6 @@ public class EncryptEndingOutputProcessor extends AbstractEncryptEndingOutputPro
                 case XMLStreamConstants.START_ELEMENT:
                     if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, actor)) {
 
-                        if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(getAction())
-                            || !((WSSSecurityProperties)getSecurityProperties()).isEncryptSymmetricEncryptionKey()) {
-                            WSSUtils.updateSecurityHeaderOrder(
-                                    outputProcessorChain, WSSConstants.TAG_xenc_ReferenceList, getAction(), true);                            
-                        }
                         int attachmentCount = attachmentCount(outputProcessorChain);
                         for (int i = 0; i < attachmentCount; i++) {
                             WSSUtils.updateSecurityHeaderOrder(

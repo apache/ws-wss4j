@@ -116,6 +116,7 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
                 if (wrappingSecurityToken.getProcessor() != null) {
                     finalSecurityContextTokenOutputProcessor.addBeforeProcessor(wrappingSecurityToken.getProcessor());
                 } else {
+                    finalSecurityContextTokenOutputProcessor.addAfterProcessor(ReferenceListOutputProcessor.class.getName());
                     finalSecurityContextTokenOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
                 }
             }
