@@ -23,6 +23,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -81,8 +82,9 @@ public class X509Security extends BinarySecurity {
         if (cachedCert != null) {
             return cachedCert;
         }
-        if (crypto == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSigCryptoFile");
+        Crypto certCrypto = crypto;
+        if (certCrypto == null) {
+            certCrypto = new Merlin();
         }
         byte[] data = getToken();
         if (data == null) {
@@ -90,7 +92,7 @@ public class X509Security extends BinarySecurity {
                 WSSecurityException.ErrorCode.FAILURE, "invalidCertData", 0);
         }
         InputStream in = new ByteArrayInputStream(data);
-        cachedCert = crypto.loadCertificate(in);
+        cachedCert = certCrypto.loadCertificate(in);
         return cachedCert;
     }
 
