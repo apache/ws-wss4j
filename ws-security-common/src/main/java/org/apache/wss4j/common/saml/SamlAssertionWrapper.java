@@ -615,33 +615,25 @@ public class SamlAssertionWrapper {
     }
     
     /**
-     * This method parses the KeyInfo of the Subject for the holder-of-key confirmation
-     * method, as required by the SAML Token spec. It then stores the SAMLKeyInfo object that
+     * This method parses the KeyInfo of the Subject. It then stores the SAMLKeyInfo object that
      * has been obtained for future processing.
      * @throws WSSecurityException
      */
-    public void parseHOKSubject(
+    public void parseSubject(
         SAMLKeyInfoProcessor keyInfoProcessor,
         Crypto sigCrypto,
         CallbackHandler callbackHandler
     ) throws WSSecurityException {
-        String confirmMethod = null;
-        List<String> methods = getConfirmationMethods();
-        if (methods != null && methods.size() > 0) {
-            confirmMethod = methods.get(0);
-        }
-        if (OpenSAMLUtil.isMethodHolderOfKey(confirmMethod)) {
-            if (saml1 != null) {
-                subjectKeyInfo = 
-                    SAMLUtil.getCredentialFromSubject(
-                        saml1, keyInfoProcessor, sigCrypto, callbackHandler
-                    );
-            } else if (saml2 != null) {
-                subjectKeyInfo = 
-                    SAMLUtil.getCredentialFromSubject(
-                        saml2, keyInfoProcessor, sigCrypto, callbackHandler
-                    );
-            }
+        if (saml1 != null) {
+            subjectKeyInfo = 
+                SAMLUtil.getCredentialFromSubject(
+                    saml1, keyInfoProcessor, sigCrypto, callbackHandler
+                );
+        } else if (saml2 != null) {
+            subjectKeyInfo = 
+                SAMLUtil.getCredentialFromSubject(
+                    saml2, keyInfoProcessor, sigCrypto, callbackHandler
+                );
         }
     }
     

@@ -185,8 +185,8 @@ public class SAMLTokenProcessor implements Processor {
 
             samlAssertion.verifySignature(samlKeyInfo);
         }
-        // Parse the HOK subject if it exists
-        samlAssertion.parseHOKSubject(
+        // Parse the subject if it exists
+        samlAssertion.parseSubject(
             new WSSSAMLKeyInfoProcessor(data, docInfo), data.getSigVerCrypto(), 
             data.getCallbackHandler()
         );

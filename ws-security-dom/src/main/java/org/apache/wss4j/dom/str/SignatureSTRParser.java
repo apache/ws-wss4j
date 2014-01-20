@@ -168,7 +168,7 @@ public class SignatureSTRParser implements STRParser {
                             );
                     } else {
                         samlAssertion = new SamlAssertionWrapper(processedToken);
-                        samlAssertion.parseHOKSubject(
+                        samlAssertion.parseSubject(
                             new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 
                             data.getSigVerCrypto(), data.getCallbackHandler()
                         );

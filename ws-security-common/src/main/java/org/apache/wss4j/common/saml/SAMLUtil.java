@@ -48,6 +48,9 @@ import org.w3c.dom.Element;
  */
 public final class SAMLUtil {
     
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(SAMLUtil.class);
+    
     private static final String SIG_NS = "http://www.w3.org/2000/09/xmldsig#";
     
     private SAMLUtil() {
@@ -84,20 +87,19 @@ public final class SAMLUtil {
      * Try to get the secret key from a CallbackHandler implementation
      * @param cb a CallbackHandler implementation
      * @return An array of bytes corresponding to the secret key (can be null)
-     * @throws WSSecurityException
      */
     public static byte[] getSecretKeyFromCallbackHandler(
         String id,
         CallbackHandler cb
-    ) throws WSSecurityException {
+    ) {
         if (cb != null) {
             WSPasswordCallback pwcb = 
                 new WSPasswordCallback(id, WSPasswordCallback.SECRET_KEY);
             try {
                 cb.handle(new Callback[]{pwcb});
             } catch (Exception e1) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKey",
-                        new Object[] { id }, e1);
+                LOG.debug("Error in retrieving secret key from CallbackHandler: " + e1.getMessage());
+                return null;
             }
             return pwcb.getKey();
         }
@@ -142,20 +144,15 @@ public final class SAMLUtil {
                 samlSubject = authzStmt.getSubject();
             }
             
-            if (samlSubject == null) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLToken", 
-                    "for Signature (no Subject)"
-                );
-            }
-
-            Element sub = samlSubject.getSubjectConfirmation().getDOM();
-            Element keyInfoElement = 
-                XMLUtils.getDirectChildElement(sub, "KeyInfo", SIG_NS);
-            if (keyInfoElement != null) {
-                return getCredentialFromKeyInfo(
-                    keyInfoElement, keyInfoProcessor, sigCrypto
-                );
+            if (samlSubject != null) {
+                Element sub = samlSubject.getSubjectConfirmation().getDOM();
+                Element keyInfoElement = 
+                    XMLUtils.getDirectChildElement(sub, "KeyInfo", SIG_NS);
+                if (keyInfoElement != null) {
+                    return getCredentialFromKeyInfo(
+                        keyInfoElement, keyInfoProcessor, sigCrypto
+                    );
+                }
             }
         }
 
@@ -185,24 +182,22 @@ public final class SAMLUtil {
         }
         
         org.opensaml.saml2.core.Subject samlSubject = assertion.getSubject();
-        if (samlSubject == null) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "invalidSAMLToken", 
-                "for Signature (no Subject)"
-            );
-        }
-        List<org.opensaml.saml2.core.SubjectConfirmation> subjectConfList = 
-            samlSubject.getSubjectConfirmations();
-        for (org.opensaml.saml2.core.SubjectConfirmation subjectConfirmation : subjectConfList) {
-            SubjectConfirmationData subjConfData = 
-                subjectConfirmation.getSubjectConfirmationData();
-            Element sub = subjConfData.getDOM();
-            Element keyInfoElement = 
-                XMLUtils.getDirectChildElement(sub, "KeyInfo", SIG_NS);
-            if (keyInfoElement != null) {
-                return getCredentialFromKeyInfo(
-                    keyInfoElement, keyInfoProcessor, sigCrypto
-                );
+        if (samlSubject != null) {
+            List<org.opensaml.saml2.core.SubjectConfirmation> subjectConfList = 
+                samlSubject.getSubjectConfirmations();
+            for (org.opensaml.saml2.core.SubjectConfirmation subjectConfirmation : subjectConfList) {
+                SubjectConfirmationData subjConfData = 
+                    subjectConfirmation.getSubjectConfirmationData();
+                if (subjConfData != null) {
+                    Element sub = subjConfData.getDOM();
+                    Element keyInfoElement = 
+                        XMLUtils.getDirectChildElement(sub, "KeyInfo", SIG_NS);
+                    if (keyInfoElement != null) {
+                        return getCredentialFromKeyInfo(
+                            keyInfoElement, keyInfoProcessor, sigCrypto
+                        );
+                    }
+                }
             }
         }
 
