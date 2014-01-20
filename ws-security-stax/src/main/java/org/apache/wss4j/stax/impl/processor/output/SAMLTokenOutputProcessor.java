@@ -384,7 +384,8 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                 if (senderVouches && getSecurityProperties().getSignatureKeyIdentifier() ==
-                        WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference) {
+                        WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
+                        && securityToken != null) {
 
                     WSSUtils.updateSecurityHeaderOrder(
                             outputProcessorChain, WSSConstants.TAG_wsse_BinarySecurityToken, getAction(), false);
