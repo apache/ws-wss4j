@@ -120,7 +120,7 @@ public class WSSUtils extends XMLSecurityUtils {
             sha.update(b4);
             return new String(Base64.encodeBase64(sha.digest()));
         } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSHA1availabe", e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "decoding.general", e);
         } catch (UnsupportedEncodingException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }

@@ -711,11 +711,11 @@ public class SamlAssertionWrapper {
                 return xmlSignature.getSignatureValue();
             } catch (XMLSignatureException e) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", null, e
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", e
                 );
             } catch (XMLSecurityException e) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", null, e
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", e
                 );
             }
         }

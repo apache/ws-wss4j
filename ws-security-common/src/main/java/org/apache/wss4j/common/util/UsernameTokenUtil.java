@@ -63,7 +63,7 @@ public final class UsernameTokenUtil {
                 LOG.debug(e.getMessage(), e);
             }
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "noSHA1availabe", e
+                WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
             );
         }
         //

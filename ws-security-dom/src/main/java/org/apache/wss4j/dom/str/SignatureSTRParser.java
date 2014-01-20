@@ -320,8 +320,7 @@ public class SignatureSTRParser implements STRParser {
         } catch (Exception e) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,
-                "noPassword", 
-                e, id);
+                "noPassword", e, id);
         }
 
         return null;
@@ -431,8 +430,7 @@ public class SignatureSTRParser implements STRParser {
                                 }
                             } catch (CertificateEncodingException ex) {
                                 throw new WSSecurityException(
-                                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError",
-                                    ex
+                                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", ex
                                 );
                             }
                         }

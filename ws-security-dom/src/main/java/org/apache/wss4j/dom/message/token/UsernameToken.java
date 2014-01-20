@@ -219,7 +219,7 @@ public class UsernameToken {
                 } catch (IllegalArgumentException e) {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
-                        "badUsernameToken",
+                        "badUsernameToken", e,
                         "Error parsing UsernameToken Created value"
                     );
                 }

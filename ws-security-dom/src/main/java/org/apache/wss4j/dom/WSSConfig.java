@@ -625,7 +625,7 @@ public class WSSConfig {
                     LOG.debug(t.getMessage(), t);
                 }
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                        "unableToLoadClass", t, new Object[] { ((Class<?>)actionObject).getName() });
+                        "unableToLoadClass", t, ((Class<?>)actionObject).getName());
             }
         } else if (actionObject instanceof Action) {
             return (Action)actionObject;
@@ -717,7 +717,7 @@ public class WSSConfig {
                     LOG.debug(t.getMessage(), t);
                 }
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                    "unableToLoadClass", t, new Object[] { ((Class<?>)validatorObject).getName() });
+                    "unableToLoadClass", t, ((Class<?>)validatorObject).getName());
             }
         } else if (validatorObject instanceof Validator) {
             return (Validator)validatorObject;
@@ -743,7 +743,7 @@ public class WSSConfig {
                     LOG.debug(t.getMessage(), t);
                 }
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                        "unableToLoadClass", t, new Object[] { ((Class<?>)processorObject).getName() });
+                        "unableToLoadClass", t, ((Class<?>)processorObject).getName());
             }
         } else if (processorObject instanceof Processor) {
             return (Processor)processorObject;

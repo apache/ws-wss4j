@@ -408,7 +408,7 @@ public class SecurityTokenReference {
             createKeyIdentifier(doc, THUMB_URI, text, true);
         } catch (WSSecurityException e1) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "noSHA1availabe", e1
+                WSSecurityException.ErrorCode.FAILURE, "decoding.general", e1
             );
         }
     }

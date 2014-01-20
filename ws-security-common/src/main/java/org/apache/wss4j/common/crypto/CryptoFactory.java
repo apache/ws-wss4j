@@ -286,9 +286,7 @@ public abstract class CryptoFactory {
             }
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, 
-                "resourceNotFound",
-                propFilename,
-                e
+                "resourceNotFound", e, propFilename
             );
         }
         return properties;

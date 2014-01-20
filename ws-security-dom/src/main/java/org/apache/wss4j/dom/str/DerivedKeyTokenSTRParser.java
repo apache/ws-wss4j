@@ -223,8 +223,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
         } catch (Exception e) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,
-                "noPassword", 
-                e, id);
+                "noPassword", e, id);
         }
 
         return null;

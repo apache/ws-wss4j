@@ -367,7 +367,7 @@ public class Merlin extends CryptoBase {
                         LOG.debug(e.getMessage(), e);
                     }
                     throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.FAILURE, "proxyNotFound", location, e
+                            WSSecurityException.ErrorCode.FAILURE, "proxyNotFound", e, location
                     );
                 }
             }
@@ -535,13 +535,11 @@ public class Merlin extends CryptoBase {
                 certFactMap.put(factory.getProvider().getName(), factory);
             } catch (CertificateException e) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "unsupportedCertType",
-                    null, e
+                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "unsupportedCertType", e
                 );
             } catch (NoSuchProviderException e) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noSecProvider",
-                    null, e
+                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noSecProvider", e
                 );
             }
         }
@@ -582,7 +580,7 @@ public class Merlin extends CryptoBase {
                 }
             } catch (KeyStoreException ex) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "keystore", null, ex
+                    WSSecurityException.ErrorCode.FAILURE, "keystore", ex
                 );
             } 
         }
@@ -704,15 +702,15 @@ public class Merlin extends CryptoBase {
             return (PrivateKey) keyTmp;
         } catch (KeyStoreException ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "noPrivateKey", new Object[]{ex.getMessage()}, ex
+                WSSecurityException.ErrorCode.FAILURE, "noPrivateKey", ex, ex.getMessage()
             );
         } catch (UnrecoverableKeyException ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "noPrivateKey", new Object[]{ex.getMessage()}, ex
+                WSSecurityException.ErrorCode.FAILURE, "noPrivateKey", ex, ex.getMessage()
             );
         } catch (NoSuchAlgorithmException ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "noPrivateKey", new Object[]{ex.getMessage()}, ex
+                WSSecurityException.ErrorCode.FAILURE, "noPrivateKey", ex, ex.getMessage()
             );
         }
     }
@@ -758,15 +756,15 @@ public class Merlin extends CryptoBase {
             return (PrivateKey) keyTmp;
         } catch (KeyStoreException ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "noPrivateKey", new Object[]{ex.getMessage()}, ex
+                WSSecurityException.ErrorCode.FAILURE, "noPrivateKey", ex, ex.getMessage()
             );
         } catch (UnrecoverableKeyException ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "noPrivateKey", new Object[]{ex.getMessage()}, ex
+                WSSecurityException.ErrorCode.FAILURE, "noPrivateKey", ex, ex.getMessage()
             );
         } catch (NoSuchAlgorithmException ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "noPrivateKey", new Object[]{ex.getMessage()}, ex
+                WSSecurityException.ErrorCode.FAILURE, "noPrivateKey", ex, ex.getMessage()
             );
         }
     }
@@ -908,40 +906,33 @@ public class Merlin extends CryptoBase {
             validator.validate(path, param);
         } catch (NoSuchProviderException e) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "certpath",
-                    e
+                    WSSecurityException.ErrorCode.FAILURE, "certpath", e
                 );
         } catch (NoSuchAlgorithmException e) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE,
-                    "certpath", new Object[] { e.getMessage() },
-                    e
+                    "certpath", e, e.getMessage()
                 );
         } catch (CertificateException e) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "certpath", 
-                    e
+                    WSSecurityException.ErrorCode.FAILURE, "certpath", e
                 );
         } catch (java.security.InvalidAlgorithmParameterException e) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "certpath",
-                    e
+                    WSSecurityException.ErrorCode.FAILURE, "certpath", e
                 );
         } catch (java.security.cert.CertPathValidatorException e) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, "certpath",
-                    e
+                    WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, "certpath", e
                 );
         } catch (KeyStoreException e) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "certpath",
-                    e
+                    WSSecurityException.ErrorCode.FAILURE, "certpath", e
                 );
         } catch (NullPointerException e) {
                 // NPE thrown by JDK 1.7 for one of the test cases
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "certpath",
-                    e
+                    WSSecurityException.ErrorCode.FAILURE, "certpath", e
                 );
         }
     }
@@ -1058,7 +1049,7 @@ public class Merlin extends CryptoBase {
             }
         } catch (KeyStoreException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "keystore", null, e
+                WSSecurityException.ErrorCode.FAILURE, "keystore", e
             );
         }
         return new Certificate[]{};
@@ -1078,7 +1069,7 @@ public class Merlin extends CryptoBase {
             sha = MessageDigest.getInstance("SHA1");
         } catch (NoSuchAlgorithmException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "noSHA1availabe", null, e
+                WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
             );
         }
         Certificate[] certs = null;
@@ -1136,7 +1127,7 @@ public class Merlin extends CryptoBase {
                     } catch (CertificateEncodingException ex) {
                         throw new WSSecurityException(
                             WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError",
-                            null, ex
+                            ex
                         );
                     }
                     byte[] data = sha.digest();
@@ -1148,7 +1139,7 @@ public class Merlin extends CryptoBase {
             }
         } catch (KeyStoreException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "keystore", null, e
+                WSSecurityException.ErrorCode.FAILURE, "keystore", e
             );
         }
         return new Certificate[]{};
@@ -1218,7 +1209,7 @@ public class Merlin extends CryptoBase {
             }
         } catch (KeyStoreException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "keystore", null, e
+                WSSecurityException.ErrorCode.FAILURE, "keystore", e
             );
         }
         return new Certificate[]{};
@@ -1306,7 +1297,7 @@ public class Merlin extends CryptoBase {
                 return null;
             }
         } catch (KeyStoreException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "keystore", null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "keystore", e);
         }
 
         X509Certificate[] x509certs = new X509Certificate[certs.length];
@@ -1386,7 +1377,7 @@ public class Merlin extends CryptoBase {
             }
         } catch (KeyStoreException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "keystore", null, e
+                WSSecurityException.ErrorCode.FAILURE, "keystore", e
             );
         }
         return new Certificate[]{};
@@ -1442,7 +1433,7 @@ public class Merlin extends CryptoBase {
                 }
             }
         } catch (KeyStoreException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "keystore", null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "keystore", e);
         }
         return null;
     }
@@ -1466,16 +1457,12 @@ public class Merlin extends CryptoBase {
         } catch (IOException e) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,
-                "noPassword",
-                new Object[]{identifier}, 
-                e
+                "noPassword", e, identifier
             );
         } catch (UnsupportedCallbackException e) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,
-                "noPassword",
-                new Object[]{identifier}, 
-                e
+                "noPassword", e, identifier
             );
         }
 

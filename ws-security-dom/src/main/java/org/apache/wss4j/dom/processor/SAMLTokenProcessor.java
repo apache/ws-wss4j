@@ -175,7 +175,7 @@ public class SAMLTokenProcessor implements Processor {
                 } catch (MarshalException ex) {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILED_CHECK, "invalidSAMLsecurity", 
-                        new Object[]{"cannot get certificate or key"}, ex
+                        ex, "cannot get certificate or key"
                     );
                 }
 
