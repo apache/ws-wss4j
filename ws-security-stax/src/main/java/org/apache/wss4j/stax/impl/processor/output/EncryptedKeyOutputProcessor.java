@@ -322,7 +322,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     if (((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler() != null) {
                         // Store the Encrypted Key in the CallbackHandler for processing on the inbound side
                         WSPasswordCallback callback = 
-                            new WSPasswordCallback(securityToken.getId(), WSPasswordCallback.ENCRYPTED_KEY_TOKEN);
+                            new WSPasswordCallback(securityToken.getId(), WSPasswordCallback.SECRET_KEY);
                         callback.setKey(encryptedEphemeralKey);
                         try {
                             ((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler().handle(new Callback[]{callback});
