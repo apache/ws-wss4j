@@ -46,6 +46,7 @@ import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.validate.Validator;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 import org.apache.xml.security.utils.Base64;
 
@@ -756,10 +757,14 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     
     private synchronized ReplayCache createCache(String key) throws WSSecurityException {
         ReplayCacheFactory replayCacheFactory = ReplayCacheFactory.newInstance();
-        byte[] nonceValue = new byte[10];
-        WSSConstants.secureRandom.nextBytes(nonceValue);
-        String cacheKey = key + Base64.encode(nonceValue);
-        return replayCacheFactory.newReplayCache(cacheKey, null);
+        byte[] nonceValue;
+        try {
+            nonceValue = WSSConstants.generateBytes(10);
+            String cacheKey = key + Base64.encode(nonceValue);
+            return replayCacheFactory.newReplayCache(cacheKey, null);
+        } catch (XMLSecurityException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        }
     }
     
     /**

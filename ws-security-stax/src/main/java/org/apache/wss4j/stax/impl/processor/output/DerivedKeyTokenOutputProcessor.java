@@ -100,8 +100,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", e, "UTF-8 encoding is not supported");
             }
 
-            byte[] nonce = new byte[16];
-            WSSConstants.secureRandom.nextBytes(nonce);
+            byte[] nonce = WSSConstants.generateBytes(16);
 
             byte[] seed = new byte[label.length + nonce.length];
             System.arraycopy(label, 0, seed, 0, label.length);

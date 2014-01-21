@@ -138,9 +138,7 @@ public final class UsernameTokenUtil {
      */
     private static byte[] generateNonce(int length) throws WSSecurityException {
         try {
-            byte[] temp = new byte[length];
-            XMLSecurityConstants.secureRandom.nextBytes(temp);
-            return temp;
+            return XMLSecurityConstants.generateBytes(length);
         } catch (Exception ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                     "empty", ex,

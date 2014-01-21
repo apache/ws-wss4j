@@ -88,8 +88,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
 
     @Test
     public void testSCTDKTEncryptOutbound() throws Exception {
-        byte[] secret = new byte[128 / 8];
-        WSSConstants.secureRandom.nextBytes(secret);
+        byte[] secret = WSSConstants.generateBytes(128 / 8);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -219,8 +218,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
 
     @Test
     public void testSCTKDKTSignOutbound() throws Exception {
-        byte[] secret = new byte[128 / 8];
-        WSSConstants.secureRandom.nextBytes(secret);
+        byte[] secret = WSSConstants.generateBytes(128 / 8);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {

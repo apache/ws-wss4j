@@ -52,7 +52,6 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 
-import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
@@ -67,7 +66,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     /**
      * SecurityTokenReference to be inserted into EncryptedData/keyInfo element.
      */
-    private SecurityTokenReference securityTokenReference ;
+    private SecurityTokenReference securityTokenReference;
 
     /**
      * Indicates whether to encrypt the symmetric key into an EncryptedKey 
@@ -498,9 +497,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                         if (XMLCipher.AES_128_GCM.equals(encryptionAlgorithm)
                                 || XMLCipher.AES_192_GCM.equals(encryptionAlgorithm)
                                 || XMLCipher.AES_256_GCM.equals(encryptionAlgorithm)) {
-                            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-                            byte[] temp = new byte[12];
-                            random.nextBytes(temp);
+                            byte[] temp = WSSecurityUtil.generateNonce(12);
                             IvParameterSpec paramSpec = new IvParameterSpec(temp);
                             cipher.init(Cipher.ENCRYPT_MODE, secretKey, paramSpec);
                         } else {

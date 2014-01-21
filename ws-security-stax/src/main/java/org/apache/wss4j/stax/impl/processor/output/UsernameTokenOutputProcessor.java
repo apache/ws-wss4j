@@ -90,8 +90,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
             byte[] nonceValue = null;
             if (usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
                 || ((WSSSecurityProperties) getSecurityProperties()).isAddUsernameTokenNonce()) {
-                nonceValue = new byte[16];
-                WSSConstants.secureRandom.nextBytes(nonceValue);
+                nonceValue = WSSConstants.generateBytes(16);
             }
             
             XMLGregorianCalendar created = null;

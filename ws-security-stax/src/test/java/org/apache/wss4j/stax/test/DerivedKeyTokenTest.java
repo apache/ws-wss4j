@@ -95,8 +95,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
             actions.add(WSSConstants.ENCRYPT_WITH_DERIVED_KEY);
             securityProperties.setActions(actions);
-            byte[] secret = new byte[192 / 8];
-            WSSConstants.secureRandom.nextBytes(secret);
+            byte[] secret = WSSConstants.generateBytes(192 / 8);
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(secret);
             securityProperties.setCallbackHandler(callbackHandler);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
@@ -220,8 +219,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
             actions.add(WSSConstants.ENCRYPT_WITH_DERIVED_KEY);
             securityProperties.setActions(actions);
-            byte[] secret = new byte[128 / 8];
-            WSSConstants.secureRandom.nextBytes(secret);
+            byte[] secret = WSSConstants.generateBytes(128 / 8);
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(secret);
             securityProperties.setCallbackHandler(callbackHandler);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());

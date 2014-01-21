@@ -2379,8 +2379,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         samlCallbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
         samlCallbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         samlCallbackHandler.setIssuer("www.example.com");
-        byte[] secret = new byte[128 / 8];
-        WSSConstants.secureRandom.nextBytes(secret);
+        byte[] secret = WSSConstants.generateBytes(128 / 8);
         CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
         callbackHandler.setSecret(secret);
         KeyStore keyStore = KeyStore.getInstance("jks");
@@ -2510,8 +2509,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         samlCallbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
         samlCallbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         samlCallbackHandler.setIssuer("www.example.com");
-        byte[] secret = new byte[128 / 8];
-        WSSConstants.secureRandom.nextBytes(secret);
+        byte[] secret = WSSConstants.generateBytes(128 / 8);
         CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl();
         callbackHandler.setSecret(secret);
         KeyStore keyStore = KeyStore.getInstance("jks");
