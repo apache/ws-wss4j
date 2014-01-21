@@ -629,6 +629,9 @@ public class Merlin extends CryptoBase {
             certs = getX509Certificates(cryptoType.getAlias());
             break;
         }
+        case ENDPOINT: {
+            break;
+        }
         }
         return certs;
     }

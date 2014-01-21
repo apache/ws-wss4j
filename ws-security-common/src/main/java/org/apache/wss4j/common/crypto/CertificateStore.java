@@ -93,6 +93,9 @@ public class CertificateStore extends CryptoBase {
             certs = getX509CertificatesSubjectDN(cryptoType.getSubjectDN());
             break;
         }
+        case ENDPOINT: {
+            break;
+        }
         }
         return certs;
     }
