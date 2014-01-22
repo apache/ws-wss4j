@@ -365,6 +365,11 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                 boolean useSingleCertificate)
                 throws XMLStreamException, XMLSecurityException {
 
+            if (securityToken.getCustomTokenReference() != null) {
+                outputDOMElement(securityToken.getCustomTokenReference(), outputProcessorChain);
+                return;
+            } 
+            
             List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
             attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
             if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier) && !useSingleCertificate) {

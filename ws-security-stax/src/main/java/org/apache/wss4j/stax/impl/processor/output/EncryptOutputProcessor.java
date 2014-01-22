@@ -56,7 +56,6 @@ import org.apache.xml.security.stax.impl.processor.output.AbstractEncryptOutputP
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenConstants.KeyIdentifier;
-import org.apache.xml.security.stax.securityToken.SecurityTokenConstants.TokenType;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 /**
@@ -106,8 +105,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                                     encryptionPartDef,
                                     xmlSecStartElement,
                                     outputProcessorChain.getDocumentContext().getEncoding(),
-                                    securityToken.getSha1Identifier(),
-                                    securityToken.getTokenType()
+                                    securityToken
                             );
                     internalEncryptionOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
                     internalEncryptionOutputProcessor.setAction(getAction());
@@ -284,19 +282,17 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
     class InternalEncryptionOutputProcessor extends AbstractInternalEncryptionOutputProcessor {
 
         private boolean doEncryptedHeader = false;
-        private final String sha1Identifier;
-        private final TokenType tokenType;
+        private final OutboundSecurityToken securityToken;
 
         InternalEncryptionOutputProcessor(EncryptionPartDef encryptionPartDef, XMLSecStartElement xmlSecStartElement, 
-                                          String encoding, String sha1Identifier, TokenType tokenType)
+                                          String encoding, OutboundSecurityToken securityToken)
                 throws XMLSecurityException, XMLStreamException {
 
             super(encryptionPartDef, xmlSecStartElement, encoding);
             this.addBeforeProcessor(EncryptEndingOutputProcessor.class.getName());
             this.addBeforeProcessor(InternalEncryptionOutputProcessor.class.getName());
             this.addAfterProcessor(EncryptOutputProcessor.class.getName());
-            this.sha1Identifier = sha1Identifier;
-            this.tokenType = tokenType;
+            this.securityToken = securityToken;
         }
 
         protected OutputStream applyTransforms(OutputStream outputStream) throws XMLSecurityException {
@@ -376,14 +372,20 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
         protected void createKeyInfoStructure(OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
             createStartElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_KeyInfo, true, null);
 
+            if (securityToken.getCustomTokenReference() != null) {
+                outputDOMElement(securityToken.getCustomTokenReference(), outputProcessorChain);
+                createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_KeyInfo);
+                return;
+            } 
+            
             KeyIdentifier keyIdentifier = ((WSSSecurityProperties) getSecurityProperties()).getEncryptionKeyIdentifier();
             if (WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier.equals(keyIdentifier)) {
                 List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
                 createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
                 
-                if (sha1Identifier != null) {
-                    WSSUtils.createEncryptedKeySha1IdentifierStructure(this, outputProcessorChain, sha1Identifier);
+                if (securityToken.getSha1Identifier() != null) {
+                    WSSUtils.createEncryptedKeySha1IdentifierStructure(this, outputProcessorChain, securityToken.getSha1Identifier());
                 } else {
                     WSSUtils.createEncryptedKeySha1IdentifierStructure(this, outputProcessorChain, getEncryptionPartDef().getSymmetricKey());
                 }
@@ -392,28 +394,28 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_Kerberos5_AP_REQ));
                 createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
                 
-                WSSUtils.createKerberosSha1IdentifierStructure(this, outputProcessorChain, sha1Identifier);
+                WSSUtils.createKerberosSha1IdentifierStructure(this, outputProcessorChain, securityToken.getSha1Identifier());
             } else {
                 boolean isSAMLToken = false;
-                if (WSSecurityTokenConstants.KerberosToken.equals(tokenType)) {
+                if (WSSecurityTokenConstants.KerberosToken.equals(securityToken.getTokenType())) {
                     List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
                     attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
                     attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_GSS_Kerberos5_AP_REQ));
                     createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
-                } else if (WSSecurityTokenConstants.Saml10Token.equals(tokenType)
-                    || WSSecurityTokenConstants.Saml11Token.equals(tokenType)) {
+                } else if (WSSecurityTokenConstants.Saml10Token.equals(securityToken.getTokenType())
+                    || WSSecurityTokenConstants.Saml11Token.equals(securityToken.getTokenType())) {
                     List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
                     attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
                     attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE));
                     createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
                     isSAMLToken = true;
-                } else if (WSSecurityTokenConstants.Saml20Token.equals(tokenType)) {
+                } else if (WSSecurityTokenConstants.Saml20Token.equals(securityToken.getTokenType())) {
                     List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
                     attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
                     attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE));
                     createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
                     isSAMLToken = true;
-                } else if (WSSecurityTokenConstants.EncryptedKeyToken.equals(tokenType)) {
+                } else if (WSSecurityTokenConstants.EncryptedKeyToken.equals(securityToken.getTokenType())) {
                     List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
                     attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
                     attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
@@ -424,29 +426,29 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                 
                 if (isSAMLToken) {
                     // Always use KeyIdentifier regardless of the configured KeyIdentifier value
-                    WSSUtils.createSAMLKeyIdentifierStructure(this, outputProcessorChain, tokenType, getEncryptionPartDef().getKeyId());
+                    WSSUtils.createSAMLKeyIdentifierStructure(this, outputProcessorChain, securityToken.getTokenType(), getEncryptionPartDef().getKeyId());
                 } else {
                     List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
                     attributes.add(createAttribute(WSSConstants.ATT_NULL_URI, "#" + getEncryptionPartDef().getKeyId()));
-                    if (WSSecurityTokenConstants.KerberosToken.equals(tokenType)) {
+                    if (WSSecurityTokenConstants.KerberosToken.equals(securityToken.getTokenType())) {
                         attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_GSS_Kerberos5_AP_REQ));
-                    } else if (WSSecurityTokenConstants.DerivedKeyToken.equals(tokenType)) {
+                    } else if (WSSecurityTokenConstants.DerivedKeyToken.equals(securityToken.getTokenType())) {
                         boolean use200512Namespace = ((WSSSecurityProperties)getSecurityProperties()).isUse200512Namespace();
                         if (use200512Namespace) {
                             attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_WSC_05_12 + "/dk"));
                         } else {
                             attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_WSC_05_02 + "/dk"));
                         }
-                    } else if (WSSecurityTokenConstants.SpnegoContextToken.equals(tokenType)
-                        || WSSecurityTokenConstants.SecurityContextToken.equals(tokenType)
-                        || WSSecurityTokenConstants.SecureConversationToken.equals(tokenType)) {
+                    } else if (WSSecurityTokenConstants.SpnegoContextToken.equals(securityToken.getTokenType())
+                        || WSSecurityTokenConstants.SecurityContextToken.equals(securityToken.getTokenType())
+                        || WSSecurityTokenConstants.SecureConversationToken.equals(securityToken.getTokenType())) {
                         boolean use200512Namespace = ((WSSSecurityProperties)getSecurityProperties()).isUse200512Namespace();
                         if (use200512Namespace) {
                             attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_WSC_05_12 + "/sct"));
                         } else {
                             attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_WSC_05_12 + "/sct"));
                         }
-                    } else if (WSSecurityTokenConstants.EncryptedKeyToken.equals(tokenType)) {
+                    } else if (WSSecurityTokenConstants.EncryptedKeyToken.equals(securityToken.getTokenType())) {
                         attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
                     }
                     createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference, false, attributes);

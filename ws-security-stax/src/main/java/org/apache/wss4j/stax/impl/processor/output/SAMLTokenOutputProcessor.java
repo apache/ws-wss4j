@@ -53,19 +53,13 @@ import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
-import org.apache.xml.security.stax.ext.stax.XMLSecNamespace;
 import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 import org.opensaml.common.SAMLVersion;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
 
 public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
     
@@ -116,24 +110,24 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             
             XMLSecurityConstants.Action action = getAction();
             boolean includeSTR = false;
+            
+            GenericOutboundSecurityToken securityToken = null;
+            
+            // See if a token is already available
+            String sigTokenId = 
+                outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE);
+            SecurityTokenProvider<OutboundSecurityToken> signatureTokenProvider = null;
+            if (sigTokenId != null) {
+                signatureTokenProvider = 
+                    outputProcessorChain.getSecurityContext().getSecurityTokenProvider(sigTokenId);
+                if (signatureTokenProvider != null) {
+                    securityToken = 
+                        (GenericOutboundSecurityToken)signatureTokenProvider.getSecurityToken();
+                }
+            }
 
             if (WSSConstants.SAML_TOKEN_SIGNED.equals(action) && senderVouches) {
-                GenericOutboundSecurityToken securityToken = null;
                 includeSTR = true;
-                
-                // See if a token is already available
-                String sigTokenId = 
-                    outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE);
-                SecurityTokenProvider<OutboundSecurityToken> signatureTokenProvider = null;
-                if (sigTokenId != null) {
-                    signatureTokenProvider = 
-                        outputProcessorChain.getSecurityContext().getSecurityTokenProvider(sigTokenId);
-                    if (signatureTokenProvider != null) {
-                        securityToken = 
-                            (GenericOutboundSecurityToken)signatureTokenProvider.getSecurityToken();
-                    }
-                }
-                
                 if (securityToken == null) {
                     CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
                     cryptoType.setAlias(samlCallback.getIssuerKeyName());
@@ -223,6 +217,13 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                         }
                     }
                 }
+                
+                final Element ref;
+                if (securityToken != null) {
+                    ref = securityToken.getCustomTokenReference();
+                } else {
+                    ref = null;
+                }
 
                 finalSAMLTokenOutputProcessor = new FinalSAMLTokenOutputProcessor(null, samlAssertionWrapper,
                         securityTokenReferenceId, senderVouches, includeSTR);
@@ -276,6 +277,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                             };
                         }
                         this.samlSecurityToken.setProcessor(finalSAMLTokenOutputProcessor);
+                        this.samlSecurityToken.setCustomTokenReference(ref);
                         return this.samlSecurityToken;
                     }
 
@@ -402,7 +404,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 }
                 WSSUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
 
-                outputSamlAssertion(samlAssertionWrapper.toDOM(null), subOutputProcessorChain);
+                outputDOMElement(samlAssertionWrapper.toDOM(null), subOutputProcessorChain);
                 if (includeSTR) {
                     WSSUtils.updateSecurityHeaderOrder(
                             outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, getAction(), false);                    
@@ -432,43 +434,4 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
         createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference);
     }
 
-    //todo serialize directly from SAML XMLObject?
-    private void outputSamlAssertion(Element element, OutputProcessorChain outputProcessorChain)
-            throws XMLStreamException, XMLSecurityException {
-
-        NamedNodeMap namedNodeMap = element.getAttributes();
-        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(namedNodeMap.getLength());
-        List<XMLSecNamespace> namespaces = new ArrayList<XMLSecNamespace>(namedNodeMap.getLength());
-        for (int i = 0; i < namedNodeMap.getLength(); i++) {
-            Attr attribute = (Attr) namedNodeMap.item(i);
-            if (attribute.getPrefix() == null) {
-                attributes.add(
-                        createAttribute(
-                                new QName(attribute.getNamespaceURI(), attribute.getLocalName()), attribute.getValue()));
-            } else if ("xmlns".equals(attribute.getPrefix()) || "xmlns".equals(attribute.getLocalName())) {
-                namespaces.add(createNamespace(attribute.getLocalName(), attribute.getValue()));
-            } else {
-                attributes.add(
-                        createAttribute(
-                                new QName(attribute.getNamespaceURI(), attribute.getLocalName(), attribute.getPrefix()),
-                                attribute.getValue()));
-            }
-        }
-
-        QName elementName = new QName(element.getNamespaceURI(), element.getLocalName(), element.getPrefix());
-        createStartElementAndOutputAsEvent(outputProcessorChain, elementName, namespaces, attributes);
-        NodeList childNodes = element.getChildNodes();
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            Node childNode = childNodes.item(i);
-            switch (childNode.getNodeType()) {
-                case Node.ELEMENT_NODE:
-                    outputSamlAssertion((Element) childNode, outputProcessorChain);
-                    break;
-                case Node.TEXT_NODE:
-                    createCharactersAndOutputAsEvent(outputProcessorChain, ((Text) childNode).getData());
-                    break;
-            }
-        }
-        createEndElementAndOutputAsEvent(outputProcessorChain, elementName);
-    }
 }

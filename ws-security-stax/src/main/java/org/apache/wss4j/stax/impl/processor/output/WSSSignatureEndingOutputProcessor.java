@@ -39,6 +39,7 @@ import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
+
 import java.security.cert.X509Certificate;
 import java.security.Key;
 import java.util.*;
@@ -87,6 +88,11 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
             boolean useSingleCertificate)
             throws XMLStreamException, XMLSecurityException {
 
+        if (securityToken.getCustomTokenReference() != null) {
+            outputDOMElement(securityToken.getCustomTokenReference(), outputProcessorChain);
+            return;
+        }
+        
         WSSecurityTokenConstants.KeyIdentifier keyIdentifier = getSecurityProperties().getSignatureKeyIdentifier();
 
         X509Certificate[] x509Certificates = securityToken.getX509Certificates();
