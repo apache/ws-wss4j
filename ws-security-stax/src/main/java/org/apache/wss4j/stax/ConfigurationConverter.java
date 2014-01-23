@@ -81,11 +81,15 @@ public final class ConfigurationConverter {
     ) {
         String action = getString(ConfigurationConstants.ACTION, config);
         
-        if (action == null || "".equals(action)) {
+        String actionToParse = action;
+        if (actionToParse == null) {
             return;
         }
-        
-        String single[] = action.split(" ");
+        actionToParse = actionToParse.trim();
+        if ("".equals(actionToParse)) {
+            return;
+        }
+        String single[] = actionToParse.split("\\s");
         List<Action> actions = new ArrayList<Action>();
         for (int i = 0; i < single.length; i++) {
             if (single[i].equals(ConfigurationConstants.USERNAME_TOKEN)) {

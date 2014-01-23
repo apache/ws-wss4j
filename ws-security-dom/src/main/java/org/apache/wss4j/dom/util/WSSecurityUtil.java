@@ -907,10 +907,15 @@ public final class WSSecurityUtil {
 
     public static List<Integer> decodeAction(String action) throws WSSecurityException {
         List<Integer> actions = new ArrayList<Integer>();
-        if (action == null || "".equals(action)) {
+        String actionToParse = action;
+        if (actionToParse == null) {
             return actions;
         }
-        String single[] = action.split(" ");
+        actionToParse = actionToParse.trim();
+        if ("".equals(actionToParse)) {
+            return actions;
+        }
+        String single[] = actionToParse.split("\\s");
         for (int i = 0; i < single.length; i++) {
             if (single[i].equals(WSHandlerConstants.NO_SECURITY)) {
                 return actions;
