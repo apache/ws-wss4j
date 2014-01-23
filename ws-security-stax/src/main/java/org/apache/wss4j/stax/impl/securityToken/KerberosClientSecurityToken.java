@@ -21,12 +21,11 @@ package org.apache.wss4j.stax.impl.securityToken;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.kerberos.KerberosClientAction;
 import org.apache.wss4j.common.kerberos.KerberosContextAndServiceNameCallback;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
 
-import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -34,6 +33,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.kerberos.KerberosTicket;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
+
 import java.io.IOException;
 import java.security.Key;
 import java.security.Principal;
@@ -141,18 +141,7 @@ public class KerberosClientSecurityToken extends GenericOutboundSecurityToken {
 
         byte[] sk = this.secretKey.getEncoded();
 
-        String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
-        int keyLength = JCEAlgorithmMapper.getKeyLengthFromURI(algorithmURI) / 8;
-        if (sk.length < keyLength) {
-            //normally we should throw an exception here because we don't have
-            //enough key material for the requested algorithm
-            //but I haven't found any documentation about how this case should be handled
-            //and the second thing is that we would need a kerberos key with minimum 160 bits
-            //to be able to sign with a more or less secure algo like hmacsha1
-            keyLength = sk.length;
-        }
-
-        key = new SecretKeySpec(sk, 0, keyLength, algoFamily);
+        key = KeyUtils.prepareSecretKey(algorithmURI, sk);
         setSecretKey(algorithmURI, key);
         return key;
     }
