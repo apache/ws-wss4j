@@ -28,7 +28,6 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.StringUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
@@ -908,10 +907,10 @@ public final class WSSecurityUtil {
 
     public static List<Integer> decodeAction(String action) throws WSSecurityException {
         List<Integer> actions = new ArrayList<Integer>();
-        if (action == null) {
+        if (action == null || "".equals(action)) {
             return actions;
         }
-        String single[] = StringUtil.split(action, ' ');
+        String single[] = action.split(" ");
         for (int i = 0; i < single.length; i++) {
             if (single[i].equals(WSHandlerConstants.NO_SECURITY)) {
                 return actions;
@@ -958,7 +957,8 @@ public final class WSSecurityUtil {
         if (action == null) {
             return actions;
         }
-        String single[] = StringUtil.split(action, ' ');
+        
+        String single[] = action.split(" ");
         for (int i = 0; i < single.length; i++) {
             if (single[i].equals(WSHandlerConstants.NO_SECURITY)) {
                 return actions;

@@ -136,15 +136,15 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                                 nonce,
                                 derivedKeyTokenType.getOffset().intValue()
                         );
-                        XMLSecurityConstants.AlgorithmUsage derivedKeyAlgoryithmUsage;
+                        XMLSecurityConstants.AlgorithmUsage derivedKeyAlgorithmUsage;
                         if (WSSConstants.Enc.equals(algorithmUsage)) {
-                            derivedKeyAlgoryithmUsage = WSSConstants.Enc_KD;
+                            derivedKeyAlgorithmUsage = WSSConstants.Enc_KD;
                         } else {
-                            derivedKeyAlgoryithmUsage = WSSConstants.Sig_KD;
+                            derivedKeyAlgorithmUsage = WSSConstants.Sig_KD;
                         }
                         AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
                         algorithmSuiteSecurityEvent.setAlgorithmURI(derivedKeyAlgorithm);
-                        algorithmSuiteSecurityEvent.setAlgorithmUsage(derivedKeyAlgoryithmUsage);
+                        algorithmSuiteSecurityEvent.setAlgorithmUsage(derivedKeyAlgorithmUsage);
                         algorithmSuiteSecurityEvent.setKeyLength(keyBytes.length * 8);
                         algorithmSuiteSecurityEvent.setCorrelationID(correlationID);
                         inputProcessorChain.getSecurityContext().registerSecurityEvent(algorithmSuiteSecurityEvent);

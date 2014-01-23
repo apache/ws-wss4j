@@ -51,7 +51,6 @@ import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
-import org.apache.wss4j.common.util.StringUtil;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.token.SignatureConfirmation;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -1221,10 +1220,10 @@ public abstract class WSHandler {
                                List<WSEncryptionPart> parts, RequestData reqData)
         throws WSSecurityException {
         WSEncryptionPart encPart = null;
-        String[] rawParts = StringUtil.split(tmpS, ';');
+        String[] rawParts = tmpS.split(";");
 
         for (int i = 0; i < rawParts.length; i++) {
-            String[] partDef = StringUtil.split(rawParts[i], '}');
+            String[] partDef = rawParts[i].split("}");
 
             if (partDef.length == 1) {
                 if (doDebug) {

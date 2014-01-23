@@ -37,7 +37,6 @@ import org.apache.wss4j.common.crypto.JasyptPasswordEncryptor;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
-import org.apache.wss4j.common.util.StringUtil;
 import org.apache.wss4j.stax.ext.WSSConfigurationException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSConstants.UsernameTokenPasswordType;
@@ -82,11 +81,11 @@ public final class ConfigurationConverter {
     ) {
         String action = getString(ConfigurationConstants.ACTION, config);
         
-        if (action == null) {
+        if (action == null || "".equals(action)) {
             return;
         }
         
-        String single[] = StringUtil.split(action, ' ');
+        String single[] = action.split(" ");
         List<Action> actions = new ArrayList<Action>();
         for (int i = 0; i < single.length; i++) {
             if (single[i].equals(ConfigurationConstants.USERNAME_TOKEN)) {
@@ -782,10 +781,10 @@ public final class ConfigurationConverter {
     
     private static void splitEncParts(String tmpS, List<SecurePart> parts, String soapNS) {
         SecurePart encPart = null;
-        String[] rawParts = StringUtil.split(tmpS, ';');
+        String[] rawParts = tmpS.split(";");
 
         for (int i = 0; i < rawParts.length; i++) {
-            String[] partDef = StringUtil.split(rawParts[i], '}');
+            String[] partDef = rawParts[i].split("}");
 
             if (partDef.length == 1) {
                 QName qname = new QName(soapNS, partDef[0].trim());

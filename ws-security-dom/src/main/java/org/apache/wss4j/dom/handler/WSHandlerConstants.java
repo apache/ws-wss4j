@@ -101,7 +101,7 @@ public final class WSHandlerConstants {
     
     /**
      * This is an alternative to specifying an "action" String. This Object should be a
-     * list of HandlerAction objects, which associated an "action" Integer with a corresponding
+     * list of HandlerAction objects, which associate an "action" Integer with a corresponding
      * SecurityActionToken object. This allows for more control over keys etc. used for 
      * different actions.
      */
