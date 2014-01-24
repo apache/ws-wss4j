@@ -304,7 +304,6 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("Expected XMLStreamException");
             } catch (XMLStreamException e) {
-                Assert.assertEquals(e.getMessage(), "org.apache.wss4j.common.ext.WSSecurityException: The message has expired");
                 Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.MESSAGE_EXPIRED);
             }
         }
@@ -336,9 +335,6 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
             Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(),
-                    "43 references are contained in the Manifest, maximum 30 are allowed. You can raise the " +
-                    "maximum via the \"MaximumAllowedReferencesPerManifest\" property in the configuration.");
             Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         }
     }
@@ -371,8 +367,6 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
             Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(), "1 transforms are contained in the Reference, maximum 0 are allowed. You can raise the " +
-                    "maximum via the \"MaximumAllowedTransformsPerReference\" property in the configuration.");
             Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.INVALID_SECURITY);
         } finally {
             changeValueOfMaximumAllowedTransformsPerReference(oldval);
@@ -411,9 +405,6 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
             Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(),
-                    "The use of MD5 algorithm is " +
-                    "strongly discouraged. Nonetheless can it be enabled via the \"AllowMD5Algorithm\" property in the configuration.");
             Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_CHECK);
         }
     }
@@ -677,9 +668,6 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
             Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-            Assert.assertEquals(e.getCause().getMessage(),
-                    "The use of RSAv1.5 key transport algorithm is discouraged. " +
-                            "Nonetheless can it be enabled via the \"AllowRSA15KeyTransportAlgorithm\" property in the configuration.");
             Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_CHECK);
         }
     }

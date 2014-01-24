@@ -191,7 +191,6 @@ public class UsernameTokenTest extends AbstractTestBase {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("Expected XMLStreamException");
             } catch (XMLStreamException e) {
-                Assert.assertEquals(e.getMessage(), "org.apache.wss4j.common.ext.WSSecurityException: The security token could not be authenticated or authorized");
                 Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_AUTHENTICATION);
             }
         }
@@ -272,7 +271,6 @@ public class UsernameTokenTest extends AbstractTestBase {
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
-            Assert.assertEquals(e.getMessage(), "org.apache.wss4j.common.ext.WSSecurityException: The security token could not be authenticated or authorized");
             Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_AUTHENTICATION);
         }
     }
@@ -321,7 +319,6 @@ public class UsernameTokenTest extends AbstractTestBase {
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
-            Assert.assertEquals(e.getMessage(), "org.apache.wss4j.common.ext.WSSecurityException: The message has expired");
             Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.MESSAGE_EXPIRED);
         }
     }
@@ -409,7 +406,6 @@ public class UsernameTokenTest extends AbstractTestBase {
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
-            Assert.assertEquals(e.getMessage(), "org.apache.wss4j.common.ext.WSSecurityException: The message has expired");
             Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.MESSAGE_EXPIRED);
         }
     }
@@ -652,7 +648,6 @@ public class UsernameTokenTest extends AbstractTestBase {
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
-            Assert.assertEquals(e.getMessage(), "org.apache.wss4j.common.ext.WSSecurityException: The security token could not be authenticated or authorized");
             Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_AUTHENTICATION);
         }
         

@@ -18,7 +18,7 @@
  */
 package org.apache.wss4j.policy.stax;
 
-import org.apache.wss4j.policy.WSSPolicyException;
+import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;

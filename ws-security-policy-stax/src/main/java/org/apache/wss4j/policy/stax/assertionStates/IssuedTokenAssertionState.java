@@ -20,7 +20,7 @@ package org.apache.wss4j.policy.stax.assertionStates;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.policy.WSSPolicyException;
+import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.IssuedToken;

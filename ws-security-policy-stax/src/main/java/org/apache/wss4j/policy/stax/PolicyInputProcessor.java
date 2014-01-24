@@ -19,7 +19,7 @@
 package org.apache.wss4j.policy.stax;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.policy.WSSPolicyException;
+import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.ext.WSSUtils;

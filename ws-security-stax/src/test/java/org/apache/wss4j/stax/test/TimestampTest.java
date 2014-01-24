@@ -204,7 +204,6 @@ public class TimestampTest extends AbstractTestBase {
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
                 Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-                Assert.assertEquals(e.getCause().getMessage(), "Invalid timestamp: The security semantics of the message have expired");
                 Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.MESSAGE_EXPIRED);
             }
         }
@@ -246,7 +245,6 @@ public class TimestampTest extends AbstractTestBase {
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
                 Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-                Assert.assertEquals(e.getCause().getMessage(), "Invalid timestamp: The security semantics of the message have expired");
                 Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.MESSAGE_EXPIRED);
             }
         }
@@ -343,7 +341,6 @@ public class TimestampTest extends AbstractTestBase {
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
                 Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-                Assert.assertEquals(e.getCause().getMessage(), "Invalid timestamp: The security semantics of the message have expired");
                 Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.MESSAGE_EXPIRED);
             }
         }
@@ -426,7 +423,6 @@ public class TimestampTest extends AbstractTestBase {
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
                 Assert.assertTrue(e.getCause() instanceof WSSecurityException);
-                Assert.assertEquals(e.getCause().getMessage(), "Invalid timestamp: The security semantics of the message have expired");
                 Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.MESSAGE_EXPIRED);
             }
         }
@@ -470,7 +466,6 @@ public class TimestampTest extends AbstractTestBase {
                 Throwable throwable = e.getCause();
                 Assert.assertNotNull(throwable);
                 Assert.assertTrue(throwable instanceof WSSecurityException);
-                Assert.assertEquals(throwable.getMessage(), "Created time is missing");
                 Assert.assertEquals(((WSSecurityException) throwable).getFaultCode(), WSSecurityException.INVALID_SECURITY);
             }
         }
@@ -558,7 +553,6 @@ public class TimestampTest extends AbstractTestBase {
                 Throwable throwable = e.getCause();
                 Assert.assertNotNull(throwable);
                 Assert.assertTrue(throwable instanceof WSSecurityException);
-                Assert.assertEquals(throwable.getMessage(), "Created time is missing");
                 Assert.assertEquals(((WSSecurityException) throwable).getFaultCode(), WSSecurityException.INVALID_SECURITY);
             }
         }
@@ -599,7 +593,6 @@ public class TimestampTest extends AbstractTestBase {
                 Throwable throwable = e.getCause();
                 Assert.assertNotNull(throwable);
                 Assert.assertTrue(throwable instanceof WSSecurityException);
-                Assert.assertEquals(throwable.getMessage(), "Invalid timestamp: Message contains two or more timestamps");
                 Assert.assertEquals(((WSSecurityException) throwable).getFaultCode(), WSSecurityException.INVALID_SECURITY);
             }
         }

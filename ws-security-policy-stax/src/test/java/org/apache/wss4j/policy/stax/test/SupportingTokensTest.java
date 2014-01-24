@@ -22,7 +22,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
-import org.apache.wss4j.policy.WSSPolicyException;
+import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.impl.securityToken.*;
 import org.apache.xml.security.stax.impl.util.IDGenerator;

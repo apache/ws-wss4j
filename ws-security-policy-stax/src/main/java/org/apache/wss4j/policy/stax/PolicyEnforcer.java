@@ -37,7 +37,7 @@ import org.apache.neethi.PolicyOperator;
 import org.apache.neethi.builders.PrimitiveAssertion;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.policy.SPConstants;
-import org.apache.wss4j.policy.WSSPolicyException;
+import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
 import org.apache.wss4j.policy.model.AbstractBinding;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;

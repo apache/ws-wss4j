@@ -18,6 +18,7 @@
  */
 package org.apache.wss4j.stax.impl;
 
+import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.InputProcessorChain;
@@ -27,7 +28,7 @@ import org.apache.xml.security.stax.impl.XMLSecurityStreamReader;
 import javax.xml.stream.XMLStreamException;
 
 public class WSSecurityStreamReader extends XMLSecurityStreamReader {
-
+    
     public WSSecurityStreamReader(InputProcessorChain inputProcessorChain, XMLSecurityProperties securityProperties) {
         super(inputProcessorChain, securityProperties);
     }
@@ -39,7 +40,15 @@ public class WSSecurityStreamReader extends XMLSecurityStreamReader {
         } catch (XMLStreamException e) {
             Throwable cause = e.getCause();
             if (cause instanceof WSSecurityException) {
-                throw e;
+                // Allow a WSSPolicyException
+                if (cause.getCause() instanceof WSSPolicyException) {
+                    throw e;
+                }
+                // Map to a "safe" error message
+                String error = ((WSSecurityException)cause).getSafeExceptionMessage();
+                throw new XMLStreamException(
+                    new WSSecurityException(((WSSecurityException)cause).getErrorCode(),
+                                            new Exception(error)));
             }
             if (cause instanceof XMLSecurityException) {
                 throw new XMLStreamException(
@@ -49,4 +58,5 @@ public class WSSecurityStreamReader extends XMLSecurityStreamReader {
             throw e;
         }
     }
+    
 }

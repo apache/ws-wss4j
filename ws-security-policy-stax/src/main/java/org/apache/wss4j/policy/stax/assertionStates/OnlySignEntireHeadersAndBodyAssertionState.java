@@ -19,7 +19,7 @@
 package org.apache.wss4j.policy.stax.assertionStates;
 
 import org.apache.wss4j.policy.AssertionState;
-import org.apache.wss4j.policy.WSSPolicyException;
+import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.xml.security.stax.securityEvent.AbstractSecuredElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;

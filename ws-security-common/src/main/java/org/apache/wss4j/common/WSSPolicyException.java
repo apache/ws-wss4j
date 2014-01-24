@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.policy;
+package org.apache.wss4j.common;
 
 public class WSSPolicyException extends Exception {
 

@@ -18,7 +18,7 @@
  */
 package org.apache.wss4j.policy.stax;
 
-import org.apache.wss4j.policy.WSSPolicyException;
+import org.apache.wss4j.common.WSSPolicyException;
 
 /**
  * Exception for PolicyViolation

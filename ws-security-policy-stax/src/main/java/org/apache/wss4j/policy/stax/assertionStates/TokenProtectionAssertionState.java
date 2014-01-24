@@ -20,7 +20,7 @@ package org.apache.wss4j.policy.stax.assertionStates;
 
 import org.apache.neethi.Assertion;
 import org.apache.wss4j.policy.AssertionState;
-import org.apache.wss4j.policy.WSSPolicyException;
+import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
 import org.apache.wss4j.policy.stax.Assertable;
 import org.apache.wss4j.stax.ext.WSSConstants;

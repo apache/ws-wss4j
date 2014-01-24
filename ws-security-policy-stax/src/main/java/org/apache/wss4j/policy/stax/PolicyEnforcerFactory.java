@@ -46,7 +46,7 @@ import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyBuilder;
 import org.apache.neethi.builders.AssertionBuilder;
-import org.apache.wss4j.policy.WSSPolicyException;
+import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.policy.builders.AlgorithmSuiteBuilder;
 import org.apache.wss4j.policy.builders.AsymmetricBindingBuilder;
 import org.apache.wss4j.policy.builders.BootstrapPolicyBuilder;

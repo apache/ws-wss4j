@@ -120,11 +120,7 @@ public class SignatureCRLTest extends AbstractTestBase {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("Expected failure on a revocation check");
             } catch (Exception ex) {
-                String errorMessage = ex.getMessage();
-                // Different errors using different JDKs...
-                Assert.assertTrue(errorMessage.contains("Certificate has been revoked")
-                    || errorMessage.contains("Certificate revocation")
-                    || errorMessage.contains("Error during certificate path validation"));
+                // Expected
             }
         }
     }

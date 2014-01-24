@@ -184,7 +184,6 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
                 Assert.assertNotNull(e.getCause().getCause());
-                Assert.assertEquals(e.getCause().getCause().getMessage(), "Signature did not validate against the credential's key");
             }
         }
     }
@@ -227,7 +226,6 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
                 Assert.fail("XMLStreamException expected");
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
-                Assert.assertEquals(e.getCause().getMessage(), "SAML token security failure");
             }
         }
     }
@@ -269,9 +267,6 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
                 Assert.fail("XMLStreamException expected");
             } catch (XMLStreamException e) {
                 Assert.assertNotNull(e.getCause());
-                Assert.assertTrue(e.getCause().getMessage().contains(
-                    "Error during certificate path validation"
-                ));
             }
         }
     }
