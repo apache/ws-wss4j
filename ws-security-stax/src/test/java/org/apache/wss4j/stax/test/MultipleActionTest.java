@@ -26,11 +26,13 @@ import java.util.List;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.OutboundWSSec;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.junit.Assert;
 import org.junit.Test;
@@ -108,4 +110,28 @@ public class MultipleActionTest extends AbstractTestBase {
         }
     }
     
+    @Test
+    public void testDuplicateActions() throws Exception {
+        WSSSecurityProperties properties = new WSSSecurityProperties();
+        List<XMLSecurityConstants.Action> actions = new ArrayList<XMLSecurityConstants.Action>();
+        actions.add(XMLSecurityConstants.SIGNATURE);
+        properties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+        properties.setSignatureUser("transmitter");
+        properties.setCallbackHandler(new CallbackHandlerImpl());
+        properties.setActions(actions);
+        
+        // Should work
+        WSSec.getOutboundWSSec(properties);
+        
+        // Should throw an error on a duplicate Action
+        actions.add(XMLSecurityConstants.SIGNATURE);
+        properties.setActions(actions);
+        
+        try {
+            WSSec.getOutboundWSSec(properties);
+            Assert.fail();
+        } catch (WSSecurityException ex) {
+            Assert.assertTrue(ex.getMessage().contains("Duplicate Actions are not allowed"));
+        }
+    }
 }

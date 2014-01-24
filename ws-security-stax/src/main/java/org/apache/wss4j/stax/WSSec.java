@@ -19,6 +19,7 @@
 package org.apache.wss4j.stax;
 
 import java.net.URISyntaxException;
+import java.util.HashSet;
 
 import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -101,6 +102,12 @@ public class WSSec {
     public static WSSSecurityProperties validateAndApplyDefaultsToOutboundSecurityProperties(WSSSecurityProperties securityProperties) throws WSSConfigurationException {
         if (securityProperties.getActions() == null) {
             throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noOutputAction");
+        }
+        
+        // Check for duplicate actions
+        if (new HashSet<XMLSecurityConstants.Action>(securityProperties.getActions()).size() 
+            != securityProperties.getActions().size()) {
+            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "stax.duplicateActions");
         }
 
         for (XMLSecurityConstants.Action action : securityProperties.getActions()) {
