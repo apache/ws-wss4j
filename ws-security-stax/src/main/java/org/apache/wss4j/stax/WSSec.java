@@ -100,7 +100,7 @@ public class WSSec {
      *          if the configuration is invalid
      */
     public static WSSSecurityProperties validateAndApplyDefaultsToOutboundSecurityProperties(WSSSecurityProperties securityProperties) throws WSSConfigurationException {
-        if (securityProperties.getActions() == null) {
+        if (securityProperties.getActions() == null || securityProperties.getActions().isEmpty()) {
             throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noOutputAction");
         }
         
