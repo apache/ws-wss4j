@@ -85,19 +85,23 @@ public class KerberosTest extends AbstractTestBase {
 
         WSSConfig.init();
 
-        kerberosServerStarted = KerberosServiceStarter.startKerberosServer();
+        //
+        // This test fails with the IBM JDK
+        //
+        if (!"IBM Corporation".equals(System.getProperty("java.vendor"))) {
+            kerberosServerStarted = KerberosServiceStarter.startKerberosServer();
 
-        String basedir = System.getProperty("basedir");
-        if (basedir == null) {
-            basedir = new File(".").getCanonicalPath();
-        } else {
-            basedir += "/..";
+            String basedir = System.getProperty("basedir");
+            if (basedir == null) {
+                basedir = new File(".").getCanonicalPath();
+            } else {
+                basedir += "/..";
+            }
+
+            //System.setProperty("sun.security.krb5.debug", "true");
+            System.setProperty("java.security.auth.login.config", basedir + "/integration/src/test/resources/kerberos/kerberos.jaas");
+            System.setProperty("java.security.krb5.conf", basedir + "/integration/src/test/resources/kerberos/krb5.conf");
         }
-
-        //System.setProperty("sun.security.krb5.debug", "true");
-        System.setProperty("java.security.auth.login.config", basedir + "/integration/src/test/resources/kerberos/kerberos.jaas");
-        System.setProperty("java.security.krb5.conf", basedir + "/integration/src/test/resources/kerberos/krb5.conf");
-
     }
 
     @AfterClass

@@ -1433,6 +1433,13 @@ public class SignatureTest extends AbstractTestBase {
     @Test
     public void testSignatureECKeyValue() throws Exception {
         
+        //
+        // This test fails with the IBM JDK
+        //
+        if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
+            return;
+        }
+        
         if (Security.getProvider("BC") == null) {
             return;
         }
