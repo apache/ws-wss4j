@@ -46,6 +46,7 @@ import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenConstants;
 
 /**
  * Concrete security context implementation
@@ -519,10 +520,28 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
             if (WSSecurityEventConstants.SignedElement.equals(securityEvent.getSecurityEventType())) {
                 SignedElementSecurityEvent signedElementSecurityEvent = (SignedElementSecurityEvent) securityEvent;
                 if (signedElementSecurityEvent.isSigned()
-                        && signedElementSecurityEvent.getSecurityToken().getId().equals(tokenSecurityEvent.getSecurityToken().getId())
+                        && matchesTokenOrWrappedTokenId(tokenSecurityEvent.getSecurityToken(),
+                        signedElementSecurityEvent.getSecurityToken().getId(),
+                        SecurityTokenConstants.TokenUsage_Signature)
                         && WSSUtils.pathMatches(elementPath, signedElementSecurityEvent.getElementPath(), true, false)) {
                     return true;
                 }
+            }
+        }
+        return false;
+    }
+
+    private boolean matchesTokenOrWrappedTokenId(
+            SecurityToken securityToken, String id,
+            SecurityTokenConstants.TokenUsage tokenUsage) throws XMLSecurityException {
+        if (securityToken.getId().equals(id) && securityToken.getTokenUsages().contains(tokenUsage)) {
+            return true;
+        }
+        List<? extends SecurityToken> wrappedTokens = securityToken.getWrappedTokens();
+        for (int i = 0; i < wrappedTokens.size(); i++) {
+            boolean match = matchesTokenOrWrappedTokenId(wrappedTokens.get(i), id, tokenUsage);
+            if (match) {
+                return match;
             }
         }
         return false;
