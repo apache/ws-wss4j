@@ -463,6 +463,11 @@ are as follows:
 <td>The signature digest algorithm to use.  The default is SHA-1.</td>
 </tr>
 <tr>
+<td>SIG_C14N_ALGO</td>
+<td>signatureC14nAlgorithm</td>
+<td>Defines which signature c14n (canonicalization) algorithm to use. The default is: "http://www.w3.org/2001/10/xml-exc-c14n#".</td>
+</tr>
+<tr>
 <td>SIGNATURE_PARTS</td>
 <td>signatureParts</td>
 <td>Parameter to define which parts of the request shall be signed. The SOAP body is signed
