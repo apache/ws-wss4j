@@ -97,9 +97,13 @@ public class BinarySecurityTokenProcessor implements Processor {
                     WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN, 
                     returnedCredential.getTransformedToken()
                 );
-                SAMLTokenPrincipal samlPrincipal = 
-                    new SAMLTokenPrincipal(credential.getTransformedToken());
-                result.put(WSSecurityEngineResult.TAG_PRINCIPAL, samlPrincipal);
+                if (credential.getPrincipal() != null) {
+                    result.put(WSSecurityEngineResult.TAG_PRINCIPAL, credential.getPrincipal());
+                } else {
+                    SAMLTokenPrincipal samlPrincipal =
+                        new SAMLTokenPrincipal(credential.getTransformedToken());
+                    result.put(WSSecurityEngineResult.TAG_PRINCIPAL, samlPrincipal);
+                }
             } else if (credential.getPrincipal() != null) {
                 result.put(WSSecurityEngineResult.TAG_PRINCIPAL, credential.getPrincipal());
             } else if (certs != null && certs[0] != null) {
