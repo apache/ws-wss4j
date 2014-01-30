@@ -29,7 +29,7 @@ import org.joda.time.DateTime;
 public class ConditionsBean {
     private DateTime notBefore;
     private DateTime notAfter;
-    private int tokenPeriodMinutes;
+    private long tokenPeriodSeconds;
     private String audienceURI;
     private boolean oneTimeUse;
     private ProxyRestrictionBean proxyRestriction;
@@ -62,7 +62,7 @@ public class ConditionsBean {
     public ConditionsBean(
         int tokenPeriodMinutes
     ) {
-        this.tokenPeriodMinutes = tokenPeriodMinutes;
+        this.tokenPeriodSeconds = tokenPeriodMinutes * 60;
     }
     
     /**
@@ -107,7 +107,7 @@ public class ConditionsBean {
      * @return the tokenPeriodMinutes (type int)
      */
     public int getTokenPeriodMinutes() {
-        return tokenPeriodMinutes;
+        return (int)(tokenPeriodSeconds / 60L);
     }
 
     /**
@@ -116,7 +116,25 @@ public class ConditionsBean {
      * @param tokenPeriodMinutes the tokenPeriodMinutes to set
      */
     public void setTokenPeriodMinutes(int tokenPeriodMinutes) {
-        this.tokenPeriodMinutes = tokenPeriodMinutes;
+        this.tokenPeriodSeconds = tokenPeriodMinutes * 60;
+    }
+    
+    /**
+     * Get the tokenPeriodSeconds of this object.
+     *
+     * @return the tokenPeriodSeconds (type long)
+     */
+    public long getTokenPeriodSeconds() {
+        return tokenPeriodSeconds;
+    }
+
+    /**
+     * Set the tokenPeriodSeconds.
+     *
+     * @param tokenPeriodSeconds the tokenPeriodSeconds to set
+     */
+    public void setTokenPeriodSeconds(long tokenPeriodSeconds) {
+        this.tokenPeriodSeconds = tokenPeriodSeconds;
     }
     
     /**
@@ -174,7 +192,7 @@ public class ConditionsBean {
 
         ConditionsBean that = (ConditionsBean) o;
 
-        if (tokenPeriodMinutes != that.tokenPeriodMinutes) return false;
+        if (tokenPeriodSeconds != that.tokenPeriodSeconds) return false;
         
         if (notBefore == null && that.notBefore != null) {
             return false;
@@ -211,7 +229,7 @@ public class ConditionsBean {
      */
     @Override
     public int hashCode() {
-        int result = tokenPeriodMinutes;
+        int result = (int)tokenPeriodSeconds;
         if (notBefore != null) {
             result = 31 * result + notBefore.hashCode();
         }

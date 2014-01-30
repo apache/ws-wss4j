@@ -189,7 +189,7 @@ public final class SAML2ComponentBuilder {
             return conditions;
         }
         
-        int tokenPeriodMinutes = conditionsBean.getTokenPeriodMinutes();
+        long tokenPeriodSeconds = conditionsBean.getTokenPeriodSeconds();
         DateTime notBefore = conditionsBean.getNotBefore();
         DateTime notAfter = conditionsBean.getNotAfter();
         
@@ -204,10 +204,13 @@ public final class SAML2ComponentBuilder {
         } else {
             DateTime newNotBefore = new DateTime();
             conditions.setNotBefore(newNotBefore);
-            if (tokenPeriodMinutes <= 0) {
-                tokenPeriodMinutes = 5;
+            if (tokenPeriodSeconds <= 0) {
+                tokenPeriodSeconds = 5L * 60L;
             }
-            conditions.setNotOnOrAfter(newNotBefore.plusMinutes(tokenPeriodMinutes));
+            DateTime notOnOrAfter = 
+                new DateTime(newNotBefore.getMillis() + tokenPeriodSeconds * 1000L);
+            
+            conditions.setNotOnOrAfter(notOnOrAfter);
         }
         
         if (conditionsBean.getAudienceURI() != null) {
