@@ -34,21 +34,23 @@
     <url>http://ws.apache.org/wss4j/</url>
 
     <properties>
+        <apacheds.version>1.5.7</apacheds.version>
         <bcprov.version>1.50</bcprov.version>
+        <commons.compress.version>1.4.1</commons.compress.version>
         <ehcache.version>2.7.4</ehcache.version>
         <geronimo.javamail.version>1.7.1</geronimo.javamail.version>
         <jasypt.version>1.9.0</jasypt.version>
+        <junit.version>4.11</junit.version>
         <log4j.version>1.2.17</log4j.version>
         <neethi.version>3.0.2</neethi.version>
+        <opensaml.version>2.6.0</opensaml.version>
         <slf4j.version>1.7.5</slf4j.version>
         <woodstox.core.asl.version>4.2.0</woodstox.core.asl.version>
+        <wsdl4j.version>1.6.2</wsdl4j.version>
         <xalan.version>2.7.1</xalan.version>
         <xerces.version>2.11.0</xerces.version>
-        <xmlsec.version>2.0.0-SNAPSHOT</xmlsec.version>
-        <opensaml.version>2.6.0</opensaml.version>
-        <junit.version>4.11</junit.version>
         <xml.apis.version>1.4.01</xml.apis.version>
-        <wsdl4j.version>1.6.2</wsdl4j.version>
+        <xmlsec.version>2.0.0-SNAPSHOT</xmlsec.version>
         <xmlunit.version>1.4</xmlunit.version>
         
         <!-- OSGi related properties -->
@@ -151,6 +153,17 @@
                 <artifactId>jasypt</artifactId>
                 <version>${jasypt.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.directory.server</groupId>
+                <artifactId>apacheds-kerberos-shared</artifactId>
+                <version>${apacheds.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${commons.compress.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
