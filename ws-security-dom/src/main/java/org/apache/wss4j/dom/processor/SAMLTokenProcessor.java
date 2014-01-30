@@ -111,9 +111,13 @@ public class SAMLTokenProcessor implements Processor {
                 result.put(
                     WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN, credential.getTransformedToken()
                 );
-                SAMLTokenPrincipalImpl samlPrincipal =
-                    new SAMLTokenPrincipalImpl(credential.getTransformedToken());
-                result.put(WSSecurityEngineResult.TAG_PRINCIPAL, samlPrincipal);
+                if (credential.getPrincipal() != null) {
+                    result.put(WSSecurityEngineResult.TAG_PRINCIPAL, credential.getPrincipal());
+                } else {
+                    SAMLTokenPrincipalImpl samlPrincipal =
+                        new SAMLTokenPrincipalImpl(credential.getTransformedToken());
+                    result.put(WSSecurityEngineResult.TAG_PRINCIPAL, samlPrincipal);
+                }
             } else if (credential.getPrincipal() != null) {
                 result.put(WSSecurityEngineResult.TAG_PRINCIPAL, credential.getPrincipal());
             } else {
