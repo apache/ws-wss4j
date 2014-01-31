@@ -111,9 +111,9 @@ public class ProtectionOrderAssertionState extends AssertionState implements Ass
                 break;
             }
             case EncryptBeforeSigning: {
-                int lastEncytpion = contentTypes.lastIndexOf(XMLSecurityConstants.ContentType.ENCRYPTION);
+                int lastEncryption = contentTypes.lastIndexOf(XMLSecurityConstants.ContentType.ENCRYPTION);
                 int firstSignature = contentTypes.indexOf(XMLSecurityConstants.ContentType.SIGNATURE);
-                if (firstSignature >= 0 && firstSignature < lastEncytpion) {
+                if (firstSignature >= 0 && firstSignature < lastEncryption) {
                     setAsserted(false);
                     setErrorMessage("Policy enforces " + protectionOrder + " but the " + WSSUtils.pathAsString(elementPath) + " was signed and then encrypted");
                 }
