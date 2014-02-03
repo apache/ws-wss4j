@@ -10,6 +10,8 @@ provides an implementation of the following WS-Security standards:
     Username Token Profile 1.1
     X.509 Certificate Token Profile 1.1
     SAML Token Profile 1.1
+    Kerberos Token Profile 1.1
+    SOAP with Attachments (SWA) Profile 1.1
     Basic Security Profile 1.1
 
 Apache WSS4J, Apache, and the Apache feather logo are trademarks of The Apache
