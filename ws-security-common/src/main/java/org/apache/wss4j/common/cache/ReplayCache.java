@@ -19,12 +19,13 @@
 
 package org.apache.wss4j.common.cache;
 
+import java.io.Closeable;
 
 /**
  * A cache to store (String) identifiers to avoid replay attacks. An example of such an identifier
  * is a UsernameToken nonce.
  */
-public interface ReplayCache {
+public interface ReplayCache extends Closeable {
     
     /**
      * Add the given identifier to the cache. It will be cached for a default amount of time.

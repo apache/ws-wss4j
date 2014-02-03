@@ -19,7 +19,6 @@
 
 package org.apache.wss4j.common.cache;
 
-import java.io.Closeable;
 import java.net.URL;
 
 import net.sf.ehcache.Cache;
@@ -32,7 +31,7 @@ import net.sf.ehcache.config.CacheConfiguration;
  * An in-memory EHCache implementation of the ReplayCache interface. The default TTL is 60 minutes and the
  * max TTL is 12 hours.
  */
-public class EHCacheReplayCache implements ReplayCache, Closeable {
+public class EHCacheReplayCache implements ReplayCache {
     
     public static final long DEFAULT_TTL = 3600L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
@@ -121,13 +120,13 @@ public class EHCacheReplayCache implements ReplayCache, Closeable {
         return false;
     }
 
+    @Override
     public synchronized void close() {
         if (cacheManager != null) {
             EHCacheManagerHolder.releaseCacheManger(cacheManager);
             cacheManager = null;
             cache = null;
         }
-        
     }
 
     public void initComplete() {

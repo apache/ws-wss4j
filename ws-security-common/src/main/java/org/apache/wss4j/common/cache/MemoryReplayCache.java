@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.common.cache;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -108,5 +109,11 @@ public class MemoryReplayCache implements ReplayCache {
                 }
             }
         }
+    }
+
+    @Override
+    public synchronized void close() throws IOException {
+        cache.clear();
+        ids.clear();
     }
 }
