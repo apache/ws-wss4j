@@ -116,13 +116,13 @@ public class SignatureTrustValidator implements Validator {
         RequestData data,
         boolean enableRevocation
     ) throws WSSecurityException {
-        String subjectString = certificates[0].getSubjectX500Principal().getName();
         //
         // Use the validation method from the crypto to check whether the subjects' 
         // certificate was really signed by the issuer stated in the certificate
         //
         crypto.verifyTrust(certificates, enableRevocation);
         if (LOG.isDebugEnabled()) {
+            String subjectString = certificates[0].getSubjectX500Principal().getName();
             LOG.debug(
                 "Certificate path has been verified for certificate with subject " + subjectString
             );
