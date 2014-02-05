@@ -129,6 +129,10 @@ public class WSPasswordCallback implements Callback {
      */
     public static final int SECRET_KEY = 9;
     
+    /**
+     * PASSWORD_ENCRYPTOR_PASSWORD usage is used to return the password used with a PasswordEncryptor
+     * implementation to decrypt encrypted passwords stored in Crypto properties files
+     */
     public static final int PASSWORD_ENCRYPTOR_PASSWORD = 10;
 
     private String identifier;

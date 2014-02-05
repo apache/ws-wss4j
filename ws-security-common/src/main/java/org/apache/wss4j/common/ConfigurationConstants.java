@@ -865,7 +865,7 @@ public final class ConfigurationConstants {
      * 
      * The encrypted passwords must be stored in the format "ENC(encoded encrypted password)".
      */
-    public static final String PASSWORD_ENCRYPTOR_INSTANCE = "passwordEncyptorInstance";
+    public static final String PASSWORD_ENCRYPTOR_INSTANCE = "passwordEncryptorInstance";
     
     /**
      * This controls how deriving tokens are referenced. The valid values are:
