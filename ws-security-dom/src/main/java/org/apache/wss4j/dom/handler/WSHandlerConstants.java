@@ -522,11 +522,6 @@ public final class WSHandlerConstants {
     //
     
     /**
-     * Text of the embedded key name to be sent in the KeyInfo for encryption.
-     */
-    public static final String ENC_KEY_NAME = "embeddedKeyName";
-
-    /**
      * Specific parameter for UsernameTokens to define the encoding of the password. It can
      * be used on either the outbound or inbound side. The valid values are:
      * 
