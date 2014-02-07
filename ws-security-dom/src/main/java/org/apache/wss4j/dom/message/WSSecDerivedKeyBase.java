@@ -22,6 +22,8 @@ package org.apache.wss4j.dom.message;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.derivedKey.ConversationException;
 import org.apache.wss4j.common.derivedKey.AlgoFactory;
@@ -36,6 +38,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.io.UnsupportedEncodingException;
+import java.security.cert.X509Certificate;
 
 /**
  * Base class for DerivedKey encryption and signature
@@ -109,15 +112,18 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
     protected int derivedKeyLength = -1;
     
     private String customValueType;
-    
+    private X509Certificate useThisCert;
+    private Crypto crypto;
     
     public WSSecDerivedKeyBase() {
         super();
+        setKeyIdentifierType(0);
     }
+    
     public WSSecDerivedKeyBase(WSSConfig config) {
         super(config);
+        setKeyIdentifierType(0);
     }
-
     
     /**
      * @param ephemeralKey The ephemeralKey to set.
@@ -140,6 +146,14 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
      */
     public String getTokenIdentifier() {
         return tokenIdentifier;
+    }
+    
+    /**
+     * Set the X509 Certificate to use
+     * @param cer the X509 Certificate to use
+     */
+    public void setX509Certificate(X509Certificate cer) {
+        this.useThisCert = cer;
     }
     
     /**
@@ -224,7 +238,22 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
             String strUri = getWsConfig().getIdAllocator().createSecureId("STR-", secRef);
             secRef.setID(strUri);
             
+            X509Certificate[] certs = getSigningCerts();
+            
             switch (keyIdentifierType) {
+    
+            case WSConstants.X509_KEY_IDENTIFIER:
+                secRef.setKeyIdentifier(certs[0]);
+                break;
+    
+            case WSConstants.SKI_KEY_IDENTIFIER:
+                secRef.setKeyIdentifierSKI(certs[0], crypto);
+                break;
+    
+            case WSConstants.THUMBPRINT_IDENTIFIER:
+                secRef.setKeyIdentifierThumb(certs[0]);
+                break;
+                
             case WSConstants.CUSTOM_KEY_IDENTIFIER:
                 secRef.setKeyIdentifier(customValueType, tokenIdentifier);
                 if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customValueType)) {
@@ -320,5 +349,38 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
     
     public void setTokenIdDirectId(boolean b) {
         tokenIdDirectId = b;
+    }
+    
+    /**
+     * Set up the X509 Certificate(s) for signing.
+     */
+    private X509Certificate[] getSigningCerts() throws WSSecurityException {
+        X509Certificate[] certs = null;
+        if (keyIdentifierType == WSConstants.ISSUER_SERIAL
+            || keyIdentifierType == WSConstants.X509_KEY_IDENTIFIER
+            || keyIdentifierType == WSConstants.SKI_KEY_IDENTIFIER
+            || keyIdentifierType == WSConstants.THUMBPRINT_IDENTIFIER) {
+            if (useThisCert == null) {
+                CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+                cryptoType.setAlias(user);
+                if (crypto == null) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSigCryptoFile");
+                }
+                certs = crypto.getX509Certificates(cryptoType);
+            } else {
+                certs = new X509Certificate[] {useThisCert};
+            }
+            if (certs == null || certs.length <= 0) {
+                throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILURE,
+                        "noUserCertsFound",
+                        user, "signature");
+            }
+        }
+        return certs;
+    }
+    
+    public void setCrypto(Crypto crypto) {
+        this.crypto = crypto;
     }
 }

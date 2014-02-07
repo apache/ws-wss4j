@@ -88,6 +88,10 @@ public class WSSConfig {
                 org.apache.wss4j.dom.action.SignatureAction.class
             );
             tmp.put(
+                WSConstants.DKT_SIGN,
+                org.apache.wss4j.dom.action.SignatureDerivedAction.class
+            );
+            tmp.put(
                 WSConstants.ST_SIGNED,
                 org.apache.wss4j.dom.action.SAMLTokenSignedAction.class
             );

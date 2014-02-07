@@ -127,7 +127,8 @@ public abstract class WSHandler {
                 && actionToDo.getActionToken() == null) {
                 decodeUTParameter(reqData);
                 decodeSignatureParameter(reqData);
-            } else if (actionToDo.getAction() == WSConstants.SIGN 
+            } else if ((actionToDo.getAction() == WSConstants.SIGN
+                || actionToDo.getAction() == WSConstants.DKT_SIGN)
                 && actionToDo.getActionToken() == null) {
                 SignatureActionToken actionToken = reqData.getSignatureToken();
                 if (actionToken == null) {
@@ -216,6 +217,7 @@ public abstract class WSHandler {
             case WSConstants.UT:
             case WSConstants.ENCR:
             case WSConstants.SIGN:
+            case WSConstants.DKT_SIGN:
             case WSConstants.ST_SIGNED:
             case WSConstants.ST_UNSIGNED:
             case WSConstants.TS:
@@ -563,6 +565,9 @@ public abstract class WSHandler {
         String algo = getString(WSHandlerConstants.SIG_ALGO, mc);
         actionToken.setSignatureAlgorithm(algo);
         
+        String derivedKeyReference = getString(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, mc);
+        actionToken.setDerivedKeyTokenReference(derivedKeyReference);
+        
         String digestAlgo = getString(WSHandlerConstants.SIG_DIGEST_ALGO, mc);
         actionToken.setDigestAlgorithm(digestAlgo);
         
@@ -658,6 +663,9 @@ public abstract class WSHandler {
         String encKeyTransport = 
             getString(WSHandlerConstants.ENC_KEY_TRANSPORT, mc);
         actionToken.setKeyTransportAlgorithm(encKeyTransport);
+        
+        String derivedKeyReference = getString(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, mc);
+        actionToken.setDerivedKeyTokenReference(derivedKeyReference);
         
         String digestAlgo = getString(WSHandlerConstants.ENC_DIGEST_ALGO, mc);
         actionToken.setDigestAlgorithm(digestAlgo);
@@ -1208,6 +1216,9 @@ public abstract class WSHandler {
             break;
         case WSConstants.SIGN:
             reason = WSPasswordCallback.SIGNATURE;
+            break;
+        case WSConstants.DKT_SIGN:
+            reason = WSPasswordCallback.SECRET_KEY;
             break;
         case WSConstants.ENCR:
             reason = WSPasswordCallback.SECRET_KEY;

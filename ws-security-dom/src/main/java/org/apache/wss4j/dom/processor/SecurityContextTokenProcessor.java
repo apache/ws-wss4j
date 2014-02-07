@@ -66,7 +66,7 @@ public class SecurityContextTokenProcessor implements Processor {
             result.put(WSSecurityEngineResult.TAG_SECRET, returnedCredential.getSecretKey());
         } else {
             String id = sct.getID();
-            if (id.charAt(0) == '#') {
+            if (!"".equals(id) && id.charAt(0) == '#') {
                 id = id.substring(1);
             }
             byte[] secret = null;

@@ -91,6 +91,7 @@ public class RequestData {
     private boolean enableNonceReplayCache = true;
     private boolean enableSamlOneTimeUseReplayCache = true;
     private PasswordEncryptor passwordEncryptor;
+    private String derivedKeyTokenReference;
 
     public void clear() {
         soapConstants = null;
@@ -123,6 +124,7 @@ public class RequestData {
         enableNonceReplayCache = true;
         setEnableSamlOneTimeUseReplayCache(true);
         passwordEncryptor = null;
+        derivedKeyTokenReference = null;
     }
 
     public boolean isEnableTimestampReplayCache() {
@@ -541,6 +543,14 @@ public class RequestData {
 
     public void setEncryptionToken(EncryptionActionToken encryptionToken) {
         this.encryptionToken = encryptionToken;
+    }
+
+    public String getDerivedKeyTokenReference() {
+        return derivedKeyTokenReference;
+    }
+
+    public void setDerivedKeyTokenReference(String derivedKeyTokenReference) {
+        this.derivedKeyTokenReference = derivedKeyTokenReference;
     }
         
 }
