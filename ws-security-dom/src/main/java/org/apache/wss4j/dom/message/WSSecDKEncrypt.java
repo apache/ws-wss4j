@@ -25,7 +25,6 @@ import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
-import org.apache.wss4j.common.derivedKey.ConversationException;
 import org.apache.wss4j.dom.message.token.Reference;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -55,8 +54,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         super(config);
     }
     
-    public Document build(Document doc, WSSecHeader secHeader)
-        throws WSSecurityException, ConversationException {
+    public Document build(Document doc, WSSecHeader secHeader) throws WSSecurityException {
         
         //
         // Setup the encrypted key

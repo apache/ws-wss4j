@@ -18,6 +18,8 @@
  */
 package org.apache.wss4j.common.derivedKey;
 
+import java.io.UnsupportedEncodingException;
+
 import org.apache.wss4j.common.ext.WSSecurityException;
 
 public class DerivedKeyUtils {
@@ -30,28 +32,28 @@ public class DerivedKeyUtils {
      * @throws org.apache.wss4j.stax.wss.ext.WSSecurityException
      *
      */
-    public static byte[] deriveKey(String algorithm, String label, int length, byte[] secret, byte[] nonce, int offset) throws WSSecurityException {
+    public static byte[] deriveKey(String algorithm, String label, int length, byte[] secret, byte[] nonce, int offset) 
+        throws WSSecurityException {
+        DerivationAlgorithm algo = AlgoFactory.getInstance(algorithm);
+        byte[] labelBytes;
         try {
-            DerivationAlgorithm algo = AlgoFactory.getInstance(algorithm);
-            byte[] labelBytes;
             if (label == null || label.length() == 0) {
                 String defaultLabel = ConversationConstants.DEFAULT_LABEL + ConversationConstants.DEFAULT_LABEL;
                 labelBytes = defaultLabel.getBytes("UTF-8");
             } else {
                 labelBytes = label.getBytes("UTF-8");
             }
-
-            byte[] seed = new byte[labelBytes.length + nonce.length];
-            System.arraycopy(labelBytes, 0, seed, 0, labelBytes.length);
-            System.arraycopy(nonce, 0, seed, labelBytes.length, nonce.length);
-
-            if (length <= 0) {
-                length = 32;
-            }
-            return algo.createKey(secret, seed, offset, length);
-
-        } catch (Exception e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        } catch (UnsupportedEncodingException ex) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
         }
+
+        byte[] seed = new byte[labelBytes.length + nonce.length];
+        System.arraycopy(labelBytes, 0, seed, 0, labelBytes.length);
+        System.arraycopy(nonce, 0, seed, labelBytes.length, nonce.length);
+
+        if (length <= 0) {
+            length = 32;
+        }
+        return algo.createKey(secret, seed, offset, length);
     }
 }

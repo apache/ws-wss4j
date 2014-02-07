@@ -22,7 +22,6 @@ package org.apache.wss4j.dom.message;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
-import org.apache.wss4j.common.derivedKey.ConversationException;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -57,8 +56,7 @@ public class WSSecSecurityContextToken {
     
     private int wscVersion = ConversationConstants.DEFAULT_VERSION;
 
-    public void prepare(Document doc, Crypto crypto)
-        throws WSSecurityException, ConversationException  {
+    public void prepare(Document doc, Crypto crypto) throws WSSecurityException {
 
         if (sct == null) {
             if (identifier != null) {

@@ -28,7 +28,6 @@ import javax.xml.namespace.QName;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
-import org.apache.wss4j.common.derivedKey.ConversationException;
 import org.apache.wss4j.common.derivedKey.AlgoFactory;
 import org.apache.wss4j.common.derivedKey.DerivationAlgorithm;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
@@ -77,7 +76,7 @@ public class DerivedKeyToken {
      *
      * @param doc The DOM document
      */
-    public DerivedKeyToken(Document doc) throws ConversationException {
+    public DerivedKeyToken(Document doc) throws WSSecurityException {
         this(ConversationConstants.DEFAULT_VERSION, doc);
     }
 
@@ -86,7 +85,7 @@ public class DerivedKeyToken {
      *
      * @param doc The DOM document
      */
-    public DerivedKeyToken(int version, Document doc) throws ConversationException {
+    public DerivedKeyToken(int version, Document doc) throws WSSecurityException {
         LOG.debug("DerivedKeyToken: created");
         
         ns = ConversationConstants.getWSCNs(version);
@@ -303,7 +302,7 @@ public class DerivedKeyToken {
      *
      * @param offset The offset value as an integer
      */
-    public void setOffset(int offset) throws ConversationException {
+    public void setOffset(int offset) throws WSSecurityException {
         //This element MUST NOT be used if the <Generation> element is specified
         if (elementGeneration == null) {
             elementOffset = 
@@ -315,9 +314,7 @@ public class DerivedKeyToken {
             );
             element.appendChild(elementOffset);
         } else {
-            throw new ConversationException(
-                "Offset cannot be set along with generation - generation is already set"
-            );
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "offsetError");
         }
 
     }
@@ -334,7 +331,7 @@ public class DerivedKeyToken {
      *
      * @param generation generation value as an integer
      */
-    public void setGeneration(int generation) throws ConversationException {
+    public void setGeneration(int generation) throws WSSecurityException {
         //This element MUST NOT be used if the <Offset> element is specified
         if (elementOffset == null) {
             elementGeneration = 
@@ -346,9 +343,7 @@ public class DerivedKeyToken {
             );
             element.appendChild(elementGeneration);
         } else {
-            throw new ConversationException(
-                "Generation cannot be set along with offset - Offset is already set"
-            );
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "offsetError");
         }
     }
 

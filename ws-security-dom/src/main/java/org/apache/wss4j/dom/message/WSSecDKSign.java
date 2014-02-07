@@ -26,7 +26,6 @@ import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
-import org.apache.wss4j.common.derivedKey.ConversationException;
 import org.apache.wss4j.dom.message.token.Reference;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.transform.STRTransform;
@@ -102,8 +101,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         }
     }
     
-    public Document build(Document doc, WSSecHeader secHeader)
-        throws WSSecurityException, ConversationException {
+    public Document build(Document doc, WSSecHeader secHeader) throws WSSecurityException {
         
         prepare(doc, secHeader);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
@@ -136,8 +134,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         return doc;
     }
     
-    public void prepare(Document doc, WSSecHeader secHeader)
-        throws WSSecurityException, ConversationException {
+    public void prepare(Document doc, WSSecHeader secHeader) throws WSSecurityException {
         super.prepare(doc);
         wsDocInfo = new WSDocInfo(doc);
         securityHeader = secHeader.getSecurityHeader();

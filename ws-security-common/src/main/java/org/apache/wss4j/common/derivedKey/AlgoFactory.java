@@ -19,6 +19,8 @@
 
 package org.apache.wss4j.common.derivedKey;
 
+import org.apache.wss4j.common.ext.WSSecurityException;
+
 public final class AlgoFactory {
     
     private AlgoFactory() {
@@ -33,13 +35,13 @@ public final class AlgoFactory {
      * @throws ConversationException If the specified algorithm is not available
      *                               in default implementations
      */
-    public static DerivationAlgorithm getInstance(String algorithm) throws
-            ConversationException {
+    public static DerivationAlgorithm getInstance(String algorithm) throws WSSecurityException {
         if (ConversationConstants.DerivationAlgorithm.P_SHA_1_2005_12.equals(algorithm)
             || ConversationConstants.DerivationAlgorithm.P_SHA_1.equals(algorithm)) {
             return new P_SHA1();
         } else {
-            throw new ConversationException("No such algorithm");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+                                          "unknownAlgorithm", algorithm);
         }
     }
 

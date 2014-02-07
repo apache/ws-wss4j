@@ -19,12 +19,13 @@
 
 package org.apache.wss4j.dom.message.token;
 
+import javax.xml.namespace.QName;
+
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
-import org.apache.wss4j.common.derivedKey.ConversationException;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.w3c.dom.Document;
@@ -32,7 +33,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
-import javax.xml.namespace.QName;
 public class SecurityContextToken {
 
     /**
@@ -54,7 +54,7 @@ public class SecurityContextToken {
      *
      * @param doc
      */
-    public SecurityContextToken(Document doc) throws ConversationException {
+    public SecurityContextToken(Document doc) throws WSSecurityException {
         this(ConversationConstants.DEFAULT_VERSION, doc);
     }
 
@@ -63,7 +63,7 @@ public class SecurityContextToken {
      *
      * @param doc
      */
-    public SecurityContextToken(Document doc, String uuid) throws ConversationException {
+    public SecurityContextToken(Document doc, String uuid) throws WSSecurityException {
         this(ConversationConstants.DEFAULT_VERSION, doc, uuid);
     }
 
@@ -72,7 +72,7 @@ public class SecurityContextToken {
      *
      * @param doc
      */
-    public SecurityContextToken(int version, Document doc) throws ConversationException {
+    public SecurityContextToken(int version, Document doc) throws WSSecurityException {
 
         String ns = ConversationConstants.getWSCNs(version);
         
@@ -98,7 +98,7 @@ public class SecurityContextToken {
      *
      * @param doc
      */
-    public SecurityContextToken(int version, Document doc, String uuid) throws ConversationException {
+    public SecurityContextToken(int version, Document doc, String uuid) throws WSSecurityException {
 
         String ns = ConversationConstants.getWSCNs(version);
         

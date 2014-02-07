@@ -25,7 +25,6 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
-import org.apache.wss4j.common.derivedKey.ConversationException;
 import org.apache.wss4j.common.derivedKey.AlgoFactory;
 import org.apache.wss4j.common.derivedKey.DerivationAlgorithm;
 import org.apache.wss4j.dom.message.token.DerivedKeyToken;
@@ -198,7 +197,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
      * @param doc The unsigned SOAP envelope as <code>Document</code>
      * @throws WSSecurityException
      */
-    public void prepare(Document doc) throws WSSecurityException, ConversationException {
+    public void prepare(Document doc) throws WSSecurityException {
         
         document = doc;
 

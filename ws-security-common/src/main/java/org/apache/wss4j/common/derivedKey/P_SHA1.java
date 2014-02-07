@@ -41,6 +41,9 @@ package org.apache.wss4j.common.derivedKey;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
+import org.apache.wss4j.common.ext.WSSecurityException;
+
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
@@ -48,7 +51,7 @@ public class P_SHA1 implements DerivationAlgorithm {
 
     @Override
     public byte[] createKey(byte[] secret, byte[] seed, int offset, long length)
-            throws ConversationException {
+            throws WSSecurityException {
 
         try {
             Mac mac = Mac.getInstance("HmacSHA1");
@@ -61,9 +64,9 @@ public class P_SHA1 implements DerivationAlgorithm {
 
             return key;
         } catch (NoSuchAlgorithmException e) {
-            throw new ConversationException("errorInKeyDerivation", null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "errorInKeyDerivation", e);
         } catch (InvalidKeyException e) {
-            throw new ConversationException("errorInKeyDerivation", null, e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "errorInKeyDerivation", e);
         }
     }
 

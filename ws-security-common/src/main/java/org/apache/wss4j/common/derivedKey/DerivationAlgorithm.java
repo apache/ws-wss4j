@@ -19,9 +19,11 @@
 
 package org.apache.wss4j.common.derivedKey;
 
+import org.apache.wss4j.common.ext.WSSecurityException;
+
 
 public interface DerivationAlgorithm {
 
     byte[] createKey(byte[] secret, byte[] seed, int offset,
-            long length) throws ConversationException;
+            long length) throws WSSecurityException;
 }

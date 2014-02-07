@@ -20,7 +20,6 @@ package org.apache.wss4j.stax.impl.processor.output;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.wss4j.common.derivedKey.AlgoFactory;
-import org.apache.wss4j.common.derivedKey.ConversationException;
 import org.apache.wss4j.common.derivedKey.DerivationAlgorithm;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -106,31 +105,22 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             System.arraycopy(label, 0, seed, 0, label.length);
             System.arraycopy(nonce, 0, seed, label.length, nonce.length);
 
-            DerivationAlgorithm derivationAlgorithm;
-            try {
-                derivationAlgorithm = AlgoFactory.getInstance(WSSConstants.P_SHA_1);
-            } catch (ConversationException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-            }
+            DerivationAlgorithm derivationAlgorithm = 
+                AlgoFactory.getInstance(WSSConstants.P_SHA_1);
             
-            final byte[] derivedKeyBytes;
-            try {
-                byte[] secret;
-                if (WSSecurityTokenConstants.SecurityContextToken.equals(wrappingSecurityToken.getTokenType())) {
-                    WSPasswordCallback passwordCallback = new WSPasswordCallback(wsuIdDKT, WSPasswordCallback.SECRET_KEY);
-                    WSSUtils.doSecretKeyCallback(((WSSSecurityProperties)securityProperties).getCallbackHandler(), passwordCallback, wsuIdDKT);
-                    if (passwordCallback.getKey() == null) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKey", wsuIdDKT);
-                    }
-                    secret = passwordCallback.getKey();
-                } else {
-                    secret = wrappingSecurityToken.getSecretKey("").getEncoded();
+            byte[] secret;
+            if (WSSecurityTokenConstants.SecurityContextToken.equals(wrappingSecurityToken.getTokenType())) {
+                WSPasswordCallback passwordCallback = new WSPasswordCallback(wsuIdDKT, WSPasswordCallback.SECRET_KEY);
+                WSSUtils.doSecretKeyCallback(((WSSSecurityProperties)securityProperties).getCallbackHandler(), passwordCallback, wsuIdDKT);
+                if (passwordCallback.getKey() == null) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKey", wsuIdDKT);
                 }
-
-                derivedKeyBytes = derivationAlgorithm.createKey(secret, seed, offset, length);
-            } catch (ConversationException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+                secret = passwordCallback.getKey();
+            } else {
+                secret = wrappingSecurityToken.getSecretKey("").getEncoded();
             }
+
+            final byte[] derivedKeyBytes = derivationAlgorithm.createKey(secret, seed, offset, length);
 
             final GenericOutboundSecurityToken derivedKeySecurityToken =
                     new GenericOutboundSecurityToken(wsuIdDKT, WSSecurityTokenConstants.DerivedKeyToken) {

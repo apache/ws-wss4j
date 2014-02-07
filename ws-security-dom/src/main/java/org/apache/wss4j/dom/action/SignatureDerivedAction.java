@@ -28,7 +28,6 @@ import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.SignatureActionToken;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.derivedKey.ConversationException;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
@@ -135,18 +134,12 @@ public class SignatureDerivedAction implements Action {
             if (encrKeyBuilder != null) {
                 encrKeyBuilder.prependToHeader(reqData.getSecHeader());
             } else if (sctId != null) {
-                try {
-                    SecurityContextToken sct = new SecurityContextToken(doc, sctId);
-                    WSSecurityUtil.prependChildElement(reqData.getSecHeader().getSecurityHeader(), sct.getElement());
-                } catch (ConversationException ex) {
-                    ex.printStackTrace();
-                }
+                SecurityContextToken sct = new SecurityContextToken(doc, sctId);
+                WSSecurityUtil.prependChildElement(reqData.getSecHeader().getSecurityHeader(), sct.getElement());
             }
             
             reqData.getSignatureValues().add(wsSign.getSignatureValue());
         } catch (WSSecurityException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", e, "Error during Signature: ");
-        } catch (ConversationException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", e, "Error during Signature: ");
         }
     }
