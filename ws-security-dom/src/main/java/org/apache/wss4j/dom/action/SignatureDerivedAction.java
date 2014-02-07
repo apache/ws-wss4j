@@ -66,9 +66,9 @@ public class SignatureDerivedAction implements Action {
         if (signatureToken.getSignatureAlgorithm() != null) {
             wsSign.setSignatureAlgorithm(signatureToken.getSignatureAlgorithm());
         }
-        //if (signatureToken.getDigestAlgorithm() != null) {
-        //    wsSign.setDigestAlgo(signatureToken.getDigestAlgorithm());
-        //}
+        if (signatureToken.getDigestAlgorithm() != null) {
+            wsSign.setDigestAlgorithm(signatureToken.getDigestAlgorithm());
+        }
         if (signatureToken.getC14nAlgorithm() != null) {
             wsSign.setSigCanonicalization(signatureToken.getC14nAlgorithm());
         }

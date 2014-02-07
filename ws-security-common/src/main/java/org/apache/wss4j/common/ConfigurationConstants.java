@@ -883,16 +883,12 @@ public class ConfigurationConstants {
     /**
      * The length to use (in bytes) when deriving a key for Signature. If this is not specified,
      * it defaults to a value based on the signature algorithm.
-     * 
-     * Currently only used in the streaming code.
      */
     public static final String DERIVED_SIGNATURE_KEY_LENGTH = "derivedSignatureKeyLength";
     
     /**
      * The length to use (in bytes) when deriving a key for Encryption. If this is not specified,
      * it defaults to a value based on the encryption algorithm.
-     * 
-     * Currently only used in the streaming code.
      */
     public static final String DERIVED_ENCRYPTION_KEY_LENGTH = "derivedEncryptionKeyLength";
     

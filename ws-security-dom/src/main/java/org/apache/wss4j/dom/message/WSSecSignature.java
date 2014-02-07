@@ -675,7 +675,7 @@ public class WSSecSignature extends WSSecSignatureBase {
 
     /**
      * Set the string that defines which digest algorithm to use. 
-     * The default is Constants.ALGO_ID_DIGEST_SHA1.
+     * The default is WSConstants.SHA1.
      * 
      * @param digestAlgo the digestAlgo to set
      */

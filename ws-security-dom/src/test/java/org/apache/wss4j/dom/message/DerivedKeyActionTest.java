@@ -93,6 +93,38 @@ public class DerivedKeyActionTest extends org.junit.Assert {
         
         verify(doc);
     }
+    
+    @org.junit.Test
+    public void testSignatureThumbprintSHA1StrongDigest() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        reqData.setUsername("wss40");
+        
+        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
+        config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
+        config.put(WSHandlerConstants.SIG_DIGEST_ALGO, WSConstants.SHA256);
+        config.put(WSHandlerConstants.SIG_KEY_ID, "Thumbprint");
+        reqData.setMsgContext(config);
+        
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.DKT_SIGN);
+        handler.send(
+            doc, 
+            reqData, 
+            Collections.singletonList(action),
+            true
+        );
+        String outputString = 
+            XMLUtils.PrettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        verify(doc);
+    }
 
     @org.junit.Test
     public void testSignatureSKI() throws Exception {

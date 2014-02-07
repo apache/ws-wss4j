@@ -344,7 +344,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     }
     
     /**
-     * Set the digest algorithm to use. The default is Constants.ALGO_ID_DIGEST_SHA1.
+     * Set the digest algorithm to use. The default is WSConstants.SHA1.
      * @param algorithm the digest algorithm to use.
      */
     public void setDigestAlgorithm(String algorithm) {
@@ -393,5 +393,5 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     public String getSigCanonicalization() {
         return canonAlgo;
     }
-
+    
 }
