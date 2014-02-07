@@ -112,9 +112,9 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_soap11_Body.getLocalPart());
-            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsc0502_SecurityContextToken.getNamespaceURI(), WSSConstants.TAG_wsc0502_SecurityContextToken.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsc0512_SecurityContextToken.getNamespaceURI(), WSSConstants.TAG_wsc0512_SecurityContextToken.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsc0502_DerivedKeyToken.getNamespaceURI(), WSSConstants.TAG_wsc0502_DerivedKeyToken.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsc0512_DerivedKeyToken.getNamespaceURI(), WSSConstants.TAG_wsc0512_DerivedKeyToken.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_ReferenceList.getNamespaceURI(), WSSConstants.TAG_xenc_ReferenceList.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
@@ -241,9 +241,9 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsc0502_SecurityContextToken.getNamespaceURI(), WSSConstants.TAG_wsc0502_SecurityContextToken.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsc0512_SecurityContextToken.getNamespaceURI(), WSSConstants.TAG_wsc0512_SecurityContextToken.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsc0502_DerivedKeyToken.getNamespaceURI(), WSSConstants.TAG_wsc0502_DerivedKeyToken.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsc0512_DerivedKeyToken.getNamespaceURI(), WSSConstants.TAG_wsc0512_DerivedKeyToken.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_ReferenceList.getNamespaceURI(), WSSConstants.TAG_xenc_ReferenceList.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 0);

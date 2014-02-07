@@ -92,6 +92,7 @@ public class RequestData {
     private boolean enableSamlOneTimeUseReplayCache = true;
     private PasswordEncryptor passwordEncryptor;
     private String derivedKeyTokenReference;
+    private boolean use200512Namespace = true;
 
     public void clear() {
         soapConstants = null;
@@ -125,6 +126,7 @@ public class RequestData {
         setEnableSamlOneTimeUseReplayCache(true);
         passwordEncryptor = null;
         derivedKeyTokenReference = null;
+        setUse200512Namespace(true);
     }
 
     public boolean isEnableTimestampReplayCache() {
@@ -551,6 +553,14 @@ public class RequestData {
 
     public void setDerivedKeyTokenReference(String derivedKeyTokenReference) {
         this.derivedKeyTokenReference = derivedKeyTokenReference;
+    }
+
+    public boolean isUse200512Namespace() {
+        return use200512Namespace;
+    }
+
+    public void setUse200512Namespace(boolean use200512Namespace) {
+        this.use200512Namespace = use200512Namespace;
     }
         
 }

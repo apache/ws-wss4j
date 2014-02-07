@@ -131,7 +131,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             SecurityContextToken receivedToken = 
                 (SecurityContextToken) actionResult.get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
             assertTrue(receivedToken != null);
-            assertTrue(WSConstants.WSC_SCT.equals(receivedToken.getTokenType()));
+            assertTrue(WSConstants.WSC_SCT_05_12.equals(receivedToken.getTokenType()));
             
             SecurityContextToken clone = new SecurityContextToken(receivedToken.getElement());
             assertTrue(clone.equals(receivedToken));

@@ -27,9 +27,9 @@ import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Document;
-
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
@@ -43,6 +43,7 @@ import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.junit.Assert;
 
 /**
  * A set of tests for using a derived key for encryption/signature using WSHandler actions.
@@ -87,6 +88,40 @@ public class DerivedKeyActionTest extends org.junit.Assert {
         );
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
+        Assert.assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        verify(doc);
+    }
+    
+    @org.junit.Test
+    public void testSignatureThumbprintSHA1OldNamespace() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        reqData.setUsername("wss40");
+        
+        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
+        config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
+        config.put(WSHandlerConstants.SIG_KEY_ID, "Thumbprint");
+        config.put(WSHandlerConstants.USE_2005_12_NAMESPACE, "false");
+        reqData.setMsgContext(config);
+        
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        HandlerAction action = new HandlerAction(WSConstants.DKT_SIGN);
+        handler.send(
+            doc, 
+            reqData, 
+            Collections.singletonList(action),
+            true
+        );
+        String outputString = 
+            XMLUtils.PrettyDocumentToString(doc);
+        Assert.assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_02));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }

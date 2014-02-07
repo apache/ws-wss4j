@@ -74,7 +74,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private boolean addUsernameTokenNonce;
     private boolean addUsernameTokenCreated;
     private boolean encryptSymmetricEncrytionKey = true;
-    private boolean use200512Namespace;
+    private boolean use200512Namespace = true;
 
     /**
      * This variable controls whether types other than PasswordDigest or PasswordText

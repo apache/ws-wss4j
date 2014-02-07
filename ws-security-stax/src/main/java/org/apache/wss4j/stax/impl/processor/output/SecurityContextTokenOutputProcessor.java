@@ -100,7 +100,8 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
             };
 
             FinalSecurityContextTokenOutputProcessor finalSecurityContextTokenOutputProcessor =
-                    new FinalSecurityContextTokenOutputProcessor(securityContextSecurityToken, identifier);
+                    new FinalSecurityContextTokenOutputProcessor(securityContextSecurityToken, identifier,
+                                                                 ((WSSSecurityProperties)getSecurityProperties()).isUse200512Namespace());
             finalSecurityContextTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
             finalSecurityContextTokenOutputProcessor.setAction(getAction());
             XMLSecurityConstants.Action action = getAction();
@@ -135,11 +136,13 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
 
         private final OutboundSecurityToken securityToken;
         private final String identifier;
+        private final boolean use200512Namespace;
 
-        FinalSecurityContextTokenOutputProcessor(OutboundSecurityToken securityToken, String identifier) throws XMLSecurityException {
+        FinalSecurityContextTokenOutputProcessor(OutboundSecurityToken securityToken, String identifier, boolean use200512Namespace) throws XMLSecurityException {
             super();
             this.securityToken = securityToken;
             this.identifier = identifier;
+            this.use200512Namespace = use200512Namespace;
         }
 
         @Override
@@ -150,21 +153,36 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
 
             if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
 
-                final QName headerElementName = WSSConstants.TAG_wsc0502_SecurityContextToken;
+                final QName headerElementName = getHeaderElementName();
                 WSSUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
 
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
                 List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
                 attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, securityToken.getId()));
+                QName identifierName = getIdentifierName();
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, true, attributes);
-                createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Identifier, false, null);
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, identifierName, false, null);
                 createCharactersAndOutputAsEvent(subOutputProcessorChain, identifier);
-                createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsc0502_Identifier);
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, identifierName);
                 createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);
 
                 outputProcessorChain.removeProcessor(this);
             }
+        }
+        
+        private QName getHeaderElementName() {
+            if (use200512Namespace) {
+                return WSSConstants.TAG_wsc0512_SecurityContextToken;
+            }
+            return WSSConstants.TAG_wsc0502_SecurityContextToken;
+        }
+        
+        private QName getIdentifierName() {
+            if (use200512Namespace) {
+                return WSSConstants.TAG_wsc0512_Identifier;
+            }
+            return WSSConstants.TAG_wsc0502_Identifier;
         }
     }
 }

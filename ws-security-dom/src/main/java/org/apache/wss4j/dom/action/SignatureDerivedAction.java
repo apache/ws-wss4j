@@ -28,6 +28,7 @@ import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.SignatureActionToken;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
@@ -76,6 +77,12 @@ public class SignatureDerivedAction implements Action {
         WSSecEncryptedKey encrKeyBuilder = null;
         String sctId = null;
         
+        if (reqData.isUse200512Namespace()) {
+            wsSign.setWscVersion(ConversationConstants.VERSION_05_12);
+        } else {
+            wsSign.setWscVersion(ConversationConstants.VERSION_05_02);
+        }
+        
         String derivedKeyTokenReference = signatureToken.getDerivedKeyTokenReference();
         if ("EncryptedKey".equals(derivedKeyTokenReference)) {
             encrKeyBuilder = new WSSecEncryptedKey();
@@ -90,7 +97,11 @@ public class SignatureDerivedAction implements Action {
             wsSign.setCustomValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
         } else if ("SecurityContextToken".equals(derivedKeyTokenReference)) {
             sctId = IDGenerator.generateID("uuid:");
-            wsSign.setCustomValueType(WSConstants.WSC_SCT);
+            if (reqData.isUse200512Namespace()) {
+                wsSign.setCustomValueType(WSConstants.WSC_SCT_05_12);
+            } else {
+                wsSign.setCustomValueType(WSConstants.WSC_SCT);
+            }
             
             wsSign.setExternalKey(passwordCallback.getKey(), sctId);
             

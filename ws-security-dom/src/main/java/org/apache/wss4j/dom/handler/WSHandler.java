@@ -573,6 +573,9 @@ public abstract class WSHandler {
         
         String c14nAlgo = getString(WSHandlerConstants.SIG_C14N_ALGO, mc);
         actionToken.setC14nAlgorithm(c14nAlgo);
+        
+        boolean use200512Namespace = decodeUse200512Namespace(reqData);
+        reqData.setUse200512Namespace(use200512Namespace);
 
         String parts = getString(WSHandlerConstants.SIGNATURE_PARTS, mc);
         if (parts != null) {
@@ -666,6 +669,9 @@ public abstract class WSHandler {
         
         String derivedKeyReference = getString(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, mc);
         actionToken.setDerivedKeyTokenReference(derivedKeyReference);
+        
+        boolean use200512Namespace = decodeUse200512Namespace(reqData);
+        reqData.setUse200512Namespace(use200512Namespace);
         
         String digestAlgo = getString(WSHandlerConstants.ENC_DIGEST_ALGO, mc);
         actionToken.setDigestAlgorithm(digestAlgo);
@@ -842,6 +848,13 @@ public abstract class WSHandler {
         throws WSSecurityException {
         return decodeBooleanConfigValue(
             reqData, WSHandlerConstants.TIMESTAMP_STRICT, true
+        );
+    }
+    
+    protected boolean decodeUse200512Namespace(RequestData reqData) 
+        throws WSSecurityException {
+        return decodeBooleanConfigValue(
+            reqData, WSHandlerConstants.USE_2005_12_NAMESPACE, true
         );
     }
     

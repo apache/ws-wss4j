@@ -30,7 +30,7 @@ public final class ConversationConstants {
     
     public static final int VERSION_05_12 = 2;
     
-    public static final int DEFAULT_VERSION = VERSION_05_02; 
+    public static final int DEFAULT_VERSION = VERSION_05_12; 
     
     /**
      * WS-SecConv Feb 2005 version
