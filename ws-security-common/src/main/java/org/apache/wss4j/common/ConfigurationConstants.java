@@ -22,9 +22,9 @@ package org.apache.wss4j.common;
  * This class defines Configuration Constants that are shared between the DOM + StAX code. This
  * allows a user to configure both layers in the same way (e.g. via a Map).
  */
-public final class ConfigurationConstants {  
+public class ConfigurationConstants {  
 
-    private ConfigurationConstants() {
+    protected ConfigurationConstants() {
         // complete
     }
     
@@ -895,6 +895,7 @@ public final class ConfigurationConstants {
      * Currently only used in the streaming code.
      */
     public static final String DERIVED_ENCRYPTION_KEY_LENGTH = "derivedEncryptionKeyLength";
+    
     
 }
 
