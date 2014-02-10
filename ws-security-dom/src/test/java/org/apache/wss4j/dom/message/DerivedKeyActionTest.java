@@ -74,7 +74,7 @@ public class DerivedKeyActionTest extends org.junit.Assert {
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
-        config.put(WSHandlerConstants.SIG_KEY_ID, "Thumbprint");
+        config.put(WSHandlerConstants.DERIVED_TOKEN_KEY_ID, "Thumbprint");
         reqData.setMsgContext(config);
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -106,7 +106,7 @@ public class DerivedKeyActionTest extends org.junit.Assert {
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
-        config.put(WSHandlerConstants.SIG_KEY_ID, "Thumbprint");
+        config.put(WSHandlerConstants.DERIVED_TOKEN_KEY_ID, "Thumbprint");
         config.put(WSHandlerConstants.USE_2005_12_NAMESPACE, "false");
         reqData.setMsgContext(config);
         
@@ -140,7 +140,7 @@ public class DerivedKeyActionTest extends org.junit.Assert {
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         config.put(WSHandlerConstants.SIG_DIGEST_ALGO, WSConstants.SHA256);
-        config.put(WSHandlerConstants.SIG_KEY_ID, "Thumbprint");
+        config.put(WSHandlerConstants.DERIVED_TOKEN_KEY_ID, "Thumbprint");
         reqData.setMsgContext(config);
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -171,7 +171,7 @@ public class DerivedKeyActionTest extends org.junit.Assert {
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
-        config.put(WSHandlerConstants.SIG_KEY_ID, "Thumbprint");
+        config.put(WSHandlerConstants.DERIVED_TOKEN_KEY_ID, "Thumbprint");
         config.put(WSHandlerConstants.DERIVED_SIGNATURE_KEY_LENGTH, "16");
         reqData.setMsgContext(config);
         
@@ -204,7 +204,7 @@ public class DerivedKeyActionTest extends org.junit.Assert {
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
-        config.put(WSHandlerConstants.SIG_KEY_ID, "SKIKeyIdentifier");
+        config.put(WSHandlerConstants.DERIVED_TOKEN_KEY_ID, "SKIKeyIdentifier");
         reqData.setMsgContext(config);
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -236,7 +236,7 @@ public class DerivedKeyActionTest extends org.junit.Assert {
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         config.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "DirectReference");
-        config.put(WSHandlerConstants.SIG_KEY_ID, "X509KeyIdentifier");
+        config.put(WSHandlerConstants.DERIVED_TOKEN_KEY_ID, "X509KeyIdentifier");
         reqData.setMsgContext(config);
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -268,7 +268,7 @@ public class DerivedKeyActionTest extends org.junit.Assert {
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         config.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "EncryptedKey");
-        config.put(WSHandlerConstants.SIG_KEY_ID, "Thumbprint");
+        config.put(WSHandlerConstants.DERIVED_TOKEN_KEY_ID, "Thumbprint");
         reqData.setMsgContext(config);
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);

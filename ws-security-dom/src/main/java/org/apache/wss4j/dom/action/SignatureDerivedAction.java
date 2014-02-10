@@ -91,7 +91,11 @@ public class SignatureDerivedAction implements Action {
         if ("EncryptedKey".equals(derivedKeyTokenReference)) {
             encrKeyBuilder = new WSSecEncryptedKey();
             encrKeyBuilder.setUserInfo(signatureToken.getUser());
-            encrKeyBuilder.setKeyIdentifierType(signatureToken.getKeyIdentifierId());
+            if (signatureToken.getDerivedKeyIdentifier() != 0) {
+                encrKeyBuilder.setKeyIdentifierType(signatureToken.getDerivedKeyIdentifier());
+            } else {
+                encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
+            }
             encrKeyBuilder.prepare(doc, signatureToken.getCrypto());
 
             byte[] ek = encrKeyBuilder.getEphemeralKey();
@@ -112,8 +116,10 @@ public class SignatureDerivedAction implements Action {
         } else {
             // DirectReference
             
-            if (signatureToken.getKeyIdentifierId() != 0) {
-                wsSign.setKeyIdentifierType(signatureToken.getKeyIdentifierId());
+            if (signatureToken.getDerivedKeyIdentifier() != 0) {
+                wsSign.setKeyIdentifierType(signatureToken.getDerivedKeyIdentifier());
+            } else {
+                wsSign.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
             }
             
             byte[] key = null;

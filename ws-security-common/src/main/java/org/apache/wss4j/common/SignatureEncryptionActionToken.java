@@ -53,6 +53,7 @@ public abstract class SignatureEncryptionActionToken implements SecurityActionTo
     private String sha1Value;
     private String derivedKeyTokenReference;
     private int derivedKeyLength;
+    private int derivedKeyIdentifier;
     
     public X509Certificate getCertificate() {
         return certificate;
@@ -166,6 +167,12 @@ public abstract class SignatureEncryptionActionToken implements SecurityActionTo
     }
     public void setDerivedKeyLength(int derivedKeyLength) {
         this.derivedKeyLength = derivedKeyLength;
+    }
+    public int getDerivedKeyIdentifier() {
+        return derivedKeyIdentifier;
+    }
+    public void setDerivedKeyIdentifier(int derivedKeyIdentifier) {
+        this.derivedKeyIdentifier = derivedKeyIdentifier;
     }
 }
 

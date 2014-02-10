@@ -568,6 +568,12 @@ public abstract class WSHandler {
         String derivedKeyReference = getString(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, mc);
         actionToken.setDerivedKeyTokenReference(derivedKeyReference);
         
+        String derivedKeyIdentifier = getString(WSHandlerConstants.DERIVED_TOKEN_KEY_ID, mc);
+        if (derivedKeyIdentifier != null) {
+            Integer id = WSHandlerConstants.getKeyIdentifier(derivedKeyIdentifier);
+            actionToken.setDerivedKeyIdentifier(id);
+        }
+        
         String derivedKeyLength = getString(WSHandlerConstants.DERIVED_SIGNATURE_KEY_LENGTH, mc);
         if (derivedKeyLength != null) {
             try {
@@ -681,6 +687,12 @@ public abstract class WSHandler {
         
         String derivedKeyReference = getString(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, mc);
         actionToken.setDerivedKeyTokenReference(derivedKeyReference);
+        
+        String derivedKeyIdentifier = getString(WSHandlerConstants.DERIVED_TOKEN_KEY_ID, mc);
+        if (derivedKeyIdentifier != null) {
+            Integer id = WSHandlerConstants.getKeyIdentifier(derivedKeyIdentifier);
+            actionToken.setDerivedKeyIdentifier(id);
+        }
         
         String derivedKeyLength = getString(WSHandlerConstants.DERIVED_ENCRYPTION_KEY_LENGTH, mc);
         if (derivedKeyLength != null) {

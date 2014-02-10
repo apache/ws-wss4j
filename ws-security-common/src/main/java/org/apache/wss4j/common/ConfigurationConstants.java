@@ -868,15 +868,16 @@ public class ConfigurationConstants {
     public static final String PASSWORD_ENCRYPTOR_INSTANCE = "passwordEncryptorInstance";
     
     /**
-     * This controls how deriving tokens are referenced. The valid values are:
-     * 
-     * <code>DirectReference</code>, <code>EncryptedKey</code>, 
-     * <code>SecurityContextToken</code>.
+     * This controls the deriving token from which DerivedKeyTokens derive keys from.
+     * Valid values are:
+     *  - DirectReference: A reference to a BinarySecurityToken
+     *  - EncryptedKey: A reference to an EncryptedKey
+     *  - SecurityContextToken: A reference to a SecurityContextToken 
      */
     public static final String DERIVED_TOKEN_REFERENCE = "derivedTokenReference";
     
     /**
-     * This controls the key identifier of Derived Tokens.
+     * This controls the key identifier of Derived Tokens, i.e. how they reference the deriving key.
      */
     public static final String DERIVED_TOKEN_KEY_ID = "derivedTokenKeyIdentifier";
     
