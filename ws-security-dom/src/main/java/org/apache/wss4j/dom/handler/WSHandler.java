@@ -568,6 +568,18 @@ public abstract class WSHandler {
         String derivedKeyReference = getString(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, mc);
         actionToken.setDerivedKeyTokenReference(derivedKeyReference);
         
+        String derivedKeyLength = getString(WSHandlerConstants.DERIVED_SIGNATURE_KEY_LENGTH, mc);
+        if (derivedKeyLength != null) {
+            try {
+                int dKL = Integer.parseInt(derivedKeyLength);
+                if (dKL > 0) {
+                    actionToken.setDerivedKeyLength(dKL);
+                }
+            } catch (NumberFormatException e) {
+                LOG.warn("Error in configuring a derived key length: " + e.getMessage());
+            }
+        }
+        
         String digestAlgo = getString(WSHandlerConstants.SIG_DIGEST_ALGO, mc);
         actionToken.setDigestAlgorithm(digestAlgo);
         
@@ -669,6 +681,18 @@ public abstract class WSHandler {
         
         String derivedKeyReference = getString(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, mc);
         actionToken.setDerivedKeyTokenReference(derivedKeyReference);
+        
+        String derivedKeyLength = getString(WSHandlerConstants.DERIVED_ENCRYPTION_KEY_LENGTH, mc);
+        if (derivedKeyLength != null) {
+            try {
+                int dKL = Integer.parseInt(derivedKeyLength);
+                if (dKL > 0) {
+                    actionToken.setDerivedKeyLength(dKL);
+                }
+            } catch (NumberFormatException e) {
+                LOG.warn("Error in configuring a derived key length: " + e.getMessage());
+            }
+        }
         
         boolean use200512Namespace = decodeUse200512Namespace(reqData);
         reqData.setUse200512Namespace(use200512Namespace);

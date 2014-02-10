@@ -83,6 +83,10 @@ public class SignatureDerivedAction implements Action {
             wsSign.setWscVersion(ConversationConstants.VERSION_05_02);
         }
         
+        if (signatureToken.getDerivedKeyLength() > 0) {
+            wsSign.setDerivedKeyLength(signatureToken.getDerivedKeyLength());
+        }
+        
         String derivedKeyTokenReference = signatureToken.getDerivedKeyTokenReference();
         if ("EncryptedKey".equals(derivedKeyTokenReference)) {
             encrKeyBuilder = new WSSecEncryptedKey();
