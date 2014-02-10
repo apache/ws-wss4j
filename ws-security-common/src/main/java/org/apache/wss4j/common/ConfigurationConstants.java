@@ -734,6 +734,9 @@ public class ConfigurationConstants {
      * encryption mode for an <code>UserName</code> element in the SOAP
      * namespace.
      * <p/>
+     * Note that the special value "{}cid:Attachments;" means that all of the message
+     * attachments should be encrypted.
+     * <p/>
      * To specify an element without a namespace use the string
      * <code>Null</code> as the namespace name (this is a case sensitive
      * string)
