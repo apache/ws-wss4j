@@ -142,7 +142,8 @@ public abstract class WSHandler {
             } else if (actionToDo.getAction() == WSConstants.ST_SIGNED 
                 && actionToDo.getActionToken() == null) {
                 decodeSignatureParameter(reqData);
-            } else if (actionToDo.getAction() == WSConstants.ENCR 
+            } else if ((actionToDo.getAction() == WSConstants.ENCR
+                || actionToDo.getAction() == WSConstants.DKT_ENCR)
                 && actionToDo.getActionToken() == null) {
                 EncryptionActionToken actionToken = reqData.getEncryptionToken();
                 if (actionToken == null) {
@@ -218,6 +219,7 @@ public abstract class WSHandler {
             case WSConstants.ENCR:
             case WSConstants.SIGN:
             case WSConstants.DKT_SIGN:
+            case WSConstants.DKT_ENCR:
             case WSConstants.ST_SIGNED:
             case WSConstants.ST_UNSIGNED:
             case WSConstants.TS:
@@ -1270,6 +1272,9 @@ public abstract class WSHandler {
             reason = WSPasswordCallback.SECRET_KEY;
             break;
         case WSConstants.ENCR:
+            reason = WSPasswordCallback.SECRET_KEY;
+            break;
+        case WSConstants.DKT_ENCR:
             reason = WSPasswordCallback.SECRET_KEY;
             break;
         }

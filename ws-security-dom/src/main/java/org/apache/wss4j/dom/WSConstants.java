@@ -492,6 +492,7 @@ public final class WSConstants {
     public static final int UT_NOPASSWORD = 0x2000; // perform UsernameToken
     public static final int CUSTOM_TOKEN = 0x4000; // perform a Custom Token action
     public static final int DKT_SIGN = 0x8000; // Perform Signature with a Derived Key
+    public static final int DKT_ENCR = 0x10000; // Perform Encryption with a Derived Key
 
     private WSConstants() {
         // Complete

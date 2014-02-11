@@ -92,6 +92,10 @@ public class WSSConfig {
                 org.apache.wss4j.dom.action.SignatureDerivedAction.class
             );
             tmp.put(
+                WSConstants.DKT_ENCR,
+                org.apache.wss4j.dom.action.EncryptionDerivedAction.class
+            );
+            tmp.put(
                 WSConstants.ST_SIGNED,
                 org.apache.wss4j.dom.action.SAMLTokenSignedAction.class
             );
