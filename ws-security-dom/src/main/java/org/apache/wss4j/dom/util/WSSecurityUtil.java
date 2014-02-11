@@ -929,6 +929,8 @@ public final class WSSecurityUtil {
                 actions.add(WSConstants.DKT_SIGN);
             } else if (single[i].equals(WSHandlerConstants.ENCRYPT)) {
                 actions.add(WSConstants.ENCR);
+            } else if (single[i].equals(WSHandlerConstants.ENCRYPT_DERIVED)) {
+                actions.add(WSConstants.DKT_ENCR);
             } else if (single[i].equals(WSHandlerConstants.SAML_TOKEN_UNSIGNED)) {
                 actions.add(WSConstants.ST_UNSIGNED);
             } else if (single[i].equals(WSHandlerConstants.SAML_TOKEN_SIGNED)) {
@@ -977,6 +979,8 @@ public final class WSSecurityUtil {
                 actions.add(new HandlerAction(WSConstants.DKT_SIGN));
             } else if (single[i].equals(WSHandlerConstants.ENCRYPT)) {
                 actions.add(new HandlerAction(WSConstants.ENCR));
+            } else if (single[i].equals(WSHandlerConstants.ENCRYPT_DERIVED)) {
+                actions.add(new HandlerAction(WSConstants.DKT_ENCR));
             } else if (single[i].equals(WSHandlerConstants.SAML_TOKEN_UNSIGNED)) {
                 actions.add(new HandlerAction(WSConstants.ST_UNSIGNED));
             } else if (single[i].equals(WSHandlerConstants.SAML_TOKEN_SIGNED)) {

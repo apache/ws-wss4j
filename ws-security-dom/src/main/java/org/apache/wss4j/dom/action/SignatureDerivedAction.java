@@ -111,7 +111,6 @@ public class SignatureDerivedAction implements Action {
                 wsSign.setCustomValueType(WSConstants.WSC_SCT);
             }
             
-            wsSign.setTokenIdDirectId(true);
             wsSign.setExternalKey(passwordCallback.getKey(), sctId);
             
         } else {

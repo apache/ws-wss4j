@@ -213,7 +213,9 @@ public abstract class AbstractTestBase extends org.junit.Assert {
 
         RequestData requestData = new RequestData();
         requestData.setMsgContext(messageContext);
-        requestData.setCallbackHandler(new WSS4JCallbackHandlerImpl());
+        if (messageContext.get(WSHandlerConstants.PW_CALLBACK_REF) == null) {
+            requestData.setCallbackHandler(new WSS4JCallbackHandlerImpl());
+        }
         requestData.setWssConfig(WSSConfig.getNewInstance());
   
         wss4JHandler.doSender(messageContext, requestData, true);

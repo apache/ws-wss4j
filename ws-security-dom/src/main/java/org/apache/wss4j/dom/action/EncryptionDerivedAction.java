@@ -93,7 +93,6 @@ public class EncryptionDerivedAction implements Action {
                 wsEncrypt.setCustomValueType(WSConstants.WSC_SCT);
             }
             
-            wsEncrypt.setTokenIdDirectId(true);
             wsEncrypt.setExternalKey(passwordCallback.getKey(), sctId);
             
         } else {
