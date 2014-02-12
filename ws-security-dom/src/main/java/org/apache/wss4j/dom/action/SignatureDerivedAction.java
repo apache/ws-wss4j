@@ -40,8 +40,9 @@ import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
-public class SignatureDerivedAction implements Action {
+public class SignatureDerivedAction extends AbstractDerivedAction implements Action {
     
     public void execute(WSHandler handler, SecurityActionToken actionToken,
                         Document doc, RequestData reqData)
@@ -88,19 +89,32 @@ public class SignatureDerivedAction implements Action {
         }
         
         String derivedKeyTokenReference = signatureToken.getDerivedKeyTokenReference();
+        boolean usingExistingEncryptedKey = false;
         if ("EncryptedKey".equals(derivedKeyTokenReference)) {
-            encrKeyBuilder = new WSSecEncryptedKey();
-            encrKeyBuilder.setUserInfo(signatureToken.getUser());
-            if (signatureToken.getDerivedKeyIdentifier() != 0) {
-                encrKeyBuilder.setKeyIdentifierType(signatureToken.getDerivedKeyIdentifier());
+            byte[] ek = null;
+            String tokenIdentifier = null;
+            // See if an EncryptionAction has already set up an EncryptedKey
+            if (reqData.getEncryptionToken() != null && reqData.getEncryptionToken().getKey() != null
+                && reqData.getEncryptionToken().getKeyIdentifier() != null) {
+                ek = reqData.getEncryptionToken().getKey();
+                tokenIdentifier = reqData.getEncryptionToken().getKeyIdentifier();
+                usingExistingEncryptedKey = true;
             } else {
-                encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
+                encrKeyBuilder = new WSSecEncryptedKey();
+                encrKeyBuilder.setUserInfo(signatureToken.getUser());
+                if (signatureToken.getDerivedKeyIdentifier() != 0) {
+                    encrKeyBuilder.setKeyIdentifierType(signatureToken.getDerivedKeyIdentifier());
+                } else {
+                    encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
+                }
+                encrKeyBuilder.prepare(doc, signatureToken.getCrypto());
+    
+                ek = encrKeyBuilder.getEphemeralKey();
+                tokenIdentifier = encrKeyBuilder.getId();
+                
+                signatureToken.setKey(ek);
+                signatureToken.setKeyIdentifier(tokenIdentifier);
             }
-            encrKeyBuilder.prepare(doc, signatureToken.getCrypto());
-
-            byte[] ek = encrKeyBuilder.getEphemeralKey();
-            String tokenIdentifier = encrKeyBuilder.getId();
-            
             wsSign.setExternalKey(ek, tokenIdentifier);
             wsSign.setCustomValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
         } else if ("SecurityContextToken".equals(derivedKeyTokenReference)) {
@@ -148,9 +162,23 @@ public class SignatureDerivedAction implements Action {
             }
             
             wsSign.setParts(parts);
-            wsSign.build(doc, reqData.getSecHeader());
+            wsSign.prepare(doc, reqData.getSecHeader());
             
-            wsSign.prependDKElementToHeader(reqData.getSecHeader());
+            List<javax.xml.crypto.dsig.Reference> referenceList = 
+                wsSign.addReferencesToSign(parts, reqData.getSecHeader());
+            wsSign.computeSignature(referenceList);
+            
+            // Put the DerivedKeyToken Element in the right place in the security header
+            Node nextSibling = null;
+            if (usingExistingEncryptedKey) {
+                nextSibling = findPlaceToInsertDKT(reqData);
+            }
+            if (nextSibling == null) {
+                wsSign.prependDKElementToHeader(reqData.getSecHeader());
+            } else {
+                reqData.getSecHeader().getSecurityHeader().insertBefore(
+                    wsSign.getdktElement(), nextSibling);
+            }
             
             if (encrKeyBuilder != null) {
                 encrKeyBuilder.prependToHeader(reqData.getSecHeader());

@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.dom.message;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -397,6 +398,78 @@ public class DerivedKeyActionTest extends org.junit.Assert {
         }
         
         verify(doc, secretKeyCallbackHandler);
+    }
+    
+    @org.junit.Test
+    public void testSignatureEncryptionThumbprintSHA1() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        reqData.setUsername("wss40");
+        
+        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
+        config.put(WSHandlerConstants.ENC_PROP_FILE, "wss40.properties");
+        config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
+        config.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "EncryptedKey");
+        config.put(WSHandlerConstants.DERIVED_TOKEN_KEY_ID, "Thumbprint");
+        reqData.setMsgContext(config);
+        
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        actions.add(new HandlerAction(WSConstants.DKT_SIGN));
+        actions.add(new HandlerAction(WSConstants.DKT_ENCR));
+        handler.send(
+            doc, 
+            reqData, 
+            actions,
+            true
+        );
+        String outputString = 
+            XMLUtils.PrettyDocumentToString(doc);
+        Assert.assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        verify(doc);
+    }
+    
+    @org.junit.Test
+    public void testEncryptionSignatureThumbprintSHA1() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        reqData.setUsername("wss40");
+        
+        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
+        config.put(WSHandlerConstants.ENC_PROP_FILE, "wss40.properties");
+        config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
+        config.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "EncryptedKey");
+        config.put(WSHandlerConstants.DERIVED_TOKEN_KEY_ID, "Thumbprint");
+        reqData.setMsgContext(config);
+        
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        actions.add(new HandlerAction(WSConstants.DKT_ENCR));
+        actions.add(new HandlerAction(WSConstants.DKT_SIGN));
+        handler.send(
+            doc, 
+            reqData, 
+            actions,
+            true
+        );
+        String outputString = 
+            XMLUtils.PrettyDocumentToString(doc);
+        Assert.assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        verify(doc);
     }
 
     private List<WSSecurityEngineResult> verify(Document doc) throws Exception {

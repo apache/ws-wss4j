@@ -39,8 +39,10 @@ import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
-public class EncryptionDerivedAction implements Action {
+public class EncryptionDerivedAction extends AbstractDerivedAction implements Action {
     
     public void execute(WSHandler handler, SecurityActionToken actionToken,
                         Document doc, RequestData reqData)
@@ -85,6 +87,7 @@ public class EncryptionDerivedAction implements Action {
         }
         
         String derivedKeyTokenReference = encryptionToken.getDerivedKeyTokenReference();
+        boolean usingExistingEncryptedKey = false;
         if ("SecurityContextToken".equals(derivedKeyTokenReference)) {
             sctId = IDGenerator.generateID("uuid:");
             if (reqData.isUse200512Namespace()) {
@@ -96,28 +99,41 @@ public class EncryptionDerivedAction implements Action {
             wsEncrypt.setExternalKey(passwordCallback.getKey(), sctId);
             
         } else {
-            encrKeyBuilder = new WSSecEncryptedKey();
-            encrKeyBuilder.setUserInfo(encryptionToken.getUser());
-            if (encryptionToken.getDerivedKeyIdentifier() != 0) {
-                encrKeyBuilder.setKeyIdentifierType(encryptionToken.getDerivedKeyIdentifier());
+            byte[] ek = null;
+            String tokenIdentifier = null;
+            // See if a SignatureDerivedAction has already set up an EncryptedKey
+            if (reqData.getSignatureToken() != null && reqData.getSignatureToken().getKey() != null
+                && reqData.getSignatureToken().getKeyIdentifier() != null) {
+                ek = reqData.getSignatureToken().getKey();
+                tokenIdentifier = reqData.getSignatureToken().getKeyIdentifier();
+                usingExistingEncryptedKey = true;
             } else {
-                encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-            }
-            
-            if (encryptionToken.getKeyTransportAlgorithm() != null) {
-                encrKeyBuilder.setKeyEncAlgo(encryptionToken.getKeyTransportAlgorithm());
-            }
-            if (encryptionToken.getDigestAlgorithm() != null) {
-                encrKeyBuilder.setDigestAlgorithm(encryptionToken.getDigestAlgorithm());
-            }
-            if (encryptionToken.getMgfAlgorithm() != null) {
-                encrKeyBuilder.setMGFAlgorithm(encryptionToken.getMgfAlgorithm());
-            }
-            
-            encrKeyBuilder.prepare(doc, encryptionToken.getCrypto());
+                encrKeyBuilder = new WSSecEncryptedKey();
+                encrKeyBuilder.setUserInfo(encryptionToken.getUser());
+                if (encryptionToken.getDerivedKeyIdentifier() != 0) {
+                    encrKeyBuilder.setKeyIdentifierType(encryptionToken.getDerivedKeyIdentifier());
+                } else {
+                    encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
+                }
+                
+                if (encryptionToken.getKeyTransportAlgorithm() != null) {
+                    encrKeyBuilder.setKeyEncAlgo(encryptionToken.getKeyTransportAlgorithm());
+                }
+                if (encryptionToken.getDigestAlgorithm() != null) {
+                    encrKeyBuilder.setDigestAlgorithm(encryptionToken.getDigestAlgorithm());
+                }
+                if (encryptionToken.getMgfAlgorithm() != null) {
+                    encrKeyBuilder.setMGFAlgorithm(encryptionToken.getMgfAlgorithm());
+                }
+                
+                encrKeyBuilder.prepare(doc, encryptionToken.getCrypto());
 
-            byte[] ek = encrKeyBuilder.getEphemeralKey();
-            String tokenIdentifier = encrKeyBuilder.getId();
+                ek = encrKeyBuilder.getEphemeralKey();
+                tokenIdentifier = encrKeyBuilder.getId();
+                
+                reqData.getSignatureToken().setKey(ek);
+                reqData.getSignatureToken().setKeyIdentifier(tokenIdentifier);
+            }
 
             wsEncrypt.setExternalKey(ek, tokenIdentifier);
             wsEncrypt.setCustomValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
@@ -135,9 +151,24 @@ public class EncryptionDerivedAction implements Action {
             }
             
             wsEncrypt.setParts(parts);
-            wsEncrypt.build(doc, reqData.getSecHeader());
+            wsEncrypt.prepare(doc);
             
-            wsEncrypt.prependDKElementToHeader(reqData.getSecHeader());
+            Element externRefList = wsEncrypt.encryptForExternalRef(null, parts);
+            
+            // Put the DerivedKeyToken Element in the right place in the security header
+            Node nextSibling = null;
+            if (usingExistingEncryptedKey) {
+                nextSibling = findPlaceToInsertDKT(reqData);
+            }
+            if (nextSibling == null) {
+                wsEncrypt.prependDKElementToHeader(reqData.getSecHeader());
+            } else {
+                reqData.getSecHeader().getSecurityHeader().insertBefore(
+                    wsEncrypt.getdktElement(), nextSibling);
+            }
+            
+            // Add the ReferenceList to the security header
+            wsEncrypt.addExternalRefElement(externRefList, reqData.getSecHeader());
             
             if (encrKeyBuilder != null) {
                 encrKeyBuilder.prependToHeader(reqData.getSecHeader());
@@ -151,5 +182,5 @@ public class EncryptionDerivedAction implements Action {
                                           "empty", e, "Error during Encryption: ");
         }
     }
-
+    
 }

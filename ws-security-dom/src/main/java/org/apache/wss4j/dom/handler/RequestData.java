@@ -57,7 +57,7 @@ public class RequestData {
     private Object msgContext;
     private SOAPConstants soapConstants;
     private String actor;
-    private String username ;
+    private String username;
     private String pwType = WSConstants.PASSWORD_DIGEST; // Make this the default when no password type is given.
     private Crypto sigVerCrypto;
     private Crypto decCrypto;
