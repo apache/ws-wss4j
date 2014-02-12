@@ -152,16 +152,23 @@ public class WSSecBase {
         String newAttrNs = WSConstants.WSU_NS;
         String newAttrPrefix = WSConstants.WSU_PREFIX;
 
-        if ((id == null || id.length() == 0)
-            && WSConstants.ENC_NS.equals(bodyElement.getNamespaceURI())
-            && (WSConstants.ENC_DATA_LN.equals(bodyElement.getLocalName())
-                || WSConstants.ENC_KEY_LN.equals(bodyElement.getLocalName()))
-        ) {
-            // If it is an XML-Enc derived element, it may already have an ID,
-            // plus it is not schema valid to add an additional ID.
-            id = bodyElement.getAttributeNS(null, "Id");
-            newAttrPrefix = WSConstants.ENC_PREFIX;
-            newAttrNs = WSConstants.ENC_NS;
+        if (id == null || id.length() == 0) {
+            if (WSConstants.ENC_NS.equals(bodyElement.getNamespaceURI())
+                && (WSConstants.ENC_DATA_LN.equals(bodyElement.getLocalName())
+                    || WSConstants.ENC_KEY_LN.equals(bodyElement.getLocalName()))
+                ) {
+                // If it is an XML-Enc derived element, it may already have an ID,
+                // plus it is not schema valid to add an additional ID.
+                id = bodyElement.getAttributeNS(null, "Id");
+                newAttrPrefix = WSConstants.ENC_PREFIX;
+                newAttrNs = WSConstants.ENC_NS;
+            } else if (WSConstants.SAML_NS.equals(bodyElement.getNamespaceURI())
+                && "Assertion".equals(bodyElement.getLocalName())) {
+                id = bodyElement.getAttributeNS(null, "AssertionID");
+            } else if (WSConstants.SAML2_NS.equals(bodyElement.getNamespaceURI())
+                && "Assertion".equals(bodyElement.getLocalName())) {
+                id = bodyElement.getAttributeNS(null, "ID");
+            }
         }
         
         if (id == null || id.length() == 0) {

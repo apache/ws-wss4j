@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.common;
 
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.ActionBean;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
@@ -72,6 +73,9 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     protected List<Object> customAttributeValues = null;
     protected ConditionsBean conditions = null;
     protected SubjectConfirmationDataBean subjectConfirmationData = null;
+    private Crypto issuerCrypto;
+    private String issuerName;
+    private String issuerPassword;
     
     public void setSubjectConfirmationData(SubjectConfirmationDataBean subjectConfirmationData) {
         this.subjectConfirmationData = subjectConfirmationData;
@@ -212,5 +216,29 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
             keyInfo.setElement(keyInfoElement);
         }
         return keyInfo;
+    }
+
+    public Crypto getIssuerCrypto() {
+        return issuerCrypto;
+    }
+
+    public void setIssuerCrypto(Crypto issuerCrypto) {
+        this.issuerCrypto = issuerCrypto;
+    }
+
+    public String getIssuerName() {
+        return issuerName;
+    }
+
+    public void setIssuerName(String issuerName) {
+        this.issuerName = issuerName;
+    }
+
+    public String getIssuerPassword() {
+        return issuerPassword;
+    }
+
+    public void setIssuerPassword(String issuerPassword) {
+        this.issuerPassword = issuerPassword;
     }
 }

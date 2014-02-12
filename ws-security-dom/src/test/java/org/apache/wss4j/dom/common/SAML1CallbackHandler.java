@@ -63,6 +63,9 @@ public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
                 if (conditions != null) {
                     callback.setConditions(conditions);
                 }
+                callback.setIssuerCrypto(getIssuerCrypto());
+                callback.setIssuerKeyName(getIssuerName());
+                callback.setIssuerKeyPassword(getIssuerPassword());
                 
                 SubjectBean subjectBean = 
                     new SubjectBean(

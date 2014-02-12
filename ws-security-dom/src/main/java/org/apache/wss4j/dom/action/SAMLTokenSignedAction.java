@@ -76,11 +76,6 @@ public class SAMLTokenSignedAction implements Action {
         
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         if (samlCallback.isSignAssertion()) {
-            Crypto signingCrypto = samlCallback.getIssuerCrypto();
-            if (signingCrypto == null) {
-                signingCrypto = handler.loadSignatureCrypto(reqData);
-            }
-            
             samlAssertion.signAssertion(
                 samlCallback.getIssuerKeyName(),
                 samlCallback.getIssuerKeyPassword(), 
