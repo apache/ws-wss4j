@@ -21,19 +21,38 @@ package org.apache.wss4j.dom.action;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
+import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 
 public abstract class AbstractDerivedAction {
     
-    protected Node findPlaceToInsertDKT(RequestData reqData) {
+    protected Node findEncryptedKeySibling(RequestData reqData) {
         Element secHeader = reqData.getSecHeader().getSecurityHeader();
         Node firstChild = secHeader.getFirstChild();
         while (firstChild != null) {
             if (firstChild instanceof Element && 
                 WSConstants.ENC_NS.equals(((Element)firstChild).getNamespaceURI())
                 && "EncryptedKey".equals(((Element)firstChild).getLocalName())
+                && firstChild.getNextSibling() != null) {
+                return firstChild.getNextSibling();
+            }
+            firstChild = firstChild.getNextSibling();
+        }
+        return null;
+    }
+    
+    protected Node findSCTSibling(RequestData reqData) {
+        String namespace = ConversationConstants.WSC_NS_05_12;
+        if (!reqData.isUse200512Namespace()) {
+            namespace = ConversationConstants.WSC_NS_05_02;
+        }
+        Element secHeader = reqData.getSecHeader().getSecurityHeader();
+        Node firstChild = secHeader.getFirstChild();
+        while (firstChild != null) {
+            if (firstChild instanceof Element && 
+                namespace.equals(((Element)firstChild).getNamespaceURI())
+                && "SecurityContextToken".equals(((Element)firstChild).getLocalName())
                 && firstChild.getNextSibling() != null) {
                 return firstChild.getNextSibling();
             }

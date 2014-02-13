@@ -31,14 +31,12 @@ import org.apache.wss4j.stax.securityEvent.EncryptedPartSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
-import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.InboundWSSec;
 import org.apache.wss4j.stax.ext.OutboundWSSec;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
-import org.apache.wss4j.stax.test.AbstractTestBase.TestSecurityEventListener;
 import org.apache.wss4j.stax.test.utils.SOAPUtil;
 import org.apache.wss4j.stax.test.utils.SecretKeyCallbackHandler;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
@@ -597,6 +595,11 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             // Derived key signature
             WSSecDKSign sigBuilder = new WSSecDKSign();
             sigBuilder.setWscVersion(version);
+            if (version == ConversationConstants.VERSION_05_12) {
+                sigBuilder.setCustomValueType(WSConstants.WSC_SCT_05_12);
+            } else {
+                sigBuilder.setCustomValueType(WSConstants.WSC_SCT);
+            }
             sigBuilder.setExternalKey(tempSecret, tokenId);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
             sigBuilder.build(doc, secHeader);
@@ -604,16 +607,120 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             // Derived key encryption
             WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
             encrBuilder.setWscVersion(version);
+            if (version == ConversationConstants.VERSION_05_12) {
+                encrBuilder.setCustomValueType(WSConstants.WSC_SCT_05_12);
+            } else {
+                encrBuilder.setCustomValueType(WSConstants.WSC_SCT);
+            }
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             encrBuilder.setExternalKey(tempSecret, tokenId);
             encrBuilder.build(doc, secHeader);
 
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
-
+            
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
         }
 
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(tempSecret);
+            securityProperties.setCallbackHandler(callbackHandler);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+
+            WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.SecurityContextToken,
+                    WSSecurityEventConstants.SignatureValue,
+                    WSSecurityEventConstants.SignedPart,
+                    WSSecurityEventConstants.EncryptedPart,
+                    WSSecurityEventConstants.Operation,
+            };
+            final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
+
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
+
+            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+
+            securityEventListener.compare();
+
+            SignedPartSecurityEvent signedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignedPart);
+            SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
+            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            String signedElementCorrelationID = signedPartSecurityEvent.getCorrelationID();
+            String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
+            String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
+            String operationCorrelationID = operationSecurityEvent.getCorrelationID();
+
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+
+            List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
+            for (int i = 0; i < securityEvents.size(); i++) {
+                SecurityEvent securityEvent = securityEvents.get(i);
+                if (securityEvent.getCorrelationID().equals(signedElementCorrelationID)) {
+                    signedElementSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(signatureValueCorrelationID)) {
+                    signatureValueSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID)) {
+                    encryptedPartSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(operationCorrelationID)) {
+                    operationSecurityEvents.add(securityEvent);
+                }
+            }
+
+            org.junit.Assert.assertEquals(3, signedElementSecurityEvents.size());
+            org.junit.Assert.assertEquals(5, signatureValueSecurityEvents.size());
+            org.junit.Assert.assertEquals(5, encryptedPartSecurityEvents.size());
+            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+                    operationSecurityEvents.size() +
+                            signedElementSecurityEvents.size() + signatureValueSecurityEvents.size() + encryptedPartSecurityEvents.size()
+            );
+        }
+    }
+    
+    @Test()
+    public void testSCTKDKTSignEncryptAction() throws Exception {
+
+        byte[] tempSecret = WSSecurityUtil.generateNonce(16);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            String action = 
+                WSHandlerConstants.SIGNATURE_DERIVED + " " + WSHandlerConstants.ENCRYPT_DERIVED;
+            
+            Properties properties = new Properties();
+            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(tempSecret);
+            properties.put(WSHandlerConstants.PW_CALLBACK_REF,  callbackHandler);
+            properties.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "SecurityContextToken");
+            if (version == ConversationConstants.VERSION_05_02) {
+                properties.put(WSHandlerConstants.USE_2005_12_NAMESPACE, "false");
+            }
+            properties.put(WSHandlerConstants.USER, "transmitter");
+            properties.put(WSHandlerConstants.ENC_SYM_ALGO, 
+                           "http://www.w3.org/2001/04/xmlenc#aes128-cbc");
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
+        
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
@@ -711,6 +818,11 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             // Derived key encryption
             WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
             encrBuilder.setWscVersion(version);
+            if (version == ConversationConstants.VERSION_05_12) {
+                encrBuilder.setCustomValueType(WSConstants.WSC_SCT_05_12);
+            } else {
+                encrBuilder.setCustomValueType(WSConstants.WSC_SCT);
+            }
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             encrBuilder.setExternalKey(tempSecret, tokenId);
             encrBuilder.build(doc, secHeader);
@@ -718,6 +830,11 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             // Derived key signature
             WSSecDKSign sigBuilder = new WSSecDKSign();
             sigBuilder.setWscVersion(version);
+            if (version == ConversationConstants.VERSION_05_12) {
+                sigBuilder.setCustomValueType(WSConstants.WSC_SCT_05_12);
+            } else {
+                sigBuilder.setCustomValueType(WSConstants.WSC_SCT);
+            }
             sigBuilder.setExternalKey(tempSecret, tokenId);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
             sigBuilder.build(doc, secHeader);
@@ -800,6 +917,106 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             );
         }
     }
+    
+    @Test
+    public void testSCTKDKTEncryptSignAction() throws Exception {
+
+        byte[] tempSecret = WSSecurityUtil.generateNonce(16);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            String action = 
+                WSHandlerConstants.ENCRYPT_DERIVED + " " + WSHandlerConstants.SIGNATURE_DERIVED;
+            
+            Properties properties = new Properties();
+            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(tempSecret);
+            properties.put(WSHandlerConstants.PW_CALLBACK_REF,  callbackHandler);
+            properties.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "SecurityContextToken");
+            if (version == ConversationConstants.VERSION_05_02) {
+                properties.put(WSHandlerConstants.USE_2005_12_NAMESPACE, "false");
+            }
+            properties.put(WSHandlerConstants.USER, "transmitter");
+            properties.put(WSHandlerConstants.ENC_SYM_ALGO, 
+                           "http://www.w3.org/2001/04/xmlenc#aes128-cbc");
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
+
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(tempSecret);
+            securityProperties.setCallbackHandler(callbackHandler);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+
+            WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.AlgorithmSuite,
+                    WSSecurityEventConstants.SecurityContextToken,
+                    WSSecurityEventConstants.SignatureValue,
+                    WSSecurityEventConstants.SignedPart,
+                    WSSecurityEventConstants.EncryptedPart,
+                    WSSecurityEventConstants.Operation,
+            };
+            final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
+
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
+
+            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+
+            securityEventListener.compare();
+
+            SignedPartSecurityEvent signedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignedPart);
+            SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
+            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            String signedElementCorrelationID = signedPartSecurityEvent.getCorrelationID();
+            String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
+            String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
+            String operationCorrelationID = operationSecurityEvent.getCorrelationID();
+
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+
+            List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
+            for (int i = 0; i < securityEvents.size(); i++) {
+                SecurityEvent securityEvent = securityEvents.get(i);
+                if (securityEvent.getCorrelationID().equals(signedElementCorrelationID)) {
+                    signedElementSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(signatureValueCorrelationID)) {
+                    signatureValueSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(encryptedPartCorrelationID)) {
+                    encryptedPartSecurityEvents.add(securityEvent);
+                } else if (securityEvent.getCorrelationID().equals(operationCorrelationID)) {
+                    operationSecurityEvents.add(securityEvent);
+                }
+            }
+
+            org.junit.Assert.assertEquals(3, signedElementSecurityEvents.size());
+            org.junit.Assert.assertEquals(5, signatureValueSecurityEvents.size());
+            org.junit.Assert.assertEquals(5, encryptedPartSecurityEvents.size());
+            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+                    operationSecurityEvents.size() +
+                            signedElementSecurityEvents.size() + signatureValueSecurityEvents.size() + encryptedPartSecurityEvents.size()
+            );
+        }
+    }
+
 
     @Test
     public void testSCTSign() throws Exception {
