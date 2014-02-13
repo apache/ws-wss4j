@@ -144,7 +144,7 @@ public final class SAMLUtil {
                 samlSubject = authzStmt.getSubject();
             }
             
-            if (samlSubject != null) {
+            if (samlSubject != null && samlSubject.getSubjectConfirmation() != null) {
                 Element sub = samlSubject.getSubjectConfirmation().getDOM();
                 Element keyInfoElement = 
                     XMLUtils.getDirectChildElement(sub, "KeyInfo", SIG_NS);
