@@ -162,15 +162,24 @@ public class PolicyEnforcer implements SecurityEventListener {
         return null;
     }
 
-    private OperationPolicy findPolicyBySOAPOperationName(List<OperationPolicy> operationPolicies, String soapOperationName) {
+    private OperationPolicy findPolicyBySOAPOperationName(List<OperationPolicy> operationPolicies, QName soapOperationName) {
         Iterator<OperationPolicy> operationPolicyIterator = operationPolicies.iterator();
+        OperationPolicy noNamespaceOperation = null;
+        
         while (operationPolicyIterator.hasNext()) {
             OperationPolicy operationPolicy = operationPolicyIterator.next();
-            if (soapOperationName.equals(operationPolicy.getOperationName())) {
-                return operationPolicy;
+            if (operationPolicy.getOperationName() != null) {
+                if (soapOperationName.equals(operationPolicy.getOperationName())) {
+                    return operationPolicy;
+                } else if ("".equals(operationPolicy.getOperationName().getNamespaceURI())
+                    && soapOperationName.getLocalPart().equals(
+                        operationPolicy.getOperationName().getLocalPart())) {
+                    noNamespaceOperation = operationPolicy;
+                }
             }
         }
-        return null;
+        
+        return noNamespaceOperation;
     }
 
     /**
@@ -591,10 +600,10 @@ public class PolicyEnforcer implements SecurityEventListener {
             }
             
             if (effectivePolicy == null) {
-                effectivePolicy = findPolicyBySOAPOperationName(operationPolicies, operationSecurityEvent.getOperation().getLocalPart());
+                effectivePolicy = findPolicyBySOAPOperationName(operationPolicies, operationSecurityEvent.getOperation());
                 if (effectivePolicy == null) {
                     //no policy to the operation given
-                    effectivePolicy = new OperationPolicy("NoPolicyFoundForOperation");
+                    effectivePolicy = new OperationPolicy(new QName(null, "NoPolicyFoundForOperation"));
                     effectivePolicy.setPolicy(new Policy());
                 }
                 try {

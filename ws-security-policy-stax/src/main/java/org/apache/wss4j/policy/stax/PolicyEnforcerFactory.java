@@ -232,7 +232,8 @@ public class PolicyEnforcerFactory {
 
                     Operation operation = bindingOperation.getOperation();
 
-                    OperationPolicy operationPolicy = new OperationPolicy(operation.getName());
+                    OperationPolicy operationPolicy = 
+                        new OperationPolicy(new QName(null, operation.getName()));
                     operationPolicyList.add(operationPolicy);
 
                     @SuppressWarnings("unchecked")

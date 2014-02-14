@@ -18,24 +18,26 @@
  */
 package org.apache.wss4j.policy.stax;
 
+import javax.xml.namespace.QName;
+
 import org.apache.neethi.Policy;
 
 public class OperationPolicy {
 
-    private String operationName;
+    private QName operationName;
     private String operationAction;
     private Policy policy;
     private String soapMessageVersionNamespace;
 
-    public OperationPolicy(String operationName) {
+    public OperationPolicy(QName operationName) {
         this.operationName = operationName;
     }
 
-    public String getOperationName() {
+    public QName getOperationName() {
         return operationName;
     }
 
-    public void setOperationName(String operationName) {
+    public void setOperationName(QName operationName) {
         this.operationName = operationName;
     }
 
