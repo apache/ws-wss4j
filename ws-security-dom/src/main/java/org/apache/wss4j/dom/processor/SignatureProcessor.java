@@ -733,7 +733,7 @@ public class SignatureProcessor implements Processor {
         // Must have exclusive C14N without comments
         parameterSpec = 
             xmlSignature.getSignedInfo().getCanonicalizationMethod().getParameterSpec();
-        if (!(parameterSpec instanceof ExcC14NParameterSpec)) {
+        if (parameterSpec != null && !(parameterSpec instanceof ExcC14NParameterSpec)) {
             bspEnforcer.handleBSPRule(BSPRule.R5404);
         }
         
