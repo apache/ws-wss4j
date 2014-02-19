@@ -104,7 +104,6 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private WSSCrypto decryptionWSSCrypto;
     private WSSCrypto encryptionWSSCrypto;
     private String encryptionUser;
-    private WSSecurityTokenConstants.KeyIdentifier encryptionKeyIdentifier;
     private boolean useReqSigCertForEncryption = false;
     private String encryptionCompressionAlgorithm;
     private boolean enableRevocation = false;
@@ -158,7 +157,6 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.decryptionWSSCrypto = wssSecurityProperties.decryptionWSSCrypto;
         this.encryptionWSSCrypto = wssSecurityProperties.encryptionWSSCrypto;
         this.encryptionUser = wssSecurityProperties.encryptionUser;
-        this.encryptionKeyIdentifier = wssSecurityProperties.encryptionKeyIdentifier;
         this.useReqSigCertForEncryption = wssSecurityProperties.useReqSigCertForEncryption;
         this.encryptionCompressionAlgorithm = wssSecurityProperties.encryptionCompressionAlgorithm;
         this.enableRevocation = wssSecurityProperties.enableRevocation;
@@ -197,24 +195,6 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      */
     public void setCallbackHandler(CallbackHandler callbackHandler) {
         this.callbackHandler = callbackHandler;
-    }
-
-    /**
-     * returns the KeyIdentifierType which will be used in the secured document
-     *
-     * @return The KeyIdentifierType
-     */
-    public WSSecurityTokenConstants.KeyIdentifier getEncryptionKeyIdentifier() {
-        return encryptionKeyIdentifier;
-    }
-
-    /**
-     * Specifies the KeyIdentifierType to use in the secured document
-     *
-     * @param encryptionKeyIdentifier
-     */
-    public void setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier encryptionKeyIdentifier) {
-        this.encryptionKeyIdentifier = encryptionKeyIdentifier;
     }
 
     public Integer getTimestampTTL() {
