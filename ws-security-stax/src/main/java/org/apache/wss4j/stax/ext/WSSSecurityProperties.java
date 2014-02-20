@@ -729,7 +729,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      */
     public ReplayCache getTimestampReplayCache() throws WSSecurityException {
         if (enableTimestampReplayCache && timestampReplayCache == null) {
-            timestampReplayCache = createCache("wss4j-timestamp-cache-");
+            timestampReplayCache = createCache("wss4j.timestamp.cache-");
         }
         
         return timestampReplayCache;
@@ -760,7 +760,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      */
     public ReplayCache getNonceReplayCache() throws WSSecurityException {
         if (enableNonceReplayCache && nonceReplayCache == null) {
-            nonceReplayCache = createCache("wss4j-nonce-cache-");
+            nonceReplayCache = createCache("wss4j.nonce.cache-");
         }
         
         return nonceReplayCache;
@@ -779,7 +779,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      */
     public ReplayCache getSamlOneTimeUseReplayCache() throws WSSecurityException {
         if (enableSamlOneTimeUseReplayCache && samlOneTimeUseReplayCache == null) {
-            samlOneTimeUseReplayCache = createCache("wss4j-saml-one-time-use-cache-");
+            samlOneTimeUseReplayCache = createCache("wss4j.saml.one.time.use.cache-");
         }
         
         return samlOneTimeUseReplayCache;
