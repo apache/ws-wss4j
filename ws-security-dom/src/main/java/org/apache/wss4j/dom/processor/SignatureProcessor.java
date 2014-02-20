@@ -764,7 +764,7 @@ public class SignatureProcessor implements Processor {
                 
                 if (WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(algorithm)) {
                     parameterSpec = transform.getParameterSpec();
-                    if (!(parameterSpec instanceof ExcC14NParameterSpec)) {
+                    if (parameterSpec != null && !(parameterSpec instanceof ExcC14NParameterSpec)) {
                         bspEnforcer.handleBSPRule(BSPRule.R5407);
                     }
                 }
