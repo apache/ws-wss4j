@@ -77,4 +77,11 @@ public class SKITest extends org.junit.Assert {
         String knownBase64Encoding = "tgkZUMZ461ZSA1nZkBu6E5GDxLM=";
         assertTrue(knownBase64Encoding.equals(Base64.encode(skiBytes)));
     }
+    
+    @org.junit.Test
+    public void testBouncyCastlePKCS12() throws Exception {
+        // Load the keystore
+        Crypto crypto = CryptoFactory.getInstance("alice_bouncycastle.properties");
+        assertNotNull(crypto);
+    }
 }
