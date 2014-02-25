@@ -97,6 +97,19 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                     encryptionPartDef.setSecurePart(securePart);
                     encryptionPartDef.setModifier(securePart.getModifier());
                     encryptionPartDef.setEncRefId(IDGenerator.generateID(null));
+                    
+                    Map<Object, SecurePart> dynamicSecureParts = 
+                        outputProcessorChain.getSecurityContext().getAsMap(WSSConstants.SIGNATURE_PARTS);
+                    if (dynamicSecureParts != null && securePart.getName() != null
+                        && securePart.equals(dynamicSecureParts.get(securePart.getName()))) {
+                        securePart.setIdToSign(encryptionPartDef.getEncRefId());
+                        outputProcessorChain.getSecurityContext().putAsMap(
+                            WSSConstants.SIGNATURE_PARTS,
+                            securePart.getIdToSign(),
+                            securePart
+                        );
+                    }
+                    
                     encryptionPartDef.setKeyId(securityTokenProvider.getId());
                     encryptionPartDef.setSymmetricKey(securityToken.getSecretKey(getSecurityProperties().getEncryptionSymAlgorithm()));
                     outputProcessorChain.getSecurityContext().putAsList(EncryptionPartDef.class, encryptionPartDef);
