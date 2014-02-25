@@ -54,6 +54,7 @@ public abstract class SignatureEncryptionActionToken implements SecurityActionTo
     private String derivedKeyTokenReference;
     private int derivedKeyLength;
     private int derivedKeyIdentifier;
+    private boolean includeToken;
     
     public X509Certificate getCertificate() {
         return certificate;
@@ -173,6 +174,12 @@ public abstract class SignatureEncryptionActionToken implements SecurityActionTo
     }
     public void setDerivedKeyIdentifier(int derivedKeyIdentifier) {
         this.derivedKeyIdentifier = derivedKeyIdentifier;
+    }
+    public boolean isIncludeToken() {
+        return includeToken;
+    }
+    public void setIncludeToken(boolean includeToken) {
+        this.includeToken = includeToken;
     }
 }
 

@@ -71,7 +71,7 @@ public class SignatureAction implements Action {
             wsSign.setSigCanonicalization(signatureToken.getC14nAlgorithm());
         }
         
-        wsSign.setIncludeSignatureToken(signatureToken.isIncludeSignatureToken());
+        wsSign.setIncludeSignatureToken(signatureToken.isIncludeToken());
 
         wsSign.setUserInfo(signatureToken.getUser(), passwordCallback.getPassword());
         wsSign.setUseSingleCertificate(signatureToken.isUseSingleCert());

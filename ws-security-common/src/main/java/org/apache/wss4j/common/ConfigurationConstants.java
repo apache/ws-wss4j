@@ -503,9 +503,16 @@ public class ConfigurationConstants {
     
     /**
      * Whether to include the Signature Token in the security header as well or not. This is only
-     * applicable to the IssuerSerial and Thumbprint Key Identifier cases. The default is false.
+     * applicable to the IssuerSerial, Thumbprint and SKI Key Identifier cases. The default is false.
      */
     public static final String INCLUDE_SIGNATURE_TOKEN = "includeSignatureToken";
+    
+    /**
+     * Whether to include the Encryption token (BinarySecurityToken) in the security header as well 
+     * or not. This is only applicable to the IssuerSerial, Thumbprint and SKI Key Identifier cases. 
+     * The default is false.
+     */
+    public static final String INCLUDE_ENCRYPTION_TOKEN = "includeEncryptionToken";
     
     /**
      * Whether to cache UsernameToken nonces. The default value is "true".

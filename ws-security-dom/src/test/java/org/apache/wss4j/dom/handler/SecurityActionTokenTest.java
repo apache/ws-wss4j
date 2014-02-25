@@ -174,7 +174,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         SignatureActionToken actionToken2 = new SignatureActionToken();
         actionToken2.setUser("16c73ab6-b892-458f-abf5-2f875f74882e");
         actionToken2.setCryptoProperties("crypto.properties");
-        actionToken2.setIncludeSignatureToken(false);
+        actionToken2.setIncludeToken(false);
         WSEncryptionPart encP =
             new WSEncryptionPart("Timestamp", WSConstants.WSU_NS, "");
         actionToken2.setParts(Collections.singletonList(encP));
@@ -266,6 +266,42 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         EncryptionActionToken actionToken = new EncryptionActionToken();
         actionToken.setUser("wss40");
         actionToken.setCryptoProperties("wss40.properties");
+        
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        actions.add(new HandlerAction(WSConstants.ENCR, actionToken));
+        handler.send(
+            doc, 
+            reqData, 
+            actions,
+            true
+        );
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+        
+        verify(doc, new KeystoreCallbackHandler());
+    }
+    
+    @org.junit.Test
+    public void testAsymmetricEncryptionIncludeToken() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
+        messageContext.put(
+            WSHandlerConstants.PW_CALLBACK_REF, new KeystoreCallbackHandler()
+        );
+        reqData.setMsgContext(messageContext);
+        
+        EncryptionActionToken actionToken = new EncryptionActionToken();
+        actionToken.setUser("wss40");
+        actionToken.setCryptoProperties("wss40.properties");
+        actionToken.setIncludeToken(true);
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();

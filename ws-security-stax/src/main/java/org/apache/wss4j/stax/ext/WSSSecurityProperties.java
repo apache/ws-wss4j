@@ -99,6 +99,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private String signatureUser;
     private boolean enableSignatureConfirmationVerification = false;
     private boolean includeSignatureToken;
+    private boolean includeEncryptionToken;
     private WSSCrypto signatureVerificationWSSCrypto;
     private CertStore crlCertStore;
     private WSSCrypto decryptionWSSCrypto;
@@ -152,6 +153,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.signatureUser = wssSecurityProperties.signatureUser;
         this.enableSignatureConfirmationVerification = wssSecurityProperties.enableSignatureConfirmationVerification;
         this.includeSignatureToken = wssSecurityProperties.includeSignatureToken;
+        this.includeEncryptionToken = wssSecurityProperties.includeEncryptionToken;
         this.signatureVerificationWSSCrypto = wssSecurityProperties.signatureVerificationWSSCrypto;
         this.crlCertStore = wssSecurityProperties.crlCertStore;
         this.decryptionWSSCrypto = wssSecurityProperties.decryptionWSSCrypto;
@@ -863,6 +865,14 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public void setIncludeSignatureToken(boolean includeSignatureToken) {
         this.includeSignatureToken = includeSignatureToken;
+    }
+
+    public boolean isIncludeEncryptionToken() {
+        return includeEncryptionToken;
+    }
+
+    public void setIncludeEncryptionToken(boolean includeEncryptionToken) {
+        this.includeEncryptionToken = includeEncryptionToken;
     }
 
     public boolean isEnableTimestampReplayCache() {

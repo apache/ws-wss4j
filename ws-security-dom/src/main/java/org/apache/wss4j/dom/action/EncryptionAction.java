@@ -68,6 +68,8 @@ public class EncryptionAction implements Action {
             wsEncrypt.setMGFAlgorithm(encryptionToken.getMgfAlgorithm());
         }
         
+        wsEncrypt.setIncludeEncryptionToken(encryptionToken.isIncludeToken());
+        
         wsEncrypt.setUserInfo(encryptionToken.getUser());
         wsEncrypt.setUseThisCert(encryptionToken.getCertificate());
         Crypto crypto = encryptionToken.getCrypto();

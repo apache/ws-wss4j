@@ -123,6 +123,14 @@ public class WSSecEncryptedKey extends WSSecBase {
     protected String encKeyId;
 
     /**
+     * BinarySecurityToken to be included in the case where BST_DIRECT_REFERENCE
+     * is used to refer to the asymmetric encryption cert
+     */
+    protected BinarySecurity bstToken;
+    
+    protected X509Certificate useThisCert;
+    
+    /**
      * Custom token value
      */
     private String customEKTokenValueType;
@@ -132,13 +140,8 @@ public class WSSecEncryptedKey extends WSSecBase {
      */
     private String customEKTokenId;
     
-    /**
-     * BinarySecurityToken to be included in the case where BST_DIRECT_REFERENCE
-     * is used to refer to the asymmetric encryption cert
-     */
-    protected BinarySecurity bstToken;
-    
-    protected X509Certificate useThisCert;
+    private boolean bstAddedToSecurityHeader;
+    private boolean includeEncryptionToken;
     
     public WSSecEncryptedKey() {
         super();
@@ -327,6 +330,10 @@ public class WSSecEncryptedKey extends WSSecBase {
 
         case WSConstants.SKI_KEY_IDENTIFIER:
             secToken.setKeyIdentifierSKI(remoteCert, crypto);
+            
+            if (includeEncryptionToken) {
+                addBST(remoteCert);
+            }
             break;
 
         case WSConstants.THUMBPRINT_IDENTIFIER:
@@ -336,6 +343,10 @@ public class WSSecEncryptedKey extends WSSecBase {
             // ThumbprintRSA.
             //
             secToken.setKeyIdentifierThumb(remoteCert);
+            
+            if (includeEncryptionToken) {
+                addBST(remoteCert);
+            }
             break;
 
         case WSConstants.ISSUER_SERIAL:
@@ -347,6 +358,10 @@ public class WSSecEncryptedKey extends WSSecBase {
                 );
             DOMX509Data domX509Data = new DOMX509Data(document, domIssuerSerial);
             secToken.setX509Data(domX509Data);
+            
+            if (includeEncryptionToken) {
+                addBST(remoteCert);
+            }
             break;
 
         case WSConstants.BST_DIRECT_REFERENCE:
@@ -424,6 +439,17 @@ public class WSSecEncryptedKey extends WSSecBase {
         xencCipherValue.appendChild(keyText);
 
         envelope = document.getDocumentElement();
+    }
+    
+    /**
+     * Add a BinarySecurityToken
+     */
+    private void addBST(X509Certificate cert) throws WSSecurityException {
+        bstToken = new X509Security(document);
+        ((X509Security) bstToken).setX509Certificate(cert);
+        
+        bstAddedToSecurityHeader = false;
+        bstToken.setID(IDGenerator.generateID(null));
     }
 
     protected KeyGenerator getKeyGenerator() throws WSSecurityException {
@@ -536,12 +562,12 @@ public class WSSecEncryptedKey extends WSSecBase {
      * @param secHeader The security header that holds the BST element.
      */
     public void prependBSTElementToHeader(WSSecHeader secHeader) {
-        if (bstToken != null) {
+        if (bstToken != null && !bstAddedToSecurityHeader) {
             WSSecurityUtil.prependChildElement(
                 secHeader.getSecurityHeader(), bstToken.getElement()
             );
+            bstAddedToSecurityHeader = true;
         }
-        bstToken = null;
     }
 
     /**
@@ -554,11 +580,11 @@ public class WSSecEncryptedKey extends WSSecBase {
      * @param secHeader The security header that holds the BST element.
      */
     public void appendBSTElementToHeader(WSSecHeader secHeader) {
-        if (bstToken != null) {
+        if (bstToken != null && !bstAddedToSecurityHeader) {
             Element secHeaderElement = secHeader.getSecurityHeader();
             secHeaderElement.appendChild(bstToken.getElement());
+            bstAddedToSecurityHeader = true;
         }
-        bstToken = null;
     }
     
     /**
@@ -748,6 +774,14 @@ public class WSSecEncryptedKey extends WSSecBase {
      */
     public void setSymmetricKey(SecretKey key) {
         this.symmetricKey = key;
+    }
+
+    public boolean isIncludeEncryptionToken() {
+        return includeEncryptionToken;
+    }
+
+    public void setIncludeEncryptionToken(boolean includeEncryptionToken) {
+        this.includeEncryptionToken = includeEncryptionToken;
     }
 
 

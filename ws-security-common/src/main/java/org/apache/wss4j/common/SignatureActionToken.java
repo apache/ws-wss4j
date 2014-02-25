@@ -25,7 +25,6 @@ package org.apache.wss4j.common;
 public class SignatureActionToken extends SignatureEncryptionActionToken {  
 
     private String c14nAlgorithm;
-    private boolean includeSignatureToken = true;
     private boolean useSingleCert = true;
     private String signatureAlgorithm;
     
@@ -34,12 +33,6 @@ public class SignatureActionToken extends SignatureEncryptionActionToken {
     }
     public void setC14nAlgorithm(String c14nAlgorithm) {
         this.c14nAlgorithm = c14nAlgorithm;
-    }
-    public boolean isIncludeSignatureToken() {
-        return includeSignatureToken;
-    }
-    public void setIncludeSignatureToken(boolean includeSignatureToken) {
-        this.includeSignatureToken = includeSignatureToken;
     }
     public boolean isUseSingleCert() {
         return useSingleCert;

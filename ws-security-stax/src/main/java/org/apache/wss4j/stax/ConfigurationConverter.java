@@ -447,6 +447,10 @@ public final class ConfigurationConverter {
             decodeBooleanConfigValue(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, false, config);
         properties.setIncludeSignatureToken(includeSignatureToken);
         
+        boolean includeEncryptionToken = 
+            decodeBooleanConfigValue(ConfigurationConstants.INCLUDE_ENCRYPTION_TOKEN, false, config);
+        properties.setIncludeEncryptionToken(includeEncryptionToken);
+        
         boolean enableTimestampCache = 
             decodeBooleanConfigValue(ConfigurationConstants.ENABLE_TIMESTAMP_CACHE, true, config);
         properties.setEnableTimestampReplayCache(enableTimestampCache);

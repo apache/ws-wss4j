@@ -73,33 +73,36 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     securityToken = (GenericOutboundSecurityToken)tokenProvider.getSecurityToken();
                 }
             }
+            
+            boolean includeToken = false;
+            WSSecurityTokenConstants.KeyIdentifier keyIdentifier = null;
+            if (WSSConstants.SIGNATURE.equals(action) || WSSConstants.SAML_TOKEN_SIGNED.equals(action)) {
+                includeToken = ((WSSSecurityProperties) getSecurityProperties()).isIncludeSignatureToken();
+                keyIdentifier = getSecurityProperties().getSignatureKeyIdentifier();
+            } else if (WSSConstants.ENCRYPT.equals(action)) {
+                includeToken = ((WSSSecurityProperties) getSecurityProperties()).isIncludeEncryptionToken();
+                keyIdentifier = getSecurityProperties().getEncryptionKeyIdentifier();
+            }
 
             if (securityToken != null) {
-                if (WSSConstants.SIGNATURE.equals(action) || WSSConstants.SAML_TOKEN_SIGNED.equals(action)) {
-                    boolean includeSignatureToken = 
-                        ((WSSSecurityProperties) getSecurityProperties()).isIncludeSignatureToken();
-                    if ((includeSignatureToken 
-                        || WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(getSecurityProperties().getSignatureKeyIdentifier()))
-                        && (securityToken.getTokenType() == null 
-                        || WSSecurityTokenConstants.X509V3Token.equals(securityToken.getTokenType()))) {
-                        FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = new FinalBinarySecurityTokenOutputProcessor(securityToken);
-                        finalBinarySecurityTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
-                        finalBinarySecurityTokenOutputProcessor.setAction(getAction());
-                        finalBinarySecurityTokenOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
-                        finalBinarySecurityTokenOutputProcessor.init(outputProcessorChain);
-                        securityToken.setProcessor(finalBinarySecurityTokenOutputProcessor);
-                    }
+                if ((WSSConstants.SIGNATURE.equals(action) || WSSConstants.SAML_TOKEN_SIGNED.equals(action))
+                    && (includeToken || WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier))
+                    && (securityToken.getTokenType() == null || WSSecurityTokenConstants.X509V3Token.equals(securityToken.getTokenType()))) {
+                    FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = new FinalBinarySecurityTokenOutputProcessor(securityToken);
+                    finalBinarySecurityTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
+                    finalBinarySecurityTokenOutputProcessor.setAction(getAction());
+                    finalBinarySecurityTokenOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
+                    finalBinarySecurityTokenOutputProcessor.init(outputProcessorChain);
+                    securityToken.setProcessor(finalBinarySecurityTokenOutputProcessor);
                 } else if (WSSConstants.ENCRYPT.equals(action)
-                    && (securityToken.getTokenType() == null 
-                    || WSSecurityTokenConstants.X509V3Token.equals(securityToken.getTokenType()))) {
-                    if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(((WSSSecurityProperties) getSecurityProperties()).getEncryptionKeyIdentifier())) {
-                        FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = new FinalBinarySecurityTokenOutputProcessor(securityToken);
-                        finalBinarySecurityTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
-                        finalBinarySecurityTokenOutputProcessor.setAction(getAction());
-                        finalBinarySecurityTokenOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
-                        finalBinarySecurityTokenOutputProcessor.init(outputProcessorChain);
-                        securityToken.setProcessor(finalBinarySecurityTokenOutputProcessor);
-                    }
+                    && (includeToken || WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier))
+                    && (securityToken.getTokenType() == null || WSSecurityTokenConstants.X509V3Token.equals(securityToken.getTokenType()))) {
+                    FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = new FinalBinarySecurityTokenOutputProcessor(securityToken);
+                    finalBinarySecurityTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
+                    finalBinarySecurityTokenOutputProcessor.setAction(getAction());
+                    finalBinarySecurityTokenOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
+                    finalBinarySecurityTokenOutputProcessor.init(outputProcessorChain);
+                    securityToken.setProcessor(finalBinarySecurityTokenOutputProcessor);
                 } else if (WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN.equals(getAction())
                     || WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN.equals(getAction())
                     || WSSConstants.KERBEROS_TOKEN.equals(getAction())) {
