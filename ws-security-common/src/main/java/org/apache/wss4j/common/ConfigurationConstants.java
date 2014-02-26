@@ -245,20 +245,6 @@ public class ConfigurationConstants {
     public static final String SAML_CALLBACK_REF = "samlCallbackRef";
 
     /**
-     * This tag refers to the CallbackHandler implementation class used to get the key
-     * associated with a key name. The value of this tag must be the class name of a 
-     * {@link javax.security.auth.callback.CallbackHandler} instance.
-     */
-    public static final String ENC_CALLBACK_CLASS = "embeddedKeyCallbackClass";
-
-    /**
-     * This tag refers to the  CallbackHandler implementation object used to get the key
-     * associated with a key name. The value of this tag must be a
-     * {@link javax.security.auth.callback.CallbackHandler} instance.
-     */
-    public static final String ENC_CALLBACK_REF = "embeddedKeyCallbackRef";
-    
-    /**
      * The path of the crypto property file to use for Signature creation. The classloader 
      * loads this file. Therefore it must be accessible via the classpath.
      * <p/>
