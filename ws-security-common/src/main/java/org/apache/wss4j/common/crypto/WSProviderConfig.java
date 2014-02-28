@@ -71,6 +71,7 @@ public final class WSProviderConfig {
                 AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
                     public Boolean run() {
                         addXMLDSigRIInternal();
+                        Security.removeProvider("BC");
                         addJceProvider("BC", "org.bouncycastle.jce.provider.BouncyCastleProvider");
                         return true;
                     }
@@ -127,6 +128,7 @@ public final class WSProviderConfig {
     }
     
     private static void addXMLDSigRIInternal() {
+        Security.removeProvider("ApacheXMLDSig");
         addJceProvider("ApacheXMLDSig", SantuarioUtil.getSantuarioProvider());
     }
 
