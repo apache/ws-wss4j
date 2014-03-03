@@ -21,7 +21,7 @@ package org.apache.wss4j.common.cache;
 
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Status;
-
+import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
 
@@ -53,6 +53,29 @@ public class EHCacheManagerHolderTest extends Assert {
         
         manager2.shutdown();
         assertEquals(Status.STATUS_SHUTDOWN, manager2.getStatus());
+        
+    }
+    
+    @Test
+    public void testCacheNames() {
+        CacheManager cacheManager = 
+            EHCacheManagerHolder.getCacheManager("testCache2", 
+                                                 EHCacheManagerHolder.class.getResource("/test-ehcache2.xml"));
+        
+        String key = "org.apache.wss4j.TokenStore";
+        CacheConfiguration cacheConfig = 
+            EHCacheManagerHolder.getCacheConfiguration(key, cacheManager);
+        assertEquals(3600, cacheConfig.getTimeToIdleSeconds());
+        
+        key = "org.apache.wss4j.TokenStore-{http://ws.apache.org}wss4j";
+        CacheConfiguration cacheConfig2 = 
+            EHCacheManagerHolder.getCacheConfiguration(key, cacheManager);
+        assertEquals(360000, cacheConfig2.getTimeToIdleSeconds());
+        
+        key = "org.apache.wss4j.TokenStore-{http://ws.apache.org}wss4junknown";
+        CacheConfiguration cacheConfig3 = 
+            EHCacheManagerHolder.getCacheConfiguration(key, cacheManager);
+        assertEquals(3600, cacheConfig3.getTimeToIdleSeconds());
         
     }
 }

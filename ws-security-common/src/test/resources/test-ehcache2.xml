@@ -1,0 +1,11 @@
+<ehcache xsi:noNamespaceSchemaLocation="ehcache.xsd" updateCheck="false" monitoring="autodetect" dynamicConfig="true">
+
+    <diskStore path="java.io.tmpdir"/>
+
+    <cache name="org.apache.wss4j.TokenStore" overflowToDisk="false" maxEntriesLocalHeap="10000" 
+           timeToIdleSeconds="3600" timeToLiveSeconds="3600"/>
+           
+    <cache name="org.apache.wss4j.TokenStore-{http://ws.apache.org}wss4j" overflowToDisk="false" maxEntriesLocalHeap="10000" 
+           timeToIdleSeconds="360000" timeToLiveSeconds="3600"/>
+           
+</ehcache>
