@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document>
+<body>
+<section name="Further Resources">
+<p>
+This page lists some further resources that describe how to use WSS4J in more
+detail.
+</p>
+<subsection name="WSS4J 2.0.0 articles">
+<ul>
+<li><a href="http://coheigea.blogspot.ie/2014/01/apache-wss4j-200-part-i.html">WSS4J 2.0.0 overview</a></li>
+</ul>
+</subsection>
+
+<subsection name="WSS4J 1.6.x articles">
+<ul>
+<li><a href="http://coheigea.blogspot.ie/2011/01/wss4j-16-crypto-property-change.html">Crypto property changes in WSS4J 1.6.x</a></li>
+<li><a href="http://coheigea.blogspot.ie/2011/02/support-for-saml2-assertions-in-wss4j.html">Support for SAML 2.0 in WSS4J 1.6.x</a></li>
+<li><a href="http://coheigea.blogspot.ie/2011/02/usernametoken-processing-changes-in.html">UsernameToken processing changes in WSS4J 1.6.x</a></li>
+<li><a href="http://coheigea.blogspot.ie/2011/02/wspasswordcallback-changes-in-wss4j-16.html">WSPasswordCallback changes in WSS4J 1.6.x</a></li>
+<li><a href="http://coheigea.blogspot.ie/2011/02/wss4j-16-specifying-elements-to-sign-or.html">Specifying elements to sign or encrypt</a></li>
+<li><a href="http://coheigea.blogspot.ie/2011/03/wss4j-16-basic-security-profile-11.html">Basic Security Profile 1.1 compliance</a></li>
+<li><a href="http://coheigea.blogspot.ie/2011/03/wss4j-16-saml-property-changes.html">SAML property changes</a></li>
+<li><a href="http://coheigea.blogspot.ie/2011/04/wss4j-16-introducing-validators.html">WSS4J Validators</a></li>
+<li><a href="http://coheigea.blogspot.ie/2011/05/crl-support-in-wss4j-161.html">CRL support in WSS4J 1.6.1</a></li>
+<li><a href="http://coheigea.blogspot.ie/2011/08/saml-token-creation-in-apache-wss4j-16.html">Creating SAML Tokens</a></li>
+<li><a href="http://coheigea.blogspot.ie/2013/03/signature-and-encryption-key.html">Signature and Encryption Key Identifiers in Apache WSS4J</a></li>
+</ul>
+</subsection>
+
+</section>            
+</body>
+</document>

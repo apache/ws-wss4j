@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document>
+<body>
+<section name="New features available in Apache WSS4J 2.0.0">
+
+<subsection name="Overview of new features">
+<p>
+Apache WSS4J 2.0.0 delivers the following major new features:
+</p>
+<ul>
+<li>Support for a streaming (StAX) based WS-Security implementation that
+covers all of the main specifications.</li>
+<li>A WS-SecurityPolicy model that can be shared between both DOM + StAX
+implementations.</li>
+<li>Support for "real-time" WS-SecurityPolicy validation for the StAX
+implementation.</li>
+<li>Support for the SOAP with Attachments (SWA) Profile 1.1 specification.</li>
+<li>Support for caching based on EhCache.</li>
+<li>Support for encrypting passwords in Crypto properties files using Jasypt.
+</li>
+</ul>
+</subsection>
+
+<subsection name="Streaming (StAX) based WS-Security implementation">
+<p>
+WSS4J 2.0.0 introduces a new streaming (StAX) based WS-Security implementation.
+Please see the dedicated <a href="streaming.html">page</a> for more
+information.
+</p>
+</subsection>
+
+<subsection name="WS-SecurityPolicy support">
+<p>
+WSS4J 2.0.0 introduces a new WS-SecurityPolicy model as part of the
+"wss4j-policy" module. This model can be shared between both the DOM and StAX
+WS-Security implementations. Web service stacks such as Apache CXF and 
+Apache Axis/Rampart that use WSS4J for WS-Security no longer need to maintain
+their own model. In this way any bug fixes to the model will get picked up
+by all web service stacks that rely on WSS4J.
+</p>
+<p>
+In addition to the new WS-SecurityPolicy model, a significant new feature of
+WSS4J 2.0.0 is that the new streaming WS-Security implementation has the
+ability to perform "real-time" validation of a request against the set of
+applicable WS-SecurityPolicy policies. The DOM-based code in WSS4J does not
+have any concept of WS-SecurityPolicy, but instead processes an inbound 
+request, and relies on the web service stack to compare the results against
+the applicable policies. The advantage of the streaming approach in WSS4J
+2.0.0 is that bogus requests can be rejected quicker, which may help to avoid
+DoS based scenarios.
+</p>
+</subsection>
+
+<subsection name="Support for signing and encrypting message attachments">
+<p>
+WSS4J 2.0.0 introduces support for signing and encrypting SOAP message
+attachments, via the the SOAP with Attachments (SWA) Profile 1.1 specification.
+Please see the dedicated <a href="attachments.html">page</a> for more
+information.
+</p>
+</subsection>
+
+
+<subsection name="Replay Attack detection using EhCache">
+<p>
+In WSS4J 1.6.x, a "ReplayCache" interface was introduced to cache tokens to
+guard against replay attacks for the following scenarios:
+</p>
+<ul>
+<li>Signed Timestamps</li>
+<li>UsernameToken nonces</li>
+<li>SAML OneTimeUse Assertions</li>
+</ul>
+<p>
+However, replay attack detection was not "switched on" by default in WSS4J
+1.6.x. In WSS4J 2.0.x, replay attack detection is enabled by default using
+an implementation of the "ReplayCache" interface based on EhCache. The 
+following configuration tags can be used to configure caching:
+</p>
+<ul>
+<li>ConfigurationConstants.TIMESTAMP_CACHE_INSTANCE ("timestampCacheInstance"):
+This holds a reference to a ReplayCache instance used to cache Timestamp
+Created Strings. The default instance that is used is the EHCacheReplayCache.
+</li>
+<li>ConfigurationConstants.ENABLE_TIMESTAMP_CACHE ("enableTimestampCache"):
+Whether to cache Timestamp Created Strings (these are only cached in
+conjunction with a message Signature). The default value is "true".</li>
+<li>ConfigurationConstants.NONCE_CACHE_INSTANCE ("nonceCacheInstance"): This
+holds a reference to a ReplayCache instance used to cache UsernameToken
+nonces. The default instance that is used is the EHCacheReplayCache.</li>
+<li>ConfigurationConstants.ENABLE_NONCE_CACHE ("enableNonceCache"): Whether to
+cache UsernameToken nonces. The default value is "true".</li>
+<li>ConfigurationConstants. SAML_ONE_TIME_USE_CACHE_INSTANCE
+("samlOneTimeUseCacheInstance"): This holds a reference to a ReplayCache
+instance used to cache SAML2 Token Identifier Strings (if the token contains a
+OneTimeUse Condition). The default instance that is used is the
+EHCacheReplayCache.</li>
+<li>ConfigurationConstants.ENABLE_SAML_ONE_TIME_USE_CACHE
+("enableSamlOneTimeUseCache"):  Whether to cache SAML2 Token Identifiers, if
+the token contains a "OneTimeUse" Condition. The default value is "true".</li>
+</ul>
+</subsection>
+
+<subsection name="Encrypting passwords in Crypto property files">
+<p>
+A typical example of the contents of a Crypto properties file (for Signature
+creation) is as follows:
+</p>
+<ul>
+<li>org.apache.wss4j.crypto.provider=org.apache.wss4j.common.crypto.Merlin</li>
+<li>org.apache.wss4j.crypto.merlin.keystore.type=jks</li>
+<li>org.apache.wss4j.crypto.merlin.keystore.password=security</li>
+<li>org.apache.wss4j.crypto.merlin.keystore.alias=wss40</li>
+<li>org.apache.wss4j.crypto.merlin.keystore.file=keys/wss40.jks</li>
+</ul>
+<p>
+Note that the password used to load the keystore is in cleartext. One of the
+new features of Apache WSS4J 2.0.0 is the ability to instead store a (BASE-64
+encoded) encrypted version of the keystore password in the Crypto properties
+file. A new PasswordEncryptor interface is defined to allow for the
+encryption/decryption of passwords. A default implementation is now provided
+based on Jasypt called JasyptPasswordEncryptor, which uses
+"PBEWithMD5AndTripleDES".
+</p>
+<p>
+The WSPasswordCallback class has an additional "usage" called
+WSPasswordCallback.PASSWORD_ENCRYPTOR_PASSWORD, which is used to return the
+master password for use with the PasswordEncryptor implementation. When WSS4J
+is loading a Crypto implementation via a properties file, and it encounters a
+password encrypted in the format "ENC(encoded encrypted password)", it queries
+a CallbackHandler for a password via this WSPasswordCallback usage tag. It is
+possible to pass a custom PasswordEncryptor implementation to WSS4J via the
+new configuration tag ConfigurationConstants.PASSWORD_ENCRYPTOR_INSTANCE
+("passwordEncryptorInstance").
+</p>
+
+</subsection>
+
+<subsection name="Miscellaneous new features">
+<p>
+Support was added in WSS4J 1.6.x to obtain a Kerberos ticket from a KDC (Key
+Distribution Center) and include it in the security header of a request, as 
+well as to process the received token. However, there was no built-in way to
+extract the secret key from the ticket to secure the request. Instead it was
+up to the user to plug in a custom "KerberosTokenDecoder" implementation to
+support this behaviour. In WSS4J 2.0.0, a default KerberosTokenDecoder
+implementation is provided, and so WSS4J now supports signing/encrypting using
+Kerberos tokens by default.
+</p>
+<p>
+A new "CustomToken" Action is defined in WSS4J 2.0.0. If this action is
+defined, a token (DOM Element) will be retrieved from a CallbackHandler via
+WSPasswordCallback.Usage.CUSTOM_TOKEN and written out as is in the security
+header. This provides for an easy way to write out tokens that have been
+retrieved out of band. Another related new feature is the ability to associate
+an action with a particular set of keys/algorithms. This means that it is now
+possible to configure two different Signature actions, that use different
+keys/algorithms.
+</p>
+<p>
+Support for enforcing the Basic Security Profile (BSP) 1.1 specification was
+added in WSS4J 1.6.x. In WSS4J 2.0.0, it is possible to disable individual
+BSP Rules for a non-compliant request, instead of having to disable BSP
+enforcement altogether as for WSS4J 1.6.x. The RequestData class has a
+setIgnoredBSPRules method, that takes a list of BSPRule Objects as an argument.
+The BSPRule class contains a complete list of Basic Security Profile rules
+that are enforced in WSS4J.
+</p>
+<p>
+WSS4J 2.0.0 now enforces the SubjectConfirmation requirements of an inbound
+SAML Token, instead of leaving it to the web services stack. For
+sender-vouches, a Signature must be present that covers both the SOAP Body and
+the SAML Assertion. For holder-of-key, a Signature must be present that signs
+some part of the SOAP request using the key information contained in the SAML
+Subject. Note that a Signature can be either a message or transport level
+Signature (i.e. using TLS is acceptable). A new configuration tag is defined
+that allows the user to switch off this validation if required
+(ConfigurationConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION  -
+"validateSamlSubjectConfirmation").
+</p>
+
+</subsection>
+
+</section>            
+</body>
+</document>

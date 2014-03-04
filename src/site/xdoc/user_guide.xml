@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document>
+<body>
+<section name="Apache WSS4J User's Guide">
+<p>
+Click on the links below for more information about the functionality offered
+by WSS4J and how to configure it.
+</p>
+<ul>
+<li><a href="using.html">Using Apache WSS4J</a></li>
+<li><a href="config.html">WSS4J Configuration</a></li>
+<li><a href="newfeatures20.html">WSS4J 2.0.0 New Features</a></li>
+<li><a href="streaming.html">Streaming WS-Security support</a></li>
+<li><a href="attachments.html">Securing message attachments</a></li>
+<li><a href="migration.html">WSS4J 2.0.0 Migration Guide</a></li>
+<li><a href="wss4j16.html">WSS4J 1.6.0 Migration Guide</a></li>
+<li><a href="topics.html">Special Topics</a></li>
+<li><a href="best_practice.html">Security Best Practices</a></li>
+<li><a href="resources.html">Further Resources</a></li>
+</ul>
+</section>            
+</body>
+</document>

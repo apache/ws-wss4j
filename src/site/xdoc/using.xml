@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document>
+<body>
+<section name="Using Apache WSS4J">
+<p>
+This page describes how to use Apache WSS4J. For information about how to
+configure WSS4J, see the <a href="config.html">configuration page</a>. WSS4J
+can essentially be used in three different ways. For information about using
+WSS4J with a SOAP stack, see the sections on Apache CXF and Apache Rampart/Axis.
+</p>
+<ul>
+<li>Action based approach: WSS4J offers an "Action" based approach to
+applying WS-Security to a SOAP request or response, in conjunction with a SOAP
+stack.</li>
+<li>WS-SecurityPolicy based approach: WSS4J can be configured for a SOAP
+request/response via WS-SecurityPolicy, in conjunction with a SOAP Stack. 
+This is the recommended approach.</li>
+<li>Standalone approach: WSS4J offers a low-level (DOM) API to
+construct/sign/encrypt/etc. tokens directly.</li>
+</ul>
+
+<subsection name="Action based approach">
+<p>
+The WSHandler class in WSS4J is designed to configure WSS4J to secure an
+outbound SOAP request, by parsing configuration that is supplied to it via
+a subclass. Typically a web services stack that uses WSS4J for WS-Security
+will subclass WSHandler. An example of a subclass is the
+<a href="http://cxf.apache.org/docs/ws-security.html">WSS4JOutInterceptor</a>
+in Apache CXF. The configuration tags are defined in the <a href="http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-common/src/main/java/org/apache/wss4j/common/ConfigurationConstants.java?view=markup">ConfigurationConstants</a> class (WSHandlerConstants in WSS4J 1.6.x). For a more detailed explanation
+of the configuration tags, please refer to the
+<a href="config.html">configuration</a> page. The next few paragraphs will
+describe the most fundamental configuration tags that are used in most
+cases.
+</p>
+
+<h3><p>Common configuration tags</p></h3>
+<p>
+The "Action" based approach to using Apache WSS4J involves explicitly telling
+WSS4J what WS-Security functionality to perform on a request, by configuring
+the stack specific WSHandler implementation with the required properties. On
+the receiving side, the "actions" that are configured are matched against what
+was processed in the security header, and an error is thrown if they do not
+match (in some order). Typical actions include "UsernameToken, "Signature",
+"Encrypt", "Timestamp, "SAMLTokenSigned", etc. 
+</p>
+<p>
+After specifying the action to perform on a request, the next task is typically
+to specify the "user". The "user" can be either the username to insert into a
+UsernameToken, or the keystore alias to use for either signature or encryption.
+If you are configuring more than one of these actions, the "signatureUser" and
+"encryptionUser" configuration tags override the more general "user" tag. The
+next task is often to specify a CallbackHandler implementation to use to
+retrieve passwords. On the sending side, this is used to retrieve a password
+to insert into a UsernameToken and to decrypt a private key from a keystore
+for Signature. On the receiving side, it is used to retrieve a password to
+validate a received UsernameToken, and to decrypt a private key from a
+keystore to use for decryption.  
+</p>
+<p>
+The next task is to specify a Crypto implementation if you are using Signature
+or Encryption. See the <a href="configuration.html">configuration</a> page for
+more information on the Crypto interface. Typically, it is configured in a 
+Crypto properties file, which specifies the Crypto implementation to use, as
+well as the keystore location, default alias/password, etc. For signature, the
+path of this properties file can be referred to by the tag "signaturePropFile"
+and "encryptionPropFile" for outbound request, and
+"signatureVerificationPropFile" and "decryptionPropFile" for inbound requests".
+How signing keys/certificates are referenced from a Signature can be 
+controlled via the "signatureKeyIdentifier" configuration tag. This defaults
+to "IssuerSerial", but could be "DirectReference", "Thumbprint", etc. The
+"encryptionKeyIdentifier" tag performs the same function for encryption.
+</p>
+<p>
+Finally, the Elements to sign or encrypt can be specified by the
+"signatureParts" and "encryptionParts" configuration tags. Both default to the
+SOAP Body. The value of signatureParts/encryptionParts is a list of semi-colon
+separated values that identify the elements to sign/encrypt. The value is of
+the format of an encryption mode specifier, and a namespace URI, each inside a
+pair of curly brackets, and then the local name of the Element. For example,
+"{Content}{http://example.org/paymentv2}CreditCard;". The encryption modifier
+can be either "Content" or "Element" and only applies to encryption.
+</p>
+<p>
+Here are some sample configuration values for various actions, as taken from
+some CXF system tests. The constructor of the
+WSS4JOutInterceptor/WSS4JInIntereptor interceptors in CXF takes a map of 
+String/Object pairs which correspond to the key/value pairs given in the tables
+below. See the CXF configuration <a href="https://git-wip-us.apache.org/repos/asf?p=cxf.git;a=blob_plain;f=systests/ws-security/src/test/resources/org/apache/cxf/systest/ws/action/client.xml;hb=HEAD">file</a> for more information.
+</p>
+
+<h3><p>Sample Outbound UsernameToken configuration</p></h3>
+
+<table name="UsernameToken configuration">
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+<tr>
+<td>action</td>
+<td>UsernameToken</td>
+</tr>
+<tr>
+<td>user</td>
+<td>Alice</td>
+</tr>
+<tr>
+<td>passwordCallbackClass</td>
+<td><a href="https://git-wip-us.apache.org/repos/asf?p=cxf.git;a=blob_plain;f=systests/ws-security/src/test/java/org/apache/cxf/systest/ws/common/UTPasswordCallback.java;hb=HEAD">org.apache.cxf.systest.ws.common.UTPasswordCallback</a></td>
+</tr>
+</table>
+
+<h3><p>Sample Outbound Signature/Timestamp configuration</p></h3>
+
+<table name="Signature configuration">
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+<tr>
+<td>action</td>
+<td>Signature Timestamp</td>
+</tr>
+<tr>
+<td>signatureUser</td>
+<td>alice</td>
+</tr>
+<tr>
+<td>passwordCallbackClass</td>
+<td><a href="https://git-wip-us.apache.org/repos/asf?p=cxf.git;a=blob_plain;f=systests/ws-security/src/test/java/org/apache/cxf/systest/ws/common/KeystorePasswordCallback.java;hb=HEAD">org.apache.cxf.systest.ws.common.KeystorePasswordCallback</a></td>
+</tr>
+<tr>
+<td>signaturePropFile</td>
+<td><a href="https://git-wip-us.apache.org/repos/asf?p=cxf.git;a=blob_plain;f=systests/ws-security/src/test/resources/alice.properties;hb=HEAD">alice.properties</a></td>
+</tr>
+<tr>
+<td>signatureKeyIdentifier</td>
+<td>DirectReference</td>
+</tr>
+<tr>
+<td>signatureParts</td>
+<td>{}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{}{http://schemas.xmlsoap.org/soap/envelope/}Body;</td>
+</tr>
+</table>
+
+</subsection>
+
+<subsection name="WS-SecurityPolicy based approach">
+<p>
+The recommended way of applying WS-Security to your web services is to use
+WS-SecurityPolicy. The WS-SecurityPolicy specification defines a set of
+WS-Policy expressions that can be used to define the security requirements of
+a web service. Typically one or more policies are attached to the WSDL of a
+service, which conveys the security requirements of the service to the client.
+A WS-SecurityPolicy aware stack such as Apache CXF or Apache Axis/Rampart can
+parse the policies and configure WSS4J appropriately. This greatly simplifies
+things for the user, who then only has to supply some basic information about
+which users, CallbackHandlers, Crypto property files, etc. to use.
+</p>
+<p>
+For more information on using WS-SecurityPolicy with WSS4J, please see CXF's
+WS-SecurityPolicy page, or go to the SOAP stack sections below:
+<a href="http://cxf.apache.org/docs/ws-securitypolicy.html">CXF
+WS-SecurityPolicy configuration</a>
+</p>
+
+</subsection>
+
+<subsection name="Standalone approach">
+<p>
+Apache WSS4J provides a set of APIs to implement WS-Security functionality on
+a SOAP message. It is possible to use these APIs directly in a standalone
+manner, although it is far more common to use either the "Action" or
+WS-SecurityPolicy based approaches. This functionality is only available for
+the DOM code. The best way of finding out how to do this is to take a look at
+the test sources. For example: 
+</p>
+<ul>
+<li>
+<a href="http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-dom/src/test/java/org/apache/wss4j/dom/message/UsernameTokenTest.java?view=markup">Username Token Test</a>
+</li>
+<li>
+<a href="http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-dom/src/test/java/org/apache/wss4j/dom/message/EncryptionTest.java?view=markup">Encryption Test</a>
+</li>
+<li>
+<a href="http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-dom/src/test/java/org/apache/wss4j/dom/message/SignatureTest.java?view=markup">Signature Test</a>
+</li>
+<li>
+<a href="http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-dom/src/test/java/org/apache/wss4j/dom/message/TimestampTest.java?view=markup">Timestamp Test</a>
+</li>
+<li>
+<a href="http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-dom/src/test/java/org/apache/wss4j/dom/saml/SamlTokenTest.java?view=markup">SAML Token Test</a>
+</li>
+</ul>
+</subsection>
+
+<subsection name="SOAP Stacks">
+
+<h3><p>Apache CXF</p></h3>
+<p>
+<a href="http://cxf.apache.org">Apache CXF</a> is an open-source web services
+stack. CXF uses WSS4J to perform the core WS-Security functionality, and
+provides extended security functionality based around the WS-SecurityPolicy,
+WS-SecureConversation and WS-Trust specifications. More information:
+</p>
+<ul>
+<li>
+<a href="http://cxf.apache.org/docs/ws-security.html">CXF WS-Security
+configuration</a>
+</li>
+<li>
+<a href="http://cxf.apache.org/docs/ws-secureconversation.html">CXF
+WS-SecureConversation configuration</a>
+</li>
+<li>
+<a href="http://cxf.apache.org/docs/ws-securitypolicy.html">CXF
+WS-SecurityPolicy configuration</a>
+</li>
+<li>
+<a href="http://cxf.apache.org/docs/ws-trust.html">CXF WS-Trust
+configuration</a>
+</li>
+<li>
+<a href="http://cxf.apache.org/resources-and-articles.html">CXF Security
+articles</a>
+</li>
+</ul>
+
+<h3><p>Apache Rampart/Axis</p></h3>
+<p>
+<a href="http://axis.apache.org/axis2/java/rampart/">Apache Rampart</a> is the
+security module for the Axis2 web services stack. Rampart uses WSS4J to
+perform the core WS-Security functionality, and provides extended security
+functionality based around the WS-SecurityPolicy, WS-SecureConversation and
+WS-Trust specifications. Note that support for Apache Axis1 via the WSS4J
+1.5.x series of releases is no longer supported. More information:
+</p>
+<ul>
+<li>
+<a href="http://axis.apache.org/axis2/java/rampart/developer-guide.html">
+Rampart developer guide</a>
+</li>
+<li>
+<a href="http://axis.apache.org/axis2/java/rampart/samples.html">Rampart
+samples</a>
+</li>
+<li>
+<a href="http://axis.apache.org/axis2/java/rampart/rampartconfig-guide.html">
+Rampart configuration guide</a>
+</li>
+<li>
+<a href="http://axis.apache.org/axis2/java/rampart/articles.html">Rampart
+articles</a>
+</li>
+</ul>
+</subsection>
+
+</section>            
+</body>
+</document>

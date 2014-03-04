@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document>
+<body>
+<section name="Streaming (StAX) WS-Security support in Apache WSS4J 2.0.0">
+
+<subsection name="Overview of new features">
+<p>
+WSS4J 2.0.0 introduces a streaming (StAX-based) WS-Security implementation to
+complement the existing DOM-based implementation. The DOM-based implementation
+is quite performant and flexible, but suffers from having to read the entire
+XML tree into memory. For large SOAP requests this can have a detrimental
+impact on performance. In addition, for web services stacks such as Apache CXF
+which are streaming-based, it carries an additional performance penalty of
+having to explicitly convert the request stream to a DOM Element.
+</p>
+<p>
+The new StAX-based WS-Security implementation does not read the request into
+memory, and hence uses far less memory for large requests. It is also more
+performant in certain circumstances. The StAX-based code offers largely the
+same functionality as that available as part of the DOM code, and is
+configured in mostly the same way (via configuration tags that are shared
+between both stacks). It does not offer the low-level API available in the DOM
+code to individually construct various WS-Security tokens, but instead must be
+used by specifying various actions to perform.
+</p>
+<p>
+As of the time of writing, Apache CXF is the only web services stack to 
+integrate the new WS-Security streaming functionality. To switch to use the
+streaming code for the manual "Action" based approach, simply change the
+outbound and inbound interceptors as follows:
+</p>
+<ul>
+<li>"org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor" to
+"org.apache.cxf.ws.security.wss4j.WSS4JStaxOutInterceptor".</li>
+<li>"org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor" to
+"org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor".</li>
+</ul>
+<p>
+For the WS-SecurityPolicy based approach of configuring WS-Security, simply
+set the JAX-WS property SecurityConstants.ENABLE_STREAMING_SECURITY
+("ws-security.enable.streaming") to "true".
+</p>
+</subsection>
+
+</section>            
+</body>
+</document>
