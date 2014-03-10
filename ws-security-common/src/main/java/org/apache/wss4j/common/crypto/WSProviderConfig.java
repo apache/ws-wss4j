@@ -25,12 +25,8 @@ import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.security.Provider;
 import java.security.Security;
-import java.util.Enumeration;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
 import org.apache.wss4j.common.util.Loader;
-import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.I18n;
 import org.apache.xml.security.utils.XMLUtils;
 
@@ -133,33 +129,7 @@ public final class WSProviderConfig {
     }
 
     private static void initializeResourceBundles() {
-
-        ResourceBundle resourceBundle = new ResourceBundle() {
-
-            private final ResourceBundle wss4jSecResourceBundle = ResourceBundle.getBundle("messages.wss4j_errors");
-            private final ResourceBundle xmlSecResourceBundle = ResourceBundle.getBundle(Constants.exceptionMessagesResourceBundleBase);
-
-            @Override
-            protected Object handleGetObject(String key) {
-                Object value = null;
-                try {
-                    value = wss4jSecResourceBundle.getObject(key);
-                } catch (MissingResourceException e) {
-                    try {
-                        value = xmlSecResourceBundle.getObject(key);
-                    } catch (MissingResourceException ex) { //NOPMD
-                        //ignore
-                    }
-                }
-                return value;
-            }
-
-            @Override
-            public Enumeration<String> getKeys() {
-                throw new UnsupportedOperationException("getKeys not supported");
-            }
-        };
-        I18n.init(resourceBundle);
+        I18n.init(new WSS4JResourceBundle());
     }
 
     /**
