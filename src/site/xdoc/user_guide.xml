@@ -7,6 +7,7 @@ Click on the links below for more information about the functionality offered
 by WSS4J and how to configure it.
 </p>
 <ul>
+<li><a href="what.html">What is Apache WSS4J?</a></li>
 <li><a href="using.html">Using Apache WSS4J</a></li>
 <li><a href="config.html">WSS4J Configuration</a></li>
 <li><a href="newfeatures20.html">WSS4J 2.0.0 New Features</a></li>
