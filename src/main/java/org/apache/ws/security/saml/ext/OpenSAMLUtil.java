@@ -165,7 +165,7 @@ public final class OpenSAMLUtil {
             }
         } finally {
             if (frag != null) {
-                if (doc.getDocumentElement() != null
+                if (doc.getDocumentElement() != null && element != null
                     && doc.getDocumentElement() != element) {
                     doc.getDocumentElement().removeChild(element);
                 }
