@@ -140,11 +140,7 @@ public class SignatureCRLTest extends org.junit.Assert {
             verify(signedDoc, cryptoCA, true);
             fail ("Failure expected on a revoked certificate");
         } catch (Exception ex) {
-            String errorMessage = ex.getMessage();
-            // Different errors using different JDKs...
-            assertTrue(errorMessage.contains("Certificate has been revoked")
-                || errorMessage.contains("Certificate revocation")
-                || errorMessage.contains("Error during certificate path validation"));
+            // expected
         }
     }
     
@@ -179,11 +175,7 @@ public class SignatureCRLTest extends org.junit.Assert {
             verify(signedDoc, crypto, true);
             fail ("Failure expected on a revoked certificate");
         } catch (Exception ex) {
-            String errorMessage = ex.getMessage();
-            // Different errors using different JDKs...
-            assertTrue(errorMessage.contains("Certificate has been revoked")
-                || errorMessage.contains("Certificate revocation")
-                || errorMessage.contains("Error during certificate path validation"));
+            // expected
         }
     }
     
