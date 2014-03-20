@@ -46,12 +46,14 @@ import java.security.cert.TrustAnchor;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -777,11 +779,14 @@ public class Merlin extends CryptoBase {
      *
      * @param certs Certificate chain to validate
      * @param enableRevocation whether to enable CRL verification or not
+     * @param subjectCertConstraints A set of constraints on the Subject DN of the certificates
+     * 
      * @throws WSSecurityException if the certificate chain is invalid
      */
     public void verifyTrust(
         X509Certificate[] certs, 
-        boolean enableRevocation
+        boolean enableRevocation,
+        Collection<Pattern> subjectCertConstraints
     ) throws WSSecurityException {
         //
         // FIRST step - Search the keystore for the transmitted certificate
@@ -937,6 +942,11 @@ public class Merlin extends CryptoBase {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "certpath", e
                 );
+        }
+        
+        // Finally check Cert Constraints
+        if (!matches(certs[0], subjectCertConstraints)) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
     }
     

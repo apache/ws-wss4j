@@ -30,10 +30,14 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.security.auth.x500.X500Principal;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -52,6 +56,9 @@ public abstract class CryptoBase implements Crypto {
      */
     public static final String NAME_CONSTRAINTS_OID = "2.5.29.30";
     
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(CryptoBase.class);
+                    
     private static final Constructor<?> BC_509CLASS_CONS;
 
     protected Map<String, CertificateFactory> certFactMap = 
@@ -290,7 +297,7 @@ public abstract class CryptoBase implements Crypto {
 
     @Override
     public void verifyDirectTrust(X509Certificate[] certs) throws WSSecurityException {
-    	verifyTrust(certs, true);
+    	verifyTrust(certs, true, null);
     }
     
     protected Object createBCX509Name(String s) {
@@ -302,6 +309,41 @@ public abstract class CryptoBase implements Crypto {
              }
         }
         return new X500Principal(s);
+    }
+    
+    /**
+     * @return      true if the certificate's SubjectDN matches the constraints defined in the
+     *              subject DNConstraints; false, otherwise. The certificate subject DN only
+     *              has to match ONE of the subject cert constraints (not all).
+     */
+    protected boolean
+    matches(
+        final X509Certificate cert, final Collection<Pattern> subjectDNPatterns
+    ) {
+        if (subjectDNPatterns.isEmpty()) {
+            LOG.warn("No Subject DN Certificate Constraints were defined. This could be a security issue");
+        }
+        if (!subjectDNPatterns.isEmpty()) {
+            if (cert == null) {
+                LOG.debug("The certificate is null so no constraints matching was possible");
+                return false;
+            }
+            String subjectName = cert.getSubjectX500Principal().getName();
+            boolean subjectMatch = false;
+            for (Pattern subjectDNPattern : subjectDNPatterns) {
+                final Matcher matcher = subjectDNPattern.matcher(subjectName);
+                if (matcher.matches()) {
+                    LOG.debug("Subject DN " + subjectName + " matches with pattern " + subjectDNPattern);
+                    subjectMatch = true;
+                    break;
+                }
+            }
+            if (!subjectMatch) {
+                return false;
+            }
+        }
+        
+        return true;
     }
     
 }

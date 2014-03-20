@@ -23,6 +23,8 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
+import java.util.regex.Pattern;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -183,14 +185,16 @@ public interface Crypto {
      *
      * @param certs Certificate chain to validate
      * @param enableRevocation whether to enable CRL verification or not
+     * @param subjectCertConstraints A set of constraints on the Subject DN of the certificates
      * @throws WSSecurityException if the certificate chain is invalid
      */
     void verifyTrust(
-        X509Certificate[] certs, boolean enableRevocation
+        X509Certificate[] certs, boolean enableRevocation,
+        Collection<Pattern> subjectCertConstraints
     ) throws WSSecurityException;
     
     /**
-     * Evaluate whether a given public key should be trusted directly (located inside trust repository).
+     * Evaluate whether a given public key should be trusted directly (located 
      * 
      * @param certs Certificate chain to validate
      * @throws WSSecurityException if the certificate chain is invalid

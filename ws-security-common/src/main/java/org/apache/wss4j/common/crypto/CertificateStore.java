@@ -31,9 +31,11 @@ import java.security.cert.PKIXParameters;
 import java.security.cert.TrustAnchor;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.x500.X500Principal;
@@ -143,11 +145,13 @@ public class CertificateStore extends CryptoBase {
      *
      * @param certs Certificate chain to validate
      * @param enableRevocation whether to enable CRL verification or not
+     * @param subjectCertConstraints A set of constraints on the Subject DN of the certificates
      * @throws WSSecurityException if the certificate chain is invalid
      */
     public void verifyTrust(
         X509Certificate[] certs, 
-        boolean enableRevocation
+        boolean enableRevocation,
+        Collection<Pattern> subjectCertConstraints
     ) throws WSSecurityException {
         //
         // FIRST step - Search the trusted certs for the transmitted certificate
@@ -268,6 +272,11 @@ public class CertificateStore extends CryptoBase {
                     WSSecurityException.ErrorCode.FAILURE, "certpath", e,
                     e.getMessage()
                 );
+        }
+        
+        // Finally check Cert Constraints
+        if (!matches(certs[0], subjectCertConstraints)) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
     }
     

@@ -117,15 +117,12 @@ public abstract class X509SecurityTokenImpl
                 x509Certificates[0].checkValidity();
                 
                 boolean enableRevocation = false;
+                Collection<Pattern> subjectCertConstraints = null;
                 if (securityProperties != null) {
                     enableRevocation = securityProperties.isEnableRevocation();
+                    subjectCertConstraints = securityProperties.getSubjectCertConstraints();
                 }
-                getCrypto().verifyTrust(x509Certificates, enableRevocation);
-                
-                Collection<Pattern> subjectCertConstraints = securityProperties.getSubjectCertConstraints();
-                if (!matches(x509Certificates[0], subjectCertConstraints)) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
-                }
+                getCrypto().verifyTrust(x509Certificates, enableRevocation, subjectCertConstraints);
             }
         } catch (CertificateExpiredException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);

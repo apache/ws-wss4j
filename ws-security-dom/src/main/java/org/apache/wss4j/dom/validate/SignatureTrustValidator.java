@@ -24,7 +24,6 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.wss4j.common.crypto.Crypto;
@@ -79,7 +78,6 @@ public class SignatureTrustValidator implements Validator {
         return data.getSigVerCrypto();
     }
 
-
     /**
      * Validate the certificates by checking the validity of each cert
      * @throws WSSecurityException
@@ -120,16 +118,13 @@ public class SignatureTrustValidator implements Validator {
         // Use the validation method from the crypto to check whether the subjects' 
         // certificate was really signed by the issuer stated in the certificate
         //
-        crypto.verifyTrust(certificates, enableRevocation);
+        Collection<Pattern> subjectCertConstraints = data.getSubjectCertConstraints();
+        crypto.verifyTrust(certificates, enableRevocation, subjectCertConstraints);
         if (LOG.isDebugEnabled()) {
             String subjectString = certificates[0].getSubjectX500Principal().getName();
             LOG.debug(
                 "Certificate path has been verified for certificate with subject " + subjectString
             );
-        }
-        Collection<Pattern> subjectCertConstraints = data.getSubjectCertConstraints();
-        if (!matches(certificates[0], subjectCertConstraints)) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
     }
     
@@ -140,41 +135,6 @@ public class SignatureTrustValidator implements Validator {
     protected void validatePublicKey(PublicKey publicKey, Crypto crypto) 
         throws WSSecurityException {
         crypto.verifyTrust(publicKey);
-    }
-    
-    /**
-     * @return      true if the certificate's SubjectDN matches the constraints defined in the
-     *              subject DNConstraints; false, otherwise. The certificate subject DN only
-     *              has to match ONE of the subject cert constraints (not all).
-     */
-    protected boolean
-    matches(
-        final X509Certificate cert, final Collection<Pattern> subjectDNPatterns
-    ) {
-        if (subjectDNPatterns.isEmpty()) {
-            LOG.warn("No Subject DN Certificate Constraints were defined. This could be a security issue");
-        }
-        if (!subjectDNPatterns.isEmpty()) {
-            if (cert == null) {
-                LOG.debug("The certificate is null so no constraints matching was possible");
-                return false;
-            }
-            String subjectName = cert.getSubjectX500Principal().getName();
-            boolean subjectMatch = false;
-            for (Pattern subjectDNPattern : subjectDNPatterns) {
-                final Matcher matcher = subjectDNPattern.matcher(subjectName);
-                if (matcher.matches()) {
-                    LOG.debug("Subject DN " + subjectName + " matches with pattern " + subjectDNPattern);
-                    subjectMatch = true;
-                    break;
-                }
-            }
-            if (!subjectMatch) {
-                return false;
-            }
-        }
-        
-        return true;
     }
     
 }

@@ -26,7 +26,9 @@ import java.security.PublicKey;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.Subject;
@@ -204,10 +206,12 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
                     //todo I don't think the checkValidity is necessary because the CertPathChecker
                     x509Certificates[0].checkValidity();
                     boolean enableRevocation = false;
+                    Collection<Pattern> subjectCertConstraints = null;
                     if (securityProperties != null) {
                         enableRevocation = securityProperties.isEnableRevocation();
+                        subjectCertConstraints = securityProperties.getSubjectCertConstraints();
                     }
-                    crypto.verifyTrust(x509Certificates, enableRevocation);
+                    crypto.verifyTrust(x509Certificates, enableRevocation, subjectCertConstraints);
                 }
                 PublicKey publicKey = getPublicKey();
                 if (publicKey != null) {
