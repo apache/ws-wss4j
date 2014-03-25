@@ -22,19 +22,26 @@ package org.apache.wss4j.dom.saml.ext;
 import java.io.InputStream;
 import java.security.KeyStore;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.crypto.Merlin;
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.Loader;
 import org.junit.Assert;
 import org.opensaml.xml.signature.Signature;
 import org.opensaml.xml.signature.SignatureConstants;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * A list of test-cases to test the functionality of signing with
@@ -51,9 +58,12 @@ public class AssertionSigningTest extends org.junit.Assert {
     // Default DSA Signature algorithm used by SamlAssertionWrapper class.
     private final String defaultDSASignatureAlgorithm = SignatureConstants.ALGO_ID_SIGNATURE_DSA;
     // Custom Signature algorithm
-    private final String customSignatureAlgorithm = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+    private final String customSignatureAlgorithm = SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA256;
     // Custom Canonicalization algorithm
     private final String customCanonicalizationAlgorithm = SignatureConstants.ALGO_ID_C14N_OMIT_COMMENTS;
+    // Custom Signature Digest algorithm
+    private final String customSignatureDigestAlgorithm = SignatureConstants.ALGO_ID_DIGEST_SHA256;
+    private final DocumentBuilderFactory dbf;
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
@@ -70,6 +80,9 @@ public class AssertionSigningTest extends org.junit.Assert {
                 "keys/client_keystore.jks");
         keyStore.load(input, "password".toCharArray());
         ((Merlin) issuerCrypto).setKeyStore(keyStore);
+        
+        dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
     }
 
     /**
@@ -98,6 +111,20 @@ public class AssertionSigningTest extends org.junit.Assert {
                         defaultDSASignatureAlgorithm));
         Assert.assertEquals(defaultCanonicalizationAlgorithm,
                 signature.getCanonicalizationAlgorithm());
+        
+        // Verify Signature
+        SAMLKeyInfo keyInfo = new SAMLKeyInfo();
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("client_certchain");
+        keyInfo.setCerts(issuerCrypto.getX509Certificates(cryptoType));
+        
+        Document doc = dbf.newDocumentBuilder().newDocument();
+        
+        Element assertionElement = samlAssertion.toDOM(doc);
+        doc.appendChild(assertionElement);
+        
+        samlAssertion = new SamlAssertionWrapper(assertionElement);
+        samlAssertion.verifySignature(keyInfo);
     }
 
     /**
@@ -118,11 +145,28 @@ public class AssertionSigningTest extends org.junit.Assert {
         
         samlAssertion.signAssertion("client_certchain", "password", issuerCrypto,
                 false, customCanonicalizationAlgorithm,
-                customSignatureAlgorithm);
+                customSignatureAlgorithm, customSignatureDigestAlgorithm);
         Signature signature = samlAssertion.getSaml2().getSignature();
         Assert.assertEquals(customSignatureAlgorithm,
                 signature.getSignatureAlgorithm());
         Assert.assertEquals(customCanonicalizationAlgorithm,
                 signature.getCanonicalizationAlgorithm());
+        
+        Document doc = dbf.newDocumentBuilder().newDocument();
+        
+        Element assertionElement = samlAssertion.toDOM(doc);
+        doc.appendChild(assertionElement);
+        String assertionString = DOM2Writer.nodeToString(assertionElement);
+        Assert.assertTrue(assertionString.contains(customSignatureDigestAlgorithm));
+
+        // Verify Signature
+        SAMLKeyInfo keyInfo = new SAMLKeyInfo();
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("client_certchain");
+        keyInfo.setCerts(issuerCrypto.getX509Certificates(cryptoType));
+        
+        samlAssertion = new SamlAssertionWrapper(assertionElement);
+        samlAssertion.verifySignature(keyInfo);
     }
+    
 }

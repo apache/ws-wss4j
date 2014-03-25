@@ -87,7 +87,8 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                         samlCallback.getIssuerCrypto(),
                         samlCallback.isSendKeyValue(),
                         samlCallback.getCanonicalizationAlgorithm(),
-                        samlCallback.getSignatureAlgorithm()
+                        samlCallback.getSignatureAlgorithm(),
+                        samlCallback.getSignatureDigestAlgorithm()
                 );
             }
 

@@ -94,6 +94,8 @@ public class SAMLCallback implements Callback {
     private String canonicalizationAlgorithm;
 
     private String signatureAlgorithm;
+    
+    private String signatureDigestAlgorithm;
 
     /**
      * Constructor SAMLCallback creates a new SAMLCallback instance.
@@ -341,5 +343,13 @@ public class SAMLCallback implements Callback {
 
     public void setSignatureAlgorithm(String signatureAlgorithm) {
         this.signatureAlgorithm = signatureAlgorithm;
+    }
+
+    public String getSignatureDigestAlgorithm() {
+        return signatureDigestAlgorithm;
+    }
+
+    public void setSignatureDigestAlgorithm(String signatureDigestAlgorithm) {
+        this.signatureDigestAlgorithm = signatureDigestAlgorithm;
     }
 }
