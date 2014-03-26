@@ -70,9 +70,15 @@ public class InboundWSSec {
     }
 
     private final WSSSecurityProperties securityProperties;
+    private final boolean initiator;
 
     public InboundWSSec(WSSSecurityProperties securityProperties) {
+        this(securityProperties, false);
+    }
+    
+    public InboundWSSec(WSSSecurityProperties securityProperties, boolean initiator) {
         this.securityProperties = securityProperties;
+        this.initiator = initiator;
     }
 
     /**
@@ -253,6 +259,6 @@ public class InboundWSSec {
             }
         }
 
-        return new WSSecurityStreamReader(inputProcessorChain, securityProperties);
+        return new WSSecurityStreamReader(inputProcessorChain, securityProperties, initiator);
     }
 }

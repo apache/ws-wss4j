@@ -29,8 +29,12 @@ import javax.xml.stream.XMLStreamException;
 
 public class WSSecurityStreamReader extends XMLSecurityStreamReader {
     
-    public WSSecurityStreamReader(InputProcessorChain inputProcessorChain, XMLSecurityProperties securityProperties) {
+    private final boolean initiator;
+    
+    public WSSecurityStreamReader(InputProcessorChain inputProcessorChain, 
+            XMLSecurityProperties securityProperties, boolean initiator) {
         super(inputProcessorChain, securityProperties);
+        this.initiator = initiator;
     }
 
     @Override
@@ -41,10 +45,10 @@ public class WSSecurityStreamReader extends XMLSecurityStreamReader {
             Throwable cause = e.getCause();
             if (cause instanceof WSSecurityException) {
                 // Allow a WSSPolicyException
-                if (cause.getCause() instanceof WSSPolicyException) {
+                if (initiator || cause.getCause() instanceof WSSPolicyException) {
                     throw e;
                 }
-                // Map to a "safe" error message
+                // Map to a "safe" error message if we are not the initiator
                 String error = ((WSSecurityException)cause).getSafeExceptionMessage();
                 throw new XMLStreamException(
                     new WSSecurityException(((WSSecurityException)cause).getErrorCode(),
