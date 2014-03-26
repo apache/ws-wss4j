@@ -37,6 +37,7 @@ import org.apache.xml.security.signature.XMLSignatureException;
 
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.common.SignableSAMLObject;
+import org.opensaml.common.impl.SAMLObjectContentReference;
 import org.opensaml.saml1.core.AttributeStatement;
 import org.opensaml.saml1.core.AuthenticationStatement;
 import org.opensaml.saml1.core.AuthorizationDecisionStatement;
@@ -139,6 +140,11 @@ public class AssertionWrapper {
      * Default DSA Signature algorithm used for signing.
      */
     private final String defaultDSASignatureAlgorithm = SignatureConstants.ALGO_ID_SIGNATURE_DSA;
+    
+    /**
+     * Default Signature Digest algorithm
+     */
+    private final String defaultSignatureDigestAlgorithm = SignatureConstants.ALGO_ID_DIGEST_SHA1;
     
     /**
      * Whether this object was instantiated with a DOM Element or an XMLObject initially
@@ -420,9 +426,26 @@ public class AssertionWrapper {
      * @param signature the signature of this AssertionWrapper object.
      */
     public void setSignature(Signature signature) {
+        setSignature(signature, defaultSignatureDigestAlgorithm);
+    }
+    
+    /**
+     * Method setSignature sets the signature of this SamlAssertionWrapper object.
+     *
+     * @param signature the signature of this SamlAssertionWrapper object.
+     * @param signatureDigestAlgorithm the signature digest algorithm to use
+     */
+    public void setSignature(Signature signature, String signatureDigestAlgorithm) {
         if (xmlObject instanceof SignableSAMLObject) {
             SignableSAMLObject signableObject = (SignableSAMLObject) xmlObject;
             signableObject.setSignature(signature);
+            String digestAlg = signatureDigestAlgorithm;
+            if (digestAlg == null) {
+                digestAlg = defaultSignatureDigestAlgorithm;
+            }
+            SAMLObjectContentReference contentRef = 
+                (SAMLObjectContentReference)signature.getContentReferences().get(0);
+            contentRef.setDigestAlgorithm(digestAlg);
             signableObject.releaseDOM();
             signableObject.releaseChildrenDOM(true);
         } else {
@@ -445,7 +468,7 @@ public class AssertionWrapper {
 
         signAssertion(issuerKeyName, issuerKeyPassword, issuerCrypto,
                 sendKeyValue, defaultCanonicalizationAlgorithm,
-                defaultRSASignatureAlgorithm);
+                defaultRSASignatureAlgorithm, defaultSignatureDigestAlgorithm);
     }
     
     /**
@@ -462,6 +485,27 @@ public class AssertionWrapper {
     public void signAssertion(String issuerKeyName, String issuerKeyPassword,
             Crypto issuerCrypto, boolean sendKeyValue,
             String canonicalizationAlgorithm, String signatureAlgorithm)
+            throws WSSecurityException {
+        signAssertion(issuerKeyName, issuerKeyPassword, issuerCrypto, sendKeyValue,
+                canonicalizationAlgorithm, signatureAlgorithm, defaultSignatureDigestAlgorithm);
+    }
+    
+    /**
+     * Create an enveloped signature on the assertion that has been created.
+     * 
+     * @param issuerKeyName the Issuer KeyName to use with the issuerCrypto argument
+     * @param issuerKeyPassword the Issuer Password to use with the issuerCrypto argument
+     * @param issuerCrypto the Issuer Crypto instance
+     * @param sendKeyValue whether to send the key value or not
+     * @param canonicalizationAlgorithm the canonicalization algorithm to be used for signing
+     * @param signatureAlgorithm the signature algorithm to be used for signing
+     * @param signatureDigestAlgorithm the signature Digest algorithm to use
+     * @throws WSSecurityException
+     */
+    public void signAssertion(String issuerKeyName, String issuerKeyPassword,
+            Crypto issuerCrypto, boolean sendKeyValue,
+            String canonicalizationAlgorithm, String signatureAlgorithm,
+            String signatureDigestAlgorithm)
             throws WSSecurityException {
         //
         // Create the signature
@@ -519,7 +563,7 @@ public class AssertionWrapper {
         }
 
         // add the signature to the assertion
-        setSignature(signature);
+        setSignature(signature, signatureDigestAlgorithm);
     }
 
     /**

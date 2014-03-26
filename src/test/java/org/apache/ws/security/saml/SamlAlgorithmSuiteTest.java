@@ -19,11 +19,7 @@
 
 package org.apache.ws.security.saml;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import javax.xml.namespace.QName;
 
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSConstants;
