@@ -25,6 +25,7 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.apache.xml.security.utils.Constants;
+import org.apache.xml.security.utils.I18n;
 
 /**
  * ResourceBundle for WSS4J
@@ -43,14 +44,16 @@ public class WSS4JResourceBundle extends ResourceBundle {
         ResourceBundle tmpResourceBundle;
         try {
             tmpResourceBundle = 
-                ResourceBundle.getBundle(Constants.exceptionMessagesResourceBundleBase);
+                ResourceBundle.getBundle(Constants.exceptionMessagesResourceBundleBase,
+                        Locale.getDefault(),
+                        I18n.class.getClassLoader());
         } catch (MissingResourceException ex) {
             // Using a Locale of which there is no properties file.
             LOG.debug(ex.getMessage());
             // Default to en/US
             tmpResourceBundle = 
                 ResourceBundle.getBundle(Constants.exceptionMessagesResourceBundleBase,
-                                         new Locale("en", "US"));
+                                         new Locale("en", "US"), I18n.class.getClassLoader());
         }
         xmlSecResourceBundle = tmpResourceBundle;
     }

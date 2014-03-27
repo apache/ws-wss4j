@@ -34,18 +34,6 @@
         <wss4j.osgi.dynamic.import>
             org.bouncycastle.jce.provider
         </wss4j.osgi.dynamic.import>
-                        <!-- Import-Package>
-                              !org.apache.wss4j.dom.*,
-                              javax.xml.crypto.*,
-                              org.slf4j.*;version="[1.7,2)",
-                              org.apache.xml.security.*;version="[2.0.0,3]",
-                              org.apache.wss4j.common.*;version="[2.0,3)",
-                              org.bouncycastle.*;resolution:=optional,
-                              org.apache.jcp.xml.dsig.internal.*,
-                              org.opensaml.*;resolution:=optional;version="[2.5.0,3)",
-                              *;resolution:=optional
-                        </Import-Package-->
-        
     </properties>
         
     <build>

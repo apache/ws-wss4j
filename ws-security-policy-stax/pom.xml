@@ -48,6 +48,7 @@
             <groupId>wsdl4j</groupId>
             <artifactId>wsdl4j</artifactId>
             <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.wss4j</groupId>
