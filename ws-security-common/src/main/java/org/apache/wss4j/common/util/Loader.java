@@ -19,6 +19,8 @@
 
 package org.apache.wss4j.common.util;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.security.AccessController;
@@ -124,6 +126,26 @@ public class Loader {
             LOG.warn("Caught Exception while in Loader.getResource. This may be innocuous.", e);
         }
         return getResource(resource);
+    }
+    
+    /**
+     * This is a convenience method to load a resource as a stream. <p/> The
+     * algorithm used to find the resource is given in getResource()
+     * 
+     * @param resourceName The name of the resource to load
+     * @param callingClass The Class object of the calling object
+     */
+    public static InputStream getResourceAsStream(String resourceName) {
+        URL url = getResource(resourceName);
+
+        try {
+            return (url != null) ? url.openStream() : null;
+        } catch (IOException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(e.getMessage(), e);
+            }
+            return null;
+        }
     }
 
     /**

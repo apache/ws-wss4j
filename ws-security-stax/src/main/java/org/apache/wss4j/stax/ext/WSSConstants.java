@@ -18,95 +18,21 @@
  */
 package org.apache.wss4j.stax.ext;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.namespace.QName;
+
 import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.stax.impl.util.ConcreteLSInput;
-import org.w3c.dom.ls.LSInput;
-import org.w3c.dom.ls.LSResourceResolver;
-import org.xml.sax.SAXException;
-
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.namespace.QName;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import java.util.*;
 
 /**
  * WSSConstants for global use
  */
 public class WSSConstants extends XMLSecurityConstants {
-
-    static {
-        try {
-            setJaxbContext(
-                    JAXBContext.newInstance(
-                            org.apache.wss4j.binding.wss10.ObjectFactory.class,
-                            org.apache.wss4j.binding.wss11.ObjectFactory.class,
-                            org.apache.wss4j.binding.wsu10.ObjectFactory.class,
-                            org.apache.wss4j.binding.wssc13.ObjectFactory.class,
-                            org.apache.wss4j.binding.wssc200502.ObjectFactory.class,
-                            org.apache.xml.security.binding.xmlenc.ObjectFactory.class,
-                            org.apache.xml.security.binding.xmlenc11.ObjectFactory.class,
-                            org.apache.xml.security.binding.xmldsig.ObjectFactory.class,
-                            org.apache.xml.security.binding.xmldsig11.ObjectFactory.class,
-                            org.apache.xml.security.binding.excc14n.ObjectFactory.class
-                    )
-            );
-            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            schemaFactory.setResourceResolver(new LSResourceResolver() {
-                @Override
-                public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseURI) {
-                    if ("http://www.w3.org/2001/XMLSchema.dtd".equals(systemId)) {
-                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
-                        concreteLSInput.setByteStream(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("bindings/schemas/XMLSchema.dtd"));
-                        return concreteLSInput;
-                    } else if ("XMLSchema.dtd".equals(systemId)) {
-                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
-                        concreteLSInput.setByteStream(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("bindings/schemas/XMLSchema.dtd"));
-                        return concreteLSInput;
-                    } else if ("datatypes.dtd".equals(systemId)) {
-                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
-                        concreteLSInput.setByteStream(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("bindings/schemas/datatypes.dtd"));
-                        return concreteLSInput;
-                    } else if ("http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd".equals(systemId)) {
-                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
-                        concreteLSInput.setByteStream(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("bindings/schemas/xmldsig-core-schema.xsd"));
-                        return concreteLSInput;
-                    } else if ("http://www.w3.org/2001/xml.xsd".equals(systemId)) {
-                        ConcreteLSInput concreteLSInput = new ConcreteLSInput();
-                        concreteLSInput.setByteStream(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("bindings/schemas/xml.xsd"));
-                        return concreteLSInput;
-                    }
-                    return null;
-                }
-            });
-            Schema schema = schemaFactory.newSchema(
-                    new Source[]{
-                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/soap-1.1.xsd")),
-                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/soap-1.2.xsd")),
-                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("bindings/schemas/exc-c14n.xsd")),
-                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("bindings/schemas/xmldsig-core-schema.xsd")),
-                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("bindings/schemas/xenc-schema.xsd")),
-                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("bindings/schemas/xenc-schema-11.xsd")),
-                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("bindings/schemas/xmldsig11-schema.xsd")),
-                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/oasis-200401-wss-wssecurity-utility-1.0.xsd")),
-                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/oasis-200401-wss-wssecurity-secext-1.0.xsd")),
-                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/oasis-wss-wssecurity-secext-1.1.xsd")),
-                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/ws-secureconversation-200502.xsd")),
-                            new StreamSource(XMLSecurityConstants.class.getClassLoader().getResourceAsStream("schemas/ws-secureconversation-1.3.xsd")),
-                    }
-            );
-            setJaxbSchemas(schema);
-        } catch (JAXBException e) {
-            throw new RuntimeException(e);
-        } catch (SAXException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     protected WSSConstants() {
     }
