@@ -34,19 +34,7 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.wss4j</groupId>
-            <artifactId>wss4j-bindings-wss10</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.wss4j</groupId>
-            <artifactId>wss4j-bindings-wss11</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.wss4j</groupId>
-            <artifactId>wss4j-bindings-wssc</artifactId>
+            <artifactId>wss4j-bindings</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
