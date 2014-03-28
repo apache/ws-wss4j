@@ -42,6 +42,7 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.Init;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.impl.util.ConcreteLSInput;
+import org.apache.xml.security.utils.ClassLoaderUtils;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.SAXException;
@@ -58,7 +59,7 @@ public class WSSec {
     static {
         WSProviderConfig.init();
         try {
-            Init.init(Loader.getResource("wss/wss-config.xml").toURI());
+            Init.init(ClassLoaderUtils.getResource("wss/wss-config.xml", WSSec.class).toURI());
             
             WSSConstants.setJaxbContext(
                     JAXBContext.newInstance(
