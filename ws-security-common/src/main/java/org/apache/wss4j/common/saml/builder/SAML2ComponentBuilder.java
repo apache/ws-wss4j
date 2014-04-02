@@ -213,9 +213,9 @@ public final class SAML2ComponentBuilder {
             conditions.setNotOnOrAfter(notOnOrAfter);
         }
         
-        if (conditionsBean.getAudienceURI() != null) {
+        if (conditionsBean.getAudienceURIs() != null && !conditionsBean.getAudienceURIs().isEmpty()) {
             AudienceRestriction audienceRestriction = 
-                createAudienceRestriction(conditionsBean.getAudienceURI());
+                createAudienceRestriction(conditionsBean.getAudienceURIs());
             conditions.getAudienceRestrictions().add(audienceRestriction);
         }
         
@@ -232,11 +232,11 @@ public final class SAML2ComponentBuilder {
     /**
      * Create an AudienceRestriction object
      *
-     * @param audienceURI of type String
+     * @param audienceURIs of type String
      * @return an AudienceRestriction object
      */
     @SuppressWarnings("unchecked")
-    public static AudienceRestriction createAudienceRestriction(String audienceURI) {
+    public static AudienceRestriction createAudienceRestriction(List<String> audienceURIs) {
         if (audienceRestrictionBuilder == null) {
             audienceRestrictionBuilder = (SAMLObjectBuilder<AudienceRestriction>) 
                 builderFactory.getBuilder(AudienceRestriction.DEFAULT_ELEMENT_NAME);
@@ -247,9 +247,12 @@ public final class SAML2ComponentBuilder {
         }
        
         AudienceRestriction audienceRestriction = audienceRestrictionBuilder.buildObject();
-        Audience audience = audienceBuilder.buildObject();
-        audience.setAudienceURI(audienceURI);
-        audienceRestriction.getAudiences().add(audience);
+        
+        for (String audienceURI : audienceURIs) {
+            Audience audience = audienceBuilder.buildObject();
+            audience.setAudienceURI(audienceURI);
+            audienceRestriction.getAudiences().add(audience);
+        }
         return audienceRestriction;
     }
     

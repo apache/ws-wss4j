@@ -19,6 +19,8 @@
 
 package org.apache.wss4j.common.saml.bean;
 
+import java.util.List;
+
 import org.joda.time.DateTime;
 
 
@@ -30,7 +32,7 @@ public class ConditionsBean {
     private DateTime notBefore;
     private DateTime notAfter;
     private long tokenPeriodSeconds;
-    private String audienceURI;
+    private List<String> audienceURIs;
     private boolean oneTimeUse;
     private ProxyRestrictionBean proxyRestriction;
 
@@ -138,12 +140,12 @@ public class ConditionsBean {
     }
     
     /**
-     * Get the audienceURI instance
+     * Get the audienceURI instances
      *
-     * @return the audienceURI instance
+     * @return the audienceURI instances
      */
-    public String getAudienceURI() {
-        return audienceURI;
+    public List<String> getAudienceURIs() {
+        return audienceURIs;
     }
 
     /**
@@ -151,8 +153,8 @@ public class ConditionsBean {
      *
      * @param audienceURI the audienceURI instance to set
      */
-    public void setAudienceURI(String audienceURI) {
-        this.audienceURI = audienceURI;
+    public void setAudienceURIs(List<String> audienceURIs) {
+        this.audienceURIs = audienceURIs;
     }
 
     /**
@@ -206,9 +208,9 @@ public class ConditionsBean {
             return false; 
         }
         
-        if (audienceURI == null && that.audienceURI != null) {
+        if (audienceURIs == null && that.audienceURIs != null) {
             return false;
-        } else if (audienceURI != null && !audienceURI.equals(that.audienceURI)) {
+        } else if (audienceURIs != null && !audienceURIs.equals(that.audienceURIs)) {
             return false; 
         }
         
@@ -236,8 +238,8 @@ public class ConditionsBean {
         if (notAfter != null) {
             result = 31 * result + notAfter.hashCode();
         }
-        if (audienceURI != null) {
-            result = 31 * result + audienceURI.hashCode();
+        if (audienceURIs != null) {
+            result = 31 * result + audienceURIs.hashCode();
         }
         result = 31 * result + (oneTimeUse ? 1 : 0);
         if (proxyRestriction != null) {
