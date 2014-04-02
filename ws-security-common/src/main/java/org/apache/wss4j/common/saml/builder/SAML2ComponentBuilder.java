@@ -215,14 +215,14 @@ public final class SAML2ComponentBuilder {
         }
         
         if (conditionsBean.getAudienceRestrictions() != null 
-                && !conditionsBean.getAudienceRestrictions().isEmpty()) {
-                for (AudienceRestrictionBean audienceRestrictionBean 
-                        : conditionsBean.getAudienceRestrictions()) {
-                    AudienceRestriction audienceRestriction = 
+            && !conditionsBean.getAudienceRestrictions().isEmpty()) {
+            for (AudienceRestrictionBean audienceRestrictionBean 
+                : conditionsBean.getAudienceRestrictions()) {
+                AudienceRestriction audienceRestriction = 
                         createAudienceRestriction(audienceRestrictionBean);
-                    conditions.getAudienceRestrictions().add(audienceRestriction);
-                }
+                conditions.getAudienceRestrictions().add(audienceRestriction);
             }
+        }
         
         if (conditionsBean.isOneTimeUse()) {
             conditions.getConditions().add(createOneTimeUse());
