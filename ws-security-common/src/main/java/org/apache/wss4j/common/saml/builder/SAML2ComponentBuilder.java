@@ -23,6 +23,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.bean.ActionBean;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
 import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
+import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
 import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
 import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
@@ -213,11 +214,15 @@ public final class SAML2ComponentBuilder {
             conditions.setNotOnOrAfter(notOnOrAfter);
         }
         
-        if (conditionsBean.getAudienceURIs() != null && !conditionsBean.getAudienceURIs().isEmpty()) {
-            AudienceRestriction audienceRestriction = 
-                createAudienceRestriction(conditionsBean.getAudienceURIs());
-            conditions.getAudienceRestrictions().add(audienceRestriction);
-        }
+        if (conditionsBean.getAudienceRestrictions() != null 
+                && !conditionsBean.getAudienceRestrictions().isEmpty()) {
+                for (AudienceRestrictionBean audienceRestrictionBean 
+                        : conditionsBean.getAudienceRestrictions()) {
+                    AudienceRestriction audienceRestriction = 
+                        createAudienceRestriction(audienceRestrictionBean);
+                    conditions.getAudienceRestrictions().add(audienceRestriction);
+                }
+            }
         
         if (conditionsBean.isOneTimeUse()) {
             conditions.getConditions().add(createOneTimeUse());
@@ -232,11 +237,13 @@ public final class SAML2ComponentBuilder {
     /**
      * Create an AudienceRestriction object
      *
-     * @param audienceURIs of type String
+     * @param audienceRestrictionBean of type AudienceRestrictionBean
      * @return an AudienceRestriction object
      */
     @SuppressWarnings("unchecked")
-    public static AudienceRestriction createAudienceRestriction(List<String> audienceURIs) {
+    public static AudienceRestriction createAudienceRestriction(
+        AudienceRestrictionBean audienceRestrictionBean
+    ) {
         if (audienceRestrictionBuilder == null) {
             audienceRestrictionBuilder = (SAMLObjectBuilder<AudienceRestriction>) 
                 builderFactory.getBuilder(AudienceRestriction.DEFAULT_ELEMENT_NAME);
@@ -248,7 +255,7 @@ public final class SAML2ComponentBuilder {
        
         AudienceRestriction audienceRestriction = audienceRestrictionBuilder.buildObject();
         
-        for (String audienceURI : audienceURIs) {
+        for (String audienceURI : audienceRestrictionBean.getAudienceURIs()) {
             Audience audience = audienceBuilder.buildObject();
             audience.setAudienceURI(audienceURI);
             audienceRestriction.getAudiences().add(audience);

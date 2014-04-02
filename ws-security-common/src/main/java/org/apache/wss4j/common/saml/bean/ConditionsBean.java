@@ -32,7 +32,7 @@ public class ConditionsBean {
     private DateTime notBefore;
     private DateTime notAfter;
     private long tokenPeriodSeconds;
-    private List<String> audienceURIs;
+    private List<AudienceRestrictionBean> audienceRestrictions;
     private boolean oneTimeUse;
     private ProxyRestrictionBean proxyRestriction;
 
@@ -140,21 +140,21 @@ public class ConditionsBean {
     }
     
     /**
-     * Get the audienceURI instances
+     * Get the audienceRestrictions instances
      *
-     * @return the audienceURI instances
+     * @return the audienceRestrictions instances
      */
-    public List<String> getAudienceURIs() {
-        return audienceURIs;
+    public List<AudienceRestrictionBean> getAudienceRestrictions() {
+        return audienceRestrictions;
     }
 
     /**
-     * Set the audienceURI instance
+     * Set the audienceRestrictions instance
      *
-     * @param audienceURI the audienceURI instance to set
+     * @param audienceRestrictions the audienceRestrictions instance to set
      */
-    public void setAudienceURIs(List<String> audienceURIs) {
-        this.audienceURIs = audienceURIs;
+    public void setAudienceRestrictions(List<AudienceRestrictionBean> audienceRestrictions) {
+        this.audienceRestrictions = audienceRestrictions;
     }
 
     /**
@@ -208,9 +208,10 @@ public class ConditionsBean {
             return false; 
         }
         
-        if (audienceURIs == null && that.audienceURIs != null) {
+        if (audienceRestrictions == null && that.audienceRestrictions != null) {
             return false;
-        } else if (audienceURIs != null && !audienceURIs.equals(that.audienceURIs)) {
+        } else if (audienceRestrictions != null 
+                && !audienceRestrictions.equals(that.audienceRestrictions)) {
             return false; 
         }
         
@@ -238,8 +239,8 @@ public class ConditionsBean {
         if (notAfter != null) {
             result = 31 * result + notAfter.hashCode();
         }
-        if (audienceURIs != null) {
-            result = 31 * result + audienceURIs.hashCode();
+        if (audienceRestrictions != null) {
+            result = 31 * result + audienceRestrictions.hashCode();
         }
         result = 31 * result + (oneTimeUse ? 1 : 0);
         if (proxyRestriction != null) {

@@ -24,6 +24,7 @@ import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.bean.ActionBean;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
 import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
+import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
 import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
 import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
@@ -277,10 +278,14 @@ public final class SAML1ComponentBuilder {
             conditions.setNotOnOrAfter(notOnOrAfter);
         }
         
-        if (conditionsBean.getAudienceURIs() != null && !conditionsBean.getAudienceURIs().isEmpty()) {
-            AudienceRestrictionCondition audienceRestriction = 
-                createSamlv1AudienceRestriction(conditionsBean.getAudienceURIs());
-            conditions.getAudienceRestrictionConditions().add(audienceRestriction);
+        if (conditionsBean.getAudienceRestrictions() != null 
+            && !conditionsBean.getAudienceRestrictions().isEmpty()) {
+            for (AudienceRestrictionBean audienceRestrictionBean 
+                    : conditionsBean.getAudienceRestrictions()) {
+                AudienceRestrictionCondition audienceRestriction = 
+                    createSamlv1AudienceRestriction(audienceRestrictionBean);
+                conditions.getAudienceRestrictionConditions().add(audienceRestriction);
+            }
         }
         
         return conditions;
@@ -289,12 +294,12 @@ public final class SAML1ComponentBuilder {
     /**
      * Create an AudienceRestrictionCondition object
      *
-     * @param audienceURIs of type String
+     * @param audienceRestrictionBean of type AudienceRestrictionBean
      * @return an AudienceRestrictionCondition object
      */
     @SuppressWarnings("unchecked")
     public static AudienceRestrictionCondition 
-    createSamlv1AudienceRestriction(List<String> audienceURIs) {
+    createSamlv1AudienceRestriction(AudienceRestrictionBean audienceRestrictionBean) {
         if (audienceRestrictionV1Builder == null) {
             audienceRestrictionV1Builder = (SAMLObjectBuilder<AudienceRestrictionCondition>) 
                 builderFactory.getBuilder(AudienceRestrictionCondition.DEFAULT_ELEMENT_NAME);
@@ -307,7 +312,7 @@ public final class SAML1ComponentBuilder {
         AudienceRestrictionCondition audienceRestriction = 
             audienceRestrictionV1Builder.buildObject();
         
-        for (String audienceURI : audienceURIs) {
+        for (String audienceURI : audienceRestrictionBean.getAudienceURIs()) {
             Audience audience = audienceV1Builder.buildObject();
             audience.setUri(audienceURI);
             audienceRestriction.getAudiences().add(audience);

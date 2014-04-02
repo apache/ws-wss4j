@@ -20,12 +20,14 @@
 package org.apache.wss4j.dom.saml;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.ProxyRestrictionBean;
 import org.apache.wss4j.common.util.XMLUtils;
@@ -331,7 +333,58 @@ public class SamlConditionsTest extends org.junit.Assert {
         List<String> audiences = new ArrayList<String>();
         audiences.add("http://apache.org/one");
         audiences.add("http://apache.org/two");
-        conditions.setAudienceURIs(audiences);
+        AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
+        audienceRestrictionBean.setAudienceURIs(audiences);
+        conditions.setAudienceRestrictions(Collections.singletonList(audienceRestrictionBean));
+        
+        callbackHandler.setConditions(conditions);
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+
+        String outputString = 
+            XMLUtils.PrettyDocumentToString(unsignedDoc);
+        assertTrue(outputString.contains("AudienceRestriction"));
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        verify(unsignedDoc);
+    }
+    
+    /**
+     * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
+     * with two AudienceRestriction Elements
+     */
+    @org.junit.Test
+    public void testSAML2AudienceRestrictionSeparateRestrictions() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        
+        ConditionsBean conditions = new ConditionsBean();
+        conditions.setTokenPeriodMinutes(5);
+        
+        List<AudienceRestrictionBean> audiencesRestrictions = 
+            new ArrayList<AudienceRestrictionBean>();
+        AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
+        audienceRestrictionBean.setAudienceURIs(Collections.singletonList("http://apache.org/one"));
+        audiencesRestrictions.add(audienceRestrictionBean);
+        
+        audienceRestrictionBean = new AudienceRestrictionBean();
+        audienceRestrictionBean.setAudienceURIs(Collections.singletonList("http://apache.org/two"));
+        audiencesRestrictions.add(audienceRestrictionBean);
+        
+        conditions.setAudienceRestrictions(audiencesRestrictions);
         
         callbackHandler.setConditions(conditions);
         
