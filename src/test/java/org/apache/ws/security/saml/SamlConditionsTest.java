@@ -20,6 +20,7 @@
 package org.apache.ws.security.saml;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.ws.security.WSConstants;
@@ -35,6 +36,7 @@ import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSAMLToken;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.SAMLParms;
+import org.apache.ws.security.saml.ext.bean.AudienceRestrictionBean;
 import org.apache.ws.security.saml.ext.bean.ConditionsBean;
 import org.apache.ws.security.saml.ext.bean.ProxyRestrictionBean;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -300,6 +302,138 @@ public class SamlConditionsTest extends org.junit.Assert {
         String outputString = 
             org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(unsignedDoc);
         assertTrue(outputString.contains("ProxyRestriction"));
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        verify(unsignedDoc);
+    }
+    
+    /**
+     * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
+     * with an AudienceRestriction Element
+     */
+    @SuppressWarnings("deprecation")
+    @org.junit.Test
+    public void testSAML2AudienceRestrictionOldAPI() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        
+        ConditionsBean conditions = new ConditionsBean();
+        conditions.setTokenPeriodMinutes(5);
+        
+        conditions.setAudienceURI("http://apache.org/one");
+        
+        callbackHandler.setConditions(conditions);
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(unsignedDoc);
+        assertTrue(outputString.contains("AudienceRestriction"));
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        verify(unsignedDoc);
+    }
+    
+    /**
+     * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
+     * with an AudienceRestriction Element
+     */
+    @org.junit.Test
+    public void testSAML2AudienceRestriction() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        
+        ConditionsBean conditions = new ConditionsBean();
+        conditions.setTokenPeriodMinutes(5);
+        List<String> audiences = new ArrayList<String>();
+        audiences.add("http://apache.org/one");
+        audiences.add("http://apache.org/two");
+        AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
+        audienceRestrictionBean.setAudienceURIs(audiences);
+        conditions.setAudienceRestrictions(Collections.singletonList(audienceRestrictionBean));
+        
+        callbackHandler.setConditions(conditions);
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(unsignedDoc);
+        assertTrue(outputString.contains("AudienceRestriction"));
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        verify(unsignedDoc);
+    }
+    
+    /**
+     * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
+     * with two AudienceRestriction Elements
+     */
+    @org.junit.Test
+    public void testSAML2AudienceRestrictionSeparateRestrictions() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        
+        ConditionsBean conditions = new ConditionsBean();
+        conditions.setTokenPeriodMinutes(5);
+        
+        List<AudienceRestrictionBean> audiencesRestrictions = 
+            new ArrayList<AudienceRestrictionBean>();
+        AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
+        audienceRestrictionBean.setAudienceURIs(Collections.singletonList("http://apache.org/one"));
+        audiencesRestrictions.add(audienceRestrictionBean);
+
+        audienceRestrictionBean = new AudienceRestrictionBean();
+        audienceRestrictionBean.setAudienceURIs(Collections.singletonList("http://apache.org/two"));
+        audiencesRestrictions.add(audienceRestrictionBean);
+
+        conditions.setAudienceRestrictions(audiencesRestrictions);
+        
+        callbackHandler.setConditions(conditions);
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(unsignedDoc);
+        assertTrue(outputString.contains("AudienceRestriction"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
