@@ -23,6 +23,7 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.saml.ext.bean.ActionBean;
 import org.apache.ws.security.saml.ext.bean.AttributeBean;
 import org.apache.ws.security.saml.ext.bean.AttributeStatementBean;
+import org.apache.ws.security.saml.ext.bean.AudienceRestrictionBean;
 import org.apache.ws.security.saml.ext.bean.AuthDecisionStatementBean;
 import org.apache.ws.security.saml.ext.bean.AuthenticationStatementBean;
 import org.apache.ws.security.saml.ext.bean.ConditionsBean;
@@ -32,7 +33,6 @@ import org.apache.ws.security.saml.ext.bean.SubjectBean;
 import org.apache.ws.security.saml.ext.bean.SubjectConfirmationDataBean;
 import org.apache.ws.security.saml.ext.bean.SubjectLocalityBean;
 import org.apache.ws.security.util.UUIDGenerator;
-
 import org.joda.time.DateTime;
 import org.opensaml.Configuration;
 import org.opensaml.common.SAMLObjectBuilder;
@@ -67,6 +67,7 @@ import org.opensaml.xml.schema.impl.XSStringBuilder;
 import org.opensaml.xml.signature.KeyInfo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -176,7 +177,7 @@ public final class SAML2ComponentBuilder {
      * @param conditionsBean A ConditionsBean object
      * @return a Conditions object
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "deprecation" })
     public static Conditions createConditions(ConditionsBean conditionsBean) {
         if (conditionsBuilder == null) {
             conditionsBuilder = (SAMLObjectBuilder<Conditions>) 
@@ -219,6 +220,16 @@ public final class SAML2ComponentBuilder {
             conditions.getAudienceRestrictions().add(audienceRestriction);
         }
         
+        if (conditionsBean.getAudienceRestrictions() != null 
+            && !conditionsBean.getAudienceRestrictions().isEmpty()) {
+            for (AudienceRestrictionBean audienceRestrictionBean 
+                : conditionsBean.getAudienceRestrictions()) {
+                AudienceRestriction audienceRestriction = 
+                        createAudienceRestriction(audienceRestrictionBean);
+                conditions.getAudienceRestrictions().add(audienceRestriction);
+            }
+        }
+        
         if (conditionsBean.isOneTimeUse()) {
             conditions.getConditions().add(createOneTimeUse());
         }
@@ -235,8 +246,23 @@ public final class SAML2ComponentBuilder {
      * @param audienceURI of type String
      * @return an AudienceRestriction object
      */
-    @SuppressWarnings("unchecked")
+    @Deprecated
     public static AudienceRestriction createAudienceRestriction(String audienceURI) {
+        AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
+        audienceRestrictionBean.setAudienceURIs(Collections.singletonList(audienceURI));
+        return createAudienceRestriction(audienceRestrictionBean);
+    }
+    
+    /**
+     * Create an AudienceRestriction object
+     *
+     * @param audienceRestrictionBean of type AudienceRestrictionBean
+     * @return an AudienceRestriction object
+     */
+    @SuppressWarnings("unchecked")
+    public static AudienceRestriction createAudienceRestriction(
+        AudienceRestrictionBean audienceRestrictionBean
+    ) {
         if (audienceRestrictionBuilder == null) {
             audienceRestrictionBuilder = (SAMLObjectBuilder<AudienceRestriction>) 
                 builderFactory.getBuilder(AudienceRestriction.DEFAULT_ELEMENT_NAME);
@@ -247,9 +273,12 @@ public final class SAML2ComponentBuilder {
         }
        
         AudienceRestriction audienceRestriction = audienceRestrictionBuilder.buildObject();
-        Audience audience = audienceBuilder.buildObject();
-        audience.setAudienceURI(audienceURI);
-        audienceRestriction.getAudiences().add(audience);
+        
+        for (String audienceURI : audienceRestrictionBean.getAudienceURIs()) {
+            Audience audience = audienceBuilder.buildObject();
+            audience.setAudienceURI(audienceURI);
+            audienceRestriction.getAudiences().add(audience);
+        }
         return audienceRestriction;
     }
     
