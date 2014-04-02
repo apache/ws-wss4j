@@ -359,7 +359,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
         int oldval = 0;
         try {
-            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
+            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI(), WSSec.class);
             oldval = changeValueOfMaximumAllowedTransformsPerReference(0);
             doInboundSecurity(securityProperties,
                     xmlInputFactory.createXMLStreamReader(
@@ -441,7 +441,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         inboundsecurityProperties.addIgnoreBSPRule(BSPRule.R5421);
 
         try {
-            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
+            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI(), WSSec.class);
             switchAllowMD5Algorithm(true);
             Document document = doInboundSecurity(inboundsecurityProperties,
                     xmlInputFactory.createXMLStreamReader(
@@ -478,7 +478,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
         int oldval = 0;
         try {
-            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
+            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI(), WSSec.class);
             oldval = changeValueOfMaximumAllowedXMLStructureDepth(10);
             doInboundSecurity(securityProperties,
                     xmlInputFactory.createXMLStreamReader(
@@ -519,7 +519,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
         int oldval = 0;
         try {
-            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
+            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI(), WSSec.class);
             oldval = changeValueOfMaximumAllowedXMLStructureDepth(10);
             doInboundSecurity(securityProperties,
                     xmlInputFactory.createXMLStreamReader(
@@ -542,7 +542,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
         long oldval = 0;
         try {
-            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
+            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI(), WSSec.class);
             Field algorithmsClassMapField = TransformerAlgorithmMapper.class.getDeclaredField("algorithmsClassMapOut");
             algorithmsClassMapField.setAccessible(true);
             Map<String, Class<?>> map = (Map<String, Class<?>>)algorithmsClassMapField.get(null);

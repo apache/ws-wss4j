@@ -1246,7 +1246,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         inSecurityProperties.addInputProcessor(new PolicyInputProcessor(policyEnforcer, inSecurityProperties));
 
         try {
-            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
+            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI(), WSSec.class);
             switchAllowMD5Algorithm(true);
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), policyEnforcer);
 

@@ -1417,7 +1417,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         securityEventList.add(httpsTokenSecurityEvent);
 
         try {
-            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
+            Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI(), WSSec.class);
             switchAllowMD5Algorithm(true);
             Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
 

@@ -64,7 +64,7 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
     @BeforeClass
     public static void setUp() throws Exception {
         WSProviderConfig.init();
-        Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
+        Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI(), WSSec.class);
     }
     
     @AfterClass

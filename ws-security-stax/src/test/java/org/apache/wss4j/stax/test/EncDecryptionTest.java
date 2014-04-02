@@ -1694,7 +1694,7 @@ public class EncDecryptionTest extends AbstractTestBase {
     @SuppressWarnings("unchecked")
     public void testCompressedEncDecryption() throws Exception {
 
-        Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI());
+        Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI(), WSSec.class);
         Field algorithmsClassMapField = TransformerAlgorithmMapper.class.getDeclaredField("algorithmsClassMapOut");
         algorithmsClassMapField.setAccessible(true);
         Map<String, Class<?>> map = (Map<String, Class<?>>)algorithmsClassMapField.get(null);
