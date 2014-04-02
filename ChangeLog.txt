@@ -5,6 +5,17 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.6.15
+=============
+
+Bug
+
+    [WSS-491] - Problem storing custom Principals
+    [WSS-492] - WSS4J adds invalid wsu:Id attribute on SAML assertions
+
+Improvement
+
+    [WSS-495] - Add support to configure the digest method used for SAML Assertions
 
 Release 1.6.14
 =============
