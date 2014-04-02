@@ -22,7 +22,7 @@
     <artifactId>wss4j</artifactId>
     <packaging>bundle</packaging>
     <name>Apache WSS4J</name>
-    <version>1.6.16-SNAPSHOT</version>
+    <version>1.6.15-SNAPSHOT</version>
     <description>
         The Apache WSS4J project provides a Java implementation of the primary security standards 
         for Web Services, namely the OASIS Web Services Security (WS-Security) specifications 
