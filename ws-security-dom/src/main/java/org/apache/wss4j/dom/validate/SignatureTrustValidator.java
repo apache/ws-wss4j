@@ -20,8 +20,6 @@
 package org.apache.wss4j.dom.validate;
 
 import java.security.PublicKey;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.regex.Pattern;
@@ -84,19 +82,7 @@ public class SignatureTrustValidator implements Validator {
      */
     protected void validateCertificates(X509Certificate[] certificates) 
         throws WSSecurityException {
-        try {
-            for (int i = 0; i < certificates.length; i++) {
-                certificates[i].checkValidity();
-            }
-        } catch (CertificateExpiredException e) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_CHECK, "invalidCert", e
-            );
-        } catch (CertificateNotYetValidException e) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_CHECK, "invalidCert", e
-            );
-        }
+        // Nothing
     }
     
     /**

@@ -23,8 +23,6 @@ import java.security.Key;
 import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.List;
@@ -192,36 +190,28 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
         if (samlAssertionWrapper == null) {
             return;
         }
-        try {
-            String confirmMethod = null;
-            List<String> methods = samlAssertionWrapper.getConfirmationMethods();
-            if (methods != null && methods.size() > 0) {
-                confirmMethod = methods.get(0);
-            }
-            // If HOK + Token is signed then we don't need to verify the subject cert, as we
-            // indirectly trust it
-            if (!OpenSAMLUtil.isMethodHolderOfKey(confirmMethod) && !samlAssertionWrapper.isSigned()) {
-                X509Certificate[] x509Certificates = getX509Certificates();
-                if (x509Certificates != null && x509Certificates.length > 0) {
-                    //todo I don't think the checkValidity is necessary because the CertPathChecker
-                    x509Certificates[0].checkValidity();
-                    boolean enableRevocation = false;
-                    Collection<Pattern> subjectCertConstraints = null;
-                    if (securityProperties != null) {
-                        enableRevocation = securityProperties.isEnableRevocation();
-                        subjectCertConstraints = securityProperties.getSubjectCertConstraints();
-                    }
-                    crypto.verifyTrust(x509Certificates, enableRevocation, subjectCertConstraints);
+        String confirmMethod = null;
+        List<String> methods = samlAssertionWrapper.getConfirmationMethods();
+        if (methods != null && methods.size() > 0) {
+            confirmMethod = methods.get(0);
+        }
+        // If HOK + Token is signed then we don't need to verify the subject cert, as we
+        // indirectly trust it
+        if (!OpenSAMLUtil.isMethodHolderOfKey(confirmMethod) && !samlAssertionWrapper.isSigned()) {
+            X509Certificate[] x509Certificates = getX509Certificates();
+            if (x509Certificates != null && x509Certificates.length > 0) {
+                boolean enableRevocation = false;
+                Collection<Pattern> subjectCertConstraints = null;
+                if (securityProperties != null) {
+                    enableRevocation = securityProperties.isEnableRevocation();
+                    subjectCertConstraints = securityProperties.getSubjectCertConstraints();
                 }
-                PublicKey publicKey = getPublicKey();
-                if (publicKey != null) {
-                    crypto.verifyTrust(publicKey);
-                }
+                crypto.verifyTrust(x509Certificates, enableRevocation, subjectCertConstraints);
             }
-        } catch (CertificateExpiredException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
-        } catch (CertificateNotYetValidException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e);
+            PublicKey publicKey = getPublicKey();
+            if (publicKey != null) {
+                crypto.verifyTrust(publicKey);
+            }
         }
     }
 

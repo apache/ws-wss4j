@@ -35,8 +35,6 @@ import javax.security.auth.callback.CallbackHandler;
 
 import java.security.Key;
 import java.security.Principal;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.regex.Matcher;
@@ -109,25 +107,15 @@ public abstract class X509SecurityTokenImpl
     @Override
     public void verify() throws XMLSecurityException {
         //todo overall call verify on wrapping tokens for non top-level SecurityTokens!?
-        try {
-            X509Certificate[] x509Certificates = getX509Certificates();
-            if (x509Certificates != null && x509Certificates.length > 0) {
-                //todo I don't think the checkValidity is necessary because the CertPathChecker
-                // in crypto-verify trust should already do the job
-                x509Certificates[0].checkValidity();
-                
-                boolean enableRevocation = false;
-                Collection<Pattern> subjectCertConstraints = null;
-                if (securityProperties != null) {
-                    enableRevocation = securityProperties.isEnableRevocation();
-                    subjectCertConstraints = securityProperties.getSubjectCertConstraints();
-                }
-                getCrypto().verifyTrust(x509Certificates, enableRevocation, subjectCertConstraints);
+        X509Certificate[] x509Certificates = getX509Certificates();
+        if (x509Certificates != null && x509Certificates.length > 0) {
+            boolean enableRevocation = false;
+            Collection<Pattern> subjectCertConstraints = null;
+            if (securityProperties != null) {
+                enableRevocation = securityProperties.isEnableRevocation();
+                subjectCertConstraints = securityProperties.getSubjectCertConstraints();
             }
-        } catch (CertificateExpiredException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
-        } catch (CertificateNotYetValidException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+            getCrypto().verifyTrust(x509Certificates, enableRevocation, subjectCertConstraints);
         }
     }
     
