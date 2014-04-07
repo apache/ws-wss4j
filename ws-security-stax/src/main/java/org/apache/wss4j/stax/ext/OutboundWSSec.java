@@ -285,6 +285,10 @@ public class OutboundWSSec {
                 } else if (WSSConstants.SAML_TOKEN_SIGNED.equals(action)) {
                     signatureAction = true;
                     signedSAML = true;
+                    final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
+                        new BinarySecurityTokenOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
+                        
                     final SAMLTokenOutputProcessor samlTokenOutputProcessor = new SAMLTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, samlTokenOutputProcessor, action);
 

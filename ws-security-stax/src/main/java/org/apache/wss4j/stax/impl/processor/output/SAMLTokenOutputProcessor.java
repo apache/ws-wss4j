@@ -386,9 +386,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
 
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
-                if (senderVouches && getSecurityProperties().getSignatureKeyIdentifier() ==
-                        WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
-                        && securityToken != null) {
+                if (includeBST()) {
 
                     WSSUtils.updateSecurityHeaderOrder(
                             outputProcessorChain, WSSConstants.TAG_wsse_BinarySecurityToken, getAction(), false);
@@ -414,6 +412,17 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 }
                 outputProcessorChain.removeProcessor(this);
             }
+        }
+        
+        private boolean includeBST() {
+            if (senderVouches && getSecurityProperties().getSignatureKeyIdentifier() ==
+                WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
+                && securityToken != null
+                && !(WSSConstants.SAML_TOKEN_SIGNED.equals(action) 
+                    && ((WSSSecurityProperties)getSecurityProperties()).isIncludeSignatureToken())) {
+                return true;
+            } 
+            return false;
         }
     }
     

@@ -85,8 +85,16 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
             }
 
             if (securityToken != null) {
-                if ((WSSConstants.SIGNATURE.equals(action) || WSSConstants.SAML_TOKEN_SIGNED.equals(action))
+                if (WSSConstants.SIGNATURE.equals(action)
                     && (includeToken || WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier))
+                    && (securityToken.getTokenType() == null || WSSecurityTokenConstants.X509V3Token.equals(securityToken.getTokenType()))) {
+                    FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = new FinalBinarySecurityTokenOutputProcessor(securityToken);
+                    finalBinarySecurityTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
+                    finalBinarySecurityTokenOutputProcessor.setAction(getAction());
+                    finalBinarySecurityTokenOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
+                    finalBinarySecurityTokenOutputProcessor.init(outputProcessorChain);
+                    securityToken.setProcessor(finalBinarySecurityTokenOutputProcessor);
+                } else if (WSSConstants.SAML_TOKEN_SIGNED.equals(action) && includeToken
                     && (securityToken.getTokenType() == null || WSSecurityTokenConstants.X509V3Token.equals(securityToken.getTokenType()))) {
                     FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = new FinalBinarySecurityTokenOutputProcessor(securityToken);
                     finalBinarySecurityTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
