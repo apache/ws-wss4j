@@ -97,7 +97,7 @@ public abstract class X509SecurityTokenImpl
     public X509Certificate[] getX509Certificates() throws XMLSecurityException {
         if (super.getX509Certificates() == null) {
             String alias = getAlias();
-            if (alias != null) {
+            if (super.getX509Certificates() == null && alias != null) {
                 CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
                 cryptoType.setAlias(alias);
                 setX509Certificates(getCrypto().getX509Certificates(cryptoType));
