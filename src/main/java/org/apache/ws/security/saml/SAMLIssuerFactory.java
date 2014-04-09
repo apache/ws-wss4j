@@ -155,6 +155,13 @@ public abstract class SAMLIssuerFactory {
      * @throws WSSecurityException if there is an error in loading the crypto properties
      */
     private static Properties getProperties(String propFilename) throws WSSecurityException {
+        if (propFilename == null) {
+            throw new WSSecurityException(
+                WSSecurityException.FAILURE, 
+                "resourceNotFound",
+                new Object[]{propFilename}
+            );
+        }
         Properties properties = new Properties();
         try {
             URL url = Loader.getResource(propFilename);
