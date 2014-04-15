@@ -73,7 +73,6 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
                     attributes.add(createAttribute(WSSConstants.ATT_NULL_Value, new Base64(76, new byte[]{'\n'}).encodeToString(signatureValueSecurityEvent.getSignatureValue())));
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, true, attributes);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);
-                    break;
                 }
             }
 
