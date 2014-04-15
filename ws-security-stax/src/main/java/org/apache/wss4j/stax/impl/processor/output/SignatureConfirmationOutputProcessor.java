@@ -73,10 +73,12 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
                     attributes.add(createAttribute(WSSConstants.ATT_NULL_Value, new Base64(76, new byte[]{'\n'}).encodeToString(signatureValueSecurityEvent.getSignatureValue())));
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, true, attributes);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);
+                    break;
                 }
             }
 
             if (!aSignatureFound) {
+                WSSUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
                 List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
                 attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, true, attributes);
