@@ -41,7 +41,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.validation.Schema;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 
@@ -1262,8 +1261,6 @@ public class InteroperabilityTest extends AbstractTestBase {
                 securityProperties.addIgnoreBSPRule(bspRules.next());
             }
 
-            Schema schema = WSSUtils.loadWSSecuritySchemas();
-            WSSConstants.setJaxbSchemas(schema);
             try {
                 Document document = doInboundSecurity(securityProperties,
                         xmlInputFactory.createXMLStreamReader(

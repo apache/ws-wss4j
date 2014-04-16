@@ -37,7 +37,6 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.config.ConfigurationProperties;
 import org.apache.xml.security.stax.config.Init;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
@@ -72,11 +71,9 @@ public class WSSec {
                             org.apache.xml.security.binding.excc14n.ObjectFactory.class
                     )
             );
-            String loadSchemas = ConfigurationProperties.getProperty("LoadSchemas");
-            if (Boolean.parseBoolean(loadSchemas)) {
-                Schema schema = WSSUtils.loadWSSecuritySchemas();
-                WSSConstants.setJaxbSchemas(schema);
-            }
+            
+            Schema schema = WSSUtils.loadWSSecuritySchemas();
+            WSSConstants.setJaxbSchemas(schema);
         } catch (XMLSecurityException e) {
             throw new RuntimeException(e.getMessage(), e);
         } catch (JAXBException e) {
