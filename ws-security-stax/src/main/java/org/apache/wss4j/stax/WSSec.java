@@ -20,9 +20,11 @@ package org.apache.wss4j.stax;
 
 import java.net.URISyntaxException;
 import java.util.HashSet;
+import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
 import javax.xml.validation.Schema;
 
 import org.apache.wss4j.common.crypto.WSProviderConfig;
@@ -37,6 +39,7 @@ import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.ConfigurationProperties;
 import org.apache.xml.security.stax.config.Init;
+import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.utils.ClassLoaderUtils;
 import org.xml.sax.SAXException;
@@ -193,6 +196,7 @@ public class WSSec {
                 if (securityProperties.getSignatureKeyIdentifier() == null) {
                     securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_IssuerSerial);
                 }
+                checkDefaultSecureParts(true, securityProperties);
             } else if (WSSConstants.ENCRYPT.equals(action)) {
                 if (securityProperties.getEncryptionUseThisCertificate() == null
                         && securityProperties.getEncryptionKeyStore() == null
@@ -220,6 +224,7 @@ public class WSSec {
                 if (securityProperties.getEncryptionKeyIdentifier() == null) {
                     securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_IssuerSerial);
                 }
+                checkDefaultSecureParts(false, securityProperties);
             } else if (WSSConstants.USERNAMETOKEN.equals(action)) {
                 if (securityProperties.getTokenUser() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noTokenUser");
@@ -251,6 +256,7 @@ public class WSSec {
                 if (securityProperties.getUsernameTokenPasswordType() == null) {
                     securityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
                 }
+                checkDefaultSecureParts(true, securityProperties);
             } else if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
                 if (securityProperties.getCallbackHandler() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
@@ -288,6 +294,7 @@ public class WSSec {
                 if (securityProperties.getDerivedKeyTokenReference() != WSSConstants.DerivedKeyTokenReference.DirectReference) {
                     securityProperties.setDerivedKeyKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                 }
+                checkDefaultSecureParts(true, securityProperties);
             } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
                 if (securityProperties.getCallbackHandler() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
@@ -327,6 +334,7 @@ public class WSSec {
                 if (securityProperties.getDerivedKeyTokenReference() != WSSConstants.DerivedKeyTokenReference.DirectReference) {
                     securityProperties.setDerivedKeyKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                 }
+                checkDefaultSecureParts(false, securityProperties);
             } else if (WSSConstants.SAML_TOKEN_SIGNED.equals(action)) {
                 if (securityProperties.getCallbackHandler() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
@@ -346,6 +354,7 @@ public class WSSec {
                 if (securityProperties.getSignatureKeyIdentifier() == null) {
                     securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                 }
+                checkDefaultSecureParts(true, securityProperties);
             } else if (WSSConstants.SAML_TOKEN_UNSIGNED.equals(action) &&
                     securityProperties.getSamlCallbackHandler() == null) {
                 throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noSAMLCallbackHandler");
@@ -365,6 +374,7 @@ public class WSSec {
                 if (securityProperties.getSignatureKeyIdentifier() == null) {
                     securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                 }
+                checkDefaultSecureParts(true, securityProperties);
             } else if (WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN.equals(action)) {
                 if (securityProperties.getCallbackHandler() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
@@ -375,9 +385,30 @@ public class WSSec {
                 if (securityProperties.getSignatureKeyIdentifier() == null) {
                     securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                 }
+                checkDefaultSecureParts(false, securityProperties);
             }
         }
         return new WSSSecurityProperties(securityProperties);
+    }
+    
+    private static void checkDefaultSecureParts(boolean signature, WSSSecurityProperties securityProperties) {
+        if (signature) {
+            List<SecurePart> signatureParts = securityProperties.getSignatureSecureParts();
+            if (signatureParts.isEmpty()) {
+                SecurePart securePart = new SecurePart(
+                    new QName(WSSConstants.NS_SOAP12, WSSConstants.TAG_soap_Body_LocalName),
+                    SecurePart.Modifier.Element);
+                signatureParts.add(securePart);
+            }
+        } else {
+            List<SecurePart> encryptionParts = securityProperties.getEncryptionSecureParts();
+            if (encryptionParts.isEmpty()) {
+                SecurePart securePart = new SecurePart(
+                    new QName(WSSConstants.NS_SOAP12, WSSConstants.TAG_soap_Body_LocalName),
+                    SecurePart.Modifier.Content);
+                encryptionParts.add(securePart);
+            }
+        }
     }
 
     /**

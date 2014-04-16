@@ -217,7 +217,10 @@ public class WSSUtils extends XMLSecurityUtils {
         final OutboundSecurityContext securityContext = outputProcessorChain.getSecurityContext();
 
         Map<Object, SecurePart> dynamicSecureParts = securityContext.getAsMap(WSSConstants.ENCRYPTION_PARTS);
-        boolean encrypted = dynamicSecureParts.containsKey(headerElementName);
+        boolean encrypted = false;
+        if (dynamicSecureParts != null) {
+            encrypted = dynamicSecureParts.containsKey(headerElementName);
+        }
 
         List<SecurityHeaderOrder> securityHeaderOrderList = securityContext.getAsList(SecurityHeaderOrder.class);
         if (securityHeaderOrderList == null) {

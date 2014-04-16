@@ -63,16 +63,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                 } else if (level == 1) {
                     //set correct namespace on secure parts
                     List<SecurePart> encryptionParts = securityProperties.getEncryptionSecureParts();
-                    if (encryptionParts.isEmpty()) {
-                        SecurePart securePart = new SecurePart(
-                                new QName(soapMessageVersion, WSSConstants.TAG_soap_Body_LocalName),
-                                SecurePart.Modifier.Content);
-                        outputProcessorChain.getSecurityContext().putAsMap(
-                                WSSConstants.ENCRYPTION_PARTS,
-                                securePart.getName(), securePart
-
-                        );
-                    } else {
+                    if (!encryptionParts.isEmpty()) {
                         for (int i = 0; i < encryptionParts.size(); i++) {
                             SecurePart securePart = encryptionParts.get(i);
                             // Check to see if the wrong SOAP NS was used
@@ -98,15 +89,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                         }
                     }
                     List<SecurePart> signatureParts = securityProperties.getSignatureSecureParts();
-                    if (signatureParts.isEmpty()) {
-                        SecurePart securePart = new SecurePart(
-                                new QName(soapMessageVersion, WSSConstants.TAG_soap_Body_LocalName),
-                                SecurePart.Modifier.Element);
-                        outputProcessorChain.getSecurityContext().putAsMap(
-                                WSSConstants.SIGNATURE_PARTS,
-                                securePart.getName(), securePart
-                        );
-                    } else {
+                    if (!signatureParts.isEmpty()) {
                         for (int i = 0; i < signatureParts.size(); i++) {
                             SecurePart securePart = signatureParts.get(i);
                             // Check to see if the wrong SOAP NS was used
