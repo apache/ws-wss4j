@@ -37,7 +37,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.DatagramSocket;
 import java.security.Provider;
-import java.security.Security;
 import java.util.List;
 
 public class KerberosServiceStarter {
@@ -64,22 +63,6 @@ public class KerberosServiceStarter {
             datagramSocket.close();
         } catch (Exception e) {
             return false;
-        }
-
-        //Ok, apache ds doesn't like the bouncy castle provider at position 2
-        //Caused by: KrbException: Integrity check on decrypted field failed (31) - Integrity check on decrypted field failed
-        Provider[] installedProviders = Security.getProviders();
-        for (int i = 0; i < installedProviders.length; i++) {
-            Provider installedProvider = installedProviders[i];
-            if ("BC".equals(installedProvider.getName())) {
-                provider = installedProvider;
-                providerPos = i;
-                Security.removeProvider("BC");
-                break;
-            }
-        }
-        if (provider != null) {
-            Security.addProvider(provider);
         }
 
         DirectoryServiceFactory directoryServiceFactory = DefaultDirectoryServiceFactory.DEFAULT;
@@ -132,16 +115,8 @@ public class KerberosServiceStarter {
     }
 
     public static void stopKerberosServer() throws Exception {
-        try {
-            directoryService.shutdown();
-            FileUtils.deleteDirectory(directoryService.getWorkingDirectory());
-            kdcServer.stop();
-        } finally {
-            //restore BC position
-            Security.removeProvider("BC");
-            if (provider != null) {
-                Security.insertProviderAt(provider, providerPos);
-            }
-        }
+        directoryService.shutdown();
+        FileUtils.deleteDirectory(directoryService.getWorkingDirectory());
+        kdcServer.stop();
     }
 }
