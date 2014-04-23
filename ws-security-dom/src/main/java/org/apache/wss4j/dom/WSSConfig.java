@@ -143,6 +143,10 @@ public class WSSConfig {
                 org.apache.wss4j.dom.processor.SAMLTokenProcessor.class
             );
             tmp.put(
+                WSSecurityEngine.ENCRYPTED_ASSERTION,
+                org.apache.wss4j.dom.processor.EncryptedAssertionProcessor.class
+            );
+            tmp.put(
                 WSSecurityEngine.ENCRYPTED_KEY,
                 org.apache.wss4j.dom.processor.EncryptedKeyProcessor.class
             );

@@ -197,6 +197,7 @@ public final class WSConstants {
     public static final String SALT_LN = "Salt";
     public static final String ITERATION_LN = "Iteration";
     public static final String ASSERTION_LN = "Assertion";
+    public static final String ENCRYPED_ASSERTION_LN = "EncryptedAssertion";
     public static final String PW_DIGEST = "PasswordDigest";
     public static final String PW_TEXT = "PasswordText";
     public static final String PW_NONE = "PasswordNone";

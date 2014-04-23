@@ -99,6 +99,12 @@ public class WSSecurityEngine {
      */
     public static final QName SAML2_TOKEN = 
         new QName(WSConstants.SAML2_NS, WSConstants.ASSERTION_LN);
+    
+    /**
+     * <code>saml:EncryptedAssertion</code> as defined by SAML v2.0 specification
+     */
+    public static final QName ENCRYPTED_ASSERTION = 
+        new QName(WSConstants.SAML2_NS, WSConstants.ENCRYPED_ASSERTION_LN);
 
     /**
      * <code>wsc:DerivedKeyToken</code> as defined by WS-SecureConversation specification
@@ -420,7 +426,9 @@ public class WSSecurityEngine {
                 if (p != null) {
                     List<WSSecurityEngineResult> results = 
                         p.handleToken((Element) node, requestData, wsDocInfo);
-                    returnResults.addAll(0, results);
+                    if (!results.isEmpty()) {
+                        returnResults.addAll(0, results);
+                    }
                 } else {
                     if (doDebug) {
                         LOG.debug(
