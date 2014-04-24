@@ -143,6 +143,10 @@ public final class DOMSAMLUtil  {
             && tlsCerts[0].getPublicKey().equals(subjectPublicKey)) {
             return true;
         }
+        
+        if (subjectPublicKey == null && subjectCerts != null && subjectCerts.length > 0) {
+            subjectPublicKey = subjectCerts[0].getPublicKey();
+        }
 
         //
         // Now try the message-level signatures
