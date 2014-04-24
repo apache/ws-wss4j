@@ -41,6 +41,8 @@ public class WSSecSAMLToken extends WSSecBase {
     private Document document = null;
     
     private AssertionWrapper saml = null;
+    
+    private Element samlElement;
 
     public WSSecSAMLToken() {
         super();
@@ -79,11 +81,24 @@ public class WSSecSAMLToken extends WSSecBase {
      */
     public void prependToHeader(WSSecHeader secHeader) {
         try {
-            Element element = (Element) saml.toDOM(document);
-            WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), element);
+            Element element = getElement();
+            if (element != null) {
+                WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), element);
+            }
         } catch (WSSecurityException ex) {
             throw new RuntimeException(ex.toString(), ex);
         }
+    }
+    
+    public Element getElement() throws WSSecurityException {
+        if (samlElement != null) {
+            return samlElement;
+        }
+        if (saml == null) {
+            return null;
+        }
+        samlElement = saml.toDOM(document);
+        return samlElement;
     }
     
     /**
