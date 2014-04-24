@@ -175,6 +175,13 @@ public class EncryptedDataProcessor implements Processor {
         }
         dataRef.setXpath(ReferenceListProcessor.getXPath(decryptedNode));
         
+        if (decryptedNode != null
+            && decryptedNode.getParentNode().getLocalName().equals(WSConstants.ENCRYPED_ASSERTION_LN)
+            && decryptedNode.getParentNode().getNamespaceURI().equals(WSConstants.SAML2_NS)) {
+            Node soapHeader = decryptedNode.getParentNode().getParentNode();
+            soapHeader.replaceChild(decryptedNode, decryptedNode.getParentNode());
+        }
+        
         WSSecurityEngineResult result = 
                 new WSSecurityEngineResult(WSConstants.ENCR, Collections.singletonList(dataRef));
         result.put(WSSecurityEngineResult.TAG_ID, elem.getAttributeNS(null, "Id"));
@@ -191,12 +198,7 @@ public class EncryptedDataProcessor implements Processor {
         WSSConfig wssConfig = request.getWssConfig();
         if (wssConfig != null) {
             // Get hold of the plain text element
-            Element decryptedElem;
-            if (previousSibling == null) {
-                decryptedElem = (Element)parent.getFirstChild();
-            } else {
-                decryptedElem = (Element)previousSibling.getNextSibling();
-            }
+            Element decryptedElem = dataRef.getProtectedElement();
             QName el = new QName(decryptedElem.getNamespaceURI(), decryptedElem.getLocalName());
             Processor proc = request.getWssConfig().getProcessor(el);
             if (proc != null) {
