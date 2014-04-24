@@ -19,8 +19,19 @@
 package org.apache.wss4j.stax.test.saml;
 
 import org.apache.wss4j.common.ConfigurationConstants;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.message.WSSecHeader;
+import org.apache.wss4j.dom.message.WSSecSAMLToken;
+import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.InboundWSSec;
@@ -28,8 +39,13 @@ import org.apache.wss4j.stax.ext.OutboundWSSec;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.test.AbstractTestBase;
+import org.apache.wss4j.stax.test.utils.SOAPUtil;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
+import org.apache.xml.security.encryption.EncryptedData;
+import org.apache.xml.security.encryption.EncryptedKey;
+import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.joda.time.DateTime;
 import org.junit.Assert;
@@ -43,8 +59,11 @@ import org.opensaml.xml.XMLObjectBuilder;
 import org.opensaml.xml.XMLObjectBuilderFactory;
 import org.opensaml.xml.schema.XSAny;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
@@ -53,6 +72,8 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.security.Key;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -839,4 +860,119 @@ public class SAMLTokenTest extends AbstractTestBase {
         }
     }
     
+    /**
+     * Test that creates, sends and processes an unsigned SAML 2 authentication assertion, which
+     * is encrypted in a saml2:EncryptedAssertion Element in the security header
+     */
+    @org.junit.Test
+    public void testSAML2EncryptedAssertion() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Crypto crypto = CryptoFactory.getInstance("wss40.properties");
+        {
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            
+            SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+            callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+            callbackHandler.setIssuer("www.example.com");
+            
+            SAMLCallback samlCallback = new SAMLCallback();
+            SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+            SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+            WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+            Document doc = SOAPUtil.toSOAPPart(sourceDocument);
+            WSSecHeader secHeader = new WSSecHeader();
+            secHeader.insertSecurityHeader(doc);
+            
+            wsSign.prepare(doc, samlAssertion);
+            
+            // Get the Element + add it to the security header as an EncryptedAssertion
+            Element assertionElement = wsSign.getElement();
+            Element encryptedAssertionElement = 
+                doc.createElementNS(WSConstants.SAML2_NS, WSConstants.ENCRYPED_ASSERTION_LN);
+            encryptedAssertionElement.appendChild(assertionElement);
+            secHeader.getSecurityHeader().appendChild(encryptedAssertionElement);
+            
+            // Encrypt the Assertion
+            KeyGenerator keygen = KeyGenerator.getInstance("AES");
+            keygen.init(128);
+            SecretKey secretKey = keygen.generateKey();
+            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+            cryptoType.setAlias("wss40");
+            X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+            assertTrue(certs != null && certs.length > 0 && certs[0] != null);
+            
+            encryptElement(doc, assertionElement, WSConstants.AES_128, secretKey,
+                    WSConstants.KEYTRANSPORT_RSAOEP, certs[0], false);
+            
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(doc), new StreamResult(baos));
+        }
+
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.setDecryptionCrypto(crypto);
+            securityProperties.setCallbackHandler(new KeystoreCallbackHandler());
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+
+            // Decrypted Assertion element must be there
+            NodeList nodeList = 
+                document.getElementsByTagNameNS(WSSConstants.TAG_saml2_Assertion.getNamespaceURI(), WSSConstants.TAG_saml2_Assertion.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+        }
+    }
+    
+    private void encryptElement(
+        Document document,
+        Element elementToEncrypt,
+        String algorithm,
+        Key encryptingKey,
+        String keyTransportAlgorithm,
+        X509Certificate wrappingCert,
+        boolean content
+    ) throws Exception {
+        XMLCipher cipher = XMLCipher.getInstance(algorithm);
+        cipher.init(XMLCipher.ENCRYPT_MODE, encryptingKey);
+
+        if (wrappingCert != null) {
+            XMLCipher newCipher = XMLCipher.getInstance(keyTransportAlgorithm);
+            newCipher.init(XMLCipher.WRAP_MODE, wrappingCert.getPublicKey());
+
+            EncryptedKey encryptedKey = newCipher.encryptKey(document, encryptingKey);
+            // Create a KeyInfo for the EncryptedKey
+            KeyInfo encryptedKeyKeyInfo = encryptedKey.getKeyInfo();
+            if (encryptedKeyKeyInfo == null) {
+                encryptedKeyKeyInfo = new KeyInfo(document);
+                encryptedKeyKeyInfo.getElement().setAttributeNS(
+                    "http://www.w3.org/2000/xmlns/", "xmlns:dsig", "http://www.w3.org/2000/09/xmldsig#"
+                );
+                encryptedKey.setKeyInfo(encryptedKeyKeyInfo);
+            }
+
+            SecurityTokenReference securityTokenReference = new SecurityTokenReference(document);
+            securityTokenReference.addWSSENamespace();
+            securityTokenReference.setKeyIdentifierSKI(wrappingCert, null);
+            encryptedKeyKeyInfo.addUnknownElement(securityTokenReference.getElement());
+
+            // Create a KeyInfo for the EncryptedData
+            EncryptedData builder = cipher.getEncryptedData();
+            KeyInfo builderKeyInfo = builder.getKeyInfo();
+            if (builderKeyInfo == null) {
+                builderKeyInfo = new KeyInfo(document);
+                builderKeyInfo.getElement().setAttributeNS(
+                    "http://www.w3.org/2000/xmlns/", "xmlns:dsig", "http://www.w3.org/2000/09/xmldsig#"
+                );
+                builder.setKeyInfo(builderKeyInfo);
+            }
+
+            builderKeyInfo.add(encryptedKey);
+        }
+
+        cipher.doFinal(document, elementToEncrypt, content);
+    }
 }

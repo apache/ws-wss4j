@@ -148,6 +148,7 @@ public class WSSConstants extends XMLSecurityConstants {
 
     public static final QName TAG_saml_Assertion = new QName(NS_SAML, "Assertion");
     public static final QName TAG_saml2_Assertion = new QName(NS_SAML2, "Assertion");
+    public static final QName TAG_saml2_EncryptedAssertion = new QName(NS_SAML2, "EncryptedAssertion");
 
     public static final String NS_SAML10_TOKEN_PROFILE = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0";
     public static final String NS_SAML11_TOKEN_PROFILE = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1";

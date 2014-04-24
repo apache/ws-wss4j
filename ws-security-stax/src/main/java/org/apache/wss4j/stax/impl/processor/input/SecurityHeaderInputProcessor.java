@@ -116,6 +116,16 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                             engageSecurityHeaderHandler(subInputProcessorChain, getSecurityProperties(),
                                     xmlSecEventList, startIndexForProcessor, xmlSecStartElement.getName());
                         }
+                    } else if (documentLevel == 5 && responsibleSecurityHeaderFound
+                            && WSSUtils.isInSecurityHeader(xmlSecStartElement,
+                            ((WSSSecurityProperties) getSecurityProperties()).getActor())
+                            && WSSConstants.TAG_xenc_EncryptedData.equals(xmlSecStartElement.getName())) {
+                        startIndexForProcessor = xmlSecEventList.size() - 1;
+
+                        // Same goes as per EncryptedData above. This is when a child of a security header
+                        // element is encrypted (e.g. EncryptedAssertion)
+                        engageSecurityHeaderHandler(subInputProcessorChain, getSecurityProperties(),
+                                xmlSecEventList, startIndexForProcessor, xmlSecStartElement.getName());
                     }
                     break;
                 case XMLStreamConstants.END_ELEMENT:
