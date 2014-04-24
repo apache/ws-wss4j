@@ -340,7 +340,9 @@ public class ReferenceListProcessor implements Processor {
         }
         
         if (parent.getLocalName().equals(WSConstants.ENCRYPTED_HEADER)
-            && parent.getNamespaceURI().equals(WSConstants.WSSE11_NS)) {
+            && parent.getNamespaceURI().equals(WSConstants.WSSE11_NS)
+            || parent.getLocalName().equals(WSConstants.ENCRYPED_ASSERTION_LN)
+            && parent.getNamespaceURI().equals(WSConstants.SAML2_NS)) {
                 
             Node decryptedHeader = parent.getFirstChild();
             Node soapHeader = parent.getParentNode();
