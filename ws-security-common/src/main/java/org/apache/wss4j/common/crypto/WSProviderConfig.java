@@ -67,7 +67,6 @@ public final class WSProviderConfig {
                 AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
                     public Boolean run() {
                         addXMLDSigRIInternal();
-                        Security.removeProvider("BC");
                         addJceProvider("BC", "org.bouncycastle.jce.provider.BouncyCastleProvider");
                         return true;
                     }
