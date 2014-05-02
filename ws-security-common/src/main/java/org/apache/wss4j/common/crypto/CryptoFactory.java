@@ -205,7 +205,6 @@ public abstract class CryptoFactory {
      * @param cryptoClass
      * @param map
      * @param loader
-     * @return
      * @throws WSSecurityException if there is an error in loading the crypto properties
      */
     private static Crypto loadClass(
@@ -234,7 +233,6 @@ public abstract class CryptoFactory {
      * @param cryptoClass
      * @param map
      * @param loader
-     * @return
      * @throws WSSecurityException if there is an error in loading the crypto properties
      */
     private static Crypto loadClass(

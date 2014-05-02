@@ -236,7 +236,6 @@ public class EncryptedKeyProcessor implements Processor {
      * @param dataRefURIs
      * @param doc
      * @param wsDocInfo
-     * @return
      * @throws WSSecurityException
      */
     private static byte[] getRandomKey(List<String> dataRefURIs, Document doc, WSDocInfo wsDocInfo) throws WSSecurityException {
