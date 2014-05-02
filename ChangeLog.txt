@@ -5,6 +5,126 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.0.0
+=============
+
+Sub-task
+
+    [WSS-343] - Move 1.6.x code into a new module.
+    [WSS-344] - Refactor Crypto functionality to be used by both implementations
+    [WSS-345] - Refactor Exception functionality to be used by both implementations
+    [WSS-346] - Refactor SAML functionality to be used by both implementations
+    [WSS-347] - Refactor configuration and constants to be used by both implementations
+    [WSS-348] - Refactor Caching nonces/timestamp functionality to be used by both implementations
+    [WSS-349] - Refactor Derived Key / SecureConveration functionality to be used by both implementations
+    [WSS-350] - Update package names
+    [WSS-352] - Reconcile AssertionWrapper & SAMLAssertionWrapper
+    [WSS-353] - Add support in the streaming code for decrypting an EncryptedKey in the Subject of a SAML Assertion.
+    [WSS-354] - Add support for specifying different algs for sign or c14n a SAML Assertion in the streaming code.
+    [WSS-355] - Reconcile SAMLCallback between the two implementations
+    [WSS-356] - Investigate signing Crypto differences
+    [WSS-360] - Port BSP enforcer to streaming code.
+    [WSS-361] - Update code to use correct WSPasswordCallback code as per the DOM code.
+    [WSS-362] - Port Kerberos & SPNEGO work to streaming code
+    [WSS-363] - Support pluggable Validation of received tokens as per DOM code
+    [WSS-364] - Ensure that SecurityEvents let us see what was processed for the non-policy case.
+    [WSS-366] - Disable Cobertura by default
+    [WSS-367] - Set up a parent pom with dependency management.
+    [WSS-368] - Log4j configuration
+    [WSS-370] - Add CXF support for custom Algorithm Suites.
+    [WSS-371] - Add support for (custom) GCM algorithm-suites.
+    [WSS-372] - Add stricter enforcement of required policy elements as added to CXF.
+    [WSS-373] - Check sender-vouches and holder-of-key requirements for SAML tokens.
+    [WSS-374] - Support Kerberos token policy validation.
+    [WSS-375] - Support IssuedToken policy validation
+    [WSS-376] - Support Derived Keys policy validation
+    [WSS-377] - Verify Signed/Endorsing/Encrypted/SupportingTokens policy validation
+    [WSS-378] - Update tests in ws-security module to check security events.
+    [WSS-379] - Does the policy validation code support checking the token requirement against whether it is an initiator or recipient?
+    [WSS-381] - Support KeyValueTokens
+    [WSS-386] - Introduce proprietary Compress-Transformation for Encryption / Decryption
+
+Bug
+
+    [WSS-408] - StAX - Exception handling and correct Fault-Codes per WSS spec
+    [WSS-421] - WSSecSignature does not allow access to the internal BinarySecurityToken after it is applied to the security header
+    [WSS-423] - Support CRL checking for streaming code
+    [WSS-424] - Signature Element is not inserted in the correct place in the header in certain circumstances
+    [WSS-427] - Add support for processing UsernameToken Created Dates
+    [WSS-433] - Specifying actions of "WSSConstants.SIGNATURE_CONFIRMATION, WSSConstants.SIGNATURE" hangs WSS4J
+    [WSS-436] - Outbound StaX code should fail on not finding a signature/encryption part
+    [WSS-437] - Error in using StaX WS-Security + CXF WS-Addressing
+    [WSS-439] - Error in using StaX WS-Security + CXF WS-Addressing
+    [WSS-442] - "Never" Token Inclustion is not handled correctly (for X.509 tokens)
+    [WSS-443] - Treat tokens received over TLS as "encrypted"
+    [WSS-446] - Enable SignatureConfirmation without a Signature
+    [WSS-448] - OnlySignEntireHeadersAndBody policy validation is incorrect
+    [WSS-449] - Receiving code can't handle the case of a Thumbprint reference to a BST in the token
+    [WSS-450] - Inbound Processing code fails with an Encrypted Signature
+    [WSS-452] - Streaming code does not support an EncryptedData security header element without a preceeding ReferenceList
+    [WSS-453] - "Once" Token Inclusion handling is not working
+    [WSS-454] - TokenProtection error
+    [WSS-457] - Incorrect validation of ProtectTokens assertion
+    [WSS-458] - Allow no security header in certain use-cases
+    [WSS-459] - RequiredParts + EncryptedParts policy validation not working
+    [WSS-462] - ProtectionOrderAssertionState.testProtectionOrder is not working
+    [WSS-463] - Refactor Signature + Encryption referencing
+    [WSS-466] - assure compatibility with the change in ehcache CacheManager's create method from version 2.5.1 to 2.5.2 and up
+    [WSS-468] - Symmetric Binding + EncryptBeforeSigning puts the Signature in front of the EncryptedKey
+    [WSS-469] - Symmetric Binding + Derived Keys is not currently working
+    [WSS-470] - AsymmetricBinding + ProtectTokens validation not working
+    [WSS-471] - AsymmetricBinding validation without IncludeTimestamp doesn't work
+    [WSS-472] - Incorrect Symmetric Key Derivation Length validation
+    [WSS-479] - Inbound streaming does not handle Symmetric Holder-Of-Key correctly
+    [WSS-480] - Streaming code hangs on a symmetric derived key response
+    [WSS-481] - Problem with EncryptSignature + EndorsingSupportingTokens
+    [WSS-482] - EncryptedElements + SignedElements validation not working
+    [WSS-484] - Streaming code can't process a Key reference pointing to an EncryptedData element
+    [WSS-486] - Streaming code does not process a (non-secured) SOAP Fault correctly
+    [WSS-487] - Certain action combinations causes WSS4J to hang
+    [WSS-490] - Derived Endorsing policy validation error
+    [WSS-491] - Problem storing custom Principals
+    [WSS-496] - "tests" classifier artifacts dependencies should not have compile scope
+    [WSS-498] - Retrieving of public key from certificates in missing for signed results in compare credential method of org.apache.wss4j.dom.saml.DOMSAMLUtil
+
+Improvement
+
+    [WSS-383] - Allow encrypted password storage in signaturePropFile
+    [WSS-391] - Create a PrivateKeyPasswordCallback for retrieval of server key passwords
+    [WSS-403] - Use a common method for all of the P_hash implementations
+    [WSS-412] - Unify error messages for the streaming code
+    [WSS-413] - EncryptedKey security issue with streaming code
+    [WSS-414] - Ensure that Algorithms are checked in streaming code before they are used
+    [WSS-415] - Reject RSA v1.5 Key Transport Algorithm by default
+    [WSS-420] - Add the ability to explicitly allow/disallow UsernameTokens with no passwords
+    [WSS-422] - Move SAML Signature Profile Validation to the SamlAssertionValidator
+    [WSS-426] - Support future TTL in the StaX code for Timestamps
+    [WSS-438] - Support Signature Cert Constraints as per the DOM code
+    [WSS-447] - Add the ability to include the signing token for IssuerSerial/Thumbprint Reference cases
+    [WSS-489] - Extend Crypto interface with verifyTrustDirect() method
+    [WSS-495] - Add support to configure the digest method used for SAML Assertions
+
+New Feature
+
+    [WSS-311] - Streaming-WebService-Security-Framework contribution/donation
+    [WSS-430] - Support for secured SOAP attachments
+    [WSS-497] - Support for SAML 2.0 EncryptedAssertion Element
+
+Task
+
+    [WSS-342] - Refactoring
+    [WSS-351] - SAML work
+    [WSS-359] - Streaming WS-Security support
+    [WSS-365] - Build issues
+    [WSS-369] - WS-SecurityPolicy work
+    [WSS-405] - Support for XML Encryption 1.1 algorithms
+    [WSS-425] - Add + update OSGi import/export information in the new modules
+    [WSS-429] - Consider some @Deprecated classes in the old namespace
+    [WSS-432] - Support EncryptedKeySHA1 KeyIdentifier in the StaX code
+    [WSS-434] - Add ValueType attribute to a Signature/Encryption Reference to a DerivedKeyToken
+    [WSS-460] - Support RequireSignatureConfirmation policy validation
+    [WSS-494] - WSS4j documentation links are broken.
+
 Release 1.6.15
 =============
 
