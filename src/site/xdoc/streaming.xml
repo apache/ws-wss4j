@@ -42,6 +42,33 @@ set the JAX-WS property SecurityConstants.ENABLE_STREAMING_SECURITY
 </p>
 </subsection>
 
+<subsection name="Limitations of the streaming WS-Security implementation">
+<p>
+The new streaming implementation in WSS4J 2.0.0 meets the vast majority of the
+most common use-cases. However, it does not support everything that the DOM
+implementation supports. The limitations are:
+</p>
+<ul>
+<li>XPath evaluation is not supported apart from certain simple expressions.
+XPath evaluations are used with WS-SecurityPolicy RequiredElements,
+SignedElements, (Content)EncryptedElements. XPath expressions that point
+directly to the element are supported, e.g. /soap:Envelope/soap:Header/wsa:To.
+See WSS-445.</li>
+<li>WS-SecurityPolicy "Strict" Layout validation is not enforced. This includes
+enforcing whether a Timestamp is first or last. See WSS-444.</li>
+<li>A SymmetricBinding policy with a ProtectTokens assertion is not supported.
+See WSS-456.</li>
+<li>The combination of EncryptBeforeSigning + EncryptSignature policies are not
+supported. See WSS-464.</li>
+<li>Deriving keys from Username Tokens (Endorsing Username Tokens) are not
+supported.</li>
+<li>Endorsing tokens don't work with Symmetric + Asymmetric binding on the
+client side, unless the endorsing token is a SAML or IssuedToken.</li>
+<li>Derived Endorsing Tokens are not supported on the client side.</li>
+</ul>
+
+</subsection>
+
 </section>            
 </body>
 </document>

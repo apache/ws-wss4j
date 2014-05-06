@@ -12,7 +12,7 @@
     <menu name="Apache WSS4J">
       <item name="Home" href="index.html"/>
       <item name="Download" href="download.html"/>
-      <item name="User's Guide" href="user_guide.html"/>
+      <item name="User Guide" href="user_guide.html"/>
     </menu>
 
     <menu ref="reports"/>
