@@ -524,7 +524,9 @@ construct a BinarySecurityToken. Default is "true".</td>
 <tr>
 <td>TIMESTAMP_STRICT</td>
 <td>timestampStrict</td>
-<td>Set whether to enable strict Timestamp handling. Default is "true".</td>
+<td>Set whether to enable strict Timestamp handling, i.e. throw an exception if
+the current receiver time is past the Expires time of the Timestamp. Default
+is "true".</td>
 </tr>
 <tr>
 <td>ENC_SYM_ENC_KEY</td>
