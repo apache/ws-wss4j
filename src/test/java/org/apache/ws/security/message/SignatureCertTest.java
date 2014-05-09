@@ -28,13 +28,16 @@ import org.apache.ws.security.common.CustomHandler;
 import org.apache.ws.security.common.SOAPUtil;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
+import org.apache.ws.security.components.crypto.Merlin;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.util.WSSecurityUtil;
+
 import org.w3c.dom.Document;
 
 import java.security.cert.X509Certificate;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * This is a test for WSS-40. Essentially it just tests that a message is signed using a
@@ -299,6 +302,83 @@ public class SignatureCertTest extends org.junit.Assert {
         assertTrue (certs != null && certs.length == 2);
     }
     
+    @org.junit.Test
+    public void testExpiredCert() throws Exception {
+        Properties clientProperties = new Properties();
+        clientProperties.put("org.apache.ws.security.crypto.provider", 
+                "org.apache.ws.security.components.crypto.Merlin");
+        clientProperties.put("org.apache.ws.security.crypto.merlin.keystore.type", "jks");
+        clientProperties.put("org.apache.ws.security.crypto.merlin.keystore.password", "security");
+        clientProperties.put("org.apache.ws.security.crypto.merlin.keystore.alias", "wss40exp");
+        clientProperties.put("org.apache.ws.security.crypto.merlin.keystore.file", "keys/wss40exp.jks");
+        
+        Crypto clientCrypto = new Merlin(clientProperties);
+        
+        WSSecSignature sign = new WSSecSignature();
+        sign.setUserInfo("wss40exp", "security");
+        sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+       
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = sign.build(doc, clientCrypto, secHeader);
+                
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        //
+        // Verify the signature
+        //
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        try {
+            newEngine.processSecurityHeader(doc, null, null, clientCrypto);
+            fail("Failure expected on an expired cert");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+    }
+    
+    @org.junit.Test
+    public void testExpiredCertInKeystore() throws Exception {
+        Properties clientProperties = new Properties();
+        clientProperties.put("org.apache.ws.security.crypto.provider", 
+                "org.apache.ws.security.components.crypto.Merlin");
+        clientProperties.put("org.apache.ws.security.crypto.merlin.keystore.type", "jks");
+        clientProperties.put("org.apache.ws.security.crypto.merlin.keystore.password", "security");
+        clientProperties.put("org.apache.ws.security.crypto.merlin.keystore.alias", "wss40exp");
+        clientProperties.put("org.apache.ws.security.crypto.merlin.keystore.file", "keys/wss40exp.jks");
+        
+        Crypto clientCrypto = new Merlin(clientProperties);
+        
+        WSSecSignature sign = new WSSecSignature();
+        sign.setUserInfo("wss40exp", "security");
+        sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+       
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = sign.build(doc, clientCrypto, secHeader);
+                
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        //
+        // Verify the signature
+        //
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        try {
+            newEngine.processSecurityHeader(doc, null, null, clientCrypto);
+            fail("Failure expected on an expired cert");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+    }
     
     /**
      * Verifies the soap envelope
