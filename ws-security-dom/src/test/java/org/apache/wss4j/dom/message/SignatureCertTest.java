@@ -337,9 +337,13 @@ public class SignatureCertTest extends org.junit.Assert {
         //
         // Verify the signature
         //
-        // TODO Failure expected after expiry
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        newEngine.processSecurityHeader(doc, null, null, cryptoCA);
+        try {
+            newEngine.processSecurityHeader(doc, null, null, cryptoCA);
+            fail("Failure expected on an expired cert");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
     }
     
     @org.junit.Test
@@ -372,9 +376,13 @@ public class SignatureCertTest extends org.junit.Assert {
         //
         // Verify the signature
         //
-        // TODO Failure expected after expiry
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        newEngine.processSecurityHeader(doc, null, null, clientCrypto);
+        try {
+            newEngine.processSecurityHeader(doc, null, null, clientCrypto);
+            fail("Failure expected on an expired cert");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
     }
     
     /**

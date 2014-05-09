@@ -39,7 +39,9 @@ import java.security.cert.CertStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.PKIXParameters;
 import java.security.cert.TrustAnchor;
@@ -804,6 +806,17 @@ public class Merlin extends CryptoBase {
             // to ensure against phony DNs (compare encoded form including signature)
             //
             if (foundCerts != null && foundCerts[0] != null && foundCerts[0].equals(certs[0])) {
+                try {
+                    certs[0].checkValidity();
+                } catch (CertificateExpiredException e) {
+                    throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILED_CHECK, "invalidCert", e
+                    );
+                } catch (CertificateNotYetValidException e) {
+                    throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILED_CHECK, "invalidCert", e
+                    );
+                }
                 if (LOG.isDebugEnabled()) {
                     LOG.debug(
                         "Direct trust for certificate with " + certs[0].getSubjectX500Principal().getName()
