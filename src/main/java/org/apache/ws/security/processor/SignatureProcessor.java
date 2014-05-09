@@ -127,6 +127,7 @@ public class SignatureProcessor implements Processor {
         String signatureMethod = getSignatureMethod(elem);
         REFERENCE_TYPE referenceType = null;
 
+        Credential credential = new Credential();
         Validator validator = data.getValidator(WSSecurityEngine.SIGNATURE);
         if (keyInfoElement == null) {
             certs = getDefaultCerts(data.getSigCrypto());
@@ -153,11 +154,10 @@ public class SignatureProcessor implements Processor {
             if (strElements.isEmpty()) {
                 publicKey = parseKeyValue(keyInfoElement);
                 if (validator != null) {
-                    Credential credential = new Credential();
                     credential.setPublicKey(publicKey);
                     principal = new PublicKeyPrincipal(publicKey);
                     credential.setPrincipal(principal);
-                    validator.validate(credential, data);
+                    credential = validator.validate(credential, data);
                 }
             } else {
                 STRParser strParser = new SignatureSTRParser();
@@ -180,11 +180,10 @@ public class SignatureProcessor implements Processor {
                     LOG.debug("Direct Trust for SAML/BST credential");
                 }
                 if (!trusted && (publicKey != null || certs != null) && (validator != null)) {
-                    Credential credential = new Credential();
                     credential.setPublicKey(publicKey);
                     credential.setCertificates(certs);
                     credential.setPrincipal(principal);
-                    validator.validate(credential, data);
+                    credential = validator.validate(credential, data);
                 }
             }
         }
@@ -257,6 +256,7 @@ public class SignatureProcessor implements Processor {
         result.put(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE, referenceType);
         if (validator != null) {
             result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
+            result.put(WSSecurityEngineResult.TAG_SUBJECT, credential.getSubject());
         }
         wsDocInfo.addResult(result);
         wsDocInfo.addTokenElement(elem);
