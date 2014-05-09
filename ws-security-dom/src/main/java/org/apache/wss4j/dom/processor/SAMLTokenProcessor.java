@@ -123,6 +123,7 @@ public class SAMLTokenProcessor implements Processor {
             } else {
                 result.put(WSSecurityEngineResult.TAG_PRINCIPAL, new SAMLTokenPrincipalImpl(samlAssertion));
             }
+            result.put(WSSecurityEngineResult.TAG_SUBJECT, credential.getSubject());
         }
         wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);
