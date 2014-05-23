@@ -19,6 +19,7 @@
 package org.apache.wss4j.stax.impl.securityToken;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.ext.WSSecurityException.ErrorCode;
 import org.apache.wss4j.common.kerberos.*;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
@@ -38,6 +39,7 @@ import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.security.Key;
 import java.security.Principal;
+import java.security.PrivilegedActionException;
 import java.util.Set;
 
 public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityToken implements KerberosServiceSecurityToken {
@@ -92,28 +94,50 @@ public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityTok
                 Set<Principal> principals = subject.getPrincipals();
                 if (principals.isEmpty()) {
                     throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.FAILURE,
-                            "kerberosLoginError",
-                            "No Client principals found after login"
+                        WSSecurityException.ErrorCode.FAILURE,
+                        "kerberosLoginError",
+                        "No Client principals found after login"
                     );
                 }
                 service = principals.iterator().next().getName();
             }
 
-            // Validate the ticket
-            KerberosServiceAction action = new KerberosServiceAction(binaryContent, service);
-            this.principal = Subject.doAs(subject, action);
-            if (this.principal == null) {
-                throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILURE, "kerberosTicketValidationError"
-                );
+            KerberosServiceExceptionAction action = new KerberosServiceExceptionAction(binaryContent,
+                                                                                       service, 
+                                                                                       contextAndServiceNameCallback.isUsernameServiceNameForm());
+            KerberosServiceContext krbServiceCtx= null;
+            try {
+                krbServiceCtx = Subject.doAs(subject, action);
+            } catch (PrivilegedActionException e) {
+                Throwable cause = e.getCause();
+                if (cause instanceof WSSecurityException) {
+                    throw (WSSecurityException) cause;
+                } else {
+                    throw new WSSecurityException(
+                        ErrorCode.FAILURE, "kerberosTicketValidationError", new Object[] {}, cause
+                    );
+                }
             }
 
-            KerberosTokenDecoder kerberosTokenDecoder = new KerberosTokenDecoderImpl();
-            kerberosTokenDecoder.setToken(binaryContent);
-            kerberosTokenDecoder.setSubject(subject);
-            return kerberosTokenDecoder;
+            this.principal = krbServiceCtx.getPrincipal();
 
+            final Key sessionKey = krbServiceCtx.getSessionKey();
+
+            if (null != sessionKey) {
+                return new KerberosTokenDecoder() {
+                    public void setToken(byte[] token) {}
+                    public void setSubject(Subject subject) {}
+                    public byte[] getSessionKey() throws KerberosTokenDecoderException {
+                        return sessionKey.getEncoded();
+                    }
+                    public void clear() {}
+                };
+            } else {
+                KerberosTokenDecoder kerberosTokenDecoder = new KerberosTokenDecoderImpl();
+                kerberosTokenDecoder.setToken(binaryContent);
+                kerberosTokenDecoder.setSubject(subject);
+                return kerberosTokenDecoder;            	
+            }
         } catch (LoginException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         } catch (UnsupportedCallbackException e) {

@@ -18,36 +18,41 @@
  */
 package org.apache.wss4j.common.kerberos;
 
-import javax.security.auth.callback.Callback;
+import java.security.Key;
+import java.security.Principal;
 
-public class KerberosContextAndServiceNameCallback implements Callback {
 
-    private String contextName;
-    private String serviceName;
-    private boolean isUsernameServiceNameForm;
-
-    public String getContextName() {
-        return contextName;
-    }
-
-    public void setContextName(String contextName) {
-        this.contextName = contextName;
-    }
-
-    public String getServiceName() {
-        return serviceName;
-    }
-
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
+public class KerberosServiceContext {
+    
+    private Principal principal = null;
+    private Key sessionKey = null;
+    
+    /**
+     * @return the principal
+     */
+    public Principal getPrincipal() {
+        return principal;
     }
     
-    public void setIsUsernameServiceNameForm(boolean isUsernameServiceNameForm){
-    	this.isUsernameServiceNameForm = isUsernameServiceNameForm;
+    /**
+     * @param principal the principal to set
+     */
+    public void setPrincipal(Principal principal) {
+        this.principal = principal;
     }
     
-    public boolean isUsernameServiceNameForm(){
-    	return this.isUsernameServiceNameForm;
+    /**
+     * @return the sessionKey
+     */
+    public Key getSessionKey() {
+        return sessionKey;
     }
-
+    
+    /**
+     * @param sessionKey the sessionKey to set
+     */
+    public void setSessionKey(Key sessionKey) {
+        this.sessionKey = sessionKey;
+    }
+    
 }

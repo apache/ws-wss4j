@@ -40,6 +40,14 @@ public interface SpnegoClientAction extends PrivilegedAction<byte[]> {
     void setServiceName(String serviceName);
 
     /**
+     * If true - sets the SPN form to "username"
+     * <br/>If false<b>(default)</b> - the SPN form is "hostbased"
+     * 
+     * @param isUsernameServiceNameForm the isUsernameServiceNameForm to set
+     */
+    void setUserNameServiceForm(boolean isUsernameServiceNameForm);
+
+    /**
      * Obtain a service ticket
      */
     byte[] run();

@@ -59,6 +59,26 @@ public class SpnegoTokenContext {
         CallbackHandler callbackHandler,
         String serviceName
     ) throws WSSecurityException {
+    	retrieveServiceTicket(jaasLoginModuleName, callbackHandler, serviceName, false);
+    }
+    
+    
+    /**
+     * Retrieve a service ticket from a KDC using the Kerberos JAAS module, and set it in this
+     * BinarySecurityToken.
+     * @param jaasLoginModuleName the JAAS Login Module name to use
+     * @param callbackHandler a CallbackHandler instance to retrieve a password (optional)
+     * @param serviceName the desired Kerberized service
+     * @param serviceNameForm 
+     * @throws WSSecurityException
+     */
+    public void retrieveServiceTicket(
+        String jaasLoginModuleName, 
+        CallbackHandler callbackHandler,
+        String serviceName,
+        boolean isUsernameServiceNameForm
+    ) throws WSSecurityException {
+    	
         // Get a TGT from the KDC using JAAS
         LoginContext loginContext = null;
         try {
@@ -94,6 +114,7 @@ public class SpnegoTokenContext {
         // Get the service ticket
         clientAction.setServiceName(serviceName);
         clientAction.setMutualAuth(mutualAuth);
+        clientAction.setUserNameServiceForm(isUsernameServiceNameForm);
         token = Subject.doAs(clientSubject, clientAction);
         if (token == null) {
             throw new WSSecurityException(
@@ -105,7 +126,6 @@ public class SpnegoTokenContext {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Successfully retrieved a service ticket");
         }
-        
     }
     
     /**
@@ -120,6 +140,24 @@ public class SpnegoTokenContext {
         String jaasLoginModuleName, 
         CallbackHandler callbackHandler,
         String serviceName,
+        byte[] ticket
+    ) throws WSSecurityException {
+    	validateServiceTicket(jaasLoginModuleName, callbackHandler, serviceName, false, ticket);
+     }
+    
+    /**
+     * Validate a service ticket.
+     * @param jaasLoginModuleName
+     * @param callbackHandler
+     * @param serviceName
+     * @param ticket
+     * @throws WSSecurityException
+     */
+    public void validateServiceTicket(
+        String jaasLoginModuleName, 
+        CallbackHandler callbackHandler,
+        String serviceName,
+        boolean isUsernameServiceNameForm,
         byte[] ticket
     ) throws WSSecurityException {
         // Get a TGT from the KDC using JAAS
@@ -162,6 +200,7 @@ public class SpnegoTokenContext {
         // Validate the ticket
         serviceAction.setTicket(ticket);
         serviceAction.setServiceName(service);
+        serviceAction.setUsernameServiceNameForm(isUsernameServiceNameForm);
         token = Subject.doAs(subject, serviceAction);
         
         secContext = serviceAction.getContext();

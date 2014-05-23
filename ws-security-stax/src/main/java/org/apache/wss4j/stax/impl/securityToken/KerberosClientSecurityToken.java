@@ -18,14 +18,13 @@
  */
 package org.apache.wss4j.stax.impl.securityToken;
 
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.kerberos.KerberosClientAction;
-import org.apache.wss4j.common.kerberos.KerberosContextAndServiceNameCallback;
-import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
+import java.io.IOException;
+import java.security.Key;
+import java.security.Principal;
+import java.security.PrivilegedActionException;
+import java.util.Set;
 
+import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -34,10 +33,15 @@ import javax.security.auth.kerberos.KerberosTicket;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
-import java.io.IOException;
-import java.security.Key;
-import java.security.Principal;
-import java.util.Set;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.ext.WSSecurityException.ErrorCode;
+import org.apache.wss4j.common.kerberos.KerberosClientExceptionAction;
+import org.apache.wss4j.common.kerberos.KerberosContext;
+import org.apache.wss4j.common.kerberos.KerberosContextAndServiceNameCallback;
+import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
 
 public class KerberosClientSecurityToken extends GenericOutboundSecurityToken {
 
@@ -50,7 +54,7 @@ public class KerberosClientSecurityToken extends GenericOutboundSecurityToken {
         this.ticket = ticket;
         this.secretKey = secretKey;
     }
-    
+
     public KerberosClientSecurityToken(CallbackHandler callbackHandler, String id) {
         super(id, WSSecurityTokenConstants.KerberosToken);
         this.callbackHandler = callbackHandler;
@@ -75,33 +79,43 @@ public class KerberosClientSecurityToken extends GenericOutboundSecurityToken {
             Set<Principal> clientPrincipals = clientSubject.getPrincipals();
             if (clientPrincipals.isEmpty()) {
                 throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILURE,
-                        "kerberosLoginError", "No Client principals found after login"
+                    WSSecurityException.ErrorCode.FAILURE,
+                    "kerberosLoginError", "No Client principals found after login"
                 );
             }
             // Store the TGT
             KerberosTicket tgt = getKerberosTicket(clientSubject, null);
 
-            // Get the service ticket
-            KerberosClientAction action =
-                    new KerberosClientAction(
-                            clientPrincipals.iterator().next(), contextAndServiceNameCallback.getServiceName()
+            // Get the service ticket           
+            KerberosClientExceptionAction action = 
+                new KerberosClientExceptionAction(clientPrincipals.iterator().next(),
+                                                  contextAndServiceNameCallback.getServiceName(),
+                                                  contextAndServiceNameCallback.isUsernameServiceNameForm());
+            KerberosContext krbCtx = null;
+            try {
+                krbCtx = (KerberosContext) Subject.doAs(clientSubject, action);
+
+                // Get the secret key from KerberosContext if available, otherwise use Kerberos ticket's session key
+                Key sessionKey = krbCtx.getSecretKey();
+                if (sessionKey != null) {
+                    secretKey = new SecretKeySpec(sessionKey.getEncoded(), sessionKey.getAlgorithm());
+                } else {
+                    KerberosTicket serviceTicket = getKerberosTicket(clientSubject, tgt);
+                    secretKey = serviceTicket.getSessionKey();
+                }
+
+                ticket = krbCtx.getKerberosToken();
+            }
+            catch (PrivilegedActionException e) {
+                Throwable cause = e.getCause();
+                if (cause instanceof WSSecurityException) {
+                    throw (WSSecurityException) cause;
+                } else {
+                    throw new WSSecurityException(
+                         ErrorCode.FAILURE, "kerberosServiceTicketError", new Object[] {}, cause
                     );
-            byte[] ticket = Subject.doAs(clientSubject, action);
-            if (ticket == null) {
-                throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILURE, "kerberosServiceTicketError"
-                );
+                }
             }
-
-            // Get the Service Ticket (private credential)
-            KerberosTicket serviceTicket = getKerberosTicket(clientSubject, tgt);
-            if (serviceTicket != null) {
-                this.secretKey = serviceTicket.getSessionKey();
-            }
-
-            this.ticket = ticket;
-
         } catch (LoginException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         } catch (UnsupportedCallbackException e) {

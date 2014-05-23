@@ -20,10 +20,13 @@
 package org.apache.wss4j.dom.message.token;
 
 import java.io.IOException;
+import java.security.Key;
 import java.security.Principal;
+import java.security.PrivilegedActionException;
 import java.util.Set;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -32,12 +35,14 @@ import javax.security.auth.kerberos.KerberosTicket;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
-import org.apache.wss4j.common.kerberos.KerberosClientAction;
+import org.apache.wss4j.common.bsp.BSPRule;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.ext.WSSecurityException.ErrorCode;
+import org.apache.wss4j.common.kerberos.KerberosClientExceptionAction;
+import org.apache.wss4j.common.kerberos.KerberosContext;
 import org.apache.wss4j.common.kerberos.KerberosContextAndServiceNameCallback;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
-import org.apache.wss4j.common.bsp.BSPRule;
-import org.apache.wss4j.common.ext.WSSecurityException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -45,11 +50,11 @@ import org.w3c.dom.Element;
  * Kerberos Security Token.
  */
 public class KerberosSecurity extends BinarySecurity {
-    
+
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(KerberosSecurity.class);
     private SecretKey secretKey;
-    
+
     /**
      * This constructor creates a new Kerberos token object and initializes
      * it from the data contained in the element.
@@ -74,7 +79,7 @@ public class KerberosSecurity extends BinarySecurity {
     public KerberosSecurity(Document doc) {
         super(doc);
     }
-    
+
     /**
      * Return true if this token is a Kerberos V5 AP REQ token
      */
@@ -87,7 +92,7 @@ public class KerberosSecurity extends BinarySecurity {
         }
         return false;
     }
-    
+
     /**
      * Return true if this token is a Kerberos GSS V5 AP REQ token
      */
@@ -100,7 +105,7 @@ public class KerberosSecurity extends BinarySecurity {
         }
         return false;
     }
-    
+
     /**
      * Retrieve a service ticket from a KDC using the Kerberos JAAS module, and set it in this
      * BinarySecurityToken.
@@ -128,7 +133,7 @@ public class KerberosSecurity extends BinarySecurity {
         if (serviceName == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "kerberosCallbackServiceNameNotSupplied");
         }
-        
+
         retrieveServiceTicket(jaasLoginModuleName, callbackHandler, serviceName);
     }
 
@@ -144,6 +149,15 @@ public class KerberosSecurity extends BinarySecurity {
         String jaasLoginModuleName, 
         CallbackHandler callbackHandler,
         String serviceName
+    ) throws WSSecurityException {
+        retrieveServiceTicket(jaasLoginModuleName, callbackHandler, serviceName, false);
+    }
+
+    public void retrieveServiceTicket(
+        String jaasLoginModuleName, 
+        CallbackHandler callbackHandler,
+        String serviceName,
+        boolean isUsernameServiceNameForm
     ) throws WSSecurityException {
         // Get a TGT from the KDC using JAAS
         LoginContext loginContext = null;
@@ -161,12 +175,13 @@ public class KerberosSecurity extends BinarySecurity {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,
                 "kerberosLoginError", 
-                ex, ex.getMessage());
+                ex, ex.getMessage()
+            );
         }
         if (LOG.isDebugEnabled()) {
             LOG.debug("Successfully authenticated to the TGT");
         }
-        
+
         Subject clientSubject = loginContext.getSubject();
         Set<Principal> clientPrincipals = clientSubject.getPrincipals();
         if (clientPrincipals.isEmpty()) {
@@ -177,33 +192,51 @@ public class KerberosSecurity extends BinarySecurity {
         }
         // Store the TGT
         KerberosTicket tgt = getKerberosTicket(clientSubject, null);
-        
+
         // Get the service ticket
-        KerberosClientAction action =
-            new KerberosClientAction(clientPrincipals.iterator().next(), serviceName);
-        byte[] ticket = Subject.doAs(clientSubject, action);
-        if (ticket == null) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "kerberosServiceTicketError"
-            );
+        KerberosClientExceptionAction action = 
+            new KerberosClientExceptionAction(clientPrincipals.iterator().next(), serviceName, isUsernameServiceNameForm);
+        KerberosContext krbCtx = null;
+        try {
+            krbCtx = (KerberosContext) Subject.doAs(clientSubject, action);
+
+            // Get the secret key from KerberosContext if available, otherwise use Kerberos ticket's session key
+            Key sessionKey = krbCtx.getSecretKey();
+            if (sessionKey != null) {
+                secretKey = new SecretKeySpec(sessionKey.getEncoded(), sessionKey.getAlgorithm());
+            } else {
+                KerberosTicket serviceTicket = getKerberosTicket(clientSubject, tgt);
+                secretKey = serviceTicket.getSessionKey();
+            }
+
+            setToken(krbCtx.getKerberosToken());
+        }
+        catch (PrivilegedActionException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof WSSecurityException) {
+                throw (WSSecurityException) cause;
+            }
+            else {
+                throw new WSSecurityException(
+                     ErrorCode.FAILURE, "kerberosServiceTicketError", new Object[] {}, cause
+                );
+            }
+        } finally {
+            if (krbCtx != null) {
+                krbCtx.dispose();
+            }
         }
         if (LOG.isDebugEnabled()) {
             LOG.debug("Successfully retrieved a service ticket");
         }
-        
-        // Get the Service Ticket (private credential)
-        KerberosTicket serviceTicket = getKerberosTicket(clientSubject, tgt);
-        if (serviceTicket != null) {
-            secretKey = serviceTicket.getSessionKey();
-        }
-        
-        setToken(ticket);
-        
+
         if ("".equals(getValueType())) {
             setValueType(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
         }
     }
-    
+
+
+
     /**
      * Get a KerberosTicket from the clientSubject parameter, that is not equal to the supplied KerberosTicket
      * parameter (can be null)
@@ -216,7 +249,7 @@ public class KerberosSecurity extends BinarySecurity {
             }
             return null;
         }
-        
+
         for (KerberosTicket privateCredential : privateCredentials) {
             if (!privateCredential.equals(previousTicket)) {
                 return privateCredential;
@@ -224,7 +257,7 @@ public class KerberosSecurity extends BinarySecurity {
         }
         return null;
     }
-    
+
     /**
      * Get the SecretKey associated with the service principal
      * @return the SecretKey associated with the service principal
@@ -232,7 +265,7 @@ public class KerberosSecurity extends BinarySecurity {
     public SecretKey getSecretKey() {
         return secretKey;
     }
-    
+
     /**
      * Return true if the valueType represents a Kerberos Token
      * @param valueType the valueType of the token
@@ -249,5 +282,5 @@ public class KerberosSecurity extends BinarySecurity {
         }
         return false;
     }
-    
+
 }
