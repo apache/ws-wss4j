@@ -154,6 +154,8 @@ public class SignaturePartsTest extends org.junit.Assert {
         String xpath = wsDataRef.getXpath();
         assertEquals("/soapenv:Envelope/soapenv:Header/foo:foobar", xpath);
         assertEquals(WSConstants.RSA_SHA1, wsDataRef.getAlgorithm());
+        assertNotNull(wsDataRef.getDigestValue());
+        assertTrue(wsDataRef.getDigestValue().length > 0);
         
         assertEquals(WSConstants.SHA1, wsDataRef.getDigestAlgorithm());
         

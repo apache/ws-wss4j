@@ -65,6 +65,12 @@ public class WSDataRef {
      */
     private String digestAlgorithm;
     
+    /**
+     * If this reference represents signed content, this field
+     * represents the digest bytes obtained after applying the digestAlgorithm
+     */
+    private byte[] digestValue;
+    
     private boolean content;
     
     /**
@@ -209,6 +215,14 @@ public class WSDataRef {
 
     public void setAttachment(boolean attachment) {
         this.attachment = attachment;
+    }
+
+    public byte[] getDigestValue() {
+        return digestValue;
+    }
+
+    public void setDigestValue(byte[] digestValue) {
+        this.digestValue = digestValue;
     }
 
 }

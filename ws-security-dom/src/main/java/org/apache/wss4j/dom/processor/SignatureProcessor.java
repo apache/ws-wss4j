@@ -567,6 +567,7 @@ public class SignatureProcessor implements Processor {
                 ref.setProtectedElement(se);
                 ref.setAlgorithm(signedInfo.getSignatureMethod().getAlgorithm());
                 ref.setDigestAlgorithm(siRef.getDigestMethod().getAlgorithm());
+                ref.setDigestValue(siRef.getDigestValue());
                 ref.setAttachment(attachment);
                 
                 // Set the Transform algorithms as well
