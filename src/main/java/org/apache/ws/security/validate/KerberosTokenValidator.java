@@ -19,7 +19,9 @@
 
 package org.apache.ws.security.validate;
 
+import java.security.Key;
 import java.security.Principal;
+import java.security.PrivilegedActionException;
 import java.util.Set;
 
 import javax.security.auth.Subject;
@@ -31,20 +33,21 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.KerberosSecurity;
-import org.apache.ws.security.message.token.KerberosServiceAction;
+import org.apache.ws.security.message.token.KerberosServiceContext;
+import org.apache.ws.security.message.token.KerberosServiceExceptionAction;
 
 /**
  */
 public class KerberosTokenValidator implements Validator {
-    
     private static org.apache.commons.logging.Log log =
         org.apache.commons.logging.LogFactory.getLog(KerberosTokenValidator.class);
-    
+
     private String serviceName;
     private CallbackHandler callbackHandler;
     private String contextName;
     private KerberosTokenDecoder kerberosTokenDecoder;
-    
+    private boolean isUsernameServiceNameForm;
+
     /**
      * Get the JAAS Login context name to use.
      * @return the JAAS Login context name to use
@@ -60,7 +63,7 @@ public class KerberosTokenValidator implements Validator {
     public void setContextName(String contextName) {
         this.contextName = contextName;
     }
-    
+
     /**
      * @deprecated
      * Get the JAAS Login module name to use.
@@ -103,7 +106,7 @@ public class KerberosTokenValidator implements Validator {
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
     }
-    
+
     /**
      * Get the name of the service to use when contacting the KDC. This value can be null, in which
      * case it defaults to the current principal name.
@@ -112,7 +115,7 @@ public class KerberosTokenValidator implements Validator {
     public String getServiceName() {
         return serviceName;
     }
-    
+
     /**
      * Get the KerberosTokenDecoder instance used to extract a session key from the received Kerberos
      * token.
@@ -130,7 +133,7 @@ public class KerberosTokenValidator implements Validator {
     public void setKerberosTokenDecoder(KerberosTokenDecoder kerberosTokenDecoder) {
         this.kerberosTokenDecoder = kerberosTokenDecoder;
     }
-    
+
     /**
      * Validate the credential argument. It must contain a non-null BinarySecurityToken. 
      * 
@@ -142,12 +145,11 @@ public class KerberosTokenValidator implements Validator {
         if (credential == null || credential.getBinarySecurityToken() == null) {
             throw new WSSecurityException(WSSecurityException.FAILURE, "noCredential");
         }
-        
+
         BinarySecurity binarySecurity = credential.getBinarySecurityToken();
         if (!(binarySecurity instanceof KerberosSecurity)) {
             return credential;
         }
-        
         if (log.isDebugEnabled()) {
             try {
                 String jaasAuth = System.getProperty("java.security.auth.login.config");
@@ -158,7 +160,7 @@ public class KerberosTokenValidator implements Validator {
                 log.debug(ex.getMessage(), ex);
             }
         }
-        
+
         // Get a TGT from the KDC using JAAS
         LoginContext loginContext = null;
         try {
@@ -182,9 +184,9 @@ public class KerberosTokenValidator implements Validator {
         if (log.isDebugEnabled()) {
             log.debug("Successfully authenticated to the TGT");
         }
-        
+
         byte[] token = binarySecurity.getToken();
-        
+
         // Get the service name to use - fall back on the principal
         Subject subject = loginContext.getSubject();
         String service = serviceName;
@@ -199,33 +201,90 @@ public class KerberosTokenValidator implements Validator {
             }
             service = principals.iterator().next().getName();
         }
-        
+
         // Validate the ticket
-        KerberosServiceAction action = new KerberosServiceAction(token, service);
-        Principal principal = (Principal)Subject.doAs(subject, action);
-        if (principal == null) {
+        KerberosServiceExceptionAction action = new KerberosServiceExceptionAction(token, service, isUsernameServiceNameForm());
+        KerberosServiceContext krbServiceCtx = null;
+        try {
+            krbServiceCtx = (KerberosServiceContext)Subject.doAs(subject, action);
+        } catch (PrivilegedActionException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof WSSecurityException) {
+                throw (WSSecurityException) cause;
+            } else {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILURE, "kerberosTicketValidationError", new Object[] {}, cause
+                );
+            }
+        }
+
+        credential.setPrincipal(krbServiceCtx.getPrincipal());
+        if (credential.getPrincipal() == null) {
             throw new WSSecurityException(
                 WSSecurityException.FAILURE, "kerberosTicketValidationError"
             );
         }
-        credential.setPrincipal(principal);
-        credential.setSubject(subject);
+
+        // Check to see if the session key is available in KerberosServiceContext
+        log.debug("Trying to obtain the Session Key from the KerberosServiceContext.");
+        Key sessionKey = krbServiceCtx.getSessionKey();
+        if (null != sessionKey) {
+            log.debug("Found session key in the KerberosServiceContext.");
+            credential.setSecretKey(sessionKey.getEncoded());
+        } else {
+            log.debug("Session key is not found in the KerberosServiceContext.");
+        }
         
-        // Try to extract the session key from the token if a KerberosTokenDecoder implementation is
+        // Otherwise, try to extract the session key from the token if a KerberosTokenDecoder implementation is
         // available
-        if (kerberosTokenDecoder != null) {
+        if (null == credential.getSecretKey() && kerberosTokenDecoder != null) {    
+            KerberosTokenDecoder kerberosTokenDecoder = this.kerberosTokenDecoder;
+            
+            log.debug("KerberosTokenDecoder is set.Trying to obtain the session key from it.");            
             kerberosTokenDecoder.clear();
             kerberosTokenDecoder.setToken(token);
             kerberosTokenDecoder.setSubject(subject);
-            byte[] sessionKey = kerberosTokenDecoder.getSessionKey();
-            credential.setSecretKey(sessionKey);
+            byte[] key = kerberosTokenDecoder.getSessionKey();
+            if (null != key) {
+                log.debug("Session key obtained from the KerberosTokenDecoder.");
+                credential.setSecretKey(key);
+            } else {
+                log.debug("Session key could not be obtained from the KerberosTokenDecoder.");
+            }
+        } else {
+            log.debug("KerberosTokenDecoder is not set.");
         }
         
         if (log.isDebugEnabled()) {
             log.debug("Successfully validated a ticket");
         }
-        
+
         return credential;
+    }
+
+    /**
+     * SPN can be configured to be in either <b>"hostbased"</b> or <b>"username"</b> form.<br/>
+     *     - <b>"hostbased"</b> - specifies that the service principal name should be interpreted as a "host-based" name as specified in GSS API Rfc, section "4.1: Host-Based Service Name Form" - The service name, as it is specified in LDAP/AD, as it is listed in the KDC.<br/>
+     *     - <b>"username"</b> - specifies that the service principal name should be interpreted as a "username" name as specified in GSS API Rfc, section "4.2: User Name Form" � This is usually the client username in LDAP/AD used for authentication to the KDC.
+     * 
+     * <br/><br/>Default is <b>"hostbased"</b>.
+     * 
+     * @return the isUsernameServiceNameForm
+     */
+    public boolean isUsernameServiceNameForm() {
+        return isUsernameServiceNameForm;
+    }
+
+    /**
+     * If true - sets the SPN form to "username"
+     * <br/>If false<b>(default)</b> - the SPN form is "hostbased"
+     * 
+     * @see KerberosSecurity#retrieveServiceTicket(String, CallbackHandler, String, boolean)
+     * 
+     * @param isUsernameServiceNameForm the isUsernameServiceNameForm to set
+     */
+    public void setUsernameServiceNameForm(boolean isUsernameServiceNameForm) {
+        this.isUsernameServiceNameForm = isUsernameServiceNameForm;
     }
     
 }

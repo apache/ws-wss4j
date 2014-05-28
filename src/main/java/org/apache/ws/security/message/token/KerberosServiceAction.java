@@ -22,51 +22,36 @@ package org.apache.ws.security.message.token;
 import java.security.Principal;
 import java.security.PrivilegedAction;
 
-import javax.security.auth.kerberos.KerberosPrincipal;
-
-import org.ietf.jgss.GSSContext;
-import org.ietf.jgss.GSSCredential;
-import org.ietf.jgss.GSSException;
-import org.ietf.jgss.GSSManager;
-import org.ietf.jgss.GSSName;
-import org.ietf.jgss.Oid;
-
 /**
  * This class represents a PrivilegedAction implementation to validate a received ticket to a KDC.
  */
 public class KerberosServiceAction implements PrivilegedAction<Principal> {
-    private static org.apache.commons.logging.Log log =
+    private static org.apache.commons.logging.Log LOG =
         org.apache.commons.logging.LogFactory.getLog(KerberosServiceAction.class);
     
     private byte[] ticket;
     private String serviceName;
+    private boolean isUsernameServiceNameForm;
     
     public KerberosServiceAction(byte[] ticket, String serviceName) {
+        this(ticket, serviceName, false);
+    }
+    
+    public KerberosServiceAction(byte[] ticket, String serviceName, boolean isUsernameServiceNameForm) {
         this.ticket = ticket;
         this.serviceName = serviceName;
+        this.isUsernameServiceNameForm = isUsernameServiceNameForm;
     }
 
     public Principal run() {
         try {
-            GSSManager gssManager = GSSManager.getInstance();
-        
-            Oid kerberos5Oid = new Oid("1.2.840.113554.1.2.2");
-            GSSName gssService = gssManager.createName(serviceName, GSSName.NT_HOSTBASED_SERVICE);
-            GSSCredential credentials = 
-                gssManager.createCredential(
-                    gssService, GSSCredential.DEFAULT_LIFETIME, kerberos5Oid, GSSCredential.ACCEPT_ONLY
-                );
-            
-            GSSContext secContext =
-                gssManager.createContext(credentials);
-            secContext.acceptSecContext(ticket, 0, ticket.length);
- 
-            GSSName clientName = secContext.getSrcName();
-            secContext.dispose();
-            return new KerberosPrincipal(clientName.toString());
-        } catch (GSSException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Error in validating a Kerberos token", e);
+            KerberosServiceExceptionAction action = 
+                new KerberosServiceExceptionAction(this.ticket, this.serviceName, this.isUsernameServiceNameForm);            
+            KerberosServiceContext krbServiceCtx = action.run();            
+            return krbServiceCtx.getPrincipal();
+        } catch (Exception e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Error in validating a Kerberos token", e);
             }
         }
 

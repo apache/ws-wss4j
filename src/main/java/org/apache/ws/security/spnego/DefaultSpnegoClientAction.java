@@ -36,6 +36,7 @@ public class DefaultSpnegoClientAction implements SpnegoClientAction {
     private String serviceName;
     private GSSContext secContext;
     private boolean mutualAuth;
+    private boolean isUsernameServiceNameForm;
     
     /**
      * Whether to enable mutual authentication or not.
@@ -59,7 +60,7 @@ public class DefaultSpnegoClientAction implements SpnegoClientAction {
             GSSManager gssManager = GSSManager.getInstance();
             Oid oid = new Oid("1.3.6.1.5.5.2");
 
-            GSSName gssService = gssManager.createName(serviceName, GSSName.NT_HOSTBASED_SERVICE);
+            GSSName gssService = gssManager.createName(serviceName, isUsernameServiceNameForm ? GSSName.NT_USER_NAME : GSSName.NT_HOSTBASED_SERVICE);
             secContext = gssManager.createContext(gssService, oid, null, GSSContext.DEFAULT_LIFETIME);
 
             secContext.requestMutualAuth(mutualAuth);
@@ -82,5 +83,9 @@ public class DefaultSpnegoClientAction implements SpnegoClientAction {
     public GSSContext getContext() {
         return secContext;
     }
-    
+
+    public void setUserNameServiceForm(boolean isUsernameServiceNameForm) {
+        this.isUsernameServiceNameForm = isUsernameServiceNameForm;
+    }
+
 }

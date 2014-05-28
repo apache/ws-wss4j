@@ -22,54 +22,35 @@ package org.apache.ws.security.message.token;
 import java.security.Principal;
 import java.security.PrivilegedAction;
 
-import org.ietf.jgss.GSSContext;
-import org.ietf.jgss.GSSCredential;
-import org.ietf.jgss.GSSException;
-import org.ietf.jgss.GSSManager;
-import org.ietf.jgss.GSSName;
-import org.ietf.jgss.Oid;
-
 /**
  * This class represents a PrivilegedAction implementation to obtain a service ticket from a Kerberos
  * Key Distribution Center.
  */
 public class KerberosClientAction implements PrivilegedAction<byte[]> {
-    private static org.apache.commons.logging.Log log =
+    private static org.apache.commons.logging.Log LOG =
         org.apache.commons.logging.LogFactory.getLog(KerberosClientAction.class);
     
     private Principal clientPrincipal;
     private String serviceName;
+    private boolean isUsernameServiceNameForm;
     
     public KerberosClientAction(Principal clientPrincipal, String serviceName) {
+        this(clientPrincipal, serviceName, false);
+    }
+    
+    public KerberosClientAction(Principal clientPrincipal, String serviceName, boolean isUsernameServiceNameForm) {
         this.clientPrincipal = clientPrincipal;
         this.serviceName = serviceName;
+        this.isUsernameServiceNameForm = isUsernameServiceNameForm;
     }
 
     public byte[] run() {
         try {
-            GSSManager gssManager = GSSManager.getInstance();
-        
-            Oid kerberos5Oid = new Oid("1.2.840.113554.1.2.2");
-            GSSName gssClient = gssManager.createName(clientPrincipal.getName(), GSSName.NT_USER_NAME);
-            GSSCredential credentials = 
-                gssManager.createCredential(
-                    gssClient, GSSCredential.DEFAULT_LIFETIME, kerberos5Oid, GSSCredential.INITIATE_ONLY
-                );
-            
-            GSSName gssService = gssManager.createName(serviceName, GSSName.NT_HOSTBASED_SERVICE);
-            GSSContext secContext =
-                gssManager.createContext(
-                    gssService, kerberos5Oid, credentials, GSSContext.DEFAULT_LIFETIME
-                );
- 
-            secContext.requestMutualAuth(false);
-            byte[] token = new byte[0];
-            byte[] returnedToken = secContext.initSecContext(token, 0, token.length);
-            secContext.dispose();
-            return returnedToken;
-        } catch (GSSException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Error in obtaining a Kerberos token", e);
+            KerberosContext krbCtx = (KerberosContext)new KerberosClientExceptionAction(clientPrincipal, serviceName, isUsernameServiceNameForm).run();
+            return krbCtx.getKerberosToken();
+        } catch (Exception e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Error in obtaining a Kerberos token", e);
             }
         }
 
