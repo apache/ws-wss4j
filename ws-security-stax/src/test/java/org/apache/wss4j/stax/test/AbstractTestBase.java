@@ -25,6 +25,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.HandlerAction;
@@ -481,10 +482,14 @@ public abstract class AbstractTestBase extends org.junit.Assert {
              * Get and check the Signature specific parameters first because they
              * may be used for encryption too.
              */
+            WSSConfig wssConfig = WSSConfig.getNewInstance();
+            reqData.setWssConfig(wssConfig);
             doReceiverAction(actions, reqData);
 
             Element elem = WSSecurityUtil.getSecurityHeader(doc, actor);
 
+            WSSecurityEngine secEngine = new WSSecurityEngine();
+            secEngine.setWssConfig(wssConfig);
             List<WSSecurityEngineResult> wsResult = null;
             try {
                 wsResult = secEngine.processSecurityHeader(elem, reqData);

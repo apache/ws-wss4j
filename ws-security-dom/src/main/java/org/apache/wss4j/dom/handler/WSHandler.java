@@ -36,7 +36,6 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.action.Action;
 import org.apache.wss4j.common.EncryptionActionToken;
@@ -63,7 +62,6 @@ import org.w3c.dom.Document;
 public abstract class WSHandler {
     private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(WSHandler.class);
-    protected WSSecurityEngine secEngine = new WSSecurityEngine();
     protected Map<String, Crypto> cryptos = new ConcurrentHashMap<String, Crypto>();
 
     private boolean doDebug = LOG.isDebugEnabled();
@@ -89,11 +87,11 @@ public abstract class WSHandler {
 
         WSSConfig wssConfig = reqData.getWssConfig();
         if (wssConfig == null) {
-            wssConfig = secEngine.getWssConfig();
+            wssConfig = WSSConfig.getNewInstance();
+            reqData.setWssConfig(wssConfig);
         }
         wssConfig.setPasswordsAreEncoded(decodeUseEncodedPasswords(reqData));
         wssConfig.setPrecisionInMilliSeconds(decodeTimestampPrecision(reqData));
-        reqData.setWssConfig(wssConfig);
 
         Object mc = reqData.getMsgContext();
         String actor = getString(WSHandlerConstants.ACTOR, mc);
@@ -304,7 +302,8 @@ public abstract class WSHandler {
 
         WSSConfig wssConfig = reqData.getWssConfig();
         if (wssConfig == null) {
-            wssConfig = secEngine.getWssConfig();
+            wssConfig = WSSConfig.getNewInstance();
+            reqData.setWssConfig(wssConfig);
         }
         boolean enableSigConf = decodeEnableSignatureConfirmation(reqData);
         wssConfig.setEnableSignatureConfirmation(
@@ -335,7 +334,6 @@ public abstract class WSHandler {
         if (!bspCompliant) {
             reqData.setDisableBSPEnforcement(true);
         }
-        reqData.setWssConfig(wssConfig);
         
         // Load CallbackHandler
         if (reqData.getCallbackHandler() == null) {
