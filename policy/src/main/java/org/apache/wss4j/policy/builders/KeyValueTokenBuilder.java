@@ -46,10 +46,14 @@ public class KeyValueTokenBuilder implements AssertionBuilder<Element> {
             throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
         }
         final Element nestedPolicyElement = SPUtils.getFirstPolicyChildElement(element);
+        Policy nestedPolicy;
         if (nestedPolicyElement == null) {
-            throw new IllegalArgumentException("sp:KeyValueToken must have an inner wsp:Policy element");
+            //throw new IllegalArgumentException("sp:KeyValueToken must have an inner wsp:Policy element");
+            nestedPolicy = new Policy();
+        } else {
+            nestedPolicy = factory.getPolicyEngine().getPolicy(nestedPolicyElement);
         }
-        final Policy nestedPolicy = factory.getPolicyEngine().getPolicy(nestedPolicyElement);
+        
         KeyValueToken keyValueToken = new KeyValueToken(
                 spVersion,
                 spVersion.getSPConstants().getInclusionFromAttributeValue(includeTokenValue),
