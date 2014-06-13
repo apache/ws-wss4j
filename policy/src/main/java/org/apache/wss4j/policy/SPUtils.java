@@ -27,7 +27,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 public class SPUtils {
@@ -36,15 +35,14 @@ public class SPUtils {
     }
 
     public static boolean hasChildElements(Element element) {
-        NodeList nodeList = element.getChildNodes();
-        int elementCount = 0;
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node node = nodeList.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                elementCount++;
+        Node firstChild = element.getFirstChild();
+        while (firstChild != null) {
+            if (firstChild.getNodeType() == Node.ELEMENT_NODE) {
+                return true;
             }
+            firstChild = firstChild.getNextSibling();
         }
-        return elementCount > 0;
+        return false;
     }
 
     public static Element getFirstPolicyChildElement(Element element) {
@@ -200,9 +198,10 @@ public class SPUtils {
                     xmlStreamWriter.writeNamespace(element.getPrefix(), element.getNamespaceURI());
                 }
             }
-            NodeList childNodes = element.getChildNodes();
-            for (int i = 0; i < childNodes.getLength(); i++) {
-                serialize(childNodes.item(i), xmlStreamWriter);
+            Node firstChild = element.getFirstChild();
+            while (firstChild != null) {
+                serialize(firstChild, xmlStreamWriter);
+                firstChild = firstChild.getNextSibling();
             }
             xmlStreamWriter.writeEndElement();
         } else if (node.getNodeType() == Node.TEXT_NODE) {

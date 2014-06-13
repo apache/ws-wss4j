@@ -108,7 +108,7 @@ public class WSSecHeader {
                 );
         }
         
-        if (securityHeader == null || securityHeader.getChildNodes().getLength() == 0) {
+        if (securityHeader == null || securityHeader.getFirstChild() == null) {
             return true;
         }
         return false;

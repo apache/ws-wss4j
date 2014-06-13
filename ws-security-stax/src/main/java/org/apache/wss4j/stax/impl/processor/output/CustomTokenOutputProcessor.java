@@ -39,7 +39,6 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 public class CustomTokenOutputProcessor extends AbstractOutputProcessor {
@@ -133,17 +132,17 @@ public class CustomTokenOutputProcessor extends AbstractOutputProcessor {
 
             QName elementName = new QName(element.getNamespaceURI(), element.getLocalName(), element.getPrefix());
             createStartElementAndOutputAsEvent(outputProcessorChain, elementName, namespaces, attributes);
-            NodeList childNodes = element.getChildNodes();
-            for (int i = 0; i < childNodes.getLength(); i++) {
-                Node childNode = childNodes.item(i);
-                switch (childNode.getNodeType()) {
+            Node firstChild = element.getFirstChild();
+            while (firstChild != null) {
+                switch (firstChild.getNodeType()) {
                     case Node.ELEMENT_NODE:
-                        outputToken((Element) childNode, outputProcessorChain);
+                        outputToken((Element) firstChild, outputProcessorChain);
                         break;
                     case Node.TEXT_NODE:
-                        createCharactersAndOutputAsEvent(outputProcessorChain, ((Text) childNode).getData());
+                        createCharactersAndOutputAsEvent(outputProcessorChain, ((Text) firstChild).getData());
                         break;
                 }
+                firstChild = firstChild.getNextSibling();
             }
             createEndElementAndOutputAsEvent(outputProcessorChain, elementName);
         }
