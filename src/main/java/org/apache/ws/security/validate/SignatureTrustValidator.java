@@ -160,6 +160,10 @@ public class SignatureTrustValidator implements Validator {
                      + subjectString
                 );
             }
+            if (isCertificateInKeyStore(crypto, cert)) {
+                return true;
+            }
+
             Collection<Pattern> subjectCertConstraints = data.getSubjectCertConstraints();
             if (matches(cert, subjectCertConstraints)) {
                 return true;
