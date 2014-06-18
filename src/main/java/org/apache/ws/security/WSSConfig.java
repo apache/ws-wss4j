@@ -417,6 +417,24 @@ public class WSSConfig {
             }
         }
     }
+
+    private static void useIvParameterSpec() {
+        try {
+            // Don't override if it was set explicitly
+            AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+                public Boolean run() {
+                    String ivParameterSpec = "org.apache.xml.security.cipher.gcm.useIvParameterSpec";
+                    if (System.getProperty(ivParameterSpec) == null) {
+                        System.setProperty(ivParameterSpec, "true");
+                        return false;
+                    }
+                    return true; 
+                }
+            });
+        } catch (Throwable t) { //NOPMD
+            //ignore
+        }
+    }
     
     public static synchronized void init() {
         if (!staticallyInitialized) {
@@ -425,7 +443,16 @@ public class WSSConfig {
                 AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
                     public Boolean run() {
                         addXMLDSigRI();
-                        addJceProvider("BC", "org.bouncycastle.jce.provider.BouncyCastleProvider");
+                        String bcProviderStr = 
+                            addJceProvider("BC", "org.bouncycastle.jce.provider.BouncyCastleProvider");
+                        // If we have BouncyCastle v1.49 installed then use IvParameterSpec in
+                        // Santuario. This can be removed when we pick up BouncyCastle 1.51+
+                        if (bcProviderStr != null) {
+                            Provider bcProvider = Security.getProvider(bcProviderStr);
+                            if (bcProvider.getInfo().contains("v1.49")) {
+                                useIvParameterSpec();
+                            }
+                        }
                         Security.removeProvider("STRTransform");
                         appendJceProvider(
                             "STRTransform", new org.apache.ws.security.transform.STRTransformProvider()
