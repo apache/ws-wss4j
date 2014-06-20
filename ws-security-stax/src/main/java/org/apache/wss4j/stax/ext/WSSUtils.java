@@ -697,7 +697,10 @@ public class WSSUtils extends XMLSecurityUtils {
         });
         
         Schema schema = schemaFactory.newSchema(
-                new Source[]{
+                new Source[] {
+                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/xml.xsd", WSSec.class)),
+                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/soap-1.1.xsd", WSSec.class)),
+                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/soap-1.2.xsd", WSSec.class)),
                         new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/exc-c14n.xsd", WSSec.class)),
                         new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/xmldsig-core-schema.xsd", WSSec.class)),
                         new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/xenc-schema.xsd", WSSec.class)),
