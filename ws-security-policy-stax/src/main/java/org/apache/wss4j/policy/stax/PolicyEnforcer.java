@@ -384,24 +384,26 @@ public class PolicyEnforcer implements SecurityEventListener {
     private void verifyPolicy(SecurityEvent securityEvent) throws WSSPolicyException, XMLSecurityException {
         {
             //We have to check the failed assertions for logging purposes firstly...
-            Iterator<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>> assertionStateMapIterator = this.failedAssertionStateMap.iterator();
-            alternative:
-            while (assertionStateMapIterator.hasNext()) {
-                Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>> map = assertionStateMapIterator.next();
-                //every list entry counts as an alternative...
-                Map<Assertion, List<Assertable>> assertionListMap = map.get(securityEvent.getSecurityEventType());
-                if (assertionListMap != null && assertionListMap.size() > 0) {
-                    Iterator<Map.Entry<Assertion, List<Assertable>>> assertionStateIterator = assertionListMap.entrySet().iterator();
-                    while (assertionStateIterator.hasNext()) {
-                        Map.Entry<Assertion, List<Assertable>> assertionStateEntry = assertionStateIterator.next();
-                        List<Assertable> assertionStates = assertionStateEntry.getValue();
-                        Iterator<Assertable> assertableIterator = assertionStates.iterator();
-                        while (assertableIterator.hasNext()) {
-                            Assertable assertable = assertableIterator.next();
-                            boolean asserted = assertable.assertEvent(securityEvent);
-                            //...so if one fails, continue with the next map entry and increment the notAssertedCount
-                            if (!asserted) {
-                                continue alternative;
+            if (!this.failedAssertionStateMap.isEmpty()) {
+                Iterator<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>> assertionStateMapIterator = this.failedAssertionStateMap.iterator();
+                alternative:
+                while (assertionStateMapIterator.hasNext()) {
+                    Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>> map = assertionStateMapIterator.next();
+                    //every list entry counts as an alternative...
+                    Map<Assertion, List<Assertable>> assertionListMap = map.get(securityEvent.getSecurityEventType());
+                    if (assertionListMap != null && assertionListMap.size() > 0) {
+                        Iterator<Map.Entry<Assertion, List<Assertable>>> assertionStateIterator = assertionListMap.entrySet().iterator();
+                        while (assertionStateIterator.hasNext()) {
+                            Map.Entry<Assertion, List<Assertable>> assertionStateEntry = assertionStateIterator.next();
+                            List<Assertable> assertionStates = assertionStateEntry.getValue();
+                            Iterator<Assertable> assertableIterator = assertionStates.iterator();
+                            while (assertableIterator.hasNext()) {
+                                Assertable assertable = assertableIterator.next();
+                                boolean asserted = assertable.assertEvent(securityEvent);
+                                //...so if one fails, continue with the next map entry and increment the notAssertedCount
+                                if (!asserted) {
+                                    continue alternative;
+                                }
                             }
                         }
                     }
@@ -548,6 +550,10 @@ public class PolicyEnforcer implements SecurityEventListener {
     }
 
     private void logFailedAssertions() {
+        if (this.failedAssertionStateMap.isEmpty()) {
+            return;
+        }
+        
         Iterator<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>> assertionStateMapIterator = this.failedAssertionStateMap.iterator();
         while (assertionStateMapIterator.hasNext()) {
             Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>> map = assertionStateMapIterator.next();
