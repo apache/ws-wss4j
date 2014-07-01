@@ -49,6 +49,8 @@ import java.util.List;
 import java.util.ArrayList;
 
 import javax.security.auth.callback.CallbackHandler;
+import javax.xml.datatype.Duration;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 /**
  * This class tests the modification of requests.
@@ -487,7 +489,14 @@ public class ModifiedRequestTest extends org.junit.Assert {
         Element createdValue = 
             WSSecurityUtil.findElement(timestampElement, "Created", WSConstants.WSU_NS);
         DateFormat zulu = new XmlSchemaDateFormat();
-        createdValue.setTextContent(zulu.format(new Date()));
+        
+        XMLGregorianCalendar createdCalendar = 
+            WSSConfig.datatypeFactory.newXMLGregorianCalendar(createdValue.getTextContent());
+        // Add 5 seconds
+        Duration duration = WSSConfig.datatypeFactory.newDuration(5000L);
+        createdCalendar.add(duration);
+        Date createdDate = createdCalendar.toGregorianCalendar().getTime();
+        createdValue.setTextContent(zulu.format(createdDate));
         
         if (LOG.isDebugEnabled()) {
             String outputString = 
