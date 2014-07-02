@@ -5,6 +5,19 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.6.16
+=============
+
+Bug
+
+    [WSS-500] - Kerberos client/server actions are only supporting NT_HOSTBASED_SERVICE service name form
+    [WSS-501] - Kerberos token decoder default implementation fails to extract the session when validating a ticket issued by a KDC based on Active Directory
+    [WSS-504] - False control flow leading to warning "No Subject DN Certificate Constraints were defined. This could be a security issue"
+
+New Feature
+
+    [WSS-497] - Support for SAML 2.0 EncryptedAssertion Element
+
 Release 1.6.15
 =============
 
