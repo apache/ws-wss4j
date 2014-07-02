@@ -5,6 +5,19 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.0.1
+=============
+
+Bug
+
+    [WSS-500] - Kerberos client/server actions are only supporting NT_HOSTBASED_SERVICE service name form
+    [WSS-501] - Kerberos token decoder default implementation fails to extract the session when validating a ticket issued by a KDC based on Active Directory
+
+Improvement
+
+    [WSS-502] - Add an easy way to retrieve signature digest values
+    [WSS-503] - Share an existing global ehcache manager for ws security replay caches
+
 Release 2.0.0
 =============
 
