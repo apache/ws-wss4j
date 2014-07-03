@@ -19,6 +19,7 @@
 package org.apache.wss4j.policy.stax.assertionStates;
 
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
+import org.apache.wss4j.policy.stax.PolicyAsserter;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 
@@ -31,8 +32,9 @@ public class SecureConversationTokenAssertionState extends SecurityContextTokenA
     //todo sp:SC13SecurityContextToken:
     //todo MustNotSendCancel etc...
     
-    public SecureConversationTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, boolean initiator) {
-        super(assertion, asserted, initiator);
+    public SecureConversationTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, 
+                                                 PolicyAsserter policyAsserter, boolean initiator) {
+        super(assertion, asserted, policyAsserter, initiator);
     }
 
     @Override

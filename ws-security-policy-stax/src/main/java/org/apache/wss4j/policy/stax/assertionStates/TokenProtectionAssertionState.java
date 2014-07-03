@@ -20,9 +20,12 @@ package org.apache.wss4j.policy.stax.assertionStates;
 
 import org.apache.neethi.Assertion;
 import org.apache.wss4j.policy.AssertionState;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
 import org.apache.wss4j.policy.stax.Assertable;
+import org.apache.wss4j.policy.stax.DummyPolicyAsserter;
+import org.apache.wss4j.policy.stax.PolicyAsserter;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
@@ -49,9 +52,22 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
     private final ArrayList<SignedElementSecurityEvent> signedElementEvents = new ArrayList<SignedElementSecurityEvent>();
     private final ArrayList<TokenSecurityEvent<? extends SecurityToken>> tokenSecurityEvents =
             new ArrayList<TokenSecurityEvent<? extends SecurityToken>>();
+    private PolicyAsserter policyAsserter;
 
-    public TokenProtectionAssertionState(Assertion assertion, boolean initialAssertionState) {
+    public TokenProtectionAssertionState(Assertion assertion, 
+                                         PolicyAsserter policyAsserter,
+                                         boolean initialAssertionState) {
         super(assertion, initialAssertionState);
+        
+        this.policyAsserter = policyAsserter;
+        if (this.policyAsserter == null) {
+            this.policyAsserter = new DummyPolicyAsserter();
+        }
+        
+        if (initialAssertionState) {
+            String namespace = getAssertion().getName().getNamespaceURI();
+            policyAsserter.assertPolicy(new QName(namespace, SPConstants.PROTECT_TOKENS));
+        }
     }
 
     @Override
@@ -76,6 +92,10 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
 
         AbstractSymmetricAsymmetricBinding abstractSymmetricAsymmetricBinding = (AbstractSymmetricAsymmetricBinding) getAssertion();
         boolean protectTokens = abstractSymmetricAsymmetricBinding.isProtectTokens();
+        String namespace = getAssertion().getName().getNamespaceURI();
+        if (protectTokens) {
+            policyAsserter.assertPolicy(new QName(namespace, SPConstants.PROTECT_TOKENS));
+        }
 
         if (securityEvent instanceof SignedElementSecurityEvent) {
             SignedElementSecurityEvent signedElementSecurityEvent = (SignedElementSecurityEvent) securityEvent;
@@ -100,10 +120,14 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                     if (protectTokens && !signsItsSignatureToken) {
                         setAsserted(false);
                         setErrorMessage("Token " + WSSUtils.pathAsString(((InboundSecurityToken)securityToken).getElementPath()) + " must be signed by its signature.");
+                        policyAsserter.unassertPolicy(new QName(namespace, SPConstants.PROTECT_TOKENS),
+                                                      getErrorMessage());
                         return false;
                     } else if (!protectTokens && signsItsSignatureToken) {
                         setAsserted(false);
                         setErrorMessage("Token " + WSSUtils.pathAsString(((InboundSecurityToken)securityToken).getElementPath()) + " must not be signed by its signature.");
+                        policyAsserter.unassertPolicy(new QName(namespace, SPConstants.PROTECT_TOKENS),
+                                                      getErrorMessage());
                         return false;
                     }
                 }
@@ -112,6 +136,8 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                     //[WSP1.3_8.9b]
                     setAsserted(false);
                     setErrorMessage("Token " + WSSUtils.pathAsString(((InboundSecurityToken)securityToken).getElementPath()) + " must sign the main signature.");
+                    policyAsserter.unassertPolicy(new QName(namespace, SPConstants.PROTECT_TOKENS),
+                                                  getErrorMessage());
                     return false;
                 }
 
@@ -119,6 +145,8 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                         && !signsSignedSupportingTokens(securityToken)) {
                     setAsserted(false);
                     setErrorMessage("Main signature must sign the Signed*Supporting-Tokens.");
+                    policyAsserter.unassertPolicy(new QName(namespace, SPConstants.PROTECT_TOKENS),
+                                                  getErrorMessage());
                     return false;
                 }
             }

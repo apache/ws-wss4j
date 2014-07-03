@@ -24,6 +24,7 @@ import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.IssuedToken;
+import org.apache.wss4j.policy.stax.PolicyAsserter;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityEvent.KerberosTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.SamlTokenSecurityEvent;
@@ -53,8 +54,9 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
     private static final String DEFAULT_CLAIMS_NAMESPACE = 
         "http://schemas.xmlsoap.org/ws/2005/05/identity";
 
-    public IssuedTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, boolean initiator) {
-        super(assertion, asserted, initiator);
+    public IssuedTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted,
+                                     PolicyAsserter policyAsserter, boolean initiator) {
+        super(assertion, asserted, policyAsserter, initiator);
     }
 
     @Override

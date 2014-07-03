@@ -23,6 +23,8 @@ import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.policy.model.*;
 import org.apache.wss4j.policy.stax.Assertable;
+import org.apache.wss4j.policy.stax.DummyPolicyAsserter;
+import org.apache.wss4j.policy.stax.PolicyAsserter;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
@@ -32,6 +34,8 @@ import org.apache.xml.security.stax.securityToken.SecurityToken;
 
 import java.util.Iterator;
 import java.util.List;
+
+import javax.xml.namespace.QName;
 
 /**
  * WSP1.3, 5 Token Assertions
@@ -43,10 +47,31 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
     //todo derived keys?
 
     private boolean initiator;
+    private PolicyAsserter policyAsserter;
 
     public TokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, boolean initiator) {
+        this(assertion, asserted, null, initiator);
+    }
+    
+    public TokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, 
+                               PolicyAsserter policyAsserter, boolean initiator) {
         super(assertion, asserted);
         this.initiator = initiator;
+        
+        this.policyAsserter = policyAsserter;
+        if (this.policyAsserter == null) {
+            this.policyAsserter = new DummyPolicyAsserter();
+        }
+        
+        if (asserted) {
+            AbstractToken token = (AbstractToken)getAssertion();
+            getPolicyAsserter().assertPolicy(token);
+            if (token.getDerivedKeys() != null) {
+                AbstractToken.DerivedKeys derivedKeys = token.getDerivedKeys();
+                String namespace = token.getName().getNamespaceURI();
+                getPolicyAsserter().assertPolicy(new QName(namespace, derivedKeys.name()));
+            }
+        }
     }
 
     @Override
@@ -195,6 +220,7 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
         //WSP1.3, 5.3 Token Properties
         boolean hasDerivedKeys = false;
         hasDerivedKeys = hasDerivedKeys(tokenSecurityEvent.getSecurityToken());
+        String namespace = getAssertion().getName().getNamespaceURI();
         if (abstractToken.getDerivedKeys() != null) {
             AbstractToken.DerivedKeys derivedKeys = abstractToken.getDerivedKeys();
             switch (derivedKeys) {
@@ -203,8 +229,13 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
                 case RequireImpliedDerivedKeys:
                     if (!hasDerivedKeys) {
                         setErrorMessage("Derived key must be used");
+                        getPolicyAsserter().unassertPolicy(new QName(namespace, derivedKeys.name()),
+                                                         "Derived key must be used");
                         asserted = false;
+                    } else {
+                        getPolicyAsserter().assertPolicy(new QName(namespace, derivedKeys.name()));
                     }
+                    break;
             }
         } else {
             if (hasDerivedKeys) {
@@ -249,5 +280,9 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
             hasDerivedKeys &= hasDerivedKeys(wrappedSecurityToken);
         }
         return hasDerivedKeys;
+    }
+    
+    protected PolicyAsserter getPolicyAsserter() {
+        return policyAsserter;
     }
 }

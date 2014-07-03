@@ -27,11 +27,14 @@ import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurit
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.wss4j.policy.stax.Assertable;
+import org.apache.wss4j.policy.stax.DummyPolicyAsserter;
+import org.apache.wss4j.policy.stax.PolicyAsserter;
 import org.apache.wss4j.policy.stax.PolicyUtils;
 import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 import javax.xml.namespace.QName;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -42,8 +45,11 @@ import java.util.List;
 public class ContentEncryptedElementsAssertionState extends AssertionState implements Assertable {
 
     private final List<List<QName>> pathElements = new ArrayList<List<QName>>();
+    private PolicyAsserter policyAsserter;
 
-    public ContentEncryptedElementsAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
+    public ContentEncryptedElementsAssertionState(AbstractSecurityAssertion assertion,
+                                                  PolicyAsserter policyAsserter,
+                                                  boolean asserted) {
         super(assertion, asserted);
 
         ContentEncryptedElements contentEncryptedElements = (ContentEncryptedElements) assertion;
@@ -51,6 +57,15 @@ public class ContentEncryptedElementsAssertionState extends AssertionState imple
             XPath xPath = contentEncryptedElements.getXPaths().get(i);
             List<QName> elements = PolicyUtils.getElementPath(xPath);
             pathElements.add(elements);
+        }
+        
+        this.policyAsserter = policyAsserter;
+        if (this.policyAsserter == null) {
+            this.policyAsserter = new DummyPolicyAsserter();
+        }
+        
+        if (asserted) {
+            policyAsserter.assertPolicy(getAssertion());
         }
     }
 
@@ -71,16 +86,19 @@ public class ContentEncryptedElementsAssertionState extends AssertionState imple
             if (WSSUtils.pathMatches(pathElements, contentEncryptedElementSecurityEvent.getElementPath(), true, false)) {
                 if (contentEncryptedElementSecurityEvent.isEncrypted()) {
                     setAsserted(true);
+                    policyAsserter.assertPolicy(getAssertion());
                     return true;
                 } else {
                     //an element must be encrypted but isn't
                     setAsserted(false);
                     setErrorMessage("Content of element " + WSSUtils.pathAsString(contentEncryptedElementSecurityEvent.getElementPath()) + " must be encrypted");
+                    policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
                     return false;
                 }
             }
         }
         //if we return false here other encrypted elements will trigger a PolicyViolationException
+        policyAsserter.assertPolicy(getAssertion());
         return true;
     }
 }

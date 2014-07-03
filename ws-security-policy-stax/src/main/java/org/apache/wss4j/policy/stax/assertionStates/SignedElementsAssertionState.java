@@ -27,6 +27,8 @@ import org.apache.xml.security.stax.securityEvent.AbstractSecuredElementSecurity
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.wss4j.policy.stax.Assertable;
+import org.apache.wss4j.policy.stax.DummyPolicyAsserter;
+import org.apache.wss4j.policy.stax.PolicyAsserter;
 import org.apache.wss4j.policy.stax.PolicyUtils;
 import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
@@ -43,8 +45,11 @@ import java.util.List;
 public class SignedElementsAssertionState extends AssertionState implements Assertable {
 
     private final List<List<QName>> pathElements = new ArrayList<List<QName>>();
+    private PolicyAsserter policyAsserter;
 
-    public SignedElementsAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
+    public SignedElementsAssertionState(AbstractSecurityAssertion assertion, 
+                                        PolicyAsserter policyAsserter,
+                                        boolean asserted) {
         super(assertion, asserted);
 
         if (assertion instanceof SignedElements) {
@@ -54,6 +59,15 @@ public class SignedElementsAssertionState extends AssertionState implements Asse
                 List<QName> elements = PolicyUtils.getElementPath(xPath);
                 pathElements.add(elements);
             }
+        }
+        
+        this.policyAsserter = policyAsserter;
+        if (this.policyAsserter == null) {
+            this.policyAsserter = new DummyPolicyAsserter();
+        }
+        
+        if (asserted) {
+            policyAsserter.assertPolicy(getAssertion());
         }
     }
 
@@ -79,16 +93,19 @@ public class SignedElementsAssertionState extends AssertionState implements Asse
             if (WSSUtils.pathMatches(pathElements, signedSecurityEvent.getElementPath(), true, false)) {
                 if (signedSecurityEvent.isSigned()) {
                     setAsserted(true);
+                    policyAsserter.assertPolicy(getAssertion());
                     return true;
                 } else {
                     //an element must be signed but isn't
                     setAsserted(false);
                     setErrorMessage("Element " + WSSUtils.pathAsString(signedSecurityEvent.getElementPath()) + " must be signed");
+                    policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
                     return false;
                 }
             }
         }
         //if we return false here other signed elements will trigger a PolicyViolationException
+        policyAsserter.assertPolicy(getAssertion());
         return true;
     }
 }

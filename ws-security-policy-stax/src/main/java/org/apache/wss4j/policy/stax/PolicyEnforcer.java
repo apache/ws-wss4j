@@ -51,6 +51,7 @@ import org.apache.wss4j.policy.model.HttpsToken;
 import org.apache.wss4j.policy.model.IssuedToken;
 import org.apache.wss4j.policy.model.KerberosToken;
 import org.apache.wss4j.policy.model.KeyValueToken;
+import org.apache.wss4j.policy.model.Layout;
 import org.apache.wss4j.policy.model.RelToken;
 import org.apache.wss4j.policy.model.RequiredElements;
 import org.apache.wss4j.policy.model.RequiredParts;
@@ -62,6 +63,7 @@ import org.apache.wss4j.policy.model.SignedParts;
 import org.apache.wss4j.policy.model.SpnegoContextToken;
 import org.apache.wss4j.policy.model.SupportingTokens;
 import org.apache.wss4j.policy.model.UsernameToken;
+import org.apache.wss4j.policy.model.Wss10;
 import org.apache.wss4j.policy.model.X509Token;
 import org.apache.wss4j.policy.model.Wss11;
 import org.apache.wss4j.policy.stax.assertionStates.AlgorithmSuiteAssertionState;
@@ -133,15 +135,27 @@ public class PolicyEnforcer implements SecurityEventListener {
     private int attachmentCount;
     private boolean noSecurityHeader;
     private boolean faultOccurred;
-
+    private final PolicyAsserter policyAsserter;
+    
     public PolicyEnforcer(List<OperationPolicy> operationPolicies, String soapAction, boolean initiator,
                           String actorOrRole, int attachmentCount) throws WSSPolicyException {
+        this(operationPolicies, soapAction, initiator, actorOrRole, attachmentCount, null);
+    }
+
+    public PolicyEnforcer(List<OperationPolicy> operationPolicies, String soapAction, boolean initiator,
+                          String actorOrRole, int attachmentCount, PolicyAsserter policyAsserter) throws WSSPolicyException {
         this.operationPolicies = operationPolicies;
         this.initiator = initiator;
         this.actorOrRole = actorOrRole;
         this.attachmentCount = attachmentCount;
         assertionStateMap = new LinkedList<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>>();
         failedAssertionStateMap = new LinkedList<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>>();
+        
+        if (policyAsserter == null) {
+            this.policyAsserter = new DummyPolicyAsserter();
+        } else {
+            this.policyAsserter = policyAsserter;
+        }
 
         if (soapAction != null && !soapAction.isEmpty()) {
             effectivePolicy = findPolicyBySOAPAction(operationPolicies, soapAction);
@@ -256,120 +270,157 @@ public class PolicyEnforcer implements SecurityEventListener {
 
     protected List<Assertable> getAssertableForAssertion(AbstractSecurityAssertion abstractSecurityAssertion) throws WSSPolicyException {
         List<Assertable> assertableList = new LinkedList<Assertable>();
+        boolean tokenRequired = true;
         if (abstractSecurityAssertion instanceof AbstractToken) {
             // Don't return a Token that is not required
             SPConstants.IncludeTokenType includeTokenType = 
                 ((AbstractToken)abstractSecurityAssertion).getIncludeTokenType();
             if (includeTokenType == IncludeTokenType.INCLUDE_TOKEN_NEVER) {
-                return assertableList;
+                tokenRequired = false;
             } else if (initiator && includeTokenType == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT) {
-                return assertableList;
+                tokenRequired = false;
             } else if (initiator && includeTokenType == IncludeTokenType.INCLUDE_TOKEN_ONCE) {
-                return assertableList;
+                tokenRequired = false;
             } else if (!initiator && includeTokenType == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_INITIATOR) {
-                return assertableList;
+                tokenRequired = false;
             }
         }
         
         if (abstractSecurityAssertion instanceof ContentEncryptedElements) {
             //initialized with asserted=true because it could be that parent elements are encrypted and therefore these element are also encrypted
             //the test if it is really encrypted is done via the PolicyInputProcessor which emits EncryptedElementEvents for unencrypted elements with the unencrypted flag
-            assertableList.add(new ContentEncryptedElementsAssertionState(abstractSecurityAssertion, true));
+            assertableList.add(new ContentEncryptedElementsAssertionState(abstractSecurityAssertion, policyAsserter, true));
         } else if (abstractSecurityAssertion instanceof EncryptedParts) {
             //initialized with asserted=true with the same reason as by the EncryptedParts above
-            assertableList.add(new EncryptedPartsAssertionState(abstractSecurityAssertion, true, attachmentCount));
+            assertableList.add(new EncryptedPartsAssertionState(abstractSecurityAssertion, policyAsserter, true, attachmentCount));
         } else if (abstractSecurityAssertion instanceof EncryptedElements) {
             //initialized with asserted=true with the same reason as by the EncryptedParts above
-            assertableList.add(new EncryptedElementsAssertionState(abstractSecurityAssertion, true));
+            assertableList.add(new EncryptedElementsAssertionState(abstractSecurityAssertion, policyAsserter, true));
         } else if (abstractSecurityAssertion instanceof SignedParts) {
             //initialized with asserted=true because it could be that parent elements are signed and therefore these element are also signed
             //the test if it is really signed is done via the PolicyInputProcessor which emits SignedElementEvents for unsigned elements with the unsigned flag
-            assertableList.add(new SignedPartsAssertionState(abstractSecurityAssertion, true, attachmentCount));
+            assertableList.add(new SignedPartsAssertionState(abstractSecurityAssertion, policyAsserter, true, attachmentCount));
         } else if (abstractSecurityAssertion instanceof SignedElements) {
             //initialized with asserted=true with the same reason as by the SignedParts above
-            assertableList.add(new SignedElementsAssertionState(abstractSecurityAssertion, true));
+            assertableList.add(new SignedElementsAssertionState(abstractSecurityAssertion, policyAsserter, true));
         } else if (abstractSecurityAssertion instanceof RequiredElements) {
-            assertableList.add(new RequiredElementsAssertionState(abstractSecurityAssertion, false));
+            assertableList.add(new RequiredElementsAssertionState(abstractSecurityAssertion, policyAsserter, false));
         } else if (abstractSecurityAssertion instanceof RequiredParts) {
-            assertableList.add(new RequiredPartsAssertionState(abstractSecurityAssertion, false));
+            assertableList.add(new RequiredPartsAssertionState(abstractSecurityAssertion, policyAsserter, false));
         } else if (abstractSecurityAssertion instanceof UsernameToken) {
-            assertableList.add(new UsernameTokenAssertionState(abstractSecurityAssertion, false, initiator));
+            assertableList.add(new UsernameTokenAssertionState(abstractSecurityAssertion, !tokenRequired, policyAsserter, initiator));
         } else if (abstractSecurityAssertion instanceof IssuedToken) {
-            assertableList.add(new IssuedTokenAssertionState(abstractSecurityAssertion, false, initiator));
+            assertableList.add(new IssuedTokenAssertionState(abstractSecurityAssertion, !tokenRequired, policyAsserter, initiator));
         } else if (abstractSecurityAssertion instanceof X509Token) {
-            assertableList.add(new X509TokenAssertionState(abstractSecurityAssertion, false, initiator));
+            assertableList.add(new X509TokenAssertionState(abstractSecurityAssertion, !tokenRequired, policyAsserter, initiator));
         } else if (abstractSecurityAssertion instanceof KerberosToken) {
-            assertableList.add(new KerberosTokenAssertionState(abstractSecurityAssertion, false, initiator));
+            assertableList.add(new KerberosTokenAssertionState(abstractSecurityAssertion, !tokenRequired, policyAsserter, initiator));
         } else if (abstractSecurityAssertion instanceof SpnegoContextToken) {
-            assertableList.add(new SpnegoContextTokenAssertionState(abstractSecurityAssertion, false, initiator));
+            assertableList.add(new SpnegoContextTokenAssertionState(abstractSecurityAssertion, !tokenRequired, policyAsserter, initiator));
         } else if (abstractSecurityAssertion instanceof SecureConversationToken) {
-            assertableList.add(new SecureConversationTokenAssertionState(abstractSecurityAssertion, false, initiator));
+            assertableList.add(new SecureConversationTokenAssertionState(abstractSecurityAssertion, !tokenRequired, policyAsserter, initiator));
         } else if (abstractSecurityAssertion instanceof SecurityContextToken) {
-            assertableList.add(new SecurityContextTokenAssertionState(abstractSecurityAssertion, false, initiator));
+            assertableList.add(new SecurityContextTokenAssertionState(abstractSecurityAssertion, !tokenRequired, policyAsserter, initiator));
         } else if (abstractSecurityAssertion instanceof SamlToken) {
-            assertableList.add(new SamlTokenAssertionState(abstractSecurityAssertion, false, initiator));
+            assertableList.add(new SamlTokenAssertionState(abstractSecurityAssertion, !tokenRequired, policyAsserter, initiator));
         } else if (abstractSecurityAssertion instanceof RelToken) {
-            assertableList.add(new RelTokenAssertionState(abstractSecurityAssertion, false, initiator));
+            assertableList.add(new RelTokenAssertionState(abstractSecurityAssertion, !tokenRequired, policyAsserter, initiator));
         } else if (abstractSecurityAssertion instanceof HttpsToken && !initiator) {
-            assertableList.add(new HttpsTokenAssertionState(abstractSecurityAssertion, false, initiator));
+            assertableList.add(new HttpsTokenAssertionState(abstractSecurityAssertion, !tokenRequired, policyAsserter, initiator));
         } else if (abstractSecurityAssertion instanceof KeyValueToken) {
-            assertableList.add(new KeyValueTokenAssertionState(abstractSecurityAssertion, false, initiator));
+            assertableList.add(new KeyValueTokenAssertionState(abstractSecurityAssertion, !tokenRequired, policyAsserter, initiator));
         } else if (abstractSecurityAssertion instanceof AlgorithmSuite) {
             //initialized with asserted=true because we do negative matching
-            assertableList.add(new AlgorithmSuiteAssertionState(abstractSecurityAssertion, true));
+            assertableList.add(new AlgorithmSuiteAssertionState(abstractSecurityAssertion, policyAsserter, true));
         } /*else if (abstractSecurityAssertion instanceof AsymmetricBinding) {
         } else if (abstractSecurityAssertion instanceof SymmetricBinding) {
         } else if (abstractSecurityAssertion instanceof TransportBinding) {
-        } else if (abstractSecurityAssertion instanceof Layout) {
-            assertableList.add(new LayoutAssertionState(abstractSecurityAssertion, true));
-        }*/
-
+        } */ else if (abstractSecurityAssertion instanceof Layout) {
+            //assertableList.add(new LayoutAssertionState(abstractSecurityAssertion, true));
+            String namespace = abstractSecurityAssertion.getName().getNamespaceURI();
+            policyAsserter.assertPolicy(new QName(namespace, SPConstants.LAYOUT_LAX));
+            policyAsserter.assertPolicy(new QName(namespace, SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST));
+            policyAsserter.assertPolicy(new QName(namespace, SPConstants.LAYOUT_LAX_TIMESTAMP_LAST));
+            policyAsserter.assertPolicy(new QName(namespace, SPConstants.LAYOUT_STRICT));
+            policyAsserter.assertPolicy(abstractSecurityAssertion);
+        }
         else if (abstractSecurityAssertion instanceof AbstractBinding) {
+            policyAsserter.assertPolicy(abstractSecurityAssertion);
             AbstractBinding abstractBinding = (AbstractBinding) abstractSecurityAssertion;
             if (abstractBinding instanceof AbstractSymmetricAsymmetricBinding) {
                 AbstractSymmetricAsymmetricBinding abstractSymmetricAsymmetricBinding = (AbstractSymmetricAsymmetricBinding) abstractSecurityAssertion;
-                assertableList.add(new ProtectionOrderAssertionState(abstractSymmetricAsymmetricBinding, true));
-                assertableList.add(new SignatureProtectionAssertionState(abstractSymmetricAsymmetricBinding, true));
+                assertableList.add(new ProtectionOrderAssertionState(abstractSymmetricAsymmetricBinding, policyAsserter, true));
+                assertableList.add(new SignatureProtectionAssertionState(abstractSymmetricAsymmetricBinding, policyAsserter, true));
                 if (abstractSymmetricAsymmetricBinding.isOnlySignEntireHeadersAndBody()) {
                     //initialized with asserted=true because we do negative matching
-                    assertableList.add(new OnlySignEntireHeadersAndBodyAssertionState(abstractSecurityAssertion, true, actorOrRole));
+                    assertableList.add(new OnlySignEntireHeadersAndBodyAssertionState(abstractSecurityAssertion, policyAsserter, true, actorOrRole));
                 }
-                assertableList.add(new TokenProtectionAssertionState(abstractSecurityAssertion, true));
+                assertableList.add(new TokenProtectionAssertionState(abstractSecurityAssertion, policyAsserter, true));
             }
 
             //WSP1.3, 6.2 Timestamp Property
-            assertableList.add(new IncludeTimeStampAssertionState(abstractBinding, true));
+            assertableList.add(new IncludeTimeStampAssertionState(abstractBinding, policyAsserter, true));
             if (abstractBinding.isIncludeTimestamp()) {
                 List<QName> timestampElementPath = new LinkedList<QName>();
                 timestampElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
                 timestampElementPath.add(WSSConstants.TAG_wsu_Timestamp);
-                RequiredElementsAssertionState requiredElementsAssertionState = new RequiredElementsAssertionState(abstractBinding, false);
+                RequiredElementsAssertionState requiredElementsAssertionState = 
+                    new RequiredElementsAssertionState(abstractBinding, policyAsserter, false);
                 requiredElementsAssertionState.addElement(timestampElementPath);
                 assertableList.add(requiredElementsAssertionState);
 
-                SignedElementsAssertionState signedElementsAssertionState = new SignedElementsAssertionState(abstractSecurityAssertion, true);
+                SignedElementsAssertionState signedElementsAssertionState = 
+                    new SignedElementsAssertionState(abstractSecurityAssertion, policyAsserter, true);
                 signedElementsAssertionState.addElement(timestampElementPath);
                 assertableList.add(signedElementsAssertionState);
             }
-        } else if (abstractSecurityAssertion instanceof Wss11) {
-            Wss11 wss11 = (Wss11)abstractSecurityAssertion;
-
-            if (initiator) {
-                //9 WSS: SOAP Message Security Options [Signature Confirmation]
-                assertableList.add(new SignatureConfirmationAssertionState(wss11, true));
+        } else if (abstractSecurityAssertion instanceof Wss10) {
+            Wss10 wss10 = (Wss10)abstractSecurityAssertion;
+            String namespace = wss10.getName().getNamespaceURI();
+            policyAsserter.assertPolicy(abstractSecurityAssertion);
+            
+            if (wss10.isMustSupportRefEmbeddedToken()) {
+                policyAsserter.assertPolicy(new QName(namespace, SPConstants.MUST_SUPPORT_REF_EMBEDDED_TOKEN));
+            }
+            if (wss10.isMustSupportRefExternalURI()) {
+                policyAsserter.assertPolicy(new QName(namespace, SPConstants.MUST_SUPPORT_REF_EXTERNAL_URI));
+            }
+            if (wss10.isMustSupportRefIssuerSerial()) {
+                policyAsserter.assertPolicy(new QName(namespace, SPConstants.MUST_SUPPORT_REF_ISSUER_SERIAL));
+            }
+            if (wss10.isMustSupportRefKeyIdentifier()) {
+                policyAsserter.assertPolicy(new QName(namespace, SPConstants.MUST_SUPPORT_REF_KEY_IDENTIFIER));
+            }
+            
+            if (abstractSecurityAssertion instanceof Wss11) {
+                Wss11 wss11 = (Wss11)abstractSecurityAssertion;
+                if (wss11.isMustSupportRefEncryptedKey()) {
+                    policyAsserter.assertPolicy(new QName(namespace, SPConstants.MUST_SUPPORT_REF_ENCRYPTED_KEY));
+                }
+                if (wss11.isMustSupportRefThumbprint()) {
+                    policyAsserter.assertPolicy(new QName(namespace, SPConstants.MUST_SUPPORT_REF_THUMBPRINT));
+                }
                 if (wss11.isRequireSignatureConfirmation()) {
-                    List<QName> signatureConfirmationElementPath = new LinkedList<QName>();
-                    signatureConfirmationElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
-                    signatureConfirmationElementPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
-                    RequiredElementsAssertionState requiredElementsAssertionState = new RequiredElementsAssertionState(wss11, false);
-                    requiredElementsAssertionState.addElement(signatureConfirmationElementPath);
-                    assertableList.add(requiredElementsAssertionState);
+                    assertableList.add(new SignatureConfirmationAssertionState(wss11, policyAsserter, true));
+                    if (initiator) {
+                        //9 WSS: SOAP Message Security Options [Signature Confirmation]
+                        List<QName> signatureConfirmationElementPath = new LinkedList<QName>();
+                        signatureConfirmationElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+                        signatureConfirmationElementPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
+                        RequiredElementsAssertionState requiredElementsAssertionState = 
+                            new RequiredElementsAssertionState(wss11, policyAsserter, false);
+                        requiredElementsAssertionState.addElement(signatureConfirmationElementPath);
+                        assertableList.add(requiredElementsAssertionState);
 
-                    SignedElementsAssertionState signedElementsAssertionState = new SignedElementsAssertionState(wss11, true);
-                    signedElementsAssertionState.addElement(signatureConfirmationElementPath);
-                    assertableList.add(signedElementsAssertionState);
+                        SignedElementsAssertionState signedElementsAssertionState = 
+                            new SignedElementsAssertionState(wss11, policyAsserter, true);
+                        signedElementsAssertionState.addElement(signatureConfirmationElementPath);
+                        assertableList.add(signedElementsAssertionState);
+                    }
                 }
             }
+        } else {
+            policyAsserter.assertPolicy(abstractSecurityAssertion);
         }
 
         return assertableList;

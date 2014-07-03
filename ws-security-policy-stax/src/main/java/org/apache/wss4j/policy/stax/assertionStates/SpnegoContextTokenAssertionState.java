@@ -22,6 +22,7 @@ import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.SpnegoContextToken;
+import org.apache.wss4j.policy.stax.PolicyAsserter;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
@@ -34,8 +35,9 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 public class SpnegoContextTokenAssertionState extends TokenAssertionState {
 
-    public SpnegoContextTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, boolean initiator) {
-        super(assertion, asserted, initiator);
+    public SpnegoContextTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, 
+                                            PolicyAsserter policyAsserter, boolean initiator) {
+        super(assertion, asserted, policyAsserter, initiator);
     }
 
     @Override
@@ -57,11 +59,14 @@ public class SpnegoContextTokenAssertionState extends TokenAssertionState {
         if (spnegoContextToken.getIssuerName() != null
             && !spnegoContextToken.getIssuerName().equals(spnegoContextTokenSecurityEvent.getIssuerName())) {
             setErrorMessage("IssuerName in Policy (" + spnegoContextToken.getIssuerName() + ") didn't match with the one in the IssuedToken (" + spnegoContextTokenSecurityEvent.getIssuerName() + ")");
+            getPolicyAsserter().unassertPolicy(getAssertion(), getErrorMessage());
             return false;
         }
+        
         //todo MustNotSend* ?
         //always return true to prevent false alarm in case additional tokens with the same usage
         //appears in the message but do not fulfill the policy and are also not needed to fulfil the policy.
+        getPolicyAsserter().assertPolicy(getAssertion());
         return true;
     }
 }

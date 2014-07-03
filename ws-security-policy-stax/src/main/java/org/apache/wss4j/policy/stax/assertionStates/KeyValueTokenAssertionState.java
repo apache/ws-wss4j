@@ -18,10 +18,14 @@
  */
 package org.apache.wss4j.policy.stax.assertionStates;
 
+import javax.xml.namespace.QName;
+
 import org.apache.wss4j.common.WSSPolicyException;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.KeyValueToken;
+import org.apache.wss4j.policy.stax.PolicyAsserter;
 import org.apache.wss4j.stax.securityToken.RsaKeyValueSecurityToken;
 import org.apache.wss4j.stax.securityEvent.KeyValueTokenSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
@@ -35,8 +39,17 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 public class KeyValueTokenAssertionState extends TokenAssertionState {
 
-    public KeyValueTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, boolean initiator) {
-        super(assertion, asserted, initiator);
+    public KeyValueTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted,
+                                       PolicyAsserter policyAsserter, boolean initiator) {
+        super(assertion, asserted, policyAsserter, initiator);
+        
+        if (asserted) {
+            KeyValueToken token = (KeyValueToken) getAssertion();
+            String namespace = token.getName().getNamespaceURI();
+            if (token.isRsaKeyValue()) {
+                getPolicyAsserter().assertPolicy(new QName(namespace, SPConstants.RSA_KEY_VALUE));
+            }
+        }
     }
 
     @Override
@@ -55,13 +68,22 @@ public class KeyValueTokenAssertionState extends TokenAssertionState {
 
         KeyValueTokenSecurityEvent keyValueTokenSecurityEvent = (KeyValueTokenSecurityEvent) tokenSecurityEvent;
         KeyValueToken keyValueToken = (KeyValueToken) abstractToken;
-        if (keyValueToken.isRsaKeyValue() && !(keyValueTokenSecurityEvent.getSecurityToken() instanceof RsaKeyValueSecurityToken)) {
-            setErrorMessage("Policy enforces that a RsaKeyValue must be present in the KeyValueToken but we got a " +
+        
+        String namespace = getAssertion().getName().getNamespaceURI();
+        if (keyValueToken.isRsaKeyValue()) {
+            if (!(keyValueTokenSecurityEvent.getSecurityToken() instanceof RsaKeyValueSecurityToken)) {
+                setErrorMessage("Policy enforces that a RsaKeyValue must be present in the KeyValueToken but we got a " +
                     keyValueTokenSecurityEvent.getSecurityToken().getClass().getSimpleName());
-            return false;
+                getPolicyAsserter().unassertPolicy(new QName(namespace, SPConstants.RSA_KEY_VALUE),
+                                                   getErrorMessage());
+                return false;
+            } else {
+                getPolicyAsserter().assertPolicy(new QName(namespace, SPConstants.RSA_KEY_VALUE));
+            }
         }
         //always return true to prevent false alarm in case additional tokens with the same usage
         //appears in the message but do not fulfill the policy and are also not needed to fulfil the policy.
+        getPolicyAsserter().assertPolicy(getAssertion());
         return true;
     }
 }

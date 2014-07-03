@@ -18,21 +18,39 @@
  */
 package org.apache.wss4j.policy.stax.assertionStates;
 
+import javax.xml.namespace.QName;
+
 import org.apache.wss4j.policy.AssertionState;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractBinding;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.wss4j.policy.stax.Assertable;
+import org.apache.wss4j.policy.stax.DummyPolicyAsserter;
+import org.apache.wss4j.policy.stax.PolicyAsserter;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 /**
  * WSP1.3, 6.2 Timestamp Property
  */
 public class IncludeTimeStampAssertionState extends AssertionState implements Assertable {
+    
+    private PolicyAsserter policyAsserter;
 
-    public IncludeTimeStampAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
+    public IncludeTimeStampAssertionState(AbstractSecurityAssertion assertion, 
+                                          PolicyAsserter policyAsserter,
+                                          boolean asserted) {
         super(assertion, asserted);
+        this.policyAsserter = policyAsserter;
+        if (this.policyAsserter == null) {
+            this.policyAsserter = new DummyPolicyAsserter();
+        }
+        
+        if (asserted) {
+            String namespace = getAssertion().getName().getNamespaceURI();
+            policyAsserter.assertPolicy(new QName(namespace, SPConstants.INCLUDE_TIMESTAMP));
+        }
     }
 
     @Override
@@ -47,11 +65,15 @@ public class IncludeTimeStampAssertionState extends AssertionState implements As
         // TimestampSecurityEvent timestampSecurityEvent = (TimestampSecurityEvent) securityEvent;
         boolean isIncludeTimestamp = ((AbstractBinding) getAssertion()).isIncludeTimestamp();
 
+        String namespace = getAssertion().getName().getNamespaceURI();
         if (isIncludeTimestamp) {
             setAsserted(true);
+            policyAsserter.assertPolicy(new QName(namespace, SPConstants.INCLUDE_TIMESTAMP));
         } else {
             setAsserted(false);
             setErrorMessage("Timestamp must not be present");
+            policyAsserter.unassertPolicy(new QName(namespace, SPConstants.INCLUDE_TIMESTAMP), 
+                getErrorMessage());
         }
         return isAsserted();
     }
