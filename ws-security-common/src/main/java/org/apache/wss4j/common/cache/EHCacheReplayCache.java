@@ -20,11 +20,13 @@
 package org.apache.wss4j.common.cache;
 
 import java.net.URL;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
+import net.sf.ehcache.Status;
 import net.sf.ehcache.config.CacheConfiguration;
 
 /**
@@ -48,13 +50,35 @@ public class EHCacheReplayCache implements ReplayCache {
         
         CacheConfiguration cc = EHCacheManagerHolder.getCacheConfiguration(key, cacheManager);
 
-        Ehcache newCache = new Cache(cc);
+        Cache newCache = new RefCountCache(cc);
         cache = cacheManager.addCacheIfAbsent(newCache);
+        synchronized (cache) {
+            if (cache.getStatus() != Status.STATUS_ALIVE) {
+                cache = cacheManager.addCacheIfAbsent(newCache);
+            }
+            if (cache instanceof RefCountCache) {
+                ((RefCountCache)cache).incrementAndGet();
+            }
+        }
 
         // Set the TimeToLive value from the CacheConfiguration
         ttl = cc.getTimeToLiveSeconds();
     }
-    
+
+    private static class RefCountCache extends Cache {
+        AtomicInteger count = new AtomicInteger();
+        public RefCountCache(CacheConfiguration cc) {
+            super(cc);
+        }
+        public int incrementAndGet() {
+            return count.incrementAndGet();
+        }
+        public int decrementAndGet() {
+            return count.decrementAndGet();
+        }
+    }
+
+
     /**
      * Set a new (default) TTL value in seconds
      * @param newTtl a new (default) TTL value in seconds
@@ -109,6 +133,9 @@ public class EHCacheReplayCache implements ReplayCache {
      * @param identifier The identifier to check
      */
     public boolean contains(String identifier) {
+        if (cache == null) {
+            return false;
+        }
         Element element = cache.get(identifier);
         if (element != null) {
             if (cache.isExpired(element)) {
@@ -125,7 +152,12 @@ public class EHCacheReplayCache implements ReplayCache {
         if (cacheManager != null) {
             // this step is especially important for global shared cache manager
             if (cache != null) {
-                cacheManager.removeCache(cache.getName());
+                synchronized (cache) {
+                    if (cache instanceof RefCountCache
+                        && ((RefCountCache)cache).decrementAndGet() == 0) {
+                        cacheManager.removeCache(cache.getName());
+                    }
+                }                
             }
 
             EHCacheManagerHolder.releaseCacheManger(cacheManager);
