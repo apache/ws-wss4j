@@ -73,7 +73,7 @@ public class HttpsTokenAssertionState extends TokenAssertionState {
             getPolicyAsserter().unassertPolicy(getAssertion(), getErrorMessage());
             return false;
         }
-        if (httpsToken.getAuthenticationType() != null) {
+        if (!isInitiator() && httpsToken.getAuthenticationType() != null) {
             String namespace = getAssertion().getName().getNamespaceURI();
             
             switch (httpsToken.getAuthenticationType()) {

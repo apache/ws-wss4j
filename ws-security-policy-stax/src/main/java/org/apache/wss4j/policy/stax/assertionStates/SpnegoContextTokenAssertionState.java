@@ -38,6 +38,10 @@ public class SpnegoContextTokenAssertionState extends TokenAssertionState {
     public SpnegoContextTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, 
                                             PolicyAsserter policyAsserter, boolean initiator) {
         super(assertion, asserted, policyAsserter, initiator);
+        
+        if (asserted) {
+            getPolicyAsserter().assertPolicy(getAssertion());
+        }
     }
 
     @Override

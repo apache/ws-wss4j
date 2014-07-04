@@ -84,6 +84,7 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
                     !issuedToken.getIssuerName().equals(issuedTokenSecurityEvent.getIssuerName())) {
                 setErrorMessage("IssuerName in Policy (" + issuedToken.getIssuerName() +
                         ") didn't match with the one in the IssuedToken (" + issuedTokenSecurityEvent.getIssuerName() + ")");
+                getPolicyAsserter().unassertPolicy(getAssertion(), getErrorMessage());
                 return false;
             }
             if (issuedToken.getRequestSecurityTokenTemplate() != null) {
@@ -92,6 +93,7 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
                     String errorMsg = checkIssuedTokenTemplate(issuedToken.getRequestSecurityTokenTemplate(), samlTokenSecurityEvent);
                     if (errorMsg != null) {
                         setErrorMessage(errorMsg);
+                        getPolicyAsserter().unassertPolicy(getAssertion(), getErrorMessage());
                         return false;
                     }
                 } else if (issuedTokenSecurityEvent instanceof KerberosTokenSecurityEvent) {
@@ -99,6 +101,7 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
                     String errorMsg = checkIssuedTokenTemplate(issuedToken.getRequestSecurityTokenTemplate(), kerberosTokenSecurityEvent);
                     if (errorMsg != null) {
                         setErrorMessage(errorMsg);
+                        getPolicyAsserter().unassertPolicy(getAssertion(), getErrorMessage());
                         return false;
                     }
                 }
@@ -110,15 +113,18 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
                     validateClaims((Element) claims, (SamlTokenSecurityEvent)issuedTokenSecurityEvent);
                 if (errorMsg != null) {
                     setErrorMessage(errorMsg);
+                    getPolicyAsserter().unassertPolicy(getAssertion(), getErrorMessage());
                     return false;
                 }
             }
         } catch (XMLSecurityException e) {
+            getPolicyAsserter().unassertPolicy(getAssertion(), getErrorMessage());
             throw new WSSPolicyException(e.getMessage(), e);
         }
 
         //always return true to prevent false alarm in case additional tokens with the same usage
         //appears in the message but do not fulfill the policy and are also not needed to fulfil the policy.
+        getPolicyAsserter().assertPolicy(getAssertion());
         return true;
     }
 

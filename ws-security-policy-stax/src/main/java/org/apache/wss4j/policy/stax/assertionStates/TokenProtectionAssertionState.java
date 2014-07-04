@@ -93,9 +93,6 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
         AbstractSymmetricAsymmetricBinding abstractSymmetricAsymmetricBinding = (AbstractSymmetricAsymmetricBinding) getAssertion();
         boolean protectTokens = abstractSymmetricAsymmetricBinding.isProtectTokens();
         String namespace = getAssertion().getName().getNamespaceURI();
-        if (protectTokens) {
-            policyAsserter.assertPolicy(new QName(namespace, SPConstants.PROTECT_TOKENS));
-        }
 
         if (securityEvent instanceof SignedElementSecurityEvent) {
             SignedElementSecurityEvent signedElementSecurityEvent = (SignedElementSecurityEvent) securityEvent;
@@ -151,6 +148,8 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                 }
             }
         }
+        
+        policyAsserter.assertPolicy(new QName(namespace, SPConstants.PROTECT_TOKENS));
         return true;
     }
 

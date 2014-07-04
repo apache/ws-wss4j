@@ -62,6 +62,8 @@ import org.apache.wss4j.policy.model.SignedElements;
 import org.apache.wss4j.policy.model.SignedParts;
 import org.apache.wss4j.policy.model.SpnegoContextToken;
 import org.apache.wss4j.policy.model.SupportingTokens;
+import org.apache.wss4j.policy.model.Trust10;
+import org.apache.wss4j.policy.model.Trust13;
 import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.Wss10;
 import org.apache.wss4j.policy.model.X509Token;
@@ -325,7 +327,7 @@ public class PolicyEnforcer implements SecurityEventListener {
             assertableList.add(new SamlTokenAssertionState(abstractSecurityAssertion, !tokenRequired, policyAsserter, initiator));
         } else if (abstractSecurityAssertion instanceof RelToken) {
             assertableList.add(new RelTokenAssertionState(abstractSecurityAssertion, !tokenRequired, policyAsserter, initiator));
-        } else if (abstractSecurityAssertion instanceof HttpsToken && !initiator) {
+        } else if (abstractSecurityAssertion instanceof HttpsToken) {
             assertableList.add(new HttpsTokenAssertionState(abstractSecurityAssertion, !tokenRequired, policyAsserter, initiator));
         } else if (abstractSecurityAssertion instanceof KeyValueToken) {
             assertableList.add(new KeyValueTokenAssertionState(abstractSecurityAssertion, !tokenRequired, policyAsserter, initiator));
@@ -417,6 +419,41 @@ public class PolicyEnforcer implements SecurityEventListener {
                         signedElementsAssertionState.addElement(signatureConfirmationElementPath);
                         assertableList.add(signedElementsAssertionState);
                     }
+                }
+            }
+        } else if (abstractSecurityAssertion instanceof Trust10) {
+            Trust10 trust10 = (Trust10)abstractSecurityAssertion;
+            String namespace = trust10.getName().getNamespaceURI();
+            policyAsserter.assertPolicy(abstractSecurityAssertion);
+            
+            if (trust10.isMustSupportClientChallenge()) {
+                policyAsserter.assertPolicy(new QName(namespace, SPConstants.MUST_SUPPORT_CLIENT_CHALLENGE));
+            }
+            if (trust10.isMustSupportIssuedTokens()) {
+                policyAsserter.assertPolicy(new QName(namespace, SPConstants.MUST_SUPPORT_ISSUED_TOKENS));
+            }
+            if (trust10.isMustSupportServerChallenge()) {
+                policyAsserter.assertPolicy(new QName(namespace, SPConstants.MUST_SUPPORT_SERVER_CHALLENGE));
+            }
+            if (trust10.isRequireClientEntropy()) {
+                policyAsserter.assertPolicy(new QName(namespace, SPConstants.REQUIRE_CLIENT_ENTROPY));
+            }
+            if (trust10.isRequireServerEntropy()) {
+                policyAsserter.assertPolicy(new QName(namespace, SPConstants.REQUIRE_SERVER_ENTROPY));
+            }
+            if (trust10 instanceof Trust13) {
+                Trust13 trust13 = (Trust13)trust10;
+                if (trust13.isMustSupportInteractiveChallenge()) {
+                    policyAsserter.assertPolicy(new QName(namespace, SPConstants.MUST_SUPPORT_INTERACTIVE_CHALLENGE));
+                }
+                if (trust13.isRequireAppliesTo()) {
+                    policyAsserter.assertPolicy(new QName(namespace, SPConstants.REQUIRE_APPLIES_TO));
+                }
+                if (trust13.isRequireRequestSecurityTokenCollection()) {
+                    policyAsserter.assertPolicy(new QName(namespace, SPConstants.REQUIRE_REQUEST_SECURITY_TOKEN_COLLECTION));
+                }
+                if (trust13.isScopePolicy15()) {
+                    policyAsserter.assertPolicy(new QName(namespace, SPConstants.SCOPE_POLICY_15));
                 }
             }
         } else {

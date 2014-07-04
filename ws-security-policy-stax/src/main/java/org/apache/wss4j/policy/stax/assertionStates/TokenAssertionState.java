@@ -285,4 +285,8 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
     protected PolicyAsserter getPolicyAsserter() {
         return policyAsserter;
     }
+    
+    protected boolean isInitiator() {
+        return initiator;
+    }
 }
