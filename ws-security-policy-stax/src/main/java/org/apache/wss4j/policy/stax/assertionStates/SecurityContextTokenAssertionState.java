@@ -18,10 +18,14 @@
  */
 package org.apache.wss4j.policy.stax.assertionStates;
 
+import javax.xml.namespace.QName;
+
 import org.apache.wss4j.common.WSSPolicyException;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.SecurityContextToken;
+import org.apache.wss4j.policy.stax.PolicyAsserter;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
@@ -34,8 +38,23 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 public class SecurityContextTokenAssertionState extends TokenAssertionState {
 
-    public SecurityContextTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, boolean initiator) {
-        super(assertion, asserted, initiator);
+    public SecurityContextTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, 
+                                              PolicyAsserter policyAsserter, boolean initiator) {
+        super(assertion, asserted, policyAsserter, initiator);
+        
+        if (asserted) {
+            SecurityContextToken token = (SecurityContextToken) getAssertion();
+            String namespace = token.getName().getNamespaceURI();
+            if (token.isRequireExternalUriReference()) {
+                getPolicyAsserter().assertPolicy(new QName(namespace, SPConstants.REQUIRE_EXTERNAL_URI_REFERENCE));
+            }
+            if (token.isSc10SecurityContextToken()) {
+                getPolicyAsserter().assertPolicy(new QName(namespace, SPConstants.SC10_SECURITY_CONTEXT_TOKEN));
+            }
+            if (token.isSc13SecurityContextToken()) {
+                getPolicyAsserter().assertPolicy(new QName(namespace, SPConstants.SC13_SECURITY_CONTEXT_TOKEN));
+            }
+        }
     }
 
     @Override
@@ -56,15 +75,32 @@ public class SecurityContextTokenAssertionState extends TokenAssertionState {
 
         if (securityContextToken.getIssuerName() != null && !securityContextToken.getIssuerName().equals(securityContextTokenSecurityEvent.getIssuerName())) {
             setErrorMessage("IssuerName in Policy (" + securityContextToken.getIssuerName() + ") didn't match with the one in the SecurityContextToken (" + securityContextTokenSecurityEvent.getIssuerName() + ")");
+            getPolicyAsserter().unassertPolicy(getAssertion(), getErrorMessage());
             return false;
         }
-        if (securityContextToken.isRequireExternalUriReference() && !securityContextTokenSecurityEvent.isExternalUriRef()) {
-            setErrorMessage("Policy enforces externalUriRef but we didn't got one");
-            return false;
+        
+        String namespace = getAssertion().getName().getNamespaceURI();
+        if (securityContextToken.isRequireExternalUriReference()) {
+            if (!securityContextTokenSecurityEvent.isExternalUriRef()) {
+                setErrorMessage("Policy enforces externalUriRef but we didn't got one");
+                getPolicyAsserter().unassertPolicy(new QName(namespace, SPConstants.REQUIRE_EXTERNAL_URI_REFERENCE),
+                                                   getErrorMessage());
+                return false;
+            } else {
+                getPolicyAsserter().assertPolicy(new QName(namespace, SPConstants.REQUIRE_EXTERNAL_URI_REFERENCE));
+            }
         }
         //todo sp:SC13SecurityContextToken:
         //always return true to prevent false alarm in case additional tokens with the same usage
         //appears in the message but do not fulfill the policy and are also not needed to fulfil the policy.
+        if (securityContextToken.isSc10SecurityContextToken()) {
+            getPolicyAsserter().assertPolicy(new QName(namespace, SPConstants.SC10_SECURITY_CONTEXT_TOKEN));
+        }
+        if (securityContextToken.isSc13SecurityContextToken()) {
+            getPolicyAsserter().assertPolicy(new QName(namespace, SPConstants.SC13_SECURITY_CONTEXT_TOKEN));
+        }
+        
+        getPolicyAsserter().assertPolicy(getAssertion());
         return true;
     }
 }

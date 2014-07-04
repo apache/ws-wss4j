@@ -18,10 +18,14 @@
  */
 package org.apache.wss4j.policy.stax.assertionStates;
 
+import javax.xml.namespace.QName;
+
 import org.apache.wss4j.common.WSSPolicyException;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.HttpsToken;
+import org.apache.wss4j.policy.stax.PolicyAsserter;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
@@ -34,8 +38,17 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 public class HttpsTokenAssertionState extends TokenAssertionState {
 
-    public HttpsTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, boolean initiator) {
-        super(assertion, asserted, initiator);
+    public HttpsTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted,
+                                    PolicyAsserter policyAsserter, boolean initiator) {
+        super(assertion, asserted, policyAsserter, initiator);
+        
+        if (asserted) {
+            HttpsToken token = (HttpsToken) getAssertion();
+            String namespace = token.getName().getNamespaceURI();
+            if (token.getAuthenticationType() != null) {
+                getPolicyAsserter().assertPolicy(new QName(namespace, token.getAuthenticationType().name()));
+            }
+        }
     }
 
     @Override
@@ -57,30 +70,44 @@ public class HttpsTokenAssertionState extends TokenAssertionState {
 
         if (httpsToken.getIssuerName() != null && !httpsToken.getIssuerName().equals(httpsTokenSecurityEvent.getIssuerName())) {
             setErrorMessage("IssuerName in Policy (" + httpsToken.getIssuerName() + ") didn't match with the one in the HttpsToken (" + httpsTokenSecurityEvent.getIssuerName() + ")");
+            getPolicyAsserter().unassertPolicy(getAssertion(), getErrorMessage());
             return false;
         }
         if (httpsToken.getAuthenticationType() != null) {
+            String namespace = getAssertion().getName().getNamespaceURI();
+            
             switch (httpsToken.getAuthenticationType()) {
                 case HttpBasicAuthentication:
                     if (httpsTokenSecurityEvent.getAuthenticationType() != HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication) {
                         setErrorMessage("Policy enforces HttpBasicAuthentication but we got " + httpsTokenSecurityEvent.getAuthenticationType());
+                        getPolicyAsserter().unassertPolicy(new QName(namespace, SPConstants.HTTP_BASIC_AUTHENTICATION),
+                                                         getErrorMessage());
                         return false;
                     }
+                    getPolicyAsserter().assertPolicy(new QName(namespace, SPConstants.HTTP_BASIC_AUTHENTICATION));
                     break;
                 case HttpDigestAuthentication:
                     if (httpsTokenSecurityEvent.getAuthenticationType() != HttpsTokenSecurityEvent.AuthenticationType.HttpDigestAuthentication) {
                         setErrorMessage("Policy enforces HttpDigestAuthentication but we got " + httpsTokenSecurityEvent.getAuthenticationType());
+                        getPolicyAsserter().unassertPolicy(new QName(namespace, SPConstants.HTTP_DIGEST_AUTHENTICATION),
+                                                           getErrorMessage());
                         return false;
                     }
+                    getPolicyAsserter().assertPolicy(new QName(namespace, SPConstants.HTTP_DIGEST_AUTHENTICATION));
                     break;
                 case RequireClientCertificate:
                     if (httpsTokenSecurityEvent.getAuthenticationType() != HttpsTokenSecurityEvent.AuthenticationType.HttpsClientCertificateAuthentication) {
                         setErrorMessage("Policy enforces HttpClientCertificateAuthentication but we got " + httpsTokenSecurityEvent.getAuthenticationType());
+                        getPolicyAsserter().unassertPolicy(new QName(namespace, SPConstants.REQUIRE_CLIENT_CERTIFICATE),
+                                                           getErrorMessage());
                         return false;
                     }
+                    getPolicyAsserter().assertPolicy(new QName(namespace, SPConstants.REQUIRE_CLIENT_CERTIFICATE));
                     break;
             }
         }
+        
+        getPolicyAsserter().assertPolicy(getAssertion());
         return true;
     }
 }

@@ -26,12 +26,15 @@ import org.apache.wss4j.policy.model.RequiredParts;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.wss4j.policy.stax.Assertable;
+import org.apache.wss4j.policy.stax.DummyPolicyAsserter;
+import org.apache.wss4j.policy.stax.PolicyAsserter;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.securityEvent.RequiredPartSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 import javax.xml.namespace.QName;
+
 import java.util.*;
 
 /**
@@ -40,14 +43,26 @@ import java.util.*;
 public class RequiredPartsAssertionState extends AssertionState implements Assertable {
 
     private final Map<Header, Boolean> headers = new HashMap<Header, Boolean>();
+    private PolicyAsserter policyAsserter;
 
-    public RequiredPartsAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
+    public RequiredPartsAssertionState(AbstractSecurityAssertion assertion,
+                                       PolicyAsserter policyAsserter,
+                                       boolean asserted) {
         super(assertion, asserted);
 
         RequiredParts requiredParts = (RequiredParts) assertion;
         for (int i = 0; i < requiredParts.getHeaders().size(); i++) {
             Header header = requiredParts.getHeaders().get(i);
             headers.put(header, Boolean.FALSE);
+        }
+        
+        this.policyAsserter = policyAsserter;
+        if (this.policyAsserter == null) {
+            this.policyAsserter = new DummyPolicyAsserter();
+        }
+        
+        if (asserted) {
+            policyAsserter.assertPolicy(getAssertion());
         }
     }
 
@@ -78,6 +93,7 @@ public class RequiredPartsAssertionState extends AssertionState implements Asser
             }
         }
         //if we return false here other required elements will trigger a PolicyViolationException
+        policyAsserter.assertPolicy(getAssertion());
         return true;
     }
 
@@ -89,9 +105,11 @@ public class RequiredPartsAssertionState extends AssertionState implements Asser
             Map.Entry<Header, Boolean> next = elementMapIterator.next();
             if (Boolean.FALSE.equals(next.getValue())) {
                 setErrorMessage("Element " + next.getKey().toString() + " must be present");
+                policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
                 return false;
             }
         }
+        policyAsserter.assertPolicy(getAssertion());
         return true;
     }
 }

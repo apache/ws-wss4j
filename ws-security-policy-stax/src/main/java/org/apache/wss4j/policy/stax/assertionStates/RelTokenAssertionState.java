@@ -22,6 +22,7 @@ import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.RelToken;
+import org.apache.wss4j.policy.stax.PolicyAsserter;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
@@ -34,8 +35,9 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 public class RelTokenAssertionState extends TokenAssertionState {
 
-    public RelTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, boolean initiator) {
-        super(assertion, asserted, initiator);
+    public RelTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, 
+                                  PolicyAsserter policyAsserter, boolean initiator) {
+        super(assertion, asserted, policyAsserter, initiator);
     }
 
     @Override
@@ -57,6 +59,7 @@ public class RelTokenAssertionState extends TokenAssertionState {
 
         if (relToken.getIssuerName() != null && !relToken.getIssuerName().equals(relTokenSecurityEvent.getIssuerName())) {
             setErrorMessage("IssuerName in Policy (" + relToken.getIssuerName() + ") didn't match with the one in the RelToken (" + relTokenSecurityEvent.getIssuerName() + ")");
+            getPolicyAsserter().unassertPolicy(getAssertion(), getErrorMessage());
             return false;
         }
 
@@ -64,6 +67,7 @@ public class RelTokenAssertionState extends TokenAssertionState {
         //todo WssRelV*
         //always return true to prevent false alarm in case additional tokens with the same usage
         //appears in the message but do not fulfill the policy and are also not needed to fulfil the policy.
+        getPolicyAsserter().assertPolicy(getAssertion());
         return true;
     }
 }

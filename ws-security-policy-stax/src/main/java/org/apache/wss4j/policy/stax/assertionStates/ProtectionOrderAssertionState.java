@@ -19,10 +19,13 @@
 package org.apache.wss4j.policy.stax.assertionStates;
 
 import org.apache.wss4j.policy.AssertionState;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
 import org.apache.wss4j.policy.stax.Assertable;
+import org.apache.wss4j.policy.stax.DummyPolicyAsserter;
+import org.apache.wss4j.policy.stax.PolicyAsserter;
 import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.securityEvent.*;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
@@ -33,6 +36,7 @@ import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 
 import javax.xml.namespace.QName;
+
 import java.util.List;
 
 /**
@@ -41,8 +45,31 @@ import java.util.List;
 
 public class ProtectionOrderAssertionState extends AssertionState implements Assertable {
 
-    public ProtectionOrderAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
+    private PolicyAsserter policyAsserter;
+    
+    public ProtectionOrderAssertionState(AbstractSecurityAssertion assertion,
+                                         PolicyAsserter policyAsserter,
+                                         boolean asserted) {
         super(assertion, asserted);
+        this.policyAsserter = policyAsserter;
+        if (this.policyAsserter == null) {
+            this.policyAsserter = new DummyPolicyAsserter();
+        }
+        
+        if (asserted) {
+            String namespace = getAssertion().getName().getNamespaceURI();
+            AbstractSymmetricAsymmetricBinding.ProtectionOrder protectionOrder = ((AbstractSymmetricAsymmetricBinding) getAssertion()).getProtectionOrder();
+            switch (protectionOrder) {
+            case SignBeforeEncrypting: {
+                policyAsserter.assertPolicy(new QName(namespace, SPConstants.SIGN_BEFORE_ENCRYPTING));
+                break;
+            }
+            case EncryptBeforeSigning: {
+                policyAsserter.assertPolicy(new QName(namespace, SPConstants.ENCRYPT_BEFORE_SIGNING));
+            }
+                break;
+            }
+        }
     }
 
     @Override
@@ -100,6 +127,8 @@ public class ProtectionOrderAssertionState extends AssertionState implements Ass
     }
 
     private void testProtectionOrder(AbstractSymmetricAsymmetricBinding.ProtectionOrder protectionOrder, List<XMLSecurityConstants.ContentType> contentTypes, List<QName> elementPath) {
+        String namespace = getAssertion().getName().getNamespaceURI();
+        
         switch (protectionOrder) {
             case SignBeforeEncrypting: {
                 int lastSignature = contentTypes.lastIndexOf(XMLSecurityConstants.ContentType.SIGNATURE);
@@ -107,6 +136,10 @@ public class ProtectionOrderAssertionState extends AssertionState implements Ass
                 if (firstEncryption >= 0 && firstEncryption < lastSignature) {
                     setAsserted(false);
                     setErrorMessage("Policy enforces " + protectionOrder + " but the " + WSSUtils.pathAsString(elementPath) + " was encrypted and then signed");
+                    policyAsserter.unassertPolicy(new QName(namespace, SPConstants.SIGN_BEFORE_ENCRYPTING),
+                                                  getErrorMessage());
+                } else {
+                    policyAsserter.assertPolicy(new QName(namespace, SPConstants.SIGN_BEFORE_ENCRYPTING));
                 }
                 break;
             }
@@ -116,6 +149,10 @@ public class ProtectionOrderAssertionState extends AssertionState implements Ass
                 if (firstSignature >= 0 && firstSignature < lastEncryption) {
                     setAsserted(false);
                     setErrorMessage("Policy enforces " + protectionOrder + " but the " + WSSUtils.pathAsString(elementPath) + " was signed and then encrypted");
+                    policyAsserter.unassertPolicy(new QName(namespace, SPConstants.ENCRYPT_BEFORE_SIGNING),
+                                                  getErrorMessage());
+                } else {
+                    policyAsserter.assertPolicy(new QName(namespace, SPConstants.ENCRYPT_BEFORE_SIGNING));
                 }
                 break;
             }

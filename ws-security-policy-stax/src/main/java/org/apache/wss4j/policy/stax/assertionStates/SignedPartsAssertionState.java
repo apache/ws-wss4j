@@ -26,6 +26,8 @@ import org.apache.wss4j.policy.model.SignedParts;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.wss4j.policy.stax.Assertable;
+import org.apache.wss4j.policy.stax.DummyPolicyAsserter;
+import org.apache.wss4j.policy.stax.PolicyAsserter;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
@@ -44,12 +46,23 @@ public class SignedPartsAssertionState extends AssertionState implements Asserta
     private int attachmentCount;
     private int signedAttachmentCount;
     private boolean signedAttachmentRequired;
+    private PolicyAsserter policyAsserter;
 
     public SignedPartsAssertionState(
-        AbstractSecurityAssertion assertion, boolean asserted, int attachmentCount
+        AbstractSecurityAssertion assertion, PolicyAsserter policyAsserter,
+        boolean asserted, int attachmentCount
     ) {
         super(assertion, asserted);
         this.attachmentCount = attachmentCount;
+        
+        this.policyAsserter = policyAsserter;
+        if (this.policyAsserter == null) {
+            this.policyAsserter = new DummyPolicyAsserter();
+        }
+        
+        if (asserted) {
+            policyAsserter.assertPolicy(getAssertion());
+        }
     }
 
     @Override
@@ -70,6 +83,7 @@ public class SignedPartsAssertionState extends AssertionState implements Asserta
             if (signedPartSecurityEvent.isAttachment()) {
                 signedAttachmentCount++;
                 setAsserted(true);
+                policyAsserter.assertPolicy(getAssertion());
                 return true;
             }
         }
@@ -78,10 +92,12 @@ public class SignedPartsAssertionState extends AssertionState implements Asserta
                 && WSSUtils.pathMatches(WSSConstants.SOAP_11_BODY_PATH, signedPartSecurityEvent.getElementPath(), true, false)) {
             if (signedPartSecurityEvent.isSigned()) {
                 setAsserted(true);
+                policyAsserter.assertPolicy(getAssertion());
                 return true;
             } else {
                 setAsserted(false);
                 setErrorMessage("Element " + WSSUtils.pathAsString(signedPartSecurityEvent.getElementPath()) + " must be signed");
+                policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
                 return false;
             }
         }
@@ -89,10 +105,12 @@ public class SignedPartsAssertionState extends AssertionState implements Asserta
         if (signedParts.isSignAllHeaders()) {
             if (signedPartSecurityEvent.isSigned()) {
                 setAsserted(true);
+                policyAsserter.assertPolicy(getAssertion());
                 return true;
             } else {
                 setAsserted(false);
                 setErrorMessage("Element " + WSSUtils.pathAsString(signedPartSecurityEvent.getElementPath()) + " must be signed");
+                policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
                 return false;
             }
         } else {
@@ -107,10 +125,12 @@ public class SignedPartsAssertionState extends AssertionState implements Asserta
                 if (WSSUtils.pathMatches(header11Path, signedPartSecurityEvent.getElementPath(), true, header.getName() == null)) {
                     if (signedPartSecurityEvent.isSigned()) {
                         setAsserted(true);
+                        policyAsserter.assertPolicy(getAssertion());
                         return true;
                     } else {
                         setAsserted(false);
                         setErrorMessage("Element " + WSSUtils.pathAsString(signedPartSecurityEvent.getElementPath()) + " must be signed");
+                        policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
                         return false;
                     }
                 }
@@ -118,6 +138,7 @@ public class SignedPartsAssertionState extends AssertionState implements Asserta
         }
 
         //if we return false here other signed elements will trigger a PolicyViolationException
+        policyAsserter.assertPolicy(getAssertion());
         return true;
     }
     

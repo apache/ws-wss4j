@@ -26,6 +26,8 @@ import org.apache.wss4j.policy.model.Header;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.wss4j.policy.stax.Assertable;
+import org.apache.wss4j.policy.stax.DummyPolicyAsserter;
+import org.apache.wss4j.policy.stax.PolicyAsserter;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.securityEvent.EncryptedPartSecurityEvent;
@@ -44,11 +46,23 @@ public class EncryptedPartsAssertionState extends AssertionState implements Asse
     private int attachmentCount;
     private int encryptedAttachmentCount;
     private boolean encryptedAttachmentRequired;
+    private PolicyAsserter policyAsserter;
 
     public EncryptedPartsAssertionState(
-        AbstractSecurityAssertion assertion, boolean asserted, int attachmentCount) {
+        AbstractSecurityAssertion assertion, 
+        PolicyAsserter policyAsserter,
+        boolean asserted, int attachmentCount) {
         super(assertion, asserted);
         this.attachmentCount = attachmentCount;
+        
+        this.policyAsserter = policyAsserter;
+        if (this.policyAsserter == null) {
+            this.policyAsserter = new DummyPolicyAsserter();
+        }
+        
+        if (asserted) {
+            policyAsserter.assertPolicy(getAssertion());
+        }
     }
 
     @Override
@@ -69,6 +83,7 @@ public class EncryptedPartsAssertionState extends AssertionState implements Asse
             if (encryptedPartSecurityEvent.isAttachment()) {
                 encryptedAttachmentCount++;
                 setAsserted(true);
+                policyAsserter.assertPolicy(getAssertion());
                 return true;
             }
         }
@@ -77,10 +92,12 @@ public class EncryptedPartsAssertionState extends AssertionState implements Asse
         if (encryptedParts.isBody() && WSSUtils.isInSOAPBody(encryptedPartSecurityEvent.getElementPath())) {
             if (encryptedPartSecurityEvent.isEncrypted()) {
                 setAsserted(true);
+                policyAsserter.assertPolicy(getAssertion());
                 return true;
             } else {
                 setAsserted(false);
                 setErrorMessage("SOAP-Body must be encrypted");
+                policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
                 return false;
             }
         }
@@ -96,16 +113,19 @@ public class EncryptedPartsAssertionState extends AssertionState implements Asse
             if (WSSUtils.pathMatches(header11Path, encryptedPartSecurityEvent.getElementPath(), true, header.getName() == null)) {
                 if (encryptedPartSecurityEvent.isEncrypted()) {
                     setAsserted(true);
+                    policyAsserter.assertPolicy(getAssertion());
                     return true;
                 } else {
                     setAsserted(false);
                     setErrorMessage("Element " + WSSUtils.pathAsString(encryptedPartSecurityEvent.getElementPath()) + " must be encrypted");
+                    policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
                     return false;
                 }
             }
         }
 
         //if we return false here other encrypted elements will trigger a PolicyViolationException
+        policyAsserter.assertPolicy(getAssertion());
         return true;
     }
     

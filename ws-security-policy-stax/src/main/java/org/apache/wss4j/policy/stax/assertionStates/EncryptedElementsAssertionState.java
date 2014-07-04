@@ -27,6 +27,8 @@ import org.apache.xml.security.stax.securityEvent.AbstractSecuredElementSecurity
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.wss4j.policy.stax.Assertable;
+import org.apache.wss4j.policy.stax.DummyPolicyAsserter;
+import org.apache.wss4j.policy.stax.PolicyAsserter;
 import org.apache.wss4j.policy.stax.PolicyUtils;
 import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
@@ -43,8 +45,11 @@ import java.util.List;
 public class EncryptedElementsAssertionState extends AssertionState implements Assertable {
 
     private final List<List<QName>> pathElements = new ArrayList<List<QName>>();
+    private PolicyAsserter policyAsserter;
 
-    public EncryptedElementsAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
+    public EncryptedElementsAssertionState(AbstractSecurityAssertion assertion, 
+                                           PolicyAsserter policyAsserter,
+                                           boolean asserted) {
         super(assertion, asserted);
 
         EncryptedElements encryptedElements = (EncryptedElements) assertion;
@@ -52,6 +57,15 @@ public class EncryptedElementsAssertionState extends AssertionState implements A
             XPath xPath = encryptedElements.getXPaths().get(i);
             List<QName> elements = PolicyUtils.getElementPath(xPath);
             pathElements.add(elements);
+        }
+        
+        this.policyAsserter = policyAsserter;
+        if (this.policyAsserter == null) {
+            this.policyAsserter = new DummyPolicyAsserter();
+        }
+        
+        if (asserted) {
+            policyAsserter.assertPolicy(getAssertion());
         }
     }
 
@@ -74,16 +88,19 @@ public class EncryptedElementsAssertionState extends AssertionState implements A
             if (WSSUtils.pathMatches(pathElements, encryptedElementSecurityEvent.getElementPath(), true, false)) {
                 if (encryptedElementSecurityEvent.isEncrypted()) {
                     setAsserted(true);
+                    policyAsserter.assertPolicy(getAssertion());
                     return true;
                 } else {
                     //an element must be encrypted but isn't
                     setAsserted(false);
                     setErrorMessage("Element " + WSSUtils.pathAsString(encryptedElementSecurityEvent.getElementPath()) + " must be encrypted");
+                    policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
                     return false;
                 }
             }
         }
         //if we return false here other encrypted elements will trigger a PolicyViolationException
+        policyAsserter.assertPolicy(getAssertion());
         return true;
     }
 }

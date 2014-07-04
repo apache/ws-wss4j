@@ -19,6 +19,7 @@
 package org.apache.wss4j.policy.stax.assertionStates;
 
 import org.apache.wss4j.policy.AssertionState;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
@@ -29,6 +30,8 @@ import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.wss4j.policy.stax.Assertable;
+import org.apache.wss4j.policy.stax.DummyPolicyAsserter;
+import org.apache.wss4j.policy.stax.PolicyAsserter;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
@@ -51,8 +54,11 @@ public class SignatureProtectionAssertionState extends AssertionState implements
     private final ArrayList<TokenSecurityEvent<? extends SecurityToken>> tokenSecurityEvents =
             new ArrayList<TokenSecurityEvent<? extends SecurityToken>>();
     private final List<List<QName>> elementPaths = new ArrayList<List<QName>>();
+    private PolicyAsserter policyAsserter;
 
-    public SignatureProtectionAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
+    public SignatureProtectionAssertionState(AbstractSecurityAssertion assertion, 
+                                             PolicyAsserter policyAsserter,
+                                             boolean asserted) {
         super(assertion, asserted);
         List<QName> signature11Path = new LinkedList<QName>();
         signature11Path.addAll(WSSConstants.SOAP_11_HEADER_PATH);
@@ -65,6 +71,16 @@ public class SignatureProtectionAssertionState extends AssertionState implements
         signatureConfirmation11Path.add(WSSConstants.TAG_wsse_Security);
         signatureConfirmation11Path.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
         elementPaths.add(signatureConfirmation11Path);
+        
+        this.policyAsserter = policyAsserter;
+        if (this.policyAsserter == null) {
+            this.policyAsserter = new DummyPolicyAsserter();
+        }
+        
+        if (asserted) {
+            String namespace = getAssertion().getName().getNamespaceURI();
+            policyAsserter.assertPolicy(new QName(namespace, SPConstants.ENCRYPT_SIGNATURE));
+        }
     }
 
     @Override
@@ -189,22 +205,30 @@ public class SignatureProtectionAssertionState extends AssertionState implements
         AbstractSymmetricAsymmetricBinding abstractSymmetricAsymmetricBinding = 
             (AbstractSymmetricAsymmetricBinding) getAssertion();
         
+        String namespace = getAssertion().getName().getNamespaceURI();
+        
         if (encryptedElementSecurityEvent.isEncrypted()) {
             if (abstractSymmetricAsymmetricBinding.isEncryptSignature()) {
                 setAsserted(true);
+                policyAsserter.assertPolicy(new QName(namespace, SPConstants.ENCRYPT_SIGNATURE));
                 return true;
             } else {
                 setAsserted(false);
                 setErrorMessage("Element " + WSSUtils.pathAsString(encryptedElementSecurityEvent.getElementPath()) + " must not be encrypted");
+                policyAsserter.unassertPolicy(new QName(namespace, SPConstants.ENCRYPT_SIGNATURE),
+                                              getErrorMessage());
                 return false;
             }
         } else {
             if (abstractSymmetricAsymmetricBinding.isEncryptSignature()) {
                 setAsserted(false);
                 setErrorMessage("Element " + WSSUtils.pathAsString(encryptedElementSecurityEvent.getElementPath()) + " must be encrypted");
+                policyAsserter.unassertPolicy(new QName(namespace, SPConstants.ENCRYPT_SIGNATURE),
+                                            getErrorMessage());
                 return false;
             } else {
                 setAsserted(true);
+                policyAsserter.assertPolicy(new QName(namespace, SPConstants.ENCRYPT_SIGNATURE));
                 return true;
             }
         }

@@ -26,12 +26,15 @@ import org.apache.wss4j.policy.model.XPath;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.wss4j.policy.stax.Assertable;
+import org.apache.wss4j.policy.stax.DummyPolicyAsserter;
+import org.apache.wss4j.policy.stax.PolicyAsserter;
 import org.apache.wss4j.policy.stax.PolicyUtils;
 import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.securityEvent.RequiredElementSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 import javax.xml.namespace.QName;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -43,8 +46,11 @@ import java.util.Map;
 public class RequiredElementsAssertionState extends AssertionState implements Assertable {
 
     private final Map<List<QName>, Boolean> pathElements = new HashMap<List<QName>, Boolean>();
+    private PolicyAsserter policyAsserter;
 
-    public RequiredElementsAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
+    public RequiredElementsAssertionState(AbstractSecurityAssertion assertion, 
+                                          PolicyAsserter policyAsserter,
+                                          boolean asserted) {
         super(assertion, asserted);
 
         if (assertion instanceof RequiredElements) {
@@ -54,6 +60,15 @@ public class RequiredElementsAssertionState extends AssertionState implements As
                 List<QName> elements = PolicyUtils.getElementPath(xPath);
                 pathElements.put(elements, Boolean.FALSE);
             }
+        }
+        
+        this.policyAsserter = policyAsserter;
+        if (this.policyAsserter == null) {
+            this.policyAsserter = new DummyPolicyAsserter();
+        }
+        
+        if (asserted) {
+            policyAsserter.assertPolicy(getAssertion());
         }
     }
 
@@ -82,6 +97,7 @@ public class RequiredElementsAssertionState extends AssertionState implements As
             }
         }
         //if we return false here other required elements will trigger a PolicyViolationException
+        policyAsserter.assertPolicy(getAssertion());
         return true;
     }
 
@@ -93,9 +109,11 @@ public class RequiredElementsAssertionState extends AssertionState implements As
             Map.Entry<List<QName>, Boolean> next = elementMapIterator.next();
             if (Boolean.FALSE.equals(next.getValue())) {
                 setErrorMessage("Element " + WSSUtils.pathAsString(next.getKey()) + " must be present");
+                policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
                 return false;
             }
         }
+        policyAsserter.assertPolicy(getAssertion());
         return true;
     }
 }
