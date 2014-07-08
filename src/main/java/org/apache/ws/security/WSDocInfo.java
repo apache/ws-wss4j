@@ -261,7 +261,7 @@ public class WSDocInfo {
      */
     public WSSecurityEngineResult getResultByTag(Integer tag, String uri) {
         String id = uri;
-        if (id == null) {
+        if (id == null || "".equals(uri)) {
             return null;
         } else if (id.charAt(0) == '#') {
             id = id.substring(1);
