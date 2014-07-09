@@ -189,7 +189,10 @@ public class EncryptedKeyProcessor implements Processor {
             WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD, 
             encryptedKeyTransportMethod
         );
-        result.put(WSSecurityEngineResult.TAG_ID, elem.getAttributeNS(null, "Id"));
+        String tokenId = elem.getAttributeNS(null, "Id");
+        if (!"".equals(tokenId)) {
+            result.put(WSSecurityEngineResult.TAG_ID, tokenId);
+        }
         result.put(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE, strParser.getCertificatesReferenceType());
         wsDocInfo.addResult(result);
         wsDocInfo.addTokenElement(elem);

@@ -57,7 +57,9 @@ public class SignatureConfirmationProcessor implements Processor {
         
         WSSecurityEngineResult result = 
             new WSSecurityEngineResult(WSConstants.SC, sigConf);
-        result.put(WSSecurityEngineResult.TAG_ID, id);
+        if (!"".equals(id)) {
+            result.put(WSSecurityEngineResult.TAG_ID, id);
+        }
         wsDocInfo.addResult(result);
         wsDocInfo.addTokenElement(elem);
         return java.util.Collections.singletonList(result);

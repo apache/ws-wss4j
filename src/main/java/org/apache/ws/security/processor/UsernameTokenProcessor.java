@@ -77,7 +77,10 @@ public class UsernameTokenProcessor implements Processor {
             } 
         }
         WSSecurityEngineResult result = new WSSecurityEngineResult(action, token);
-        result.put(WSSecurityEngineResult.TAG_ID, token.getID());
+        String tokenId = token.getID();
+        if (!"".equals(tokenId)) {
+            result.put(WSSecurityEngineResult.TAG_ID, tokenId);
+        }
         result.put(WSSecurityEngineResult.TAG_SECRET, secretKey);
         
         if (validator != null) {

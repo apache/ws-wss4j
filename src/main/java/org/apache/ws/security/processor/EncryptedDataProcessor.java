@@ -184,7 +184,10 @@ public class EncryptedDataProcessor implements Processor {
         
         WSSecurityEngineResult result = 
                 new WSSecurityEngineResult(WSConstants.ENCR, Collections.singletonList(dataRef));
-        result.put(WSSecurityEngineResult.TAG_ID, elem.getAttributeNS(null, "Id"));
+        String encryptedDataId = elem.getAttributeNS(null, "Id");
+        if (!"".equals(encryptedDataId)) {
+            result.put(WSSecurityEngineResult.TAG_ID, encryptedDataId);
+        }
         wsDocInfo.addResult(result);
         wsDocInfo.addTokenElement(elem);
         

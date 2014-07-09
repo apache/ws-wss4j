@@ -80,7 +80,9 @@ public class BinarySecurityTokenProcessor implements Processor {
         WSSecurityEngineResult result = 
             new WSSecurityEngineResult(WSConstants.BST, token, certs);
         wsDocInfo.addTokenElement(elem);
-        result.put(WSSecurityEngineResult.TAG_ID, id);
+        if (!"".equals(id)) {
+            result.put(WSSecurityEngineResult.TAG_ID, id);
+        }
         
         if (validator != null) {
             // Hook to allow the user to validate the BinarySecurityToken

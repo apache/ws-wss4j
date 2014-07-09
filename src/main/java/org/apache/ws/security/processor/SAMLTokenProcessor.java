@@ -102,7 +102,9 @@ public class SAMLTokenProcessor implements Processor {
             result = new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, assertion);
         }
         
-        result.put(WSSecurityEngineResult.TAG_ID, assertion.getId());
+        if (!"".equals(id)) {
+            result.put(WSSecurityEngineResult.TAG_ID, id);
+        }
 
         if (validator != null) {
             result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);

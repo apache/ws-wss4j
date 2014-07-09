@@ -55,7 +55,10 @@ public class TimestampProcessor implements Processor {
         
         WSSecurityEngineResult result = 
             new WSSecurityEngineResult(WSConstants.TS, timestamp);
-        result.put(WSSecurityEngineResult.TAG_ID, timestamp.getID());
+        String tokenId = timestamp.getID();
+        if (!"".equals(tokenId)) {
+            result.put(WSSecurityEngineResult.TAG_ID, tokenId);
+        }
         
         Validator validator = data.getValidator(WSSecurityEngine.TIMESTAMP);
         if (validator != null) {
