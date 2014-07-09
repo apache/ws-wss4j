@@ -252,7 +252,10 @@ public class SignatureProcessor implements Processor {
                 certs, dataRefs, signatureValue);
         result.put(WSSecurityEngineResult.TAG_SIGNATURE_METHOD, signatureMethod);
         result.put(WSSecurityEngineResult.TAG_CANONICALIZATION_METHOD, c14nMethod);
-        result.put(WSSecurityEngineResult.TAG_ID, elem.getAttributeNS(null, "Id"));
+        String tokenId = elem.getAttributeNS(null, "Id");
+        if (!"".equals(tokenId)) {
+            result.put(WSSecurityEngineResult.TAG_ID, tokenId);
+        }
         result.put(WSSecurityEngineResult.TAG_SECRET, secretKey);
         result.put(WSSecurityEngineResult.TAG_PUBLIC_KEY, publicKey);
         result.put(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE, referenceType);

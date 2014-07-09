@@ -80,7 +80,10 @@ public class ReferenceListProcessor implements Processor {
         List<WSDataRef> dataRefs = handleReferenceList(elem, data, wsDocInfo);
         WSSecurityEngineResult result = 
             new WSSecurityEngineResult(WSConstants.ENCR, dataRefs);
-        result.put(WSSecurityEngineResult.TAG_ID, elem.getAttributeNS(null, "Id"));
+        String tokenId = elem.getAttributeNS(null, "Id");
+        if (!"".equals(tokenId)) {
+            result.put(WSSecurityEngineResult.TAG_ID, tokenId);
+        }
         wsDocInfo.addTokenElement(elem);
         wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);
