@@ -80,7 +80,7 @@ public class TimestampTest extends AbstractTestBase {
 
             Assert.assertTrue(gregorianCalendarCreated.before(gregorianCalendarExpires));
             GregorianCalendar now = new GregorianCalendar();
-            Assert.assertTrue(now.after(gregorianCalendarCreated));
+            Assert.assertTrue(!now.before(gregorianCalendarCreated));
             Assert.assertTrue(now.before(gregorianCalendarExpires));
 
             gregorianCalendarCreated.add(Calendar.SECOND, 301);
@@ -157,7 +157,7 @@ public class TimestampTest extends AbstractTestBase {
 
             Assert.assertTrue(gregorianCalendarCreated.before(gregorianCalendarExpires));
             GregorianCalendar now = new GregorianCalendar();
-            Assert.assertTrue(now.after(gregorianCalendarCreated));
+            Assert.assertTrue(!now.before(gregorianCalendarCreated));
             Assert.assertTrue(now.before(gregorianCalendarExpires));
 
             gregorianCalendarCreated.add(Calendar.SECOND, 3601);
@@ -190,7 +190,7 @@ public class TimestampTest extends AbstractTestBase {
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
-        Thread.sleep(1000);
+        Thread.sleep(1500);
 
         //done timestamp; now test timestamp-verification:
         {
@@ -229,7 +229,7 @@ public class TimestampTest extends AbstractTestBase {
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
-        Thread.sleep(1000);
+        Thread.sleep(1500);
 
         //done timestamp; now test timestamp-verification:
         {
@@ -408,7 +408,7 @@ public class TimestampTest extends AbstractTestBase {
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
-        Thread.sleep(1000);
+        Thread.sleep(1500);
 
         //done timestamp; now test timestamp-verification:
         {
@@ -627,7 +627,7 @@ public class TimestampTest extends AbstractTestBase {
 
             Assert.assertTrue(gregorianCalendarCreated.before(gregorianCalendarExpires));
             GregorianCalendar now = new GregorianCalendar();
-            Assert.assertTrue(now.after(gregorianCalendarCreated));
+            Assert.assertTrue(!now.before(gregorianCalendarCreated));
             Assert.assertTrue(now.before(gregorianCalendarExpires));
 
             gregorianCalendarCreated.add(Calendar.SECOND, 301);
