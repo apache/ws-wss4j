@@ -1298,7 +1298,7 @@ public final class WSSecurityUtil {
         Element element
     ) {
         String id = uri;
-        if (uri.charAt(0) == '#') {
+        if (!"".equals(uri) && uri.charAt(0) == '#') {
             id = id.substring(1);
         }
         
