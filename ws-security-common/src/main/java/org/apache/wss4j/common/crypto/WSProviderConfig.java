@@ -73,10 +73,51 @@ public final class WSProviderConfig {
                         // Santuario. This can be removed when we pick up BouncyCastle 1.51+
                         if (bcProviderStr != null) {
                             Provider bcProvider = Security.getProvider(bcProviderStr);
-                            if (bcProvider.getInfo().contains("v1.49")) {
+                            if (bcProvider.getVersion() < 1.50) {
                                 useIvParameterSpec();
                             }
                         }
+                        return true;
+                    }
+                });
+            }
+            staticallyInitialized = true;
+        }
+    }
+    
+    public static synchronized void init(boolean addXMLDSigRIInternalProv, boolean addBCProv, boolean addTLProv) {
+        if (!staticallyInitialized) {
+            initializeResourceBundles();
+            setXmlSecIgnoreLineBreak();
+            if (addXMLDSigRIInternalProv) {
+                AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+                    public Boolean run() {
+                        addXMLDSigRIInternal();
+                        return true;
+                    }
+                });
+            }
+            if (addBCProv) {
+                AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+                    public Boolean run() {
+                        String bcProviderStr = 
+                            addJceProvider("BC", "org.bouncycastle.jce.provider.BouncyCastleProvider");
+                        // If we have BouncyCastle v1.49 installed then use IvParameterSpec in
+                        // Santuario. This can be removed when we pick up BouncyCastle 1.51+
+                        if (bcProviderStr != null) {
+                            Provider bcProvider = Security.getProvider(bcProviderStr);
+                            if (bcProvider.getVersion() < 1.50) {
+                                useIvParameterSpec();
+                            }
+                        }
+                        return true;
+                    }
+                });
+            }
+            if (addTLProv) {
+                AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+                    public Boolean run() {
+                        ThreadLocalSecurityProvider.install();
                         return true;
                     }
                 });
