@@ -35,6 +35,7 @@ public class ThreadLocalSecurityProvider extends Provider {
     private static final String NAME = "TLSP";
     private static final ThreadLocal<Provider> provider = new ThreadLocal<Provider>();
     private static boolean installed = false;
+    private static final EmptyEnumeration<Object> emptyEnumeration = new EmptyEnumeration<Object>(); 
 
     public static synchronized void install() {
         Security.insertProviderAt(new ThreadLocalSecurityProvider(),
@@ -147,7 +148,7 @@ public class ThreadLocalSecurityProvider extends Provider {
         if (p != null) {
             return p.keys();
         } else {
-            return new EmptyEnumeration<Object>();
+            return emptyEnumeration;
         }
     }
 
@@ -156,7 +157,7 @@ public class ThreadLocalSecurityProvider extends Provider {
         if (p != null) {
             return p.elements();
         } else {
-            return new EmptyEnumeration<Object>();
+            return emptyEnumeration;
         }
     }
 
