@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class ThreadLocalSecurityProvider extends Provider {
@@ -146,7 +147,7 @@ public class ThreadLocalSecurityProvider extends Provider {
         if (p != null) {
             return p.keys();
         } else {
-            return Collections.emptyEnumeration();
+            return new EmptyEnumeration<Object>();
         }
     }
 
@@ -155,7 +156,7 @@ public class ThreadLocalSecurityProvider extends Provider {
         if (p != null) {
             return p.elements();
         } else {
-            return Collections.emptyEnumeration();
+            return new EmptyEnumeration<Object>();
         }
     }
 
@@ -184,5 +185,19 @@ public class ThreadLocalSecurityProvider extends Provider {
         } else {
             return null;
         }
+    }
+    
+    private static class EmptyEnumeration<T> implements Enumeration<T> {
+
+        @Override
+        public boolean hasMoreElements() {
+            return false;
+        }
+
+        @Override
+        public T nextElement() {
+            throw new NoSuchElementException();
+        }
+        
     }
 }
