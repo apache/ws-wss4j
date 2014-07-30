@@ -30,6 +30,7 @@ import javax.xml.crypto.dsig.SignatureMethod;
 import javax.xml.crypto.dsig.SignedInfo;
 import javax.xml.crypto.dsig.XMLSignContext;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
+import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 
@@ -451,6 +452,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         XMLStructure structure = new DOMStructure(secRef.getElement());
         wsDocInfo.addTokenElement(secRef.getElement(), false);
 
+        KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
         keyInfo = 
             keyInfoFactory.newKeyInfo(
                 java.util.Collections.singletonList(structure), keyInfoUri

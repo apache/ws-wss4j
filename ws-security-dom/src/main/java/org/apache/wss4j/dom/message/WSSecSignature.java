@@ -90,7 +90,6 @@ public class WSSecSignature extends WSSecSignatureBase {
     protected String strUri;
     protected BinarySecurity bstToken;
     
-    protected KeyInfoFactory keyInfoFactory;
     protected XMLSignatureFactory signatureFactory;
     protected KeyInfo keyInfo;
     protected CanonicalizationMethod c14nMethod;
@@ -125,11 +124,6 @@ public class WSSecSignature extends WSSecSignatureBase {
             signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
         } catch (NoSuchProviderException ex) {
             signatureFactory = XMLSignatureFactory.getInstance("DOM");
-        }
-        try {
-            keyInfoFactory = KeyInfoFactory.getInstance("DOM", "ApacheXMLDSig");
-        } catch (NoSuchProviderException ex) {
-            keyInfoFactory = KeyInfoFactory.getInstance("DOM");
         }
     }
    
@@ -321,6 +315,7 @@ public class WSSecSignature extends WSSecSignatureBase {
                 java.security.PublicKey publicKey = certs[0].getPublicKey();
                 
                 try {
+                    KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
                     KeyValue keyValue = keyInfoFactory.newKeyValue(publicKey);
                     keyInfo = 
                         keyInfoFactory.newKeyInfo(
@@ -341,6 +336,7 @@ public class WSSecSignature extends WSSecSignatureBase {
         if (keyIdentifierType != WSConstants.KEY_VALUE) {
             XMLStructure structure = new DOMStructure(secRef.getElement());
             wsDocInfo.addTokenElement(secRef.getElement(), false);
+            KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
             keyInfo = 
                 keyInfoFactory.newKeyInfo(
                     java.util.Collections.singletonList(structure), keyInfoUri

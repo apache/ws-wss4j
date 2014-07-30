@@ -95,7 +95,6 @@ public class SignatureProcessor implements Processor {
         org.slf4j.LoggerFactory.getLogger(SignatureProcessor.class);
     
     private XMLSignatureFactory signatureFactory;
-    private KeyInfoFactory keyInfoFactory;
     
     public SignatureProcessor() {
         // Try to install the Santuario Provider - fall back to the JDK provider if this does
@@ -104,11 +103,6 @@ public class SignatureProcessor implements Processor {
             signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
         } catch (NoSuchProviderException ex) {
             signatureFactory = XMLSignatureFactory.getInstance("DOM");
-        }
-        try {
-            keyInfoFactory = KeyInfoFactory.getInstance("DOM", "ApacheXMLDSig");
-        } catch (NoSuchProviderException ex) {
-            keyInfoFactory = KeyInfoFactory.getInstance("DOM");
         }
     }
     
@@ -330,6 +324,7 @@ public class SignatureProcessor implements Processor {
         Element keyInfoElement
     ) throws MarshalException {
         XMLStructure keyInfoStructure = new DOMStructure(keyInfoElement);
+        KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
         KeyInfo keyInfo = keyInfoFactory.unmarshalKeyInfo(keyInfoStructure);
         List<?> list = keyInfo.getContent();
 

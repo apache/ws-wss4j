@@ -69,7 +69,6 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     private String strUri;
     private WSDocInfo wsDocInfo;
     
-    private KeyInfoFactory keyInfoFactory;
     private XMLSignatureFactory signatureFactory;
     private XMLSignature sig;
     private KeyInfo keyInfo;
@@ -93,11 +92,6 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
             signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
         } catch (NoSuchProviderException ex) {
             signatureFactory = XMLSignatureFactory.getInstance("DOM");
-        }
-        try {
-            keyInfoFactory = KeyInfoFactory.getInstance("DOM", "ApacheXMLDSig");
-        } catch (NoSuchProviderException ex) {
-            keyInfoFactory = KeyInfoFactory.getInstance("DOM");
         }
     }
     
@@ -173,6 +167,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         
         XMLStructure structure = new DOMStructure(secRef.getElement());
         wsDocInfo.addTokenElement(secRef.getElement(), false);
+        KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
         keyInfo = 
             keyInfoFactory.newKeyInfo(
                 java.util.Collections.singletonList(structure), keyInfoUri
