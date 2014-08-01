@@ -73,7 +73,6 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
-@org.junit.Ignore
 public class KerberosTest extends AbstractTestBase {
     
     private static final org.slf4j.Logger LOG = 

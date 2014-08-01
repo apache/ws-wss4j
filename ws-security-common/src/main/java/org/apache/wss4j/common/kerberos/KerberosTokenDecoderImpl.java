@@ -123,8 +123,8 @@ public class KerberosTokenDecoderImpl implements KerberosTokenDecoder {
             asn1InputStream.close();
 
             asn1InputStream = new org.bouncycastle.asn1.ASN1InputStream(new ByteArrayInputStream(derToken.getContents()));
-            org.bouncycastle.asn1.DERObjectIdentifier kerberosOid =
-                    (org.bouncycastle.asn1.DERObjectIdentifier) asn1InputStream.readObject();
+            org.bouncycastle.asn1.ASN1ObjectIdentifier kerberosOid =
+                    (org.bouncycastle.asn1.ASN1ObjectIdentifier) asn1InputStream.readObject();
             if (!kerberosOid.getId().equals(KERBEROS_OID)) {
                 asn1InputStream.close();
                 throw new KerberosTokenDecoderException("invalid kerberos token");
