@@ -628,7 +628,7 @@ public class SamlReferenceTest extends org.junit.Assert {
     @org.junit.Test
     @SuppressWarnings("unchecked")
     public void testSAML2SVDirectReference() throws Exception {
-    	SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         callbackHandler.setIssuer("www.example.com");

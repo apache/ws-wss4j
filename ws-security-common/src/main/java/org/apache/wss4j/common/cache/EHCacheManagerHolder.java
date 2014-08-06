@@ -61,7 +61,7 @@ public final class EHCacheManagerHolder {
                 cacheManagerCreateMethodConfigurationArg = CacheManager.class.getMethod("create", Configuration.class);
             } catch (Throwable t) {
                 // ignore
-            	LOG.warn(t.getMessage());
+                LOG.warn(t.getMessage());
             }
         }
     }

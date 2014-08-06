@@ -144,7 +144,7 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
                 if (parentAssertion instanceof TransportToken) {
                     continue loop;
                 }
-            	
+                
                 if (!(parentAssertion instanceof SupportingTokens)) {
                     ignoreToken++;
                     continue loop;

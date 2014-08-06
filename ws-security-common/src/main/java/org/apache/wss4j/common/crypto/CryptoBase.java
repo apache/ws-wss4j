@@ -297,7 +297,7 @@ public abstract class CryptoBase implements Crypto {
 
     @Override
     public void verifyDirectTrust(X509Certificate[] certs) throws WSSecurityException {
-    	verifyTrust(certs, true, null);
+        verifyTrust(certs, true, null);
     }
     
     protected Object createBCX509Name(String s) {

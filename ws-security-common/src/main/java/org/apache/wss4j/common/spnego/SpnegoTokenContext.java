@@ -59,7 +59,7 @@ public class SpnegoTokenContext {
         CallbackHandler callbackHandler,
         String serviceName
     ) throws WSSecurityException {
-    	retrieveServiceTicket(jaasLoginModuleName, callbackHandler, serviceName, false);
+        retrieveServiceTicket(jaasLoginModuleName, callbackHandler, serviceName, false);
     }
     
     
@@ -78,7 +78,7 @@ public class SpnegoTokenContext {
         String serviceName,
         boolean isUsernameServiceNameForm
     ) throws WSSecurityException {
-    	
+        
         // Get a TGT from the KDC using JAAS
         LoginContext loginContext = null;
         try {
@@ -142,7 +142,7 @@ public class SpnegoTokenContext {
         String serviceName,
         byte[] ticket
     ) throws WSSecurityException {
-    	validateServiceTicket(jaasLoginModuleName, callbackHandler, serviceName, false, ticket);
+        validateServiceTicket(jaasLoginModuleName, callbackHandler, serviceName, false, ticket);
      }
     
     /**
