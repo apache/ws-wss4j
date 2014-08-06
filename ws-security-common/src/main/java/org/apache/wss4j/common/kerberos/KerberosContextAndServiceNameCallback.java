@@ -25,6 +25,7 @@ public class KerberosContextAndServiceNameCallback implements Callback {
     private String contextName;
     private String serviceName;
     private boolean isUsernameServiceNameForm;
+    private boolean requestCredDeleg;
 
     public String getContextName() {
         return contextName;
@@ -48,6 +49,14 @@ public class KerberosContextAndServiceNameCallback implements Callback {
     
     public boolean isUsernameServiceNameForm(){
     	return this.isUsernameServiceNameForm;
+    }
+
+    public boolean isRequestCredDeleg() {
+        return requestCredDeleg;
+    }
+
+    public void setRequestCredDeleg(boolean requestCredDeleg) {
+        this.requestCredDeleg = requestCredDeleg;
     }
 
 }

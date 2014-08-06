@@ -208,6 +208,7 @@ public class KerberosTokenValidator implements Validator {
         }
 
         credential.setPrincipal(krbServiceCtx.getPrincipal());
+        credential.setDelegationCredential(krbServiceCtx.getDelegationCredential());
 
         // Check to see if the session key is available in KerberosServiceContext
         LOG.debug("Trying to obtain the Session Key from the KerberosServiceContext.");

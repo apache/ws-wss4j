@@ -53,22 +53,37 @@ public class KerberosClientExceptionAction implements PrivilegedExceptionAction<
     private Principal clientPrincipal;
     private String serviceName;
     private boolean isUsernameServiceNameForm;
+    private boolean requestCredDeleg;
+    private GSSCredential delegatedCredential;
 
-    public KerberosClientExceptionAction(Principal clientPrincipal, String serviceName, boolean isUsernameServiceNameForm) {
+    public KerberosClientExceptionAction(Principal clientPrincipal, String serviceName, 
+                                         boolean isUsernameServiceNameForm, boolean requestCredDeleg) {
+        this(clientPrincipal, serviceName, isUsernameServiceNameForm, requestCredDeleg, null);
+    }
+    
+    public KerberosClientExceptionAction(Principal clientPrincipal, String serviceName, 
+                                         boolean isUsernameServiceNameForm, boolean requestCredDeleg,
+                                         GSSCredential delegatedCredential) {
         this.clientPrincipal = clientPrincipal;
         this.serviceName = serviceName;
         this.isUsernameServiceNameForm = isUsernameServiceNameForm;
+        this.requestCredDeleg = requestCredDeleg;
+        this.delegatedCredential = delegatedCredential;
     }
-
+    
     public KerberosContext run() throws GSSException, WSSecurityException {
         GSSManager gssManager = GSSManager.getInstance();
 
         Oid kerberos5Oid = new Oid("1.2.840.113554.1.2.2");
-        GSSName gssClient = gssManager.createName(clientPrincipal.getName(), GSSName.NT_USER_NAME);
-        GSSCredential credentials = 
-            gssManager.createCredential(
-                gssClient, GSSCredential.DEFAULT_LIFETIME, kerberos5Oid, GSSCredential.INITIATE_ONLY
-            );
+        
+        GSSCredential credentials = delegatedCredential;
+        if (credentials == null) {
+            GSSName gssClient = gssManager.createName(clientPrincipal.getName(), GSSName.NT_USER_NAME);
+            credentials = 
+                gssManager.createCredential(
+                    gssClient, GSSCredential.DEFAULT_LIFETIME, kerberos5Oid, GSSCredential.INITIATE_ONLY
+                );
+        }
 
         GSSName gssService = gssManager.createName(serviceName, isUsernameServiceNameForm ? GSSName.NT_USER_NAME : GSSName.NT_HOSTBASED_SERVICE);
         GSSContext secContext =
@@ -77,6 +92,7 @@ public class KerberosClientExceptionAction implements PrivilegedExceptionAction<
             );
 
         secContext.requestMutualAuth(false);
+        secContext.requestCredDeleg(requestCredDeleg);
 
         byte[] token = new byte[0];
         byte[] returnedToken = secContext.initSecContext(token, 0, token.length);

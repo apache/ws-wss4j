@@ -87,11 +87,15 @@ public class KerberosServiceExceptionAction implements PrivilegedExceptionAction
             secContext = gssManager.createContext(credentials);
             secContext.acceptSecContext(ticket, 0, ticket.length);
 
-            krbServiceCtx = new KerberosServiceContext();            
-
+            krbServiceCtx = new KerberosServiceContext();         
+            
+            if (secContext.getCredDelegState()) {
+                krbServiceCtx.setDelegationCredential(secContext.getDelegCred());
+            }
+            
             GSSName clientName = secContext.getSrcName();
             krbServiceCtx.setPrincipal(new KerberosPrincipal(clientName.toString()));
-
+            
             if (!isJava5Or6 && (isOracleJavaVendor || isIBMJavaVendor)) {
                 try {
                     @SuppressWarnings("rawtypes")
@@ -127,12 +131,12 @@ public class KerberosServiceExceptionAction implements PrivilegedExceptionAction
                     throw new WSSecurityException(
                         ErrorCode.FAILURE, KERBEROS_TICKET_VALIDATION_ERROR_MSG_ID, new Object[] {}, e
                     );
-                }            
+                }      
             }            
         } finally {
             if (null != secContext) {
                 secContext.dispose();    
-            }  
+            }
         }               
 
         return krbServiceCtx;

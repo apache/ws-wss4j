@@ -26,7 +26,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.w3c.dom.Element;
-
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
@@ -113,6 +112,11 @@ public class BinarySecurityTokenProcessor implements Processor {
                 result.put(WSSecurityEngineResult.TAG_PRINCIPAL, certs[0].getSubjectX500Principal());
             }
             result.put(WSSecurityEngineResult.TAG_SUBJECT, credential.getSubject());
+            
+            if (credential.getDelegationCredential() != null) {
+                result.put(WSSecurityEngineResult.TAG_DELEGATION_CREDENTIAL, 
+                           credential.getDelegationCredential());
+            }
         }
         
         wsDocInfo.addResult(result);

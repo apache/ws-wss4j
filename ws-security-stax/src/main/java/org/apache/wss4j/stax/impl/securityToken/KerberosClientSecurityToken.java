@@ -90,7 +90,8 @@ public class KerberosClientSecurityToken extends GenericOutboundSecurityToken {
             KerberosClientExceptionAction action = 
                 new KerberosClientExceptionAction(clientPrincipals.iterator().next(),
                                                   contextAndServiceNameCallback.getServiceName(),
-                                                  contextAndServiceNameCallback.isUsernameServiceNameForm());
+                                                  contextAndServiceNameCallback.isUsernameServiceNameForm(),
+                                                  contextAndServiceNameCallback.isRequestCredDeleg());
             KerberosContext krbCtx = null;
             try {
                 krbCtx = (KerberosContext) Subject.doAs(clientSubject, action);
