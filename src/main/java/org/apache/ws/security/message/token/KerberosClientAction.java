@@ -46,7 +46,9 @@ public class KerberosClientAction implements PrivilegedAction<byte[]> {
 
     public byte[] run() {
         try {
-            KerberosContext krbCtx = (KerberosContext)new KerberosClientExceptionAction(clientPrincipal, serviceName, isUsernameServiceNameForm).run();
+            KerberosContext krbCtx = 
+                (KerberosContext)new KerberosClientExceptionAction(clientPrincipal, serviceName, 
+                                                                   isUsernameServiceNameForm, false).run();
             return krbCtx.getKerberosToken();
         } catch (Exception e) {
             if (LOG.isDebugEnabled()) {

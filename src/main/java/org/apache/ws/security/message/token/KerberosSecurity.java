@@ -34,6 +34,8 @@ import javax.security.auth.login.LoginException;
 
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
+import org.ietf.jgss.GSSCredential;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -133,6 +135,29 @@ public class KerberosSecurity extends BinarySecurity {
         String serviceName,
         boolean isUsernameServiceNameForm
     ) throws WSSecurityException {
+        retrieveServiceTicket(jaasLoginModuleName, callbackHandler, serviceName, 
+                              isUsernameServiceNameForm, false);
+    }
+    
+    public void retrieveServiceTicket(
+         String jaasLoginModuleName, 
+         CallbackHandler callbackHandler,
+         String serviceName,
+         boolean isUsernameServiceNameForm,
+         boolean requestCredDeleg
+    ) throws WSSecurityException {
+        retrieveServiceTicket(jaasLoginModuleName, callbackHandler, serviceName, 
+                              isUsernameServiceNameForm, requestCredDeleg, null);
+    }
+    
+    public void retrieveServiceTicket(
+        String jaasLoginModuleName, 
+        CallbackHandler callbackHandler,
+        String serviceName,
+        boolean isUsernameServiceNameForm,
+        boolean requestCredDeleg,
+        GSSCredential delegatedCredential
+    ) throws WSSecurityException {
         // Get a TGT from the KDC using JAAS
         LoginContext loginContext = null;
         try {
@@ -171,7 +196,9 @@ public class KerberosSecurity extends BinarySecurity {
 
         // Get the service ticket
         KerberosClientExceptionAction action = 
-            new KerberosClientExceptionAction(clientPrincipals.iterator().next(), serviceName, isUsernameServiceNameForm);
+            new KerberosClientExceptionAction(clientPrincipals.iterator().next(), serviceName, 
+                                              isUsernameServiceNameForm, requestCredDeleg,
+                                              delegatedCredential);
         KerberosContext krbCtx = null;
         try {
             krbCtx = (KerberosContext) Subject.doAs(clientSubject, action);

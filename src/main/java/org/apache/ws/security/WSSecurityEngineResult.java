@@ -225,6 +225,13 @@ public class WSSecurityEngineResult extends java.util.HashMap<String, Object> {
     public static final String TAG_CANONICALIZATION_METHOD = "canonicalization-method";
     
     /**
+     * Tag denoting a delegation credential found, if applicable.
+     *
+     * For Kerberos (if delegation is enabled), the value under this tag is of type GSSCredential
+     */
+    public static final String TAG_DELEGATION_CREDENTIAL = "delegation-credential";
+    
+    /**
      * The (wsu) Id of the token corresponding to this result.
      */
     public static final String TAG_ID = "id";

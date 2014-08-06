@@ -112,6 +112,11 @@ public class BinarySecurityTokenProcessor implements Processor {
                 result.put(WSSecurityEngineResult.TAG_PRINCIPAL, certs[0].getSubjectX500Principal());
             }
             result.put(WSSecurityEngineResult.TAG_SUBJECT, credential.getSubject());
+            
+            if (credential.getDelegationCredential() != null) {
+                result.put(WSSecurityEngineResult.TAG_DELEGATION_CREDENTIAL, 
+                           credential.getDelegationCredential());
+            }
         }
         
         wsDocInfo.addResult(result);

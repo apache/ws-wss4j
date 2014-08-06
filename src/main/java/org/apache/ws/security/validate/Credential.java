@@ -48,6 +48,7 @@ public class Credential {
     private Principal principal;
     private byte[] secretKey;
     private Subject subject;
+    private Object delegationCredential;
     
     /**
      * Set a SecurityContextToken to be validated
@@ -224,6 +225,14 @@ public class Credential {
      */
     public Subject getSubject() {
         return subject;
+    }
+
+    public Object getDelegationCredential() {
+        return delegationCredential;
+    }
+
+    public void setDelegationCredential(Object delegationCredential) {
+        this.delegationCredential = delegationCredential;
     }
     
 }

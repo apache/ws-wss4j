@@ -224,6 +224,7 @@ public class KerberosTokenValidator implements Validator {
                 WSSecurityException.FAILURE, "kerberosTicketValidationError"
             );
         }
+        credential.setDelegationCredential(krbServiceCtx.getDelegationCredential());
 
         // Check to see if the session key is available in KerberosServiceContext
         log.debug("Trying to obtain the Session Key from the KerberosServiceContext.");
