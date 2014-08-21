@@ -149,7 +149,7 @@ public class ReferenceListProcessor implements Processor {
         Element encryptedDataElement = findEncryptedDataElement(doc, wsDocInfo, dataRefURI);
         
         if (encryptedDataElement != null && asymBinding && data.isRequireSignedEncryptedDataElements()) {
-            WSSecurityUtil.verifySignedElement(encryptedDataElement, doc, wsDocInfo.getSecurityHeader());
+            WSSecurityUtil.verifySignedElement(encryptedDataElement, wsDocInfo);
         }
         //
         // Prepare the SecretKey object to decrypt EncryptedData

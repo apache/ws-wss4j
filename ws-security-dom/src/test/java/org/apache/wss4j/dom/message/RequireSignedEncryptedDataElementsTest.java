@@ -228,6 +228,44 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         }
     }
     
+    @org.junit.Test
+    public void testEncryptedKeyRefAndDuplicatedEncDataInWsseWrapperBody() throws Exception {
+        Document encryptedSignedDoc = getRequestDocumentEncryptionFirst();
+        RequestData reqData = getRequestData(false);
+        TestMessageTransformer.duplicateEncryptedDataInWrapperBody(encryptedSignedDoc.getDocumentElement());
+        try {
+            verify(encryptedSignedDoc, reqData);
+            fail("WSSecurityException expected");
+        } catch (WSSecurityException e) {
+            assertTrue(e.getMessage().contains("The signature or decryption was invalid"));
+        }
+        
+        encryptedSignedDoc = getRequestDocumentEncryptionFirst();
+        TestMessageTransformer.duplicateEncryptedDataInWrapperBody(encryptedSignedDoc.getDocumentElement());
+        reqData = getRequestData(true);
+        
+        try {
+            verify(encryptedSignedDoc, reqData);
+            fail("WSSecurityException expected");
+        } catch (WSSecurityException e) {
+            assertTrue(e.getMessage().contains("is not included in the signature"));
+        }
+    }
+    
+    @org.junit.Test
+    public void testEncryptedKeyRefAndDuplicatedEncDataAfterWsseWrapperBody() throws Exception {
+        Document encryptedSignedDoc = getRequestDocumentEncryptionFirst();
+        TestMessageTransformer.duplicateEncryptedDataAfterWrapperBody(encryptedSignedDoc.getDocumentElement());
+        
+        RequestData reqData = getRequestData(true);
+        try {
+            verify(encryptedSignedDoc, reqData);
+            fail("WSSecurityException expected");
+        } catch (WSSecurityException e) {
+            assertTrue(e.getMessage().contains("is not included in the signature"));
+        }
+    }
+    
     private static void checkFailure(Element attackElement, WSSecurityException e) {
         final String mex = MessageFormat.format(resources.getString("requiredElementNotSigned"), attackElement);
         assertTrue(e.getMessage().contains(mex));
@@ -277,6 +315,38 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         return encryptedSignedDoc;
+    }
+    
+    private Document getRequestDocumentEncryptionFirst() throws Exception {
+        WSSecEncrypt encrypt = new WSSecEncrypt();
+        WSSecSignature sign = new WSSecSignature();
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
+        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        LOG.info("Before Encryption....");
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+
+        Document signedDoc = sign.build(doc, crypto, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("After Signing....");
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        
+        Document encryptedDoc = encrypt.build(signedDoc, crypto, secHeader);
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("After Encryption....");
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(encryptedDoc);
+            LOG.debug(outputString);
+        }
+        
+        return encryptedDoc;
     }
 
     
