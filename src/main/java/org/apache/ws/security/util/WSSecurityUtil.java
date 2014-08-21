@@ -24,6 +24,7 @@ import org.apache.ws.security.SOAP12Constants;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
+import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSEncryptionPart;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
@@ -50,10 +51,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 /**
  * WS-Security Utility methods. <p/>
@@ -1350,56 +1349,44 @@ public final class WSSecurityUtil {
         }
     }
     
-    public static void verifySignedElement(Element elem, Document doc, Element securityHeader)
+    public static void verifySignedElement(Element elem, WSDocInfo wsDocInfo)
         throws WSSecurityException {
-        final Element envelope = doc.getDocumentElement();
-        final Set<String> signatureRefIDs = getSignatureReferenceIDs(securityHeader);
-        if (!signatureRefIDs.isEmpty()) {
-            Node cur = elem;
-            while (!cur.isSameNode(envelope)) {
-                if (cur.getNodeType() == Node.ELEMENT_NODE) {
-                    if (WSConstants.SIG_LN.equals(cur.getLocalName())
-                        && WSConstants.SIG_NS.equals(cur.getNamespaceURI())) {
-                        throw new WSSecurityException(WSSecurityException.FAILED_CHECK,
-                            "requiredElementNotSigned", new Object[] {elem});
-                    } else if (isLinkedBySignatureRefs((Element)cur, signatureRefIDs)) {
-                        return;
+        List<WSSecurityEngineResult> signedResults = 
+            wsDocInfo.getResultsByTag(WSConstants.SIGN);
+        if (signedResults != null) {
+            for (WSSecurityEngineResult signedResult : signedResults) {
+                @SuppressWarnings("unchecked")
+                List<WSDataRef> dataRefs = 
+                    (List<WSDataRef>)signedResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+                if (dataRefs != null) {
+                    for (WSDataRef dataRef : dataRefs) {
+                        if (isElementOrAncestorSigned(elem, dataRef.getProtectedElement())) {
+                            return;
+                        }
                     }
                 }
-                cur = cur.getParentNode();
             }
         }
+        
         throw new WSSecurityException(
             WSSecurityException.FAILED_CHECK, "requiredElementNotSigned", new Object[] {elem});
     }
     
-    private static boolean isLinkedBySignatureRefs(Element elem, Set<String> allIDs) {
-        // Try the wsu:Id first
-        String attributeNS = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
-        if (!"".equals(attributeNS) && allIDs.contains(attributeNS)) {
-            return true;
-        }
-        attributeNS = elem.getAttributeNS(null, "Id");
-        return (!"".equals(attributeNS) && allIDs.contains(attributeNS));
-    }
-    
-    private static Set<String> getSignatureReferenceIDs(Element wsseHeader) throws WSSecurityException {
-        final Set<String> refs = new HashSet<String>();
-        final List<Element> signatures = WSSecurityUtil.getDirectChildElements(wsseHeader, WSConstants.SIG_LN, WSConstants.SIG_NS);
-        for (Element signature : signatures) {
-            Element sigInfo = WSSecurityUtil.getDirectChildElement(signature, WSConstants.SIG_INFO_LN, WSConstants.SIG_NS);
-            List<Element> references = WSSecurityUtil.getDirectChildElements(sigInfo, WSConstants.REF_LN, WSConstants.SIG_NS);
-            for (Element reference : references) {
-                String uri = reference.getAttributeNS(null, "URI");
-                if (!"".equals(uri)) {
-                    boolean added = refs.add(WSSecurityUtil.getIDFromReference(uri));
-                    if (!added) {
-                        log.warn("Duplicated reference uri: " + uri);
-                    }
-                }
+    /**
+     * Does the current element or some ancestor of it correspond to the known "signedElement"? 
+     */
+    private static boolean isElementOrAncestorSigned(Element elem, Element signedElement) 
+        throws WSSecurityException {
+        final Element envelope = elem.getOwnerDocument().getDocumentElement();
+        Node cur = elem;
+        while (!cur.isSameNode(envelope)) {
+            if (cur.getNodeType() == Node.ELEMENT_NODE && cur.equals(signedElement)) {
+                return true;
             }
+            cur = cur.getParentNode();
         }
-        return refs;
+        
+        return false;
     }
     
 }

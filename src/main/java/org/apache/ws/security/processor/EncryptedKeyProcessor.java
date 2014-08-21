@@ -406,7 +406,7 @@ public class EncryptedKeyProcessor implements Processor {
         Element encryptedDataElement = 
             ReferenceListProcessor.findEncryptedDataElement(doc, docInfo, dataRefURI);
         if (encryptedDataElement != null && data.isRequireSignedEncryptedDataElements()) {
-            WSSecurityUtil.verifySignedElement(encryptedDataElement, doc, docInfo.getSecurityHeader());
+            WSSecurityUtil.verifySignedElement(encryptedDataElement, docInfo);
         }
         //
         // Prepare the SecretKey object to decrypt EncryptedData

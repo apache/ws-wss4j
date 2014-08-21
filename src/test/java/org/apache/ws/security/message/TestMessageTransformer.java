@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
+import javax.xml.transform.TransformerException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -107,6 +108,78 @@ public class TestMessageTransformer extends org.junit.Assert {
         if (!moveReferenceList) {
             updateEncryptedKeyRefList(newWsseHeader, newId);
         }
+
+        Node parent = wsseHeader.getParentNode();
+        parent.removeChild(wsseHeader);
+        parent.appendChild(newWsseHeader);
+        print(saaj.getOwnerDocument());
+        return newEncData;
+    }
+    
+    public static Element duplicateEncryptedDataInWrapperBody(Element saaj) throws TransformerException {
+        Element body = getFirstChildElement(saaj, new QName("http://schemas.xmlsoap.org/soap/envelope/",
+                                                            "Body"), true);
+        Element encData = getFirstChildElement(body, new QName("http://www.w3.org/2001/04/xmlenc#",
+                                                               "EncryptedData"), true);
+        Element newEncData = createNewEncryptedData(encData);
+        Element sh = getFirstChildElement(saaj, new QName("http://schemas.xmlsoap.org/soap/envelope/",
+                                                          "Header"), true);
+        Element signature = getFirstChildElement(sh, new QName("http://www.w3.org/2000/09/xmldsig#",
+                                                               "Signature"), true);
+
+        Node wsseHeader = signature.getParentNode();
+        Node newWsseHeader = wsseHeader.cloneNode(false);
+        Node cur = wsseHeader.getFirstChild();
+        String newId = newEncData.getAttributeNS(null, "Id");
+        while (!cur.isSameNode(signature)) {
+            cur = copyHeadersAndUpdateRefList(cur, newWsseHeader, newId);
+        }
+        Element wrapper = encData.getOwnerDocument().createElementNS(null, "a");
+        wrapper.appendChild(newEncData);
+        
+        body.appendChild(wrapper);
+        while (cur != null) {
+            cur = copyHeadersAndUpdateRefList(cur, newWsseHeader, newId);
+        }
+
+        updateEncryptedKeyRefList(newWsseHeader, newId);
+
+        Node parent = wsseHeader.getParentNode();
+        parent.removeChild(wsseHeader);
+        parent.appendChild(newWsseHeader);
+        print(saaj.getOwnerDocument());
+        return newEncData;
+    }
+    
+    public static Element duplicateEncryptedDataAfterWrapperBody(Element saaj) throws TransformerException {
+        Element body = getFirstChildElement(saaj, new QName("http://schemas.xmlsoap.org/soap/envelope/",
+                                                            "Body"), true);
+        Element encData = getFirstChildElement(body, new QName("http://www.w3.org/2001/04/xmlenc#",
+                                                               "EncryptedData"), true);
+        Element newEncData = createNewEncryptedData(encData);
+        Element sh = getFirstChildElement(saaj, new QName("http://schemas.xmlsoap.org/soap/envelope/",
+                                                          "Header"), true);
+        Element signature = getFirstChildElement(sh, new QName("http://www.w3.org/2000/09/xmldsig#",
+                                                               "Signature"), true);
+
+        Node wsseHeader = signature.getParentNode();
+        Node newWsseHeader = wsseHeader.cloneNode(false);
+        Node cur = wsseHeader.getFirstChild();
+        String newId = newEncData.getAttributeNS(null, "Id");
+        while (!cur.isSameNode(signature)) {
+            cur = copyHeadersAndUpdateRefList(cur, newWsseHeader, newId);
+        }
+        Element wrapper = encData.getOwnerDocument().createElementNS(null, "a");
+        Node clonedBody = body.cloneNode(false);
+        clonedBody.appendChild(newEncData);
+        wrapper.appendChild(clonedBody);
+        
+        body.getParentNode().appendChild(wrapper);
+        while (cur != null) {
+            cur = copyHeadersAndUpdateRefList(cur, newWsseHeader, newId);
+        }
+
+        updateEncryptedKeyRefList(newWsseHeader, newId);
 
         Node parent = wsseHeader.getParentNode();
         parent.removeChild(wsseHeader);
