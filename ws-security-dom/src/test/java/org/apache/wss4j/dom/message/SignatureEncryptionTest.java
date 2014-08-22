@@ -24,9 +24,13 @@ import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.handler.HandlerAction;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -355,6 +359,95 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         verify(encryptedSignedDoc);
     }
 
+    @org.junit.Test
+    public void testEncryptionSigningHandler() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
+        messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, new KeystoreCallbackHandler());
+        messageContext.put(WSHandlerConstants.ENC_PROP_REF_ID, "" + crypto.hashCode());
+        messageContext.put(WSHandlerConstants.SIG_PROP_REF_ID, "" + crypto.hashCode());
+        messageContext.put("" + crypto.hashCode(), crypto);
+        reqData.setMsgContext(messageContext);
+        reqData.setUsername("wss40");
+        
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        List<HandlerAction> handlerActions = new ArrayList<HandlerAction>();
+        HandlerAction action = new HandlerAction(WSConstants.ENCR);
+        handlerActions.add(action);
+        action = new HandlerAction(WSConstants.SIGN);
+        handlerActions.add(action);
+        
+        handler.send(
+            doc, 
+            reqData, 
+            handlerActions,
+            true
+        );
+        
+        String outputString = 
+            XMLUtils.PrettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        List<Integer> receivingActions = new ArrayList<Integer>();
+        receivingActions.add(WSConstants.ENCR);
+        receivingActions.add(WSConstants.SIGN);
+        messageContext.put(WSHandlerConstants.DEC_PROP_REF_ID, "" + crypto.hashCode());
+        messageContext.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "" + crypto.hashCode());
+        handler.receive(receivingActions, reqData);
+        
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        newEngine.processSecurityHeader(doc, null, reqData);
+    }
+    
+    @org.junit.Test
+    public void testSigningEncryptionHandler() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
+        messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, new KeystoreCallbackHandler());
+        messageContext.put(WSHandlerConstants.ENC_PROP_REF_ID, "" + crypto.hashCode());
+        messageContext.put(WSHandlerConstants.SIG_PROP_REF_ID, "" + crypto.hashCode());
+        messageContext.put("" + crypto.hashCode(), crypto);
+        reqData.setMsgContext(messageContext);
+        reqData.setUsername("wss40");
+        
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        List<HandlerAction> handlerActions = new ArrayList<HandlerAction>();
+        HandlerAction action = new HandlerAction(WSConstants.SIGN);
+        handlerActions.add(action);
+        action = new HandlerAction(WSConstants.ENCR);
+        handlerActions.add(action);
+        
+        handler.send(
+            doc, 
+            reqData, 
+            handlerActions,
+            true
+        );
+        
+        String outputString = 
+            XMLUtils.PrettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        List<Integer> receivingActions = new ArrayList<Integer>();
+        receivingActions.add(WSConstants.SIGN);
+        receivingActions.add(WSConstants.ENCR);
+        messageContext.put(WSHandlerConstants.DEC_PROP_REF_ID, "" + crypto.hashCode());
+        messageContext.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "" + crypto.hashCode());
+        handler.receive(receivingActions, reqData);
+        
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        newEngine.processSecurityHeader(doc, null, reqData);
+    }
 
     /**
      * Verifies the soap envelope <p/>
