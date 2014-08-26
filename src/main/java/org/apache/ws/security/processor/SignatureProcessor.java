@@ -257,6 +257,7 @@ public class SignatureProcessor implements Processor {
         result.put(WSSecurityEngineResult.TAG_SECRET, secretKey);
         result.put(WSSecurityEngineResult.TAG_PUBLIC_KEY, publicKey);
         result.put(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE, referenceType);
+        result.put(WSSecurityEngineResult.TAG_TOKEN_ELEMENT, elem);
         if (validator != null) {
             result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
             result.put(WSSecurityEngineResult.TAG_SUBJECT, credential.getSubject());

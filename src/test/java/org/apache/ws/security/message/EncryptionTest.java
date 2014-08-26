@@ -196,11 +196,7 @@ public class EncryptionTest extends org.junit.Assert {
         }
         assertTrue(outputString.indexOf("counter_port_type") == -1 ? true : false);
         
-        // Turn off BSP spec compliance
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setWsiBSPCompliant(false);
-        newEngine.setWssConfig(config);
         List<WSSecurityEngineResult> results = 
             newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
         
@@ -211,17 +207,6 @@ public class EncryptionTest extends org.junit.Assert {
         REFERENCE_TYPE referenceType = 
             (REFERENCE_TYPE)actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
         assertTrue(referenceType == REFERENCE_TYPE.KEY_IDENTIFIER);
-        
-        // Now turn on BSP spec compliance
-        config.setWsiBSPCompliant(true);
-        newEngine.setWssConfig(config);
-        try {
-            newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
-            fail("Failure expected on a bad ValueType attribute");
-        } catch (WSSecurityException ex) {
-            // expected
-        }
-
     }
     
     /**
