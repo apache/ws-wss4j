@@ -203,20 +203,8 @@ public class EncryptionTest extends org.junit.Assert {
         assertFalse(outputString.contains("counter_port_type"));
         
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        
-        try {
-            newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
-            fail("Failure expected on a bad ValueType attribute");
-        } catch (WSSecurityException ex) {
-            // expected
-        }
-        
-        RequestData data = new RequestData();
-        data.setCallbackHandler(keystoreCallbackHandler);
-        data.setDecCrypto(crypto);
-        data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3063));
         List<WSSecurityEngineResult> results = 
-            newEngine.processSecurityHeader(encryptedDoc, "", data);
+            newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
         
         WSSecurityEngineResult actionResult =
                 WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);

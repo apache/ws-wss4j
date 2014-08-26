@@ -342,18 +342,8 @@ public class SignatureTest extends org.junit.Assert {
         }
         
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        try {
-            newEngine.processSecurityHeader(doc, null, null, crypto);
-            fail("Failure expected on a bad ValueType attribute");
-        } catch (WSSecurityException ex) {
-            // expected
-        }
-        
-        RequestData data = new RequestData();
-        data.setSigVerCrypto(crypto);
-        data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3063));
         List<WSSecurityEngineResult> results = 
-            newEngine.processSecurityHeader(signedDoc, "", data);
+            newEngine.processSecurityHeader(doc, null, null, crypto);
 
         WSSecurityEngineResult actionResult =
                 WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);

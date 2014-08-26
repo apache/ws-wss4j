@@ -138,7 +138,8 @@ public final class STRParserUtil {
             String valueType = secRef.getKeyIdentifierValueType();
             if (!SecurityTokenReference.SKI_URI.equals(valueType) 
                 && !SecurityTokenReference.THUMB_URI.equals(valueType)
-                && !WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(valueType)) {
+                && !WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(valueType)
+                && !X509Security.X509_V3_TYPE.equals(valueType)) {
                 bspEnforcer.handleBSPRule(BSPRule.R3063);
             }
         }
