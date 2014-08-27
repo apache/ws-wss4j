@@ -41,6 +41,14 @@ public class MerlinDevice extends Merlin {
         org.apache.commons.logging.LogFactory.getLog(MerlinDevice.class);
     private static final boolean DO_DEBUG = LOG.isDebugEnabled();
 
+    public MerlinDevice() {
+        super();
+    }
+    
+    public MerlinDevice(Properties properties, ClassLoader loader) 
+        throws CredentialException, IOException {
+        super(properties, loader);
+    }
     
     @Override
     public void loadProperties(Properties properties, ClassLoader loader) 
