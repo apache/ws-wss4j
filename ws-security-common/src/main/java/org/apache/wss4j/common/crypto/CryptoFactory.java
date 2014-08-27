@@ -216,9 +216,17 @@ public abstract class CryptoFactory {
             LOG.debug("Using Crypto Engine [" + cryptoClass + "]");
         }
         try {
-            Class<?>[] classes = new Class[]{Map.class, ClassLoader.class};
-            Constructor<? extends Crypto> c = cryptoClass.getConstructor(classes);
-            return c.newInstance(map, loader);
+            Constructor<? extends Crypto> c = null;
+            try {
+                Class<?>[] classes = new Class[]{Map.class, ClassLoader.class};
+                c = cryptoClass.getConstructor(classes);
+                return c.newInstance(map, loader);
+            } catch (NoSuchMethodException ex) {
+                Class<?>[] classes = 
+                    new Class[]{Properties.class, Map.class, PasswordEncryptor.class};
+                c = cryptoClass.getConstructor(classes);
+                return c.newInstance(map, loader, null);
+            }
         } catch (java.lang.Exception e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Unable to instantiate: " + cryptoClass.getName(), e);
@@ -244,9 +252,17 @@ public abstract class CryptoFactory {
             LOG.debug("Using Crypto Engine [" + cryptoClass + "]");
         }
         try {
-            Class<?>[] classes = new Class[]{Properties.class, ClassLoader.class};
-            Constructor<? extends Crypto> c = cryptoClass.getConstructor(classes);
-            return c.newInstance(map, loader);
+            Constructor<? extends Crypto> c = null;
+            try {
+                Class<?>[] classes = new Class[]{Properties.class, ClassLoader.class};
+                c = cryptoClass.getConstructor(classes);
+                return c.newInstance(map, loader);
+            } catch (NoSuchMethodException ex) {
+                Class<?>[] classes = 
+                    new Class[]{Properties.class, ClassLoader.class, PasswordEncryptor.class};
+                c = cryptoClass.getConstructor(classes);
+                return c.newInstance(map, loader, null);
+            }
         } catch (java.lang.Exception e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Unable to instantiate: " + cryptoClass.getName(), e);

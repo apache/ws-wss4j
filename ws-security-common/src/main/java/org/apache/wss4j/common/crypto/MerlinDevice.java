@@ -43,6 +43,14 @@ public class MerlinDevice extends Merlin {
         org.slf4j.LoggerFactory.getLogger(MerlinDevice.class);
     private static final boolean DO_DEBUG = LOG.isDebugEnabled();
 
+    public MerlinDevice() {
+        super();
+    }
+    
+    public MerlinDevice(Properties properties, ClassLoader loader, PasswordEncryptor passwordEncryptor) 
+        throws WSSecurityException, IOException {
+        super(properties, loader, passwordEncryptor);
+    }
     
     @Override
     public void loadProperties(Properties properties, ClassLoader loader,  PasswordEncryptor passwordEncryptor) 

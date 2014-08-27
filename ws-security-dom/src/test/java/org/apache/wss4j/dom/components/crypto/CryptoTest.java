@@ -21,6 +21,7 @@ package org.apache.wss4j.dom.components.crypto;
 
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.util.Properties;
 
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
@@ -134,6 +135,24 @@ public class CryptoTest extends org.junit.Assert {
         } catch (WSSecurityException ex) {
             // expected
         }
+    }
+    
+    @org.junit.Test
+    public void testCryptoFactoryMerlin() throws Exception {
+        ClassLoader classLoader = this.getClass().getClassLoader();
+        Properties properties = CryptoFactory.getProperties("crypto.properties", classLoader);
+        Crypto crypto = 
+            CryptoFactory.getInstance(properties, classLoader, null);
+        assertTrue(crypto instanceof Merlin);
+    }
+    
+    @org.junit.Test
+    public void testCryptoFactoryMerlinDevice() throws Exception {
+        ClassLoader classLoader = this.getClass().getClassLoader();
+        Properties properties = CryptoFactory.getProperties("crypto_device.properties", classLoader);
+        Crypto crypto = 
+            CryptoFactory.getInstance(properties, classLoader, null);
+        assertTrue(crypto instanceof Merlin);
     }
     
     /**
