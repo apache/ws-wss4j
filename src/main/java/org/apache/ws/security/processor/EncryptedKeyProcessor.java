@@ -19,6 +19,7 @@
 
 package org.apache.ws.security.processor;
 
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.security.spec.MGF1ParameterSpec;
@@ -212,7 +213,7 @@ public class EncryptedKeyProcessor implements Processor {
     private static byte[] getRandomKey(List<String> dataRefURIs, Document doc, WSDocInfo wsDocInfo) throws WSSecurityException {
         try {
             String alg = "AES";
-            int size = 128;
+            int size = 16;
             if (!dataRefURIs.isEmpty()) {
                 String uri = dataRefURIs.iterator().next();
                 Element ee = ReferenceListProcessor.findEncryptedDataElement(doc, wsDocInfo, uri);
@@ -224,8 +225,16 @@ public class EncryptedKeyProcessor implements Processor {
             kgen.init(size * 8);
             SecretKey k = kgen.generateKey();
             return k.getEncoded();
-        } catch (Exception ex) {
-            throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, ex);
+        } catch (Throwable ex) {
+            // Fallback to just using AES to avoid attacks on EncryptedData algorithms
+            try {
+                KeyGenerator kgen = KeyGenerator.getInstance("AES");
+                kgen.init(128);
+                SecretKey k = kgen.generateKey();
+                return k.getEncoded();
+            } catch (NoSuchAlgorithmException e) {
+                throw new WSSecurityException(WSSecurityException.FAILED_CHECK, null, null, e);
+            }
         }
     }
     
