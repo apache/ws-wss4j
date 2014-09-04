@@ -20,6 +20,7 @@
 package org.apache.ws.security.spnego;
 
 import java.security.Principal;
+import java.security.PrivilegedActionException;
 import java.util.Set;
 
 import javax.security.auth.Subject;
@@ -28,7 +29,12 @@ import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.message.token.KerberosClientExceptionAction;
+import org.apache.ws.security.message.token.KerberosContext;
+import org.apache.ws.security.message.token.KerberosServiceContext;
+import org.apache.ws.security.message.token.KerberosServiceExceptionAction;
 import org.ietf.jgss.GSSContext;
+import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.MessageProp;
 
@@ -43,8 +49,10 @@ public class SpnegoTokenContext {
     private GSSContext secContext;
     private byte[] token;
     private boolean mutualAuth;
-    private SpnegoClientAction clientAction = new DefaultSpnegoClientAction();
-    private SpnegoServiceAction serviceAction = new DefaultSpnegoServiceAction();
+    private SpnegoClientAction clientAction;
+    private SpnegoServiceAction serviceAction;
+    private GSSCredential delegationCredential;
+    private Principal spnegoPrincipal;
 
     /**
      * Retrieve a service ticket from a KDC using the Kerberos JAAS module, and set it in this
@@ -59,6 +67,49 @@ public class SpnegoTokenContext {
         CallbackHandler callbackHandler,
         String serviceName
     ) throws WSSecurityException {
+        retrieveServiceTicket(jaasLoginModuleName, callbackHandler, serviceName, false);
+    }
+    
+    
+    /**
+     * Retrieve a service ticket from a KDC using the Kerberos JAAS module, and set it in this
+     * BinarySecurityToken.
+     * @param jaasLoginModuleName the JAAS Login Module name to use
+     * @param callbackHandler a CallbackHandler instance to retrieve a password (optional)
+     * @param serviceName the desired Kerberized service
+     * @param serviceNameForm 
+     * @throws WSSecurityException
+     */
+    public void retrieveServiceTicket(
+        String jaasLoginModuleName, 
+        CallbackHandler callbackHandler,
+        String serviceName,
+        boolean isUsernameServiceNameForm
+    ) throws WSSecurityException {
+        retrieveServiceTicket(jaasLoginModuleName, callbackHandler, serviceName, 
+                              isUsernameServiceNameForm, false, null);
+    }
+    
+    /**
+     * Retrieve a service ticket from a KDC using the Kerberos JAAS module, and set it in this
+     * BinarySecurityToken.
+     * @param jaasLoginModuleName the JAAS Login Module name to use
+     * @param callbackHandler a CallbackHandler instance to retrieve a password (optional)
+     * @param serviceName the desired Kerberized service
+     * @param serviceNameForm 
+     * @param requestCredDeleg Whether to request credential delegation or not
+     * @param delegationCredential The delegation credential to use
+     * @throws WSSecurityException
+     */
+    public void retrieveServiceTicket(
+        String jaasLoginModuleName, 
+        CallbackHandler callbackHandler,
+        String serviceName,
+        boolean isUsernameServiceNameForm,
+        boolean requestCredDeleg,
+        GSSCredential delegationCredential
+    ) throws WSSecurityException {
+        
         // Get a TGT from the KDC using JAAS
         LoginContext loginContext = null;
         try {
@@ -94,16 +145,49 @@ public class SpnegoTokenContext {
         }
         
         // Get the service ticket
-        clientAction.setServiceName(serviceName);
-        clientAction.setMutualAuth(mutualAuth);
-        token = (byte[])Subject.doAs(clientSubject, clientAction);
-        if (token == null) {
-            throw new WSSecurityException(
-                WSSecurityException.FAILURE, "kerberosServiceTicketError"
-            );
+        if (clientAction != null) {
+            clientAction.setServiceName(serviceName);
+            clientAction.setMutualAuth(mutualAuth);
+            token = Subject.doAs(clientSubject, clientAction);
+            if (token == null) {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILURE, "kerberosServiceTicketError"
+                );
+            }
+            
+            secContext = clientAction.getContext();
+        } else {
+            KerberosClientExceptionAction action = 
+                new KerberosClientExceptionAction(null, serviceName, 
+                                                  isUsernameServiceNameForm, 
+                                                  requestCredDeleg,
+                                                  delegationCredential,
+                                                  true,
+                                                  mutualAuth);
+            KerberosContext krbCtx = null;
+            try {
+                krbCtx = (KerberosContext) Subject.doAs(clientSubject, action);
+    
+                token = krbCtx.getKerberosToken();
+                if (token == null) {
+                    throw new WSSecurityException(
+                        WSSecurityException.FAILURE, "kerberosServiceTicketError"
+                    );
+                }
+                
+                secContext = krbCtx.getGssContext();
+            } catch (PrivilegedActionException e) {
+                Throwable cause = e.getCause();
+                if (cause instanceof WSSecurityException) {
+                    throw (WSSecurityException) cause;
+                } else {
+                    throw new WSSecurityException(
+                        WSSecurityException.FAILURE, "kerberosServiceTicketError", new Object[] {}, cause
+                    );
+                }
+            }
         }
         
-        secContext = clientAction.getContext();
         if (LOG.isDebugEnabled()) {
             LOG.debug("Successfully retrieved a service ticket");
         }
@@ -123,6 +207,16 @@ public class SpnegoTokenContext {
         CallbackHandler callbackHandler,
         String serviceName,
         byte[] ticket
+    ) throws WSSecurityException {
+        validateServiceTicket(jaasLoginModuleName, callbackHandler, serviceName, ticket, false);
+    }
+    
+    public void validateServiceTicket(
+        String jaasLoginModuleName, 
+        CallbackHandler callbackHandler,
+        String serviceName,
+        byte[] ticket,
+        boolean isUsernameServiceNameForm
     ) throws WSSecurityException {
         // Get a TGT from the KDC using JAAS
         LoginContext loginContext = null;
@@ -164,15 +258,44 @@ public class SpnegoTokenContext {
         }
 
         // Validate the ticket
-        serviceAction.setTicket(ticket);
-        serviceAction.setServiceName(service);
-        token = (byte[])Subject.doAs(subject, serviceAction);
+        if (serviceAction != null) {
+            serviceAction.setTicket(ticket);
+            serviceAction.setServiceName(service);
+            token = Subject.doAs(subject, serviceAction);
+            secContext = serviceAction.getContext();
+        } else {
+            KerberosServiceExceptionAction action = 
+                new KerberosServiceExceptionAction(ticket, service, 
+                                                   isUsernameServiceNameForm, true);
+            KerberosServiceContext krbCtx = null;
+            try {
+                krbCtx = (KerberosServiceContext) Subject.doAs(subject, action);
+    
+                token = krbCtx.getKerberosToken();
+                if (token == null) {
+                    throw new WSSecurityException(
+                        WSSecurityException.FAILURE, "kerberosServiceTicketError"
+                    );
+                }
+                
+                secContext = krbCtx.getGssContext();
+                delegationCredential = krbCtx.getDelegationCredential();
+                spnegoPrincipal = krbCtx.getPrincipal();
+            } catch (PrivilegedActionException e) {
+                Throwable cause = e.getCause();
+                if (cause instanceof WSSecurityException) {
+                    throw (WSSecurityException) cause;
+                } else {
+                    throw new WSSecurityException(
+                         WSSecurityException.FAILURE, "kerberosServiceTicketError", new Object[] {}, cause
+                    );
+                }
+            }
+        }
         
-        secContext = serviceAction.getContext();
         if (LOG.isDebugEnabled()) {
             LOG.debug("Successfully validated a service ticket");
         }
-
     }
     
     /**
@@ -250,6 +373,8 @@ public class SpnegoTokenContext {
     public void clear() {
         token = null;
         mutualAuth = false;
+        delegationCredential = null;
+        spnegoPrincipal = null;
         try {
             secContext.dispose();
         } catch (GSSException e) {
@@ -258,5 +383,13 @@ public class SpnegoTokenContext {
             }
         }
     }
-    
+
+    public GSSCredential getDelegationCredential() {
+        return delegationCredential;
+    }
+
+    public Principal getSpnegoPrincipal() {
+        return spnegoPrincipal;
+    }
+
 }

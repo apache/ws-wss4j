@@ -49,48 +49,63 @@ public class KerberosClientExceptionAction implements PrivilegedExceptionAction<
     private static final String IBM_JGSS_INQUIRE_TYPE_CLASS = "com.ibm.security.jgss.InquireType";
     private static final String IBM_JGSS_EXT_GSSCTX_CLASS = "com.ibm.security.jgss.ExtendedGSSContext";
 
+    private static final String JGSS_KERBEROS_TICKET_OID = "1.2.840.113554.1.2.2";
+    private static final String JGSS_SPNEGO_TICKET_OID = "1.3.6.1.5.5.2";
+    
     private Principal clientPrincipal;
     private String serviceName;
     private boolean isUsernameServiceNameForm;
     private boolean requestCredDeleg;
     private GSSCredential delegatedCredential;
+    private boolean spnego;
+    private boolean mutualAuth;
 
     public KerberosClientExceptionAction(Principal clientPrincipal, String serviceName, 
                                          boolean isUsernameServiceNameForm, boolean requestCredDeleg) {
-        this(clientPrincipal, serviceName, isUsernameServiceNameForm, requestCredDeleg, null);
+        this(clientPrincipal, serviceName, isUsernameServiceNameForm, 
+             requestCredDeleg, null, false, false);
     }
     
     public KerberosClientExceptionAction(Principal clientPrincipal, String serviceName, 
                                          boolean isUsernameServiceNameForm, boolean requestCredDeleg,
-                                         GSSCredential delegatedCredential) {
+                                         GSSCredential delegatedCredential,
+                                         boolean spnego, boolean mutualAuth) {
         this.clientPrincipal = clientPrincipal;
         this.serviceName = serviceName;
         this.isUsernameServiceNameForm = isUsernameServiceNameForm;
         this.requestCredDeleg = requestCredDeleg;
         this.delegatedCredential = delegatedCredential;
+        this.spnego = spnego;
+        this.mutualAuth = mutualAuth;
     }
     
     public KerberosContext run() throws GSSException, WSSecurityException {
         GSSManager gssManager = GSSManager.getInstance();
 
-        Oid kerberos5Oid = new Oid("1.2.840.113554.1.2.2");
-        
+        GSSName gssService = gssManager.createName(serviceName, isUsernameServiceNameForm 
+                                                   ? GSSName.NT_USER_NAME : GSSName.NT_HOSTBASED_SERVICE);
+        Oid oid = null;
         GSSCredential credentials = delegatedCredential;
-        if (credentials == null) {
-            GSSName gssClient = gssManager.createName(clientPrincipal.getName(), GSSName.NT_USER_NAME);
-            credentials = 
-                gssManager.createCredential(
-                    gssClient, GSSCredential.DEFAULT_LIFETIME, kerberos5Oid, GSSCredential.INITIATE_ONLY
-                );
+        if (spnego) {
+            oid = new Oid(JGSS_SPNEGO_TICKET_OID);
+        } else {
+            oid = new Oid(JGSS_KERBEROS_TICKET_OID);
+            
+            if (credentials == null) {
+                GSSName gssClient = gssManager.createName(clientPrincipal.getName(), GSSName.NT_USER_NAME);
+                credentials = 
+                    gssManager.createCredential(
+                        gssClient, GSSCredential.DEFAULT_LIFETIME, oid, GSSCredential.INITIATE_ONLY
+                    );
+            }
         }
 
-        GSSName gssService = gssManager.createName(serviceName, isUsernameServiceNameForm ? GSSName.NT_USER_NAME : GSSName.NT_HOSTBASED_SERVICE);
         GSSContext secContext =
             gssManager.createContext(
-                gssService, kerberos5Oid, credentials, GSSContext.DEFAULT_LIFETIME
+                gssService, oid, credentials, GSSContext.DEFAULT_LIFETIME
             );
 
-        secContext.requestMutualAuth(false);
+        secContext.requestMutualAuth(mutualAuth);
         secContext.requestCredDeleg(requestCredDeleg);
 
         byte[] token = new byte[0];

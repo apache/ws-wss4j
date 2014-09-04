@@ -46,7 +46,8 @@ public class KerberosServiceAction implements PrivilegedAction<Principal> {
     public Principal run() {
         try {
             KerberosServiceExceptionAction action = 
-                new KerberosServiceExceptionAction(this.ticket, this.serviceName, this.isUsernameServiceNameForm);            
+                new KerberosServiceExceptionAction(this.ticket, this.serviceName, 
+                                                   this.isUsernameServiceNameForm, false);            
             KerberosServiceContext krbServiceCtx = action.run();            
             return krbServiceCtx.getPrincipal();
         } catch (Exception e) {

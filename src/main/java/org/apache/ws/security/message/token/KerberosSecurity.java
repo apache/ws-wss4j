@@ -198,7 +198,7 @@ public class KerberosSecurity extends BinarySecurity {
         KerberosClientExceptionAction action = 
             new KerberosClientExceptionAction(clientPrincipals.iterator().next(), serviceName, 
                                               isUsernameServiceNameForm, requestCredDeleg,
-                                              delegatedCredential);
+                                              delegatedCredential, false, false);
         KerberosContext krbCtx = null;
         try {
             krbCtx = (KerberosContext) Subject.doAs(clientSubject, action);

@@ -21,6 +21,7 @@ package org.apache.ws.security.message.token;
 import java.security.Key;
 import java.security.Principal;
 
+import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
 
 
@@ -29,6 +30,8 @@ public class KerberosServiceContext {
     private Principal principal;
     private Key sessionKey;
     private GSSCredential delegationCredential;
+    private GSSContext gssContext;
+    private byte[] kerberosToken;
     
     /**
      * @return the principal
@@ -64,6 +67,22 @@ public class KerberosServiceContext {
 
     public void setDelegationCredential(GSSCredential delegationCredential) {
         this.delegationCredential = delegationCredential;
+    }
+
+    public GSSContext getGssContext() {
+        return gssContext;
+    }
+
+    public void setGssContext(GSSContext gssContext) {
+        this.gssContext = gssContext;
+    }
+
+    public byte[] getKerberosToken() {
+        return kerberosToken;
+    }
+
+    public void setKerberosToken(byte[] kerberosToken) {
+        this.kerberosToken = kerberosToken;
     }
     
 }
