@@ -52,17 +52,21 @@ public class KerberosServiceExceptionAction implements PrivilegedExceptionAction
     private static final String EXTENDED_JGSS_CONTEXT_INQUIRE_TYPE_KRB5_GET_SESSION_KEY = "KRB5_GET_SESSION_KEY";
 
     private static final String JGSS_KERBEROS_TICKET_OID = "1.2.840.113554.1.2.2";
+    private static final String JGSS_SPNEGO_TICKET_OID = "1.3.6.1.5.5.2";
 
     private static final String KERBEROS_TICKET_VALIDATION_ERROR_MSG_ID = "kerberosTicketValidationError";
 
     private byte[] ticket;
     private String serviceName;
     private boolean isUsernameServiceNameForm;
+    private boolean spnego;
 
-    public KerberosServiceExceptionAction(byte[] ticket, String serviceName, boolean isUsernameServiceNameForm) {
+    public KerberosServiceExceptionAction(byte[] ticket, String serviceName, boolean isUsernameServiceNameForm,
+                                          boolean spnego) {
         this.ticket = ticket;
         this.serviceName = serviceName;
         this.isUsernameServiceNameForm = isUsernameServiceNameForm;
+        this.spnego = spnego;
     }
 
 
@@ -73,19 +77,25 @@ public class KerberosServiceExceptionAction implements PrivilegedExceptionAction
 
         GSSManager gssManager = GSSManager.getInstance();
 
-        Oid kerberos5Oid = new Oid(JGSS_KERBEROS_TICKET_OID);
-        GSSName gssService = gssManager.createName(serviceName, isUsernameServiceNameForm ? GSSName.NT_USER_NAME : GSSName.NT_HOSTBASED_SERVICE);
-        GSSCredential credentials = 
-            gssManager.createCredential(
-                gssService, GSSCredential.DEFAULT_LIFETIME, kerberos5Oid, GSSCredential.ACCEPT_ONLY
-            );
+        GSSContext secContext = null;
+        GSSName gssService = gssManager.createName(serviceName, isUsernameServiceNameForm 
+                                                   ? GSSName.NT_USER_NAME : GSSName.NT_HOSTBASED_SERVICE);
+        if (spnego) {
+            Oid oid = new Oid(JGSS_SPNEGO_TICKET_OID);
+            secContext = gssManager.createContext(gssService, oid, null, GSSContext.DEFAULT_LIFETIME);
+        } else {
+            Oid oid = new Oid(JGSS_KERBEROS_TICKET_OID);
+            GSSCredential credentials = 
+                gssManager.createCredential(
+                    gssService, GSSCredential.DEFAULT_LIFETIME, oid, GSSCredential.ACCEPT_ONLY
+                );
+            secContext = gssManager.createContext(credentials);
+        }
 
         KerberosServiceContext krbServiceCtx = null;
-        GSSContext secContext = null;
 
         try{
-            secContext = gssManager.createContext(credentials);
-            secContext.acceptSecContext(ticket, 0, ticket.length);
+            byte[] returnedToken = secContext.acceptSecContext(ticket, 0, ticket.length);
 
             krbServiceCtx = new KerberosServiceContext();         
             
@@ -95,6 +105,8 @@ public class KerberosServiceExceptionAction implements PrivilegedExceptionAction
             
             GSSName clientName = secContext.getSrcName();
             krbServiceCtx.setPrincipal(new KerberosPrincipal(clientName.toString()));
+            krbServiceCtx.setGssContext(secContext);
+            krbServiceCtx.setKerberosToken(returnedToken);
             
             if (!isJava5Or6 && (isOracleJavaVendor || isIBMJavaVendor)) {
                 try {
@@ -134,7 +146,7 @@ public class KerberosServiceExceptionAction implements PrivilegedExceptionAction
                 }      
             }            
         } finally {
-            if (null != secContext) {
+            if (null != secContext && !spnego) {
                 secContext.dispose();    
             }
         }               
