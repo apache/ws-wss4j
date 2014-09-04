@@ -148,7 +148,7 @@ public class SpnegoTokenContext {
         if (clientAction != null) {
             clientAction.setServiceName(serviceName);
             clientAction.setMutualAuth(mutualAuth);
-            token = Subject.doAs(clientSubject, clientAction);
+            token = (byte[])Subject.doAs(clientSubject, clientAction);
             if (token == null) {
                 throw new WSSecurityException(
                     WSSecurityException.FAILURE, "kerberosServiceTicketError"
@@ -261,7 +261,7 @@ public class SpnegoTokenContext {
         if (serviceAction != null) {
             serviceAction.setTicket(ticket);
             serviceAction.setServiceName(service);
-            token = Subject.doAs(subject, serviceAction);
+            token = (byte[])Subject.doAs(subject, serviceAction);
             secContext = serviceAction.getContext();
         } else {
             KerberosServiceExceptionAction action = 
