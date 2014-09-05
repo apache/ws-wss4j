@@ -390,7 +390,12 @@ public abstract class WSHandler {
             int act = actInt;
             if (act == WSConstants.SC || act == WSConstants.BST) {
                 continue;
+            } else if (act == WSConstants.ENCR
+                && (result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS) == null
+                    || ((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS)).isEmpty())) {
+                continue;
             }
+                
             
             if (!recordedActions.remove(actInt)) {
                 return false;
