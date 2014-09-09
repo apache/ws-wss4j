@@ -19,6 +19,8 @@
 
 package org.apache.wss4j.dom.saml;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.security.Key;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -27,6 +29,7 @@ import java.util.List;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -928,6 +931,30 @@ public class SamlTokenTest extends org.junit.Assert {
         
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
         assertTrue(actionResult != null);
+    }
+    
+    @org.junit.Test
+    public void testAssertionWrapper() throws Exception {
+        SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+        callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+        String assertionString = samlAssertion.assertionToString();
+        
+        // Convert String to DOM + into an assertionWrapper
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        
+        InputStream in = new ByteArrayInputStream(assertionString.getBytes());
+        Document newDoc = dbf.newDocumentBuilder().parse(in);
+        
+        SamlAssertionWrapper newAssertion = 
+            new SamlAssertionWrapper(newDoc.getDocumentElement());
+        String secondAssertionString = newAssertion.assertionToString();
+        assertEquals(assertionString, secondAssertionString);
     }
     
     private void encryptElement(
