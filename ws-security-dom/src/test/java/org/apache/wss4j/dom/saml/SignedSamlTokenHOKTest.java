@@ -139,16 +139,24 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         assertTrue(receivedSamlAssertion.isSigned());
         assertTrue(receivedSamlAssertion.getSignatureValue() != null);
         
-        // Test we processed a signature (SOAP body)
-        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
-        assertTrue(actionResult != null);
-        assertFalse(actionResult.isEmpty());
-        final List<WSDataRef> refs =
+        // Test we have a WSDataRef for the signed SAML token as well
+        List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);
         
         WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
+        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Header/wsse:Security/saml1:Assertion", xpath);
+        
+        // Test we processed a signature (SOAP body)
+        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        assertTrue(actionResult != null);
+        assertFalse(actionResult.isEmpty());
+        refs = (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        assertTrue(refs.size() == 1);
+        
+        wsDataRef = refs.get(0);
+        xpath = wsDataRef.getXpath();
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
     }
     
