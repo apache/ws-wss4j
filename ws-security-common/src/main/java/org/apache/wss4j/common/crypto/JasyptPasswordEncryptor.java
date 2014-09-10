@@ -41,6 +41,7 @@ public class JasyptPasswordEncryptor implements PasswordEncryptor {
         org.slf4j.LoggerFactory.getLogger(JasyptPasswordEncryptor.class);
     
     private final StandardPBEStringEncryptor passwordEncryptor;
+    private CallbackHandler callbackHandler;
     
     public JasyptPasswordEncryptor(String masterPassword) {
         this(masterPassword, DEFAULT_ALGORITHM);
@@ -59,19 +60,7 @@ public class JasyptPasswordEncryptor implements PasswordEncryptor {
     public JasyptPasswordEncryptor(CallbackHandler callbackHandler, String algorithm) {
         passwordEncryptor = new StandardPBEStringEncryptor();
         passwordEncryptor.setAlgorithm(algorithm);
-        
-        WSPasswordCallback pwCb = 
-            new WSPasswordCallback("", WSPasswordCallback.PASSWORD_ENCRYPTOR_PASSWORD);
-        try {
-            callbackHandler.handle(new Callback[]{pwCb});
-        } catch (IOException e) {
-            LOG.debug("Error in getting master password: ", e);
-        } catch (UnsupportedCallbackException e) {
-            LOG.debug("Error in getting master password: ", e);
-        }
-        if (pwCb.getPassword() != null) {
-            passwordEncryptor.setPassword(pwCb.getPassword());
-        }
+        this.callbackHandler = callbackHandler;
     }
 
     /**
@@ -80,6 +69,20 @@ public class JasyptPasswordEncryptor implements PasswordEncryptor {
      * @return the encrypted password
      */
     public String encrypt(String password) {
+        if (callbackHandler != null) {
+            WSPasswordCallback pwCb = 
+                new WSPasswordCallback("", WSPasswordCallback.PASSWORD_ENCRYPTOR_PASSWORD);
+            try {
+                callbackHandler.handle(new Callback[]{pwCb});
+            } catch (IOException e) {
+                LOG.debug("Error in getting master password: ", e);
+            } catch (UnsupportedCallbackException e) {
+                LOG.debug("Error in getting master password: ", e);
+            }
+            if (pwCb.getPassword() != null) {
+                passwordEncryptor.setPassword(pwCb.getPassword());
+            }
+        }
         return passwordEncryptor.encrypt(password);
     }
     
@@ -89,6 +92,20 @@ public class JasyptPasswordEncryptor implements PasswordEncryptor {
      * @return the decrypted password
      */
     public String decrypt(String encryptedPassword) {
+        if (callbackHandler != null) {
+            WSPasswordCallback pwCb = 
+                new WSPasswordCallback("", WSPasswordCallback.PASSWORD_ENCRYPTOR_PASSWORD);
+            try {
+                callbackHandler.handle(new Callback[]{pwCb});
+            } catch (IOException e) {
+                LOG.debug("Error in getting master password: ", e);
+            } catch (UnsupportedCallbackException e) {
+                LOG.debug("Error in getting master password: ", e);
+            }
+            if (pwCb.getPassword() != null) {
+                passwordEncryptor.setPassword(pwCb.getPassword());
+            }
+        }
         return passwordEncryptor.decrypt(encryptedPassword);
     }
     
