@@ -27,6 +27,8 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.builder.SAML1Constants;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;
@@ -59,6 +61,12 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
      * If this is set, then the value must appear as one of the Subject Confirmation Methods
      */
     private String requiredSubjectConfirmationMethod;
+    
+    /**
+     * If this is set, at least one of the standard Subject Confirmation Methods *must*
+     * be present in the assertion (Bearer / SenderVouches / HolderOfKey).
+     */
+    private boolean requireStandardSubjectConfirmationMethod = true;
     
     /**
      * Set the time in seconds in the future within which the NotBefore time of an incoming 
@@ -109,15 +117,21 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
     ) throws WSSecurityException {
         
         List<String> methods = samlAssertion.getConfirmationMethods();
-        if ((methods == null || methods.isEmpty()) 
-            && requiredSubjectConfirmationMethod != null) {
-            LOG.debug("A required subject confirmation method was not present");
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+        if (methods == null || methods.isEmpty()) {
+            if (requiredSubjectConfirmationMethod != null) {
+                LOG.debug("A required subject confirmation method was not present");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
                                           "invalidSAMLsecurity");
+            } else if (requireStandardSubjectConfirmationMethod) {
+                LOG.debug("A standard subject confirmation method was not present");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+                                          "invalidSAMLsecurity");
+            }
         }
         
         boolean signed = samlAssertion.isSigned();
         boolean requiredMethodFound = false;
+        boolean standardMethodFound = false;
         for (String method : methods) {
             if (OpenSAMLUtil.isMethodHolderOfKey(method)) {
                 if (samlAssertion.getSubjectKeyInfo() == null) {
@@ -130,10 +144,19 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
                     LOG.debug("A holder-of-key assertion must be signed");
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
                 }
+                standardMethodFound = true;
             }
             
-            if (method != null && method.equals(requiredSubjectConfirmationMethod)) {
-                requiredMethodFound = true;
+            if (method != null) {
+                if (method.equals(requiredSubjectConfirmationMethod)) {
+                    requiredMethodFound = true;
+                }
+                if (SAML2Constants.CONF_BEARER.equals(method)
+                    || SAML2Constants.CONF_SENDER_VOUCHES.equals(method)
+                    || SAML1Constants.CONF_BEARER.equals(method)
+                    || SAML1Constants.CONF_SENDER_VOUCHES.equals(method)) {
+                    standardMethodFound = true;
+                }
             }
         }
         
@@ -141,6 +164,12 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
             LOG.debug("A required subject confirmation method was not present");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
                                           "invalidSAMLsecurity");
+        }
+        
+        if (!standardMethodFound && requireStandardSubjectConfirmationMethod) {
+            LOG.debug("A standard subject confirmation method was not present");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+                                      "invalidSAMLsecurity");
         }
     }
     
@@ -234,6 +263,14 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
 
     public void setRequiredSubjectConfirmationMethod(String requiredSubjectConfirmationMethod) {
         this.requiredSubjectConfirmationMethod = requiredSubjectConfirmationMethod;
+    }
+
+    public boolean isRequireStandardSubjectConfirmationMethod() {
+        return requireStandardSubjectConfirmationMethod;
+    }
+
+    public void setRequireStandardSubjectConfirmationMethod(boolean requireStandardSubjectConfirmationMethod) {
+        this.requireStandardSubjectConfirmationMethod = requireStandardSubjectConfirmationMethod;
     }
     
 }

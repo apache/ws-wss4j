@@ -1010,6 +1010,45 @@ public class SamlTokenTest extends org.junit.Assert {
         }
     }
     
+    @org.junit.Test
+    public void testStandardSubjectConfirmationMethod() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        callbackHandler.setConfirmationMethod("urn:oasis:names:tc:SAML:2.0:cm:custom");
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        try {
+            newEngine.processSecurityHeader(unsignedDoc, null, null, null);
+            fail("Failure expected on an unknown subject confirmation method");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+
+        // Now disable this check
+        WSSConfig config = WSSConfig.getNewInstance();
+        SamlAssertionValidator assertionValidator = new SamlAssertionValidator();
+        assertionValidator.setRequireStandardSubjectConfirmationMethod(false);
+        config.setValidator(WSSecurityEngine.SAML_TOKEN, assertionValidator);
+        config.setValidator(WSSecurityEngine.SAML2_TOKEN, assertionValidator);
+        config.setValidateSamlSubjectConfirmation(false);
+        
+        newEngine.setWssConfig(config);
+        newEngine.processSecurityHeader(unsignedDoc, null, null, null);
+    }
+    
     private void encryptElement(
         Document document,
         Element elementToEncrypt,
