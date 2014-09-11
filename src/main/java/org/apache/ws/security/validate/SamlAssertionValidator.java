@@ -58,6 +58,11 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
     private boolean validateSignatureAgainstProfile = true;
     
     /**
+     * If this is set, then the value must appear as one of the Subject Confirmation Methods
+     */
+    private String requiredSubjectConfirmationMethod;
+    
+    /**
      * Set the time in seconds in the future within which the NotBefore time of an incoming 
      * Assertion is valid. The default is 60 seconds.
      */
@@ -79,23 +84,8 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         }
         AssertionWrapper assertion = credential.getAssertion();
         
-        // Check HOK requirements
-        String confirmMethod = null;
-        List<String> methods = assertion.getConfirmationMethods();
-        if (methods != null && methods.size() > 0) {
-            confirmMethod = methods.get(0);
-        }
-        if (OpenSAMLUtil.isMethodHolderOfKey(confirmMethod)) {
-            if (assertion.getSubjectKeyInfo() == null) {
-                LOG.debug("There is no Subject KeyInfo to match the holder-of-key subject conf method");
-                throw new WSSecurityException(WSSecurityException.FAILURE, "noKeyInSAMLToken");
-            }
-            // The assertion must have been signed for HOK
-            if (!assertion.isSigned()) {
-                LOG.debug("A holder-of-key assertion must be signed");
-                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
-            }
-        }
+        // Check the Subject Confirmation requirements
+        verifySubjectConfirmationMethod(assertion);
         
         // Check conditions
         checkConditions(assertion);
@@ -111,6 +101,49 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
             verifySignedAssertion(assertion, data);
         }
         return credential;
+    }
+    
+    /**
+     * Check the Subject Confirmation method requirements
+     */
+    protected void verifySubjectConfirmationMethod(
+        AssertionWrapper samlAssertion
+    ) throws WSSecurityException {
+        
+        List<String> methods = samlAssertion.getConfirmationMethods();
+        if ((methods == null || methods.isEmpty()) 
+            && requiredSubjectConfirmationMethod != null) {
+            LOG.debug("A required subject confirmation method was not present");
+            throw new WSSecurityException(WSSecurityException.FAILURE, 
+                                          "invalidSAMLsecurity");
+        }
+        
+        boolean signed = samlAssertion.isSigned();
+        boolean requiredMethodFound = false;
+        for (String method : methods) {
+            if (OpenSAMLUtil.isMethodHolderOfKey(method)) {
+                if (samlAssertion.getSubjectKeyInfo() == null) {
+                    LOG.debug("There is no Subject KeyInfo to match the holder-of-key subject conf method");
+                    throw new WSSecurityException(WSSecurityException.FAILURE, "noKeyInSAMLToken");
+                }
+                
+                // The assertion must have been signed for HOK
+                if (!signed) {
+                    LOG.debug("A holder-of-key assertion must be signed");
+                    throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+                }
+            }
+            
+            if (method != null && method.equals(requiredSubjectConfirmationMethod)) {
+                requiredMethodFound = true;
+            }
+        }
+        
+        if (!requiredMethodFound && requiredSubjectConfirmationMethod != null) {
+            LOG.debug("A required subject confirmation method was not present");
+            throw new WSSecurityException(WSSecurityException.FAILURE, 
+                                          "invalidSAMLsecurity");
+        }
     }
     
     /**
@@ -251,6 +284,14 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
      */
     public void setValidateSignatureAgainstProfile(boolean validateSignatureAgainstProfile) {
         this.validateSignatureAgainstProfile = validateSignatureAgainstProfile;
+    }
+
+    public String getRequiredSubjectConfirmationMethod() {
+        return requiredSubjectConfirmationMethod;
+    }
+
+    public void setRequiredSubjectConfirmationMethod(String requiredSubjectConfirmationMethod) {
+        this.requiredSubjectConfirmationMethod = requiredSubjectConfirmationMethod;
     }
     
 }

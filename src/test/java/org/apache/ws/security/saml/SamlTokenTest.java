@@ -52,8 +52,10 @@ import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.SAMLParms;
 import org.apache.ws.security.saml.ext.bean.SubjectConfirmationDataBean;
 import org.apache.ws.security.saml.ext.builder.SAML1Constants;
+import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.XMLUtils;
+import org.apache.ws.security.validate.SamlAssertionValidator;
 import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.EncryptedKey;
 import org.apache.xml.security.encryption.XMLCipher;
@@ -957,6 +959,56 @@ public class SamlTokenTest extends org.junit.Assert {
         
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
         assertTrue(actionResult != null);
+    }
+    
+    @org.junit.Test
+    public void testRequiredSubjectConfirmationMethod() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper samlAssertion = new AssertionWrapper(samlParms);
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+
+        WSSConfig config = WSSConfig.getNewInstance();
+        SamlAssertionValidator assertionValidator = new SamlAssertionValidator();
+        assertionValidator.setRequiredSubjectConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
+        config.setValidator(WSSecurityEngine.SAML_TOKEN, assertionValidator);
+        config.setValidator(WSSecurityEngine.SAML2_TOKEN, assertionValidator);
+        
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        newEngine.setWssConfig(config);
+        newEngine.processSecurityHeader(unsignedDoc, null, null, null);
+        
+        // Now create a Bearer assertion
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+        
+        samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        samlAssertion = new AssertionWrapper(samlParms);
+
+        wsSign = new WSSecSAMLToken();
+
+        doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        try {
+            newEngine.processSecurityHeader(unsignedDoc, null, null, null);
+            fail("Failure expected on an incorrect subject confirmation method");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
     }
     
     private void encryptElement(
