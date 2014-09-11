@@ -1011,6 +1011,44 @@ public class SamlTokenTest extends org.junit.Assert {
         }
     }
     
+    @org.junit.Test
+    public void testStandardSubjectConfirmationMethod() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        callbackHandler.setConfirmationMethod("urn:oasis:names:tc:SAML:2.0:cm:custom");
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper samlAssertion = new AssertionWrapper(samlParms);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        try {
+            newEngine.processSecurityHeader(unsignedDoc, null, null, null);
+            fail("Failure expected on an unknown subject confirmation method");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+
+        // Now disable this check
+        WSSConfig config = WSSConfig.getNewInstance();
+        SamlAssertionValidator assertionValidator = new SamlAssertionValidator();
+        assertionValidator.setRequireStandardSubjectConfirmationMethod(false);
+        config.setValidator(WSSecurityEngine.SAML_TOKEN, assertionValidator);
+        config.setValidator(WSSecurityEngine.SAML2_TOKEN, assertionValidator);
+        
+        newEngine.setWssConfig(config);
+        newEngine.processSecurityHeader(unsignedDoc, null, null, null);
+    }
+    
     private void encryptElement(
         Document document,
         Element elementToEncrypt,
