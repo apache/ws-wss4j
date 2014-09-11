@@ -19,10 +19,12 @@
 package org.apache.wss4j.stax.validate;
 
 import java.util.Date;
+import java.util.List;
 
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.stax.securityToken.SamlSecurityToken;
 import org.apache.wss4j.stax.impl.securityToken.SamlSecurityTokenImpl;
@@ -33,6 +35,9 @@ import org.opensaml.common.SAMLVersion;
 
 public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implements SamlTokenValidator {
     
+    private static final transient org.slf4j.Logger LOG =
+        org.slf4j.LoggerFactory.getLogger(SamlTokenValidatorImpl.class);
+                                          
     /**
      * The time in seconds in the future within which the NotBefore time of an incoming
      * Assertion is valid. The default is 60 seconds.
@@ -44,6 +49,11 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
      * relevant profile. Default is true.
      */
     private boolean validateSignatureAgainstProfile = true;
+    
+    /**
+     * If this is set, then the value must appear as one of the Subject Confirmation Methods
+     */
+    private String requiredSubjectConfirmationMethod;
 
     /**
      * Set the time in seconds in the future within which the NotBefore time of an incoming
@@ -68,6 +78,14 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
     public void setValidateSignatureAgainstProfile(boolean validateSignatureAgainstProfile) {
         this.validateSignatureAgainstProfile = validateSignatureAgainstProfile;
     }
+    
+    public String getRequiredSubjectConfirmationMethod() {
+        return requiredSubjectConfirmationMethod;
+    }
+
+    public void setRequiredSubjectConfirmationMethod(String requiredSubjectConfirmationMethod) {
+        this.requiredSubjectConfirmationMethod = requiredSubjectConfirmationMethod;
+    }
 
     @Override
     public <T extends SamlSecurityToken & InboundSecurityToken> T validate(final SamlAssertionWrapper samlAssertionWrapper,
@@ -75,6 +93,9 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
                                                  final TokenContext tokenContext) throws WSSecurityException {
         // Check conditions
         checkConditions(samlAssertionWrapper);
+        
+        // Check the Subject Confirmation requirements
+        verifySubjectConfirmationMethod(samlAssertionWrapper);
         
         // Check OneTimeUse Condition
         checkOneTimeUse(samlAssertionWrapper, 
@@ -101,6 +122,41 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
         return token;
     }
 
+    /**
+     * Check the Subject Confirmation method requirements
+     */
+    protected void verifySubjectConfirmationMethod(
+        SamlAssertionWrapper samlAssertion
+    ) throws WSSecurityException {
+        
+        List<String> methods = samlAssertion.getConfirmationMethods();
+        if ((methods == null || methods.isEmpty()) 
+            && requiredSubjectConfirmationMethod != null) {
+            LOG.debug("A required subject confirmation method was not present");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+                                          "invalidSAMLsecurity");
+        }
+        
+        boolean signed = samlAssertion.isSigned();
+        boolean requiredMethodFound = false;
+        for (String method : methods) {
+            // The assertion must have been signed for HOK
+            if (OpenSAMLUtil.isMethodHolderOfKey(method) && !signed) {
+                LOG.debug("A holder-of-key assertion must be signed");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+            }
+            
+            if (method != null && method.equals(requiredSubjectConfirmationMethod)) {
+                requiredMethodFound = true;
+            }
+        }
+        
+        if (!requiredMethodFound && requiredSubjectConfirmationMethod != null) {
+            LOG.debug("A required subject confirmation method was not present");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+                                          "invalidSAMLsecurity");
+        }
+    }
     
     /**
      * Check the Conditions of the Assertion.

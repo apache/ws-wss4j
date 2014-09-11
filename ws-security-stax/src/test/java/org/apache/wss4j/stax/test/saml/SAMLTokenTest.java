@@ -26,6 +26,7 @@ import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
@@ -42,6 +43,7 @@ import org.apache.wss4j.stax.test.AbstractTestBase;
 import org.apache.wss4j.stax.test.utils.SOAPUtil;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
+import org.apache.wss4j.stax.validate.SamlTokenValidatorImpl;
 import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.EncryptedKey;
 import org.apache.xml.security.encryption.XMLCipher;
@@ -64,6 +66,7 @@ import org.w3c.dom.NodeList;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
@@ -924,6 +927,99 @@ public class SAMLTokenTest extends AbstractTestBase {
             NodeList nodeList = 
                 document.getElementsByTagNameNS(WSSConstants.TAG_saml2_Assertion.getNamespaceURI(), WSSConstants.TAG_saml2_Assertion.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
+        }
+    }
+    
+    @Test
+    public void testRequiredSubjectConfirmationMethod() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+            callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+            callbackHandler.setIssuer("www.example.com");
+            callbackHandler.setSignAssertion(false);
+
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED + " " + WSHandlerConstants.SIGNATURE;
+            Properties properties = new Properties();
+            properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
+            properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{urn:oasis:names:tc:SAML:2.0:assertion}Assertion;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            //some test that we can really sure we get what we want from WSS4J
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
+
+        // Test that we have a SenderVouches assertion
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setSamlCallbackHandler(new SAMLCallbackHandlerImpl());
+            
+            SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
+            validator.setRequiredSubjectConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
+            securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
+            securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
+            
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+
+            //header element must still be there
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+        }
+        
+        baos = new ByteArrayOutputStream();
+        // Now create a Bearer assertion
+        {
+            SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+            callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+            callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+            callbackHandler.setIssuer("www.example.com");
+            callbackHandler.setSignAssertion(false);
+
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED + " " + WSHandlerConstants.SIGNATURE;
+            Properties properties = new Properties();
+            properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
+            properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{urn:oasis:names:tc:SAML:2.0:assertion}Assertion;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            //some test that we can really sure we get what we want from WSS4J
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
+
+        // Test that we have a SenderVouches assertion
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setSamlCallbackHandler(new SAMLCallbackHandlerImpl());
+            
+            SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
+            validator.setRequiredSubjectConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
+            securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
+            securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
+            
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            try {
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                fail("Failure expected on a Bearer assertion");
+            }  catch (XMLStreamException e) {
+                // expected
+            }
         }
     }
     

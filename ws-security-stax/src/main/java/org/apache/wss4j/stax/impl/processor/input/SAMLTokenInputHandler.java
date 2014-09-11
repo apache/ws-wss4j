@@ -157,15 +157,20 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             }
         }
 
-        String confirmMethod = null;
+        final InboundSecurityToken subjectSecurityToken;
+        
         List<String> methods = samlAssertionWrapper.getConfirmationMethods();
-        if (methods != null && methods.size() > 0) {
-            confirmMethod = methods.get(0);
+        boolean holderOfKey = false;
+        if (methods != null) {
+            for (String method : methods) {
+                if (OpenSAMLUtil.isMethodHolderOfKey(method)) {
+                    holderOfKey = true;
+                    break;
+                }
+            }
         }
 
-        final InboundSecurityToken subjectSecurityToken;
-
-        if (OpenSAMLUtil.isMethodHolderOfKey(confirmMethod)) {
+        if (holderOfKey) {
 
             // First try to get the credential from a CallbackHandler
             final byte[] subjectSecretKey = SAMLUtil.getSecretKeyFromCallbackHandler(
@@ -200,11 +205,6 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                     }
                 };
             } else {
-                // The assertion must have been signed for HOK
-                if (!samlAssertionWrapper.isSigned()) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "invalidSAMLsecurity");
-                }
-
                 int subjectKeyInfoIndex = getSubjectKeyInfoIndex(eventQueue);
                 if (subjectKeyInfoIndex < 0) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "noKeyInSAMLToken");
