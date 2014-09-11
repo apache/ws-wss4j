@@ -1084,6 +1084,67 @@ public class SAMLTokenTest extends AbstractTestBase {
         }
     }
     
+    @Test
+    public void testUnsignedBearer() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+            callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+            callbackHandler.setIssuer("www.example.com");
+            callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+            callbackHandler.setSignAssertion(false);
+
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED + " " + WSHandlerConstants.SIGNATURE;
+            Properties properties = new Properties();
+            properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
+            properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{urn:oasis:names:tc:SAML:2.0:assertion}Assertion;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            //some test that we can really sure we get what we want from WSS4J
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 1);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
+
+        // Validate
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setSamlCallbackHandler(new SAMLCallbackHandlerImpl());
+            
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            try {
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                fail("Failure expected on an unsigned bearer token");
+            }  catch (XMLStreamException e) {
+                // expected
+            }
+        }
+        
+        // Validate again - disable the signed Bearer check
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setSamlCallbackHandler(new SAMLCallbackHandlerImpl());
+            
+            SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
+            validator.setRequireBearerSignature(false);
+            securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
+            securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
+            
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+        }
+    }
+    
     private void encryptElement(
         Document document,
         Element elementToEncrypt,

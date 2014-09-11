@@ -46,6 +46,7 @@ import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.dom.validate.SamlAssertionValidator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -476,6 +477,11 @@ public class ReplayTest extends org.junit.Assert {
         }
         
         WSSConfig wssConfig = WSSConfig.getNewInstance();
+        SamlAssertionValidator assertionValidator = new SamlAssertionValidator();
+        assertionValidator.setRequireBearerSignature(false);
+        wssConfig.setValidator(WSSecurityEngine.SAML_TOKEN, assertionValidator);
+        wssConfig.setValidator(WSSecurityEngine.SAML2_TOKEN, assertionValidator);
+        
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);
         data.setCallbackHandler(callbackHandler);
@@ -524,6 +530,11 @@ public class ReplayTest extends org.junit.Assert {
         }
         
         WSSConfig wssConfig = WSSConfig.getNewInstance();
+        SamlAssertionValidator assertionValidator = new SamlAssertionValidator();
+        assertionValidator.setRequireBearerSignature(false);
+        wssConfig.setValidator(WSSecurityEngine.SAML_TOKEN, assertionValidator);
+        wssConfig.setValidator(WSSecurityEngine.SAML2_TOKEN, assertionValidator);
+        
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);
         data.setCallbackHandler(callbackHandler);

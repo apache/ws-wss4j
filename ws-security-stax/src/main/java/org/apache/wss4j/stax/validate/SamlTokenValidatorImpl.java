@@ -62,6 +62,12 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
      * be present in the assertion (Bearer / SenderVouches / HolderOfKey).
      */
     private boolean requireStandardSubjectConfirmationMethod = true;
+    
+    /**
+     * If this is set, an Assertion with a Bearer SubjectConfirmation Method must be
+     * signed 
+     */
+    private boolean requireBearerSignature = true;
 
     /**
      * Set the time in seconds in the future within which the NotBefore time of an incoming
@@ -169,8 +175,14 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
                     requiredMethodFound = true;
                 }
                 if (SAML2Constants.CONF_BEARER.equals(method)
-                    || SAML2Constants.CONF_SENDER_VOUCHES.equals(method)
-                    || SAML1Constants.CONF_BEARER.equals(method)
+                    || SAML1Constants.CONF_BEARER.equals(method)) {
+                    standardMethodFound = true;
+                    if (requireBearerSignature && !signed) {
+                        LOG.debug("A Bearer Assertion was not signed");
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+                                                      "invalidSAMLsecurity");
+                    }
+                } else if (SAML2Constants.CONF_SENDER_VOUCHES.equals(method)
                     || SAML1Constants.CONF_SENDER_VOUCHES.equals(method)) {
                     standardMethodFound = true;
                 }
@@ -242,6 +254,14 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
 
     public void setRequireStandardSubjectConfirmationMethod(boolean requireStandardSubjectConfirmationMethod) {
         this.requireStandardSubjectConfirmationMethod = requireStandardSubjectConfirmationMethod;
+    }
+
+    public boolean isRequireBearerSignature() {
+        return requireBearerSignature;
+    }
+
+    public void setRequireBearerSignature(boolean requireBearerSignature) {
+        this.requireBearerSignature = requireBearerSignature;
     }
     
 }

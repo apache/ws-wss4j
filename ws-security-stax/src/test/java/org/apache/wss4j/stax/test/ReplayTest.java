@@ -39,6 +39,7 @@ import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.test.saml.SAML2CallbackHandler;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
+import org.apache.wss4j.stax.validate.SamlTokenValidatorImpl;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -187,6 +188,12 @@ public class ReplayTest extends AbstractTestBase {
         ReplayCache replayCache = null;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            
+            SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
+            validator.setRequireBearerSignature(false);
+            securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
+            securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
+            
             replayCache = securityProperties.getSamlOneTimeUseReplayCache();
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
@@ -198,6 +205,12 @@ public class ReplayTest extends AbstractTestBase {
         // now process SAML Token again
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            
+            SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
+            validator.setRequireBearerSignature(false);
+            securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
+            securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
+            
             securityProperties.setSamlOneTimeUseReplayCache(replayCache);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
@@ -240,6 +253,12 @@ public class ReplayTest extends AbstractTestBase {
         ReplayCache replayCache = null;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            
+            SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
+            validator.setRequireBearerSignature(false);
+            securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
+            securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
+            
             replayCache = securityProperties.getSamlOneTimeUseReplayCache();
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
@@ -251,6 +270,12 @@ public class ReplayTest extends AbstractTestBase {
         // now process SAML Token again
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            
+            SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
+            validator.setRequireBearerSignature(false);
+            securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
+            securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
+            
             securityProperties.setSamlOneTimeUseReplayCache(replayCache);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
