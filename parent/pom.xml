@@ -45,7 +45,7 @@
         <neethi.version>3.0.3</neethi.version>
         <opensaml.version>2.6.1</opensaml.version>
         <slf4j.version>1.7.7</slf4j.version>
-        <woodstox.core.asl.version>4.4.0</woodstox.core.asl.version>
+        <woodstox.core.asl.version>4.4.1</woodstox.core.asl.version>
         <wsdl4j.version>1.6.3</wsdl4j.version>
         <xalan.version>2.7.2</xalan.version>
         <xerces.version>2.11.0</xerces.version>
