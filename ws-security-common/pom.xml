@@ -172,6 +172,10 @@
                     <artifactId>xalan</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>xalan</groupId>
+                    <artifactId>serializer</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>org.apache.xerces</groupId>
                     <artifactId>serializer</artifactId>
                 </exclusion>
