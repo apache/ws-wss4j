@@ -58,6 +58,16 @@
                 http://mail-archives.apache.org/mod_mbox/ws-users/
             </archive>
         </mailingList>
+        <mailingList>
+            <name>Apache Web Services Commits List</name>
+            <subscribe>commits-subscribe@ws.apache.org</subscribe>
+            <unsubscribe>
+                commits-unsubscribe@ws.apache.org
+            </unsubscribe>
+            <archive>
+                http://mail-archives.apache.org/mod_mbox/ws-commits/
+            </archive>
+        </mailingList>
     </mailingLists>
     <inceptionYear>2004</inceptionYear>
     <licenses>
