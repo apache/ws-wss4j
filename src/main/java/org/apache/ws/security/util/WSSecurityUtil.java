@@ -409,8 +409,8 @@ public final class WSSecurityUtil {
             // start node processing at this point
             if (startNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element se = (Element) startNode;
-                if ((se.hasAttribute("ID") && value.equals(se.getAttributeNS(null, "ID")))
-                    || (se.hasAttribute("AssertionID") 
+                if ((se.hasAttributeNS(null, "ID") && value.equals(se.getAttributeNS(null, "ID")))
+                    || (se.hasAttributeNS(null, "AssertionID") 
                         && value.equals(se.getAttributeNS(null, "AssertionID")))) {
                     if (foundElement == null) {
                         foundElement = se; // Continue searching to find duplicates

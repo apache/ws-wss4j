@@ -58,7 +58,7 @@ public class EncryptedAssertionProcessor implements Processor {
         }
         
         // Type must be "Element" if specified
-        String typeStr = encryptedDataElement.getAttribute("Type");
+        String typeStr = encryptedDataElement.getAttributeNS(null, "Type");
         if (typeStr != null && !(WSConstants.ENC_NS + "Element").equals(typeStr)) {
             throw new WSSecurityException(
                 WSSecurityException.INVALID_SECURITY, "badElement", 
