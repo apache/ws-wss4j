@@ -178,7 +178,7 @@ public class UsernameToken {
         }
         
         if (elementPassword != null) {
-            if (elementPassword.hasAttribute(WSConstants.PASSWORD_TYPE_ATTR)) {
+            if (elementPassword.hasAttributeNS(null, WSConstants.PASSWORD_TYPE_ATTR)) {
                 passwordType = elementPassword.getAttributeNS(null, WSConstants.PASSWORD_TYPE_ATTR);
             } else if (elementPassword.hasAttributeNS(
                 WSConstants.WSSE_NS, WSConstants.PASSWORD_TYPE_ATTR)

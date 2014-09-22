@@ -323,7 +323,7 @@ public class ReferenceListProcessor implements Processor {
         dataRef.setWsuId(dataRefURI);
         dataRef.setAlgorithm(symEncAlgo);
 
-        String typeStr = encData.getAttribute("Type");
+        String typeStr = encData.getAttributeNS(null, "Type");
         if (typeStr != null &&
             (WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY.equals(typeStr) ||
             WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE.equals(typeStr))) {

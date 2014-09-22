@@ -157,8 +157,8 @@ public class WSDocInfo {
                 String samlId = elem.getAttributeNS(null, "AssertionID");
                 String samlId2 = elem.getAttributeNS(null, "ID");
                 if (elem.hasAttributeNS(WSConstants.WSU_NS, "Id") && id.equals(cId)
-                    || elem.hasAttribute("AssertionID") && id.equals(samlId)
-                    || elem.hasAttribute("ID") && id.equals(samlId2)) {
+                    || elem.hasAttributeNS(null, "AssertionID") && id.equals(samlId)
+                    || elem.hasAttributeNS(null, "ID") && id.equals(samlId2)) {
                     return elem;
                 }
             }
