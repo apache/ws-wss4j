@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * WS-Security Test Case for Timestamps.
@@ -819,6 +820,33 @@ public class TimestampTest extends org.junit.Assert {
         WSSecurityEngineResult actionResult = 
             WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
         assertTrue(actionResult != null);
+    }
+    
+    @org.junit.Test
+    public void testThaiLocaleVerification() throws Exception {
+        
+        Locale defaultLocale = Locale.getDefault();
+        try {
+            Locale.setDefault(new Locale("th", "TH"));
+        
+            Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+            WSSecHeader secHeader = new WSSecHeader();
+            secHeader.insertSecurityHeader(doc);
+            
+            WSSecTimestamp timestamp = new WSSecTimestamp();
+            timestamp.setTimeToLive(300);
+            Document createdDoc = timestamp.build(doc, secHeader);
+            
+            //
+            // Do some processing
+            //
+            List<WSSecurityEngineResult> wsResult = verify(createdDoc, WSSConfig.getNewInstance());
+            WSSecurityEngineResult actionResult = 
+                WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
+            assertTrue(actionResult != null);
+        } finally {
+            Locale.setDefault(defaultLocale);
+        }
     }
     
     /**

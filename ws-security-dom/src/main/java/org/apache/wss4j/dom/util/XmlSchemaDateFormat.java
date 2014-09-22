@@ -25,6 +25,7 @@ import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -48,7 +49,7 @@ public class XmlSchemaDateFormat extends DateFormat {
      * DateFormat for Zulu (UTC) form of an XML Schema dateTime string.
      */
     private static final DateFormat DATEFORMAT_XSD_ZULU = new SimpleDateFormat(
-            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ENGLISH);
 
     static {
         DATEFORMAT_XSD_ZULU.setTimeZone(TimeZone.getTimeZone("UTC"));
