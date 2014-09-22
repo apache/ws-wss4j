@@ -38,6 +38,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -203,7 +204,7 @@ public class Timestamp {
         if (milliseconds) {
             zulu = new XmlSchemaDateFormat();
         } else {
-            zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH);
             zulu.setTimeZone(TimeZone.getTimeZone("UTC"));
         }
         Element elementCreated =
