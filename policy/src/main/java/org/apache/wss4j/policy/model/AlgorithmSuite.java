@@ -216,6 +216,22 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
             this.maximumAsymmetricKeyLength = maximumAsymmetricKeyLength;
         }
         
+        public AlgorithmSuiteType(AlgorithmSuiteType algorithmSuiteType) {
+            this.name = algorithmSuiteType.name;
+            this.digest = algorithmSuiteType.digest;
+            this.encryption = algorithmSuiteType.encryption;
+            this.symmetricKeyWrap = algorithmSuiteType.symmetricKeyWrap;
+            this.asymmetricKeyWrap = algorithmSuiteType.asymmetricKeyWrap;
+            this.encryptionKeyDerivation = algorithmSuiteType.encryptionKeyDerivation;
+            this.signatureKeyDerivation = algorithmSuiteType.signatureKeyDerivation;
+            this.encryptionDerivedKeyLength = algorithmSuiteType.encryptionDerivedKeyLength;
+            this.signatureDerivedKeyLength = algorithmSuiteType.signatureDerivedKeyLength;
+            this.minimumSymmetricKeyLength = algorithmSuiteType.minimumSymmetricKeyLength;
+            this.maximumSymmetricKeyLength = algorithmSuiteType.maximumSymmetricKeyLength;
+            this.minimumAsymmetricKeyLength = algorithmSuiteType.minimumAsymmetricKeyLength;
+            this.maximumAsymmetricKeyLength = algorithmSuiteType.maximumAsymmetricKeyLength;
+        }
+        
         public String getName() {
             return name;
         }
@@ -447,8 +463,11 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                     if (algorithmSuite.getAlgorithmSuiteType() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
-                    algorithmSuiteType.setNamespace(getVersion().getNamespace());
-                    algorithmSuite.setAlgorithmSuiteType(algorithmSuiteType);
+                    
+                    // Clone so as not to change the namespace for other AlgorithmSuiteTypes...
+                    AlgorithmSuiteType newAlgorithmSuiteType = new AlgorithmSuiteType(algorithmSuiteType);
+                    newAlgorithmSuiteType.setNamespace(getVersion().getNamespace());
+                    algorithmSuite.setAlgorithmSuiteType(newAlgorithmSuiteType);
                     continue;
                 }
                 C14NType c14NType = C14NType.lookUp(assertionName);
