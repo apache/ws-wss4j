@@ -469,6 +469,10 @@ public class SecurityTokenReference {
      *         type was detected.
      */
     public X509Certificate[] getKeyIdentifier(Crypto crypto) throws WSSecurityException {
+        if (crypto == null) {
+            return null;
+        }
+        
         Element elem = getFirstElement();
         String value = elem.getAttributeNS(null, "ValueType");
 
@@ -537,6 +541,10 @@ public class SecurityTokenReference {
     }
     
     public X509Certificate getX509SKIAlias(Crypto crypto) throws WSSecurityException {
+        if (crypto == null) {
+            return null;
+        }
+        
         if (skiBytes == null) {
             skiBytes = getSKIBytes();
             if (skiBytes == null) {
@@ -609,6 +617,10 @@ public class SecurityTokenReference {
      * @return a certificate array or null if nothing found
      */
     public X509Certificate[] getX509IssuerSerial(Crypto crypto) throws WSSecurityException {
+        if (crypto == null) {
+            return null;
+        }
+        
         if (issuerSerial == null) {
             issuerSerial = getIssuerSerial();
             if (issuerSerial == null) {
