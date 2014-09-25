@@ -34,7 +34,10 @@ import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;
+import javax.xml.parsers.DocumentBuilderFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
@@ -88,6 +91,60 @@ public class CryptoProviderTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         verify(signedDoc);
+    }
+    
+    /**
+     * Like before but substitute in an "EMAILADDRESS" instead of the OID
+     * @throws Exception
+     */
+    @org.junit.Test
+    public void testSignatureEmailAddress() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecSignature sign = new WSSecSignature();
+        sign.setUserInfo("wss86", "security");
+        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = sign.build(doc, crypto, secHeader);
+        
+        String outputString = XMLUtils.PrettyDocumentToString(signedDoc);
+        outputString = 
+            outputString.replace("1.2.840.113549.1.9.1=#16125765726e6572406578616d706c652e636f6d",
+                             "EMAILADDRESS=Werner@example.com");
+        
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        InputStream is = new ByteArrayInputStream(outputString.getBytes());
+        Document parsedDoc = dbf.newDocumentBuilder().parse(is);
+        verify(parsedDoc);
+    }
+    
+    /**
+     * Like before but substitute in an "E" instead of the OID
+     * @throws Exception
+     */
+    @org.junit.Test
+    public void testSignatureOtherEmailAddress() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecSignature sign = new WSSecSignature();
+        sign.setUserInfo("wss86", "security");
+        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = sign.build(doc, crypto, secHeader);
+        
+        String outputString = XMLUtils.PrettyDocumentToString(signedDoc);
+        outputString = 
+            outputString.replace("1.2.840.113549.1.9.1=#16125765726e6572406578616d706c652e636f6d",
+                             "E=Werner@example.com");
+        
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        InputStream is = new ByteArrayInputStream(outputString.getBytes());
+        Document parsedDoc = dbf.newDocumentBuilder().parse(is);
+        verify(parsedDoc);
     }
     
     /**
