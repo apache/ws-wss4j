@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document>
+<body>
+<section name="Security Advisories">
+<p>
+As Apache WSS4J is a library that provides WS-Security functionality to web
+service stacks such as Apache CXF and Apache Axis, security issues associated
+with WS-Security tend to be reported to these downstream projects. Therefore
+the best way to keep an eye on security issues involving WSS4J is to look at
+the security advisories pages of these projects.
+</p>
+<p>
+The security advisory page for Apache CXF is <a href="http://cxf.apache.org/security-advisories.html">here</a>. In particular, the following security 
+advisories are relevant to users of WSS4J:
+</p>
+<ul>
+<li><a href="http://cxf.apache.org/cve-2012-5575.html">Note on CVE-2012-5575</a> - XML Encryption backwards compatibility attack on Apache CXF.</li>
+<li><a href="http://cxf.apache.org/note-on-cve-2011-2487.html">Note on CVE-2011-2487</a> - Bleichenbacher attack against distributed symmetric key in WS-Security.</li>
+<li><a href="http://cxf.apache.org/note-on-cve-2011-1096.html">Note on CVE-2011-1096</a> - XML Encryption flaw / Character pattern encoding attack.</li>
+</ul>
+
+</section>            
+</body>
+</document>

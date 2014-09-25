@@ -13,6 +13,7 @@
       <item name="Home" href="index.html"/>
       <item name="Download" href="download.html"/>
       <item name="User Guide" href="user_guide.html"/>
+      <item name="Security Advisories" href="security_advisories.html"/>
     </menu>
 
     <menu ref="reports"/>
