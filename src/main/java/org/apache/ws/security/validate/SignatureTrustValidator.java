@@ -303,7 +303,7 @@ public class SignatureTrustValidator implements Validator {
         final java.security.cert.X509Certificate cert,
         final Collection<Pattern> subjectDNPatterns
     ) {
-        if (subjectDNPatterns.isEmpty()) {
+        if (subjectDNPatterns == null || subjectDNPatterns.isEmpty()) {
             LOG.warn("No Subject DN Certificate Constraints were defined. This could be a security issue");
         }
         if (!subjectDNPatterns.isEmpty()) {
