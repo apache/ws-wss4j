@@ -320,7 +320,7 @@ public abstract class CryptoBase implements Crypto {
     matches(
         final X509Certificate cert, final Collection<Pattern> subjectDNPatterns
     ) {
-        if (subjectDNPatterns.isEmpty()) {
+        if (subjectDNPatterns == null || subjectDNPatterns.isEmpty()) {
             LOG.warn("No Subject DN Certificate Constraints were defined. This could be a security issue");
         }
         if (!subjectDNPatterns.isEmpty()) {
