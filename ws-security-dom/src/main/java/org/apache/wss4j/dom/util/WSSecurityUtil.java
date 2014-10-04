@@ -940,6 +940,8 @@ public final class WSSecurityUtil {
                 actions.add(WSConstants.UT_SIGN);
             } else if (single[i].equals(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION)) {
                 actions.add(WSConstants.SC);
+            } else if (single[i].equals(WSHandlerConstants.CUSTOM_TOKEN)) {
+                actions.add(WSConstants.CUSTOM_TOKEN);
             } else {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                         "Unknown action defined: " + single[i]
