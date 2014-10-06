@@ -22,6 +22,7 @@ package org.apache.wss4j.common.saml.builder;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.bean.ActionBean;
+import org.apache.wss4j.common.saml.bean.AdviceBean;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
 import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
 import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
@@ -37,7 +38,9 @@ import org.opensaml.Configuration;
 import org.opensaml.common.SAMLObjectBuilder;
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.saml1.core.Action;
+import org.opensaml.saml1.core.Advice;
 import org.opensaml.saml1.core.Assertion;
+import org.opensaml.saml1.core.AssertionIDReference;
 import org.opensaml.saml1.core.Attribute;
 import org.opensaml.saml1.core.AttributeStatement;
 import org.opensaml.saml1.core.AttributeValue;
@@ -60,6 +63,7 @@ import org.opensaml.xml.schema.impl.XSStringBuilder;
 import org.opensaml.xml.security.x509.BasicX509Credential;
 import org.opensaml.xml.security.x509.X509KeyInfoGeneratorFactory;
 import org.opensaml.xml.signature.KeyInfo;
+import org.w3c.dom.Element;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +77,10 @@ public final class SAML1ComponentBuilder {
     private static volatile SAMLObjectBuilder<Assertion> assertionV1Builder;
     
     private static volatile SAMLObjectBuilder<Conditions> conditionsV1Builder;
+    
+    private static volatile SAMLObjectBuilder<Advice> adviceV1Builder;
+    
+    private static volatile SAMLObjectBuilder<AssertionIDReference> assertionIDReferenceBuilder;
     
     private static volatile SAMLObjectBuilder<AudienceRestrictionCondition> audienceRestrictionV1Builder;
     
@@ -289,6 +297,49 @@ public final class SAML1ComponentBuilder {
         }
         
         return conditions;
+    }
+
+    /**
+     * Create a Advice object
+     *
+     * @param adviceBean A AdviceBean object
+     * @return a Advice object
+     * @throws WSSecurityException 
+     */
+    @SuppressWarnings("unchecked")
+    public static Advice createAdvice(AdviceBean adviceBean) throws WSSecurityException {
+        if (adviceV1Builder == null) {
+            adviceV1Builder = (SAMLObjectBuilder<Advice>) 
+                builderFactory.getBuilder(Advice.DEFAULT_ELEMENT_NAME);
+        }
+        
+        Advice advice = adviceV1Builder.buildObject();
+        
+        if (!adviceBean.getIdReferences().isEmpty()) {
+            if (assertionIDReferenceBuilder == null) {
+                assertionIDReferenceBuilder = (SAMLObjectBuilder<AssertionIDReference>) 
+                    builderFactory.getBuilder(AssertionIDReference.DEFAULT_ELEMENT_NAME);
+            }
+            
+            for (String ref : adviceBean.getIdReferences()) {
+                AssertionIDReference assertionIdReference = 
+                    assertionIDReferenceBuilder.buildObject();
+                assertionIdReference.setReference(ref);
+                advice.getAssertionIDReferences().add(assertionIdReference);
+            }
+        }
+        
+        if (!adviceBean.getAssertions().isEmpty()) {
+            for (Element assertionElement : adviceBean.getAssertions()) {
+                XMLObject xmlObject = OpenSAMLUtil.fromDom(assertionElement);
+                if (xmlObject instanceof Assertion) {
+                    Assertion assertion = (Assertion)xmlObject;
+                    advice.getAssertions().add(assertion);
+                }
+            }
+        }
+        
+        return advice;
     }
     
     /**

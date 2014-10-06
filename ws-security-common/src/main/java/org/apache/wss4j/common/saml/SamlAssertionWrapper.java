@@ -910,6 +910,12 @@ public class SamlAssertionWrapper {
                 org.opensaml.saml1.core.Conditions conditions = 
                     SAML1ComponentBuilder.createSamlv1Conditions(samlCallback.getConditions());
                 saml1.setConditions(conditions);
+                
+                if (samlCallback.getAdvice() != null) {
+                    org.opensaml.saml1.core.Advice advice = 
+                        SAML1ComponentBuilder.createAdvice(samlCallback.getAdvice());
+                    saml1.setAdvice(advice);
+                }
             } catch (org.opensaml.xml.security.SecurityException ex) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", ex,
                         "Error generating KeyInfo from signing credential"
@@ -961,6 +967,12 @@ public class SamlAssertionWrapper {
             org.opensaml.saml2.core.Conditions conditions = 
                 SAML2ComponentBuilder.createConditions(samlCallback.getConditions());
             saml2.setConditions(conditions);
+            
+            if (samlCallback.getAdvice() != null) {
+                org.opensaml.saml2.core.Advice advice = 
+                    SAML2ComponentBuilder.createAdvice(samlCallback.getAdvice());
+                saml2.setAdvice(advice);
+            }
 
             // Set the OpenSaml2 XMLObject instance
             xmlObject = saml2;

@@ -1088,6 +1088,53 @@ public class SamlTokenTest extends org.junit.Assert {
         newEngine.processSecurityHeader(unsignedDoc, null, null, null);
     }
     
+    @org.junit.Test
+    public void testSAML2Advice() throws Exception {
+        // Create a "Advice" Element first
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        Element adviceElement = samlAssertion.toDOM(doc);
+        
+        // Now create a SAML Assertion that uses the advice Element
+        callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        callbackHandler.setAssertionAdviceElement(adviceElement);
+        
+        samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+
+        String outputString = 
+            XMLUtils.PrettyDocumentToString(unsignedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        assertTrue(outputString.contains("Advice"));
+        
+        List<WSSecurityEngineResult> results = verify(unsignedDoc);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertFalse(receivedSamlAssertion.isSigned());
+    }
+    
     private void encryptElement(
         Document document,
         Element elementToEncrypt,

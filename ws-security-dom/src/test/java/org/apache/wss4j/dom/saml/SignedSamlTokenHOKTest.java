@@ -44,6 +44,7 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -588,6 +589,85 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
+        final List<WSDataRef> refs =
+            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        assertTrue(refs.size() == 1);
+        
+        WSDataRef wsDataRef = refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
+    }
+    
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testSAML2Advice() throws Exception {
+        // Create a signed "Advice" Element first
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.ATTR);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+        
+        samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        Element adviceElement = samlAssertion.toDOM(doc);
+
+        // Now create a SAML Assertion that uses the signed advice Element
+        callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.ATTR);
+        callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
+        callbackHandler.setIssuer("www.example.com");
+        callbackHandler.setAssertionAdviceElement(adviceElement);
+        
+        samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        samlAssertion = new SamlAssertionWrapper(samlCallback);
+        
+        samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
+        
+        byte[] ephemeralKey = callbackHandler.getEphemeralKey();
+
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        wsSign.setUserInfo("wss40", "security");
+        wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
+        wsSign.setSignatureAlgorithm(WSConstants.HMAC_SHA256);
+        wsSign.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
+        wsSign.setSecretKey(ephemeralKey);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+
+        Document signedDoc = 
+            wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
+
+        String outputString = 
+            XMLUtils.PrettyDocumentToString(signedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed SAML 2 Attr Assertion (key holder):");
+            LOG.debug(outputString);
+        }
+        System.out.println(outputString);
+        
+        /* https://issues.apache.org/jira/browse/WSS-265 */
+        List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto);
+        
+        // Test we processed a SAML assertion
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
+        SamlAssertionWrapper receivedAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedAssertion != null);
+        assertTrue(receivedAssertion.isSigned());
+        
+        // Test we processed a signature (SOAP body)
+        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        assertTrue(actionResult != null);
+        assertFalse(actionResult.isEmpty());
+        @SuppressWarnings("unchecked")
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs.size() == 1);

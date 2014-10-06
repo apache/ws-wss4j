@@ -19,8 +19,13 @@
 
 package org.apache.wss4j.common.saml.builder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.bean.ActionBean;
+import org.apache.wss4j.common.saml.bean.AdviceBean;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
 import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
 import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
@@ -38,7 +43,10 @@ import org.opensaml.Configuration;
 import org.opensaml.common.SAMLObjectBuilder;
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.saml2.core.Action;
+import org.opensaml.saml2.core.Advice;
 import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml2.core.AssertionIDRef;
+import org.opensaml.saml2.core.AssertionURIRef;
 import org.opensaml.saml2.core.Attribute;
 import org.opensaml.saml2.core.AttributeStatement;
 import org.opensaml.saml2.core.AttributeValue;
@@ -65,9 +73,7 @@ import org.opensaml.xml.XMLObjectBuilderFactory;
 import org.opensaml.xml.schema.XSString;
 import org.opensaml.xml.schema.impl.XSStringBuilder;
 import org.opensaml.xml.signature.KeyInfo;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.w3c.dom.Element;
 
 /**
  * Class SAML2ComponentBuilder provides builder methods that can be used
@@ -89,6 +95,12 @@ public final class SAML2ComponentBuilder {
     private static volatile SAMLObjectBuilder<ProxyRestriction> proxyRestrictionBuilder;
     
     private static volatile SAMLObjectBuilder<Conditions> conditionsBuilder;
+    
+    private static volatile SAMLObjectBuilder<Advice> adviceBuilder;
+    
+    private static volatile SAMLObjectBuilder<AssertionIDRef> assertionIDRefBuilder;
+    
+    private static volatile SAMLObjectBuilder<AssertionURIRef> assertionURIRefBuilder;
     
     private static volatile SAMLObjectBuilder<SubjectConfirmationData> subjectConfirmationDataBuilder;
     
@@ -232,6 +244,61 @@ public final class SAML2ComponentBuilder {
             conditions.getConditions().add(createProxyRestriction(conditionsBean.getProxyRestriction()));
         }
         return conditions;
+    }
+    
+    /**
+     * Create a Advice object
+     *
+     * @param adviceBean A AdviceBean object
+     * @return a Advice object
+     * @throws WSSecurityException 
+     */
+    @SuppressWarnings("unchecked")
+    public static Advice createAdvice(AdviceBean adviceBean) throws WSSecurityException {
+        if (adviceBuilder == null) {
+            adviceBuilder = (SAMLObjectBuilder<Advice>) 
+                builderFactory.getBuilder(Advice.DEFAULT_ELEMENT_NAME);
+        }
+        
+        Advice advice = adviceBuilder.buildObject();
+        
+        if (!adviceBean.getIdReferences().isEmpty()) {
+            if (assertionIDRefBuilder == null) {
+                assertionIDRefBuilder = (SAMLObjectBuilder<AssertionIDRef>) 
+                    builderFactory.getBuilder(AssertionIDRef.DEFAULT_ELEMENT_NAME);
+            }
+            
+            for (String ref : adviceBean.getIdReferences()) {
+                AssertionIDRef assertionIdRef = assertionIDRefBuilder.buildObject();
+                assertionIdRef.setAssertionID(ref);
+                advice.getAssertionIDReferences().add(assertionIdRef);
+            }
+        }
+        
+        if (!adviceBean.getUriReferences().isEmpty()) {
+            if (assertionURIRefBuilder == null) {
+                assertionURIRefBuilder = (SAMLObjectBuilder<AssertionURIRef>) 
+                    builderFactory.getBuilder(AssertionURIRef.DEFAULT_ELEMENT_NAME);
+            }
+            
+            for (String ref : adviceBean.getUriReferences()) {
+                AssertionURIRef assertionURIRef = assertionURIRefBuilder.buildObject();
+                assertionURIRef.setAssertionURI(ref);
+                advice.getAssertionURIReferences().add(assertionURIRef);
+            }
+        }
+        
+        if (!adviceBean.getAssertions().isEmpty()) {
+            for (Element assertionElement : adviceBean.getAssertions()) {
+                XMLObject xmlObject = OpenSAMLUtil.fromDom(assertionElement);
+                if (xmlObject instanceof Assertion) {
+                    Assertion assertion = (Assertion)xmlObject;
+                    advice.getAssertions().add(assertion);
+                }
+            }
+        }
+        
+        return advice;
     }
 
     /**

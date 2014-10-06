@@ -20,6 +20,7 @@
 package org.apache.wss4j.common.saml;
 
 import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.saml.bean.AdviceBean;
 import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
 import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
 import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
@@ -29,6 +30,7 @@ import org.opensaml.common.SAMLVersion;
 import org.w3c.dom.Element;
 
 import javax.security.auth.callback.Callback;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,6 +62,11 @@ public class SAMLCallback implements Callback {
      * SAML Conditions representation
      */
     private ConditionsBean conditions;
+    
+    /**
+     * SAML Advice representation
+     */
+    private AdviceBean advice;
 
     /**
      * A list of <code>AuthenticationStatementBean</code> values
@@ -351,5 +358,13 @@ public class SAMLCallback implements Callback {
 
     public void setSignatureDigestAlgorithm(String signatureDigestAlgorithm) {
         this.signatureDigestAlgorithm = signatureDigestAlgorithm;
+    }
+
+    public AdviceBean getAdvice() {
+        return advice;
+    }
+
+    public void setAdvice(AdviceBean advice) {
+        this.advice = advice;
     }
 }

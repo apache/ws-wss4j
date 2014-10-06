@@ -76,6 +76,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     private Crypto issuerCrypto;
     private String issuerName;
     private String issuerPassword;
+    private Element assertionAdviceElement;
     
     public void setSubjectConfirmationData(SubjectConfirmationDataBean subjectConfirmationData) {
         this.subjectConfirmationData = subjectConfirmationData;
@@ -240,5 +241,13 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
 
     public void setIssuerPassword(String issuerPassword) {
         this.issuerPassword = issuerPassword;
+    }
+
+    public Element getAssertionAdviceElement() {
+        return assertionAdviceElement;
+    }
+
+    public void setAssertionAdviceElement(Element assertionAdviceElement) {
+        this.assertionAdviceElement = assertionAdviceElement;
     }
 }
