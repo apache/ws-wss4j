@@ -117,7 +117,7 @@ public final class EHCacheManagerHolder {
     
     private static CacheManager findDefaultCacheManager(String confName) {
 
-        String defaultConfigFile = "wss4j-ehcache.xml";
+        String defaultConfigFile = "/wss4j-ehcache.xml";
         URL configFileURL = null;
         try {
             configFileURL = Loader.getResource(defaultConfigFile);
