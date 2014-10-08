@@ -223,7 +223,10 @@ public class AssertionWrapper {
         // Create the SAML callback that the handler will use to get the required data from the 
         // client application.
         //
-        SAMLCallback[] samlCallbacks = new SAMLCallback[] { new SAMLCallback() };
+        SAMLCallback samlCallback = new SAMLCallback();
+        samlCallback.setSamlVersion(parms.getSAMLVersion());
+        
+        SAMLCallback[] samlCallbacks = new SAMLCallback[] { samlCallback };
 
         try {
             // Get the SAML source data using the currently configured callback implementation.
