@@ -71,6 +71,10 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
         //
         // First try to find an EncryptedKey, BinarySecret or a SecurityTokenReference via DOM
         //
+        if (keyInfoElement == null) {
+            return null;
+        }
+        
         Node node = keyInfoElement.getFirstChild();
         while (node != null) {
             if (Node.ELEMENT_NODE == node.getNodeType()) {
