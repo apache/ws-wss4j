@@ -76,13 +76,15 @@ public class DOMCallbackLookup implements CallbackLookup {
     public Element getAndRegisterElement(
         String id, String valueType, boolean checkMultipleElements, DOMCryptoContext context
     ) throws WSSecurityException {
+        String idToMatch = WSSecurityUtil.getIDFromReference(id);
+        
         //
         // Try the SOAP Body first
         //
         Element bodyElement = WSSecurityUtil.findBodyElement(doc);
         if (bodyElement != null) {
             String cId = bodyElement.getAttributeNS(WSConstants.WSU_NS, "Id");
-            if (cId.equals(id)) {
+            if (cId.equals(idToMatch)) {
                 if (context != null) {
                     context.setIdAttributeNS(bodyElement, WSConstants.WSU_NS, "Id");
                 }
@@ -91,13 +93,9 @@ public class DOMCallbackLookup implements CallbackLookup {
         }
         // Otherwise do a general search
         Element foundElement = 
-            WSSecurityUtil.findElementById(doc.getDocumentElement(), id, checkMultipleElements);
+            WSSecurityUtil.findElementById(doc.getDocumentElement(), idToMatch, checkMultipleElements);
         if (foundElement != null) {
             if (context != null) {
-                String idToMatch = id;
-                if (idToMatch.charAt(0) == '#') {
-                    idToMatch = idToMatch.substring(1);
-                }
                 if (foundElement.hasAttributeNS(WSConstants.WSU_NS, "Id")
                     && idToMatch.equals(foundElement.getAttributeNS(WSConstants.WSU_NS, "Id"))) {
                     context.setIdAttributeNS(foundElement, WSConstants.WSU_NS, "Id");
@@ -120,13 +118,9 @@ public class DOMCallbackLookup implements CallbackLookup {
             || valueType == null) {
             foundElement = 
                 WSSecurityUtil.findSAMLAssertionElementById(
-                    doc.getDocumentElement(), id
+                    doc.getDocumentElement(), idToMatch
                 );
             if (foundElement != null) {
-                String idToMatch = id;
-                if (idToMatch.charAt(0) == '#') {
-                    idToMatch = idToMatch.substring(1);
-                }
                 if (context != null) {
                     if (foundElement.hasAttributeNS(null, "ID")
                         && idToMatch.equals(foundElement.getAttributeNS(null, "ID"))) {

@@ -631,6 +631,9 @@ public final class WSSecurityUtil {
      *         correctly formed
      */
     public static String getIDFromReference(String ref) {
+        if (ref == null) {
+            return null;
+        }
         String id = ref.trim();
         if (id.length() == 0) {
             return null;
