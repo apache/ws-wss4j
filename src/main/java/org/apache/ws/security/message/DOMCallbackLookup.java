@@ -53,19 +53,21 @@ public class DOMCallbackLookup implements CallbackLookup {
     public Element getElement(
         String id, String valueType, boolean checkMultipleElements
     ) throws WSSecurityException {
+        String idToMatch = WSSecurityUtil.getIDFromReference(id);
+
         //
         // Try the SOAP Body first
         //
         Element bodyElement = WSSecurityUtil.findBodyElement(doc);
         if (bodyElement != null) {
             String cId = bodyElement.getAttributeNS(WSConstants.WSU_NS, "Id");
-            if (cId.equals(id)) {
+            if (cId.equals(idToMatch)) {
                  return bodyElement;
             }
         }
         // Otherwise do a general search
         Element foundElement = 
-            WSSecurityUtil.findElementById(doc.getDocumentElement(), id, checkMultipleElements);
+            WSSecurityUtil.findElementById(doc.getDocumentElement(), idToMatch, checkMultipleElements);
         if (foundElement != null) {
             return foundElement;
         }
@@ -80,7 +82,7 @@ public class DOMCallbackLookup implements CallbackLookup {
             || valueType == null) {
             return 
                 WSSecurityUtil.findSAMLAssertionElementById(
-                    doc.getDocumentElement(), id
+                    doc.getDocumentElement(), idToMatch
                 );
         }
         
