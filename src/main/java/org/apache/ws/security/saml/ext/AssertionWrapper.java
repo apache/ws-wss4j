@@ -217,6 +217,12 @@ public class AssertionWrapper {
      * @param parms of type SAMLParms
      */
     public AssertionWrapper(SAMLParms parms) throws WSSecurityException {
+        if (parms == null || parms.getCallbackHandler() == null) {
+            throw new IllegalStateException(
+               "No SAML CallbackHandler has been configured"
+            );
+        }
+        
         OpenSAMLUtil.initSamlEngine();
         
         //
