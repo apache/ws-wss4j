@@ -232,7 +232,9 @@ public class KerberosSecurity extends BinarySecurity {
                 secretKey = new SecretKeySpec(sessionKey.getEncoded(), sessionKey.getAlgorithm());
             } else {
                 KerberosTicket serviceTicket = getKerberosTicket(clientSubject, tgt);
-                secretKey = serviceTicket.getSessionKey();
+                if (serviceTicket != null) {
+                    secretKey = serviceTicket.getSessionKey();
+                }
             }
 
             setToken(krbCtx.getKerberosToken());
