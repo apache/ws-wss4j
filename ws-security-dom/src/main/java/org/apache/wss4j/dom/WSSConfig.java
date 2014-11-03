@@ -236,6 +236,22 @@ public class WSSConfig {
         }
         DEFAULT_VALIDATORS = java.util.Collections.unmodifiableMap(tmp);
     }
+    
+    /**
+     * a static boolean flag that determines whether default JCE providers
+     * should be added at the time of construction.
+     *
+     * These providers, and the order in which they are added, can interfere
+     * with some JVMs (such as IBMs).
+     */
+    private static boolean addJceProviders = true;
+    
+    /**
+     * a boolean flag to record whether we have already been statically
+     * initialized.  This flag prevents repeated and unnecessary calls
+     * to static initialization code at construction time.
+     */
+    private static boolean staticallyInitialized = false;
 
     /**
      * Whether to add an InclusiveNamespaces PrefixList as a CanonicalizationMethod
@@ -384,30 +400,6 @@ public class WSSConfig {
         new HashMap<QName, Object>(DEFAULT_VALIDATORS);
     
     static {
-        AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
-            public Boolean run() {
-                Security.removeProvider("STRTransform");
-                WSProviderConfig.appendJceProvider(
-                    "STRTransform", 
-                    new org.apache.wss4j.dom.transform.STRTransformProvider()
-                );
-
-                Security.removeProvider("AttachmentContentSignatureTransform");
-                WSProviderConfig.appendJceProvider(
-                        "AttachmentContentSignatureTransform",
-                        new AttachmentContentSignatureTransformProvider()
-                );
-
-                Security.removeProvider("AttachmentCompleteSignatureTransform");
-                WSProviderConfig.appendJceProvider(
-                        "AttachmentCompleteSignatureTransform",
-                        new AttachmentCompleteSignatureTransformProvider()
-                );
-
-                return true;
-            }
-        });
-
         try {
             Transform.register(WSConstants.SWA_ATTACHMENT_CIPHERTEXT_TRANS,
                     AttachmentCiphertextTransform.class);
@@ -425,7 +417,35 @@ public class WSSConfig {
     }
     
     public static synchronized void init() {
-        WSProviderConfig.init();
+        if (!staticallyInitialized) {
+            if (addJceProviders) {
+                AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+                    public Boolean run() {
+                        Security.removeProvider("STRTransform");
+                        WSProviderConfig.appendJceProvider(
+                            "STRTransform", 
+                            new org.apache.wss4j.dom.transform.STRTransformProvider()
+                        );
+    
+                        Security.removeProvider("AttachmentContentSignatureTransform");
+                        WSProviderConfig.appendJceProvider(
+                                "AttachmentContentSignatureTransform",
+                                new AttachmentContentSignatureTransformProvider()
+                        );
+    
+                        Security.removeProvider("AttachmentCompleteSignatureTransform");
+                        WSProviderConfig.appendJceProvider(
+                                "AttachmentCompleteSignatureTransform",
+                                new AttachmentCompleteSignatureTransformProvider()
+                        );
+    
+                        return true;
+                    }
+                });
+            }
+            WSProviderConfig.init();
+            staticallyInitialized = true;
+        }
     }
 
     /**
@@ -822,5 +842,15 @@ public class WSSConfig {
 
     public void setCurrentTime(WSTimeSource currentTime) {
         this.currentTime = currentTime;
+    }
+    
+
+    public static boolean isAddJceProviders() {
+        return addJceProviders;
+    }
+
+    public static void setAddJceProviders(boolean addJceProviders) {
+        WSSConfig.addJceProviders = addJceProviders;
+        WSProviderConfig.setAddJceProviders(addJceProviders);
     }
 }
