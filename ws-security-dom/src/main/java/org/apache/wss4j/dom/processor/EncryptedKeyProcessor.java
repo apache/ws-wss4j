@@ -19,6 +19,8 @@
 
 package org.apache.wss4j.dom.processor;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
@@ -40,6 +42,7 @@ import org.w3c.dom.Text;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
+import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
@@ -48,6 +51,8 @@ import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.message.token.DOMX509IssuerSerial;
+import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.str.EncryptedKeySTRParser;
 import org.apache.wss4j.dom.str.STRParser;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -376,9 +381,40 @@ public class EncryptedKeyProcessor implements Processor {
                     WSSecurityException.ErrorCode.INVALID_SECURITY, "noSecTokRef"
                 );
             }
-            strParser.parseSecurityTokenReference(strElement, data, wsDocInfo, null);
             
-            X509Certificate[] certs = strParser.getCertificates();
+            X509Certificate[] certs = null;
+            if (SecurityTokenReference.SECURITY_TOKEN_REFERENCE.equals(strElement.getLocalName()) 
+                && WSConstants.WSSE_NS.equals(strElement.getNamespaceURI())) {
+                strParser.parseSecurityTokenReference(strElement, data, wsDocInfo, null);
+                
+                certs = strParser.getCertificates();
+            } else if (WSConstants.SIG_NS.equals(strElement.getNamespaceURI())
+                && WSConstants.X509_DATA_LN.equals(strElement.getLocalName())) {
+                data.getBSPEnforcer().handleBSPRule(BSPRule.R5426);
+                
+                Element x509Child = getFirstElement(strElement);
+                
+                if (x509Child != null && WSConstants.SIG_NS.equals(x509Child.getNamespaceURI())) {
+                    if (WSConstants.X509_ISSUER_SERIAL_LN.equals(x509Child.getLocalName())) {
+                        DOMX509IssuerSerial issuerSerial = new DOMX509IssuerSerial(x509Child);
+                        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
+                        cryptoType.setIssuerSerial(issuerSerial.getIssuer(), issuerSerial.getSerialNumber());
+                        certs = data.getDecCrypto().getX509Certificates(cryptoType);
+                    } else if (WSConstants.X509_CERT_LN.equals(x509Child.getLocalName())) {
+                        byte[] token = getToken(x509Child);
+                        if (token == null) {
+                            throw new WSSecurityException(
+                                WSSecurityException.ErrorCode.FAILURE, "invalidCertData", 0);
+                        }
+                        InputStream in = new ByteArrayInputStream(token);
+                        X509Certificate cert = data.getDecCrypto().loadCertificate(in);
+                        if (cert != null) {
+                            certs = new X509Certificate[]{cert};
+                        }
+                    }
+                }
+            }
+            
             if (certs == null || certs.length < 1 || certs[0] == null) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE,
@@ -387,6 +423,38 @@ public class EncryptedKeyProcessor implements Processor {
             return certs;
         } else {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");
+        }
+    }
+    
+    private Element getFirstElement(Element element) {
+        for (Node currentChild = element.getFirstChild();
+             currentChild != null;
+             currentChild = currentChild.getNextSibling()
+        ) {
+            if (Node.ELEMENT_NODE == currentChild.getNodeType()) {
+                return (Element) currentChild;
+            }
+        }
+        return null;
+    }
+    
+    private byte[] getToken(Element element) {
+        Node node = element.getFirstChild();
+        StringBuilder builder = new StringBuilder();
+        while (node != null) {
+            if (Node.TEXT_NODE == node.getNodeType()) {
+                builder.append(((Text)node).getData());
+            }
+            node = node.getNextSibling();
+        }
+                
+        try {
+            return Base64.decode(builder.toString());
+        } catch (Exception ex) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(ex.getMessage(), ex);
+            }
+            return null;
         }
     }
     
