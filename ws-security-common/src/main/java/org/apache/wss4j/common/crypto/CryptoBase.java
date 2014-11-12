@@ -69,7 +69,7 @@ public abstract class CryptoBase implements Crypto {
     static {
         Constructor<?> cons = null;
         try {
-            Class<?> c = Class.forName("org.bouncycastle.asn1.x509.X509Name");
+            Class<?> c = Class.forName("org.bouncycastle.asn1.x500.X500Name");
             cons = c.getConstructor(new Class[] {String.class});
         } catch (Exception e) {
             //ignore
