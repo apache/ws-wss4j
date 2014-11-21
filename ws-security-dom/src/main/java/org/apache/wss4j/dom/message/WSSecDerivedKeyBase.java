@@ -44,6 +44,9 @@ import java.security.cert.X509Certificate;
  */
 public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
     
+    private static final org.slf4j.Logger LOG = 
+        org.slf4j.LoggerFactory.getLogger(WSSecDerivedKeyBase.class);
+    
     protected Document document;
     
     /**
@@ -220,6 +223,11 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
         
         DerivationAlgorithm algo = 
             AlgoFactory.getInstance(ConversationConstants.DerivationAlgorithm.P_SHA_1);
+        
+        if (ephemeralKey == null || ephemeralKey.length == 0) {
+            LOG.debug("No ephemeral key is supplied for id: " + tokenIdentifier);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
+        }
         
         derivedKeyBytes = algo.createKey(ephemeralKey, seed, offset, length);
         
