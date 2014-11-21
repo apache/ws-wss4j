@@ -21,7 +21,6 @@ package org.apache.wss4j.dom.message.token;
 
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.common.util.RFC2253Parser;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -29,6 +28,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
 import java.math.BigInteger;
+
+import javax.security.auth.x500.X500Principal;
 
 /**
  * An X.509 Issuer Serial token.
@@ -73,7 +74,7 @@ public final class DOMX509IssuerSerial {
         if (serialNumber == null) {
             throw new NullPointerException("The serialNumber cannot be null");
         }
-        this.issuer = RFC2253Parser.normalize(issuer);
+        this.issuer = new X500Principal(issuer).getName();
         this.serialNumber = serialNumber;
         
         element = 
