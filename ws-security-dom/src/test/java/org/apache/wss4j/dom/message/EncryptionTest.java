@@ -658,6 +658,34 @@ public class EncryptionTest extends org.junit.Assert {
         assertNotNull(actionResult);
     }
     
+    // CN has a "*" in it
+    @org.junit.Test
+    public void testEncryptionWithRegexpCert() throws Exception {
+        WSSecEncrypt builder = new WSSecEncrypt();
+        builder.setUserInfo("regexp");
+        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        builder.setKeyEnc(WSConstants.KEYTRANSPORT_RSAOEP);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);        
+        LOG.info("Before Encryption Triple DES/RSA-OAEP....");
+        
+        Crypto regexpCrypto = CryptoFactory.getInstance("regexp.properties");
+        Document encryptedDoc = builder.build(doc, regexpCrypto, secHeader);
+        LOG.info("After Encryption Triple DES/RSA-OAEP....");
+
+        String outputString = 
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
+            LOG.debug(outputString);
+        }
+        assertFalse(outputString.contains("counter_port_type"));
+        
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, regexpCrypto);
+    }
+    
     /**
      * Verifies the soap envelope <p/>
      * 
