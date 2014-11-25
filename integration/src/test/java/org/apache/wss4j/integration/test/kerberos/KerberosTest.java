@@ -18,6 +18,39 @@
  */
 package org.apache.wss4j.integration.test.kerberos;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.crypto.SecretKey;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.security.auth.kerberos.KerberosPrincipal;
+import javax.xml.crypto.dsig.SignatureMethod;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.apache.directory.server.annotations.CreateKdcServer;
+import org.apache.directory.server.annotations.CreateLdapServer;
+import org.apache.directory.server.annotations.CreateTransport;
+import org.apache.directory.server.core.annotations.ApplyLdifFiles;
+import org.apache.directory.server.core.annotations.CreateDS;
+import org.apache.directory.server.core.annotations.CreateIndex;
+import org.apache.directory.server.core.annotations.CreatePartition;
+import org.apache.directory.server.core.integ.AbstractLdapTestUnit;
+import org.apache.directory.server.core.integ.FrameworkRunner;
+import org.apache.directory.server.core.kerberos.KeyDerivationInterceptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.kerberos.KerberosContextAndServiceNameCallback;
 import org.apache.wss4j.common.spnego.SpnegoTokenContext;
@@ -34,11 +67,12 @@ import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.KerberosTokenValidator;
-import org.apache.wss4j.integration.test.common.KerberosServiceStarter;
 import org.apache.wss4j.stax.WSSec;
-import org.apache.wss4j.stax.ext.*;
+import org.apache.wss4j.stax.ext.InboundWSSec;
+import org.apache.wss4j.stax.ext.OutboundWSSec;
+import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityEvent.KerberosTokenSecurityEvent;
-import org.apache.wss4j.stax.test.AbstractTestBase;
 import org.apache.wss4j.stax.test.utils.SOAPUtil;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
@@ -50,47 +84,68 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-import javax.crypto.SecretKey;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.auth.kerberos.KerberosPrincipal;
-import javax.xml.crypto.dsig.SignatureMethod;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+@RunWith(FrameworkRunner.class)
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
+//Define the DirectoryService
+@CreateDS(name = "KerberosTest-class",
+    enableAccessControl = false,
+    allowAnonAccess = false,
+    enableChangeLog = true,
+    partitions = {
+        @CreatePartition(
+            name = "example",
+            suffix = "dc=example,dc=com",
+            indexes = {
+                @CreateIndex(attribute = "objectClass"),
+                @CreateIndex(attribute = "dc"),
+                @CreateIndex(attribute = "ou")
+            } )
+        },
+    additionalInterceptors = {
+       KeyDerivationInterceptor.class
+    }
+)
 
-public class KerberosTest extends AbstractTestBase {
+@CreateLdapServer(
+    transports = {
+        @CreateTransport(protocol = "LDAP")
+    }
+)
+
+@CreateKdcServer(
+    transports = {
+        @CreateTransport(protocol = "TCP", address = "127.0.0.1", port = 23749),
+        @CreateTransport(protocol = "UDP", address = "127.0.0.1", port = 23749)
+    },
+    primaryRealm = "service.ws.apache.org",
+    kdcPrincipal = "krbtgt/service.ws.apache.org@service.ws.apache.org"
+)
+
+//Inject an file containing entries
+@ApplyLdifFiles("kerberos/kerberos.ldif")
+
+public class KerberosTest extends AbstractLdapTestUnit {
     
     private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(KerberosTest.class);
-
-    private static boolean kerberosServerStarted = false;
-
+    
+    private static final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+    private static final TransformerFactory TRANSFORMER_FACTORY = TransformerFactory.newInstance();
+    private static DocumentBuilderFactory dbf;
+    
     @BeforeClass
     public static void setUp() throws Exception {
 
         WSSConfig.init();
-
+        
         //
         // This test fails with the IBM JDK
         //
         if (!"IBM Corporation".equals(System.getProperty("java.vendor"))) {
-            kerberosServerStarted = KerberosServiceStarter.startKerberosServer();
-
             String basedir = System.getProperty("basedir");
             if (basedir == null) {
                 basedir = new File(".").getCanonicalPath();
@@ -102,13 +157,19 @@ public class KerberosTest extends AbstractTestBase {
             System.setProperty("java.security.auth.login.config", basedir + "/integration/src/test/resources/kerberos/kerberos.jaas");
             System.setProperty("java.security.krb5.conf", basedir + "/integration/src/test/resources/kerberos/krb5.conf");
         }
+        
+        dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        dbf.setIgnoringComments(false);
+        dbf.setCoalescing(false);
+        dbf.setIgnoringElementContentWhitespace(false);
+        
+        xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, false);
+        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
     }
 
     @AfterClass
     public static void tearDown() throws Exception {
-        if (kerberosServerStarted) {
-            KerberosServiceStarter.stopKerberosServer();
-        }
         SecurityTestUtil.cleanup();
     }
     
@@ -122,13 +183,12 @@ public class KerberosTest extends AbstractTestBase {
      */
     @Test
     public void testKerberosCreationAndProcessing() throws Exception {
-        if (!kerberosServerStarted) {
-            System.out.println("Skipping test because kerberos server could not be started");
+        if (!isServiceUp()) {
             return;
         }
-
+        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-
+        
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
@@ -180,11 +240,10 @@ public class KerberosTest extends AbstractTestBase {
      */
     @Test
     public void testSpnego() throws Exception {
-        if (!kerberosServerStarted) {
-            System.out.println("Skipping test because kerberos server could not be started");
+        if (!isServiceUp()) {
             return;
         }
-
+        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader();
@@ -217,11 +276,10 @@ public class KerberosTest extends AbstractTestBase {
      */
     @Test
     public void testKerberosClient() throws Exception {
-        if (!kerberosServerStarted) {
-            System.out.println("Skipping test because kerberos server could not be started");
+        if (!isServiceUp()) {
             return;
         }
-
+        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         CallbackHandler callbackHandler = new CallbackHandler() {
@@ -261,11 +319,10 @@ public class KerberosTest extends AbstractTestBase {
      */
     @Test
     public void testKerberosSignature() throws Exception {
-        if (!kerberosServerStarted) {
-            System.out.println("Skipping test because kerberos server could not be started");
+        if (!isServiceUp()) {
             return;
         }
-
+        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader();
@@ -335,11 +392,10 @@ public class KerberosTest extends AbstractTestBase {
      */
     @Test
     public void testKerberosSignatureKI() throws Exception {
-        if (!kerberosServerStarted) {
-            System.out.println("Skipping test because kerberos server could not be started");
+        if (!isServiceUp()) {
             return;
         }
-
+        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader();
@@ -413,11 +469,10 @@ public class KerberosTest extends AbstractTestBase {
      */
     @Test
     public void testKerberosEncryption() throws Exception {
-        if (!kerberosServerStarted) {
-            System.out.println("Skipping test because kerberos server could not be started");
+        if (!isServiceUp()) {
             return;
         }
-
+        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader();
@@ -485,11 +540,10 @@ public class KerberosTest extends AbstractTestBase {
      */
     @Test
     public void testKerberosEncryptionBSTFirst() throws Exception {
-        if (!kerberosServerStarted) {
-            System.out.println("Skipping test because kerberos server could not be started");
+        if (!isServiceUp()) {
             return;
         }
-
+        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader();
@@ -558,11 +612,10 @@ public class KerberosTest extends AbstractTestBase {
      */
     @Test
     public void testKerberosEncryptionKI() throws Exception {
-        if (!kerberosServerStarted) {
-            System.out.println("Skipping test because kerberos server could not be started");
+        if (!isServiceUp()) {
             return;
         }
-
+        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader();
@@ -630,14 +683,12 @@ public class KerberosTest extends AbstractTestBase {
     //
     // Streaming tests
     //
-
     @Test
     public void testKerberosSignatureOutbound() throws Exception {
-        if (!kerberosServerStarted) {
-            System.out.println("Skipping test because kerberos server could not be started");
+        if (!isServiceUp()) {
             return;
         }
-
+        
         Document document;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -669,7 +720,7 @@ public class KerberosTest extends AbstractTestBase {
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
 
-            document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            document = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
         }
@@ -713,11 +764,10 @@ public class KerberosTest extends AbstractTestBase {
 
     @Test
     public void testKerberosSignatureInbound() throws Exception {
-        if (!kerberosServerStarted) {
-            System.out.println("Skipping test because kerberos server could not be started");
+        if (!isServiceUp()) {
             return;
         }
-
+        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -789,7 +839,7 @@ public class KerberosTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(
                     new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
 
-            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Document document = StAX2DOM.readDoc(dbf.newDocumentBuilder(), xmlStreamReader);
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
@@ -806,11 +856,10 @@ public class KerberosTest extends AbstractTestBase {
 
     @Test
     public void testKerberosSignatureKIInbound() throws Exception {
-        if (!kerberosServerStarted) {
-            System.out.println("Skipping test because kerberos server could not be started");
+        if (!isServiceUp()) {
             return;
         }
-
+        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -886,7 +935,7 @@ public class KerberosTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(
                     new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
 
-            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Document document = StAX2DOM.readDoc(dbf.newDocumentBuilder(), xmlStreamReader);
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
@@ -899,11 +948,10 @@ public class KerberosTest extends AbstractTestBase {
 
     @Test
     public void testKerberosEncryptionOutbound() throws Exception {
-        if (!kerberosServerStarted) {
-            System.out.println("Skipping test because kerberos server could not be started");
+        if (!isServiceUp()) {
             return;
         }
-
+        
         Document document;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -936,7 +984,7 @@ public class KerberosTest extends AbstractTestBase {
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
 
-            document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            document = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_ReferenceList.getNamespaceURI(), WSSConstants.TAG_xenc_ReferenceList.getLocalPart());
             Assert.assertEquals(1, nodeList.getLength());
         }
@@ -979,11 +1027,10 @@ public class KerberosTest extends AbstractTestBase {
 
     @Test
     public void testKerberosEncryptionInbound() throws Exception {
-        if (!kerberosServerStarted) {
-            System.out.println("Skipping test because kerberos server could not be started");
+        if (!isServiceUp()) {
             return;
         }
-
+        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -1053,7 +1100,7 @@ public class KerberosTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(
                     new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
 
-            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Document document = StAX2DOM.readDoc(dbf.newDocumentBuilder(), xmlStreamReader);
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsse_BinarySecurityToken.getNamespaceURI(), WSSConstants.TAG_wsse_BinarySecurityToken.getLocalPart());
@@ -1070,11 +1117,10 @@ public class KerberosTest extends AbstractTestBase {
 
     @Test
     public void testKerberosEncryptionKIInbound() throws Exception {
-        if (!kerberosServerStarted) {
-            System.out.println("Skipping test because kerberos server could not be started");
+        if (!isServiceUp()) {
             return;
         }
-
+        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -1149,7 +1195,7 @@ public class KerberosTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(
                     new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
 
-            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Document document = StAX2DOM.readDoc(dbf.newDocumentBuilder(), xmlStreamReader);
 
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsse_BinarySecurityToken.getNamespaceURI(), WSSConstants.TAG_wsse_BinarySecurityToken.getLocalPart());
@@ -1163,4 +1209,13 @@ public class KerberosTest extends AbstractTestBase {
             Assert.assertEquals(kerberosTokenSecurityEvents.size(), 1);
         }
     }
+    
+    private boolean isServiceUp() {
+        if (super.getKdcServer().isEnabled() && super.getKdcServer().isStarted()) {
+            return true;
+        }
+        
+        return false;
+    }
+    
 }

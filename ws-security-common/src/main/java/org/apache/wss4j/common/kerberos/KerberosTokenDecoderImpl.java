@@ -19,17 +19,18 @@
 
 package org.apache.wss4j.common.kerberos;
 
+import org.apache.directory.shared.kerberos.codec.types.EncryptionType;
+import org.apache.directory.shared.kerberos.components.EncTicketPart;
+import org.apache.directory.shared.kerberos.components.EncryptionKey;
+import org.apache.directory.shared.kerberos.exceptions.KerberosException;
+import org.apache.directory.shared.kerberos.messages.ApReq;
+import org.apache.directory.server.kerberos.protocol.codec.KerberosDecoder;
 import org.apache.directory.server.kerberos.shared.crypto.encryption.CipherTextHandler;
-import org.apache.directory.server.kerberos.shared.crypto.encryption.EncryptionType;
 import org.apache.directory.server.kerberos.shared.crypto.encryption.KeyUsage;
-import org.apache.directory.server.kerberos.shared.exceptions.KerberosException;
-import org.apache.directory.server.kerberos.shared.io.decoder.ApplicationRequestDecoder;
-import org.apache.directory.server.kerberos.shared.messages.ApplicationRequest;
-import org.apache.directory.server.kerberos.shared.messages.components.EncTicketPart;
-import org.apache.directory.server.kerberos.shared.messages.value.EncryptionKey;
 
 import javax.security.auth.Subject;
 import javax.security.auth.kerberos.KerberosKey;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -84,8 +85,8 @@ public class KerberosTokenDecoderImpl implements KerberosTokenDecoder {
         if (!decoded) {
             decodeServiceTicket();
         }
-        if (encTicketPart != null && encTicketPart.getSessionKey() != null) {
-            return encTicketPart.getSessionKey().getKeyValue();
+        if (encTicketPart != null && encTicketPart.getKey() != null) {
+            return encTicketPart.getKey().getKeyValue();
         }
         return null;
     }
@@ -99,7 +100,7 @@ public class KerberosTokenDecoderImpl implements KerberosTokenDecoder {
         if (!decoded) {
             decodeServiceTicket();
         }
-        return encTicketPart.getClientPrincipal().toString();
+        return encTicketPart.getCName().toString();
     }
 
     // Decode the service ticket.
@@ -137,18 +138,21 @@ public class KerberosTokenDecoderImpl implements KerberosTokenDecoder {
                 throw new KerberosTokenDecoderException("invalid kerberos token");
             }
 
-            ApplicationRequestDecoder applicationRequestDecoder = new ApplicationRequestDecoder();
-            ApplicationRequest applicationRequest = applicationRequestDecoder.decode(toByteArray(asn1InputStream));
+            ApReq applicationRequest = 
+                KerberosDecoder.decodeApReq(toByteArray(asn1InputStream));
 
-            final int encryptionType = applicationRequest.getTicket().getEncPart().getEType().getOrdinal();
+            final int encryptionType = applicationRequest.getTicket().getEncPart().getEType().getValue();
             KerberosKey kerberosKey = getKrbKey(subject, encryptionType);
 
             EncryptionKey encryptionKey =
-                    new EncryptionKey(EncryptionType.getTypeByOrdinal(encryptionType), kerberosKey.getEncoded());
+                    new EncryptionKey(EncryptionType.getTypeByValue(encryptionType), kerberosKey.getEncoded());
 
             CipherTextHandler cipherTextHandler = new CipherTextHandler();
-            this.encTicketPart = (EncTicketPart) cipherTextHandler.unseal(
-                    EncTicketPart.class, encryptionKey, applicationRequest.getTicket().getEncPart(), KeyUsage.NUMBER2);
+            byte[] dec = cipherTextHandler.decrypt(
+                         encryptionKey, applicationRequest.getTicket().getEncPart(), 
+                                                      KeyUsage.getTypeByOrdinal(2));
+            
+            this.encTicketPart = KerberosDecoder.decodeEncTicketPart(dec);
         } catch (KerberosException e) {
             throw new KerberosTokenDecoderException(e);
         } catch (IOException e) {
