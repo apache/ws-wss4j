@@ -21,6 +21,8 @@ package org.apache.wss4j.integration.test.kerberos;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -41,6 +43,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.directory.server.annotations.CreateKdcServer;
 import org.apache.directory.server.annotations.CreateLdapServer;
 import org.apache.directory.server.annotations.CreateTransport;
@@ -118,8 +121,8 @@ import org.w3c.dom.NodeList;
 
 @CreateKdcServer(
     transports = {
-        @CreateTransport(protocol = "TCP", address = "127.0.0.1", port = 23749),
-        @CreateTransport(protocol = "UDP", address = "127.0.0.1", port = 23749)
+        @CreateTransport(protocol = "TCP", address = "127.0.0.1", port=12412),
+        @CreateTransport(protocol = "UDP", address = "127.0.0.1", port=12412)
     },
     primaryRealm = "service.ws.apache.org",
     kdcPrincipal = "krbtgt/service.ws.apache.org@service.ws.apache.org"
@@ -153,9 +156,9 @@ public class KerberosTest extends AbstractLdapTestUnit {
                 basedir += "/..";
             }
 
-            //System.setProperty("sun.security.krb5.debug", "true");
+            System.setProperty("sun.security.krb5.debug", "true");
             System.setProperty("java.security.auth.login.config", basedir + "/integration/src/test/resources/kerberos/kerberos.jaas");
-            System.setProperty("java.security.krb5.conf", basedir + "/integration/src/test/resources/kerberos/krb5.conf");
+            
         }
         
         dbf = DocumentBuilderFactory.newInstance();
@@ -173,6 +176,24 @@ public class KerberosTest extends AbstractLdapTestUnit {
         SecurityTestUtil.cleanup();
     }
     
+    public KerberosTest() throws Exception {
+        String basedir = System.getProperty("basedir");
+        if (basedir == null) {
+            basedir = new File(".").getCanonicalPath();
+        }
+        
+        // Read in krb5.conf and substitute in the correct port
+        File f = new File(basedir + "/src/test/resources/kerberos/krb5.conf");
+        
+        String content = IOUtils.toString(new FileInputStream(f), "UTF-8");
+        content = content.replaceAll("port", "" + super.getKdcServer().getTcpPort());
+                                     
+        File f2 = new File(basedir + "/target/test-classes/kerberos/krb5.conf");
+        IOUtils.write(content, new FileOutputStream(f2), "UTF-8");
+        
+        System.setProperty("java.security.krb5.conf", f2.getPath());
+    }
+    
     //
     // DOM tests
     //
@@ -183,10 +204,6 @@ public class KerberosTest extends AbstractLdapTestUnit {
      */
     @Test
     public void testKerberosCreationAndProcessing() throws Exception {
-        if (!isServiceUp()) {
-            return;
-        }
-        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         
         WSSecHeader secHeader = new WSSecHeader();
@@ -240,10 +257,6 @@ public class KerberosTest extends AbstractLdapTestUnit {
      */
     @Test
     public void testSpnego() throws Exception {
-        if (!isServiceUp()) {
-            return;
-        }
-        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader();
@@ -276,10 +289,6 @@ public class KerberosTest extends AbstractLdapTestUnit {
      */
     @Test
     public void testKerberosClient() throws Exception {
-        if (!isServiceUp()) {
-            return;
-        }
-        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         CallbackHandler callbackHandler = new CallbackHandler() {
@@ -319,10 +328,6 @@ public class KerberosTest extends AbstractLdapTestUnit {
      */
     @Test
     public void testKerberosSignature() throws Exception {
-        if (!isServiceUp()) {
-            return;
-        }
-        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader();
@@ -392,10 +397,6 @@ public class KerberosTest extends AbstractLdapTestUnit {
      */
     @Test
     public void testKerberosSignatureKI() throws Exception {
-        if (!isServiceUp()) {
-            return;
-        }
-        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader();
@@ -469,10 +470,6 @@ public class KerberosTest extends AbstractLdapTestUnit {
      */
     @Test
     public void testKerberosEncryption() throws Exception {
-        if (!isServiceUp()) {
-            return;
-        }
-        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader();
@@ -540,10 +537,6 @@ public class KerberosTest extends AbstractLdapTestUnit {
      */
     @Test
     public void testKerberosEncryptionBSTFirst() throws Exception {
-        if (!isServiceUp()) {
-            return;
-        }
-        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader();
@@ -612,10 +605,6 @@ public class KerberosTest extends AbstractLdapTestUnit {
      */
     @Test
     public void testKerberosEncryptionKI() throws Exception {
-        if (!isServiceUp()) {
-            return;
-        }
-        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader();
@@ -685,10 +674,6 @@ public class KerberosTest extends AbstractLdapTestUnit {
     //
     @Test
     public void testKerberosSignatureOutbound() throws Exception {
-        if (!isServiceUp()) {
-            return;
-        }
-        
         Document document;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -764,10 +749,6 @@ public class KerberosTest extends AbstractLdapTestUnit {
 
     @Test
     public void testKerberosSignatureInbound() throws Exception {
-        if (!isServiceUp()) {
-            return;
-        }
-        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -856,10 +837,6 @@ public class KerberosTest extends AbstractLdapTestUnit {
 
     @Test
     public void testKerberosSignatureKIInbound() throws Exception {
-        if (!isServiceUp()) {
-            return;
-        }
-        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -948,10 +925,6 @@ public class KerberosTest extends AbstractLdapTestUnit {
 
     @Test
     public void testKerberosEncryptionOutbound() throws Exception {
-        if (!isServiceUp()) {
-            return;
-        }
-        
         Document document;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -1027,10 +1000,6 @@ public class KerberosTest extends AbstractLdapTestUnit {
 
     @Test
     public void testKerberosEncryptionInbound() throws Exception {
-        if (!isServiceUp()) {
-            return;
-        }
-        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -1117,10 +1086,6 @@ public class KerberosTest extends AbstractLdapTestUnit {
 
     @Test
     public void testKerberosEncryptionKIInbound() throws Exception {
-        if (!isServiceUp()) {
-            return;
-        }
-        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -1208,14 +1173,6 @@ public class KerberosTest extends AbstractLdapTestUnit {
 
             Assert.assertEquals(kerberosTokenSecurityEvents.size(), 1);
         }
-    }
-    
-    private boolean isServiceUp() {
-        if (super.getKdcServer().isEnabled() && super.getKdcServer().isStarted()) {
-            return true;
-        }
-        
-        return false;
     }
     
 }
