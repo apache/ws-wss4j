@@ -237,14 +237,21 @@ public class KerberosSecurity extends BinarySecurity {
                 }
             }
 
+            if (LOG.isDebugEnabled()) {
+                if (secretKey == null ) {
+                    LOG.debug("No secret key for kerberos was found");
+                } else {
+                    LOG.debug("Successfully retrieved a secret key for kerberos");
+                }
+            }
+            
             setToken(krbCtx.getKerberosToken());
         }
         catch (PrivilegedActionException e) {
             Throwable cause = e.getCause();
             if (cause instanceof WSSecurityException) {
                 throw (WSSecurityException) cause;
-            }
-            else {
+            } else {
                 throw new WSSecurityException(
                      ErrorCode.FAILURE, "kerberosServiceTicketError", new Object[] {}, cause
                 );
