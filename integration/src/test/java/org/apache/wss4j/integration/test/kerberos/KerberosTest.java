@@ -85,6 +85,7 @@ import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.apache.xml.security.utils.Base64;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -141,6 +142,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
     private static DocumentBuilderFactory dbf;
     
     private static boolean runTests;
+    private static boolean portUpdated;
     
     @BeforeClass
     public static void setUp() throws Exception {
@@ -159,7 +161,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
                 basedir += "/..";
             }
 
-            System.setProperty("sun.security.krb5.debug", "true");
+            // System.setProperty("sun.security.krb5.debug", "true");
             System.setProperty("java.security.auth.login.config", basedir + "/integration/src/test/resources/kerberos/kerberos.jaas");
             
         }
@@ -179,26 +181,31 @@ public class KerberosTest extends AbstractLdapTestUnit {
         SecurityTestUtil.cleanup();
     }
     
-    public KerberosTest() throws Exception {
-        String basedir = System.getProperty("basedir");
-        if (basedir == null) {
-            basedir = new File(".").getCanonicalPath();
+    @Before
+    public void updatePort() throws Exception {
+        if (!portUpdated) {
+            String basedir = System.getProperty("basedir");
+            if (basedir == null) {
+                basedir = new File(".").getCanonicalPath();
+            }
+            
+            // Read in krb5.conf and substitute in the correct port
+            File f = new File(basedir + "/src/test/resources/kerberos/krb5.conf");
+            
+            FileInputStream inputStream = new FileInputStream(f);
+            String content = IOUtils.toString(inputStream, "UTF-8");
+            inputStream.close();
+            content = content.replaceAll("port", "" + super.getKdcServer().getTransports()[0].getPort());
+            
+            File f2 = new File(basedir + "/target/test-classes/kerberos/krb5.conf");
+            FileOutputStream outputStream = new FileOutputStream(f2);
+            IOUtils.write(content, outputStream, "UTF-8");
+            outputStream.close();
+            
+            System.setProperty("java.security.krb5.conf", f2.getPath());
+            
+            portUpdated = true;
         }
-        
-        // Read in krb5.conf and substitute in the correct port
-        File f = new File(basedir + "/src/test/resources/kerberos/krb5.conf");
-        
-        FileInputStream inputStream = new FileInputStream(f);
-        String content = IOUtils.toString(inputStream, "UTF-8");
-        inputStream.close();
-        content = content.replaceAll("port", "" + super.getKdcServer().getTransports()[0].getPort());
-        
-        File f2 = new File(basedir + "/target/test-classes/kerberos/krb5.conf");
-        FileOutputStream outputStream = new FileOutputStream(f2);
-        IOUtils.write(content, outputStream, "UTF-8");
-        outputStream.close();
-        
-        System.setProperty("java.security.krb5.conf", f2.getPath());
     }
     
     //
