@@ -149,6 +149,21 @@ public class AlgorithmSuiteValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
     }
+    
+    /**
+     * Check the asymmetric key length
+     */
+    public void checkAsymmetricKeyLength(
+        X509Certificate[] x509Certificates
+    ) throws WSSecurityException {
+        if (x509Certificates == null) {
+            return;
+        }
+        
+        for (X509Certificate cert : x509Certificates) {
+            checkAsymmetricKeyLength(cert.getPublicKey());
+        }
+    }
 
     /**
      * Check the asymmetric key length

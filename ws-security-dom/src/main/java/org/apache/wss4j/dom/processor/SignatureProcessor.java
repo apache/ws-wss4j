@@ -208,16 +208,11 @@ public class SignatureProcessor implements Processor {
                     ((WSDerivedKeyTokenPrincipal)principal).getLength()
                 );
             } else {
-                Key key = null;
-                if (certs != null && certs[0] != null) {
-                    key = certs[0].getPublicKey();
+                if (certs != null && certs.length > 0) {
+                    algorithmSuiteValidator.checkAsymmetricKeyLength(certs);
                 } else if (publicKey != null) {
-                    key = publicKey;
-                }
-
-                if (key instanceof PublicKey) {
-                    algorithmSuiteValidator.checkAsymmetricKeyLength((PublicKey)key);
-                } else {
+                    algorithmSuiteValidator.checkAsymmetricKeyLength(publicKey);
+                } else if (secretKey != null) {
                     algorithmSuiteValidator.checkSymmetricKeyLength(secretKey.length);
                 }
             }

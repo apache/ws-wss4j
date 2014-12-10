@@ -217,7 +217,12 @@ public class SAMLTokenProcessor implements Processor {
                     AlgorithmSuiteValidator(algorithmSuite);
 
                 algorithmSuiteValidator.checkSignatureAlgorithms(xmlSignature);
-                algorithmSuiteValidator.checkAsymmetricKeyLength(key);
+                
+                if (samlKeyInfo.getCerts() != null && samlKeyInfo.getCerts().length > 0) {
+                    algorithmSuiteValidator.checkAsymmetricKeyLength(samlKeyInfo.getCerts());
+                } else {
+                    algorithmSuiteValidator.checkAsymmetricKeyLength(key);
+                }
             }
 
             samlAssertion.verifySignature(samlKeyInfo);
