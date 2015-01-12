@@ -835,6 +835,32 @@ public class SignatureTest extends org.junit.Assert {
             newSecEngine.processSecurityHeader(elem, data);
         assertTrue(handler.checkResults(results, actions));
     }
+    
+    @org.junit.Test
+    public void testCommentInSOAPBody() throws Exception {
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        LOG.info("Before Signing....");
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Document signedDoc = builder.build(doc, crypto, secHeader);
+        
+        // Add a comment node
+        Element body = WSSecurityUtil.findBodyElement(signedDoc);
+        org.w3c.dom.Node commentNode = signedDoc.createComment("This is a comment");
+        body.getFirstChild().appendChild(commentNode);
+
+        // if (LOG.isDebugEnabled()) {
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+            System.out.println(outputString);
+       //  }
+        
+        verify(signedDoc);
+    }
+    
 
     /**
      * Verifies the soap envelope.
