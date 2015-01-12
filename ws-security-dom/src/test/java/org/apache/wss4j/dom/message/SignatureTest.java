@@ -914,12 +914,11 @@ public class SignatureTest extends org.junit.Assert {
         org.w3c.dom.Node commentNode = signedDoc.createComment("This is a comment");
         body.getFirstChild().appendChild(commentNode);
 
-        // if (LOG.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             String outputString = 
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
-            System.out.println(outputString);
-       //  }
+        }
         
         verify(signedDoc);
     }
