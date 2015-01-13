@@ -155,6 +155,84 @@ public class SamlConditionsTest extends org.junit.Assert {
         }
     }
     
+    @org.junit.Test
+    public void testSAML2StaleNotOnOrAfter() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        
+        ConditionsBean conditions = new ConditionsBean();
+        DateTime notBefore = new DateTime();
+        conditions.setNotAfter(notBefore.minusMinutes(60));
+        conditions.setNotBefore(notBefore.minusMinutes(70));
+        callbackHandler.setConditions(conditions);
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SAML 2 Authn Assertion (sender vouches):");
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(unsignedDoc);
+            LOG.debug(outputString);
+        }
+        
+        try {
+            verify(unsignedDoc);
+            fail("Failure expected in processing the SAML Conditions element");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getMessage().contains("SAML token security failure"));
+        }
+    }
+    
+    @org.junit.Test
+    public void testSAML2FutureNotBefore() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        
+        ConditionsBean conditions = new ConditionsBean();
+        DateTime notBefore = new DateTime();
+        conditions.setNotAfter(new DateTime().plusMinutes(70));
+        conditions.setNotBefore(notBefore.plusMinutes(60));
+        callbackHandler.setConditions(conditions);
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SAML 2 Authn Assertion (sender vouches):");
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(unsignedDoc);
+            LOG.debug(outputString);
+        }
+        
+        try {
+            verify(unsignedDoc);
+            fail("Failure expected in processing the SAML Conditions element");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getMessage().contains("SAML token security failure"));
+        }
+    }
+    
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with an (invalid) custom Conditions statement.
