@@ -158,9 +158,9 @@ public class SamlConditionsTest extends org.junit.Assert {
         conditions.setNotBefore(notBefore.minusMinutes(70));
         callbackHandler.setConditions(conditions);
         
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -168,12 +168,12 @@ public class SamlConditionsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion (sender vouches):");
             String outputString = 
-                XMLUtils.PrettyDocumentToString(unsignedDoc);
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
         
@@ -197,9 +197,9 @@ public class SamlConditionsTest extends org.junit.Assert {
         conditions.setNotBefore(notBefore.plusMinutes(60));
         callbackHandler.setConditions(conditions);
         
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
@@ -207,12 +207,12 @@ public class SamlConditionsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion (sender vouches):");
             String outputString = 
-                XMLUtils.PrettyDocumentToString(unsignedDoc);
+                org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
         
