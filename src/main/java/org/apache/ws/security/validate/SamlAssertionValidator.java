@@ -212,14 +212,18 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
     protected void checkConditions(AssertionWrapper assertion) throws WSSecurityException {
         DateTime validFrom = null;
         DateTime validTill = null;
+        DateTime issueInstant = null;
+        
         if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)
             && assertion.getSaml2().getConditions() != null) {
             validFrom = assertion.getSaml2().getConditions().getNotBefore();
             validTill = assertion.getSaml2().getConditions().getNotOnOrAfter();
+            issueInstant = assertion.getSaml2().getIssueInstant();
         } else if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_11)
             && assertion.getSaml1().getConditions() != null) {
             validFrom = assertion.getSaml1().getConditions().getNotBefore();
             validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
+            issueInstant = assertion.getSaml1().getIssueInstant();
         }
         
         if (validFrom != null) {
@@ -234,6 +238,17 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         if (validTill != null && validTill.isBeforeNow()) {
             LOG.debug("SAML Token condition (Not On Or After) not met");
             throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+        }
+        
+        // IssueInstant is not strictly in Conditions, but it has similar semantics to 
+        // NotBefore, so including it here
+        if (issueInstant != null) {
+            DateTime currentTime = new DateTime();
+            currentTime = currentTime.plusSeconds(futureTTL);
+            if (issueInstant.isAfter(currentTime)) {
+                LOG.debug("SAML Token IssueInstant not met");
+                throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            }
         }
     }
 
