@@ -108,6 +108,9 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
         // Check conditions
         checkConditions(samlAssertionWrapper);
         
+        // Check the AuthnStatements of the assertion (if any)
+        checkAuthnStatements(samlAssertionWrapper);
+        
         // Check the Subject Confirmation requirements
         verifySubjectConfirmationMethod(samlAssertionWrapper);
         
@@ -207,6 +210,13 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
      */
     protected void checkConditions(SamlAssertionWrapper samlAssertion) throws WSSecurityException {
         samlAssertion.checkConditions(futureTTL);
+    }
+    
+    /**
+     * Check the AuthnStatements of the Assertion (if any)
+     */
+    protected void checkAuthnStatements(SamlAssertionWrapper samlAssertion) throws WSSecurityException {
+        samlAssertion.checkAuthnStatements(futureTTL);
     }
     
     /**

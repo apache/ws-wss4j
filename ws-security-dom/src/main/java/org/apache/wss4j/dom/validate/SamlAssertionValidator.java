@@ -102,7 +102,7 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         // Check conditions
         checkConditions(samlAssertion);
         
-        // Check conditions
+        // Check the AuthnStatements of the assertion (if any)
         checkAuthnStatements(samlAssertion);
         
         // Check OneTimeUse Condition
