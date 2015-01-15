@@ -67,6 +67,15 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     protected String subjectLocalityIpAddress = null;
     protected String subjectLocalityDnsAddress = null;
     protected DateTime sessionNotOnOrAfter = null;
+    protected DateTime authenticationInstant;
+    public DateTime getAuthenticationInstant() {
+        return authenticationInstant;
+    }
+
+    public void setAuthenticationInstant(DateTime authenticationInstant) {
+        this.authenticationInstant = authenticationInstant;
+    }
+
     protected String resource = null;
     protected List<?> customAttributeValues = null;
     protected ConditionsBean conditions = null;
@@ -141,6 +150,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
                 authBean.setSubjectLocality(subjectLocality);
             }
             authBean.setAuthenticationMethod("Password");
+            authBean.setAuthenticationInstant(authenticationInstant);
             authBean.setSessionNotOnOrAfter(sessionNotOnOrAfter);
             callback.setAuthenticationStatementData(Collections.singletonList(authBean));
         } else if (statement == Statement.ATTR) {

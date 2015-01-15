@@ -644,7 +644,7 @@ public class SamlTokenTest extends org.junit.Assert {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        callbackHandler.setSubjectLocality("12.34.56.780", "test-dns");
+        callbackHandler.setSubjectLocality("12.34.56.78", "test-dns");
         
         SAMLParms samlParms = new SAMLParms();
         samlParms.setCallbackHandler(callbackHandler);
@@ -664,7 +664,7 @@ public class SamlTokenTest extends org.junit.Assert {
             LOG.debug("SAML 1.1 Authn Assertion (sender vouches):");
             LOG.debug(outputString);
         }
-        assertTrue(outputString.contains("12.34.56.780"));
+        assertTrue(outputString.contains("12.34.56.78"));
         assertTrue(outputString.contains("test-dns"));
         
         List<WSSecurityEngineResult> results = verify(unsignedDoc);
@@ -725,7 +725,7 @@ public class SamlTokenTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        callbackHandler.setSubjectLocality("12.34.56.780", "test-dns");
+        callbackHandler.setSubjectLocality("12.34.56.78", "test-dns");
         
         SAMLParms samlParms = new SAMLParms();
         samlParms.setCallbackHandler(callbackHandler);
@@ -745,7 +745,7 @@ public class SamlTokenTest extends org.junit.Assert {
             LOG.debug("SAML 2 Authn Assertion (sender vouches):");
             LOG.debug(outputString);
         }
-        assertTrue(outputString.contains("12.34.56.780"));
+        assertTrue(outputString.contains("12.34.56.78"));
         assertTrue(outputString.contains("test-dns"));
         
         List<WSSecurityEngineResult> results = verify(unsignedDoc);

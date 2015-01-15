@@ -30,8 +30,11 @@ import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.saml.ext.OpenSAMLUtil;
 import org.apache.ws.security.saml.ext.builder.SAML1Constants;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
+import org.apache.ws.security.util.InetAddressUtils;
 import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;
+import org.opensaml.saml1.core.AuthenticationStatement;
+import org.opensaml.saml2.core.AuthnStatement;
 import org.opensaml.xml.validation.ValidationException;
 import org.opensaml.xml.validation.ValidatorSuite;
 
@@ -104,6 +107,9 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         // Check conditions
         checkConditions(assertion);
 
+        // Check the AuthnStatements of the Assertion (if any)
+        checkAuthnStatements(assertion);
+        
         // Check OneTimeUse Condition
         checkOneTimeUse(assertion, data);
         
@@ -252,6 +258,74 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         }
     }
 
+    /**
+     * Check the AuthnStatements of the Assertion (if any)
+     */
+    protected void checkAuthnStatements(AssertionWrapper assertion) throws WSSecurityException {
+        if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)
+            && assertion.getSaml2().getAuthnStatements() != null) {
+            List<AuthnStatement> authnStatements = assertion.getSaml2().getAuthnStatements();
+
+            for (AuthnStatement authnStatement : authnStatements) {
+                DateTime authnInstant = authnStatement.getAuthnInstant();
+                DateTime sessionNotOnOrAfter = authnStatement.getSessionNotOnOrAfter();
+                String subjectLocalityAddress = null;
+
+                if (authnStatement.getSubjectLocality() != null
+                    && authnStatement.getSubjectLocality().getAddress() != null) {
+                    subjectLocalityAddress = authnStatement.getSubjectLocality().getAddress();
+                }
+
+                validateAuthnStatement(authnInstant, sessionNotOnOrAfter, 
+                                       subjectLocalityAddress, futureTTL);
+            }
+        } else if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_11)
+            && assertion.getSaml1().getAuthenticationStatements() != null) {
+            List<AuthenticationStatement> authnStatements = 
+                assertion.getSaml1().getAuthenticationStatements();
+
+            for (AuthenticationStatement authnStatement : authnStatements) {
+                DateTime authnInstant = authnStatement.getAuthenticationInstant();
+                String subjectLocalityAddress = null;
+
+                if (authnStatement.getSubjectLocality() != null
+                    && authnStatement.getSubjectLocality().getIPAddress() != null) {
+                    subjectLocalityAddress = authnStatement.getSubjectLocality().getIPAddress();
+                }
+
+                validateAuthnStatement(authnInstant, null, 
+                                       subjectLocalityAddress, futureTTL);
+            }
+        }
+    }
+        
+    private void validateAuthnStatement(
+        DateTime authnInstant, DateTime sessionNotOnOrAfter, String subjectLocalityAddress,
+        int futureTTL
+    ) throws WSSecurityException {
+        // AuthnInstant in the future
+        DateTime currentTime = new DateTime();
+        currentTime = currentTime.plusSeconds(futureTTL);
+        if (authnInstant.isAfter(currentTime)) {
+            LOG.debug("SAML Token AuthnInstant not met");
+            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+        }
+
+        // Stale SessionNotOnOrAfter
+        if (sessionNotOnOrAfter != null && sessionNotOnOrAfter.isBeforeNow()) {
+            LOG.debug("SAML Token SessionNotOnOrAfter not met");
+            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+        }
+
+        // Check that the SubjectLocality address is an IP address
+        if (subjectLocalityAddress != null
+            && !(InetAddressUtils.isIPv4Address(subjectLocalityAddress)
+                || InetAddressUtils.isIPv6Address(subjectLocalityAddress))) {
+            LOG.debug("SAML Token SubjectLocality address is not valid: " + subjectLocalityAddress);
+            throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+        }
+    }
+    
     /**
      * Check the "OneTimeUse" Condition of the Assertion. If this is set then the Assertion
      * is cached (if a cache is defined), and must not have been previously cached
