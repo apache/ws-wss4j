@@ -630,7 +630,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
-            callbackHandler.setSubjectLocality("12.34.56.780", "test-dns");
+            callbackHandler.setSubjectLocality("12.34.56.78", "test-dns");
             securityProperties.setSamlCallbackHandler(callbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
@@ -669,7 +669,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
             callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
-            callbackHandler.setSubjectLocality("12.34.56.780", "test-dns");
+            callbackHandler.setSubjectLocality("12.34.56.78", "test-dns");
             securityProperties.setSamlCallbackHandler(callbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);

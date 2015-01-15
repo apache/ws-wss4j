@@ -102,6 +102,9 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         // Check conditions
         checkConditions(samlAssertion);
         
+        // Check conditions
+        checkAuthnStatements(samlAssertion);
+        
         // Check OneTimeUse Condition
         checkOneTimeUse(samlAssertion, data);
         
@@ -209,6 +212,13 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
      */
     protected void checkConditions(SamlAssertionWrapper samlAssertion) throws WSSecurityException {
         samlAssertion.checkConditions(futureTTL);
+    }
+    
+    /**
+     * Check the AuthnStatements of the Assertion (if any)
+     */
+    protected void checkAuthnStatements(SamlAssertionWrapper samlAssertion) throws WSSecurityException {
+        samlAssertion.checkAuthnStatements(futureTTL);
     }
     
     /**

@@ -32,6 +32,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.builder.SAML1ComponentBuilder;
 import org.apache.wss4j.common.saml.builder.SAML2ComponentBuilder;
 import org.apache.wss4j.common.util.DOM2Writer;
+import org.apache.wss4j.common.util.InetAddressUtils;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
@@ -819,6 +820,74 @@ public class SamlAssertionWrapper {
                 LOG.debug("SAML Token IssueInstant not met");
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
+        }
+    }
+    
+    /**
+     * Check the various attributes of the AuthnStatements of the assertion (if any)
+     */
+    public void checkAuthnStatements(int futureTTL) throws WSSecurityException {
+        if (getSamlVersion().equals(SAMLVersion.VERSION_20)
+            && getSaml2().getAuthnStatements() != null) {
+            List<AuthnStatement> authnStatements = getSaml2().getAuthnStatements();
+           
+            for (AuthnStatement authnStatement : authnStatements) {
+                DateTime authnInstant = authnStatement.getAuthnInstant();
+                DateTime sessionNotOnOrAfter = authnStatement.getSessionNotOnOrAfter();
+                String subjectLocalityAddress = null;
+
+                if (authnStatement.getSubjectLocality() != null
+                    && authnStatement.getSubjectLocality().getAddress() != null) {
+                    subjectLocalityAddress = authnStatement.getSubjectLocality().getAddress();
+                }
+                
+                validateAuthnStatement(authnInstant, sessionNotOnOrAfter, 
+                                       subjectLocalityAddress, futureTTL);
+            }
+        } else if (getSamlVersion().equals(SAMLVersion.VERSION_11)
+            && getSaml1().getAuthenticationStatements() != null) {
+            List<AuthenticationStatement> authnStatements = 
+                getSaml1().getAuthenticationStatements();
+            
+            for (AuthenticationStatement authnStatement : authnStatements) {
+                DateTime authnInstant = authnStatement.getAuthenticationInstant();
+                String subjectLocalityAddress = null;
+
+                if (authnStatement.getSubjectLocality() != null
+                    && authnStatement.getSubjectLocality().getIPAddress() != null) {
+                    subjectLocalityAddress = authnStatement.getSubjectLocality().getIPAddress();
+                }
+                
+                validateAuthnStatement(authnInstant, null, 
+                                       subjectLocalityAddress, futureTTL);
+            }
+        }
+    }
+    
+    private void validateAuthnStatement(
+        DateTime authnInstant, DateTime sessionNotOnOrAfter, String subjectLocalityAddress,
+        int futureTTL
+    ) throws WSSecurityException {
+        // AuthnInstant in the future
+        DateTime currentTime = new DateTime();
+        currentTime = currentTime.plusSeconds(futureTTL);
+        if (authnInstant.isAfter(currentTime)) {
+            LOG.debug("SAML Token AuthnInstant not met");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+        }
+        
+        // Stale SessionNotOnOrAfter
+        if (sessionNotOnOrAfter != null && sessionNotOnOrAfter.isBeforeNow()) {
+            LOG.debug("SAML Token SessionNotOnOrAfter not met");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+        }
+        
+        // Check that the SubjectLocality address is an IP address
+        if (subjectLocalityAddress != null
+            && !(InetAddressUtils.isIPv4Address(subjectLocalityAddress)
+                || InetAddressUtils.isIPv6Address(subjectLocalityAddress))) {
+            LOG.debug("SAML Token SubjectLocality address is not valid: " + subjectLocalityAddress);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
     }
     
