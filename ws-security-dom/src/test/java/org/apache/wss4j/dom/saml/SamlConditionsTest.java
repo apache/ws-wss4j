@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.security.auth.callback.CallbackHandler;
+
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
@@ -31,7 +33,6 @@ import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.ProxyRestrictionBean;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
@@ -42,7 +43,6 @@ import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.joda.time.DateTime;
 import org.w3c.dom.Document;
 
@@ -83,33 +83,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         conditions.setNotAfter(notBefore.plusMinutes(20));
         callbackHandler.setConditions(conditions);
         
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
-        
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("SAML 1.1 Authn Assertion (sender vouches):");
-            String outputString = 
-                XMLUtils.PrettyDocumentToString(unsignedDoc);
-            LOG.debug(outputString);
-        }
-        
-        List<WSSecurityEngineResult> results = verify(unsignedDoc);
-        WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
-        SamlAssertionWrapper receivedSamlAssertion =
-            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-        assertTrue(receivedSamlAssertion != null);
-        assertFalse(receivedSamlAssertion.isSigned());
-        assertTrue(receivedSamlAssertion.getSignatureValue() == null);
+        createAndVerifyMessage(callbackHandler, true);
     }
     
     /**
@@ -128,31 +102,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         conditions.setNotAfter(notBefore.minusMinutes(3));
         callbackHandler.setConditions(conditions);
         
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
-        
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("SAML 2 Authn Assertion (sender vouches):");
-            String outputString = 
-                XMLUtils.PrettyDocumentToString(unsignedDoc);
-            LOG.debug(outputString);
-        }
-        
-        try {
-            verify(unsignedDoc);
-            fail("Failure expected in processing the SAML Conditions element");
-        } catch (WSSecurityException ex) {
-            assertTrue(ex.getMessage().contains("SAML token security failure"));
-        }
+        createAndVerifyMessage(callbackHandler, false);
     }
     
     @org.junit.Test
@@ -167,31 +117,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         conditions.setNotBefore(notBefore.minusMinutes(70));
         callbackHandler.setConditions(conditions);
         
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
-        
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("SAML 2 Authn Assertion (sender vouches):");
-            String outputString = 
-                XMLUtils.PrettyDocumentToString(unsignedDoc);
-            LOG.debug(outputString);
-        }
-        
-        try {
-            verify(unsignedDoc);
-            fail("Failure expected in processing the SAML Conditions element");
-        } catch (WSSecurityException ex) {
-            assertTrue(ex.getMessage().contains("SAML token security failure"));
-        }
+        createAndVerifyMessage(callbackHandler, false);
     }
     
     @org.junit.Test
@@ -206,31 +132,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         conditions.setNotBefore(notBefore.plusMinutes(60));
         callbackHandler.setConditions(conditions);
         
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
-        
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("SAML 2 Authn Assertion (sender vouches):");
-            String outputString = 
-                XMLUtils.PrettyDocumentToString(unsignedDoc);
-            LOG.debug(outputString);
-        }
-        
-        try {
-            verify(unsignedDoc);
-            fail("Failure expected in processing the SAML Conditions element");
-        } catch (WSSecurityException ex) {
-            assertTrue(ex.getMessage().contains("SAML token security failure"));
-        }
+        createAndVerifyMessage(callbackHandler, false);
     }
     
     @org.junit.Test
@@ -286,31 +188,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         conditions.setNotAfter(notBefore.plusMinutes(5));
         callbackHandler.setConditions(conditions);
         
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-        
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
-        
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("SAML 2 Authn Assertion (sender vouches):");
-            String outputString = 
-                XMLUtils.PrettyDocumentToString(unsignedDoc);
-            LOG.debug(outputString);
-        }
-        
-        try {
-            verify(unsignedDoc);
-            fail("Failure expected in processing the SAML Conditions element");
-        } catch (WSSecurityException ex) {
-            assertTrue(ex.getMessage().contains("SAML token security failure"));
-        }
+        createAndVerifyMessage(callbackHandler, false);
     }
     
     /**
@@ -329,26 +207,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         conditions.setNotAfter(notBefore.plusMinutes(5));
         callbackHandler.setConditions(conditions);
         
-        SAMLCallback samlCallback = new SAMLCallback();
-        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
-        
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("SAML 2 Authn Assertion (sender vouches):");
-            String outputString = 
-                XMLUtils.PrettyDocumentToString(unsignedDoc);
-            LOG.debug(outputString);
-        }
-        
-        verify(unsignedDoc);
+        createAndVerifyMessage(callbackHandler, true);
     }
     
     /**
@@ -523,6 +382,38 @@ public class SamlConditionsTest extends org.junit.Assert {
         }
         
         verify(unsignedDoc);
+    }
+    
+    private void createAndVerifyMessage(
+        CallbackHandler samlCallbackHandler, boolean success
+    ) throws Exception {
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(samlCallbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(unsignedDoc);
+            LOG.debug(outputString);
+        }
+
+        try {
+            verify(unsignedDoc);
+            if (!success) {
+                fail("Failure expected in processing the SAML assertion");
+            }
+        } catch (WSSecurityException ex) {
+            assertTrue(!success);
+            assertTrue(ex.getMessage().contains("SAML token security failure"));
+        }
     }
     
     /**
