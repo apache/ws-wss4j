@@ -106,7 +106,8 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
                                                  final InboundSecurityToken subjectSecurityToken,
                                                  final TokenContext tokenContext) throws WSSecurityException {
         // Check conditions
-        checkConditions(samlAssertionWrapper);
+        checkConditions(samlAssertionWrapper,
+                        tokenContext.getWssSecurityProperties().getAudienceRestrictions());
         
         // Check the AuthnStatements of the assertion (if any)
         checkAuthnStatements(samlAssertionWrapper);
@@ -203,6 +204,16 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
                                       "invalidSAMLsecurity");
         }
+    }
+    
+    /**
+     * Check the Conditions of the Assertion.
+     */
+    protected void checkConditions(
+        SamlAssertionWrapper samlAssertion, List<String> audienceRestrictions
+    ) throws WSSecurityException {
+        checkConditions(samlAssertion);
+        samlAssertion.checkAudienceRestrictions(audienceRestrictions);
     }
     
     /**

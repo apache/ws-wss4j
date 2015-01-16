@@ -116,6 +116,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private boolean enableSamlOneTimeUseReplayCache = true;
     private boolean validateSamlSubjectConfirmation = true;
     private Collection<Pattern> subjectDNPatterns = new ArrayList<Pattern>();
+    private List<String> audienceRestrictions = new ArrayList<String>();
 
     private CallbackHandler attachmentCallbackHandler;
     private Object msgContext;
@@ -178,6 +179,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.subjectDNPatterns = wssSecurityProperties.subjectDNPatterns;
         this.attachmentCallbackHandler = wssSecurityProperties.attachmentCallbackHandler;
         this.msgContext = wssSecurityProperties.msgContext;
+        this.audienceRestrictions = wssSecurityProperties.audienceRestrictions;
     }
 
     /**
@@ -921,6 +923,22 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      */
     public Collection<Pattern> getSubjectCertConstraints() {
         return subjectDNPatterns;
+    }
+    
+    /**
+     * Set the Audience Restrictions
+     */
+    public void setAudienceRestrictions(List<String> audienceRestrictions) {
+        if (audienceRestrictions != null) {
+            this.audienceRestrictions.addAll(audienceRestrictions);
+        }
+    }
+    
+    /**
+     * Get the Audience Restrictions
+     */
+    public List<String> getAudienceRestrictions() {
+        return audienceRestrictions;
     }
 
     public int getDerivedSignatureKeyLength() {

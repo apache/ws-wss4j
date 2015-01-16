@@ -509,6 +509,130 @@ public class SamlConditionsTest extends AbstractTestBase {
         }
     }
     
+    // Now test AudienceRestrictions with supplied restrictions
+    @org.junit.Test
+    public void testSAML2AudienceRestrictionValidation() throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        List<String> audiences = new ArrayList<String>();
+        {
+            SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+            callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+            callbackHandler.setIssuer("www.example.com");
+
+            ConditionsBean conditions = new ConditionsBean();
+            conditions.setTokenPeriodMinutes(5);
+            audiences.add("http://apache.org/one");
+            audiences.add("http://apache.org/two");
+            AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
+            audienceRestrictionBean.setAudienceURIs(audiences);
+            conditions.setAudienceRestrictions(Collections.singletonList(audienceRestrictionBean));
+            
+            callbackHandler.setConditions(conditions);
+
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            String action = WSHandlerConstants.SAML_TOKEN_SIGNED;
+            Properties properties = new Properties();
+            properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
+
+        // This should fail as the expected audience isn't in the assertion
+        audiences.clear();
+        audiences.add("http://apache.org/three");
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setAudienceRestrictions(audiences);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            try {
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                Assert.fail("XMLStreamException expected");
+            } catch (XMLStreamException e) {
+                Assert.assertNotNull(e.getCause());
+            }
+        }
+        
+        // Now add the correct audience back in...
+        audiences.add("http://apache.org/one");
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setAudienceRestrictions(audiences);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Assert.assertNotNull(document);
+        }
+    }
+    
+    // Now test AudienceRestrictions with supplied restrictions
+    @org.junit.Test
+    public void testSAML1AudienceRestrictionValidation() throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        List<String> audiences = new ArrayList<String>();
+        {
+            SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+            callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
+            callbackHandler.setIssuer("www.example.com");
+
+            ConditionsBean conditions = new ConditionsBean();
+            conditions.setTokenPeriodMinutes(5);
+            audiences.add("http://apache.org/one");
+            audiences.add("http://apache.org/two");
+            AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
+            audienceRestrictionBean.setAudienceURIs(audiences);
+            conditions.setAudienceRestrictions(Collections.singletonList(audienceRestrictionBean));
+            
+            callbackHandler.setConditions(conditions);
+
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            String action = WSHandlerConstants.SAML_TOKEN_SIGNED;
+            Properties properties = new Properties();
+            properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
+
+        // This should fail as the expected audience isn't in the assertion
+        audiences.clear();
+        audiences.add("http://apache.org/three");
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setAudienceRestrictions(audiences);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            try {
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                Assert.fail("XMLStreamException expected");
+            } catch (XMLStreamException e) {
+                Assert.assertNotNull(e.getCause());
+            }
+        }
+        
+        // Now add the correct audience back in...
+        audiences.add("http://apache.org/one");
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setAudienceRestrictions(audiences);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Assert.assertNotNull(document);
+        }
+    }
+    
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with two AudienceRestriction Elements
@@ -552,6 +676,74 @@ public class SamlConditionsTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+            Assert.assertNotNull(document);
+        }
+    }
+    
+    // Now test AudienceRestrictions with supplied restrictions
+    @org.junit.Test
+    public void testSAML1AudienceRestrictionSeparateRestrictionsValidation() throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+            callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+            callbackHandler.setIssuer("www.example.com");
+
+            ConditionsBean conditions = new ConditionsBean();
+            conditions.setTokenPeriodMinutes(5);
+            
+            List<AudienceRestrictionBean> audiencesRestrictions = 
+                new ArrayList<AudienceRestrictionBean>();
+            AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
+            audienceRestrictionBean.setAudienceURIs(Collections.singletonList("http://apache.org/one"));
+            audiencesRestrictions.add(audienceRestrictionBean);
+
+            audienceRestrictionBean = new AudienceRestrictionBean();
+            audienceRestrictionBean.setAudienceURIs(Collections.singletonList("http://apache.org/two"));
+            audiencesRestrictions.add(audienceRestrictionBean);
+
+            conditions.setAudienceRestrictions(audiencesRestrictions);
+            
+            callbackHandler.setConditions(conditions);
+
+            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
+            String action = WSHandlerConstants.SAML_TOKEN_SIGNED;
+            Properties properties = new Properties();
+            properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
+            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
+
+            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
+        }
+
+        // This should fail as the expected audience isn't in the assertion
+        List<String> audiences = new ArrayList<String>();
+        audiences.add("http://apache.org/three");
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setAudienceRestrictions(audiences);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+
+            try {
+                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+                Assert.fail("XMLStreamException expected");
+            } catch (XMLStreamException e) {
+                Assert.assertNotNull(e.getCause());
+            }
+        }
+        
+        // Now add the correct audience back in...
+        audiences.add("http://apache.org/one");
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setAudienceRestrictions(audiences);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
