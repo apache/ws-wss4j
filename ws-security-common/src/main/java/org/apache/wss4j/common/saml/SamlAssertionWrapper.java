@@ -835,7 +835,8 @@ public class SamlAssertionWrapper {
         
         if (getSamlVersion().equals(SAMLVersion.VERSION_20) && getSaml2().getConditions() != null) {
             org.opensaml.saml2.core.Conditions conditions = getSaml2().getConditions();
-            if (conditions != null && conditions.getAudienceRestrictions() != null) {
+            if (conditions != null && conditions.getAudienceRestrictions() != null
+                && !conditions.getAudienceRestrictions().isEmpty()) {
                 boolean foundAddress = false;
                 for (org.opensaml.saml2.core.AudienceRestriction audienceRestriction 
                     : conditions.getAudienceRestrictions()) {
@@ -858,7 +859,8 @@ public class SamlAssertionWrapper {
             }
         } else if (getSamlVersion().equals(SAMLVersion.VERSION_11) && getSaml1().getConditions() != null) {
             org.opensaml.saml1.core.Conditions conditions = getSaml1().getConditions();
-            if (conditions != null && conditions.getAudienceRestrictionConditions() != null) {
+            if (conditions != null && conditions.getAudienceRestrictionConditions() != null
+                && !conditions.getAudienceRestrictionConditions().isEmpty()) {
                 boolean foundAddress = false;
                 for (org.opensaml.saml1.core.AudienceRestrictionCondition audienceRestriction 
                     : conditions.getAudienceRestrictionConditions()) {
