@@ -276,7 +276,8 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
             && assertion.getSaml2().getConditions() != null) {
             org.opensaml.saml2.core.Conditions conditions = 
                 assertion.getSaml2().getConditions();
-            if (conditions != null && conditions.getAudienceRestrictions() != null) {
+            if (conditions != null && conditions.getAudienceRestrictions() != null
+                && !conditions.getAudienceRestrictions().isEmpty()) {
                 boolean foundAddress = false;
                 for (org.opensaml.saml2.core.AudienceRestriction audienceRestriction 
                     : conditions.getAudienceRestrictions()) {
@@ -301,7 +302,8 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
             && assertion.getSaml1().getConditions() != null) {
             org.opensaml.saml1.core.Conditions conditions = 
                 assertion.getSaml1().getConditions();
-            if (conditions != null && conditions.getAudienceRestrictionConditions() != null) {
+            if (conditions != null && conditions.getAudienceRestrictionConditions() != null
+                && !conditions.getAudienceRestrictionConditions().isEmpty()) {
                 boolean foundAddress = false;
                 for (org.opensaml.saml1.core.AudienceRestrictionCondition audienceRestriction 
                     : conditions.getAudienceRestrictionConditions()) {
