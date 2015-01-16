@@ -821,6 +821,65 @@ public class SamlAssertionWrapper {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
         }
+        
+    }
+    
+    /**
+     * Check the AudienceRestrictions of the Assertion
+     */
+    public void checkAudienceRestrictions(List<String> audienceRestrictions) throws WSSecurityException {
+        // Now check the audience restriction conditions
+        if (audienceRestrictions == null || audienceRestrictions.isEmpty()) {
+            return;
+        }
+        
+        if (getSamlVersion().equals(SAMLVersion.VERSION_20) && getSaml2().getConditions() != null) {
+            org.opensaml.saml2.core.Conditions conditions = getSaml2().getConditions();
+            if (conditions != null && conditions.getAudienceRestrictions() != null) {
+                boolean foundAddress = false;
+                for (org.opensaml.saml2.core.AudienceRestriction audienceRestriction 
+                    : conditions.getAudienceRestrictions()) {
+                    if (audienceRestriction.getAudiences() != null) {
+                        List<org.opensaml.saml2.core.Audience> audiences = 
+                            audienceRestriction.getAudiences();
+                        for (org.opensaml.saml2.core.Audience audience : audiences) {
+                            String audienceURI = audience.getAudienceURI();
+                            if (audienceRestrictions.contains(audienceURI)) {
+                                foundAddress = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                if (!foundAddress) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+                }
+            }
+        } else if (getSamlVersion().equals(SAMLVersion.VERSION_11) && getSaml1().getConditions() != null) {
+            org.opensaml.saml1.core.Conditions conditions = getSaml1().getConditions();
+            if (conditions != null && conditions.getAudienceRestrictionConditions() != null) {
+                boolean foundAddress = false;
+                for (org.opensaml.saml1.core.AudienceRestrictionCondition audienceRestriction 
+                    : conditions.getAudienceRestrictionConditions()) {
+                    if (audienceRestriction.getAudiences() != null) {
+                        List<org.opensaml.saml1.core.Audience> audiences = 
+                            audienceRestriction.getAudiences();
+                        for (org.opensaml.saml1.core.Audience audience : audiences) {
+                            String audienceURI = audience.getUri();
+                            if (audienceRestrictions.contains(audienceURI)) {
+                                foundAddress = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                if (!foundAddress) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+                }
+            }
+        }
     }
     
     /**

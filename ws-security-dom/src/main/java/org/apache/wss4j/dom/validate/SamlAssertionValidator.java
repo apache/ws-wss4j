@@ -100,7 +100,7 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         verifySubjectConfirmationMethod(samlAssertion);
         
         // Check conditions
-        checkConditions(samlAssertion);
+        checkConditions(samlAssertion, data.getAudienceRestrictions());
         
         // Check the AuthnStatements of the assertion (if any)
         checkAuthnStatements(samlAssertion);
@@ -205,6 +205,16 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         trustCredential.setPublicKey(samlKeyInfo.getPublicKey());
         trustCredential.setCertificates(samlKeyInfo.getCerts());
         return super.validate(trustCredential, data);
+    }
+    
+    /**
+     * Check the Conditions of the Assertion.
+     */
+    protected void checkConditions(
+        SamlAssertionWrapper samlAssertion, List<String> audienceRestrictions
+    ) throws WSSecurityException {
+        checkConditions(samlAssertion);
+        samlAssertion.checkAudienceRestrictions(audienceRestrictions);
     }
     
     /**
