@@ -91,6 +91,7 @@ public class RequestData {
     private int originalSignatureActionPosition;
     private AlgorithmSuite algorithmSuite;
     private AlgorithmSuite samlAlgorithmSuite;
+    private final List<String> audienceRestrictions = new ArrayList<String>();
 
     public void clear() {
         soapConstants = null;
@@ -122,6 +123,7 @@ public class RequestData {
         algorithmSuite = null;
         samlAlgorithmSuite = null;
         setOriginalSignatureActionPosition(0);
+        audienceRestrictions.clear();
     }
 
     public String getSignatureC14nAlgorithm() {
@@ -547,7 +549,23 @@ public class RequestData {
     public Collection<Pattern> getSubjectCertConstraints() {
         return subjectDNPatterns;
     }
-
+    
+    /**
+     * Set the Audience Restrictions
+     */
+    public void setAudienceRestrictions(List<String> audienceRestrictions) {
+        if (audienceRestrictions != null) {
+            this.audienceRestrictions.addAll(audienceRestrictions);
+        }
+    }
+    
+    /**
+     * Get the Audience Restrictions
+     */
+    public List<String> getAudienceRestrictions() {
+        return audienceRestrictions;
+    }
+    
     public boolean isAppendSignatureAfterTimestamp() {
         return appendSignatureAfterTimestamp;
     }

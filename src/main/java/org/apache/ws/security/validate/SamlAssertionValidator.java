@@ -106,8 +106,11 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         
         // Check conditions
         checkConditions(assertion);
-
-        // Check the AuthnStatements of the Assertion (if any)
+        
+        // Check the audience restrictions
+        checkAudienceRestrictions(assertion, data.getAudienceRestrictions());
+        
+        // Check the AuthnStatements of the assertion (if any)
         checkAuthnStatements(assertion);
         
         // Check OneTimeUse Condition
@@ -254,6 +257,70 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
             if (issueInstant.isAfter(currentTime)) {
                 LOG.debug("SAML Token IssueInstant not met");
                 throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            }
+        }
+    }
+    
+    /**
+     * Check the AudienceRestrictions of the Assertion
+     */
+    public void checkAudienceRestrictions(
+        AssertionWrapper assertion, List<String> audienceRestrictions
+    ) throws WSSecurityException {
+        // Now check the audience restriction conditions
+        if (audienceRestrictions == null || audienceRestrictions.isEmpty()) {
+            return;
+        }
+        
+        if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20) 
+            && assertion.getSaml2().getConditions() != null) {
+            org.opensaml.saml2.core.Conditions conditions = 
+                assertion.getSaml2().getConditions();
+            if (conditions != null && conditions.getAudienceRestrictions() != null) {
+                boolean foundAddress = false;
+                for (org.opensaml.saml2.core.AudienceRestriction audienceRestriction 
+                    : conditions.getAudienceRestrictions()) {
+                    if (audienceRestriction.getAudiences() != null) {
+                        List<org.opensaml.saml2.core.Audience> audiences = 
+                            audienceRestriction.getAudiences();
+                        for (org.opensaml.saml2.core.Audience audience : audiences) {
+                            String audienceURI = audience.getAudienceURI();
+                            if (audienceRestrictions.contains(audienceURI)) {
+                                foundAddress = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                if (!foundAddress) {
+                    throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+                }
+            }
+        } else if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_11) 
+            && assertion.getSaml1().getConditions() != null) {
+            org.opensaml.saml1.core.Conditions conditions = 
+                assertion.getSaml1().getConditions();
+            if (conditions != null && conditions.getAudienceRestrictionConditions() != null) {
+                boolean foundAddress = false;
+                for (org.opensaml.saml1.core.AudienceRestrictionCondition audienceRestriction 
+                    : conditions.getAudienceRestrictionConditions()) {
+                    if (audienceRestriction.getAudiences() != null) {
+                        List<org.opensaml.saml1.core.Audience> audiences = 
+                            audienceRestriction.getAudiences();
+                        for (org.opensaml.saml1.core.Audience audience : audiences) {
+                            String audienceURI = audience.getUri();
+                            if (audienceRestrictions.contains(audienceURI)) {
+                                foundAddress = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                if (!foundAddress) {
+                    throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+                }
             }
         }
     }

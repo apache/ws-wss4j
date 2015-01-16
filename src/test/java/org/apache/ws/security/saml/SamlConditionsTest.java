@@ -32,6 +32,7 @@ import org.apache.ws.security.common.CustomSamlAssertionValidator;
 import org.apache.ws.security.common.SAML1CallbackHandler;
 import org.apache.ws.security.common.SAML2CallbackHandler;
 import org.apache.ws.security.common.SOAPUtil;
+import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecSAMLToken;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
@@ -42,6 +43,7 @@ import org.apache.ws.security.saml.ext.bean.ProxyRestrictionBean;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.joda.time.DateTime;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Test-case for sending and processing an a SAML Token with a custom Conditions element.
@@ -507,6 +509,133 @@ public class SamlConditionsTest extends org.junit.Assert {
         verify(unsignedDoc);
     }
     
+    // Now test AudienceRestrictions with supplied restrictions
+    @org.junit.Test
+    public void testSAML2AudienceRestrictionVerification() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        
+        ConditionsBean conditions = new ConditionsBean();
+        conditions.setTokenPeriodMinutes(5);
+        List<String> audiences = new ArrayList<String>();
+        audiences.add("http://apache.org/one");
+        audiences.add("http://apache.org/two");
+        AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
+        audienceRestrictionBean.setAudienceURIs(audiences);
+        conditions.setAudienceRestrictions(Collections.singletonList(audienceRestrictionBean));
+        
+        callbackHandler.setConditions(conditions);
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(unsignedDoc);
+        assertTrue(outputString.contains("AudienceRestriction"));
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        // This should fail as the expected audience isn't in the assertion
+        audiences.clear();
+        audiences.add("http://apache.org/three");
+     
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        RequestData data = new RequestData();
+        data.setAudienceRestrictions(audiences);
+        
+        Element securityHeader = 
+            WSSecurityUtil.findWsseSecurityHeaderBlock(unsignedDoc, 
+                                                       unsignedDoc.getDocumentElement(), 
+                                                       false);
+        try {
+            newEngine.processSecurityHeader(securityHeader, data);
+            fail("Failure expected on a bad audience restriction");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+        
+        // Now add the correct audience back in...
+        audiences.add("http://apache.org/one");
+        data.setAudienceRestrictions(audiences);
+        
+        newEngine.processSecurityHeader(securityHeader, data);
+    }
+    
+    // Now test AudienceRestrictions with supplied restrictions
+    @org.junit.Test
+    public void testSAML1AudienceRestrictionVerification() throws Exception {
+        SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+        callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        
+        ConditionsBean conditions = new ConditionsBean();
+        conditions.setTokenPeriodMinutes(5);
+        List<String> audiences = new ArrayList<String>();
+        audiences.add("http://apache.org/one");
+        audiences.add("http://apache.org/two");
+        AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
+        audienceRestrictionBean.setAudienceURIs(audiences);
+        conditions.setAudienceRestrictions(Collections.singletonList(audienceRestrictionBean));
+        
+        callbackHandler.setConditions(conditions);
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(unsignedDoc);
+        assertTrue(outputString.contains("AudienceRestriction"));
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        // This should fail as the expected audience isn't in the assertion
+        audiences.clear();
+        audiences.add("http://apache.org/three");
+     
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        RequestData data = new RequestData();
+        data.setAudienceRestrictions(audiences);
+        
+        Element securityHeader = 
+            WSSecurityUtil.findWsseSecurityHeaderBlock(unsignedDoc, 
+                                                       unsignedDoc.getDocumentElement(), 
+                                                       false);
+        
+        try {
+            newEngine.processSecurityHeader(securityHeader, data);
+            fail("Failure expected on a bad audience restriction");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+        
+        // Now add the correct audience back in...
+        audiences.add("http://apache.org/one");
+        data.setAudienceRestrictions(audiences);
+        
+        newEngine.processSecurityHeader(securityHeader, data);
+    }
+    
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with two AudienceRestriction Elements
@@ -554,6 +683,76 @@ public class SamlConditionsTest extends org.junit.Assert {
         }
         
         verify(unsignedDoc);
+    }
+    
+    // Now test AudienceRestrictions with supplied restrictions
+    @org.junit.Test
+    public void testSAML2AudienceRestrictionSeparateRestrictionsValidation() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        
+        ConditionsBean conditions = new ConditionsBean();
+        conditions.setTokenPeriodMinutes(5);
+        
+        List<AudienceRestrictionBean> audiencesRestrictions = 
+            new ArrayList<AudienceRestrictionBean>();
+        AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
+        audienceRestrictionBean.setAudienceURIs(Collections.singletonList("http://apache.org/one"));
+        audiencesRestrictions.add(audienceRestrictionBean);
+        
+        audienceRestrictionBean = new AudienceRestrictionBean();
+        audienceRestrictionBean.setAudienceURIs(Collections.singletonList("http://apache.org/two"));
+        audiencesRestrictions.add(audienceRestrictionBean);
+        
+        conditions.setAudienceRestrictions(audiencesRestrictions);
+        
+        callbackHandler.setConditions(conditions);
+        
+        SAMLParms samlParms = new SAMLParms();
+        samlParms.setCallbackHandler(callbackHandler);
+        AssertionWrapper assertion = new AssertionWrapper(samlParms);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, assertion, secHeader);
+
+        String outputString = 
+            org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(unsignedDoc);
+        assertTrue(outputString.contains("AudienceRestriction"));
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        // This should fail as the expected audience isn't in the assertion
+        List<String> audiences = new ArrayList<String>();
+        audiences.add("http://apache.org/three");
+     
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        RequestData data = new RequestData();
+        data.setAudienceRestrictions(audiences);
+
+        Element securityHeader = 
+            WSSecurityUtil.findWsseSecurityHeaderBlock(unsignedDoc, 
+                                                       unsignedDoc.getDocumentElement(), 
+                                                       false);
+        
+        try {
+            newEngine.processSecurityHeader(securityHeader, data);
+            fail("Failure expected on a bad audience restriction");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+        
+        // Now add the correct audience back in...
+        audiences.add("http://apache.org/one");
+        data.setAudienceRestrictions(audiences);
+        
+        newEngine.processSecurityHeader(securityHeader, data);
     }
     
     /**
