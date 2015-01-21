@@ -783,18 +783,15 @@ public class SamlAssertionWrapper {
     public void checkConditions(int futureTTL) throws WSSecurityException {
         DateTime validFrom = null;
         DateTime validTill = null;
-        DateTime issueInstant = null;
         
         if (getSamlVersion().equals(SAMLVersion.VERSION_20)
             && getSaml2().getConditions() != null) {
             validFrom = getSaml2().getConditions().getNotBefore();
             validTill = getSaml2().getConditions().getNotOnOrAfter();
-            issueInstant = getSaml2().getIssueInstant();
         } else if (getSamlVersion().equals(SAMLVersion.VERSION_11)
             && getSaml1().getConditions() != null) {
             validFrom = getSaml1().getConditions().getNotBefore();
             validTill = getSaml1().getConditions().getNotOnOrAfter();
-            issueInstant = getSaml1().getIssueInstant();
         }
         
         if (validFrom != null) {
@@ -810,15 +807,43 @@ public class SamlAssertionWrapper {
             LOG.debug("SAML Token condition (Not On Or After) not met");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
+    }
+    
+    /**
+     * Check the IssueInstant value of the Assertion.
+     */
+    public void checkIssueInstant(int futureTTL, int ttl) throws WSSecurityException {
+        DateTime issueInstant = null;
+        DateTime validTill = null;
         
-        // IssueInstant is not strictly in Conditions, but it has similar semantics to 
-        // NotBefore, so including it here
+        if (getSamlVersion().equals(SAMLVersion.VERSION_20)
+            && getSaml2().getConditions() != null) {
+            validTill = getSaml2().getConditions().getNotOnOrAfter();
+            issueInstant = getSaml2().getIssueInstant();
+        } else if (getSamlVersion().equals(SAMLVersion.VERSION_11)
+            && getSaml1().getConditions() != null) {
+            validTill = getSaml1().getConditions().getNotOnOrAfter();
+            issueInstant = getSaml1().getIssueInstant();
+        }
+        
+        // Check the IssueInstant is not in the future, subject to the future TTL
         if (issueInstant != null) {
             DateTime currentTime = new DateTime();
             currentTime = currentTime.plusSeconds(futureTTL);
             if (issueInstant.isAfter(currentTime)) {
                 LOG.debug("SAML Token IssueInstant not met");
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+            }
+            
+            // If there is no NotOnOrAfter, then impose a TTL on the IssueInstant.
+            if (validTill == null) {
+                currentTime = new DateTime();
+                currentTime.minusSeconds(ttl);
+                
+                if (issueInstant.isBefore(currentTime)) {
+                    LOG.debug("SAML Token IssueInstant not met. The assertion was created too long ago.");
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+                }
             }
         }
         

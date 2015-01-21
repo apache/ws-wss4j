@@ -52,6 +52,12 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
     private int futureTTL = 60;
     
     /**
+     * The time in seconds within which a SAML Assertion is valid, if it does not contain
+     * a NotOnOrAfter Condition. The default is 30 minutes.
+     */
+    private int ttl = 60 * 30;
+    
+    /**
      * Whether to validate the signature of the Assertion (if it exists) against the 
      * relevant profile. Default is true.
      */
@@ -222,6 +228,7 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
      */
     protected void checkConditions(SamlAssertionWrapper samlAssertion) throws WSSecurityException {
         samlAssertion.checkConditions(futureTTL);
+        samlAssertion.checkIssueInstant(futureTTL, ttl);
     }
     
     /**
@@ -311,6 +318,14 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
 
     public void setRequireBearerSignature(boolean requireBearerSignature) {
         this.requireBearerSignature = requireBearerSignature;
+    }
+    
+    public int getTtl() {
+        return ttl;
+    }
+
+    public void setTtl(int ttl) {
+        this.ttl = ttl;
     }
     
 }

@@ -173,6 +173,118 @@ public class SamlConditionsTest extends org.junit.Assert {
         }
     }
     
+    @org.junit.Test
+    public void testSAML2StaleIssueInstant() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+        
+        DateTime issueInstant = new DateTime();
+        issueInstant = issueInstant.minusMinutes(31);
+        samlAssertion.getSaml2().setIssueInstant(issueInstant);
+        samlAssertion.getSaml2().getConditions().setNotOnOrAfter(null);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SAML 2 Authn Assertion (sender vouches):");
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(unsignedDoc);
+            LOG.debug(outputString);
+        }
+        
+        try {
+            verify(unsignedDoc);
+            fail("Failure expected in processing a stale SAML Assertion");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getMessage().contains("SAML token security failure"));
+        }
+    }
+    
+    @org.junit.Test
+    public void testSAML2StaleIssueInstantButWithNotOnOrAfter() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+        
+        ConditionsBean conditions = new ConditionsBean();
+        conditions.setNotBefore(new DateTime());
+        conditions.setNotAfter(new DateTime().plusMinutes(35));
+        
+        DateTime issueInstant = new DateTime();
+        issueInstant = issueInstant.minusMinutes(31);
+        samlAssertion.getSaml2().setIssueInstant(issueInstant);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SAML 2 Authn Assertion (sender vouches):");
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(unsignedDoc);
+            LOG.debug(outputString);
+        }
+        
+        verify(unsignedDoc);
+    }
+    
+    @org.junit.Test
+    public void testSAML1StaleIssueInstant() throws Exception {
+        SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+        callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+        
+        DateTime issueInstant = new DateTime();
+        issueInstant = issueInstant.minusMinutes(31);
+        samlAssertion.getSaml1().setIssueInstant(issueInstant);
+        samlAssertion.getSaml1().getConditions().setNotOnOrAfter(null);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("SAML 1 Authn Assertion (sender vouches):");
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(unsignedDoc);
+            LOG.debug(outputString);
+        }
+        
+        try {
+            verify(unsignedDoc);
+            fail("Failure expected in processing a stale SAML Assertion");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getMessage().contains("SAML token security failure"));
+        }
+    }
+    
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with an (invalid) custom Conditions statement.
