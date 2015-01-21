@@ -524,7 +524,7 @@ public class SamlAssertionWrapper {
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias(issuerKeyName);
         X509Certificate[] issuerCerts = issuerCrypto.getX509Certificates(cryptoType);
-        if (issuerCerts == null) {
+        if (issuerCerts == null || issuerCerts.length == 0) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                     "No issuer certs were found to sign the SAML Assertion using issuer name: "
                             + issuerKeyName);
@@ -547,6 +547,10 @@ public class SamlAssertionWrapper {
             privateKey = issuerCrypto.getPrivateKey(issuerKeyName, issuerKeyPassword);
         } catch (Exception ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
+        }
+        if (privateKey == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
+                    "No private key was found using issuer name: " + issuerKeyName);
         }
 
         signature.setSignatureAlgorithm(sigAlgo);
