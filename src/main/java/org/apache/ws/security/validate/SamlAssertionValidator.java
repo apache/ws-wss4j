@@ -57,6 +57,12 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
     private int futureTTL = 60;
     
     /**
+     * The time in seconds within which a SAML Assertion is valid, if it does not contain
+     * a NotOnOrAfter Condition. The default is 30 minutes.
+     */
+    private int ttl = 60 * 30;
+    
+    /**
      * Whether to validate the signature of the Assertion (if it exists) against the 
      * relevant profile. Default is true.
      */
@@ -251,12 +257,25 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         
         // IssueInstant is not strictly in Conditions, but it has similar semantics to 
         // NotBefore, so including it here
+        
+        // Check the IssueInstant is not in the future, subject to the future TTL
         if (issueInstant != null) {
             DateTime currentTime = new DateTime();
             currentTime = currentTime.plusSeconds(futureTTL);
             if (issueInstant.isAfter(currentTime)) {
                 LOG.debug("SAML Token IssueInstant not met");
                 throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+            }
+            
+            // If there is no NotOnOrAfter, then impose a TTL on the IssueInstant.
+            if (validTill == null) {
+                currentTime = new DateTime();
+                currentTime.minusSeconds(ttl);
+                
+                if (issueInstant.isBefore(currentTime)) {
+                    LOG.debug("SAML Token IssueInstant not met. The assertion was created too long ago.");
+                    throw new WSSecurityException(WSSecurityException.FAILURE, "invalidSAMLsecurity");
+                }
             }
         }
     }
@@ -509,4 +528,12 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
         this.requireBearerSignature = requireBearerSignature;
     }
     
+    public int getTtl() {
+        return ttl;
+    }
+
+    public void setTtl(int ttl) {
+        this.ttl = ttl;
+    }
+
 }
