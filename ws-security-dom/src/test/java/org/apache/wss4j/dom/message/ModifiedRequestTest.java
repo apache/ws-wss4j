@@ -404,7 +404,71 @@ public class ModifiedRequestTest extends org.junit.Assert {
             fail("Failure expected on a modified EncryptedData CipherValue");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
-            //the error message is not deterministic so we do not do a message comparison
+        }
+    }
+    
+    /**
+     * Test for when some EncryptedData CipherValue data is modified 
+     * (in the security header)
+     */
+    @org.junit.Test
+    public void testModifiedSecurityHeaderEncryptedDataCipherValue() throws Exception {
+        WSSecEncrypt builder = new WSSecEncrypt();
+        builder.setUserInfo("wss40");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
+        
+        WSSecTimestamp timestamp = new WSSecTimestamp();
+        timestamp.setTimeToLive(300);
+        timestamp.build(doc, secHeader);
+        
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        WSEncryptionPart encP =
+            new WSEncryptionPart(
+                "Timestamp",
+                WSConstants.WSU_NS,
+                "");
+        parts.add(encP);
+        builder.setParts(parts);
+        
+        Document encryptedDoc = builder.build(doc, wssCrypto, secHeader);
+
+        Element securityHeader = 
+            WSSecurityUtil.getSecurityHeader(encryptedDoc, "");
+        Element encryptedTimestamp = 
+            WSSecurityUtil.findElement(securityHeader, "EncryptedData", WSConstants.ENC_NS);
+        Element cipherValue = 
+            WSSecurityUtil.findElement(encryptedTimestamp, "CipherValue", WSConstants.ENC_NS);
+        String cipherText = cipherValue.getTextContent();
+        
+        StringBuilder stringBuilder = new StringBuilder(cipherText);
+        int index = stringBuilder.length() / 2;
+        char ch = stringBuilder.charAt(index);
+        if (ch != 'A') {
+            ch = 'A';
+        } else {
+            ch = 'B';
+        }
+        stringBuilder.setCharAt(index, ch);
+        cipherValue.setTextContent(stringBuilder.toString());
+        
+        String outputString = 
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        try {
+            newEngine.processSecurityHeader(doc, null, new KeystoreCallbackHandler(), wssCrypto);
+            fail("Failure expected on a modified EncryptedData CipherValue");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
         }
     }
     
@@ -452,7 +516,6 @@ public class ModifiedRequestTest extends org.junit.Assert {
             fail("Failure expected on a modified EncryptedData CipherValue");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
-            //the error message is not deterministic so we do not do a message comparison
         }
     }
 
@@ -509,7 +572,6 @@ public class ModifiedRequestTest extends org.junit.Assert {
             fail("Failure expected on a modified Signature Reference");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
-            assertEquals("The signature or decryption was invalid", ex.getMessage());
         }
     }
     
@@ -538,7 +600,6 @@ public class ModifiedRequestTest extends org.junit.Assert {
             fail("Failure expected on an untrusted Certificate");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
-            assertEquals("The signature or decryption was invalid", ex.getMessage());
         }
     }
     
@@ -574,7 +635,6 @@ public class ModifiedRequestTest extends org.junit.Assert {
             fail("Failure expected on a modified Signature element");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
-            assertEquals("The signature or decryption was invalid", ex.getMessage());
         }
     }
 
