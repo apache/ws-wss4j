@@ -111,8 +111,8 @@ public class EncryptedKeyProcessor implements Processor {
         }
         if (WSConstants.KEYTRANSPORT_RSA15.equals(encryptedKeyTransportMethod)
             && !data.isAllowRSA15KeyTransportAlgorithm()
-            && algorithmSuite != null
-            && !algorithmSuite.getKeyWrapAlgorithms().contains(WSConstants.KEYTRANSPORT_RSA15)) {
+            && (algorithmSuite == null
+              || !algorithmSuite.getKeyWrapAlgorithms().contains(WSConstants.KEYTRANSPORT_RSA15))) {
             LOG.debug(
                 "The Key transport method does not match the requirement"
             );

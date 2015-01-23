@@ -135,6 +135,49 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
     }
     
     @org.junit.Test
+    public void testEncryptionKeyTransportRSA15NoAlgorithmSuite() throws Exception {
+        
+        Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
+        
+        WSSecEncrypt builder = new WSSecEncrypt();
+        builder.setUserInfo("wss40");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
+        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSA15);
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document encryptedDoc = builder.build(doc, wssCrypto, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(encryptedDoc);
+            LOG.debug(outputString);
+        }
+        
+        Element securityHeader = WSSecurityUtil.getSecurityHeader(encryptedDoc, null);
+        
+        try {
+            verify(securityHeader, null, wssCrypto);
+            fail("Expected failure as RSA 15 is not allowed");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+        
+        // Now enable RSA v1.5 processing
+        WSSecurityEngine secEngine = new WSSecurityEngine();
+        RequestData data = new RequestData();
+        data.setDecCrypto(wssCrypto);
+        data.setAllowRSA15KeyTransportAlgorithm(true);
+        
+        data.setCallbackHandler(new KeystoreCallbackHandler());
+        
+        secEngine.processSecurityHeader(securityHeader, data);
+    }
+    
+    @org.junit.Test
     public void testEncryptionMethodAES128() throws Exception {
         
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
