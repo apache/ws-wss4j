@@ -195,7 +195,7 @@ public class TimestampTest extends AbstractTestBase {
         //done timestamp; now test timestamp-verification:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
@@ -236,7 +236,7 @@ public class TimestampTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
@@ -332,7 +332,7 @@ public class TimestampTest extends AbstractTestBase {
         //done timestamp; now test timestamp-verification:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
@@ -414,7 +414,7 @@ public class TimestampTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.setTimestampTTL(1);
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
@@ -456,7 +456,7 @@ public class TimestampTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.addIgnoreBSPRule(BSPRule.R3203);
             securityProperties.addIgnoreBSPRule(BSPRule.R3221);
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
@@ -543,7 +543,7 @@ public class TimestampTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.addIgnoreBSPRule(BSPRule.R3203);
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
@@ -583,7 +583,7 @@ public class TimestampTest extends AbstractTestBase {
         //done timestamp; now test timestamp-verification:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {

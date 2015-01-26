@@ -145,7 +145,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
     public Document doInboundSecurity(WSSSecurityProperties securityProperties, XMLStreamReader xmlStreamReader,
                                       List<SecurityEvent> securityEventList, SecurityEventListener securityEventListener)
             throws XMLStreamException, ParserConfigurationException, XMLSecurityException {
-        InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+        InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
         XMLStreamReader outXmlStreamReader = wsSecIn.processInMessage(xmlStreamReader, securityEventList, securityEventListener);
         return StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), outXmlStreamReader);
     }

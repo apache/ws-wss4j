@@ -77,6 +77,12 @@ public class WSSecurityException extends XMLSecurityException {
      */
     public static final QName MESSAGE_EXPIRED = new QName(NS_WSSE10, "MessageExpired");
     
+    /**
+     * Generic Security error
+     */
+    public static final QName SECURITY_ERROR = 
+        new QName("http://ws.apache.org/wss4j", "SecurityError");
+    
     // FAULT error messages
     public static final String UNSUPPORTED_TOKEN_ERR = "An unsupported token was provided";
     public static final String UNSUPPORTED_ALGORITHM_ERR = 
@@ -91,6 +97,8 @@ public class WSSecurityException extends XMLSecurityException {
     public static final String SECURITY_TOKEN_UNAVAILABLE_ERR = 
         "Referenced security token could not be retrieved";
     public static final String MESSAGE_EXPIRED_ERR = "The message has expired";
+    public static final String UNIFIED_SECURITY_ERR = 
+        "A security error was encountered when verifying the message";
 
     public enum ErrorCode {
         FAILURE(null), //Non standard error message
@@ -104,6 +112,7 @@ public class WSSecurityException extends XMLSecurityException {
         MESSAGE_EXPIRED(WSSecurityException.MESSAGE_EXPIRED),
         FAILED_ENCRYPTION(null), //Non standard error message
         FAILED_SIGNATURE(null), //Non standard error message
+        SECURITY_ERROR(WSSecurityException.SECURITY_ERROR)
         ;
 
         private QName qName;
@@ -196,39 +205,19 @@ public class WSSecurityException extends XMLSecurityException {
     }
     
     /**
-     * Map a WSSecurityException FaultCode to a standard error String, so as not to leak
-     * internal configuration to an attacker.
+     * Get a "safe" / unified error message, so as not to leak internal configuration
+     * to an attacker.
      */
     public String getSafeExceptionMessage() {
-        // Allow a Replay Attack message to be returned, otherwise it could be confusing
-        // for clients who don't understand the default caching functionality of WSS4J/CXF
-        if (getMessage() != null && getMessage().contains("replay attack")) {
-            return getMessage();
-        }
+        return UNIFIED_SECURITY_ERR;
         
-        String errorMessage = null;
-        QName faultCode = getFaultCode();
-        if (UNSUPPORTED_SECURITY_TOKEN.equals(faultCode)) {
-            errorMessage = UNSUPPORTED_TOKEN_ERR;
-        } else if (UNSUPPORTED_ALGORITHM.equals(faultCode)) {
-            errorMessage = UNSUPPORTED_ALGORITHM_ERR;
-        } else if (INVALID_SECURITY.equals(faultCode)) {
-            errorMessage = INVALID_SECURITY_ERR;
-        } else if (INVALID_SECURITY_TOKEN.equals(faultCode)) {
-            errorMessage = INVALID_SECURITY_TOKEN_ERR;
-        } else if (FAILED_AUTHENTICATION.equals(faultCode)) {
-            errorMessage = FAILED_AUTHENTICATION_ERR;
-        } else if (FAILED_CHECK.equals(faultCode)) {
-            errorMessage = FAILED_CHECK_ERR;
-        } else if (SECURITY_TOKEN_UNAVAILABLE.equals(faultCode)) {
-            errorMessage = SECURITY_TOKEN_UNAVAILABLE_ERR;
-        } else if (MESSAGE_EXPIRED.equals(faultCode)) {
-            errorMessage = MESSAGE_EXPIRED_ERR;
-        } else {
-            // Default
-            errorMessage = INVALID_SECURITY_ERR;
-        }
-        return errorMessage;
-        
+    }
+    
+    /**
+     * Get the "safe" / unified fault code QName associated with this exception, so as
+     * not to leak internal configuration to an attacker
+     */
+    public QName getSafeFaultCode() {
+        return SECURITY_ERROR;
     }
 }

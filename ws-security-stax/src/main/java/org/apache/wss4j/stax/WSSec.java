@@ -135,12 +135,30 @@ public class WSSec {
      */
     public static InboundWSSec getInboundWSSec(WSSSecurityProperties securityProperties,
             boolean initiator) throws WSSecurityException {
+        return getInboundWSSec(securityProperties, false, false);
+    }
+    
+    /**
+     * Creates and configures an inbound streaming security engine
+     *
+     * @param securityProperties The user-defined security configuration
+     * @param initiator Whether we are the message initiator or not
+     * @param returnSecurityError Whether to return the underlying security error or not
+     * @return A new InboundWSSec
+     * @throws WSSecurityException
+     *          if the initialisation failed
+     * @throws org.apache.wss4j.stax.ext.WSSConfigurationException
+     *          if the configuration is invalid
+     */
+    public static InboundWSSec getInboundWSSec(WSSSecurityProperties securityProperties,
+                                               boolean initiator,
+                                               boolean returnSecurityError) throws WSSecurityException {
         if (securityProperties == null) {
             throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "missingSecurityProperties");
         }
 
         securityProperties = validateAndApplyDefaultsToInboundSecurityProperties(securityProperties);
-        return new InboundWSSec(securityProperties, initiator);
+        return new InboundWSSec(securityProperties, initiator, returnSecurityError);
     }
     
     /**

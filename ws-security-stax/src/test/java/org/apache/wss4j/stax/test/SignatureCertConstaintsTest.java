@@ -94,7 +94,7 @@ public class SignatureCertConstaintsTest extends AbstractTestBase {
             Pattern subjectDNPattern = Pattern.compile(certConstraint.trim());
             securityProperties.setSubjectCertConstraints(Collections.singletonList(subjectDNPattern));
             
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
@@ -152,7 +152,7 @@ public class SignatureCertConstaintsTest extends AbstractTestBase {
             Pattern subjectDNPattern = Pattern.compile(certConstraint.trim());
             securityProperties.setSubjectCertConstraints(Collections.singletonList(subjectDNPattern));
             
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {

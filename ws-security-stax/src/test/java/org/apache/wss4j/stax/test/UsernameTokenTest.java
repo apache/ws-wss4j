@@ -128,7 +128,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.setCallbackHandler(new CallbackHandlerImpl("wrongUsername"));
             //securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
@@ -171,7 +171,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.setCallbackHandler(new CallbackHandlerImpl("username"));
             //securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
 
             SecurityEventListener securityEventListener = new SecurityEventListener() {
                 @Override
@@ -262,7 +262,7 @@ public class UsernameTokenTest extends AbstractTestBase {
 
         WSSSecurityProperties securityProperties = new WSSSecurityProperties();
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-        InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+        InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
         XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(req.getBytes())));
         StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
@@ -311,7 +311,7 @@ public class UsernameTokenTest extends AbstractTestBase {
 
         WSSSecurityProperties securityProperties = new WSSSecurityProperties();
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-        InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+        InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
 
         try {
             XMLStreamReader xmlStreamReader = 
@@ -398,7 +398,7 @@ public class UsernameTokenTest extends AbstractTestBase {
 
         WSSSecurityProperties securityProperties = new WSSSecurityProperties();
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-        InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+        InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
 
         try {
             XMLStreamReader xmlStreamReader = 
@@ -641,7 +641,7 @@ public class UsernameTokenTest extends AbstractTestBase {
         try {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
             
             xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));

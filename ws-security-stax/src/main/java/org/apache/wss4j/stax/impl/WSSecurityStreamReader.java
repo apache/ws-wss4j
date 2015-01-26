@@ -20,7 +20,6 @@ package org.apache.wss4j.stax.impl;
 
 import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.InputProcessorChain;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 import org.apache.xml.security.stax.impl.XMLSecurityStreamReader;
@@ -30,11 +29,14 @@ import javax.xml.stream.XMLStreamException;
 public class WSSecurityStreamReader extends XMLSecurityStreamReader {
     
     private final boolean initiator;
+    private final boolean returnSecurityError;
     
     public WSSecurityStreamReader(InputProcessorChain inputProcessorChain, 
-            XMLSecurityProperties securityProperties, boolean initiator) {
+            XMLSecurityProperties securityProperties, boolean initiator,
+            boolean returnSecurityError) {
         super(inputProcessorChain, securityProperties);
         this.initiator = initiator;
+        this.returnSecurityError = returnSecurityError;
     }
 
     @Override
@@ -43,23 +45,18 @@ public class WSSecurityStreamReader extends XMLSecurityStreamReader {
             return super.next();
         } catch (XMLStreamException e) {
             Throwable cause = e.getCause();
-            if (cause instanceof WSSecurityException) {
-                // Allow a WSSPolicyException
-                if (initiator || cause.getCause() instanceof WSSPolicyException) {
-                    throw e;
-                }
-                // Map to a "safe" error message if we are not the initiator
-                String error = ((WSSecurityException)cause).getSafeExceptionMessage();
-                throw new XMLStreamException(
-                    new WSSecurityException(((WSSecurityException)cause).getErrorCode(),
-                                            new Exception(error)));
+            
+            // Allow a WSSPolicyException
+            if (returnSecurityError || initiator || 
+                cause != null && cause.getCause() instanceof WSSPolicyException) {
+                throw e;
             }
-            if (cause instanceof XMLSecurityException) {
-                throw new XMLStreamException(
-                        new WSSecurityException(
-                                WSSecurityException.ErrorCode.FAILED_CHECK, (XMLSecurityException)cause));
-            }
-            throw e;
+            
+            // Mask the real error
+            String safeErrorMessage = WSSecurityException.UNIFIED_SECURITY_ERR;
+            throw new XMLStreamException(
+                new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_ERROR,
+                                        new Exception(safeErrorMessage)));
         }
     }
     

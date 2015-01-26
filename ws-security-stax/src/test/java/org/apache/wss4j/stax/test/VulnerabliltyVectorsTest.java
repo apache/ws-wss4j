@@ -109,12 +109,10 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         } catch (XMLStreamException e) {
             Throwable throwable = e.getCause();
             Assert.assertNotNull(throwable);
-            Assert.assertTrue(throwable instanceof WSSecurityException);
             //we expect a "No SecurityToken found" since WSS says that a token must be declared before use.
             //the declare before use is in the nature of streaming xml-security and therefore expected
             //Assert.assertEquals(throwable.getMessage(), "An invalid security token was provided");
             Assert.assertEquals(throwable.getMessage(), "Recursive key reference detected.");
-            Assert.assertEquals(((WSSecurityException) throwable).getFaultCode(), WSSecurityException.FAILED_CHECK);
         }
     }
 
@@ -196,9 +194,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         } catch (XMLStreamException e) {
             Throwable throwable = e.getCause();
             Assert.assertNotNull(throwable);
-            Assert.assertTrue(throwable instanceof WSSecurityException);
             Assert.assertTrue(throwable.getMessage().contains("Invalid digest of reference "));
-            Assert.assertEquals(((WSSecurityException) throwable).getFaultCode(), WSSecurityException.FAILED_CHECK);
         }
     }
 
@@ -294,7 +290,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
