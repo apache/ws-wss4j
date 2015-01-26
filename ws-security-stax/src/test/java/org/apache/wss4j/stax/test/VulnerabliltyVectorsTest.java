@@ -522,7 +522,6 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
                             new ByteArrayInputStream(baos.toByteArray())));
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
-            Assert.assertTrue(e.getCause() instanceof WSSecurityException);
             Assert.assertEquals(e.getCause().getMessage(),
                     "Maximum depth (10) of the XML structure reached. You can raise the maximum via the " +
                     "\"MaximumAllowedXMLStructureDepth\" property in the configuration.");
