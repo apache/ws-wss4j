@@ -525,7 +525,6 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
             Assert.assertEquals(e.getCause().getMessage(),
                     "Maximum depth (10) of the XML structure reached. You can raise the maximum via the " +
                     "\"MaximumAllowedXMLStructureDepth\" property in the configuration.");
-            Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_CHECK);
         } finally {
             changeValueOfMaximumAllowedXMLStructureDepth(oldval);
         }
