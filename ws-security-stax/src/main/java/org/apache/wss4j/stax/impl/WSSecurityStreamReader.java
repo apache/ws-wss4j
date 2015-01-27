@@ -53,10 +53,8 @@ public class WSSecurityStreamReader extends XMLSecurityStreamReader {
             }
             
             // Mask the real error
-            String safeErrorMessage = WSSecurityException.UNIFIED_SECURITY_ERR;
             throw new XMLStreamException(
-                new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_ERROR,
-                                        new Exception(safeErrorMessage)));
+                new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_ERROR));
         }
     }
     

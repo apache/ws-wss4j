@@ -79,7 +79,7 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("saml/issuer.jks"), "default".toCharArray());
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
@@ -130,7 +130,7 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("saml/issuer.jks"), "default".toCharArray());
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
@@ -175,7 +175,7 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
@@ -218,7 +218,7 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("saml/issuer.jks"), "default".toCharArray());
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
@@ -259,7 +259,7 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             try {
