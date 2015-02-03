@@ -22,7 +22,7 @@
     <artifactId>wss4j</artifactId>
     <packaging>bundle</packaging>
     <name>Apache WSS4J</name>
-    <version>1.6.18-SNAPSHOT</version>
+    <version>1.6.18</version>
     <description>
         The Apache WSS4J project provides a Java implementation of the primary security standards 
         for Web Services, namely the OASIS Web Services Security (WS-Security) specifications 
@@ -67,12 +67,12 @@
     </licenses>
     <scm>
         <connection>
-            scm:svn:http://svn.apache.org/repos/asf/webservices/wss4j/branches/1_6_x-fixes/
+            scm:svn:http://svn.apache.org/repos/asf/webservices/wss4j/tags/wss4j-1.6.18
         </connection>
         <developerConnection>
-            scm:svn:https://svn.apache.org/repos/asf/webservices/wss4j/branches/1_6_x-fixes/
+            scm:svn:https://svn.apache.org/repos/asf/webservices/wss4j/tags/wss4j-1.6.18
         </developerConnection>
-        <url>http://svn.apache.org/repos/asf/webservices/wss4j/branches/1_6_x-fixes</url>
+        <url>http://svn.apache.org/repos/asf/webservices/wss4j/tags/wss4j-1.6.18</url>
     </scm>
     <organization>
         <name>The Apache Software Foundation</name>
