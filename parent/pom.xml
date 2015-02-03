@@ -51,7 +51,7 @@
         <xerces.version>2.11.0</xerces.version>
         <xml.apis.version>1.4.01</xml.apis.version>
         <xmlsec.version>2.0.3</xmlsec.version>
-        <xmlunit.version>1.5</xmlunit.version>
+        <xmlunit.version>1.6</xmlunit.version>
         
         <!-- OSGi related properties -->
         <wss4j.osgi.import />
