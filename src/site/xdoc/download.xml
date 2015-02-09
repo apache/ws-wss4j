@@ -19,31 +19,31 @@ LICENSE.txt and NOTICE.txt files contained in each release artifact.
 <ul>
 <li>
 <p>
-The current stable release is Apache WSS4J 2.0.2:
+The current stable release is Apache WSS4J 2.0.3:
 </p>
 <p>
-<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/2.0.2/wss4j-2.0.2-source-release.zip">wss4j-2.0.2-source-release.zip</a>
-(<a href="http://www.apache.org/dist/ws/wss4j/2.0.2/wss4j-2.0.2-source-release.zip.asc">PGP</a>)
-(<a href="http://www.apache.org/dist/ws/wss4j/2.0.2/wss4j-2.0.2-source-release.zip.md5">MD5</a>)
-(<a href="http://www.apache.org/dist/ws/wss4j/2.0.2/wss4j-2.0.2-source-release.zip.sha1">SHA1</a>)
+<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/2.0.3/wss4j-2.0.3-source-release.zip">wss4j-2.0.3-source-release.zip</a>
+(<a href="http://www.apache.org/dist/ws/wss4j/2.0.3/wss4j-2.0.3-source-release.zip.asc">PGP</a>)
+(<a href="http://www.apache.org/dist/ws/wss4j/2.0.3/wss4j-2.0.3-source-release.zip.md5">MD5</a>)
+(<a href="http://www.apache.org/dist/ws/wss4j/2.0.3/wss4j-2.0.3-source-release.zip.sha1">SHA1</a>)
 </p>
 </li>
 <li>
 <p>
-The older branch release is Apache WSS4J 1.6.17:
+The older branch release is Apache WSS4J 1.6.18:
 </p>
 <p>
-<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1.6.17/wss4j-bin-1.6.17.zip">wss4j-bin-1.6.17.zip</a>
-(<a href="http://www.apache.org/dist/ws/wss4j/1.6.17/wss4j-bin-1.6.17.zip.asc">
+<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1.6.18/wss4j-bin-1.6.18.zip">wss4j-bin-1.6.18.zip</a>
+(<a href="http://www.apache.org/dist/ws/wss4j/1.6.18/wss4j-bin-1.6.18.zip.asc">
 PGP</a>)
-(<a href="http://www.apache.org/dist/ws/wss4j/1.6.17/wss4j-bin-1.6.17.zip.md5">
+(<a href="http://www.apache.org/dist/ws/wss4j/1.6.18/wss4j-bin-1.6.18.zip.md5">
 MD5</a>)
 </p>
 <p>
-<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1.6.17/wss4j-src-1.6.17.zip">wss4j-src-1.6.17.zip</a>
-(<a href="http://www.apache.org/dist/ws/wss4j/1.6.17/wss4j-src-1.6.17.zip.asc">
+<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/1.6.18/wss4j-src-1.6.18.zip">wss4j-src-1.6.18.zip</a>
+(<a href="http://www.apache.org/dist/ws/wss4j/1.6.18/wss4j-src-1.6.18.zip.asc">
 PGP</a>)
-(<a href="http://www.apache.org/dist/ws/wss4j/1.6.17/wss4j-src-1.6.17.zip.md5">
+(<a href="http://www.apache.org/dist/ws/wss4j/1.6.18/wss4j-src-1.6.18.zip.md5">
 MD5</a>)
 </p>
 </li>
