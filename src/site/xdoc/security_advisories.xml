@@ -3,6 +3,19 @@
 <body>
 <section name="Security Advisories">
 <p>
+The following security advisories have been issued for Apache WSS4J:
+<ul>
+<li><b>2015</b></li>
+<ul>
+<li><a href="advisories/CVE-2015-0226.txt.asc">CVE-2015-0226</a> - Apache
+WSS4J is (still) vulnerable to Bleichenbacher's attack.</li>
+<li><a href="advisories/CVE-2015-0227.txt.asc">CVE-2015-0227</a> - Apache
+WSS4J doesn't correctly enforce the requireSignedEncryptedDataElements
+property</li>
+</ul>
+</ul>
+</p>
+<p>
 As Apache WSS4J is a library that provides WS-Security functionality to web
 service stacks such as Apache CXF and Apache Axis, security issues associated
 with WS-Security tend to be reported to these downstream projects. Therefore

@@ -62,6 +62,14 @@ The Apache WSS4J team are pleased to announce the release of version 1.6.18.
 Please see the <a href="https://issues.apache.org/jira/browse/WSS/fixforversion/12328782">
 release notes</a> for more information.
 </p>
+<p><b>February 2015</b> - 
+Two new security advisories have been issued for Apache WSS4J, both of which
+are fixed in 1.6.17 and 2.0.2.
+</p>
+<p>
+Please see the <a href="security_advisories.html">the security advisories</a>
+page for more information.
+</p>
 </li>
 </ul>
 </subsection>
