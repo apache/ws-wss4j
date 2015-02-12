@@ -981,48 +981,6 @@ public class SamlAssertionWrapper {
     }
     
     /**
-     * Validate the samlAssertion against schemas/profiles
-     */
-    public void validateAssertion(boolean validateSignatureAgainstProfile) throws WSSecurityException {
-        if (validateSignatureAgainstProfile) {
-            validateSignatureAgainstProfile();
-        }
-        /*
-         * TODO 
-        if (getSaml1() != null) {
-            ValidatorSuite schemaValidators = 
-                org.opensaml.core.config.Configuration.getValidatorSuite("saml1-schema-validator");
-            ValidatorSuite specValidators = 
-                org.opensaml.core.config.Configuration.getValidatorSuite("saml1-spec-validator");
-            try {
-                schemaValidators.validate(getSaml1());
-                specValidators.validate(getSaml1());
-            } catch (ValidationException e) {
-                LOG.debug("Saml Validation error: " + e.getMessage(), e);
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", e
-                );
-            }
-        } else if (getSaml2() != null) {
-            ValidatorSuite schemaValidators = 
-                org.opensaml.core.config.Configuration.getValidatorSuite("saml2-core-schema-validator");
-            ValidatorSuite specValidators = 
-                org.opensaml.core.config.Configuration.getValidatorSuite("saml2-core-spec-validator");
-            try {
-                schemaValidators.validate(getSaml2());
-                specValidators.validate(getSaml2());
-            } catch (ValidationException e) {
-                LOG.debug("Saml Validation error: " + e.getMessage(), e);
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", e
-                );
-            }
-        }
-        */
-    }
-
-    
-    /**
      * Parse the DOM Element into Opensaml objects.
      */
     private void parseElement(Element element) throws WSSecurityException {

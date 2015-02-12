@@ -277,7 +277,9 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
      * Validate the samlAssertion against schemas/profiles
      */
     protected void validateAssertion(SamlAssertionWrapper samlAssertion) throws WSSecurityException {
-        samlAssertion.validateAssertion(validateSignatureAgainstProfile);
+        if (validateSignatureAgainstProfile) {
+            samlAssertion.validateSignatureAgainstProfile();
+        }
     }
 
     /**

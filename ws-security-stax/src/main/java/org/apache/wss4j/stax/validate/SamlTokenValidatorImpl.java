@@ -273,7 +273,9 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
      * Validate the samlAssertion against schemas/profiles
      */
     protected void validateAssertion(SamlAssertionWrapper samlAssertion) throws WSSecurityException {
-        samlAssertion.validateAssertion(validateSignatureAgainstProfile);
+        if (validateSignatureAgainstProfile) {
+            samlAssertion.validateSignatureAgainstProfile();
+        }
     }
 
     public boolean isRequireStandardSubjectConfirmationMethod() {
