@@ -40,7 +40,7 @@ import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.opensaml.saml2.core.SubjectConfirmationData;
+import org.opensaml.saml.saml2.core.SubjectConfirmationData;
 import org.w3c.dom.Element;
 
 /**
@@ -117,7 +117,7 @@ public final class SAMLUtil {
      * @throws WSSecurityException
      */
     public static SAMLKeyInfo getCredentialFromSubject(
-        org.opensaml.saml1.core.Assertion assertion,
+        org.opensaml.saml.saml1.core.Assertion assertion,
         SAMLKeyInfoProcessor keyInfoProcessor,
         Crypto sigCrypto,
         CallbackHandler callbackHandler
@@ -128,19 +128,19 @@ public final class SAMLUtil {
             return new SAMLKeyInfo(key);
         }
         
-        for (org.opensaml.saml1.core.Statement stmt : assertion.getStatements()) {
-            org.opensaml.saml1.core.Subject samlSubject = null;
-            if (stmt instanceof org.opensaml.saml1.core.AttributeStatement) {
-                org.opensaml.saml1.core.AttributeStatement attrStmt = 
-                    (org.opensaml.saml1.core.AttributeStatement) stmt;
+        for (org.opensaml.saml.saml1.core.Statement stmt : assertion.getStatements()) {
+            org.opensaml.saml.saml1.core.Subject samlSubject = null;
+            if (stmt instanceof org.opensaml.saml.saml1.core.AttributeStatement) {
+                org.opensaml.saml.saml1.core.AttributeStatement attrStmt = 
+                    (org.opensaml.saml.saml1.core.AttributeStatement) stmt;
                 samlSubject = attrStmt.getSubject();
-            } else if (stmt instanceof org.opensaml.saml1.core.AuthenticationStatement) {
-                org.opensaml.saml1.core.AuthenticationStatement authStmt = 
-                    (org.opensaml.saml1.core.AuthenticationStatement) stmt;
+            } else if (stmt instanceof org.opensaml.saml.saml1.core.AuthenticationStatement) {
+                org.opensaml.saml.saml1.core.AuthenticationStatement authStmt = 
+                    (org.opensaml.saml.saml1.core.AuthenticationStatement) stmt;
                 samlSubject = authStmt.getSubject();
             } else {
-                org.opensaml.saml1.core.AuthorizationDecisionStatement authzStmt =
-                    (org.opensaml.saml1.core.AuthorizationDecisionStatement)stmt;
+                org.opensaml.saml.saml1.core.AuthorizationDecisionStatement authzStmt =
+                    (org.opensaml.saml.saml1.core.AuthorizationDecisionStatement)stmt;
                 samlSubject = authzStmt.getSubject();
             }
             
@@ -170,7 +170,7 @@ public final class SAMLUtil {
      * @throws WSSecurityException
      */
     public static SAMLKeyInfo getCredentialFromSubject(
-        org.opensaml.saml2.core.Assertion assertion,
+        org.opensaml.saml.saml2.core.Assertion assertion,
         SAMLKeyInfoProcessor keyInfoProcessor,
         Crypto sigCrypto,
         CallbackHandler callbackHandler
@@ -181,11 +181,11 @@ public final class SAMLUtil {
             return new SAMLKeyInfo(key);
         }
         
-        org.opensaml.saml2.core.Subject samlSubject = assertion.getSubject();
+        org.opensaml.saml.saml2.core.Subject samlSubject = assertion.getSubject();
         if (samlSubject != null) {
-            List<org.opensaml.saml2.core.SubjectConfirmation> subjectConfList = 
+            List<org.opensaml.saml.saml2.core.SubjectConfirmation> subjectConfList = 
                 samlSubject.getSubjectConfirmations();
-            for (org.opensaml.saml2.core.SubjectConfirmation subjectConfirmation : subjectConfList) {
+            for (org.opensaml.saml.saml2.core.SubjectConfirmation subjectConfirmation : subjectConfList) {
                 SubjectConfirmationData subjConfData = 
                     subjectConfirmation.getSubjectConfirmationData();
                 if (subjConfData != null) {

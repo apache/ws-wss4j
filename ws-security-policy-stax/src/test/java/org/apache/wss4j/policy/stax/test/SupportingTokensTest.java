@@ -28,7 +28,7 @@ import org.apache.wss4j.stax.impl.securityToken.*;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opensaml.common.SAMLVersion;
+import org.opensaml.saml.common.SAMLVersion;
 import org.apache.wss4j.policy.stax.PolicyEnforcer;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityEvent.*;

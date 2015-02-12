@@ -70,14 +70,14 @@ import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.keys.content.X509Data;
 import org.joda.time.DateTime;
-import org.opensaml.Configuration;
-import org.opensaml.common.SAMLObjectBuilder;
-import org.opensaml.saml2.core.AttributeValue;
-import org.opensaml.saml2.core.Conditions;
-import org.opensaml.xml.XMLObjectBuilder;
-import org.opensaml.xml.XMLObjectBuilderFactory;
-import org.opensaml.xml.schema.XSAny;
-import org.opensaml.xml.schema.XSInteger;
+import org.opensaml.core.xml.XMLObjectBuilder;
+import org.opensaml.core.xml.XMLObjectBuilderFactory;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.schema.XSAny;
+import org.opensaml.core.xml.schema.XSInteger;
+import org.opensaml.saml.common.SAMLObjectBuilder;
+import org.opensaml.saml.saml2.core.AttributeValue;
+import org.opensaml.saml.saml2.core.Conditions;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -567,7 +567,8 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setIssuer("www.example.com");
         
         // Create and add a custom Attribute (conditions Object)
-        XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+        XMLObjectBuilderFactory builderFactory = 
+            XMLObjectProviderRegistrySupport.getBuilderFactory();
         
         SAMLObjectBuilder<Conditions> conditionsV2Builder = 
                 (SAMLObjectBuilder<Conditions>)builderFactory.getBuilder(Conditions.DEFAULT_ELEMENT_NAME);
@@ -576,7 +577,8 @@ public class SamlTokenTest extends org.junit.Assert {
         conditions.setNotBefore(newNotBefore);
         conditions.setNotOnOrAfter(newNotBefore.plusMinutes(5));
         
-        XMLObjectBuilder<XSAny> xsAnyBuilder = builderFactory.getBuilder(XSAny.TYPE_NAME);
+        XMLObjectBuilder<XSAny> xsAnyBuilder = 
+            (XMLObjectBuilder<XSAny>)builderFactory.getBuilder(XSAny.TYPE_NAME);
         XSAny attributeValue = xsAnyBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
         attributeValue.getUnknownXMLObjects().add(conditions);
         
@@ -624,9 +626,10 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setIssuer("www.example.com");
         
         // Create and add a custom Attribute (Integer)
-        XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+        XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
         
-        XMLObjectBuilder<XSInteger> xsIntegerBuilder = builderFactory.getBuilder(XSInteger.TYPE_NAME);
+        XMLObjectBuilder<XSInteger> xsIntegerBuilder = 
+            (XMLObjectBuilder<XSInteger>)builderFactory.getBuilder(XSInteger.TYPE_NAME);
         XSInteger attributeValue = 
             xsIntegerBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSInteger.TYPE_NAME);
         attributeValue.setValue(5);

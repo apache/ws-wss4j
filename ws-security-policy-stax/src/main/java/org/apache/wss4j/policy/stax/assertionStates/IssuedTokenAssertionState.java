@@ -34,7 +34,7 @@ import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.wss4j.stax.securityEvent.IssuedTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
-import org.opensaml.common.SAMLVersion;
+import org.opensaml.saml.common.SAMLVersion;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -236,16 +236,16 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
         return "Unsupported SAML version";
     }
 
-    protected String findClaimInAssertion(org.opensaml.saml2.core.Assertion assertion, URI claimURI) {
-        List<org.opensaml.saml2.core.AttributeStatement> attributeStatements =
+    protected String findClaimInAssertion(org.opensaml.saml.saml2.core.Assertion assertion, URI claimURI) {
+        List<org.opensaml.saml.saml2.core.AttributeStatement> attributeStatements =
                 assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
             return "Attribute " + claimURI + " not found in the SAMLAssertion";
         }
 
-        for (org.opensaml.saml2.core.AttributeStatement statement : attributeStatements) {
-            List<org.opensaml.saml2.core.Attribute> attributes = statement.getAttributes();
-            for (org.opensaml.saml2.core.Attribute attribute : attributes) {
+        for (org.opensaml.saml.saml2.core.AttributeStatement statement : attributeStatements) {
+            List<org.opensaml.saml.saml2.core.Attribute> attributes = statement.getAttributes();
+            for (org.opensaml.saml.saml2.core.Attribute attribute : attributes) {
 
                 if (attribute.getName().equals(claimURI.toString())
                         && attribute.getAttributeValues() != null && !attribute.getAttributeValues().isEmpty()) {
@@ -256,17 +256,17 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
         return "Attribute " + claimURI + " not found in the SAMLAssertion";
     }
 
-    protected String findClaimInAssertion(org.opensaml.saml1.core.Assertion assertion, URI claimURI) {
-        List<org.opensaml.saml1.core.AttributeStatement> attributeStatements =
+    protected String findClaimInAssertion(org.opensaml.saml.saml1.core.Assertion assertion, URI claimURI) {
+        List<org.opensaml.saml.saml1.core.AttributeStatement> attributeStatements =
                 assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
             return "Attribute " + claimURI + " not found in the SAMLAssertion";
         }
 
-        for (org.opensaml.saml1.core.AttributeStatement statement : attributeStatements) {
+        for (org.opensaml.saml.saml1.core.AttributeStatement statement : attributeStatements) {
 
-            List<org.opensaml.saml1.core.Attribute> attributes = statement.getAttributes();
-            for (org.opensaml.saml1.core.Attribute attribute : attributes) {
+            List<org.opensaml.saml.saml1.core.Attribute> attributes = statement.getAttributes();
+            for (org.opensaml.saml.saml1.core.Attribute attribute : attributes) {
 
                 URI attributeNamespace = URI.create(attribute.getAttributeNamespace());
                 String desiredRole = attributeNamespace.relativize(claimURI).toString();

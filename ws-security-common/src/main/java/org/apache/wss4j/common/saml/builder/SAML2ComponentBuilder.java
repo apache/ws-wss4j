@@ -39,40 +39,40 @@ import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
 import org.apache.wss4j.common.saml.bean.SubjectLocalityBean;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.joda.time.DateTime;
-import org.opensaml.Configuration;
-import org.opensaml.common.SAMLObjectBuilder;
-import org.opensaml.common.SAMLVersion;
-import org.opensaml.saml2.core.Action;
-import org.opensaml.saml2.core.Advice;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.saml2.core.AssertionIDRef;
-import org.opensaml.saml2.core.AssertionURIRef;
-import org.opensaml.saml2.core.Attribute;
-import org.opensaml.saml2.core.AttributeStatement;
-import org.opensaml.saml2.core.AttributeValue;
-import org.opensaml.saml2.core.Audience;
-import org.opensaml.saml2.core.AudienceRestriction;
-import org.opensaml.saml2.core.AuthnContext;
-import org.opensaml.saml2.core.AuthnContextClassRef;
-import org.opensaml.saml2.core.AuthnStatement;
-import org.opensaml.saml2.core.AuthzDecisionStatement;
-import org.opensaml.saml2.core.Conditions;
-import org.opensaml.saml2.core.DecisionTypeEnumeration;
-import org.opensaml.saml2.core.Evidence;
-import org.opensaml.saml2.core.Issuer;
-import org.opensaml.saml2.core.KeyInfoConfirmationDataType;
-import org.opensaml.saml2.core.NameID;
-import org.opensaml.saml2.core.OneTimeUse;
-import org.opensaml.saml2.core.ProxyRestriction;
-import org.opensaml.saml2.core.Subject;
-import org.opensaml.saml2.core.SubjectConfirmation;
-import org.opensaml.saml2.core.SubjectConfirmationData;
-import org.opensaml.saml2.core.SubjectLocality;
-import org.opensaml.xml.XMLObject;
-import org.opensaml.xml.XMLObjectBuilderFactory;
-import org.opensaml.xml.schema.XSString;
-import org.opensaml.xml.schema.impl.XSStringBuilder;
-import org.opensaml.xml.signature.KeyInfo;
+import org.opensaml.saml.common.SAMLObjectBuilder;
+import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.saml.saml2.core.Action;
+import org.opensaml.saml.saml2.core.Advice;
+import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.AssertionIDRef;
+import org.opensaml.saml.saml2.core.AssertionURIRef;
+import org.opensaml.saml.saml2.core.Attribute;
+import org.opensaml.saml.saml2.core.AttributeStatement;
+import org.opensaml.saml.saml2.core.AttributeValue;
+import org.opensaml.saml.saml2.core.Audience;
+import org.opensaml.saml.saml2.core.AudienceRestriction;
+import org.opensaml.saml.saml2.core.AuthnContext;
+import org.opensaml.saml.saml2.core.AuthnContextClassRef;
+import org.opensaml.saml.saml2.core.AuthnStatement;
+import org.opensaml.saml.saml2.core.AuthzDecisionStatement;
+import org.opensaml.saml.saml2.core.Conditions;
+import org.opensaml.saml.saml2.core.DecisionTypeEnumeration;
+import org.opensaml.saml.saml2.core.Evidence;
+import org.opensaml.saml.saml2.core.Issuer;
+import org.opensaml.saml.saml2.core.KeyInfoConfirmationDataType;
+import org.opensaml.saml.saml2.core.NameID;
+import org.opensaml.saml.saml2.core.OneTimeUse;
+import org.opensaml.saml.saml2.core.ProxyRestriction;
+import org.opensaml.saml.saml2.core.Subject;
+import org.opensaml.saml.saml2.core.SubjectConfirmation;
+import org.opensaml.saml.saml2.core.SubjectConfirmationData;
+import org.opensaml.saml.saml2.core.SubjectLocality;
+import org.opensaml.core.xml.XMLObject;
+import org.opensaml.core.xml.XMLObjectBuilderFactory;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.schema.XSString;
+import org.opensaml.core.xml.schema.impl.XSStringBuilder;
+import org.opensaml.xmlsec.signature.KeyInfo;
 import org.w3c.dom.Element;
 
 /**
@@ -126,7 +126,8 @@ public final class SAML2ComponentBuilder {
     
     private static volatile SAMLObjectBuilder<Action> actionElementBuilder;
     
-    private static volatile XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+    private static volatile XMLObjectBuilderFactory builderFactory = 
+        XMLObjectProviderRegistrySupport.getBuilderFactory();
     
     private static volatile SAMLObjectBuilder<SubjectLocality> subjectLocalityBuilder;
 
@@ -506,7 +507,7 @@ public final class SAML2ComponentBuilder {
      */
     @SuppressWarnings("unchecked")
     public static Subject createSaml2Subject(SubjectBean subjectBean) 
-        throws org.opensaml.xml.security.SecurityException, WSSecurityException {
+        throws org.opensaml.security.SecurityException, WSSecurityException {
         if (subjectBuilder == null) {
             subjectBuilder = (SAMLObjectBuilder<Subject>) 
                 builderFactory.getBuilder(Subject.DEFAULT_ELEMENT_NAME);
@@ -549,7 +550,7 @@ public final class SAML2ComponentBuilder {
     public static SubjectConfirmationData createSubjectConfirmationData(
         SubjectConfirmationDataBean subjectConfirmationDataBean,
         KeyInfoBean keyInfoBean
-    ) throws org.opensaml.xml.security.SecurityException, WSSecurityException {
+    ) throws org.opensaml.security.SecurityException, WSSecurityException {
         SubjectConfirmationData subjectConfirmationData = null;
         KeyInfo keyInfo = null;
         if (keyInfoBean == null) {

@@ -43,7 +43,7 @@ import org.apache.xml.security.stax.securityEvent.*;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opensaml.common.SAMLVersion;
+import org.opensaml.saml.common.SAMLVersion;
 
 import javax.xml.namespace.QName;
 

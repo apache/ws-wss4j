@@ -18,6 +18,20 @@
  */
 package org.apache.wss4j.stax.test.saml;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.ProxyRestrictionBean;
@@ -36,24 +50,10 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opensaml.Configuration;
+import org.opensaml.saml.config.SAMLConfigurationSupport;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
 
 public class SamlConditionsTest extends AbstractTestBase {
 
@@ -100,8 +100,8 @@ public class SamlConditionsTest extends AbstractTestBase {
 
             nodeList = document.getElementsByTagNameNS("urn:oasis:names:tc:SAML:1.0:assertion", "Conditions");
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotBefore"), Configuration.getSAMLDateFormatter().print(notBefore));
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotOnOrAfter"), Configuration.getSAMLDateFormatter().print(notAfter));
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotBefore"), SAMLConfigurationSupport.getSAMLDateFormatter().print(notBefore));
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotOnOrAfter"), SAMLConfigurationSupport.getSAMLDateFormatter().print(notAfter));
         }
 
         //done signature; now test sig-verification:
@@ -147,8 +147,8 @@ public class SamlConditionsTest extends AbstractTestBase {
 
             nodeList = securedDocument.getElementsByTagNameNS("urn:oasis:names:tc:SAML:1.0:assertion", "Conditions");
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotBefore"), Configuration.getSAMLDateFormatter().print(notBefore));
-            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotOnOrAfter"), Configuration.getSAMLDateFormatter().print(notAfter));
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotBefore"), SAMLConfigurationSupport.getSAMLDateFormatter().print(notBefore));
+            Assert.assertEquals(((Element) nodeList.item(0)).getAttributeNS(null, "NotOnOrAfter"), SAMLConfigurationSupport.getSAMLDateFormatter().print(notAfter));
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));

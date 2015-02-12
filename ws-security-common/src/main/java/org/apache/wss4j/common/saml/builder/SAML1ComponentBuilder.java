@@ -19,6 +19,9 @@
 
 package org.apache.wss4j.common.saml.builder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.bean.ActionBean;
@@ -34,39 +37,37 @@ import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.bean.SubjectLocalityBean;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.joda.time.DateTime;
-import org.opensaml.Configuration;
-import org.opensaml.common.SAMLObjectBuilder;
-import org.opensaml.common.SAMLVersion;
-import org.opensaml.saml1.core.Action;
-import org.opensaml.saml1.core.Advice;
-import org.opensaml.saml1.core.Assertion;
-import org.opensaml.saml1.core.AssertionIDReference;
-import org.opensaml.saml1.core.Attribute;
-import org.opensaml.saml1.core.AttributeStatement;
-import org.opensaml.saml1.core.AttributeValue;
-import org.opensaml.saml1.core.Audience;
-import org.opensaml.saml1.core.AudienceRestrictionCondition;
-import org.opensaml.saml1.core.AuthenticationStatement;
-import org.opensaml.saml1.core.AuthorizationDecisionStatement;
-import org.opensaml.saml1.core.Conditions;
-import org.opensaml.saml1.core.ConfirmationMethod;
-import org.opensaml.saml1.core.DecisionTypeEnumeration;
-import org.opensaml.saml1.core.Evidence;
-import org.opensaml.saml1.core.NameIdentifier;
-import org.opensaml.saml1.core.Subject;
-import org.opensaml.saml1.core.SubjectConfirmation;
-import org.opensaml.saml1.core.SubjectLocality;
-import org.opensaml.xml.XMLObject;
-import org.opensaml.xml.XMLObjectBuilderFactory;
-import org.opensaml.xml.schema.XSString;
-import org.opensaml.xml.schema.impl.XSStringBuilder;
-import org.opensaml.xml.security.x509.BasicX509Credential;
-import org.opensaml.xml.security.x509.X509KeyInfoGeneratorFactory;
-import org.opensaml.xml.signature.KeyInfo;
+import org.opensaml.core.xml.XMLObject;
+import org.opensaml.core.xml.XMLObjectBuilderFactory;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.schema.XSString;
+import org.opensaml.core.xml.schema.impl.XSStringBuilder;
+import org.opensaml.saml.common.SAMLObjectBuilder;
+import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.saml.saml1.core.Action;
+import org.opensaml.saml.saml1.core.Advice;
+import org.opensaml.saml.saml1.core.Assertion;
+import org.opensaml.saml.saml1.core.AssertionIDReference;
+import org.opensaml.saml.saml1.core.Attribute;
+import org.opensaml.saml.saml1.core.AttributeStatement;
+import org.opensaml.saml.saml1.core.AttributeValue;
+import org.opensaml.saml.saml1.core.Audience;
+import org.opensaml.saml.saml1.core.AudienceRestrictionCondition;
+import org.opensaml.saml.saml1.core.AuthenticationStatement;
+import org.opensaml.saml.saml1.core.AuthorizationDecisionStatement;
+import org.opensaml.saml.saml1.core.Conditions;
+import org.opensaml.saml.saml1.core.ConfirmationMethod;
+import org.opensaml.saml.saml1.core.DecisionTypeEnumeration;
+import org.opensaml.saml.saml1.core.Evidence;
+import org.opensaml.saml.saml1.core.NameIdentifier;
+import org.opensaml.saml.saml1.core.Subject;
+import org.opensaml.saml.saml1.core.SubjectConfirmation;
+import org.opensaml.saml.saml1.core.SubjectLocality;
+import org.opensaml.security.credential.BasicCredential;
+import org.opensaml.security.x509.BasicX509Credential;
+import org.opensaml.xmlsec.keyinfo.impl.X509KeyInfoGeneratorFactory;
+import org.opensaml.xmlsec.signature.KeyInfo;
 import org.w3c.dom.Element;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Class SAML1ComponentBuilder provides builder methods that can be used
@@ -109,7 +110,8 @@ public final class SAML1ComponentBuilder {
     
     private static volatile SAMLObjectBuilder<Action> actionElementV1Builder;
     
-    private static volatile XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+    private static volatile XMLObjectBuilderFactory builderFactory = 
+        XMLObjectProviderRegistrySupport.getBuilderFactory();
     
     private static volatile SAMLObjectBuilder<SubjectLocality> subjectLocalityBuilder;
 
@@ -156,7 +158,7 @@ public final class SAML1ComponentBuilder {
      */
     @SuppressWarnings("unchecked")
     public static Subject createSaml1v1Subject(SubjectBean subjectBean) 
-        throws org.opensaml.xml.security.SecurityException, WSSecurityException {
+        throws org.opensaml.security.SecurityException, WSSecurityException {
         if (subjectV1Builder == null) {
             subjectV1Builder = (SAMLObjectBuilder<Subject>) 
                 builderFactory.getBuilder(Subject.DEFAULT_ELEMENT_NAME);
@@ -181,7 +183,7 @@ public final class SAML1ComponentBuilder {
         ConfirmationMethod confirmationMethod = confirmationMethodV1Builder.buildObject();
         
         nameIdentifier.setNameQualifier(subjectBean.getSubjectNameQualifier());
-        nameIdentifier.setNameIdentifier(subjectBean.getSubjectName());
+        nameIdentifier.setValue(subjectBean.getSubjectName());
         nameIdentifier.setFormat(subjectBean.getSubjectNameIDFormat());
         String confirmationMethodStr = subjectBean.getSubjectConfirmationMethod();
         
@@ -208,16 +210,16 @@ public final class SAML1ComponentBuilder {
      * @throws org.opensaml.xml.security.SecurityException
      */
     public static KeyInfo createKeyInfo(KeyInfoBean keyInfo) 
-        throws org.opensaml.xml.security.SecurityException, WSSecurityException {
+        throws org.opensaml.security.SecurityException, WSSecurityException {
         if (keyInfo.getElement() != null) {
             return (KeyInfo)OpenSAMLUtil.fromDom(keyInfo.getElement());
         } else {
             // Set the certificate or public key
-            BasicX509Credential keyInfoCredential = new BasicX509Credential();
+            BasicCredential keyInfoCredential = null;
             if (keyInfo.getCertificate() != null) {
-                keyInfoCredential.setEntityCertificate(keyInfo.getCertificate());
+                keyInfoCredential = new BasicX509Credential(keyInfo.getCertificate());
             } else if (keyInfo.getPublicKey() != null) {
-                keyInfoCredential.setPublicKey(keyInfo.getPublicKey());
+                keyInfoCredential = new BasicCredential(keyInfo.getPublicKey());
             }
             
             // Configure how to emit the certificate
@@ -380,7 +382,7 @@ public final class SAML1ComponentBuilder {
     @SuppressWarnings("unchecked")
     public static List<AuthenticationStatement> createSamlv1AuthenticationStatement(
         List<AuthenticationStatementBean> authBeans
-    ) throws org.opensaml.xml.security.SecurityException, WSSecurityException {
+    ) throws org.opensaml.security.SecurityException, WSSecurityException {
         List<AuthenticationStatement> authenticationStatements = 
             new ArrayList<AuthenticationStatement>();
         
@@ -460,7 +462,7 @@ public final class SAML1ComponentBuilder {
     @SuppressWarnings("unchecked")
     public static List<AttributeStatement> createSamlv1AttributeStatement(
         List<AttributeStatementBean> attributeData
-    ) throws org.opensaml.xml.security.SecurityException, WSSecurityException {
+    ) throws org.opensaml.security.SecurityException, WSSecurityException {
         if (attributeStatementV1Builder == null) {
             attributeStatementV1Builder = (SAMLObjectBuilder<AttributeStatement>) 
                 builderFactory.getBuilder(AttributeStatement.DEFAULT_ELEMENT_NAME);
@@ -544,7 +546,7 @@ public final class SAML1ComponentBuilder {
     @SuppressWarnings("unchecked")
     public static List<AuthorizationDecisionStatement> createSamlv1AuthorizationDecisionStatement(
             List<AuthDecisionStatementBean> decisionData) 
-        throws org.opensaml.xml.security.SecurityException, WSSecurityException {
+        throws org.opensaml.security.SecurityException, WSSecurityException {
         List<AuthorizationDecisionStatement> authDecisionStatements = 
                 new ArrayList<AuthorizationDecisionStatement>();
         if (authorizationDecisionStatementV1Builder == null) {

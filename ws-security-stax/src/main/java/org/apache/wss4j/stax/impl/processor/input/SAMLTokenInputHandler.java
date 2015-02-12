@@ -59,10 +59,11 @@ import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenFactory;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
-import org.opensaml.xml.security.x509.BasicX509Credential;
-import org.opensaml.xml.signature.Signature;
-import org.opensaml.xml.signature.SignatureValidator;
-import org.opensaml.xml.validation.ValidationException;
+import org.opensaml.security.credential.BasicCredential;
+import org.opensaml.security.x509.BasicX509Credential;
+import org.opensaml.xmlsec.signature.Signature;
+import org.opensaml.xmlsec.signature.support.SignatureException;
+import org.opensaml.xmlsec.signature.support.SignatureValidator;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -80,6 +81,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Comment;
 import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.ProcessingInstruction;
+
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -137,21 +139,20 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
             samlTokenValidator.validate(sigSecurityToken, wssSecurityProperties);
 
-            BasicX509Credential credential = new BasicX509Credential();
+            BasicCredential credential = null;
             if (sigSecurityToken.getX509Certificates() != null) {
-                credential.setEntityCertificate(sigSecurityToken.getX509Certificates()[0]);
+                credential = new BasicX509Credential(sigSecurityToken.getX509Certificates()[0]);
             } else if (sigSecurityToken.getPublicKey() != null) {
-                credential.setPublicKey(sigSecurityToken.getPublicKey());
+                credential = new BasicCredential(sigSecurityToken.getPublicKey());
             } else {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
                         "cannot get certificate or key"
                 );
             }
-            SignatureValidator sigValidator = new SignatureValidator(credential);
             try {
-                sigValidator.validate(signature);
-            } catch (ValidationException ex) {
+                SignatureValidator.validate(signature, credential);
+            } catch (SignatureException ex) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                         "empty", ex, "SAML signature validation failed");
             }
