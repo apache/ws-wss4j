@@ -65,6 +65,7 @@ import org.opensaml.saml.saml1.core.SubjectConfirmation;
 import org.opensaml.saml.saml1.core.SubjectLocality;
 import org.opensaml.security.credential.BasicCredential;
 import org.opensaml.security.x509.BasicX509Credential;
+import org.opensaml.xmlsec.keyinfo.impl.BasicKeyInfoGeneratorFactory;
 import org.opensaml.xmlsec.keyinfo.impl.X509KeyInfoGeneratorFactory;
 import org.opensaml.xmlsec.signature.KeyInfo;
 import org.w3c.dom.Element;
@@ -215,31 +216,36 @@ public final class SAML1ComponentBuilder {
             return (KeyInfo)OpenSAMLUtil.fromDom(keyInfo.getElement());
         } else {
             // Set the certificate or public key
-            BasicCredential keyInfoCredential = null;
             if (keyInfo.getCertificate() != null) {
-                keyInfoCredential = new BasicX509Credential(keyInfo.getCertificate());
+                BasicCredential keyInfoCredential = new BasicX509Credential(keyInfo.getCertificate());
+                
+                // Configure how to emit the certificate
+                X509KeyInfoGeneratorFactory kiFactory = new X509KeyInfoGeneratorFactory();
+                KeyInfoBean.CERT_IDENTIFIER certIdentifier = keyInfo.getCertIdentifer();
+                switch (certIdentifier) {
+                    case X509_CERT: {
+                        kiFactory.setEmitEntityCertificate(true);
+                        break;
+                    }
+                    case KEY_VALUE: {
+                        kiFactory.setEmitPublicKeyValue(true);
+                        break;
+                    }
+                    case X509_ISSUER_SERIAL: {
+                        kiFactory.setEmitX509IssuerSerial(true);
+                    }
+                }
+                return kiFactory.newInstance().generate(keyInfoCredential);
+
             } else if (keyInfo.getPublicKey() != null) {
-                keyInfoCredential = new BasicCredential(keyInfo.getPublicKey());
+                BasicCredential keyInfoCredential = new BasicCredential(keyInfo.getPublicKey());
+                BasicKeyInfoGeneratorFactory kiFactory = new BasicKeyInfoGeneratorFactory();
+                kiFactory.setEmitPublicKeyValue(true);
+                return kiFactory.newInstance().generate(keyInfoCredential);
             }
-            
-            // Configure how to emit the certificate
-            X509KeyInfoGeneratorFactory kiFactory = new X509KeyInfoGeneratorFactory();
-            KeyInfoBean.CERT_IDENTIFIER certIdentifier = keyInfo.getCertIdentifer();
-            switch (certIdentifier) {
-                case X509_CERT: {
-                    kiFactory.setEmitEntityCertificate(true);
-                    break;
-                }
-                case KEY_VALUE: {
-                    kiFactory.setEmitPublicKeyValue(true);
-                    break;
-                }
-                case X509_ISSUER_SERIAL: {
-                    kiFactory.setEmitX509IssuerSerial(true);
-                }
-            }
-            return kiFactory.newInstance().generate(keyInfoCredential);
         }
+        
+        return null;
     }
 
     /**
