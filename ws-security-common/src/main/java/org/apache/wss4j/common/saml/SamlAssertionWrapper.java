@@ -36,7 +36,6 @@ import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.InetAddressUtils;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
-import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.joda.time.DateTime;
 import org.opensaml.core.xml.XMLObject;
@@ -757,10 +756,6 @@ public class SamlAssertionWrapper {
                 // Use XML-Security class to obtain SignatureValue
                 XMLSignature xmlSignature = new XMLSignature(signatureElement, "");
                 return xmlSignature.getSignatureValue();
-            } catch (XMLSignatureException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", e
-                );
             } catch (XMLSecurityException e) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", e

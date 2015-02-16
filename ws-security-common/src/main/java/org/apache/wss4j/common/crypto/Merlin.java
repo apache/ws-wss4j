@@ -338,7 +338,7 @@ public class Merlin extends CryptoBase {
                 if (DO_DEBUG) {
                     LOG.debug(e.getMessage(), e);
                 }
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "ioError00", e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "failedCredentialLoad", e);
             } finally {
                 if (is != null) {
                     is.close();
@@ -400,21 +400,11 @@ public class Merlin extends CryptoBase {
                     
             ks.load(input, storepass == null || storepass.length() == 0
                 ? new char[0] : storepass.toCharArray());
-        } catch (IOException e) {
+        } catch (IOException | GeneralSecurityException e) {
             if (DO_DEBUG) {
                 LOG.debug(e.getMessage(), e);
             }
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "ioError00", e);
-        } catch (GeneralSecurityException e) {
-            if (DO_DEBUG) {
-                LOG.debug(e.getMessage(), e);
-            }
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "secError00", e);
-        } catch (Exception e) {
-            if (DO_DEBUG) {
-                LOG.debug(e.getMessage(), e);
-            }
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "error00", e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "failedCredentialLoad", e);
         }
         return ks;
     }
@@ -707,15 +697,7 @@ public class Merlin extends CryptoBase {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", msg);
             }
             return (PrivateKey) keyTmp;
-        } catch (KeyStoreException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "noPrivateKey", ex, ex.getMessage()
-            );
-        } catch (UnrecoverableKeyException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "noPrivateKey", ex, ex.getMessage()
-            );
-        } catch (NoSuchAlgorithmException ex) {
+        } catch (KeyStoreException | UnrecoverableKeyException | NoSuchAlgorithmException ex) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, "noPrivateKey", ex, ex.getMessage()
             );
@@ -761,15 +743,7 @@ public class Merlin extends CryptoBase {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", msg);
             }
             return (PrivateKey) keyTmp;
-        } catch (KeyStoreException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "noPrivateKey", ex, ex.getMessage()
-            );
-        } catch (UnrecoverableKeyException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "noPrivateKey", ex, ex.getMessage()
-            );
-        } catch (NoSuchAlgorithmException ex) {
+        } catch (KeyStoreException | UnrecoverableKeyException | NoSuchAlgorithmException ex) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, "noPrivateKey", ex, ex.getMessage()
             );
@@ -808,11 +782,7 @@ public class Merlin extends CryptoBase {
             if (foundCerts != null && foundCerts[0] != null && foundCerts[0].equals(certs[0])) {
                 try {
                     certs[0].checkValidity();
-                } catch (CertificateExpiredException e) {
-                    throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILED_CHECK, "invalidCert", e
-                    );
-                } catch (CertificateNotYetValidException e) {
+                } catch (CertificateExpiredException | CertificateNotYetValidException e) {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILED_CHECK, "invalidCert", e
                     );
@@ -925,33 +895,11 @@ public class Merlin extends CryptoBase {
                 validator = CertPathValidator.getInstance("PKIX", provider);
             }
             validator.validate(path, param);
-        } catch (NoSuchProviderException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "certpath", e
-                );
-        } catch (NoSuchAlgorithmException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE,
-                    "certpath", e, e.getMessage()
-                );
-        } catch (CertificateException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "certpath", e
-                );
-        } catch (java.security.InvalidAlgorithmParameterException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "certpath", e
-                );
-        } catch (java.security.cert.CertPathValidatorException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, "certpath", e
-                );
-        } catch (KeyStoreException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "certpath", e
-                );
-        } catch (NullPointerException e) {
-                // NPE thrown by JDK 1.7 for one of the test cases
+        } catch (NoSuchProviderException | NoSuchAlgorithmException 
+            | CertificateException | java.security.InvalidAlgorithmParameterException
+            | java.security.cert.CertPathValidatorException 
+            | KeyStoreException
+            | NullPointerException e) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "certpath", e
                 );

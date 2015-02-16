@@ -298,13 +298,9 @@ public final class SAMLUtil {
         try {
             // Get the SAML source data using the currently configured callback implementation.
             callbackHandler.handle(new SAMLCallback[]{callback});
-        } catch (IOException e) {
+        } catch (IOException | UnsupportedCallbackException e) {
             throw new IllegalStateException(
-                "IOException while creating SAML assertion wrapper", e
-            );
-        } catch (UnsupportedCallbackException e) {
-            throw new IllegalStateException(
-                "UnsupportedCallbackException while creating SAML assertion wrapper", e
+                "Error while creating SAML assertion wrapper", e
             );
         }
     }

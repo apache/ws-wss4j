@@ -495,9 +495,7 @@ public class AttachmentUtils {
 
                 try {
                     cipher.init(Cipher.DECRYPT_MODE, key, iv);
-                } catch (InvalidKeyException e) {
-                    throw new IOException(e);
-                } catch (InvalidAlgorithmParameterException e) {
+                } catch (InvalidKeyException | InvalidAlgorithmParameterException e) {
                     throw new IOException(e);
                 }
             }
@@ -592,8 +590,6 @@ public class AttachmentUtils {
                         new ByteArrayInputStream(byteArrayOutputStream.toByteArray()),
                         attachment.getSourceStream()
                 );
-            } catch (UnsupportedEncodingException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
             } catch (IOException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
             }

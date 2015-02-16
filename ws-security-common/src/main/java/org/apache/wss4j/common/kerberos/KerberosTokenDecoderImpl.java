@@ -153,9 +153,7 @@ public class KerberosTokenDecoderImpl implements KerberosTokenDecoder {
                                                       KeyUsage.getTypeByOrdinal(2));
             
             this.encTicketPart = KerberosDecoder.decodeEncTicketPart(dec);
-        } catch (KerberosException e) {
-            throw new KerberosTokenDecoderException(e);
-        } catch (IOException e) {
+        } catch (KerberosException | IOException e) {
             throw new KerberosTokenDecoderException(e);
         }
     }

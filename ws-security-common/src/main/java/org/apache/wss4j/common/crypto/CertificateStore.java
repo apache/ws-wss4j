@@ -247,27 +247,10 @@ public class CertificateStore extends CryptoBase {
                 validator = CertPathValidator.getInstance("PKIX", provider);
             }
             validator.validate(path, param);
-        } catch (java.security.NoSuchProviderException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "certpath", e,
-                    e.getMessage()
-                );
-        } catch (NoSuchAlgorithmException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "certpath", e,
-                    e.getMessage()
-                );
-        } catch (java.security.cert.CertificateException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "certpath", e,
-                    e.getMessage()
-                );
-        } catch (java.security.InvalidAlgorithmParameterException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "certpath", e,
-                    e.getMessage()
-                );
-        } catch (java.security.cert.CertPathValidatorException e) {
+        } catch (java.security.NoSuchProviderException | NoSuchAlgorithmException 
+            | java.security.cert.CertificateException
+            | java.security.InvalidAlgorithmParameterException
+            | java.security.cert.CertPathValidatorException e) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "certpath", e,
                     e.getMessage()
