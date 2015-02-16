@@ -38,13 +38,13 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
-import org.opensaml.common.SAMLVersion;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
@@ -424,7 +424,7 @@ public class SamlNegativeTest extends org.junit.Assert {
                             subjectName, subjectQualifier, confirmationMethod
                         );
                     createAndSetStatement(subjectBean, callback);
-                    callback.setSamlVersion(SAMLVersion.VERSION_11);
+                    callback.setSamlVersion(Version.SAML_11);
                 } else {
                     throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
                 }
