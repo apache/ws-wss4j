@@ -26,8 +26,8 @@ import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.AdviceBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
-import org.opensaml.saml.common.SAMLVersion;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -59,7 +59,7 @@ public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
-                callback.setSamlVersion(SAMLVersion.VERSION_11);
+                callback.setSamlVersion(Version.SAML_11);
                 callback.setIssuer(issuer);
                 if (conditions != null) {
                     callback.setConditions(conditions);

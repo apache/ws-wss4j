@@ -27,12 +27,13 @@ import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
-import org.opensaml.saml.common.SAMLVersion;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
+
 import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
@@ -59,7 +60,7 @@ public class SAML1AuthnHOKHandler implements CallbackHandler {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
-                callback.setSamlVersion(SAMLVersion.VERSION_11);
+                callback.setSamlVersion(Version.SAML_11);
                 SubjectBean subjectBean = 
                     new SubjectBean(
                         subjectName, subjectQualifier, SAML1Constants.CONF_HOLDER_KEY

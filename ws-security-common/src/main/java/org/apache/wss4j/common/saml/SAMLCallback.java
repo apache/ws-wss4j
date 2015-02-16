@@ -26,6 +26,7 @@ import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
 import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.saml.bean.Version;
 import org.opensaml.saml.common.SAMLVersion;
 import org.w3c.dom.Element;
 
@@ -268,6 +269,7 @@ public class SAMLCallback implements Callback {
      * Set the SAMLVersion of the assertion to create
      * @param samlVersion the SAMLVersion of the assertion to create
      */
+    @Deprecated
     public void setSamlVersion(SAMLVersion samlVersion) {
         this.samlVersion = samlVersion;
     }
@@ -278,6 +280,20 @@ public class SAMLCallback implements Callback {
      */
     public SAMLVersion getSamlVersion() {
         return samlVersion;
+    }
+    
+    /**
+     * Set the SAML Version of the assertion to create
+     * @param samlVersion the SAML Version of the assertion to create
+     */
+    public void setSamlVersion(Version samlVersion) {
+        if (samlVersion == Version.SAML_20) {
+            this.samlVersion = SAMLVersion.VERSION_20;
+        } else if (samlVersion == Version.SAML_11) {
+            this.samlVersion = SAMLVersion.VERSION_11;
+        } else if (samlVersion == Version.SAML_10) {
+            this.samlVersion = SAMLVersion.VERSION_10;
+        }
     }
     
     /**
