@@ -32,7 +32,7 @@ public class KerberosToken extends AbstractToken {
         WssKerberosV5ApReqToken11,
         WssGssKerberosV5ApReqToken11;
 
-        private static final Map<String, ApReqTokenType> lookup = new HashMap<String, ApReqTokenType>();
+        private static final Map<String, ApReqTokenType> lookup = new HashMap<>();
 
         static {
             for (ApReqTokenType u : EnumSet.allOf(ApReqTokenType.class))

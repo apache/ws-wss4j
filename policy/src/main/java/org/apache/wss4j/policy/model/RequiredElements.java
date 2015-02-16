@@ -33,7 +33,7 @@ import java.util.Map;
 public class RequiredElements extends AbstractSecurityAssertion {
 
     private String xPathVersion;
-    private final List<XPath> xPaths = new ArrayList<XPath>();
+    private final List<XPath> xPaths = new ArrayList<>();
 
     public RequiredElements(SPConstants.SPVersion version, String xPathVersion, List<XPath> xPaths) {
         super(version);

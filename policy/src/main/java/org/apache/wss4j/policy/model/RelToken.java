@@ -34,7 +34,7 @@ public class RelToken extends AbstractToken {
         WssRelV10Token11,
         WssRelV20Token11;
 
-        private static final Map<String, RelTokenType> lookup = new HashMap<String, RelTokenType>();
+        private static final Map<String, RelTokenType> lookup = new HashMap<>();
 
         static {
             for (RelTokenType u : EnumSet.allOf(RelTokenType.class))

@@ -694,7 +694,7 @@ public class SP11Constants extends SPConstants {
         EndorsingSupportingTokens(ENDORSING_SUPPORTING_TOKENS),
         SignedEndorsingSupportingTokens(SIGNED_ENDORSING_SUPPORTING_TOKENS);
 
-        private static final Map<QName, SupportingTokenTypes> lookup = new HashMap<QName, SupportingTokenTypes>();
+        private static final Map<QName, SupportingTokenTypes> lookup = new HashMap<>();
 
         static {
             for (SupportingTokenTypes u : EnumSet.allOf(SupportingTokenTypes.class))

@@ -30,7 +30,7 @@ import java.util.List;
 
 public class RequiredParts extends AbstractSecurityAssertion {
 
-    private final List<Header> headers = new ArrayList<Header>();
+    private final List<Header> headers = new ArrayList<>();
 
     public RequiredParts(SPConstants.SPVersion version, List<Header> headers) {
         super(version);

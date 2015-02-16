@@ -33,7 +33,7 @@ import java.util.List;
 public class SupportingTokens extends AbstractTokenWrapper {
 
     private SupportingTokenType supportingTokenType;
-    private final List<AbstractToken> tokens = new ArrayList<AbstractToken>();
+    private final List<AbstractToken> tokens = new ArrayList<>();
     private AlgorithmSuite algorithmSuite;
     private SignedParts signedParts;
     private SignedElements signedElements;

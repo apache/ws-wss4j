@@ -754,7 +754,7 @@ public class SP12Constants extends SPConstants {
         EndorsingEncryptedSupportingTokens(ENDORSING_ENCRYPTED_SUPPORTING_TOKENS),
         SignedEndorsingEncryptedSupportingTokens(SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
 
-        private static final Map<QName, SupportingTokenTypes> lookup = new HashMap<QName, SupportingTokenTypes>();
+        private static final Map<QName, SupportingTokenTypes> lookup = new HashMap<>();
 
         static {
             for (SupportingTokenTypes u : EnumSet.allOf(SupportingTokenTypes.class))

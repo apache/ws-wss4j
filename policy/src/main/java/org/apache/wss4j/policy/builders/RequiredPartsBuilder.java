@@ -47,7 +47,7 @@ public class RequiredPartsBuilder implements AssertionBuilder<Element> {
     }
 
     protected List<Header> getHeaders(Element element, boolean ignoreNameElement, SPConstants.SPVersion spVersion) {
-        List<Header> headers = new ArrayList<Header>();
+        List<Header> headers = new ArrayList<>();
         Element child = SPUtils.getFirstChildElement(element);
         while (child != null) {
             if (SPConstants.HEADER.equals(child.getLocalName()) && spVersion.getNamespace().equals(child.getNamespaceURI())) {
