@@ -93,19 +93,14 @@ public class MerlinDevice extends Merlin {
         }
         if (keyStoreLocation != null) {
             keyStoreLocation = keyStoreLocation.trim();
-            InputStream is = loadInputStream(loader, keyStoreLocation);
 
-            try {
+            try (InputStream is = loadInputStream(loader, keyStoreLocation)) {
                 keystore = load(is, keyStorePassword, provider, keyStoreType);
                 if (DO_DEBUG) {
                     LOG.debug(
                         "The KeyStore " + keyStoreLocation + " of type " + keyStoreType 
                         + " has been loaded"
                     );
-                }
-            } finally {
-                if (is != null) {
-                    is.close();
                 }
             }
         } else {
@@ -131,9 +126,8 @@ public class MerlinDevice extends Merlin {
         String trustStoreLocation = properties.getProperty(TRUSTSTORE_FILE);
         if (trustStoreLocation != null) {
             trustStoreLocation = trustStoreLocation.trim();
-            InputStream is = loadInputStream(loader, trustStoreLocation);
 
-            try {
+            try (InputStream is = loadInputStream(loader, trustStoreLocation)) {
                 truststore = load(is, trustStorePassword, provider, trustStoreType);
                 if (DO_DEBUG) {
                     LOG.debug(
@@ -142,18 +136,13 @@ public class MerlinDevice extends Merlin {
                     );
                 }
                 loadCACerts = false;
-            } finally {
-                if (is != null) {
-                    is.close();
-                }
             }
         } else if (Boolean.valueOf(loadCacerts)) {
             String cacertsPath = System.getProperty("java.home") + "/lib/security/cacerts";
             if (cacertsPath != null) {
                 cacertsPath = cacertsPath.trim();
             }
-            InputStream is = new FileInputStream(cacertsPath);
-            try {
+            try (InputStream is = new FileInputStream(cacertsPath)) {
                 String cacertsPasswd = properties.getProperty(TRUSTSTORE_PASSWORD, "changeit");
                 if (cacertsPasswd != null) {
                     cacertsPasswd = cacertsPasswd.trim();
@@ -164,10 +153,6 @@ public class MerlinDevice extends Merlin {
                     LOG.debug("CA certs have been loaded");
                 }
                 loadCACerts = true;
-            } finally {
-                if (is != null) {
-                    is.close();
-                }
             }
         } else {
             truststore = load(null, trustStorePassword, provider, trustStoreType);
@@ -178,9 +163,8 @@ public class MerlinDevice extends Merlin {
         String crlLocation = properties.getProperty(X509_CRL_FILE);
         if (crlLocation != null) {
             crlLocation = crlLocation.trim();
-            InputStream is = loadInputStream(loader, crlLocation);
 
-            try {
+            try (InputStream is = loadInputStream(loader, crlLocation)) {
                 CertificateFactory cf = getCertificateFactory();
                 X509CRL crl = (X509CRL)cf.generateCRL(is);
                 
@@ -208,10 +192,6 @@ public class MerlinDevice extends Merlin {
                     LOG.debug(e.getMessage(), e);
                 }
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "failedCredentialLoad", e);
-            } finally {
-                if (is != null) {
-                    is.close();
-                }
             }
         }
     }

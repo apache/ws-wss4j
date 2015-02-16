@@ -131,26 +131,15 @@ public class Merlin extends CryptoBase {
         super();
 
         if (truststore == null && loadCACerts) {
-            InputStream cacertsIs = null;
-
-            try {
-                String cacertsPath = System.getProperty("java.home") + "/lib/security/cacerts";
-                cacertsIs = new FileInputStream(cacertsPath);
-
+            String cacertsPath = System.getProperty("java.home") + "/lib/security/cacerts";
+            
+            try (InputStream cacertsIs = new FileInputStream(cacertsPath)) {
+                
                 truststore = KeyStore.getInstance(KeyStore.getDefaultType());
                 truststore.load(cacertsIs, cacertsPasswd.toCharArray());
                 loadCACerts = true;
             } catch (Exception e) {
                 LOG.warn("CA certs could not be loaded: " + e.getMessage());
-            } finally {
-                if (cacertsIs != null) {
-                    try {
-                        cacertsIs.close();
-                    } catch (IOException e) {
-                        LOG.debug(e.getMessage(), e);
-                        //ignore
-                    }
-                }
             }
         }
     }
@@ -209,9 +198,8 @@ public class Merlin extends CryptoBase {
         }
         if (keyStoreLocation != null) {
             keyStoreLocation = keyStoreLocation.trim();
-            InputStream is = loadInputStream(loader, keyStoreLocation);
 
-            try {
+            try (InputStream is = loadInputStream(loader, keyStoreLocation)) {
                 String passwd = properties.getProperty(prefix + KEYSTORE_PASSWORD, "security");
                 if (passwd != null) {
                     passwd = passwd.trim();
@@ -232,10 +220,6 @@ public class Merlin extends CryptoBase {
                 if (privatePasswd != null) {
                     privatePasswordSet = true;
                 }
-            } finally {
-                if (is != null) {
-                    is.close();
-                }
             }
         } else {
             if (DO_DEBUG) {
@@ -249,9 +233,8 @@ public class Merlin extends CryptoBase {
         String trustStoreLocation = properties.getProperty(prefix + TRUSTSTORE_FILE);
         if (trustStoreLocation != null) {
             trustStoreLocation = trustStoreLocation.trim();
-            InputStream is = loadInputStream(loader, trustStoreLocation);
 
-            try {
+            try (InputStream is = loadInputStream(loader, trustStoreLocation)) {
                 String passwd = properties.getProperty(prefix + TRUSTSTORE_PASSWORD, "changeit");
                 if (passwd != null) {
                     passwd = passwd.trim();
@@ -269,10 +252,6 @@ public class Merlin extends CryptoBase {
                     );
                 }
                 loadCACerts = false;
-            } finally {
-                if (is != null) {
-                    is.close();
-                }
             }
         } else {
             String loadCacerts = properties.getProperty(prefix + LOAD_CA_CERTS, "false");
@@ -284,8 +263,7 @@ public class Merlin extends CryptoBase {
                 if (cacertsPath != null) {
                     cacertsPath = cacertsPath.trim();
                 }
-                InputStream is = new FileInputStream(cacertsPath);
-                try {
+                try (InputStream is = new FileInputStream(cacertsPath)) {
                     String cacertsPasswd = properties.getProperty(prefix + TRUSTSTORE_PASSWORD, "changeit");
                     if (cacertsPasswd != null) {
                         cacertsPasswd = cacertsPasswd.trim();
@@ -296,10 +274,6 @@ public class Merlin extends CryptoBase {
                         LOG.debug("CA certs have been loaded");
                     }
                     loadCACerts = true;
-                } finally {
-                    if (is != null) {
-                        is.close();
-                    }
                 }
             }
         }
@@ -309,9 +283,8 @@ public class Merlin extends CryptoBase {
         String crlLocation = properties.getProperty(prefix + X509_CRL_FILE);
         if (crlLocation != null) {
             crlLocation = crlLocation.trim();
-            InputStream is = loadInputStream(loader, crlLocation);
 
-            try {
+            try (InputStream is = loadInputStream(loader, crlLocation)) {
                 CertificateFactory cf = getCertificateFactory();
                 X509CRL crl = (X509CRL)cf.generateCRL(is);
                 
@@ -339,10 +312,6 @@ public class Merlin extends CryptoBase {
                     LOG.debug(e.getMessage(), e);
                 }
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "failedCredentialLoad", e);
-            } finally {
-                if (is != null) {
-                    is.close();
-                }
             }
         }
     }
@@ -898,8 +867,7 @@ public class Merlin extends CryptoBase {
         } catch (NoSuchProviderException | NoSuchAlgorithmException 
             | CertificateException | java.security.InvalidAlgorithmParameterException
             | java.security.cert.CertPathValidatorException 
-            | KeyStoreException
-            | NullPointerException e) {
+            | KeyStoreException e) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "certpath", e
                 );

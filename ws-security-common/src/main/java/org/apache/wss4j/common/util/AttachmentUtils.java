@@ -385,8 +385,8 @@ public class AttachmentUtils {
     }
 
     /*
-         * Removes any comment outside quoted text. Comments are enclosed between ()
-         */
+     * Removes any comment outside quoted text. Comments are enclosed between ()
+     */
     public static String uncomment(String text) {
         StringBuilder stringBuilder = new StringBuilder();
 
