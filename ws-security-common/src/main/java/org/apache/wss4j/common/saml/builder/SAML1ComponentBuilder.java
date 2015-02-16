@@ -389,8 +389,7 @@ public final class SAML1ComponentBuilder {
     public static List<AuthenticationStatement> createSamlv1AuthenticationStatement(
         List<AuthenticationStatementBean> authBeans
     ) throws org.opensaml.security.SecurityException, WSSecurityException {
-        List<AuthenticationStatement> authenticationStatements = 
-            new ArrayList<AuthenticationStatement>();
+        List<AuthenticationStatement> authenticationStatements = new ArrayList<>();
         
         if (authenticationStatementV1Builder == null) {
             authenticationStatementV1Builder = (SAMLObjectBuilder<AuthenticationStatement>) 
@@ -474,7 +473,7 @@ public final class SAML1ComponentBuilder {
                 builderFactory.getBuilder(AttributeStatement.DEFAULT_ELEMENT_NAME);
         }
 
-        List<AttributeStatement> attributeStatements = new ArrayList<AttributeStatement>();
+        List<AttributeStatement> attributeStatements = new ArrayList<>();
 
         if (attributeData != null && attributeData.size() > 0) {
             for (AttributeStatementBean statementBean : attributeData) {
@@ -553,8 +552,7 @@ public final class SAML1ComponentBuilder {
     public static List<AuthorizationDecisionStatement> createSamlv1AuthorizationDecisionStatement(
             List<AuthDecisionStatementBean> decisionData) 
         throws org.opensaml.security.SecurityException, WSSecurityException {
-        List<AuthorizationDecisionStatement> authDecisionStatements = 
-                new ArrayList<AuthorizationDecisionStatement>();
+        List<AuthorizationDecisionStatement> authDecisionStatements = new ArrayList<>();
         if (authorizationDecisionStatementV1Builder == null) {
             authorizationDecisionStatementV1Builder = 
                 (SAMLObjectBuilder<AuthorizationDecisionStatement>) 

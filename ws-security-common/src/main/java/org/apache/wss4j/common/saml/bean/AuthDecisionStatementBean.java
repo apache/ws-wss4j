@@ -63,7 +63,7 @@ public class AuthDecisionStatementBean {
      * Constructor SamlDecision creates a new SamlDecision instance.
      */
     public AuthDecisionStatementBean() {
-        actionBeans = new ArrayList<ActionBean>();
+        actionBeans = new ArrayList<>();
     }
 
     /**

@@ -373,7 +373,7 @@ public class SamlAssertionWrapper {
      * @return the confirmationMethods of this SamlAssertionWrapper object.
      */
     public List<String> getConfirmationMethods() {
-        List<String> methods = new ArrayList<String>();
+        List<String> methods = new ArrayList<>();
         if (saml2 != null) {
             org.opensaml.saml.saml2.core.Subject subject = saml2.getSubject();
             List<org.opensaml.saml.saml2.core.SubjectConfirmation> confirmations = 
@@ -382,7 +382,7 @@ public class SamlAssertionWrapper {
                 methods.add(confirmation.getMethod());
             }
         } else if (saml1 != null) {
-            List<SubjectStatement> subjectStatements = new ArrayList<SubjectStatement>();
+            List<SubjectStatement> subjectStatements = new ArrayList<>();
             subjectStatements.addAll(saml1.getSubjectStatements());
             subjectStatements.addAll(saml1.getAuthenticationStatements());
             subjectStatements.addAll(saml1.getAttributeStatements());

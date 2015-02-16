@@ -65,7 +65,7 @@ public class AttachmentUtils {
     public static final String PARAM_SIZE = "size";
     public static final String PARAM_TYPE = "type";
 
-    public static final Set<String> ALL_PARAMS = new HashSet<String>();
+    public static final Set<String> ALL_PARAMS = new HashSet<>();
 
     static {
         ALL_PARAMS.add(PARAM_CHARSET);
@@ -83,7 +83,7 @@ public class AttachmentUtils {
         //5.4.1 MIME header canonicalization:
 
         //3. sorting
-        Map<String, String> sortedHeaders = new TreeMap<String, String>();
+        Map<String, String> sortedHeaders = new TreeMap<>();
         Iterator<Map.Entry<String, String>> iterator = headers.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, String> next = iterator.next();
@@ -237,7 +237,7 @@ public class AttachmentUtils {
         //10. lower case
         stringBuilder.append(params[0].toLowerCase());
 
-        TreeMap<String, String> paramMap = new TreeMap<String, String>();
+        TreeMap<String, String> paramMap = new TreeMap<>();
 
         String parameterName = null;
         String parameterValue = null;
@@ -429,7 +429,7 @@ public class AttachmentUtils {
             Map<String, String> headers, InputStream attachmentInputStream) throws IOException, WSSecurityException {
 
         //read and replace headers
-        List<String> headerLines = new ArrayList<String>();
+        List<String> headerLines = new ArrayList<>();
         StringBuilder stringBuilder = new StringBuilder();
         boolean cr = false;
         int ch;

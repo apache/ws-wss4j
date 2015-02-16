@@ -815,7 +815,7 @@ public class Merlin extends CryptoBase {
             List<X509Certificate> certList = Arrays.asList(x509certs);
             CertPath path = getCertificateFactory().generateCertPath(certList);
 
-            Set<TrustAnchor> set = new HashSet<TrustAnchor>();
+            Set<TrustAnchor> set = new HashSet<>();
             if (truststore != null) {
                 Enumeration<String> truststoreAliases = truststore.aliases();
                 while (truststoreAliases.hasMoreElements()) {

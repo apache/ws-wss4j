@@ -108,9 +108,9 @@ public class SAMLCallback implements Callback {
      * Constructor SAMLCallback creates a new SAMLCallback instance.
      */
     public SAMLCallback() {
-        authenticationStatementData = new ArrayList<AuthenticationStatementBean>();
-        attributeStatementData = new ArrayList<AttributeStatementBean>();
-        authDecisionStatementData = new ArrayList<AuthDecisionStatementBean>();
+        authenticationStatementData = new ArrayList<>();
+        attributeStatementData = new ArrayList<>();
+        authDecisionStatementData = new ArrayList<>();
     }
 
     /**

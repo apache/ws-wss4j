@@ -388,7 +388,7 @@ public final class SAML2ComponentBuilder {
     public static List<AuthnStatement> createAuthnStatement(
         List<AuthenticationStatementBean> authBeans
     ) {
-        List<AuthnStatement> authnStatements = new ArrayList<AuthnStatement>();
+        List<AuthnStatement> authnStatements = new ArrayList<>();
         
         if (authnStatementBuilder == null) {
             authnStatementBuilder = (SAMLObjectBuilder<AuthnStatement>) 
@@ -656,7 +656,7 @@ public final class SAML2ComponentBuilder {
     public static List<AttributeStatement> createAttributeStatement(
         List<AttributeStatementBean> attributeData
     ) {
-        List<AttributeStatement> attributeStatements = new ArrayList<AttributeStatement>();
+        List<AttributeStatement> attributeStatements = new ArrayList<>();
         if (attributeStatementBuilder == null) {
             attributeStatementBuilder = (SAMLObjectBuilder<AttributeStatement>) 
             builderFactory.getBuilder(AttributeStatement.DEFAULT_ELEMENT_NAME);
@@ -720,8 +720,7 @@ public final class SAML2ComponentBuilder {
     public static List<AuthzDecisionStatement> createAuthorizationDecisionStatement(
         List<AuthDecisionStatementBean> decisionData
     ) {
-        List<AuthzDecisionStatement> authDecisionStatements = 
-                new ArrayList<AuthzDecisionStatement>();
+        List<AuthzDecisionStatement> authDecisionStatements = new ArrayList<>();
         if (authorizationDecisionStatementBuilder == null) {
             authorizationDecisionStatementBuilder = 
                 (SAMLObjectBuilder<AuthzDecisionStatement>)

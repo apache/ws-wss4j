@@ -226,7 +226,7 @@ public class CertificateStore extends CryptoBase {
             List<X509Certificate> certList = Arrays.asList(x509certs);
             CertPath path = getCertificateFactory().generateCertPath(certList);
 
-            Set<TrustAnchor> set = new HashSet<TrustAnchor>();
+            Set<TrustAnchor> set = new HashSet<>();
             if (trustedCerts != null) {
                 for (X509Certificate cert : trustedCerts) {
                     TrustAnchor anchor = 

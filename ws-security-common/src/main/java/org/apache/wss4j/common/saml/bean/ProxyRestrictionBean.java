@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class ProxyRestrictionBean {
     private int count;
-    private final List<String> audienceURIs = new ArrayList<String>();
+    private final List<String> audienceURIs = new ArrayList<>();
 
     /**
      * Constructor ProxyRestrictionBean creates a new ProxyRestrictionBean instance.

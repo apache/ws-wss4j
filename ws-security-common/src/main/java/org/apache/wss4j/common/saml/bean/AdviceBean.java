@@ -30,9 +30,9 @@ import org.w3c.dom.Element;
  */
 public class AdviceBean {
     
-    private List<String> idReferences = new ArrayList<String>();
-    private List<String> uriReferences = new ArrayList<String>();
-    private List<Element> assertions = new ArrayList<Element>();
+    private List<String> idReferences = new ArrayList<>();
+    private List<String> uriReferences = new ArrayList<>();
+    private List<Element> assertions = new ArrayList<>();
     
     public List<String> getIdReferences() {
         return idReferences;
