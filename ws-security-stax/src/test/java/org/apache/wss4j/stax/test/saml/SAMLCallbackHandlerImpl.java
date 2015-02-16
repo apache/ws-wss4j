@@ -42,11 +42,11 @@ import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.bean.SubjectLocalityBean;
+import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
-import org.opensaml.saml.common.SAMLVersion;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -64,7 +64,7 @@ public class SAMLCallbackHandlerImpl implements CallbackHandler {
     private KeyInfoBean.CERT_IDENTIFIER certIdentifier = KeyInfoBean.CERT_IDENTIFIER.X509_CERT;
     private byte[] ephemeralKey = null;
     private String issuer = null;
-    private SAMLVersion samlVersion = SAMLVersion.VERSION_11;
+    private Version samlVersion = Version.SAML_11;
 
     private String subjectNameIDFormat = null;
     private String subjectLocalityIpAddress = null;
@@ -114,11 +114,11 @@ public class SAMLCallbackHandlerImpl implements CallbackHandler {
                 }
                 samlCallback.setSubject(subjectBean);
 
-                if (getSamlVersion() == SAMLVersion.VERSION_11) {
-                    samlCallback.setSamlVersion(SAMLVersion.VERSION_11);
+                if (getSamlVersion() == Version.SAML_11) {
+                    samlCallback.setSamlVersion(Version.SAML_11);
                     createAndSetStatement(subjectBean, samlCallback);
                 } else {
-                    samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+                    samlCallback.setSamlVersion(Version.SAML_20);
                     createAndSetStatement(null, samlCallback);
                 }
             } catch (Exception e) {
@@ -287,11 +287,11 @@ public class SAMLCallbackHandlerImpl implements CallbackHandler {
         this.signAssertion = signAssertion;
     }
 
-    public SAMLVersion getSamlVersion() {
+    public Version getSamlVersion() {
         return samlVersion;
     }
 
-    public void setSamlVersion(SAMLVersion samlVersion) {
+    public void setSamlVersion(Version samlVersion) {
         this.samlVersion = samlVersion;
     }
 

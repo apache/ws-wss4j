@@ -21,12 +21,12 @@ package org.apache.wss4j.policy.stax.test;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.impl.securityToken.SamlSecurityTokenImpl;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opensaml.saml.common.SAMLVersion;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.policy.stax.PolicyEnforcer;
 import org.apache.wss4j.policy.stax.PolicyViolationException;
@@ -80,7 +80,7 @@ public class SamlTokenTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         SAMLCallback samlCallback = new SAMLCallback();
-        samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+        samlCallback.setSamlVersion(Version.SAML_20);
         samlCallback.setIssuer("xs:anyURI");
         SubjectBean subjectBean = new SubjectBean();
         samlCallback.setSubject(subjectBean);
@@ -162,7 +162,7 @@ public class SamlTokenTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         SAMLCallback samlCallback = new SAMLCallback();
-        samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+        samlCallback.setSamlVersion(Version.SAML_20);
         samlCallback.setIssuer("xs:anyURI");
         SubjectBean subjectBean = new SubjectBean();
         samlCallback.setSubject(subjectBean);

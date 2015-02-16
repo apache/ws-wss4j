@@ -23,6 +23,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.impl.InboundWSSecurityContextImpl;
@@ -43,7 +44,6 @@ import org.apache.xml.security.stax.securityEvent.*;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opensaml.saml.common.SAMLVersion;
 
 import javax.xml.namespace.QName;
 
@@ -561,7 +561,7 @@ public class InboundWSSecurityContextImplTest {
         XMLSecEvent samlTokenXmlEvent = XMLSecEventFactory.createXmlSecStartElement(WSSConstants.TAG_wsse_UsernameToken, null, null);
 
         SAMLCallback samlCallback = new SAMLCallback();
-        samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+        samlCallback.setSamlVersion(Version.SAML_20);
         samlCallback.setIssuer("xs:anyURI");
         SubjectBean subjectBean = new SubjectBean();
         samlCallback.setSubject(subjectBean);

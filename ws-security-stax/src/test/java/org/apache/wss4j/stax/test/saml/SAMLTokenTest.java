@@ -25,6 +25,7 @@ import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.dom.WSConstants;
@@ -57,7 +58,6 @@ import org.opensaml.core.xml.XMLObjectBuilderFactory;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.core.xml.schema.XSAny;
 import org.opensaml.saml.common.SAMLObjectBuilder;
-import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.saml2.core.AttributeValue;
 import org.opensaml.saml.saml2.core.Conditions;
 import org.w3c.dom.Document;
@@ -319,7 +319,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
             securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
-            callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
+            callbackHandler.setSamlVersion(Version.SAML_20);
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
@@ -394,7 +394,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
             securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
-            callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
+            callbackHandler.setSamlVersion(Version.SAML_20);
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.ATTR);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
@@ -469,7 +469,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
             securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
-            callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
+            callbackHandler.setSamlVersion(Version.SAML_20);
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHZ);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
@@ -589,7 +589,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
-            callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
+            callbackHandler.setSamlVersion(Version.SAML_20);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
             callbackHandler.setSubjectNameIDFormat(SAML1Constants.NAMEID_FORMAT_EMAIL_ADDRESS);
@@ -668,7 +668,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
-            callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
+            callbackHandler.setSamlVersion(Version.SAML_20);
             callbackHandler.setSubjectLocality("12.34.56.78", "test-dns");
             securityProperties.setSamlCallbackHandler(callbackHandler);
 
@@ -747,7 +747,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.ATTR);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
-            callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
+            callbackHandler.setSamlVersion(Version.SAML_20);
 
             // Create and add a custom Attribute (conditions Object)
             XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
