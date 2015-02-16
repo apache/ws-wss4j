@@ -23,8 +23,8 @@ import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.config.Init;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opensaml.common.SAMLVersion;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -2375,7 +2375,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         actions.add(WSSConstants.ENCRYPT_WITH_DERIVED_KEY);
         outSecurityProperties.setActions(actions);
         SAMLCallbackHandlerImpl samlCallbackHandler = new SAMLCallbackHandlerImpl();
-        samlCallbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
+        samlCallbackHandler.setSamlVersion(Version.SAML_20);
         samlCallbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
         samlCallbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         samlCallbackHandler.setIssuer("www.example.com");
@@ -2505,7 +2505,7 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         actions.add(WSSConstants.ENCRYPT_WITH_DERIVED_KEY);
         outSecurityProperties.setActions(actions);
         SAMLCallbackHandlerImpl samlCallbackHandler = new SAMLCallbackHandlerImpl();
-        samlCallbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
+        samlCallbackHandler.setSamlVersion(Version.SAML_20);
         samlCallbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
         samlCallbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         samlCallbackHandler.setIssuer("www.example.com");

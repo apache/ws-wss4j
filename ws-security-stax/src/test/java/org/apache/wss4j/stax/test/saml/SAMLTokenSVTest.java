@@ -19,6 +19,7 @@
 package org.apache.wss4j.stax.test.saml;
 
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
@@ -35,7 +36,6 @@ import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opensaml.common.SAMLVersion;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -388,7 +388,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
             actions.add(WSSConstants.SAML_TOKEN_SIGNED);
             securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
-            callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
+            callbackHandler.setSamlVersion(Version.SAML_20);
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
             callbackHandler.setIssuer("www.example.com");
@@ -478,7 +478,7 @@ public class SAMLTokenSVTest extends AbstractTestBase {
             actions.add(WSSConstants.SAML_TOKEN_SIGNED);
             securityProperties.setActions(actions);
             SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
-            callbackHandler.setSamlVersion(SAMLVersion.VERSION_20);
+            callbackHandler.setSamlVersion(Version.SAML_20);
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.ATTR);
             callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
             callbackHandler.setIssuer("www.example.com");

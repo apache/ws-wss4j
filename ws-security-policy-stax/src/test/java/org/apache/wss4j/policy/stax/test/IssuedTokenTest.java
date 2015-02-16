@@ -25,6 +25,7 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
 import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.policy.stax.PolicyViolationException;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.impl.securityToken.KerberosServiceSecurityTokenImpl;
@@ -33,7 +34,6 @@ import org.apache.wss4j.stax.securityEvent.KerberosTokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opensaml.common.SAMLVersion;
 import org.apache.wss4j.policy.stax.PolicyEnforcer;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
@@ -98,7 +98,7 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(samlPolicyString);
 
         SAMLCallback samlCallback = new SAMLCallback();
-        samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+        samlCallback.setSamlVersion(Version.SAML_20);
         samlCallback.setIssuer("http://initiatorTokenIssuer.com");
         SubjectBean subjectBean = new SubjectBean();
         samlCallback.setSubject(subjectBean);
@@ -165,7 +165,7 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(samlPolicyString);
 
         SAMLCallback samlCallback = new SAMLCallback();
-        samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+        samlCallback.setSamlVersion(Version.SAML_20);
         samlCallback.setIssuer("http://initiatorTokenIssuer.com");
         SubjectBean subjectBean = new SubjectBean();
         samlCallback.setSubject(subjectBean);
@@ -234,7 +234,7 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(samlPolicyString);
 
         SAMLCallback samlCallback = new SAMLCallback();
-        samlCallback.setSamlVersion(SAMLVersion.VERSION_11);
+        samlCallback.setSamlVersion(Version.SAML_11);
         samlCallback.setIssuer("http://initiatorTokenIssuer.com");
         SubjectBean subjectBean = new SubjectBean();
         samlCallback.setSubject(subjectBean);
@@ -306,7 +306,7 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(samlPolicyString.replaceFirst("PublicKey", "SymmetricKey"));
 
         SAMLCallback samlCallback = new SAMLCallback();
-        samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+        samlCallback.setSamlVersion(Version.SAML_20);
         samlCallback.setIssuer("http://initiatorTokenIssuer.com");
         SubjectBean subjectBean = new SubjectBean();
         samlCallback.setSubject(subjectBean);
@@ -378,7 +378,7 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(samlPolicyString);
 
         SAMLCallback samlCallback = new SAMLCallback();
-        samlCallback.setSamlVersion(SAMLVersion.VERSION_20);
+        samlCallback.setSamlVersion(Version.SAML_20);
         samlCallback.setIssuer("http://initiatorTokenIssuer.com");
         SubjectBean subjectBean = new SubjectBean();
         samlCallback.setSubject(subjectBean);
