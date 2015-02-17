@@ -102,13 +102,7 @@ public final class X509Util {
                 new WSPasswordCallback(keyName, WSPasswordCallback.SECRET_KEY);
         try {
             cb.handle(new Callback[]{pwCb});
-        } catch (IOException e) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE,
-                "noPassword",
-                e,
-                keyName);
-        } catch (UnsupportedCallbackException e) {
+        } catch (IOException | UnsupportedCallbackException e) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,
                 "noPassword",

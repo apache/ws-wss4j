@@ -230,15 +230,8 @@ public class AttachmentContentSignatureTransform extends TransformService {
                         attachmentUri, mimeType);
             }
             return null;
-        } catch (IOException e) {
-            throw new TransformException(e);
-        } catch (InvalidCanonicalizerException e) {
-            throw new TransformException(e);
-        } catch (CanonicalizationException e) {
-            throw new TransformException(e);
-        } catch (ParserConfigurationException e) {
-            throw new TransformException(e);
-        } catch (SAXException e) {
+        } catch (IOException | InvalidCanonicalizerException | CanonicalizationException
+            | ParserConfigurationException | SAXException e) {
             throw new TransformException(e);
         }
     }

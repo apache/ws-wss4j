@@ -104,13 +104,9 @@ public class BinarySecurity {
 
         try {
             callbackHandler.handle(callback);
-        } catch (IOException e) {
+        } catch (IOException | UnsupportedCallbackException e) {
             throw new IllegalStateException(
-                "IOException while creating a token element", e
-            );
-        } catch (UnsupportedCallbackException e) {
-            throw new IllegalStateException(
-                "UnsupportedCallbackException while creating a token element", e
+                "Exception while creating a token element", e
             );
         }
         element = callback[0].getTokenElement();

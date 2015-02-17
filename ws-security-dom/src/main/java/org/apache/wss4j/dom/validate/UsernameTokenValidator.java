@@ -167,14 +167,7 @@ public class UsernameTokenValidator implements Validator {
             new WSPasswordCallback(user, null, pwType, WSPasswordCallback.USERNAME_TOKEN);
         try {
             data.getCallbackHandler().handle(new Callback[]{pwCb});
-        } catch (IOException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(e.getMessage(), e);
-            }
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e
-            );
-        } catch (UnsupportedCallbackException e) {
+        } catch (IOException | UnsupportedCallbackException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(e.getMessage(), e);
             }

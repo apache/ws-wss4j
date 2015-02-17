@@ -273,11 +273,7 @@ public class WSSecEncryptedKey extends WSSecBase {
             } else {
                 cipher.init(Cipher.WRAP_MODE, remoteCert.getPublicKey(), oaepParameterSpec);
             }
-        } catch (InvalidKeyException e) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e
-            );
-        } catch (InvalidAlgorithmParameterException e) {
+        } catch (InvalidKeyException | InvalidAlgorithmParameterException e) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e
             );
@@ -291,15 +287,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         
         try {
             encryptedEphemeralKey = cipher.wrap(secretKey);
-        } catch (IllegalStateException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
-            );
-        } catch (IllegalBlockSizeException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
-            );
-        } catch (InvalidKeyException ex) {
+        } catch (IllegalStateException | IllegalBlockSizeException | InvalidKeyException ex) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
             );

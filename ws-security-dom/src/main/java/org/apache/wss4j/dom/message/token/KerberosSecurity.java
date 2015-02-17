@@ -120,11 +120,9 @@ public class KerberosSecurity extends BinarySecurity {
         KerberosContextAndServiceNameCallback contextAndServiceNameCallback = new KerberosContextAndServiceNameCallback();
         try {
             callbackHandler.handle(new Callback[]{contextAndServiceNameCallback});
-        } catch (IOException e) {
+        } catch (IOException | UnsupportedCallbackException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-        } catch (UnsupportedCallbackException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-        } 
+        }
 
         String jaasLoginModuleName = contextAndServiceNameCallback.getContextName();
         if (jaasLoginModuleName == null) {

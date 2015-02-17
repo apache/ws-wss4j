@@ -158,9 +158,7 @@ public class WSSecSignatureBase extends WSSecBase {
                                 );
 
                         attachmentReferenceList.add(reference);
-                    } catch (InvalidAlgorithmParameterException e) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-                    } catch (NoSuchAlgorithmException e) {
+                    } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException e) {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
                     }
                 }

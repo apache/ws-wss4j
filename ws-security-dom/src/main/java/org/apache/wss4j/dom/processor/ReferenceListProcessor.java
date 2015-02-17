@@ -392,16 +392,8 @@ public class ReferenceListProcessor implements Processor {
                 attachmentResultCallback.setAttachmentId(resultAttachment.getId());
                 attachmentCallbackHandler.handle(new Callback[]{attachmentResultCallback});
 
-            } catch (UnsupportedCallbackException e) {
-                throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILED_CHECK, e);
-            } catch (IOException e) {
-                throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILED_CHECK, e);
-            } catch (NoSuchAlgorithmException e) {
-                throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILED_CHECK, e);
-            } catch (NoSuchPaddingException e) {
+            } catch (UnsupportedCallbackException | IOException
+                | NoSuchAlgorithmException | NoSuchPaddingException e) {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILED_CHECK, e);
             }
