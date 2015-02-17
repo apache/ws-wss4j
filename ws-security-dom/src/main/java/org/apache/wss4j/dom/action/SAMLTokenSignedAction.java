@@ -122,7 +122,7 @@ public class SAMLTokenSignedAction implements Action {
          * defaults to only sign the body.
          */
         if (signatureToken.getParts().size() > 0) {
-            wsSign.setParts(signatureToken.getParts());
+            wsSign.getParts().addAll(signatureToken.getParts());
         }
 
         try {

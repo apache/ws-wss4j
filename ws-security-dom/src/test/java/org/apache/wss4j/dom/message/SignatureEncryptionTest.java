@@ -140,13 +140,12 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
-        List<WSEncryptionPart> encParts = new ArrayList<>();
-        encParts.add(
-                new WSEncryptionPart(
-                        "add",
-                        "http://ws.apache.org/counter/counter_port_type",
-                        "Element"));
-        encrypt.setParts(encParts);
+        WSEncryptionPart part = 
+            new WSEncryptionPart(
+                    "add",
+                    "http://ws.apache.org/counter/counter_port_type",
+                    "Element");
+        encrypt.getParts().add(part);
         
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
         
@@ -157,13 +156,12 @@ public class SignatureEncryptionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSEncryptionPart> sigParts = new ArrayList<>();
-        sigParts.add(
-                new WSEncryptionPart(
-                        WSConstants.ENC_DATA_LN,
-                        WSConstants.ENC_NS,
-                        "Element"));
-        sign.setParts(sigParts);
+        WSEncryptionPart signPart = 
+            new WSEncryptionPart(
+                    WSConstants.ENC_DATA_LN,
+                    WSConstants.ENC_NS,
+                    "Element");
+        sign.getParts().add(signPart);
         
         Document encryptedSignedDoc = sign.build(encryptedDoc, crypto, secHeader);
         
@@ -249,14 +247,12 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         LOG.info("Before Encryption....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "add",
                 "http://ws.apache.org/counter/counter_port_type",
                 "");
-        parts.add(encP);
-        encrypt.setParts(parts);
+        encrypt.getParts().add(encP);
 
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);

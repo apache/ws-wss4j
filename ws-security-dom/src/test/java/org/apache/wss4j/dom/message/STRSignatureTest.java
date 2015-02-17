@@ -32,9 +32,6 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.w3c.dom.Document;
 
-import java.util.List;
-import java.util.ArrayList;
-
 /**
  * WS-Security Test Case for signature creation/validation using the
  * SecurityTokenReference transform.
@@ -70,7 +67,6 @@ public class STRSignatureTest extends org.junit.Assert {
         builder.setUserInfo("wss40", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        List<WSEncryptionPart> parts = new ArrayList<>();
         
         //
         // Set up to sign body and use STRTransform to sign
@@ -81,15 +77,14 @@ public class STRSignatureTest extends org.junit.Assert {
                 soapConstants.getBodyQName().getLocalPart(),
                 soapConstants.getEnvelopeURI(),
                 "Content");
-        parts.add(encP);
+        builder.getParts().add(encP);
         encP =
             new WSEncryptionPart(
                 "STRTransform",
                 soapConstants.getEnvelopeURI(),
                 "Content");
-        parts.add(encP);
+        builder.getParts().add(encP);
 
-        builder.setParts(parts);
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         LOG.info("Before Signing STR DirectReference....");
@@ -120,7 +115,6 @@ public class STRSignatureTest extends org.junit.Assert {
         builder.setUserInfo("wss40", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        List<WSEncryptionPart> parts = new ArrayList<>();
         
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -134,20 +128,19 @@ public class STRSignatureTest extends org.junit.Assert {
                 soapConstants.getBodyQName().getLocalPart(),
                 soapConstants.getEnvelopeURI(),
                 "Content");
-        parts.add(encP);
+        builder.getParts().add(encP);
         encP =
             new WSEncryptionPart(
                 "STRTransform",
                 soapConstants.getEnvelopeURI(),
                 "Content");
-        parts.add(encP);
+        builder.getParts().add(encP);
         
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(600);
         timestamp.build(doc, secHeader);
-        parts.add(new WSEncryptionPart(timestamp.getId()));
+        builder.getParts().add(new WSEncryptionPart(timestamp.getId()));
 
-        builder.setParts(parts);
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         LOG.info("Before Signing STR DirectReference....");
@@ -180,7 +173,6 @@ public class STRSignatureTest extends org.junit.Assert {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        List<WSEncryptionPart> parts = new ArrayList<>();
         
         //
         // Set up to sign body and use STRTransform to sign
@@ -191,15 +183,14 @@ public class STRSignatureTest extends org.junit.Assert {
                 soapConstants.getBodyQName().getLocalPart(),    // define the body
                 soapConstants.getEnvelopeURI(),
                 "Content");
-        parts.add(encP);
+        builder.getParts().add(encP);
         encP =
             new WSEncryptionPart(
                 "STRTransform",                // reserved word to use STRTransform
                 soapConstants.getEnvelopeURI(),
                 "Content");
-        parts.add(encP);
+        builder.getParts().add(encP);
 
-        builder.setParts(parts);
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         LOG.info("Before Signing STR IS....");
@@ -234,7 +225,6 @@ public class STRSignatureTest extends org.junit.Assert {
         builder.setUserInfo("wss40", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        List<WSEncryptionPart> parts = new ArrayList<>();
         
         //
         // Set up to sign body and use STRTransform to sign
@@ -245,15 +235,14 @@ public class STRSignatureTest extends org.junit.Assert {
                 soapConstants.getBodyQName().getLocalPart(),    // define the body
                 soapConstants.getEnvelopeURI(),
                 "Content");
-        parts.add(encP);
+        builder.getParts().add(encP);
         encP =
             new WSEncryptionPart(
                 "STRTransform",                // reserved word to use STRTransform
                 soapConstants.getEnvelopeURI(),
                 "Content");
-        parts.add(encP);
+        builder.getParts().add(encP);
 
-        builder.setParts(parts);
         builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
 
         LOG.info("Before Signing STR SKI....");

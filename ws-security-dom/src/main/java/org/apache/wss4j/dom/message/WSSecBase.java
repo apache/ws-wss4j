@@ -27,6 +27,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import javax.security.auth.callback.CallbackHandler;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,20 +38,15 @@ import java.util.List;
  */
 public class WSSecBase {
     protected String user;
-
     protected String password;
-
     protected int keyIdentifierType = WSConstants.ISSUER_SERIAL;
-
-    protected List<WSEncryptionPart> parts;
-
     protected boolean doDebug;
-    
     protected CallbackLookup callbackLookup;
+    protected CallbackHandler attachmentCallbackHandler;
 
     private WSSConfig wssConfig;
+    private final List<WSEncryptionPart> parts = new ArrayList<>();
 
-    protected CallbackHandler attachmentCallbackHandler;
     
     public WSSecBase() {
     }
@@ -66,12 +63,10 @@ public class WSSecBase {
     }
     
     /**
-     * Set which parts of the message to encrypt/sign. <p/>
-     * 
-     * @param parts The list containing the WSEncryptionPart objects
+     * Get which parts of the message to encrypt/sign.
      */
-    public void setParts(List<WSEncryptionPart> parts) {
-        this.parts = parts;
+    public List<WSEncryptionPart> getParts() {
+        return parts;
     }
 
     /**

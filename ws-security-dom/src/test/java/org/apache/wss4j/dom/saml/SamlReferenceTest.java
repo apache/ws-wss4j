@@ -50,7 +50,6 @@ import org.w3c.dom.Node;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.util.List;
-import java.util.ArrayList;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -441,13 +440,12 @@ public class SamlReferenceTest extends org.junit.Assert {
         builder.setCustomEKTokenId(samlAssertion.getId());
         builder.prepare(doc, userCrypto);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP = 
             new WSEncryptionPart(
                 "add", "http://ws.apache.org/counter/counter_port_type", "Element"
             );
-        parts.add(encP);
-        Element refElement = builder.encryptForRef(null, parts);
+        builder.getParts().add(encP);
+        Element refElement = builder.encrypt();
         builder.addInternalRefElement(refElement);
         builder.appendToHeader(secHeader);
 
@@ -518,13 +516,12 @@ public class SamlReferenceTest extends org.junit.Assert {
         builder.setCustomEKTokenId(samlAssertion.getId());
         builder.prepare(doc, userCrypto);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP = 
             new WSEncryptionPart(
                 "add", "http://ws.apache.org/counter/counter_port_type", "Element"
             );
-        parts.add(encP);
-        Element refElement = builder.encryptForRef(null, parts);
+        builder.getParts().add(encP);
+        Element refElement = builder.encrypt();
         builder.addInternalRefElement(refElement);
         builder.appendToHeader(secHeader);
 
@@ -846,13 +843,12 @@ public class SamlReferenceTest extends org.junit.Assert {
         builder.setCustomEKTokenId(samlAssertion.getId());
         builder.prepare(doc, userCrypto);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP = 
             new WSEncryptionPart(
                 "add", "http://ws.apache.org/counter/counter_port_type", "Element"
             );
-        parts.add(encP);
-        Element refElement = builder.encryptForRef(null, parts);
+        builder.getParts().add(encP);
+        Element refElement = builder.encrypt();
         builder.addInternalRefElement(refElement);
         builder.appendToHeader(secHeader);
 
@@ -923,13 +919,12 @@ public class SamlReferenceTest extends org.junit.Assert {
         builder.setCustomEKTokenId(samlAssertion.getId());
         builder.prepare(doc, userCrypto);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP = 
             new WSEncryptionPart(
                 "add", "http://ws.apache.org/counter/counter_port_type", "Element"
             );
-        parts.add(encP);
-        Element refElement = builder.encryptForRef(null, parts);
+        builder.getParts().add(encP);
+        Element refElement = builder.encrypt();
         builder.addInternalRefElement(refElement);
         builder.appendToHeader(secHeader);
 

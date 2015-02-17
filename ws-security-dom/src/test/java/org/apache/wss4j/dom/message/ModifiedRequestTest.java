@@ -46,7 +46,6 @@ import org.w3c.dom.Node;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.ArrayList;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.datatype.Duration;
@@ -100,14 +99,12 @@ public class ModifiedRequestTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "value",
                 "http://blah.com",
                 "");
-        parts.add(encP);
-        builder.setParts(parts);
+        builder.getParts().add(encP);
         
         Document signedDoc = builder.build(doc, crypto, secHeader);
         
@@ -157,14 +154,12 @@ public class ModifiedRequestTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "value",
                 "http://blah.com",
                 "");
-        parts.add(encP);
-        builder.setParts(parts);
+        builder.getParts().add(encP);
         
         Document signedDoc = builder.build(doc, crypto, secHeader);
         
@@ -286,22 +281,20 @@ public class ModifiedRequestTest extends org.junit.Assert {
         usernameToken.setUserInfo("wss86", "security");
         Document createdDoc = usernameToken.build(doc, secHeader);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "UsernameToken",
                 WSConstants.WSSE_NS,
                 "");
-        parts.add(encP);
-        
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        builder.setParts(parts);
+        builder.getParts().add(encP);
         
         builder.prepare(createdDoc, crypto, secHeader);
         
         List<javax.xml.crypto.dsig.Reference> referenceList = 
-            builder.addReferencesToSign(parts, secHeader);
+            builder.addReferencesToSign(builder.getParts(), secHeader);
 
         builder.computeSignature(referenceList, false, null);
         
@@ -427,14 +420,12 @@ public class ModifiedRequestTest extends org.junit.Assert {
         timestamp.setTimeToLive(300);
         timestamp.build(doc, secHeader);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp",
                 WSConstants.WSU_NS,
                 "");
-        parts.add(encP);
-        builder.setParts(parts);
+        builder.getParts().add(encP);
         
         Document encryptedDoc = builder.build(doc, wssCrypto, secHeader);
 
@@ -536,14 +527,12 @@ public class ModifiedRequestTest extends org.junit.Assert {
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp",
                 WSConstants.WSU_NS,
                 "");
-        parts.add(encP);
-        builder.setParts(parts);
+        builder.getParts().add(encP);
         
         Document signedDoc = builder.build(createdDoc, crypto, secHeader);
         

@@ -48,7 +48,6 @@ import org.w3c.dom.Element;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.util.List;
-import java.util.ArrayList;
 
 import javax.xml.namespace.QName;
 
@@ -107,14 +106,12 @@ public class SignaturePartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
                 "urn:foo.bar",
                 "");
-        parts.add(encP);
-        sign.setParts(parts);
+        sign.getParts().add(encP);
         
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
@@ -182,14 +179,13 @@ public class SignaturePartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
                 "urn:foo.bar",
                 "");
         encP.setRequired(false);
-        parts.add(encP);
+        sign.getParts().add(encP);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         encP = 
             new WSEncryptionPart(
@@ -197,8 +193,7 @@ public class SignaturePartsTest extends org.junit.Assert {
                 soapNamespace, 
                 "Content"
             );
-        parts.add(encP);
-        sign.setParts(parts);
+        sign.getParts().add(encP);
         
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
@@ -222,14 +217,13 @@ public class SignaturePartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
                 "urn:foo.bar",
                 "");
         encP.setRequired(false);
-        parts.add(encP);
+        sign.getParts().add(encP);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         encP = 
             new WSEncryptionPart(
@@ -237,8 +231,7 @@ public class SignaturePartsTest extends org.junit.Assert {
                 soapNamespace, 
                 "Content"
             );
-        parts.add(encP);
-        sign.setParts(parts);
+        sign.getParts().add(encP);
         
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
@@ -262,13 +255,12 @@ public class SignaturePartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
                 "urn:foo.bar",
                 "");
-        parts.add(encP);
+        sign.getParts().add(encP);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         encP = 
             new WSEncryptionPart(
@@ -276,8 +268,7 @@ public class SignaturePartsTest extends org.junit.Assert {
                 soapNamespace, 
                 "Content"
             );
-        parts.add(encP);
-        sign.setParts(parts);
+        sign.getParts().add(encP);
         
         try {
             sign.build(doc, crypto, secHeader);
@@ -323,11 +314,9 @@ public class SignaturePartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart("STRTransform", "", "Element");
-        parts.add(encP);
-        wsSign.setParts(parts);
+        wsSign.getParts().add(encP);
 
         //
         // set up for keyHolder
@@ -383,14 +372,12 @@ public class SignaturePartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar2",
                 "urn:foo.bar",
                 "");
-        parts.add(encP);
-        sign.setParts(parts);
+        sign.getParts().add(encP);
         
         try {
             sign.build(doc, crypto, secHeader);
@@ -414,14 +401,12 @@ public class SignaturePartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
                 "urn:foo.bar2",
                 "");
-        parts.add(encP);
-        sign.setParts(parts);
+        sign.getParts().add(encP);
         
         try {
             sign.build(doc, crypto, secHeader);
@@ -447,20 +432,18 @@ public class SignaturePartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 soapConstants.getBodyQName().getLocalPart(),    // define the body
                 soapConstants.getEnvelopeURI(),
                 "");
-        parts.add(encP);
+        sign.getParts().add(encP);
         WSEncryptionPart encP2 =
             new WSEncryptionPart(
                 "foobar",
                 "urn:foo.bar",
                 "");
-        parts.add(encP2);
-        sign.setParts(parts);
+        sign.getParts().add(encP2);
         
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
@@ -526,7 +509,6 @@ public class SignaturePartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         // Give wrong names to make sure it's picking up the element
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -536,8 +518,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         Element bodyElement = WSSecurityUtil.findBodyElement(doc);
         assertTrue(bodyElement != null && "Body".equals(bodyElement.getLocalName()));
         encP.setElement(bodyElement);
-        parts.add(encP);
-        sign.setParts(parts);
+        sign.getParts().add(encP);
         
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
@@ -566,14 +547,12 @@ public class SignaturePartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "testMethod",
                 "http://axis/service/security/test6/LogTestService8",
                 "");
-        parts.add(encP);
-        sign.setParts(parts);
+        sign.getParts().add(encP);
         
         Document signedDoc = sign.build(doc, crypto, secHeader);
         

@@ -20,7 +20,6 @@
 package org.apache.wss4j.dom.message;
 
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -90,29 +89,27 @@ public class SignedBSTTest extends org.junit.Assert {
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setX509Certificate(certs[0]);
 
-        List<WSEncryptionPart> parts = new ArrayList<>();
         // Add SOAP Body
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 WSConstants.ELEM_BODY, soapNamespace, "Content"
             );
-        parts.add(encP);
+        sign.getParts().add(encP);
         // Add BST
         encP =
             new WSEncryptionPart(
                 WSConstants.BINARY_TOKEN_LN, WSConstants.WSSE_NS, "Element"
             );
         encP.setElement(bst.getElement());
-        parts.add(encP);
-        sign.setParts(parts);
+        sign.getParts().add(encP);
         
         sign.setCustomTokenId(bst.getID());
         sign.setCustomTokenValueType(bst.getValueType());
         sign.prepare(doc, crypto, secHeader);
         
         List<javax.xml.crypto.dsig.Reference> referenceList = 
-            sign.addReferencesToSign(parts, secHeader);
+            sign.addReferencesToSign(sign.getParts(), secHeader);
         sign.computeSignature(referenceList, false, null);
         
         if (LOG.isDebugEnabled()) {

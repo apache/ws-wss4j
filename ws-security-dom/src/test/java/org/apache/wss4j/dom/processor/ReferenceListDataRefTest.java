@@ -20,7 +20,6 @@
 package org.apache.wss4j.dom.processor;
 
 import java.util.List;
-import java.util.ArrayList;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -96,12 +95,11 @@ public class ReferenceListDataRefTest extends org.junit.Assert {
         /*
          * Set up the parts structure to encrypt the body
          */
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP = 
             new WSEncryptionPart(
                 "add", "http://ws.apache.org/counter/counter_port_type", "Element"
             );
-        parts.add(encP);
+        builder.getParts().add(encP);
 
         /*
          * Encrypt the element (testMethod), create EncryptedData elements that reference
@@ -109,7 +107,7 @@ public class ReferenceListDataRefTest extends org.junit.Assert {
          * Security header. Be sure that the ReferenceList is after the
          * EncryptedKey element in the Security header (strict layout)
          */
-        Element refs = builder.encryptForRef(null, parts);
+        Element refs = builder.encrypt();
         builder.addExternalRefElement(refs, secHeader);
 
         /*

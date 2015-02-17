@@ -83,7 +83,7 @@ public class EncryptionAction implements Action {
             }
         }
         if (encryptionToken.getParts().size() > 0) {
-            wsEncrypt.setParts(encryptionToken.getParts());
+            wsEncrypt.getParts().addAll(encryptionToken.getParts());
         }
         
         wsEncrypt.setEncryptSymmKey(encryptionToken.isEncSymmetricEncryptionKey());

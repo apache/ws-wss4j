@@ -469,14 +469,12 @@ public class SignatureTest extends org.junit.Assert {
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp",
                 WSConstants.WSU_NS,
                 "");
-        parts.add(encP);
-        builder.setParts(parts);
+        builder.getParts().add(encP);
         
         Document signedDoc = builder.build(createdDoc, crypto, secHeader);
         org.w3c.dom.Element secHeaderElement = secHeader.getSecurityHeader();
@@ -619,22 +617,20 @@ public class SignatureTest extends org.junit.Assert {
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp",
                 WSConstants.WSU_NS,
                 "");
-        parts.add(encP);
-        
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        builder.setParts(parts);
+        builder.getParts().add(encP);
         
         builder.prepare(createdDoc, crypto, secHeader);
         
         List<javax.xml.crypto.dsig.Reference> referenceList = 
-            builder.addReferencesToSign(parts, secHeader);
+            builder.addReferencesToSign(builder.getParts(), secHeader);
 
         builder.computeSignature(referenceList, false, null);
         

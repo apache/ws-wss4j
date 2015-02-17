@@ -19,7 +19,6 @@
 
 package org.apache.wss4j.dom.action;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -89,18 +88,18 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
 
         try {
             List<WSEncryptionPart> parts = encryptionToken.getParts();
-            if (parts == null || parts.isEmpty()) {
+            if (parts != null && !parts.isEmpty()) {
+                wsEncrypt.getParts().addAll(parts);
+            } else {
                 WSEncryptionPart encP = new WSEncryptionPart(reqData.getSoapConstants()
                         .getBodyQName().getLocalPart(), reqData.getSoapConstants()
                         .getEnvelopeURI(), "Content");
-                parts = new ArrayList<>();
-                parts.add(encP);
+                wsEncrypt.getParts().add(encP);
             }
             
-            wsEncrypt.setParts(parts);
             wsEncrypt.prepare(doc);
             
-            Element externRefList = wsEncrypt.encryptForExternalRef(null, parts);
+            Element externRefList = wsEncrypt.encrypt();
             
             // Put the DerivedKeyToken Element in the right place in the security header
             Node nextSibling = null;

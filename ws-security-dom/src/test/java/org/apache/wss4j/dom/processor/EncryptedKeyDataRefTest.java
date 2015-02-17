@@ -20,7 +20,6 @@
 package org.apache.wss4j.dom.processor;
 
 import java.util.List;
-import java.util.ArrayList;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -96,19 +95,18 @@ public class EncryptedKeyDataRefTest extends org.junit.Assert {
         /*
          * Set up the parts structure to encrypt the body
          */
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP = 
             new WSEncryptionPart(
                 "add", "http://ws.apache.org/counter/counter_port_type", "Element"
             );
-        parts.add(encP);
+        builder.getParts().add(encP);
 
         /*
          * Encrypt the element (testMethod), create EncryptedData elements that reference
          * the EncryptedKey, and get a ReferenceList that can be put into the EncryptedKey
          * itself as a child.
          */
-        Element refs = builder.encryptForRef(null, parts);
+        Element refs = builder.encrypt();
         
         /*
          * We use this method because we want the reference list to be inside the 

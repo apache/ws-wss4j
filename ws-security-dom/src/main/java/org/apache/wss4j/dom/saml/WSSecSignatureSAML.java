@@ -21,7 +21,6 @@ package org.apache.wss4j.dom.saml;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.crypto.XMLStructure;
@@ -122,13 +121,12 @@ public class WSSecSignatureSAML extends WSSecSignature {
         prepare(doc, uCrypto, samlAssertion, iCrypto, iKeyName, iKeyPW, secHeader);
 
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
-        if (parts == null) {
-            parts = new ArrayList<>(1);
+        if (getParts().isEmpty()) {
             WSEncryptionPart encP = 
                 new WSEncryptionPart(WSConstants.ELEM_BODY, soapNamespace, "Content");
-            parts.add(encP);
+            getParts().add(encP);
         } else {
-            for (WSEncryptionPart part : parts) {
+            for (WSEncryptionPart part : getParts()) {
                 if ("STRTransform".equals(part.getName()) && part.getId() == null) {
                     part.setId(strUri);
                 }
@@ -143,11 +141,11 @@ public class WSSecSignatureSAML extends WSSecSignature {
             WSEncryptionPart encP =
                 new WSEncryptionPart("STRTransform", soapNamespace, "Content");
             encP.setId(secRefID);
-            parts.add(encP);
+            getParts().add(encP);
         }
         
         List<javax.xml.crypto.dsig.Reference> referenceList = 
-            addReferencesToSign(parts, secHeader);
+            addReferencesToSign(getParts(), secHeader);
 
         prependSAMLElementsToHeader(secHeader);
 

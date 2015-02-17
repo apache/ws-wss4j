@@ -179,16 +179,13 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Assertion",
                 "urn:oasis:names:tc:SAML:1.0:assertion",
                 "Element");
         encP.setRequired(false);
-        parts.add(encP);
-        
-        sign.setParts(parts);
+        sign.getParts().add(encP);
         
         Document signedDoc = sign.build(doc, crypto, secHeader);
         

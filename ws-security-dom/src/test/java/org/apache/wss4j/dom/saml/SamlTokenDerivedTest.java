@@ -45,7 +45,6 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -180,7 +179,6 @@ public class SamlTokenDerivedTest extends org.junit.Assert {
             crypto.getPrivateKey("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sigBuilder.setExternalKey(key.getEncoded(), secToken.getElement());
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-        List<WSEncryptionPart> parts = new ArrayList<>(2);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         WSEncryptionPart encP = 
             new WSEncryptionPart(
@@ -188,12 +186,11 @@ public class SamlTokenDerivedTest extends org.junit.Assert {
                 soapNamespace, 
                 "Content"
             );
-        parts.add(encP);
+        sigBuilder.getParts().add(encP);
         encP = new WSEncryptionPart("STRTransform", "", "Element");
         encP.setId(secRefSaml.getID());
         encP.setElement(secRefSaml.getElement());
-        parts.add(encP);
-        sigBuilder.setParts(parts);
+        sigBuilder.getParts().add(encP);
         
         return sigBuilder;
     }

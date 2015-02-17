@@ -19,7 +19,6 @@
 
 package org.apache.wss4j.dom.action;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -92,15 +91,15 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
 
         try {
             List<WSEncryptionPart> parts = signatureToken.getParts();
-            if (parts == null || parts.isEmpty()) {
+            if (parts != null && !parts.isEmpty()) {
+                wsSign.getParts().addAll(parts);
+            } else {
                 WSEncryptionPart encP = new WSEncryptionPart(reqData.getSoapConstants()
                         .getBodyQName().getLocalPart(), reqData.getSoapConstants()
                         .getEnvelopeURI(), "Content");
-                parts = new ArrayList<>();
-                parts.add(encP);
+                wsSign.getParts().add(encP);
             }
             
-            wsSign.setParts(parts);
             wsSign.prepare(doc, reqData.getSecHeader());
             
             List<javax.xml.crypto.dsig.Reference> referenceList = 

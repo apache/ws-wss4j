@@ -199,23 +199,11 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             envelope = document.getDocumentElement();
         }
         
-        if (parts == null) {
-            parts = new ArrayList<>(1);
-            String soapNamespace = WSSecurityUtil.getSOAPNamespace(envelope);
-            WSEncryptionPart encP = 
-                new WSEncryptionPart(
-                    WSConstants.ELEM_BODY, 
-                    soapNamespace, 
-                    "Content"
-                );
-            parts.add(encP);
-        }
-
         if (doDebug) {
             LOG.debug("Beginning Encryption...");
         }
         
-        Element refs = encryptForRef(null, parts);
+        Element refs = encrypt();
 
         addAttachmentEncryptedDataElements(secHeader);
         if (encryptedKeyElement != null) {
@@ -231,6 +219,21 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
         LOG.debug("Encryption complete.");
         return doc;
+    }
+    
+    public Element encrypt() throws WSSecurityException {
+        if (getParts().isEmpty()) {
+            String soapNamespace = WSSecurityUtil.getSOAPNamespace(envelope);
+            WSEncryptionPart encP = 
+                new WSEncryptionPart(
+                    WSConstants.ELEM_BODY, 
+                    soapNamespace, 
+                    "Content"
+                );
+            getParts().add(encP);
+        }
+        
+        return encryptForRef(null, getParts());
     }
     
     /**
@@ -258,7 +261,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         Element dataRef, 
         List<WSEncryptionPart> references
     ) throws WSSecurityException {
-
         KeyInfo keyInfo = createKeyInfo();
         //the sun/oracle jce provider doesn't like a foreign SecretKey impl.
         //this occurs e.g. with a kerberos session-key. It doesn't matter for the bouncy-castle provider

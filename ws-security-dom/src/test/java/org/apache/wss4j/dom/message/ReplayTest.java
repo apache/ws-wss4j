@@ -19,7 +19,6 @@
 
 package org.apache.wss4j.dom.message;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -84,17 +83,15 @@ public class ReplayTest extends org.junit.Assert {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp", WSConstants.WSU_NS, "");
-        parts.add(encP);
-        builder.setParts(parts);
+        builder.getParts().add(encP);
         
         builder.prepare(createdDoc, crypto, secHeader);
         
         List<javax.xml.crypto.dsig.Reference> referenceList = 
-            builder.addReferencesToSign(parts, secHeader);
+            builder.addReferencesToSign(builder.getParts(), secHeader);
 
         builder.computeSignature(referenceList, false, null);
 
@@ -137,17 +134,15 @@ public class ReplayTest extends org.junit.Assert {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp", WSConstants.WSU_NS, "");
-        parts.add(encP);
-        builder.setParts(parts);
+        builder.getParts().add(encP);
         
         builder.prepare(createdDoc, crypto, secHeader);
         
         List<javax.xml.crypto.dsig.Reference> referenceList = 
-            builder.addReferencesToSign(parts, secHeader);
+            builder.addReferencesToSign(builder.getParts(), secHeader);
 
         builder.computeSignature(referenceList, false, null);
 
@@ -189,12 +184,10 @@ public class ReplayTest extends org.junit.Assert {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp", WSConstants.WSU_NS, "");
-        parts.add(encP);
-        builder.setParts(parts);
+        builder.getParts().add(encP);
         
         builder.build(createdDoc, crypto, secHeader);
         
@@ -237,12 +230,10 @@ public class ReplayTest extends org.junit.Assert {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp", WSConstants.WSU_NS, "");
-        parts.add(encP);
-        builder.setParts(parts);
+        builder.getParts().add(encP);
         
         builder.build(createdDoc, crypto, secHeader);
         
@@ -284,17 +275,15 @@ public class ReplayTest extends org.junit.Assert {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp", WSConstants.WSU_NS, "");
-        parts.add(encP);
-        builder.setParts(parts);
+        builder.getParts().add(encP);
         
         builder.prepare(createdDoc, crypto, secHeader);
         
         List<javax.xml.crypto.dsig.Reference> referenceList = 
-            builder.addReferencesToSign(parts, secHeader);
+            builder.addReferencesToSign(builder.getParts(), secHeader);
 
         builder.computeSignature(referenceList, false, null);
 
@@ -337,17 +326,15 @@ public class ReplayTest extends org.junit.Assert {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp", WSConstants.WSU_NS, "");
-        parts.add(encP);
-        builder.setParts(parts);
+        builder.getParts().add(encP);
         
         builder.prepare(createdDoc, crypto, secHeader);
         
         List<javax.xml.crypto.dsig.Reference> referenceList = 
-            builder.addReferencesToSign(parts, secHeader);
+            builder.addReferencesToSign(builder.getParts(), secHeader);
 
         builder.computeSignature(referenceList, false, null);
 

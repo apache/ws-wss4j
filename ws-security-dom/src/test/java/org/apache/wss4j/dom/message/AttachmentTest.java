@@ -95,10 +95,8 @@ public class AttachmentTest extends org.junit.Assert {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
-        List<WSEncryptionPart> parts = new ArrayList<>();
-        parts.add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
-        parts.add(new WSEncryptionPart("cid:Attachments", "Content"));
-        builder.setParts(parts);
+        builder.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        builder.getParts().add(new WSEncryptionPart("cid:Attachments", "Content"));
 
         final String attachmentId = UUID.randomUUID().toString();
         final Attachment attachment = new Attachment();
@@ -142,10 +140,8 @@ public class AttachmentTest extends org.junit.Assert {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
-        List<WSEncryptionPart> parts = new ArrayList<>();
-        parts.add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
-        parts.add(new WSEncryptionPart("cid:Attachments", "Content"));
-        builder.setParts(parts);
+        builder.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        builder.getParts().add(new WSEncryptionPart("cid:Attachments", "Content"));
 
         final String attachmentId = UUID.randomUUID().toString();
         final Attachment attachment = new Attachment();
@@ -200,10 +196,8 @@ public class AttachmentTest extends org.junit.Assert {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
-        List<WSEncryptionPart> parts = new ArrayList<>();
-        parts.add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
-        parts.add(new WSEncryptionPart("cid:Attachments", "Content"));
-        builder.setParts(parts);
+        builder.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        builder.getParts().add(new WSEncryptionPart("cid:Attachments", "Content"));
 
         final String attachmentId = UUID.randomUUID().toString();
         final Attachment attachment = new Attachment();
@@ -247,10 +241,8 @@ public class AttachmentTest extends org.junit.Assert {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
-        List<WSEncryptionPart> parts = new ArrayList<>();
-        parts.add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
-        parts.add(new WSEncryptionPart("cid:Attachments", "Element"));
-        builder.setParts(parts);
+        builder.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        builder.getParts().add(new WSEncryptionPart("cid:Attachments", "Element"));
 
         final String attachmentId = UUID.randomUUID().toString();
         final Attachment attachment = new Attachment();
@@ -304,10 +296,8 @@ public class AttachmentTest extends org.junit.Assert {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
-        List<WSEncryptionPart> parts = new ArrayList<>();
-        parts.add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
-        parts.add(new WSEncryptionPart("cid:Attachments", "Element"));
-        builder.setParts(parts);
+        builder.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        builder.getParts().add(new WSEncryptionPart("cid:Attachments", "Element"));
 
         final String attachment1Id = UUID.randomUUID().toString();
         final Attachment[] attachment = new Attachment[2];
@@ -368,10 +358,8 @@ public class AttachmentTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
-        List<WSEncryptionPart> parts = new ArrayList<>();
-        parts.add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
-        parts.add(new WSEncryptionPart("cid:Attachments", "Content"));
-        encrypt.setParts(parts);
+        encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Content"));
 
         String attachmentId = UUID.randomUUID().toString();
         final Attachment attachment = new Attachment();
@@ -429,10 +417,8 @@ public class AttachmentTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
-        List<WSEncryptionPart> parts = new ArrayList<>();
-        parts.add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
-        parts.add(new WSEncryptionPart("cid:Attachments", "Content"));
-        encrypt.setParts(parts);
+        encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Content"));
 
         String attachmentId = UUID.randomUUID().toString();
         final Attachment attachment = new Attachment();
@@ -486,10 +472,8 @@ public class AttachmentTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
-        List<WSEncryptionPart> parts = new ArrayList<>();
-        parts.add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
-        parts.add(new WSEncryptionPart("cid:Attachments", "Content"));
-        encrypt.setParts(parts);
+        encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Content"));
 
         String attachmentId = UUID.randomUUID().toString();
         final Attachment attachment = new Attachment();
@@ -504,7 +488,7 @@ public class AttachmentTest extends org.junit.Assert {
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
         encrypt.prepare(doc, crypto);
-        Element refs = encrypt.encryptForRef(null, parts);
+        Element refs = encrypt.encrypt();
         encrypt.addAttachmentEncryptedDataElements(secHeader);
         encrypt.addExternalRefElement(refs, secHeader);
         encrypt.prependToHeader(secHeader);
@@ -553,10 +537,8 @@ public class AttachmentTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
-        List<WSEncryptionPart> parts = new ArrayList<>();
-        parts.add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
-        parts.add(new WSEncryptionPart("cid:Attachments", "Content"));
-        encrypt.setParts(parts);
+        encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Content"));
 
         String attachmentId = UUID.randomUUID().toString();
         final Attachment attachment =  new Attachment();
@@ -571,7 +553,7 @@ public class AttachmentTest extends org.junit.Assert {
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
         encrypt.prepare(doc, crypto);
-        encrypt.encryptForRef(null, parts);
+        encrypt.encrypt();
         encrypt.addAttachmentEncryptedDataElements(secHeader);
         //encrypt.addExternalRefElement(refs, secHeader);
         encrypt.prependToHeader(secHeader);
@@ -619,10 +601,8 @@ public class AttachmentTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
-        List<WSEncryptionPart> parts = new ArrayList<>();
-        parts.add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
-        parts.add(new WSEncryptionPart("cid:Attachments", "Element"));
-        encrypt.setParts(parts);
+        encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Element"));
 
         String attachmentId = UUID.randomUUID().toString();
         final Attachment attachment = new Attachment();
@@ -669,10 +649,8 @@ public class AttachmentTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
-        List<WSEncryptionPart> parts = new ArrayList<>();
-        parts.add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
-        parts.add(new WSEncryptionPart("cid:Attachments", "Element"));
-        encrypt.setParts(parts);
+        encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Element"));
 
         String attachmentId = UUID.randomUUID().toString();
         final Attachment attachment = new Attachment();
@@ -723,10 +701,8 @@ public class AttachmentTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
-        List<WSEncryptionPart> parts = new ArrayList<>();
-        parts.add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
-        parts.add(new WSEncryptionPart("cid:Attachments", "Element"));
-        encrypt.setParts(parts);
+        encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Element"));
 
         final String attachment1Id = UUID.randomUUID().toString();
         final Attachment[] attachment = new Attachment[2];
@@ -786,10 +762,8 @@ public class AttachmentTest extends org.junit.Assert {
         WSSecSignature signature = new WSSecSignature();
         signature.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
-        List<WSEncryptionPart> parts = new ArrayList<>();
-        parts.add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
-        parts.add(new WSEncryptionPart("cid:Attachments", "Element"));
-        signature.setParts(parts);
+        signature.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        signature.getParts().add(new WSEncryptionPart("cid:Attachments", "Element"));
 
         String attachmentId = UUID.randomUUID().toString();
         final Attachment attachment = new Attachment();
@@ -807,7 +781,7 @@ public class AttachmentTest extends org.junit.Assert {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        encrypt.setParts(parts);
+        encrypt.getParts().addAll(signature.getParts());
 
         attachmentCallbackHandler = 
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
@@ -853,10 +827,8 @@ public class AttachmentTest extends org.junit.Assert {
         WSSecSignature signature = new WSSecSignature();
         signature.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
-        List<WSEncryptionPart> parts = new ArrayList<>();
-        parts.add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
-        parts.add(new WSEncryptionPart("cid:Attachments", "Element"));
-        signature.setParts(parts);
+        signature.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        signature.getParts().add(new WSEncryptionPart("cid:Attachments", "Element"));
 
         String attachmentId = UUID.randomUUID().toString();
         final Attachment[] attachment = new Attachment[1];
@@ -887,7 +859,7 @@ public class AttachmentTest extends org.junit.Assert {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        encrypt.setParts(parts);
+        encrypt.getParts().addAll(signature.getParts());
 
         encrypt.setAttachmentCallbackHandler(new CallbackHandler() {
             @Override
@@ -955,10 +927,8 @@ public class AttachmentTest extends org.junit.Assert {
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        List<WSEncryptionPart> parts = new ArrayList<>();
-        parts.add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
-        parts.add(new WSEncryptionPart("cid:Attachments", "Element"));
-        encrypt.setParts(parts);
+        encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Element"));
 
         String attachmentId = UUID.randomUUID().toString();
         final Attachment attachment = new Attachment();
@@ -976,7 +946,7 @@ public class AttachmentTest extends org.junit.Assert {
 
         WSSecSignature signature = new WSSecSignature();
         signature.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        signature.setParts(parts);
+        signature.getParts().addAll(encrypt.getParts());
 
         attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
         signature.setAttachmentCallbackHandler(attachmentCallbackHandler);
@@ -1022,10 +992,8 @@ public class AttachmentTest extends org.junit.Assert {
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        List<WSEncryptionPart> parts = new ArrayList<>();
-        parts.add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
-        parts.add(new WSEncryptionPart("cid:Attachments", "Element"));
-        encrypt.setParts(parts);
+        encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Element"));
 
         String attachmentId = UUID.randomUUID().toString();
         final Attachment[] attachment = new Attachment[1];
@@ -1055,7 +1023,7 @@ public class AttachmentTest extends org.junit.Assert {
 
         WSSecSignature signature = new WSSecSignature();
         signature.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        signature.setParts(parts);
+        signature.getParts().addAll(encrypt.getParts());
 
         signature.setAttachmentCallbackHandler(new CallbackHandler() {
             @Override

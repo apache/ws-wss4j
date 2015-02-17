@@ -19,7 +19,6 @@
 
 package org.apache.wss4j.dom.message;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -73,29 +72,27 @@ public class EncryptedDataInHeaderTest extends org.junit.Assert {
         timestamp.setTimeToLive(300);
         timestamp.build(doc, secHeader);
         
+        WSSecEncrypt encrypt = new WSSecEncrypt();
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        
         // Encrypt the Timestamp and SOAP Body
-        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp", WSConstants.WSU_NS, "");
-        parts.add(encP);
+        encrypt.getParts().add(encP);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         encP = 
             new WSEncryptionPart(
                 WSConstants.ELEM_BODY, soapNamespace, "Content"
             );
-        parts.add(encP);
-        
-        WSSecEncrypt encrypt = new WSSecEncrypt();
-        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        encrypt.setParts(parts);
+        encrypt.getParts().add(encP);
         
         encrypt.prepare(doc, crypto);
         encrypt.prependToHeader(secHeader);
         
         // Append Reference List to security header
-        Element refs = encrypt.encryptForRef(null, parts);
+        Element refs = encrypt.encrypt();
         secHeader.getSecurityHeader().appendChild(refs);
 
         if (LOG.isDebugEnabled()) {

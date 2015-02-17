@@ -44,7 +44,6 @@ import org.w3c.dom.Node;
 
 import java.security.NoSuchProviderException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.crypto.XMLStructure;
@@ -369,8 +368,7 @@ public class WSSecSignature extends WSSecSignatureBase {
         }
 
         prepare(doc, cr, secHeader);
-        if (parts == null) {
-            parts = new ArrayList<>(1);
+        if (getParts().isEmpty()) {
             String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
             WSEncryptionPart encP = 
                 new WSEncryptionPart(
@@ -378,9 +376,9 @@ public class WSSecSignature extends WSSecSignatureBase {
                     soapNamespace, 
                     "Content"
                 );
-            parts.add(encP);
+            getParts().add(encP);
         } else {
-            for (WSEncryptionPart part : parts) {
+            for (WSEncryptionPart part : getParts()) {
                 if ("STRTransform".equals(part.getName()) && part.getId() == null) {
                     part.setId(strUri);
                 }
@@ -388,7 +386,7 @@ public class WSSecSignature extends WSSecSignatureBase {
         }
 
         List<javax.xml.crypto.dsig.Reference> referenceList = 
-            addReferencesToSign(parts, secHeader);
+            addReferencesToSign(getParts(), secHeader);
 
         computeSignature(referenceList);
         

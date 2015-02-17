@@ -55,8 +55,6 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
 
 public class SamlTokenDerivedTest extends AbstractTestBase {
 
@@ -187,7 +185,7 @@ public class SamlTokenDerivedTest extends AbstractTestBase {
                 crypto.getPrivateKey("transmitter", "default");
         sigBuilder.setExternalKey(key.getEncoded(), secToken.getElement());
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>(2);
+        
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         WSEncryptionPart encP =
                 new WSEncryptionPart(
@@ -195,12 +193,12 @@ public class SamlTokenDerivedTest extends AbstractTestBase {
                         soapNamespace,
                         "Content"
                 );
-        parts.add(encP);
+        sigBuilder.getParts().add(encP);
+
         encP = new WSEncryptionPart("STRTransform", "", "Element");
         encP.setId(secRefSaml.getID());
         encP.setElement(secRefSaml.getElement());
-        parts.add(encP);
-        sigBuilder.setParts(parts);
+        sigBuilder.getParts().add(encP);
 
         return sigBuilder;
     }

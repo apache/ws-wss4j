@@ -125,6 +125,7 @@ public class EncryptionTest extends org.junit.Assert {
         }
         assertFalse(outputString.contains("counter_port_type"));
         verify(encryptedDoc, keystoreCallbackHandler, SOAP_BODY);
+        builder.getParts().clear();
 
         /*
          * second run, same Junit set up, but change encryption method, 
@@ -135,13 +136,13 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         builder.setSymmetricKey(null);
-        java.util.List<WSEncryptionPart> parts = new ArrayList<>();
+        
         WSEncryptionPart encP = 
             new WSEncryptionPart(
                 "add", "http://ws.apache.org/counter/counter_port_type", "Element"
             );
-        parts.add(encP);
-        builder.setParts(parts);
+        builder.getParts().add(encP);
+        
         doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);        
@@ -469,11 +470,10 @@ public class EncryptionTest extends org.junit.Assert {
          */
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
                 .getDocumentElement());
-        java.util.List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP = new WSEncryptionPart(soapConstants
                 .getBodyQName().getLocalPart(), soapConstants.getEnvelopeURI(),
                 "Content");
-        parts.add(encP);
+        builder.getParts().add(encP);
 
         /*
          * Encrypt the parts (Body), create EncryptedData elements that reference
@@ -481,7 +481,7 @@ public class EncryptionTest extends org.junit.Assert {
          * Security header. Be sure that the ReferenceList is after the
          * EncryptedKey element in the Security header (strict layout)
          */
-        Element refs = builder.encryptForRef(null, parts);
+        Element refs = builder.encrypt();
         builder.addExternalRefElement(refs, secHeader);
 
         /*
@@ -550,7 +550,7 @@ public class EncryptionTest extends org.junit.Assert {
          * Security header. Be sure that the ReferenceList is after the
          * EncryptedKey element in the Security header (strict layout)
          */
-        Element refs = builder.encryptForRef(null, parts);
+        Element refs = builder.encrypt();
         builder.addExternalRefElement(refs, secHeader);
 
         /*
@@ -609,7 +609,7 @@ public class EncryptionTest extends org.junit.Assert {
                 "Content");
         parts.add(encP);
 
-        builder.encryptForRef(null, parts);
+        builder.encrypt();
 
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);

@@ -393,7 +393,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             properties.put(WSHandlerConstants.ENC_SYM_ALGO, 
                            "http://www.w3.org/2001/04/xmlenc#aes128-cbc");
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
-
+            
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_soap11_Body.getLocalPart());

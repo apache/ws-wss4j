@@ -34,7 +34,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.security.NoSuchProviderException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.crypto.XMLStructure;
@@ -99,17 +98,16 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         
         prepare(doc, secHeader);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
-        if (parts == null) {
-            parts = new ArrayList<>(1);
+        if (getParts().isEmpty()) {
             WSEncryptionPart encP = 
                 new WSEncryptionPart(
                     WSConstants.ELEM_BODY,
                     soapNamespace, 
                     "Content"
                 );
-            parts.add(encP);
+            getParts().add(encP);
         } else {
-            for (WSEncryptionPart part : parts) {
+            for (WSEncryptionPart part : getParts()) {
                 if ("STRTransform".equals(part.getName()) && part.getId() == null) {
                     part.setId(strUri);
                 }
@@ -117,7 +115,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         }
         
         List<javax.xml.crypto.dsig.Reference> referenceList = 
-            addReferencesToSign(parts, secHeader);
+            addReferencesToSign(getParts(), secHeader);
         computeSignature(referenceList);
         
         //

@@ -35,7 +35,6 @@ import org.w3c.dom.Node;
 
 import javax.crypto.SecretKey;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -66,21 +65,25 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         //
         prependDKElementToHeader(secHeader);
                 
-        String soapNamespace = WSSecurityUtil.getSOAPNamespace(envelope);
-        if (parts == null) {
-            parts = new ArrayList<>(1);
+        Element externRefList = encrypt();
+        addExternalRefElement(externRefList, secHeader);
+
+        return doc;
+    }
+    
+    public Element encrypt() throws WSSecurityException {
+        if (getParts().isEmpty()) {
+            String soapNamespace = WSSecurityUtil.getSOAPNamespace(envelope);
             WSEncryptionPart encP = 
                 new WSEncryptionPart(
                     WSConstants.ELEM_BODY, 
                     soapNamespace, 
                     "Content"
                 );
-            parts.add(encP);
+            getParts().add(encP);
         }
-        Element externRefList = encryptForExternalRef(null, parts);
-        addExternalRefElement(externRefList, secHeader);
-
-        return doc;
+        
+        return encryptForExternalRef(null, getParts());
     }
 
     /**
