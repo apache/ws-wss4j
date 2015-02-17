@@ -135,7 +135,7 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         builder.setSymmetricKey(null);
-        java.util.List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        java.util.List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP = 
             new WSEncryptionPart(
                 "add", "http://ws.apache.org/counter/counter_port_type", "Element"
@@ -469,7 +469,7 @@ public class EncryptionTest extends org.junit.Assert {
          */
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
                 .getDocumentElement());
-        java.util.List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        java.util.List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP = new WSEncryptionPart(soapConstants
                 .getBodyQName().getLocalPart(), soapConstants.getEnvelopeURI(),
                 "Content");
@@ -538,7 +538,7 @@ public class EncryptionTest extends org.junit.Assert {
          */
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
                 .getDocumentElement());
-        java.util.List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        java.util.List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP = new WSEncryptionPart(soapConstants
                 .getBodyQName().getLocalPart(), soapConstants.getEnvelopeURI(),
                 "Content");
@@ -603,7 +603,7 @@ public class EncryptionTest extends org.junit.Assert {
 
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
                 .getDocumentElement());
-        java.util.List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        java.util.List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP = new WSEncryptionPart(soapConstants
                 .getBodyQName().getLocalPart(), soapConstants.getEnvelopeURI(),
                 "Content");

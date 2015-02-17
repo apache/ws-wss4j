@@ -74,7 +74,7 @@ public class EncryptedDataInHeaderTest extends org.junit.Assert {
         timestamp.build(doc, secHeader);
         
         // Encrypt the Timestamp and SOAP Body
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp", WSConstants.WSU_NS, "");

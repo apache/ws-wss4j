@@ -370,7 +370,7 @@ public class WSSecSignature extends WSSecSignatureBase {
 
         prepare(doc, cr, secHeader);
         if (parts == null) {
-            parts = new ArrayList<WSEncryptionPart>(1);
+            parts = new ArrayList<>(1);
             String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
             WSEncryptionPart encP = 
                 new WSEncryptionPart(

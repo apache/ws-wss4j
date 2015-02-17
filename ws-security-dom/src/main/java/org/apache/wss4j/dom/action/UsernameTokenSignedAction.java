@@ -122,7 +122,7 @@ public class UsernameTokenSignedAction implements Action {
             if (soapConstants == null) {
                 soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
             }
-            parts = new ArrayList<WSEncryptionPart>();
+            parts = new ArrayList<>();
             WSEncryptionPart encP = 
                 new WSEncryptionPart(WSConstants.ELEM_BODY, soapConstants.getEnvelopeURI(), "Content");
             parts.add(encP);

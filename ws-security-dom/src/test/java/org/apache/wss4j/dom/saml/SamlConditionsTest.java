@@ -374,7 +374,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
         ProxyRestrictionBean proxyRestriction = new ProxyRestrictionBean();
-        List<String> audiences = new ArrayList<String>();
+        List<String> audiences = new ArrayList<>();
         audiences.add("http://apache.org/one");
         audiences.add("http://apache.org/two");
         proxyRestriction.getAudienceURIs().addAll(audiences);
@@ -417,7 +417,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
-        List<String> audiences = new ArrayList<String>();
+        List<String> audiences = new ArrayList<>();
         audiences.add("http://apache.org/one");
         audiences.add("http://apache.org/two");
         AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
@@ -457,7 +457,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
-        List<String> audiences = new ArrayList<String>();
+        List<String> audiences = new ArrayList<>();
         audiences.add("http://apache.org/one");
         audiences.add("http://apache.org/two");
         AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
@@ -520,7 +520,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
-        List<String> audiences = new ArrayList<String>();
+        List<String> audiences = new ArrayList<>();
         audiences.add("http://apache.org/one");
         audiences.add("http://apache.org/two");
         AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
@@ -587,8 +587,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
         
-        List<AudienceRestrictionBean> audiencesRestrictions = 
-            new ArrayList<AudienceRestrictionBean>();
+        List<AudienceRestrictionBean> audiencesRestrictions = new ArrayList<>();
         AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
         audienceRestrictionBean.setAudienceURIs(Collections.singletonList("http://apache.org/one"));
         audiencesRestrictions.add(audienceRestrictionBean);
@@ -633,8 +632,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
         
-        List<AudienceRestrictionBean> audiencesRestrictions = 
-            new ArrayList<AudienceRestrictionBean>();
+        List<AudienceRestrictionBean> audiencesRestrictions = new ArrayList<>();
         AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
         audienceRestrictionBean.setAudienceURIs(Collections.singletonList("http://apache.org/one"));
         audiencesRestrictions.add(audienceRestrictionBean);
@@ -667,7 +665,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         }
         
         // This should fail as the expected audience isn't in the assertion
-        List<String> audiences = new ArrayList<String>();
+        List<String> audiences = new ArrayList<>();
         audiences.add("http://apache.org/three");
      
         WSSecurityEngine newEngine = new WSSecurityEngine();

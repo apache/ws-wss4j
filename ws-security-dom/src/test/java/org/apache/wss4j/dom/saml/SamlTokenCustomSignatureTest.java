@@ -179,7 +179,7 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Assertion",
@@ -226,7 +226,7 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         HandlerAction action = new HandlerAction(WSConstants.ST_UNSIGNED);
         actions.add(action);
         action = new HandlerAction(WSConstants.SIGN);

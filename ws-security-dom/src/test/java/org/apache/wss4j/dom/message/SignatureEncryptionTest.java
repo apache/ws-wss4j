@@ -140,7 +140,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
-        List<WSEncryptionPart> encParts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> encParts = new ArrayList<>();
         encParts.add(
                 new WSEncryptionPart(
                         "add",
@@ -157,7 +157,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSEncryptionPart> sigParts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> sigParts = new ArrayList<>();
         sigParts.add(
                 new WSEncryptionPart(
                         WSConstants.ENC_DATA_LN,
@@ -249,7 +249,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         LOG.info("Before Encryption....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "add",
@@ -374,7 +374,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> handlerActions = new ArrayList<HandlerAction>();
+        List<HandlerAction> handlerActions = new ArrayList<>();
         HandlerAction action = new HandlerAction(WSConstants.ENCR);
         handlerActions.add(action);
         action = new HandlerAction(WSConstants.SIGN);
@@ -393,7 +393,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<Integer> receivingActions = new ArrayList<Integer>();
+        List<Integer> receivingActions = new ArrayList<>();
         receivingActions.add(WSConstants.ENCR);
         receivingActions.add(WSConstants.SIGN);
         messageContext.put(WSHandlerConstants.DEC_PROP_REF_ID, "" + crypto.hashCode());
@@ -419,7 +419,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> handlerActions = new ArrayList<HandlerAction>();
+        List<HandlerAction> handlerActions = new ArrayList<>();
         HandlerAction action = new HandlerAction(WSConstants.SIGN);
         handlerActions.add(action);
         action = new HandlerAction(WSConstants.ENCR);
@@ -438,7 +438,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<Integer> receivingActions = new ArrayList<Integer>();
+        List<Integer> receivingActions = new ArrayList<>();
         receivingActions.add(WSConstants.SIGN);
         receivingActions.add(WSConstants.ENCR);
         messageContext.put(WSHandlerConstants.DEC_PROP_REF_ID, "" + crypto.hashCode());

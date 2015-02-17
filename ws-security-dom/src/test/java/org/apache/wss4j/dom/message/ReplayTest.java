@@ -84,7 +84,7 @@ public class ReplayTest extends org.junit.Assert {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp", WSConstants.WSU_NS, "");
@@ -137,7 +137,7 @@ public class ReplayTest extends org.junit.Assert {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp", WSConstants.WSU_NS, "");
@@ -189,7 +189,7 @@ public class ReplayTest extends org.junit.Assert {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp", WSConstants.WSU_NS, "");
@@ -237,7 +237,7 @@ public class ReplayTest extends org.junit.Assert {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp", WSConstants.WSU_NS, "");
@@ -284,7 +284,7 @@ public class ReplayTest extends org.junit.Assert {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp", WSConstants.WSU_NS, "");
@@ -337,7 +337,7 @@ public class ReplayTest extends org.junit.Assert {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp", WSConstants.WSU_NS, "");

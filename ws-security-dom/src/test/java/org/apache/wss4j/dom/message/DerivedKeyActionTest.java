@@ -417,7 +417,7 @@ public class DerivedKeyActionTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.DKT_SIGN));
         actions.add(new HandlerAction(WSConstants.DKT_ENCR));
         handler.send(
@@ -453,7 +453,7 @@ public class DerivedKeyActionTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.DKT_ENCR));
         actions.add(new HandlerAction(WSConstants.DKT_SIGN));
         handler.send(
@@ -495,7 +495,7 @@ public class DerivedKeyActionTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.DKT_SIGN));
         actions.add(new HandlerAction(WSConstants.DKT_ENCR));
         handler.send(
@@ -537,7 +537,7 @@ public class DerivedKeyActionTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.DKT_ENCR));
         actions.add(new HandlerAction(WSConstants.DKT_SIGN));
         handler.send(

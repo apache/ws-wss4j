@@ -184,7 +184,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
         javax.xml.namespace.QName expectedEncryptedElement
     ) throws Exception {
         RequestData requestData = new RequestData();
-        List<BSPRule> bspRules = new ArrayList<BSPRule>();
+        List<BSPRule> bspRules = new ArrayList<>();
         bspRules.add(BSPRule.R5621);
         bspRules.add(BSPRule.R5620);
         requestData.setIgnoredBSPRules(bspRules);

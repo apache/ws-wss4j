@@ -343,7 +343,7 @@ public class TestMessageTransformer extends org.junit.Assert {
     }
 
     private static List<Element> getChildElements(Node node, QName nodeName, boolean recursive) {
-        List<Element> list = new LinkedList<Element>();
+        List<Element> list = new LinkedList<>();
 
         NodeList nlist = node.getChildNodes();
         int len = nlist.getLength();

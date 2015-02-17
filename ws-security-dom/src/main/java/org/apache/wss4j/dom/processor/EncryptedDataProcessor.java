@@ -99,7 +99,7 @@ public class EncryptedDataProcessor implements Processor {
         Principal principal = null;
         if (secRefToken != null) {
             STRParser strParser = new SecurityTokenRefSTRParser();
-            Map<String, Object> parameters = new HashMap<String, Object>();
+            Map<String, Object> parameters = new HashMap<>();
             parameters.put(SecurityTokenRefSTRParser.SIGNATURE_METHOD, symEncAlgo);
             strParser.parseSecurityTokenReference(
                 secRefToken, request,
@@ -108,7 +108,7 @@ public class EncryptedDataProcessor implements Processor {
             byte[] secretKey = strParser.getSecretKey();
             principal = strParser.getPrincipal();
             key = KeyUtils.prepareSecretKey(symEncAlgo, secretKey);
-            encrKeyResults = new ArrayList<WSSecurityEngineResult>();
+            encrKeyResults = new ArrayList<>();
         } else if (encryptedKeyElement != null) {
             EncryptedKeyProcessor encrKeyProc = new EncryptedKeyProcessor();
             encrKeyResults = encrKeyProc.handleToken(encryptedKeyElement, request, wsDocInfo);
@@ -150,8 +150,7 @@ public class EncryptedDataProcessor implements Processor {
         wsDocInfo.addResult(result);
         wsDocInfo.addTokenElement(elem);
         
-        List<WSSecurityEngineResult> completeResults = 
-            new ArrayList<WSSecurityEngineResult>();
+        List<WSSecurityEngineResult> completeResults = new ArrayList<>();
         completeResults.addAll(encrKeyResults);
         completeResults.add(result);
         

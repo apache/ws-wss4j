@@ -96,7 +96,7 @@ public class ReferenceListDataRefTest extends org.junit.Assert {
         /*
          * Set up the parts structure to encrypt the body
          */
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP = 
             new WSEncryptionPart(
                 "add", "http://ws.apache.org/counter/counter_port_type", "Element"

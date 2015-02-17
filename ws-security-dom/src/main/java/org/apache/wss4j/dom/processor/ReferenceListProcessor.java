@@ -100,7 +100,7 @@ public class ReferenceListProcessor implements Processor {
         RequestData data,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
-        List<WSDataRef> dataRefs = new ArrayList<WSDataRef>();
+        List<WSDataRef> dataRefs = new ArrayList<>();
         //find out if there's an EncryptedKey in the doc (AsymmetricBinding)
         Element wsseHeaderElement = wsDocInfo.getSecurityHeader();
         boolean asymBinding = WSSecurityUtil.getDirectChildElement(
@@ -180,7 +180,7 @@ public class ReferenceListProcessor implements Processor {
             symmetricKey = X509Util.getSharedKey(keyInfoElement, symEncAlgo, data.getCallbackHandler());
         } else {
             STRParser strParser = new SecurityTokenRefSTRParser();
-            Map<String, Object> parameters = new HashMap<String, Object>();
+            Map<String, Object> parameters = new HashMap<>();
             parameters.put(SecurityTokenRefSTRParser.SIGNATURE_METHOD, symEncAlgo);
             strParser.parseSecurityTokenReference(
                 secRefToken, data,

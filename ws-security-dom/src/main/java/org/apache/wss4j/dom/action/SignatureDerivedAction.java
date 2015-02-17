@@ -96,7 +96,7 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
                 WSEncryptionPart encP = new WSEncryptionPart(reqData.getSoapConstants()
                         .getBodyQName().getLocalPart(), reqData.getSoapConstants()
                         .getEnvelopeURI(), "Content");
-                parts = new ArrayList<WSEncryptionPart>();
+                parts = new ArrayList<>();
                 parts.add(encP);
             }
             

@@ -40,8 +40,8 @@ import java.util.Map;
 public class AttachmentCallbackHandler implements CallbackHandler {
     
     private final List<Attachment> originalRequestAttachments;
-    private Map<String, Attachment> attachmentMap = new HashMap<String, Attachment>();
-    private List<Attachment> responseAttachments = new ArrayList<Attachment>();
+    private Map<String, Attachment> attachmentMap = new HashMap<>();
+    private List<Attachment> responseAttachments = new ArrayList<>();
     
     public AttachmentCallbackHandler(List<Attachment> attachments) {
         originalRequestAttachments = attachments;
@@ -84,7 +84,7 @@ public class AttachmentCallbackHandler implements CallbackHandler {
     
     // Try to match the Attachment Id. Otherwise, add all Attachments.
     private List<Attachment> getAttachmentsToAdd(String id) {
-        List<Attachment> attachments = new ArrayList<Attachment>();
+        List<Attachment> attachments = new ArrayList<>();
         if (attachmentMap.containsKey(id)) {
             attachments.add(attachmentMap.get(id));
         } else {

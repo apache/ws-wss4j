@@ -90,7 +90,7 @@ public class SignedBSTTest extends org.junit.Assert {
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setX509Certificate(certs[0]);
 
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         // Add SOAP Body
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         WSEncryptionPart encP =

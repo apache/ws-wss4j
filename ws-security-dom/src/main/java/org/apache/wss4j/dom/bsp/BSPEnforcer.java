@@ -41,7 +41,7 @@ public class BSPEnforcer {
     }
     
     public BSPEnforcer(List<BSPRule> bspRules) {
-        ignoredBSPRules = new ArrayList<BSPRule>(bspRules);
+        ignoredBSPRules = new ArrayList<>(bspRules);
     }
     
     public BSPEnforcer(boolean disableBSPRules) {
@@ -63,7 +63,7 @@ public class BSPEnforcer {
     }
 
     public void setIgnoredBSPRules(List<BSPRule> bspRules) {
-        ignoredBSPRules = new ArrayList<BSPRule>(bspRules);
+        ignoredBSPRules = new ArrayList<>(bspRules);
     }
     
     public void setDisableBSPRules(boolean disableBSPRules) {

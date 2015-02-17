@@ -100,7 +100,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         prepare(doc, secHeader);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         if (parts == null) {
-            parts = new ArrayList<WSEncryptionPart>(1);
+            parts = new ArrayList<>(1);
             WSEncryptionPart encP = 
                 new WSEncryptionPart(
                     WSConstants.ELEM_BODY,

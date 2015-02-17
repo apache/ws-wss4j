@@ -123,7 +123,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         
-        java.util.List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        java.util.List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(bst.getID());
         parts.add(encP);
@@ -165,7 +165,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         
-        java.util.List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        java.util.List<WSEncryptionPart> parts = new ArrayList<>();
         parts.add(new WSEncryptionPart(bst.getID()));
         parts.add(new WSEncryptionPart(timestamp.getId()));
         sign.setParts(parts);

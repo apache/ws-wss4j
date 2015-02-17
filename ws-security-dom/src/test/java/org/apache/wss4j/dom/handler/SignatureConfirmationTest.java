@@ -188,7 +188,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
         WSHandlerResult handlerResult = new WSHandlerResult(null, results);
-        List<WSHandlerResult> receivedResults = new ArrayList<WSHandlerResult>();
+        List<WSHandlerResult> receivedResults = new ArrayList<>();
         receivedResults.add(handlerResult);
         msgContext.put(WSHandlerConstants.RECV_RESULTS, receivedResults);
         action = new HandlerAction(WSConstants.NO_SECURITY);
@@ -247,7 +247,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
         WSHandlerResult handlerResult = new WSHandlerResult(null, results);
-        List<WSHandlerResult> receivedResults = new ArrayList<WSHandlerResult>();
+        List<WSHandlerResult> receivedResults = new ArrayList<>();
         receivedResults.add(handlerResult);
         msgContext.put(WSHandlerConstants.RECV_RESULTS, receivedResults);
         handler.send(

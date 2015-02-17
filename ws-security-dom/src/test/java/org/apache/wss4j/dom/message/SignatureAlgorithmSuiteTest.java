@@ -286,7 +286,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         
         data.setAlgorithmSuite(algorithmSuite);
         
-        List<BSPRule> ignoredRules = new ArrayList<BSPRule>();
+        List<BSPRule> ignoredRules = new ArrayList<>();
         ignoredRules.add(BSPRule.R5404);
         ignoredRules.add(BSPRule.R5406);
         data.setIgnoredBSPRules(ignoredRules);

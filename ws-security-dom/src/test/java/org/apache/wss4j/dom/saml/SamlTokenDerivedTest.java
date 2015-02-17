@@ -180,7 +180,7 @@ public class SamlTokenDerivedTest extends org.junit.Assert {
             crypto.getPrivateKey("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sigBuilder.setExternalKey(key.getEncoded(), secToken.getElement());
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>(2);
+        List<WSEncryptionPart> parts = new ArrayList<>(2);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         WSEncryptionPart encP = 
             new WSEncryptionPart(

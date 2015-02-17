@@ -137,7 +137,7 @@ public class SignatureAction implements Action {
                 WSEncryptionPart encP = new WSEncryptionPart(reqData.getSoapConstants()
                         .getBodyQName().getLocalPart(), reqData.getSoapConstants()
                         .getEnvelopeURI(), "Content");
-                parts = new ArrayList<WSEncryptionPart>();
+                parts = new ArrayList<>();
                 parts.add(encP);
             }
             

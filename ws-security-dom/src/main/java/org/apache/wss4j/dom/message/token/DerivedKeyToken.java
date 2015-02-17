@@ -229,7 +229,7 @@ public class DerivedKeyToken {
      * @param nonce Value of the Properties/Nonce element
      */
     public void setProperties(String name, String label, String nonce) {
-        Map<String, String> table = new HashMap<String, String>();
+        Map<String, String> table = new HashMap<>();
         table.put("Name", name);
         table.put("Label", label);
         table.put("Nonce", nonce);
@@ -260,7 +260,7 @@ public class DerivedKeyToken {
 
     public Map<String, String> getProperties() {
         if (elementProperties != null) {
-            Map<String, String> table = new HashMap<String, String>();
+            Map<String, String> table = new HashMap<>();
             Node node = elementProperties.getFirstChild();
             while (node != null) {
                 if (Node.ELEMENT_NODE == node.getNodeType()) {

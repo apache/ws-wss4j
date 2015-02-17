@@ -467,7 +467,7 @@ public class EncryptedKeyProcessor implements Processor {
             WSSecurityUtil.getDirectChildElement(
                 xencEncryptedKey, "ReferenceList", WSConstants.ENC_NS
             );
-        List<String> dataRefURIs = new LinkedList<String>();
+        List<String> dataRefURIs = new LinkedList<>();
         if (refList != null) {
             for (Node node = refList.getFirstChild(); node != null; node = node.getNextSibling()) {
                 if (Node.ELEMENT_NODE == node.getNodeType()
@@ -497,7 +497,7 @@ public class EncryptedKeyProcessor implements Processor {
         if (dataRefURIs == null || dataRefURIs.isEmpty()) {
             return null;
         }
-        List<WSDataRef> dataRefs = new ArrayList<WSDataRef>();
+        List<WSDataRef> dataRefs = new ArrayList<>();
         for (String dataRefURI : dataRefURIs) {
             WSDataRef dataRef = 
                 decryptDataRef(doc, dataRefURI, docInfo, decryptedBytes, data);

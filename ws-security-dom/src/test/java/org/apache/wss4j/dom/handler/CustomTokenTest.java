@@ -80,7 +80,7 @@ public class CustomTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.CUSTOM_TOKEN, null));
         handler.send(
             doc, 

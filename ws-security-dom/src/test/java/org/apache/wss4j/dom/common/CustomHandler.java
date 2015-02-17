@@ -36,7 +36,7 @@ import java.util.Map;
  */
 public class CustomHandler extends WSHandler {
     
-    private Map<String, Object> optionsMap = new HashMap<String, Object>();
+    private Map<String, Object> optionsMap = new HashMap<>();
 
     public Object 
     getOption(String key) {

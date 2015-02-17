@@ -73,7 +73,7 @@ public class UseReqSigCertTest extends org.junit.Assert {
         
         // Send the request
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.SIGN));
         actions.add(new HandlerAction(WSConstants.TS));
         handler.send(
@@ -92,7 +92,7 @@ public class UseReqSigCertTest extends org.junit.Assert {
         // Process the request
         List<WSSecurityEngineResult> results = processRequest(doc);
         WSHandlerResult rResult = new WSHandlerResult("", results);
-        List<WSHandlerResult> handlerResults = new ArrayList<WSHandlerResult>();
+        List<WSHandlerResult> handlerResults = new ArrayList<>();
         handlerResults.add(0, rResult);
         
         // Send the response
@@ -119,7 +119,7 @@ public class UseReqSigCertTest extends org.junit.Assert {
         
         // Send the request
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.SIGN));
         actions.add(new HandlerAction(WSConstants.TS));
         handler.send(
@@ -138,7 +138,7 @@ public class UseReqSigCertTest extends org.junit.Assert {
         // Process the request
         List<WSSecurityEngineResult> results = processRequest(doc);
         WSHandlerResult rResult = new WSHandlerResult("", results);
-        List<WSHandlerResult> handlerResults = new ArrayList<WSHandlerResult>();
+        List<WSHandlerResult> handlerResults = new ArrayList<>();
         handlerResults.add(0, rResult);
         
         // Send the response
@@ -165,7 +165,7 @@ public class UseReqSigCertTest extends org.junit.Assert {
         
         // Send the request
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.SIGN));
         actions.add(new HandlerAction(WSConstants.TS));
         handler.send(
@@ -184,7 +184,7 @@ public class UseReqSigCertTest extends org.junit.Assert {
         // Process the request
         List<WSSecurityEngineResult> results = processRequest(doc);
         WSHandlerResult rResult = new WSHandlerResult("", results);
-        List<WSHandlerResult> handlerResults = new ArrayList<WSHandlerResult>();
+        List<WSHandlerResult> handlerResults = new ArrayList<>();
         handlerResults.add(0, rResult);
         
         // Send the response
@@ -201,7 +201,7 @@ public class UseReqSigCertTest extends org.junit.Assert {
         reqData.setMsgContext(config);
         
         CustomHandler handler = new CustomHandler();
-        List<Integer> receivedActions = new ArrayList<Integer>();
+        List<Integer> receivedActions = new ArrayList<>();
         receivedActions.add(WSConstants.SIGN);
         receivedActions.add(WSConstants.TS);
         handler.receive(receivedActions, reqData);

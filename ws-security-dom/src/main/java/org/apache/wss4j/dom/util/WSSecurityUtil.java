@@ -197,7 +197,7 @@ public final class WSSecurityUtil {
         String localName,
         String namespace
     ) {
-        List<Element> children = new ArrayList<Element>();
+        List<Element> children = new ArrayList<>();
         for (
             Node currentChild = fNode.getFirstChild(); 
             currentChild != null; 
@@ -337,7 +337,7 @@ public final class WSSecurityUtil {
         Node startParent = startNode.getParentNode();
         Node processedNode = null;
 
-        List<Element> foundNodes = new ArrayList<Element>();
+        List<Element> foundNodes = new ArrayList<>();
         while (startNode != null) {
             // start node processing at this point
             if (startNode.getNodeType() == Node.ELEMENT_NODE
@@ -899,7 +899,7 @@ public final class WSSecurityUtil {
                     (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
             if (actions.contains(resultAction)) {
                 if (actionResultList.isEmpty()) {
-                    actionResultList = new ArrayList<WSSecurityEngineResult>();
+                    actionResultList = new ArrayList<>();
                 }
                 actionResultList.add(result);
             }
@@ -908,7 +908,7 @@ public final class WSSecurityUtil {
     }
 
     public static List<Integer> decodeAction(String action) throws WSSecurityException {
-        List<Integer> actions = new ArrayList<Integer>();
+        List<Integer> actions = new ArrayList<>();
         String actionToParse = action;
         if (actionToParse == null) {
             return actions;
@@ -966,7 +966,7 @@ public final class WSSecurityUtil {
         String action, 
         WSSConfig wssConfig
     ) throws WSSecurityException {
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         if (action == null) {
             return actions;
         }
@@ -1160,7 +1160,7 @@ public final class WSSecurityUtil {
     listChildren(
         final Node parent
     ) {
-        final List<Node> ret = new ArrayList<Node>();
+        final List<Node> ret = new ArrayList<>();
         if (parent != null) {
             Node node = parent.getFirstChild();
             while (node != null) {
@@ -1182,7 +1182,7 @@ public final class WSSecurityUtil {
         if (a.size() == 0) {
             return b;
         }
-        final List<Node> ret = new ArrayList<Node>();
+        final List<Node> ret = new ArrayList<>();
         if (b.size() == 0) {
             return ret;
         }

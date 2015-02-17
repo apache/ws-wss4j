@@ -96,7 +96,7 @@ public class WSDocInfo {
      */
     public void addTokenElement(Element element, boolean checkMultipleElements) throws WSSecurityException {
         if (tokenList == null) {
-            tokenList = new ArrayList<Element>();
+            tokenList = new ArrayList<>();
         }
         
         if (checkMultipleElements) {
@@ -184,7 +184,7 @@ public class WSDocInfo {
      */
     public void addResult(WSSecurityEngineResult result) {
         if (resultsList == null) {
-            resultsList = new ArrayList<WSSecurityEngineResult>();
+            resultsList = new ArrayList<>();
         }
         resultsList.add(result);
     }
@@ -218,7 +218,7 @@ public class WSDocInfo {
      * Get a list of WSSecurityEngineResults of the given Integer tag
      */
     public List<WSSecurityEngineResult> getResultsByTag(Integer tag) {
-        List<WSSecurityEngineResult> foundResults = new ArrayList<WSSecurityEngineResult>();
+        List<WSSecurityEngineResult> foundResults = new ArrayList<>();
         if (resultsList != null) {
             for (WSSecurityEngineResult result : resultsList) {
                 if (result != null) {

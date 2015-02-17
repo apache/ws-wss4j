@@ -68,7 +68,7 @@ public class Timestamp {
     public Timestamp(Element timestampElement, BSPEnforcer bspEnforcer) throws WSSecurityException {
 
         element = timestampElement;
-        customElements = new ArrayList<Element>();
+        customElements = new ArrayList<>();
 
         String strCreated = null;
         String strExpires = null;
@@ -188,7 +188,7 @@ public class Timestamp {
      */
     public Timestamp(boolean milliseconds, Document doc, WSTimeSource timeSource, int ttl) {
 
-        customElements = new ArrayList<Element>();
+        customElements = new ArrayList<>();
         element = 
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN

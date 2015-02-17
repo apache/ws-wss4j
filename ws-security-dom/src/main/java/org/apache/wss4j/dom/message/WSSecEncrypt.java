@@ -139,7 +139,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             ephemeralKey = symmetricKey.getEncoded();
         }
 
-        attachmentEncryptedDataElements = new ArrayList<Element>();
+        attachmentEncryptedDataElements = new ArrayList<>();
         
         symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, ephemeralKey);
         
@@ -200,7 +200,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         }
         
         if (parts == null) {
-            parts = new ArrayList<WSEncryptionPart>(1);
+            parts = new ArrayList<>(1);
             String soapNamespace = WSSecurityUtil.getSOAPNamespace(envelope);
             WSEncryptionPart encP = 
                 new WSEncryptionPart(
@@ -372,7 +372,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             );
         }
 
-        List<String> encDataRef = new ArrayList<String>();
+        List<String> encDataRef = new ArrayList<>();
         for (int part = 0; part < references.size(); part++) {
             WSEncryptionPart encPart = references.get(part);
 
@@ -507,7 +507,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
                     }
 
-                    Map<String, String> headers = new HashMap<String, String>();
+                    Map<String, String> headers = new HashMap<>();
                     headers.putAll(attachment.getHeaders());
                     resultAttachment.setSourceStream(
                             AttachmentUtils.setupAttachmentEncryptionStream(

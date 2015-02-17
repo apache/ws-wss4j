@@ -193,7 +193,7 @@ public abstract class WSHandler {
         HandlerAction signingAction = getSignatureActionThatSignsATimestamp(actions, reqData);
 
         if (signingAction != null) {
-            actionsToPerform = new ArrayList<HandlerAction>(actions);
+            actionsToPerform = new ArrayList<>(actions);
             Collections.copy(actionsToPerform, actions);
 
             int signatureIndex = actions.indexOf(WSConstants.SIGN);
@@ -258,7 +258,7 @@ public abstract class WSHandler {
             List<byte[]> savedSignatures = 
                 (List<byte[]>)getProperty(reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV);
             if (savedSignatures == null) {
-                savedSignatures = new ArrayList<byte[]>();
+                savedSignatures = new ArrayList<>();
                 setProperty(
                     reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV, savedSignatures
                 );
@@ -380,7 +380,7 @@ public abstract class WSHandler {
     protected boolean checkReceiverResultsAnyOrder(
         List<WSSecurityEngineResult> wsResult, List<Integer> actions
     ) {
-        List<Integer> recordedActions = new ArrayList<Integer>(actions.size());
+        List<Integer> recordedActions = new ArrayList<>(actions.size());
         for (Integer action : actions) {
             recordedActions.add(action);
         }
@@ -1409,7 +1409,7 @@ public abstract class WSHandler {
             String[] certConstraintsList = certConstraints.split(",");
             if (certConstraintsList != null) {
                 Collection<Pattern> subjectCertConstraints = 
-                    new ArrayList<Pattern>(certConstraintsList.length);
+                    new ArrayList<>(certConstraintsList.length);
                 for (String certConstraint : certConstraintsList) {
                     try {
                         subjectCertConstraints.add(Pattern.compile(certConstraint.trim()));

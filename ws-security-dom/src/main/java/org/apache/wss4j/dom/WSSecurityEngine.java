@@ -383,7 +383,7 @@ public class WSSecurityEngine {
         Element securityHeader,
         RequestData requestData
     ) throws WSSecurityException {
-        List<WSSecurityEngineResult> returnResults = new ArrayList<WSSecurityEngineResult>();
+        List<WSSecurityEngineResult> returnResults = new ArrayList<>();
         if (securityHeader == null) {
             return returnResults;
         }

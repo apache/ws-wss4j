@@ -160,7 +160,7 @@ public class SignatureProcessor implements Processor {
                 }
             } else {
                 STRParser strParser = new SignatureSTRParser();
-                Map<String, Object> parameters = new HashMap<String, Object>();
+                Map<String, Object> parameters = new HashMap<>();
                 parameters.put(SignatureSTRParser.SIGNATURE_METHOD, signatureMethod);
                 strParser.parseSecurityTokenReference(
                     child, data, wsDocInfo, parameters
@@ -524,7 +524,7 @@ public class SignatureProcessor implements Processor {
         RequestData requestData,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
-        List<WSDataRef> protectedRefs = new ArrayList<WSDataRef>();
+        List<WSDataRef> protectedRefs = new ArrayList<>();
         List<?> referencesList = signedInfo.getReferences();
         for (int i = 0; i < referencesList.size(); i++) {
             Reference siRef = (Reference)referencesList.get(i);
@@ -567,7 +567,7 @@ public class SignatureProcessor implements Processor {
                 // Set the Transform algorithms as well
                 @SuppressWarnings("unchecked")
                 List<Transform> transforms = (List<Transform>)siRef.getTransforms();
-                List<String> transformAlgorithms = new ArrayList<String>(transforms.size());
+                List<String> transformAlgorithms = new ArrayList<>(transforms.size());
                 for (Transform transform : transforms) {
                     transformAlgorithms.add(transform.getAlgorithm());
                 }

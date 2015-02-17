@@ -73,7 +73,7 @@ public class WSSConfig {
      */
     private static final Map<Integer, Class<?>> DEFAULT_ACTIONS;
     static {
-        final Map<Integer, Class<?>> tmp = new HashMap<Integer, Class<?>>();
+        final Map<Integer, Class<?>> tmp = new HashMap<>();
         try {
             tmp.put(
                 WSConstants.UT,
@@ -132,7 +132,7 @@ public class WSSConfig {
      */
     private static final Map<QName, Class<?>> DEFAULT_PROCESSORS;
     static {
-        final Map<QName, Class<?>> tmp = new HashMap<QName, Class<?>>();
+        final Map<QName, Class<?>> tmp = new HashMap<>();
         try {
             tmp.put(
                 WSSecurityEngine.SAML_TOKEN,
@@ -207,7 +207,7 @@ public class WSSConfig {
      */
     private static final Map<QName, Class<?>> DEFAULT_VALIDATORS;
     static {
-        final Map<QName, Class<?>> tmp = new HashMap<QName, Class<?>>();
+        final Map<QName, Class<?>> tmp = new HashMap<>();
         try {
             tmp.put(
                 WSSecurityEngine.SAML_TOKEN,
@@ -378,8 +378,7 @@ public class WSSConfig {
      * The known actions are initialized from a set of defaults,
      * but the list may be modified via the setAction operations.
      */
-    private final Map<Integer, Object> actionMap = 
-        new HashMap<Integer, Object>(DEFAULT_ACTIONS);
+    private final Map<Integer, Object> actionMap = new HashMap<Integer, Object>(DEFAULT_ACTIONS);
 
     /**
      * The known processors. This map is of the form <QName, Class<?>> or
@@ -387,8 +386,7 @@ public class WSSConfig {
      * The known processors are initialized from a set of defaults,
      * but the list may be modified via the setProcessor operations.
      */
-    private final Map<QName, Object> processorMap = 
-        new HashMap<QName, Object>(DEFAULT_PROCESSORS);
+    private final Map<QName, Object> processorMap = new HashMap<QName, Object>(DEFAULT_PROCESSORS);
     
     /**
      * The known validators. This map is of the form <QName, Class<?>> or
@@ -396,8 +394,7 @@ public class WSSConfig {
      * The known validators are initialized from a set of defaults,
      * but the list may be modified via the setValidator operations.
      */
-    private final Map<QName, Object> validatorMap = 
-        new HashMap<QName, Object>(DEFAULT_VALIDATORS);
+    private final Map<QName, Object> validatorMap = new HashMap<QName, Object>(DEFAULT_VALIDATORS);
     
     static {
         try {

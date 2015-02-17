@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public class KeystoreCallbackHandler implements CallbackHandler {
     
-    private Map<String, String> users = new HashMap<String, String>();
+    private Map<String, String> users = new HashMap<>();
     
     public KeystoreCallbackHandler() {
         users.put("wss86", "security");

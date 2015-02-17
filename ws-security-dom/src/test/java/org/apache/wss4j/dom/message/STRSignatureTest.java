@@ -70,7 +70,7 @@ public class STRSignatureTest extends org.junit.Assert {
         builder.setUserInfo("wss40", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         
         //
         // Set up to sign body and use STRTransform to sign
@@ -120,7 +120,7 @@ public class STRSignatureTest extends org.junit.Assert {
         builder.setUserInfo("wss40", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -180,7 +180,7 @@ public class STRSignatureTest extends org.junit.Assert {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         
         //
         // Set up to sign body and use STRTransform to sign
@@ -234,7 +234,7 @@ public class STRSignatureTest extends org.junit.Assert {
         builder.setUserInfo("wss40", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         
         //
         // Set up to sign body and use STRTransform to sign

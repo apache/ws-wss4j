@@ -216,7 +216,7 @@ public class SignatureTest extends org.junit.Assert {
         
         RequestData data = new RequestData();
         data.setSigVerCrypto(crypto);
-        List<BSPRule> ignoredRules = new ArrayList<BSPRule>();
+        List<BSPRule> ignoredRules = new ArrayList<>();
         ignoredRules.add(BSPRule.R5404);
         ignoredRules.add(BSPRule.R5406);
         data.setIgnoredBSPRules(ignoredRules);
@@ -469,7 +469,7 @@ public class SignatureTest extends org.junit.Assert {
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
         
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp",
@@ -619,7 +619,7 @@ public class SignatureTest extends org.junit.Assert {
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
         
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp",
@@ -757,7 +757,7 @@ public class SignatureTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.SIGN));
         actions.add(new HandlerAction(WSConstants.TS));
         handler.send(
@@ -775,7 +775,7 @@ public class SignatureTest extends org.junit.Assert {
         
         List<WSSecurityEngineResult> results = verify(doc);
         
-        List<Integer> receivedActions = new ArrayList<Integer>();
+        List<Integer> receivedActions = new ArrayList<>();
         receivedActions.add(WSConstants.SIGN);
         receivedActions.add(WSConstants.TS);
         assertTrue(handler.checkResults(results, receivedActions));
@@ -800,7 +800,7 @@ public class SignatureTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.SIGN));
         actions.add(new HandlerAction(WSConstants.ENCR));
         actions.add(new HandlerAction(WSConstants.TS));
@@ -837,7 +837,7 @@ public class SignatureTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.ENCR));
         actions.add(new HandlerAction(WSConstants.SIGN));
         actions.add(new HandlerAction(WSConstants.TS));
@@ -888,7 +888,7 @@ public class SignatureTest extends org.junit.Assert {
         data.setWssConfig(WSSConfig.getNewInstance());
         data.setSigVerCrypto(crypto);
         
-        List<BSPRule> disabledRules = new ArrayList<BSPRule>();
+        List<BSPRule> disabledRules = new ArrayList<>();
         disabledRules.add(BSPRule.R5404);
         disabledRules.add(BSPRule.R5406);
         data.setIgnoredBSPRules(disabledRules);

@@ -582,7 +582,7 @@ public class SamlTokenTest extends org.junit.Assert {
         XSAny attributeValue = xsAnyBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
         attributeValue.getUnknownXMLObjects().add(conditions);
         
-        List<Object> attributeValues = new ArrayList<Object>();
+        List<Object> attributeValues = new ArrayList<>();
         attributeValues.add(attributeValue);
         callbackHandler.setCustomAttributeValues(attributeValues);
 
@@ -634,7 +634,7 @@ public class SamlTokenTest extends org.junit.Assert {
             xsIntegerBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSInteger.TYPE_NAME);
         attributeValue.setValue(5);
         
-        List<Object> attributeValues = new ArrayList<Object>();
+        List<Object> attributeValues = new ArrayList<>();
         attributeValues.add(attributeValue);
         callbackHandler.setCustomAttributeValues(attributeValues);
 
@@ -804,7 +804,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         RequestData data = new RequestData();
         data.setDecCrypto(crypto);
-        List<BSPRule> ignoredRules = new ArrayList<BSPRule>();
+        List<BSPRule> ignoredRules = new ArrayList<>();
         ignoredRules.add(BSPRule.R5426);
         data.setIgnoredBSPRules(ignoredRules);
         data.setCallbackHandler(new KeystoreCallbackHandler());

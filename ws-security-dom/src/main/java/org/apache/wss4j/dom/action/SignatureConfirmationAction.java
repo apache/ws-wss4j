@@ -59,11 +59,11 @@ public class SignatureConfirmationAction implements Action {
         // Loop over all the (signature) results gathered by all the processors, and store
         // them in a list.
         //
-        final List<Integer> actions = new ArrayList<Integer>(3);
+        final List<Integer> actions = new ArrayList<>(3);
         actions.add(WSConstants.SIGN);
         actions.add(WSConstants.ST_SIGNED);
         actions.add(WSConstants.UT_SIGN);
-        List<WSSecurityEngineResult> signatureActions = new ArrayList<WSSecurityEngineResult>();
+        List<WSSecurityEngineResult> signatureActions = new ArrayList<>();
         for (WSHandlerResult wshResult : results) {
             List<WSSecurityEngineResult> resultList = wshResult.getResults();
 

@@ -99,7 +99,7 @@ public class WSSecSignatureBase extends WSSecBase {
 
         //create separate list for attachment and append it after same document references
         //are processed.
-        List<javax.xml.crypto.dsig.Reference> attachmentReferenceList = new ArrayList<javax.xml.crypto.dsig.Reference>();
+        List<javax.xml.crypto.dsig.Reference> attachmentReferenceList = new ArrayList<>();
 
         for (WSEncryptionPart encPart : references) {
             if (encPart.getId() != null && encPart.getId().startsWith("cid:")) {
@@ -128,7 +128,7 @@ public class WSSecSignatureBase extends WSSecBase {
                     Attachment attachment = attachments.get(i);
 
                     try {
-                        List<Transform> transforms = new ArrayList<Transform>();
+                        List<Transform> transforms = new ArrayList<>();
 
                         AttachmentTransformParameterSpec attachmentTransformParameterSpec =
                                 new AttachmentTransformParameterSpec(
@@ -166,7 +166,7 @@ public class WSSecSignatureBase extends WSSecBase {
             }
         }
 
-        List<javax.xml.crypto.dsig.Reference> referenceList = new ArrayList<javax.xml.crypto.dsig.Reference>();
+        List<javax.xml.crypto.dsig.Reference> referenceList = new ArrayList<>();
 
         for (WSEncryptionPart encPart : references) {
             String idToSign = encPart.getId();
@@ -293,7 +293,7 @@ public class WSSecSignatureBase extends WSSecBase {
      * Get the List of inclusive prefixes from the DOM Element argument 
      */
     public List<String> getInclusivePrefixes(Element target, boolean excludeVisible) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         Node parent = target;
         while (parent.getParentNode() != null &&
             !(Node.DOCUMENT_NODE == parent.getParentNode().getNodeType())) {

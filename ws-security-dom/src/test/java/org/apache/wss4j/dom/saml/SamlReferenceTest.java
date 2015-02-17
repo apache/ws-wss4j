@@ -441,7 +441,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         builder.setCustomEKTokenId(samlAssertion.getId());
         builder.prepare(doc, userCrypto);
         
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP = 
             new WSEncryptionPart(
                 "add", "http://ws.apache.org/counter/counter_port_type", "Element"
@@ -518,7 +518,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         builder.setCustomEKTokenId(samlAssertion.getId());
         builder.prepare(doc, userCrypto);
         
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP = 
             new WSEncryptionPart(
                 "add", "http://ws.apache.org/counter/counter_port_type", "Element"
@@ -846,7 +846,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         builder.setCustomEKTokenId(samlAssertion.getId());
         builder.prepare(doc, userCrypto);
         
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP = 
             new WSEncryptionPart(
                 "add", "http://ws.apache.org/counter/counter_port_type", "Element"
@@ -923,7 +923,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         builder.setCustomEKTokenId(samlAssertion.getId());
         builder.prepare(doc, userCrypto);
         
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP = 
             new WSEncryptionPart(
                 "add", "http://ws.apache.org/counter/counter_port_type", "Element"

@@ -55,7 +55,7 @@ public final class DOMSAMLUtil  {
         Certificate[] tlsCerts,
         Element body
     ) throws WSSecurityException {
-        final List<Integer> samlActions = new ArrayList<Integer>(2);
+        final List<Integer> samlActions = new ArrayList<>(2);
         samlActions.add(WSConstants.ST_SIGNED);
         samlActions.add(WSConstants.ST_UNSIGNED);
         List<WSSecurityEngineResult> samlResults = 
@@ -65,7 +65,7 @@ public final class DOMSAMLUtil  {
             return;
         }
 
-        final List<Integer> signedActions = new ArrayList<Integer>(2);
+        final List<Integer> signedActions = new ArrayList<>(2);
         signedActions.add(WSConstants.SIGN);
         signedActions.add(WSConstants.UT_SIGN);
         List<WSSecurityEngineResult> signedResults = 

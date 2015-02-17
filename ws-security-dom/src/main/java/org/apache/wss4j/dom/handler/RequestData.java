@@ -65,7 +65,7 @@ public class RequestData {
     private EncryptionActionToken encryptionToken;
     private int timeToLive = 300;   // Timestamp: time in seconds between creation and expiry
     private WSSConfig wssConfig;
-    private List<byte[]> signatureValues = new ArrayList<byte[]>();
+    private List<byte[]> signatureValues = new ArrayList<>();
     private WSSecHeader secHeader;
     private int derivedKeyIterations = UsernameToken.DEFAULT_ITERATION;
     private boolean useDerivedKeyForMAC = true;
@@ -76,8 +76,8 @@ public class RequestData {
     private ReplayCache timestampReplayCache;
     private ReplayCache nonceReplayCache;
     private ReplayCache samlOneTimeUseReplayCache;
-    private Collection<Pattern> subjectDNPatterns = new ArrayList<Pattern>();
-    private final List<BSPRule> ignoredBSPRules = new LinkedList<BSPRule>();
+    private Collection<Pattern> subjectDNPatterns = new ArrayList<>();
+    private final List<BSPRule> ignoredBSPRules = new LinkedList<>();
     private boolean appendSignatureAfterTimestamp;
     private int originalSignatureActionPosition;
     private AlgorithmSuite algorithmSuite;
@@ -93,7 +93,7 @@ public class RequestData {
     private PasswordEncryptor passwordEncryptor;
     private String derivedKeyTokenReference;
     private boolean use200512Namespace = true;
-    private final List<String> audienceRestrictions = new ArrayList<String>();
+    private final List<String> audienceRestrictions = new ArrayList<>();
 
     public void clear() {
         soapConstants = null;

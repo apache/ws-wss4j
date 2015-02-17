@@ -239,7 +239,7 @@ public class SAMLTokenProcessor implements Processor {
             return null;
         }
         
-        List<WSDataRef> protectedRefs = new ArrayList<WSDataRef>();
+        List<WSDataRef> protectedRefs = new ArrayList<>();
         String signatureMethod = 
             xmlSignature.getSignedInfo().getSignatureMethod().getAlgorithm();
         
@@ -259,7 +259,7 @@ public class SAMLTokenProcessor implements Processor {
                 // Set the Transform algorithms as well
                 @SuppressWarnings("unchecked")
                 List<Transform> transforms = (List<Transform>)reference.getTransforms();
-                List<String> transformAlgorithms = new ArrayList<String>(transforms.size());
+                List<String> transformAlgorithms = new ArrayList<>(transforms.size());
                 for (Transform transform : transforms) {
                     transformAlgorithms.add(transform.getAlgorithm());
                 }

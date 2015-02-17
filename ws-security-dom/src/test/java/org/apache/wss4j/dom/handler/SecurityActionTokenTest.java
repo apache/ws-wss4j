@@ -96,7 +96,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.SIGN, actionToken));
         handler.send(
             doc, 
@@ -132,7 +132,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.SIGN, actionToken));
         handler.send(
             doc, 
@@ -181,7 +181,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.SIGN, actionToken));
         actions.add(new HandlerAction(WSConstants.SIGN, actionToken2));
         actions.add(new HandlerAction(WSConstants.TS, null));
@@ -227,7 +227,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.SIGN, actionToken));
         actions.add(new HandlerAction(WSConstants.SIGN, actionToken2));
         actions.add(new HandlerAction(WSConstants.TS, null));
@@ -269,7 +269,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.ENCR, actionToken));
         handler.send(
             doc, 
@@ -305,7 +305,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.ENCR, actionToken));
         handler.send(
             doc, 
@@ -342,7 +342,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.ENCR, actionToken));
         handler.send(
             doc, 
@@ -389,7 +389,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.ENCR, actionToken));
         actions.add(new HandlerAction(WSConstants.TS, null));
         actions.add(new HandlerAction(WSConstants.ENCR, actionToken2));
@@ -435,7 +435,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.ENCR, actionToken));
         actions.add(new HandlerAction(WSConstants.TS, null));
         actions.add(new HandlerAction(WSConstants.ENCR, actionToken2));
@@ -486,7 +486,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.SIGN, actionToken));
         actions.add(new HandlerAction(WSConstants.ENCR, actionToken2));
         handler.send(
@@ -533,7 +533,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.SIGN, actionToken2));
         actions.add(new HandlerAction(WSConstants.ENCR, actionToken));
         handler.send(
@@ -576,7 +576,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.SIGN, actionToken2));
         actions.add(new HandlerAction(WSConstants.ENCR, actionToken));
         handler.send(

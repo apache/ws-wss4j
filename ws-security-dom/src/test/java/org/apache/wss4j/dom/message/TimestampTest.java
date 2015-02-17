@@ -472,7 +472,7 @@ public class TimestampTest extends org.junit.Assert {
             // expected
         }
         
-        List<BSPRule> rules = new ArrayList<BSPRule>();
+        List<BSPRule> rules = new ArrayList<>();
         rules.add(BSPRule.R3203);
         rules.add(BSPRule.R3221);
         verify(doc, rules);

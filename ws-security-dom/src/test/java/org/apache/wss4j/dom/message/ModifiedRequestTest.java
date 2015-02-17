@@ -100,7 +100,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "value",
@@ -157,7 +157,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "value",
@@ -286,7 +286,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         usernameToken.setUserInfo("wss86", "security");
         Document createdDoc = usernameToken.build(doc, secHeader);
         
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "UsernameToken",
@@ -427,7 +427,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         timestamp.setTimeToLive(300);
         timestamp.build(doc, secHeader);
         
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp",
@@ -536,7 +536,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
         
-        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        List<WSEncryptionPart> parts = new ArrayList<>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp",
