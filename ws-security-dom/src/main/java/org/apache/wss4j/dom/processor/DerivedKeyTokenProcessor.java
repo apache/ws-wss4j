@@ -19,7 +19,9 @@
 
 package org.apache.wss4j.dom.processor;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Element;
 import org.apache.wss4j.dom.WSConstants;
@@ -60,8 +62,9 @@ public class DerivedKeyTokenProcessor implements Processor {
         Element secRefElement = dkt.getSecurityTokenReferenceElement();
         if (secRefElement != null) {
             STRParser strParser = new DerivedKeyTokenSTRParser();
+            Map<String, Object> parameters = Collections.emptyMap();
             strParser.parseSecurityTokenReference(
-                secRefElement, data, wsDocInfo, null
+                secRefElement, data, wsDocInfo, parameters
             );
             secret = strParser.getSecretKey();
         } else {
@@ -85,7 +88,7 @@ public class DerivedKeyTokenProcessor implements Processor {
         result.put(WSSecurityEngineResult.TAG_SECRET, secret);
         result.put(WSSecurityEngineResult.TAG_TOKEN_ELEMENT, dkt.getElement());
         wsDocInfo.addResult(result);
-        return java.util.Collections.singletonList(result);
+        return Collections.singletonList(result);
     }
 
 

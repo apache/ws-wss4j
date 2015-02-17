@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +87,7 @@ public class ReferenceListProcessor implements Processor {
         }
         wsDocInfo.addTokenElement(elem);
         wsDocInfo.addResult(result);
-        return java.util.Collections.singletonList(result);
+        return Collections.singletonList(result);
     }
 
     /**
@@ -180,7 +181,7 @@ public class ReferenceListProcessor implements Processor {
             symmetricKey = X509Util.getSharedKey(keyInfoElement, symEncAlgo, data.getCallbackHandler());
         } else {
             STRParser strParser = new SecurityTokenRefSTRParser();
-            Map<String, Object> parameters = new HashMap<>();
+            Map<String, Object> parameters = new HashMap<String, Object>(1);
             parameters.put(SecurityTokenRefSTRParser.SIGNATURE_METHOD, symEncAlgo);
             strParser.parseSecurityTokenReference(
                 secRefToken, data,

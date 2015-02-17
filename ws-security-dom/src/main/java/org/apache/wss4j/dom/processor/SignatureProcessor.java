@@ -160,7 +160,7 @@ public class SignatureProcessor implements Processor {
                 }
             } else {
                 STRParser strParser = new SignatureSTRParser();
-                Map<String, Object> parameters = new HashMap<>();
+                Map<String, Object> parameters = new HashMap<>(1);
                 parameters.put(SignatureSTRParser.SIGNATURE_METHOD, signatureMethod);
                 strParser.parseSecurityTokenReference(
                     child, data, wsDocInfo, parameters

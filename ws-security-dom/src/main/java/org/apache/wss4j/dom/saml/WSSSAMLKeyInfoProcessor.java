@@ -20,15 +20,15 @@
 package org.apache.wss4j.dom.saml;
 
 import java.security.Principal;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
-
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -98,8 +98,9 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
                     }
                 } else if (SecurityTokenReference.STR_QNAME.equals(el)) {
                     STRParser strParser = new SignatureSTRParser();
+                    Map<String, Object> parameters = Collections.emptyMap();
                     strParser.parseSecurityTokenReference(
-                        (Element)node, data, docInfo, new HashMap<String, Object>()
+                        (Element)node, data, docInfo, parameters
                     );
                     SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo(strParser.getCertificates());
                     samlKeyInfo.setPublicKey(strParser.getPublicKey());

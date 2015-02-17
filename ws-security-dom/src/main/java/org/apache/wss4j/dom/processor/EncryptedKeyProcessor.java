@@ -26,8 +26,10 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.security.spec.MGF1ParameterSpec;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -89,7 +91,7 @@ public class EncryptedKeyProcessor implements Processor {
              if (result != null && 
                  WSConstants.ENCR == (Integer)result.get(WSSecurityEngineResult.TAG_ACTION)
              ) {
-                 return java.util.Collections.singletonList(result);
+                 return Collections.singletonList(result);
              }
         }
         
@@ -235,7 +237,7 @@ public class EncryptedKeyProcessor implements Processor {
         result.put(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE, strParser.getCertificatesReferenceType());
         wsDocInfo.addResult(result);
         wsDocInfo.addTokenElement(elem);
-        return java.util.Collections.singletonList(result);
+        return Collections.singletonList(result);
     }
     
     /**
@@ -385,7 +387,8 @@ public class EncryptedKeyProcessor implements Processor {
             X509Certificate[] certs = null;
             if (SecurityTokenReference.SECURITY_TOKEN_REFERENCE.equals(strElement.getLocalName()) 
                 && WSConstants.WSSE_NS.equals(strElement.getNamespaceURI())) {
-                strParser.parseSecurityTokenReference(strElement, data, wsDocInfo, null);
+                Map<String, Object> parameters = Collections.emptyMap();
+                strParser.parseSecurityTokenReference(strElement, data, wsDocInfo, parameters);
                 
                 certs = strParser.getCertificates();
             } else if (WSConstants.SIG_NS.equals(strElement.getNamespaceURI())

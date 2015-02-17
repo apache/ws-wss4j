@@ -99,7 +99,7 @@ public class EncryptedDataProcessor implements Processor {
         Principal principal = null;
         if (secRefToken != null) {
             STRParser strParser = new SecurityTokenRefSTRParser();
-            Map<String, Object> parameters = new HashMap<>();
+            Map<String, Object> parameters = new HashMap<String, Object>(1);
             parameters.put(SecurityTokenRefSTRParser.SIGNATURE_METHOD, symEncAlgo);
             strParser.parseSecurityTokenReference(
                 secRefToken, request,
