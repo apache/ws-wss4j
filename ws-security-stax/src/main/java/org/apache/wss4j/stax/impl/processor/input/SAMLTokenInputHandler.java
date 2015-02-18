@@ -94,8 +94,8 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
     private static final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
-    private static final List<QName> saml1TokenPath = new ArrayList<QName>(WSSConstants.WSSE_SECURITY_HEADER_PATH);
-    private static final List<QName> saml2TokenPath = new ArrayList<QName>(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+    private static final List<QName> saml1TokenPath = new ArrayList<>(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+    private static final List<QName> saml2TokenPath = new ArrayList<>(WSSConstants.WSSE_SECURITY_HEADER_PATH);
 
     static {
         documentBuilderFactory.setNamespaceAware(true);
@@ -573,7 +573,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         private SamlAssertionWrapper samlAssertionWrapper;
         private SecurityTokenProvider<InboundSecurityToken> securityTokenProvider;
         private InboundSecurityToken subjectSecurityToken;
-        private List<SignedElementSecurityEvent> samlTokenSignedElementSecurityEvents = new ArrayList<SignedElementSecurityEvent>();
+        private List<SignedElementSecurityEvent> samlTokenSignedElementSecurityEvents = new ArrayList<>();
         private SignedPartSecurityEvent bodySignedPartSecurityEvent;
 
         SAMLTokenVerifierInputProcessor(XMLSecurityProperties securityProperties, SamlAssertionWrapper samlAssertionWrapper,

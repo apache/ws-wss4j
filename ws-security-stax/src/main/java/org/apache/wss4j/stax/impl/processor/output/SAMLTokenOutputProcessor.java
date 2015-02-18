@@ -430,7 +430,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             OutputProcessorChain outputProcessorChain, SamlAssertionWrapper samlAssertionWrapper,
             String referenceId, String tokenId) throws XMLStreamException, XMLSecurityException {
 
-        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
+        List<XMLSecAttribute> attributes = new ArrayList<>(2);
         WSSecurityTokenConstants.TokenType tokenType = WSSecurityTokenConstants.Saml11Token;
         if (samlAssertionWrapper.getSamlVersion() == SAMLVersion.VERSION_11) {
             attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE));

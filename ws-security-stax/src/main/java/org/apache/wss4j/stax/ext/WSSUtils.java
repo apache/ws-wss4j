@@ -263,7 +263,7 @@ public class WSSUtils extends XMLSecurityUtils {
         } else {
             valueType = WSSConstants.NS_X509PKIPathv1;
         }
-        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(3);
+        List<XMLSecAttribute> attributes = new ArrayList<>(3);
         attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
         attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, valueType));
         attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_wsu_Id, referenceId));
@@ -295,7 +295,7 @@ public class WSSUtils extends XMLSecurityUtils {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidCertForSKI");
         }
 
-        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
+        List<XMLSecAttribute> attributes = new ArrayList<>(2);
         attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
         attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_X509SubjectKeyIdentifier));
         abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
@@ -308,7 +308,7 @@ public class WSSUtils extends XMLSecurityUtils {
                                                         OutputProcessorChain outputProcessorChain,
                                                         X509Certificate[] x509Certificates)
             throws XMLStreamException, XMLSecurityException {
-        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
+        List<XMLSecAttribute> attributes = new ArrayList<>(2);
         attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
         attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_X509_V3_TYPE));
         abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
@@ -324,7 +324,7 @@ public class WSSUtils extends XMLSecurityUtils {
                                                               OutputProcessorChain outputProcessorChain,
                                                               X509Certificate[] x509Certificates)
             throws XMLStreamException, XMLSecurityException {
-        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
+        List<XMLSecAttribute> attributes = new ArrayList<>(2);
         attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
         attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_THUMBPRINT));
         abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
@@ -355,7 +355,7 @@ public class WSSUtils extends XMLSecurityUtils {
                                                                  OutputProcessorChain outputProcessorChain, String identifier)
             throws XMLStreamException, XMLSecurityException {
 
-        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
+        List<XMLSecAttribute> attributes = new ArrayList<>(2);
         attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
         attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_ENCRYPTED_KEY_SHA1));
         abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
@@ -367,7 +367,7 @@ public class WSSUtils extends XMLSecurityUtils {
                                                                  OutputProcessorChain outputProcessorChain, String identifier)
             throws XMLStreamException, XMLSecurityException {
 
-        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
+        List<XMLSecAttribute> attributes = new ArrayList<>(2);
         attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
         attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_Kerberos5_AP_REQ_SHA1));
         abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
@@ -379,7 +379,7 @@ public class WSSUtils extends XMLSecurityUtils {
                                                    OutputProcessorChain outputProcessorChain, String referenceId,
                                                    String valueType, boolean includedInMessage)
             throws XMLStreamException, XMLSecurityException {
-        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
+        List<XMLSecAttribute> attributes = new ArrayList<>(2);
         String uri = includedInMessage ? "#" + referenceId : referenceId;
         attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_URI, uri));
         if (valueType != null) {
@@ -393,7 +393,7 @@ public class WSSUtils extends XMLSecurityUtils {
                                                             OutputProcessorChain outputProcessorChain,
                                                             WSSecurityTokenConstants.TokenType tokenType, String referenceId)
             throws XMLStreamException, XMLSecurityException {
-        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
+        List<XMLSecAttribute> attributes = new ArrayList<>(1);
         if (WSSecurityTokenConstants.Saml10Token.equals(tokenType) || WSSecurityTokenConstants.Saml11Token.equals(tokenType)) {
             attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML10_TYPE));
         } else if (WSSecurityTokenConstants.Saml20Token.equals(tokenType)) {
@@ -408,7 +408,7 @@ public class WSSUtils extends XMLSecurityUtils {
                                                             OutputProcessorChain outputProcessorChain,
                                                             WSSecurityTokenConstants.TokenType tokenType, String referenceId)
             throws XMLStreamException, XMLSecurityException {
-        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
+        List<XMLSecAttribute> attributes = new ArrayList<>(1);
         if (WSSecurityTokenConstants.Saml10Token.equals(tokenType) || WSSecurityTokenConstants.Saml11Token.equals(tokenType)) {
             attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML10_TYPE));
         } else if (WSSecurityTokenConstants.Saml20Token.equals(tokenType)) {
@@ -422,7 +422,7 @@ public class WSSUtils extends XMLSecurityUtils {
     public static void createUsernameTokenReferenceStructure(AbstractOutputProcessor abstractOutputProcessor,
                                                              OutputProcessorChain outputProcessorChain, String tokenId)
             throws XMLStreamException, XMLSecurityException {
-        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
+        List<XMLSecAttribute> attributes = new ArrayList<>(2);
         attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_URI, "#" + tokenId));
         attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_USERNAMETOKEN_PROFILE_UsernameToken));
         abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference, false, attributes);
@@ -445,7 +445,7 @@ public class WSSUtils extends XMLSecurityUtils {
         while (encryptionPartDefIterator.hasNext()) {
             EncryptionPartDef encryptionPartDef = encryptionPartDefIterator.next();
 
-            attributes = new ArrayList<XMLSecAttribute>(1);
+            attributes = new ArrayList<>(1);
             attributes.add(abstractOutputProcessor.createAttribute(
                     XMLSecurityConstants.ATT_NULL_URI, "#" + encryptionPartDef.getEncRefId()));
             abstractOutputProcessor.createStartElementAndOutputAsEvent(
@@ -455,7 +455,7 @@ public class WSSUtils extends XMLSecurityUtils {
             if (compressionAlgorithm != null) {
                 abstractOutputProcessor.createStartElementAndOutputAsEvent(
                         outputProcessorChain, XMLSecurityConstants.TAG_dsig_Transforms, true, null);
-                attributes = new ArrayList<XMLSecAttribute>(1);
+                attributes = new ArrayList<>(1);
                 attributes.add(abstractOutputProcessor.createAttribute(
                         XMLSecurityConstants.ATT_NULL_Algorithm, compressionAlgorithm));
                 abstractOutputProcessor.createStartElementAndOutputAsEvent(
@@ -490,7 +490,7 @@ public class WSSUtils extends XMLSecurityUtils {
                 continue;
             }
 
-            List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(3);
+            List<XMLSecAttribute> attributes = new ArrayList<>(3);
             attributes.add(abstractOutputProcessor.createAttribute(XMLSecurityConstants.ATT_NULL_Id,
                     encryptionPartDef.getEncRefId()));
             if (encryptionPartDef.getModifier() == SecurePart.Modifier.Element) {
@@ -508,7 +508,7 @@ public class WSSUtils extends XMLSecurityUtils {
             abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain,
                     XMLSecurityConstants.TAG_xenc_EncryptedData, true, attributes);
 
-            attributes = new ArrayList<XMLSecAttribute>(1);
+            attributes = new ArrayList<>(1);
             attributes.add(abstractOutputProcessor.createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm,
                     abstractOutputProcessor.getSecurityProperties().getEncryptionSymAlgorithm()));
             abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain,
@@ -520,7 +520,7 @@ public class WSSUtils extends XMLSecurityUtils {
             abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain,
                     XMLSecurityConstants.TAG_dsig_KeyInfo, true, null);
 
-            attributes = new ArrayList<XMLSecAttribute>(1);
+            attributes = new ArrayList<>(1);
             attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_wsse11_TokenType,
                     WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
             abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain,
@@ -541,7 +541,7 @@ public class WSSUtils extends XMLSecurityUtils {
             abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain,
                     XMLSecurityConstants.TAG_xenc_CipherData, false, null);
 
-            attributes = new ArrayList<XMLSecAttribute>(1);
+            attributes = new ArrayList<>(1);
             attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_URI,
                     "cid:" + encryptionPartDef.getCipherReferenceId()));
             abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain,
@@ -550,7 +550,7 @@ public class WSSUtils extends XMLSecurityUtils {
             abstractOutputProcessor.createStartElementAndOutputAsEvent(
                     outputProcessorChain, XMLSecurityConstants.TAG_xenc_Transforms, false, null);
 
-            attributes = new ArrayList<XMLSecAttribute>(1);
+            attributes = new ArrayList<>(1);
             attributes.add(abstractOutputProcessor.createAttribute(
                     XMLSecurityConstants.ATT_NULL_Algorithm, WSSConstants.SWA_ATTACHMENT_CIPHERTEXT_TRANS));
             abstractOutputProcessor.createStartElementAndOutputAsEvent(

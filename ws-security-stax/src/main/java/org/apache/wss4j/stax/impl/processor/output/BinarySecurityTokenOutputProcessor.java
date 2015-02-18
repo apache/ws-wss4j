@@ -156,7 +156,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                 if (WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN.equals(getAction())
                     || WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN.equals(getAction())
                     || WSSConstants.KERBEROS_TOKEN.equals(getAction())) {
-                    List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(3);
+                    List<XMLSecAttribute> attributes = new ArrayList<>(3);
                     attributes.add(createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
                     attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_GSS_Kerberos5_AP_REQ));
                     attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, securityToken.getId()));

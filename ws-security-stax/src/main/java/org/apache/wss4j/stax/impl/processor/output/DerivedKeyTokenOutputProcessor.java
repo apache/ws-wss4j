@@ -221,7 +221,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-                List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
+                List<XMLSecAttribute> attributes = new ArrayList<>(1);
                 attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, securityToken.getId()));
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, true, attributes);
 
@@ -253,7 +253,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 throws XMLStreamException, XMLSecurityException {
 
             SecurityToken wrappingToken = securityToken.getKeyWrappingToken();
-            List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
+            List<XMLSecAttribute> attributes = new ArrayList<>(2);
             attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
             if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier) && !useSingleCertificate) {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_X509PKIPathv1));

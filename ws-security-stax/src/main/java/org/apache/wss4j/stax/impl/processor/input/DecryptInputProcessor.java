@@ -85,7 +85,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
     private static final Long maximumAllowedDecompressedBytes =
             Long.valueOf(ConfigurationProperties.getProperty("MaximumAllowedDecompressedBytes"));
 
-    private List<DeferredAttachment> attachmentReferences = new ArrayList<DeferredAttachment>();
+    private List<DeferredAttachment> attachmentReferences = new ArrayList<>();
 
     public DecryptInputProcessor(KeyInfoType keyInfoType, ReferenceList referenceList,
                                  WSSSecurityProperties securityProperties, WSInboundSecurityContext securityContext)

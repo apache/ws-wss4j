@@ -103,7 +103,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                         if (attribute != null) {
                             signaturePartDef.setSigRefId(attribute.getValue());
                         } else {
-                            List<XMLSecAttribute> attributeList = new ArrayList<XMLSecAttribute>(1);
+                            List<XMLSecAttribute> attributeList = new ArrayList<>(1);
                             attributeList.add(createAttribute(WSSConstants.ATT_wsu_Id, signaturePartDef.getSigRefId()));
                             xmlSecEvent = addAttributes(xmlSecStartElement, attributeList);
                         }
@@ -201,7 +201,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                 try {
                     Transformer transformer = buildTransformerChain(digestOutputStream, signaturePartDef, null);
 
-                    Map<String, Object> transformerProperties = new HashMap<String, Object>(2);
+                    Map<String, Object> transformerProperties = new HashMap<>(2);
                     transformerProperties.put(
                             AttachmentContentSignatureTransform.ATTACHMENT, attachment);
                     transformer.setProperties(transformerProperties);

@@ -501,7 +501,7 @@ public final class ConfigurationConverter {
         Object sigParts = config.get(ConfigurationConstants.SIGNATURE_PARTS);
         if (sigParts != null) {
             if (sigParts instanceof String) {
-                List<SecurePart> parts = new ArrayList<SecurePart>();
+                List<SecurePart> parts = new ArrayList<>();
                 splitEncParts((String)sigParts, parts, WSSConstants.NS_SOAP11);
                 for (SecurePart part : parts) {
                     part.setDigestMethod(sigDigestAlgo);
@@ -522,7 +522,7 @@ public final class ConfigurationConverter {
         sigParts = config.get(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS);
         if (sigParts != null) {
             if (sigParts instanceof String) {
-                List<SecurePart> parts = new ArrayList<SecurePart>();
+                List<SecurePart> parts = new ArrayList<>();
                 splitEncParts((String)sigParts, parts, WSSConstants.NS_SOAP11);
                 for (SecurePart part : parts) {
                     part.setRequired(false);
@@ -558,7 +558,7 @@ public final class ConfigurationConverter {
         Object encParts = config.get(ConfigurationConstants.ENCRYPTION_PARTS);
         if (encParts != null) {
             if (encParts instanceof String) {
-                List<SecurePart> parts = new ArrayList<SecurePart>();
+                List<SecurePart> parts = new ArrayList<>();
                 splitEncParts((String)encParts, parts, WSSConstants.NS_SOAP11);
                 for (SecurePart part : parts) {
                     properties.addEncryptionPart(part);
@@ -577,7 +577,7 @@ public final class ConfigurationConverter {
         encParts = config.get(ConfigurationConstants.OPTIONAL_ENCRYPTION_PARTS);
         if (encParts != null) {
             if (encParts instanceof String) {
-                List<SecurePart> parts = new ArrayList<SecurePart>();
+                List<SecurePart> parts = new ArrayList<>();
                 splitEncParts((String)encParts, parts, WSSConstants.NS_SOAP11);
                 for (SecurePart part : parts) {
                     part.setRequired(false);
@@ -614,7 +614,7 @@ public final class ConfigurationConverter {
             String[] certConstraintsList = certConstraints.split(",");
             if (certConstraintsList != null) {
                 Collection<Pattern> subjectCertConstraints = 
-                    new ArrayList<Pattern>(certConstraintsList.length);
+                    new ArrayList<>(certConstraintsList.length);
                 for (String certConstraint : certConstraintsList) {
                     try {
                         subjectCertConstraints.add(Pattern.compile(certConstraint.trim()));

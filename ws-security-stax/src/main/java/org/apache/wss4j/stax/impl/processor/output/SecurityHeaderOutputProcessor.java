@@ -197,7 +197,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
         OutputProcessorChain subOutputProcessorChain,
         boolean mustUnderstand
     ) throws XMLStreamException, XMLSecurityException {
-        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
+        List<XMLSecAttribute> attributes = new ArrayList<>(1);
         final String actor = ((WSSSecurityProperties) getSecurityProperties()).getActor();
         if (actor != null && !actor.isEmpty()) {
             if (WSSConstants.NS_SOAP11.equals(soapMessageVersion)) {

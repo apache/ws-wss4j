@@ -36,9 +36,9 @@ public class STRTransformer extends TransformIdentity {
         if (!(transformer instanceof Canonicalizer20010315_Excl)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        List<String> inclusiveNamespacesPrefixList = new ArrayList<String>();
+        List<String> inclusiveNamespacesPrefixList = new ArrayList<>();
         inclusiveNamespacesPrefixList.add("#default");
-        Map<String, Object> transformerProperties = new HashMap<String, Object>();
+        Map<String, Object> transformerProperties = new HashMap<>();
         transformerProperties.put(
             Canonicalizer20010315_Excl.INCLUSIVE_NAMESPACES_PREFIX_LIST, inclusiveNamespacesPrefixList);
         transformerProperties.put(Canonicalizer20010315_Excl.PROPAGATE_DEFAULT_NAMESPACE, Boolean.TRUE);

@@ -101,7 +101,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
             WSSUtils.createKeyValueTokenStructure(this, outputProcessorChain, x509Certificates);
         } else {
             boolean isSAMLToken = false;
-            List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
+            List<XMLSecAttribute> attributes = new ArrayList<>(2);
             attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
             if (WSSecurityTokenConstants.Saml10Token.equals(securityToken.getTokenType())
                 || WSSecurityTokenConstants.Saml11Token.equals(securityToken.getTokenType())) {
@@ -199,12 +199,12 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
             createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transforms, false, null);
 
             if (WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(transforms[0])) {
-                List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
+                List<XMLSecAttribute> attributes = new ArrayList<>(1);
                 attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, transforms[0]));
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform, false, attributes);
                 if (transforms.length >= 2) {
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_TransformationParameters, false, null);
-                    attributes = new ArrayList<XMLSecAttribute>(1);
+                    attributes = new ArrayList<>(1);
                     attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, transforms[1]));
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_CanonicalizationMethod, false, attributes);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_CanonicalizationMethod);
@@ -215,7 +215,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                 for (int i = 0; i < transforms.length; i++) {
                     String transform = transforms[i];
 
-                    List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
+                    List<XMLSecAttribute> attributes = new ArrayList<>(1);
                     attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, transform));
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform, false, attributes);
 
@@ -223,7 +223,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                             && !WSSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(transform)
                             && !WSSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(transform))
                     {
-                        attributes = new ArrayList<XMLSecAttribute>(1);
+                        attributes = new ArrayList<>(1);
                         attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_PrefixList, signaturePartDef.getInclusiveNamespacesPrefixes()));
                         createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces, true, attributes);
                         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
@@ -258,7 +258,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                                 outputProcessorChain.getSecurityContext().getAsList(SecurityHeaderOrder.class);
                         List<SecurityHeaderOrder> tmpList = null;
                         if (securityHeaderOrderList != null) {
-                            tmpList = new ArrayList<SecurityHeaderOrder>(securityHeaderOrderList);
+                            tmpList = new ArrayList<>(securityHeaderOrderList);
                             securityHeaderOrderList.clear();
                         }
                         

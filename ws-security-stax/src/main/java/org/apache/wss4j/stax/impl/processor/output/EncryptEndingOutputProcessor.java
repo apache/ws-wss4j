@@ -75,7 +75,7 @@ public class EncryptEndingOutputProcessor extends AbstractEncryptEndingOutputPro
                                 outputProcessorChain.getSecurityContext().getAsList(SecurityHeaderOrder.class);
                         List<SecurityHeaderOrder> tmpList = null;
                         if (securityHeaderOrderList != null) {
-                            tmpList = new ArrayList<SecurityHeaderOrder>(securityHeaderOrderList);
+                            tmpList = new ArrayList<>(securityHeaderOrderList);
                             securityHeaderOrderList.clear();
                         }
                         

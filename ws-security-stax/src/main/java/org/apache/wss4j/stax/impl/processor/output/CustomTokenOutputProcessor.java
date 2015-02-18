@@ -112,8 +112,8 @@ public class CustomTokenOutputProcessor extends AbstractOutputProcessor {
                 throws XMLStreamException, XMLSecurityException {
 
             NamedNodeMap namedNodeMap = element.getAttributes();
-            List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(namedNodeMap.getLength());
-            List<XMLSecNamespace> namespaces = new ArrayList<XMLSecNamespace>(namedNodeMap.getLength());
+            List<XMLSecAttribute> attributes = new ArrayList<>(namedNodeMap.getLength());
+            List<XMLSecNamespace> namespaces = new ArrayList<>(namedNodeMap.getLength());
             for (int i = 0; i < namedNodeMap.getLength(); i++) {
                 Attr attribute = (Attr) namedNodeMap.item(i);
                 if (attribute.getPrefix() == null) {

@@ -182,7 +182,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
 
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-                List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
+                List<XMLSecAttribute> attributes = new ArrayList<>(1);
                 attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, this.wsuId));
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, false, attributes);
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Username, false, null);
@@ -190,7 +190,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                 createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Username);
                 if (((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType() != WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE
                         && !WSSConstants.USERNAMETOKEN_SIGNED.equals(action)) {
-                    attributes = new ArrayList<XMLSecAttribute>(1);
+                    attributes = new ArrayList<>(1);
                     attributes.add(createAttribute(WSSConstants.ATT_NULL_Type,
                             ((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType() == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
                                     ? WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST.getNamespace()
@@ -216,7 +216,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                 }
 
                 if (nonceValue != null && !WSSConstants.USERNAMETOKEN_SIGNED.equals(action)) {
-                    attributes = new ArrayList<XMLSecAttribute>(1);
+                    attributes = new ArrayList<>(1);
                     attributes.add(createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Nonce, false, attributes);
                     createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(this.nonceValue));
