@@ -53,11 +53,10 @@ public class ExternalSecurityTokenImpl extends AbstractInboundSecurityToken {
                 new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
             try {
                 securityProperties.getCallbackHandler().handle(new Callback[]{pwcb});
-            } catch (IOException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noPassword", e);
-            } catch (UnsupportedCallbackException e) {
+            } catch (IOException | UnsupportedCallbackException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noPassword", e);
             }
+            
             this.tokenElement = pwcb.getCustomToken();
             this.key = pwcb.getKey();
         }

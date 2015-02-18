@@ -76,11 +76,10 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
                 new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
             try {
                 securityProperties.getCallbackHandler().handle(new Callback[]{pwcb});
-            } catch (IOException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noPassword", e);
-            } catch (UnsupportedCallbackException e) {
+            } catch (IOException | UnsupportedCallbackException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noPassword", e);
             }
+            
             Element assertionElem = pwcb.getCustomToken();
             if (assertionElem != null && "Assertion".equals(assertionElem.getLocalName())
                 && (WSSConstants.NS_SAML.equals(assertionElem.getNamespaceURI())

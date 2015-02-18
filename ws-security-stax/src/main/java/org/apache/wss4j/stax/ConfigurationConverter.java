@@ -37,7 +37,6 @@ import org.apache.wss4j.common.crypto.JasyptPasswordEncryptor;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
-import org.apache.wss4j.stax.ext.WSSConfigurationException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSConstants.UsernameTokenPasswordType;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
@@ -297,8 +296,6 @@ public final class ConfigurationConverter {
                 crypto = properties.getEncryptionCrypto();
             }
             return crypto.getDefaultX509Identifier();
-        } catch (WSSConfigurationException e) {
-            LOG.debug(e.getMessage(), e);
         } catch (WSSecurityException e) {
             LOG.debug(e.getMessage(), e);
         }

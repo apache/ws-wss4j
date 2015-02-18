@@ -326,24 +326,16 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                         callback.setKey(encryptedEphemeralKey);
                         try {
                             ((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler().handle(new Callback[]{callback});
-                        } catch (IOException e) { // NOPMD
-                            // Do nothing
-                        } catch (UnsupportedCallbackException e) { // NOPMD
+                        } catch (IOException | UnsupportedCallbackException e) { // NOPMD
                             // Do nothing
                         }
                     }
 
                     createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(encryptedEphemeralKey));
 
-                } catch (NoSuchPaddingException e) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-                } catch (NoSuchAlgorithmException e) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-                } catch (InvalidKeyException e) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-                } catch (IllegalBlockSizeException e) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-                } catch (InvalidAlgorithmParameterException e) {
+                } catch (NoSuchPaddingException | NoSuchAlgorithmException
+                    | InvalidKeyException | IllegalBlockSizeException
+                    | InvalidAlgorithmParameterException e) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
                 }
 

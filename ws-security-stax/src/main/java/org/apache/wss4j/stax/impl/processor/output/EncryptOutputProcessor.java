@@ -319,13 +319,8 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                 try {
                     Constructor<OutputStream> constructor = transformerClass.getConstructor(OutputStream.class);
                     outputStream = constructor.newInstance(outputStream);
-                } catch (InvocationTargetException e) {
-                    throw new XMLSecurityException(e);
-                } catch (NoSuchMethodException e) {
-                    throw new XMLSecurityException(e);
-                } catch (InstantiationException e) {
-                    throw new XMLSecurityException(e);
-                } catch (IllegalAccessException e) {
+                } catch (InvocationTargetException | NoSuchMethodException
+                    | InstantiationException | IllegalAccessException e) {
                     throw new XMLSecurityException(e);
                 }
             }

@@ -141,13 +141,8 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
                     inputStream = new LimitingInputStream(
                             constructor.newInstance(inputStream),
                             maximumAllowedDecompressedBytes);
-                } catch (InvocationTargetException e) {
-                    throw new XMLSecurityException(e);
-                } catch (NoSuchMethodException e) {
-                    throw new XMLSecurityException(e);
-                } catch (InstantiationException e) {
-                    throw new XMLSecurityException(e);
-                } catch (IllegalAccessException e) {
+                } catch (InvocationTargetException | NoSuchMethodException
+                    | InstantiationException | IllegalAccessException e) {
                     throw new XMLSecurityException(e);
                 }
             }

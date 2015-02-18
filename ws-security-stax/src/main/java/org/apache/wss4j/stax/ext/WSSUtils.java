@@ -85,9 +85,7 @@ public class WSSUtils extends XMLSecurityUtils {
         }
         try {
             callbackHandler.handle(new Callback[]{callback});
-        } catch (IOException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-        } catch (UnsupportedCallbackException e) {
+        } catch (IOException | UnsupportedCallbackException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
     }
@@ -104,9 +102,7 @@ public class WSSUtils extends XMLSecurityUtils {
         if (callbackHandler != null) {
             try {
                 callbackHandler.handle(new Callback[]{callback});
-            } catch (IOException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noPassword", e);
-            } catch (UnsupportedCallbackException e) {
+            } catch (IOException | UnsupportedCallbackException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noPassword", e);
             }
         }
@@ -280,9 +276,7 @@ public class WSSUtils extends XMLSecurityUtils {
                     CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509", "BC");
                     List<X509Certificate> certificates = Arrays.asList(x509Certificates);
                     abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(certificateFactory.generateCertPath(certificates).getEncoded()));
-                } catch (CertificateException e) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-                } catch (NoSuchProviderException e) {
+                } catch (CertificateException | NoSuchProviderException e) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
                 }
             }
@@ -338,9 +332,7 @@ public class WSSUtils extends XMLSecurityUtils {
             MessageDigest sha = MessageDigest.getInstance("SHA-1");
             byte[] data = sha.digest(x509Certificates[0].getEncoded());
             abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(data));
-        } catch (CertificateEncodingException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (CertificateEncodingException | NoSuchAlgorithmException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);

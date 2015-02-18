@@ -212,9 +212,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
 
                     //reset the inputStream to be able to reuse it
                     inputStream.reset();
-                } catch (IOException e) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
-                } catch (XMLStreamException e) {
+                } catch (IOException | XMLStreamException e) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
                 }
 
