@@ -27,7 +27,7 @@ import java.util.List;
 public class PolicyUtils {
 
     public static List<QName> getElementPath(XPath xPath) {
-        List<QName> elements = new LinkedList<QName>();
+        List<QName> elements = new LinkedList<>();
         String[] xPathElements = xPath.getXPath().split("/");
         for (int j = 0; j < xPathElements.length; j++) {
             String xPathElement = xPathElements[j];

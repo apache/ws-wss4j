@@ -45,7 +45,7 @@ import java.util.Map;
  */
 public class RequiredElementsAssertionState extends AssertionState implements Assertable {
 
-    private final Map<List<QName>, Boolean> pathElements = new HashMap<List<QName>, Boolean>();
+    private final Map<List<QName>, Boolean> pathElements = new HashMap<>();
     private PolicyAsserter policyAsserter;
 
     public RequiredElementsAssertionState(AbstractSecurityAssertion assertion, 

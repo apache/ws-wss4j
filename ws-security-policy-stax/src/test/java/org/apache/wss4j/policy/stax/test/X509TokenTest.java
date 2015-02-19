@@ -87,7 +87,7 @@ public class X509TokenTest extends AbstractPolicyTestBase {
         recipientX509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientX509TokenSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         SignedPartSecurityEvent signedPartSecurityEvent =
@@ -157,7 +157,7 @@ public class X509TokenTest extends AbstractPolicyTestBase {
         recipientX509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientX509TokenSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         SignedPartSecurityEvent signedPartSecurityEvent =

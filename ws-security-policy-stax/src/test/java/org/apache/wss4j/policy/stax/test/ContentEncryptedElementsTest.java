@@ -48,18 +48,18 @@ public class ContentEncryptedElementsTest extends AbstractPolicyTestBase {
         operationSecurityEvent.setOperation(new QName("definitions"));
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(null, true, protectionOrder);
         contentEncryptedElementSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
-        List<QName> headerPath = new ArrayList<QName>();
+        List<QName> headerPath = new ArrayList<>();
         headerPath.add(new QName("http://example.org", "a"));
         contentEncryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
         //additional ContentEncryptedElements are also allowed!
-        headerPath = new ArrayList<QName>();
+        headerPath = new ArrayList<>();
         headerPath.add(new QName("http://example.org", "b"));
         contentEncryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
@@ -78,14 +78,14 @@ public class ContentEncryptedElementsTest extends AbstractPolicyTestBase {
         operationSecurityEvent.setOperation(new QName("definitions"));
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         ContentEncryptedElementSecurityEvent contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(null, true, protectionOrder);
         contentEncryptedElementSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(contentEncryptedElementSecurityEvent);
         contentEncryptedElementSecurityEvent = new ContentEncryptedElementSecurityEvent(null, false, null);
-        List<QName> headerPath = new ArrayList<QName>();
+        List<QName> headerPath = new ArrayList<>();
         headerPath.add(new QName("http://example.org", "a"));
         contentEncryptedElementSecurityEvent.setElementPath(headerPath);
         try {

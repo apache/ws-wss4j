@@ -32,7 +32,7 @@ import java.util.List;
 
 public class LayoutAssertionState extends AssertionState implements Assertable {
 
-    private List<SecurityEventConstants.Event> occuredEvents = new ArrayList<SecurityEventConstants.Event>();
+    private List<SecurityEventConstants.Event> occuredEvents = new ArrayList<>();
 
     public LayoutAssertionState(AbstractSecurityAssertion assertion, boolean asserted) {
         super(assertion, asserted);

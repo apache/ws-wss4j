@@ -44,7 +44,7 @@ import java.util.List;
  */
 public class SignedElementsAssertionState extends AssertionState implements Assertable {
 
-    private final List<List<QName>> pathElements = new ArrayList<List<QName>>();
+    private final List<List<QName>> pathElements = new ArrayList<>();
     private PolicyAsserter policyAsserter;
 
     public SignedElementsAssertionState(AbstractSecurityAssertion assertion, 

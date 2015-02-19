@@ -110,7 +110,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
         actions.add(WSSConstants.ENCRYPT);
@@ -134,7 +134,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
-        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> securityEventList = new ArrayList<>();
         securityEventList.add(httpsTokenSecurityEvent);
 
         Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
@@ -213,7 +213,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.SIGNATURE);
         actions.add(WSSConstants.ENCRYPT);
         outSecurityProperties.setActions(actions);
@@ -236,7 +236,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
-        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> securityEventList = new ArrayList<>();
         securityEventList.add(httpsTokenSecurityEvent);
 
         try {
@@ -334,7 +334,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -359,7 +359,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
-        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> securityEventList = new ArrayList<>();
         securityEventList.add(httpsTokenSecurityEvent);
 
         Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
@@ -449,7 +449,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
         actions.add(WSSConstants.ENCRYPT);
@@ -473,7 +473,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
-        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> securityEventList = new ArrayList<>();
         securityEventList.add(httpsTokenSecurityEvent);
 
         try {
@@ -551,7 +551,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.SIGNATURE);
         actions.add(WSSConstants.ENCRYPT);
         outSecurityProperties.setActions(actions);
@@ -574,7 +574,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
-        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> securityEventList = new ArrayList<>();
         securityEventList.add(httpsTokenSecurityEvent);
 
         try {
@@ -672,7 +672,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -697,7 +697,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
-        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> securityEventList = new ArrayList<>();
         securityEventList.add(httpsTokenSecurityEvent);
 
         Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
@@ -780,7 +780,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.ENCRYPT);
@@ -805,7 +805,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
-        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> securityEventList = new ArrayList<>();
         securityEventList.add(httpsTokenSecurityEvent);
 
         Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
@@ -912,7 +912,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
 
         outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -937,7 +937,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
-        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> securityEventList = new ArrayList<>();
         securityEventList.add(httpsTokenSecurityEvent);
 
         Document document = doInboundSecurity(inSecurityProperties, new ByteArrayInputStream(baos.toByteArray()), securityEventList, policyEnforcer);
@@ -1032,7 +1032,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
 
         outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -1057,7 +1057,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
-        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> securityEventList = new ArrayList<>();
         securityEventList.add(httpsTokenSecurityEvent);
 
         try {
@@ -1150,7 +1150,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Created.getNamespaceURI(), WSSConstants.TAG_wsu_Created.getLocalPart()), SecurePart.Modifier.Element));
         outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Expires.getNamespaceURI(), WSSConstants.TAG_wsu_Expires.getLocalPart()), SecurePart.Modifier.Content));
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
         actions.add(WSSConstants.ENCRYPT);
@@ -1175,7 +1175,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
-        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> securityEventList = new ArrayList<>();
         securityEventList.add(httpsTokenSecurityEvent);
 
         try {
@@ -1268,7 +1268,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Created.getNamespaceURI(), WSSConstants.TAG_wsu_Created.getLocalPart()), SecurePart.Modifier.Element));
         outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Expires.getNamespaceURI(), WSSConstants.TAG_wsu_Expires.getLocalPart()), SecurePart.Modifier.Content));
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
         actions.add(WSSConstants.ENCRYPT);
@@ -1295,7 +1295,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
-        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> securityEventList = new ArrayList<>();
         securityEventList.add(httpsTokenSecurityEvent);
 
         try {
@@ -1388,7 +1388,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Created.getNamespaceURI(), WSSConstants.TAG_wsu_Created.getLocalPart()), SecurePart.Modifier.Element));
         outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Expires.getNamespaceURI(), WSSConstants.TAG_wsu_Expires.getLocalPart()), SecurePart.Modifier.Content));
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
         actions.add(WSSConstants.ENCRYPT);
@@ -1413,7 +1413,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
-        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> securityEventList = new ArrayList<>();
         securityEventList.add(httpsTokenSecurityEvent);
 
         try {
@@ -1510,7 +1510,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Created.getNamespaceURI(), WSSConstants.TAG_wsu_Created.getLocalPart()), SecurePart.Modifier.Element));
         outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Expires.getNamespaceURI(), WSSConstants.TAG_wsu_Expires.getLocalPart()), SecurePart.Modifier.Content));
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
-        List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+        List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
         actions.add(WSSConstants.ENCRYPT);
@@ -1534,7 +1534,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
-        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> securityEventList = new ArrayList<>();
         securityEventList.add(httpsTokenSecurityEvent);
 
         try {
@@ -1648,7 +1648,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsSecurityToken.addTokenUsage(WSTokenConstants.TokenUsage_MainSignature);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
-        List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> securityEventList = new ArrayList<>();
         securityEventList.add(httpsTokenSecurityEvent);
 
         try {

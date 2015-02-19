@@ -38,7 +38,7 @@ public class LayoutTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
 
         RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
-        List<QName> headerPath = new ArrayList<QName>();
+        List<QName> headerPath = new ArrayList<>();
         headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         headerPath.add(WSSConstants.TAG_wsu_Timestamp);
         requiredElementSecurityEvent.setElementPath(headerPath);
@@ -50,7 +50,7 @@ public class LayoutTest extends AbstractPolicyTestBase {
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(x509TokenSecurityEvent.getSecurityToken(), true, protectionOrder);
@@ -82,7 +82,7 @@ public class LayoutTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
 
         RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
-        List<QName> headerPath = new ArrayList<QName>();
+        List<QName> headerPath = new ArrayList<>();
         headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         headerPath.add(WSSConstants.TAG_wsu_Timestamp);
         requiredElementSecurityEvent.setElementPath(headerPath);
@@ -94,7 +94,7 @@ public class LayoutTest extends AbstractPolicyTestBase {
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(x509TokenSecurityEvent.getSecurityToken(), true, protectionOrder);

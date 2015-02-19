@@ -48,12 +48,12 @@ public class RequiredElementsTest extends AbstractPolicyTestBase {
         RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
         requiredElementSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
-        List<QName> headerPath = new ArrayList<QName>();
+        List<QName> headerPath = new ArrayList<>();
         headerPath.add(new QName("http://example.org", "a"));
         requiredElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
         //additional RequiredElements are also allowed!
-        headerPath = new ArrayList<QName>();
+        headerPath = new ArrayList<>();
         headerPath.add(new QName("http://example.org", "b"));
         requiredElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);

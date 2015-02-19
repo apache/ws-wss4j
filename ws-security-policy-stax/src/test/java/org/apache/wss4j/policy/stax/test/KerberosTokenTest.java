@@ -96,7 +96,7 @@ public class KerberosTokenTest extends AbstractPolicyTestBase {
         recipientTokenSecurityEvent.setSecurityToken(kerberosServiceSecurityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         SignedPartSecurityEvent signedPartSecurityEvent =
@@ -172,7 +172,7 @@ public class KerberosTokenTest extends AbstractPolicyTestBase {
         recipientTokenSecurityEvent.setSecurityToken(kerberosServiceSecurityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         SignedPartSecurityEvent signedPartSecurityEvent =

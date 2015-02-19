@@ -118,7 +118,7 @@ public class SignedPartsAssertionState extends AssertionState implements Asserta
                 Header header = signedParts.getHeaders().get(i);
                 QName headerQName = new QName(header.getNamespace(), header.getName() == null ? "" : header.getName());
 
-                List<QName> header11Path = new LinkedList<QName>();
+                List<QName> header11Path = new LinkedList<>();
                 header11Path.addAll(WSSConstants.SOAP_11_HEADER_PATH);
                 header11Path.add(headerQName);
 

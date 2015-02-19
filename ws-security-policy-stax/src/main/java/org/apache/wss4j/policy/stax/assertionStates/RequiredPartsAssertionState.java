@@ -42,7 +42,7 @@ import java.util.*;
  */
 public class RequiredPartsAssertionState extends AssertionState implements Assertable {
 
-    private final Map<Header, Boolean> headers = new HashMap<Header, Boolean>();
+    private final Map<Header, Boolean> headers = new HashMap<>();
     private PolicyAsserter policyAsserter;
 
     public RequiredPartsAssertionState(AbstractSecurityAssertion assertion,
@@ -83,7 +83,7 @@ public class RequiredPartsAssertionState extends AssertionState implements Asser
             Header header = next.getKey();
             QName headerQName = new QName(header.getNamespace(), header.getName() == null ? "" : header.getName());
 
-            List<QName> header11Path = new LinkedList<QName>();
+            List<QName> header11Path = new LinkedList<>();
             header11Path.addAll(WSSConstants.SOAP_11_HEADER_PATH);
             header11Path.add(headerQName);
 

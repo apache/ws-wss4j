@@ -130,7 +130,7 @@ public class PolicyEnforcer implements SecurityEventListener {
     private final List<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>> assertionStateMap;
     private final List<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>> failedAssertionStateMap;
 
-    private final Deque<SecurityEvent> securityEventQueue = new LinkedList<SecurityEvent>();
+    private final Deque<SecurityEvent> securityEventQueue = new LinkedList<>();
     private boolean operationSecurityEventOccured = false;
     private boolean initiator;
     private String actorOrRole;
@@ -150,8 +150,8 @@ public class PolicyEnforcer implements SecurityEventListener {
         this.initiator = initiator;
         this.actorOrRole = actorOrRole;
         this.attachmentCount = attachmentCount;
-        assertionStateMap = new LinkedList<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>>();
-        failedAssertionStateMap = new LinkedList<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>>();
+        assertionStateMap = new LinkedList<>();
+        failedAssertionStateMap = new LinkedList<>();
         
         if (policyAsserter == null) {
             this.policyAsserter = new DummyPolicyAsserter();
@@ -247,7 +247,7 @@ public class PolicyEnforcer implements SecurityEventListener {
                     SecurityEventConstants.Event event = securityEventType[j];
                     Map<Assertion, List<Assertable>> assertables = map.get(event);
                     if (assertables == null) {
-                        assertables = new HashMap<Assertion, List<Assertable>>();
+                        assertables = new HashMap<>();
                         map.put(event, assertables);
                     }
                     addAssertionState(assertables, abstractSecurityAssertion, assertable);
@@ -264,14 +264,14 @@ public class PolicyEnforcer implements SecurityEventListener {
     private void addAssertionState(Map<Assertion, List<Assertable>> assertables, Assertion keyAssertion, Assertable assertable) {
         List<Assertable> assertableList = assertables.get(keyAssertion);
         if (assertableList == null) {
-            assertableList = new LinkedList<Assertable>();
+            assertableList = new LinkedList<>();
             assertables.put(keyAssertion, assertableList);
         }
         assertableList.add(assertable);
     }
 
     protected List<Assertable> getAssertableForAssertion(AbstractSecurityAssertion abstractSecurityAssertion) throws WSSPolicyException {
-        List<Assertable> assertableList = new LinkedList<Assertable>();
+        List<Assertable> assertableList = new LinkedList<>();
         boolean tokenRequired = true;
         if (abstractSecurityAssertion instanceof AbstractToken) {
             // Don't return a Token that is not required
@@ -364,7 +364,7 @@ public class PolicyEnforcer implements SecurityEventListener {
             //WSP1.3, 6.2 Timestamp Property
             assertableList.add(new IncludeTimeStampAssertionState(abstractBinding, policyAsserter, true));
             if (abstractBinding.isIncludeTimestamp()) {
-                List<QName> timestampElementPath = new LinkedList<QName>();
+                List<QName> timestampElementPath = new LinkedList<>();
                 timestampElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
                 timestampElementPath.add(WSSConstants.TAG_wsu_Timestamp);
                 RequiredElementsAssertionState requiredElementsAssertionState = 
@@ -407,7 +407,7 @@ public class PolicyEnforcer implements SecurityEventListener {
                     assertableList.add(new SignatureConfirmationAssertionState(wss11, policyAsserter, true));
                     if (initiator) {
                         //9 WSS: SOAP Message Security Options [Signature Confirmation]
-                        List<QName> signatureConfirmationElementPath = new LinkedList<QName>();
+                        List<QName> signatureConfirmationElementPath = new LinkedList<>();
                         signatureConfirmationElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
                         signatureConfirmationElementPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
                         RequiredElementsAssertionState requiredElementsAssertionState = 
@@ -679,9 +679,7 @@ public class PolicyEnforcer implements SecurityEventListener {
         if (operationSecurityEventOccured) {
             try {
                 verifyPolicy(securityEvent);
-            } catch (WSSPolicyException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
-            } catch (XMLSecurityException e) {
+            } catch (WSSPolicyException | XMLSecurityException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
         }
@@ -717,9 +715,7 @@ public class PolicyEnforcer implements SecurityEventListener {
                 verifyPolicy(securityEvent);
 
                 verifyPolicyAfterOperationSecurityEvent();
-            } catch (WSSPolicyException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
-            } catch (XMLSecurityException e) {
+            } catch (WSSPolicyException | XMLSecurityException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
             securityEventQueue.clear();

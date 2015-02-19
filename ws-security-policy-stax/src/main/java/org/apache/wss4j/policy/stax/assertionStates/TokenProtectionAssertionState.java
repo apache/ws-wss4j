@@ -49,9 +49,8 @@ import java.util.List;
  */
 public class TokenProtectionAssertionState extends AssertionState implements Assertable {
 
-    private final ArrayList<SignedElementSecurityEvent> signedElementEvents = new ArrayList<SignedElementSecurityEvent>();
-    private final ArrayList<TokenSecurityEvent<? extends SecurityToken>> tokenSecurityEvents =
-            new ArrayList<TokenSecurityEvent<? extends SecurityToken>>();
+    private final ArrayList<SignedElementSecurityEvent> signedElementEvents = new ArrayList<>();
+    private final ArrayList<TokenSecurityEvent<? extends SecurityToken>> tokenSecurityEvents = new ArrayList<>();
     private PolicyAsserter policyAsserter;
 
     public TokenProtectionAssertionState(Assertion assertion, 
@@ -198,7 +197,7 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
 
     private boolean signsMainSignature(SecurityToken securityToken) throws XMLSecurityException {
 
-        List<QName> signaturePath = new LinkedList<QName>();
+        List<QName> signaturePath = new LinkedList<>();
         signaturePath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         signaturePath.add(WSSConstants.TAG_dsig_Signature);
 
@@ -246,8 +245,8 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
 
     private boolean signsSignedSupportingTokens(SecurityToken securityToken) throws XMLSecurityException {
 
-        List<SecurityToken> signedSupportingTokens = new LinkedList<SecurityToken>();
-        List<SignedElementSecurityEvent> signedElements = new LinkedList<SignedElementSecurityEvent>();
+        List<SecurityToken> signedSupportingTokens = new LinkedList<>();
+        List<SignedElementSecurityEvent> signedElements = new LinkedList<>();
 
         for (int i = 0; i < tokenSecurityEvents.size(); i++) {
             TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent = tokenSecurityEvents.get(i);
