@@ -37,10 +37,14 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
-public class XMLUtils {
+public final class XMLUtils {
     
     public static final String XMLNS_NS = "http://www.w3.org/2000/xmlns/";
     public static final String XML_NS = "http://www.w3.org/XML/1998/namespace";
+    
+    private XMLUtils() {
+        // complete
+    }
 
     /**
      * Gets a direct child with specified localname and namespace. <p/>

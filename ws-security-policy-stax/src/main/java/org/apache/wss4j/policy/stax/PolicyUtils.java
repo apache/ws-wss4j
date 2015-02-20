@@ -24,7 +24,11 @@ import javax.xml.namespace.QName;
 import java.util.LinkedList;
 import java.util.List;
 
-public class PolicyUtils {
+public final class PolicyUtils {
+    
+    private PolicyUtils() {
+        // complete
+    }
 
     public static List<QName> getElementPath(XPath xPath) {
         List<QName> elements = new LinkedList<>();

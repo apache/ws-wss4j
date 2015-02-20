@@ -91,11 +91,9 @@ public class EncryptionAction implements Action {
         if (!encryptionToken.isEncSymmetricEncryptionKey() && ephemeralKey == null) {
             CallbackHandler callbackHandler = 
                 handler.getPasswordCallbackHandler(reqData);
-            if (ephemeralKey == null) {
-                WSPasswordCallback passwordCallback = 
-                    handler.getPasswordCB(encryptionToken.getUser(), WSConstants.ENCR, callbackHandler, reqData);
-                ephemeralKey = passwordCallback.getKey();
-            }
+            WSPasswordCallback passwordCallback = 
+                handler.getPasswordCB(encryptionToken.getUser(), WSConstants.ENCR, callbackHandler, reqData);
+            ephemeralKey = passwordCallback.getKey();
         }
         wsEncrypt.setEphemeralKey(ephemeralKey);
         

@@ -35,7 +35,7 @@ import java.security.InvalidKeyException;
 import java.security.Key;
 import java.util.*;
 
-public class AttachmentUtils {
+public final class AttachmentUtils {
 
     public static final String MIME_HEADER_CONTENT_DESCRIPTION = "Content-Description";
     public static final String MIME_HEADER_CONTENT_DISPOSITION = "Content-Disposition";
@@ -77,7 +77,10 @@ public class AttachmentUtils {
         ALL_PARAMS.add(PARAM_SIZE);
         ALL_PARAMS.add(PARAM_TYPE);
     }
-
+    
+    private AttachmentUtils() {
+        // complete
+    }
 
     public static void canonizeMimeHeaders(OutputStream os, Map<String, String> headers) throws IOException {
         //5.4.1 MIME header canonicalization:

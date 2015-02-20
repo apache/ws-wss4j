@@ -49,8 +49,8 @@ import java.util.List;
  */
 public class SignatureProtectionAssertionState extends AssertionState implements Assertable {
 
-    private final ArrayList<EncryptedElementSecurityEvent> encryptedElementEvents = new ArrayList<>();
-    private final ArrayList<TokenSecurityEvent<? extends SecurityToken>> tokenSecurityEvents = new ArrayList<>();
+    private final List<EncryptedElementSecurityEvent> encryptedElementEvents = new ArrayList<>();
+    private final List<TokenSecurityEvent<? extends SecurityToken>> tokenSecurityEvents = new ArrayList<>();
     private final List<List<QName>> elementPaths = new ArrayList<>();
     private PolicyAsserter policyAsserter;
 

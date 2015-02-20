@@ -31,6 +31,10 @@ public final class UsernameTokenUtil {
     private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(UsernameTokenUtil.class);
     
+    private UsernameTokenUtil() {
+        // complete
+    }
+    
     /**
      * This static method generates a derived key as defined in WSS Username
      * Token Profile.

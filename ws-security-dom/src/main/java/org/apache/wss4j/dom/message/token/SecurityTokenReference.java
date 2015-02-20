@@ -821,11 +821,11 @@ public class SecurityTokenReference {
             }
             String encodingType = getFirstElement().getAttributeNS(null, "EncodingType");
             // Encoding Type must be equal to Base64Binary if it's specified
-            if (encodingType != null && !"".equals(encodingType)
-                && !BinarySecurity.BASE64_ENCODING.equals(encodingType)) {
+            if (!"".equals(encodingType) && !BinarySecurity.BASE64_ENCODING.equals(encodingType)) {
                 bspEnforcer.handleBSPRule(BSPRule.R3071);
             }
             // Encoding type must be specified other than for a SAML Assertion
+
             if (!WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(valueType) 
                 && !WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)
                 && (encodingType == null || "".equals(encodingType))) {

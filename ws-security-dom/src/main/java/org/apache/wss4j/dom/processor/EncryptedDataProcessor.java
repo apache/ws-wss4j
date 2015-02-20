@@ -90,7 +90,7 @@ public class EncryptedDataProcessor implements Processor {
                 kiElem, WSConstants.ENC_KEY_LN, WSConstants.ENC_NS
             );
         
-        if (elem != null && request.isRequireSignedEncryptedDataElements()) {
+        if (request.isRequireSignedEncryptedDataElements()) {
             WSSecurityUtil.verifySignedElement(elem, wsDocInfo);
         }
         

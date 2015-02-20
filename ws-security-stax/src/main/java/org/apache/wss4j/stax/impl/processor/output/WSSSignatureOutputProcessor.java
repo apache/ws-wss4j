@@ -216,7 +216,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
                 }
 
-                String calculatedDigest = new String(Base64.encode(digestOutputStream.getDigestValue()));
+                String calculatedDigest = Base64.encode(digestOutputStream.getDigestValue());
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Calculated Digest: " + calculatedDigest);
                 }

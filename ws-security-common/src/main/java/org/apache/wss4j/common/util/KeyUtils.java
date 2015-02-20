@@ -29,6 +29,10 @@ public final class KeyUtils {
     private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(KeyUtils.class);
     private static final int MAX_SYMMETRIC_KEY_SIZE = 1024;
+    
+    private KeyUtils() {
+        // complete
+    }
 
     /**
      * Returns the length of the key in # of bytes
