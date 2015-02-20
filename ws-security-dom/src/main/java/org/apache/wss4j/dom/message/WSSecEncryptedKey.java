@@ -210,6 +210,12 @@ public class WSSecEncryptedKey extends WSSecBase {
         if (remoteCert == null) {
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
             cryptoType.setAlias(user);
+            if (crypto == null) {
+                throw new WSSecurityException(
+                                              WSSecurityException.ErrorCode.FAILURE,
+                                              "noUserCertsFound",
+                                              user, "encryption");
+            }
             X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
             if (certs == null || certs.length <= 0) {
                 throw new WSSecurityException(
