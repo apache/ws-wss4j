@@ -49,8 +49,8 @@ import java.util.List;
  */
 public class TokenProtectionAssertionState extends AssertionState implements Assertable {
 
-    private final ArrayList<SignedElementSecurityEvent> signedElementEvents = new ArrayList<SignedElementSecurityEvent>();
-    private final ArrayList<TokenSecurityEvent<? extends SecurityToken>> tokenSecurityEvents =
+    private final List<SignedElementSecurityEvent> signedElementEvents = new ArrayList<SignedElementSecurityEvent>();
+    private final List<TokenSecurityEvent<? extends SecurityToken>> tokenSecurityEvents =
             new ArrayList<TokenSecurityEvent<? extends SecurityToken>>();
     private PolicyAsserter policyAsserter;
 

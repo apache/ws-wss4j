@@ -22,7 +22,11 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 
-public class DerivedKeyUtils {
+public final class DerivedKeyUtils {
+    
+    private DerivedKeyUtils() {
+        // complete
+    }
 
     /**
      * Derive a key from this DerivedKeyToken instance

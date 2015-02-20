@@ -292,8 +292,8 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
         ReplayCache replayCache = 
             ((WSSSecurityProperties)getSecurityProperties()).getTimestampReplayCache();
         if (timestampSecurityEvent != null && replayCache != null) {
-            final String cacheKey = String.valueOf(
-                    timestampSecurityEvent.getCreated().getTimeInMillis()) +
+            final String cacheKey = 
+                    timestampSecurityEvent.getCreated().getTimeInMillis() +
                     "" + Arrays.hashCode(getSignatureType().getSignatureValue().getValue());
             if (replayCache.contains(cacheKey)) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED);

@@ -84,7 +84,7 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
             Element assertionElem = pwcb.getCustomToken();
             if (assertionElem != null && "Assertion".equals(assertionElem.getLocalName())
                 && (WSSConstants.NS_SAML.equals(assertionElem.getNamespaceURI())
-                || WSSConstants.NS_SAML2.equals(assertionElem))) {
+                || WSSConstants.NS_SAML2.equals(assertionElem.getNamespaceURI()))) {
                 this.samlAssertionWrapper = new SamlAssertionWrapper(assertionElem);
                 
                 subjectKeyInfo = 

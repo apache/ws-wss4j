@@ -322,6 +322,7 @@ public abstract class CryptoBase implements Crypto {
     ) {
         if (subjectDNPatterns == null || subjectDNPatterns.isEmpty()) {
             LOG.warn("No Subject DN Certificate Constraints were defined. This could be a security issue");
+            return true;
         }
         if (!subjectDNPatterns.isEmpty()) {
             if (cert == null) {

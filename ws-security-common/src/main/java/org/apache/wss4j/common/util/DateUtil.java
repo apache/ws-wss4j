@@ -24,6 +24,10 @@ import java.util.Date;
 public final class DateUtil {
     private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(DateUtil.class);
+    
+    private DateUtil() {
+        // complete
+    }
 
     /**
      * Return true if the "Created" value is before the current time minus the timeToLive
