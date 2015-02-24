@@ -134,7 +134,10 @@ public class WSSecBase {
      * @throws Exception
      */
     protected String setBodyID(Document doc) throws Exception {
-        Element bodyElement = WSSecurityUtil.findBodyElement(doc);
+        if (callbackLookup == null) {
+            callbackLookup = new DOMCallbackLookup(doc);
+        }
+        Element bodyElement = callbackLookup.getSOAPBody();
         if (bodyElement == null) {
             throw new Exception("SOAP Body Element node not found");
         }

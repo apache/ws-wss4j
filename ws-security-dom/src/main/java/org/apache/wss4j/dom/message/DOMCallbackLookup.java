@@ -81,7 +81,7 @@ public class DOMCallbackLookup implements CallbackLookup {
         //
         // Try the SOAP Body first
         //
-        Element bodyElement = WSSecurityUtil.findBodyElement(doc);
+        Element bodyElement = getSOAPBody();
         if (bodyElement != null) {
             String cId = bodyElement.getAttributeNS(WSConstants.WSU_NS, "Id");
             if (cId.equals(idToMatch)) {
@@ -151,11 +151,19 @@ public class DOMCallbackLookup implements CallbackLookup {
         //
         // Try the SOAP Body first
         //
-        Element bodyElement = WSSecurityUtil.findBodyElement(doc);
+        Element bodyElement = getSOAPBody();
         if (WSConstants.ELEM_BODY.equals(localname) &&
             bodyElement.getNamespaceURI().equals(namespace)) {
             return Collections.singletonList(bodyElement);
         }
         return WSSecurityUtil.findElements(doc.getDocumentElement(), localname, namespace);
+    }
+
+    
+    /**
+     * Get the SOAP Body
+     */
+    public Element getSOAPBody() {
+        return WSSecurityUtil.findBodyElement(doc);
     }
 }

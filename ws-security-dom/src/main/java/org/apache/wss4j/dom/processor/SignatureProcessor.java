@@ -73,7 +73,6 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.CallbackLookup;
-import org.apache.wss4j.dom.message.DOMCallbackLookup;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.message.token.Timestamp;
 import org.apache.wss4j.dom.str.STRParser;
@@ -411,7 +410,7 @@ public class SignatureProcessor implements Processor {
             // Test for replay attacks
             testMessageReplay(elem, xmlSignature.getSignatureValue().getValue(), data, wsDocInfo);
             
-            setElementsOnContext(xmlSignature, (DOMValidateContext)context, wsDocInfo, elem.getOwnerDocument());
+            setElementsOnContext(xmlSignature, (DOMValidateContext)context, wsDocInfo);
             boolean signatureOk = xmlSignature.validate(context);
             if (signatureOk) {
                 return xmlSignature;
@@ -457,15 +456,11 @@ public class SignatureProcessor implements Processor {
     private void setElementsOnContext(
         XMLSignature xmlSignature, 
         DOMValidateContext context,
-        WSDocInfo wsDocInfo,
-        Document doc
+        WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         java.util.Iterator<?> referenceIterator = 
             xmlSignature.getSignedInfo().getReferences().iterator();
         CallbackLookup callbackLookup = wsDocInfo.getCallbackLookup();
-        if (callbackLookup == null) {
-            callbackLookup = new DOMCallbackLookup(doc);
-        }
         while (referenceIterator.hasNext()) {
             Reference reference = (Reference)referenceIterator.next();
             String uri = reference.getURI();

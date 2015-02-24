@@ -32,6 +32,7 @@ import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.CallbackLookup;
+import org.apache.wss4j.dom.message.DOMCallbackLookup;
 import org.apache.wss4j.dom.processor.Processor;
 import org.apache.wss4j.dom.saml.DOMSAMLUtil;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -398,7 +399,11 @@ public class WSSecurityEngine {
         // (no need for encryption --- yet)
         //
         WSDocInfo wsDocInfo = new WSDocInfo(securityHeader.getOwnerDocument());
-        wsDocInfo.setCallbackLookup(callbackLookup);
+        CallbackLookup callbackLookupToUse = callbackLookup;
+        if (callbackLookupToUse == null) {
+            callbackLookupToUse = new DOMCallbackLookup(securityHeader.getOwnerDocument());
+        }
+        wsDocInfo.setCallbackLookup(callbackLookupToUse);
         wsDocInfo.setCrypto(requestData.getSigVerCrypto());
         wsDocInfo.setSecurityHeader(securityHeader);
 
@@ -454,9 +459,7 @@ public class WSSecurityEngine {
         
         // Validate SAML Subject Confirmation requirements
         if (wssConfig.isValidateSamlSubjectConfirmation()) {
-            Element bodyElement = 
-                WSSecurityUtil.findBodyElement(securityHeader.getOwnerDocument());
-            
+            Element bodyElement = callbackLookupToUse.getSOAPBody();
             DOMSAMLUtil.validateSAMLResults(returnResults, requestData.getTlsCerts(), bodyElement);
         }
         

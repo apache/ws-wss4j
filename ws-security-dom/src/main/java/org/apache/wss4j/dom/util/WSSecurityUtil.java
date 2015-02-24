@@ -29,7 +29,6 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.CallbackLookup;
@@ -46,13 +45,11 @@ import org.w3c.dom.Text;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.xml.crypto.dom.DOMCryptoContext;
-import javax.xml.namespace.QName;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -232,9 +229,6 @@ public final class WSSecurityUtil {
      *         contain a SOAP body
      */
     public static Element findBodyElement(Document doc) {
-        //
-        // Find the SOAP Envelope NS. Default to SOAP11 NS
-        //
         Element docElement = doc.getDocumentElement();
         String ns = docElement.getNamespaceURI();
         return getDirectChildElement(docElement, WSConstants.ELEM_BODY, ns);
@@ -537,9 +531,6 @@ public final class WSSecurityUtil {
         return prefix;
     }
 
-    /*
-     * The following methods were copied over from axis.utils.XMLUtils and adapted
-     */
     public static String getPrefixNS(String uri, Node e) {
         while (e != null && e.getNodeType() == Element.ELEMENT_NODE) {
             NamedNodeMap attrs = e.getAttributes();
@@ -553,85 +544,6 @@ public final class WSSecurityUtil {
             e = e.getParentNode();
         }
         return null;
-    }
-
-    public static String getNamespace(String prefix, Node e) {
-        while (e != null && e.getNodeType() == Node.ELEMENT_NODE) {
-            Attr attr = null;
-            if (prefix == null) {
-                attr = ((Element) e).getAttributeNodeNS(null, "xmlns");
-            } else {
-                attr = ((Element) e).getAttributeNodeNS(WSConstants.XMLNS_NS, prefix);
-            }
-            if (attr != null) {
-                return attr.getValue();
-            }
-            e = e.getParentNode();
-        }
-        return null;
-    }
-
-    /**
-     * Return a QName when passed a string like "foo:bar" by mapping the "foo"
-     * prefix to a namespace in the context of the given Node.
-     * 
-     * @return a QName generated from the given string representation
-     */
-    public static QName getQNameFromString(String str, Node e) {
-        return getQNameFromString(str, e, false);
-    }
-
-    /**
-     * Return a QName when passed a string like "foo:bar" by mapping the "foo"
-     * prefix to a namespace in the context of the given Node. If default
-     * namespace is found it is returned as part of the QName.
-     * 
-     * @return a QName generated from the given string representation
-     */
-    public static QName getFullQNameFromString(String str, Node e) {
-        return getQNameFromString(str, e, true);
-    }
-
-    private static QName getQNameFromString(String str, Node e, boolean defaultNS) {
-        if (str == null || e == null) {
-            return null;
-        }
-        int idx = str.indexOf(':');
-        if (idx > -1) {
-            String prefix = str.substring(0, idx);
-            String ns = XMLUtils.getNamespace(prefix, e);
-            if (ns == null) {
-                return null;
-            }
-            return new QName(ns, str.substring(idx + 1));
-        } else {
-            if (defaultNS) {
-                String ns = XMLUtils.getNamespace(null, e);
-                if (ns != null) {
-                    return new QName(ns, str);
-                }
-            }
-            return new QName("", str);
-        }
-    }
-
-    /**
-     * Return a string for a particular QName, mapping a new prefix if
-     * necessary.
-     */
-    public static String getStringForQName(QName qname, Element e) {
-        String uri = qname.getNamespaceURI();
-        String prefix = getPrefixNS(uri, e);
-        if (prefix == null) {
-            int i = 1;
-            prefix = "ns" + i;
-            while (XMLUtils.getNamespace(prefix, e) != null) {
-                i++;
-                prefix = "ns" + i;
-            }
-            e.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:" + prefix, uri);
-        }
-        return prefix + ":" + qname.getLocalPart();
     }
 
     /**
@@ -919,15 +831,16 @@ public final class WSSecurityUtil {
     }
 
     public static List<Integer> decodeAction(String action) throws WSSecurityException {
-        List<Integer> actions = new ArrayList<>();
         String actionToParse = action;
         if (actionToParse == null) {
-            return actions;
+            return Collections.emptyList();
         }
         actionToParse = actionToParse.trim();
         if ("".equals(actionToParse)) {
-            return actions;
+            return Collections.emptyList();
         }
+        
+        List<Integer> actions = new ArrayList<>();
         String single[] = actionToParse.split("\\s");
         for (int i = 0; i < single.length; i++) {
             if (single[i].equals(WSHandlerConstants.NO_SECURITY)) {
@@ -977,11 +890,11 @@ public final class WSSecurityUtil {
         String action, 
         WSSConfig wssConfig
     ) throws WSSecurityException {
-        List<HandlerAction> actions = new ArrayList<>();
         if (action == null) {
-            return actions;
+            return Collections.emptyList();
         }
         
+        List<HandlerAction> actions = new ArrayList<>();
         String single[] = action.split(" ");
         for (int i = 0; i < single.length; i++) {
             if (single[i].equals(WSHandlerConstants.NO_SECURITY)) {
@@ -1061,73 +974,6 @@ public final class WSSecurityUtil {
                     "Error in generating digest"
             );
         }
-    }
-    
-    /**
-     * @return  a list of child Nodes
-     */
-    public static List<Node>
-    listChildren(
-        final Node parent
-    ) {
-        final List<Node> ret = new ArrayList<>();
-        if (parent != null) {
-            Node node = parent.getFirstChild();
-            while (node != null) {
-                ret.add(node);
-                node = node.getNextSibling();
-            }
-        }
-        return ret;
-    }
-    
-    /**
-     * @return a list of Nodes in b that are not in a 
-     */
-    public static List<Node>
-    newNodes(
-        final List<Node> a,
-        final List<Node> b
-    ) {
-        if (a.size() == 0) {
-            return b;
-        }
-        final List<Node> ret = new ArrayList<>();
-        if (b.size() == 0) {
-            return ret;
-        }
-        for (
-            final Iterator<Node> bpos = b.iterator();
-            bpos.hasNext();
-        ) {
-            final Node bnode = bpos.next();
-            final String bns = bnode.getNamespaceURI();
-            final String bln = bnode.getLocalName();
-            boolean found = false;
-            for (
-                final Iterator<Node> apos = a.iterator();
-                apos.hasNext() && !found;
-            ) {
-                final Node anode = apos.next();
-                final String ans = anode.getNamespaceURI();
-                final String aln = anode.getLocalName();
-                final boolean nsmatch =
-                    ans == null
-                    ? bns == null ? true : false
-                    : bns == null ? false : ans.equals(bns);
-                final boolean lnmatch =
-                    aln == null
-                    ? bln == null ? true : false
-                    : bln == null ? false : aln.equals(bln);
-                if (nsmatch && lnmatch) {
-                    found = true;
-                }
-            }
-            if (!found) {
-                ret.add(bnode);
-            }
-        }
-        return ret;
     }
     
     /**

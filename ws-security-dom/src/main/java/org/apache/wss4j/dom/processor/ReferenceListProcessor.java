@@ -58,7 +58,6 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.CallbackLookup;
-import org.apache.wss4j.dom.message.DOMCallbackLookup;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.str.STRParser;
 import org.apache.wss4j.dom.str.SecurityTokenRefSTRParser;
@@ -282,9 +281,6 @@ public class ReferenceListProcessor implements Processor {
         String dataRefURI
     ) throws WSSecurityException {
         CallbackLookup callbackLookup = wsDocInfo.getCallbackLookup();
-        if (callbackLookup == null) {
-            callbackLookup = new DOMCallbackLookup(doc);
-        }
         Element encryptedDataElement = 
             callbackLookup.getElement(dataRefURI, null, true);
         if (encryptedDataElement == null) {
