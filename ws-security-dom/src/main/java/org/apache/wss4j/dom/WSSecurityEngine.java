@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -383,9 +384,8 @@ public class WSSecurityEngine {
         Element securityHeader,
         RequestData requestData
     ) throws WSSecurityException {
-        List<WSSecurityEngineResult> returnResults = new ArrayList<>();
         if (securityHeader == null) {
-            return returnResults;
+            return Collections.emptyList();
         }
     
         if (requestData.getWssConfig() == null) {
@@ -405,6 +405,7 @@ public class WSSecurityEngine {
         final WSSConfig cfg = getWssConfig();
         Node node = securityHeader.getFirstChild();
         
+        List<WSSecurityEngineResult> returnResults = new ArrayList<>();
         boolean foundTimestamp = false;
         while (node != null) {
             Node nextSibling = node.getNextSibling();

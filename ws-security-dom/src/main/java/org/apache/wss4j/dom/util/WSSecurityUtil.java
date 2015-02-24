@@ -92,9 +92,20 @@ public final class WSSecurityUtil {
             return null;
         }
         
+        return getSecurityHeader(soapHeaderElement, actor, WSConstants.URI_SOAP12_ENV.equals(soapNamespace));
+    }
+    
+    /**
+     * Returns the first WS-Security header element for a given actor. Only one
+     * WS-Security header is allowed for an actor.
+     */
+    public static Element getSecurityHeader(Element soapHeader, String actor, boolean soap12) throws WSSecurityException {
+        
         String actorLocal = WSConstants.ATTR_ACTOR;
-        if (WSConstants.URI_SOAP12_ENV.equals(soapNamespace)) {
+        String soapNamespace = WSConstants.URI_SOAP11_ENV;
+        if (soap12) {
             actorLocal = WSConstants.ATTR_ROLE;
+            soapNamespace = WSConstants.URI_SOAP12_ENV;
         }
         
         //
@@ -102,7 +113,7 @@ public final class WSSecurityUtil {
         //
         Element foundSecurityHeader = null;
         for (
-            Node currentChild = soapHeaderElement.getFirstChild(); 
+            Node currentChild = soapHeader.getFirstChild(); 
             currentChild != null; 
             currentChild = currentChild.getNextSibling()
         ) {
