@@ -19,6 +19,23 @@
 
 package org.apache.wss4j.dom.message;
 
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.List;
+
+import javax.security.auth.callback.CallbackHandler;
+import javax.xml.datatype.Duration;
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.builder.SAML1Constants;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
@@ -27,29 +44,12 @@ import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
-import org.apache.wss4j.common.WSEncryptionPart;
-import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoFactory;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.saml.SAMLCallback;
-import org.apache.wss4j.common.saml.SAMLUtil;
-import org.apache.wss4j.common.saml.builder.SAML1Constants;
-import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.saml.WSSecSignatureSAML;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
-import java.text.DateFormat;
-import java.util.Date;
-import java.util.List;
-
-import javax.security.auth.callback.CallbackHandler;
-import javax.xml.datatype.Duration;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 /**
  * This class tests the modification of requests.
@@ -143,7 +143,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
      * Test that signs a SOAP body element "value". The SOAP request is then modified
      * so that the signed "value" element is put in the header, and the value of the
      * original element is changed. The wsu:Id value of the original element is also
-     * changed. Signature verification will pass, so we need to check the wsu:Id's.
+     * changed. Signature verification will pass, so we need to check the Elements.
      */
     @org.junit.Test
     public void testMovedElementChangedId() throws Exception {
@@ -174,8 +174,6 @@ public class ModifiedRequestTest extends org.junit.Assert {
         org.w3c.dom.Node clonedValueNode = valueNode.cloneNode(true);
         secHeaderElement.appendChild(clonedValueNode);
         valueNode.getFirstChild().setNodeValue("250");
-        String savedId = 
-            ((org.w3c.dom.Element)valueNode).getAttributeNS(WSConstants.WSU_NS, "Id");
         ((org.w3c.dom.Element)valueNode).setAttributeNS(
              WSConstants.WSU_NS, "wsu:Id", "id-250"
         );
@@ -188,18 +186,12 @@ public class ModifiedRequestTest extends org.junit.Assert {
         }
         
         //
-        // Now we check that the wsu:Id of the element we want signed corresponds to the
-        // wsu:Id that was actually signed...again, this should pass
+        // Check the signature...this should pass
         //
         List<WSSecurityEngineResult> results = verify(signedDoc);
         
-        WSSecurityEngineResult actionResult = 
-            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
-        WSSecurityUtil.checkSignsAllElements(actionResult, new String[]{savedId});
-        
         //
-        // Finally we need to check that the wsu:Id of the element we want signed in the
-        // SOAP request is the same as the wsu:Id that was actually signed
+        // Finally we need to check that the Element that was signed is what we expect to be signed
         //
         envelopeElement = signedDoc.getDocumentElement();
         org.w3c.dom.Node bodyNode = 
@@ -210,14 +202,14 @@ public class ModifiedRequestTest extends org.junit.Assert {
             ((org.w3c.dom.Element)bodyNode).getElementsByTagNameNS(
                 "http://blah.com", "value"
             ).item(0);
-        String actualId = 
-            ((org.w3c.dom.Element)valueNode).getAttributeNS(WSConstants.WSU_NS, "Id");
+        
+        List<WSSecurityEngineResult> signedResults = 
+            WSSecurityUtil.fetchAllActionResults(results, WSConstants.SIGN);
         try {
-            WSSecurityUtil.checkSignsAllElements(actionResult, new String[]{actualId});
-            fail("Failure expected on bad wsu:Id");
+            WSSecurityUtil.verifySignedElement((org.w3c.dom.Element)valueNode, signedResults);
+            fail("Failure expected on the required element not being signed");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
-            assertEquals("Element id-250 is not included in the signature", ex.getMessage());
         }
     }
     

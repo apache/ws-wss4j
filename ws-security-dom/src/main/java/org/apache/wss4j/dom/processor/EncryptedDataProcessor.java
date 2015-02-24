@@ -91,7 +91,9 @@ public class EncryptedDataProcessor implements Processor {
             );
         
         if (request.isRequireSignedEncryptedDataElements()) {
-            WSSecurityUtil.verifySignedElement(elem, wsDocInfo);
+            List<WSSecurityEngineResult> signedResults = 
+                wsDocInfo.getResultsByTag(WSConstants.SIGN);
+            WSSecurityUtil.verifySignedElement(elem, signedResults);
         }
         
         SecretKey key = null;
