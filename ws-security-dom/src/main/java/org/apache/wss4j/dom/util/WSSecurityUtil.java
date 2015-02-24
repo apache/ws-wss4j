@@ -1064,107 +1064,6 @@ public final class WSSecurityUtil {
     }
     
     /**
-     * Check that all of the QName[] requiredParts are protected by a specified action in the
-     * results list.
-     * @param results The List of WSSecurityEngineResults from processing
-     * @param action The action that is required (e.g. WSConstants.SIGN)
-     * @param requiredParts An array of QNames that correspond to the required elements
-     */
-    @SuppressWarnings("unchecked")
-    public static void checkAllElementsProtected(
-        List<WSSecurityEngineResult> results,
-        int action,
-        QName[] requiredParts
-    ) throws WSSecurityException {
-        
-        if (requiredParts != null) {
-            for (int i = 0; i < requiredParts.length; i++) {
-                QName requiredPart = requiredParts[i];
-                
-                boolean found = false;
-                for (Iterator<WSSecurityEngineResult> iter = results.iterator(); 
-                    iter.hasNext() && !found;) {
-                    WSSecurityEngineResult result = iter.next();
-                    int resultAction =
-                            (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
-                    if (resultAction != action) {
-                        continue;
-                    }
-                    List<WSDataRef> refList = 
-                        (List<WSDataRef>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
-                    if (refList != null) {
-                        for (WSDataRef dataRef : refList) {
-                            if (dataRef.getName().equals(requiredPart)) {
-                                found = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (!found) {
-                    throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILED_CHECK,
-                        "requiredElementNotProtected",
-                        requiredPart);
-                }
-            }
-            LOG.debug("All required elements are protected");
-        }
-    }
-
-    /**
-     * Ensure that this covers all required elements (identified by
-     * their wsu:Id attributes).
-     * 
-     * @param resultItem the signature to check
-     * @param requiredIDs the list of wsu:Id values that must be covered
-     * @throws WSSecurityException if any required element is not included
-     */
-    @SuppressWarnings("unchecked")
-    public static void checkSignsAllElements(
-        WSSecurityEngineResult resultItem, 
-        String[] requiredIDs
-    ) throws WSSecurityException {
-        int resultAction =
-                (Integer) resultItem.get(WSSecurityEngineResult.TAG_ACTION);
-        if (resultAction != WSConstants.SIGN) {
-            throw new IllegalArgumentException("Not a SIGN result");
-        }
-
-        List<WSDataRef> signedElemsRefList = 
-            (List<WSDataRef>)resultItem.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
-        if (signedElemsRefList == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
-                    "WSSecurityEngineResult does not contain any references to signed elements"
-            );
-        }
-
-        LOG.debug("Checking required elements are in the signature...");
-        for (int i = 0; i < requiredIDs.length; i++) {
-            boolean found = false;
-            for (int j = 0; j < signedElemsRefList.size(); j++) {
-                WSDataRef dataRef = signedElemsRefList.get(j);
-                String wsuId = dataRef.getWsuId();
-                if (wsuId.charAt(0) == '#') {
-                    wsuId = wsuId.substring(1);
-                }
-                if (wsuId.equals(requiredIDs[i])) {
-                    found = true;
-                }
-            }
-            if (!found) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILED_CHECK,
-                    "requiredElementNotSigned",
-                    requiredIDs[i]);
-            }
-            LOG.debug("Element with ID " + requiredIDs[i] + " was correctly signed");
-        }
-        LOG.debug("All required elements are signed");
-    }
-    
-    
-    /**
      * @return  a list of child Nodes
      */
     public static List<Node>
@@ -1255,8 +1154,11 @@ public final class WSSecurityUtil {
     
     public static void verifySignedElement(Element elem, WSDocInfo wsDocInfo)
         throws WSSecurityException {
-        List<WSSecurityEngineResult> signedResults = 
-            wsDocInfo.getResultsByTag(WSConstants.SIGN);
+        verifySignedElement(elem, wsDocInfo.getResultsByTag(WSConstants.SIGN));
+    }
+    
+    public static void verifySignedElement(Element elem, List<WSSecurityEngineResult> signedResults)
+        throws WSSecurityException {
         if (signedResults != null) {
             for (WSSecurityEngineResult signedResult : signedResults) {
                 @SuppressWarnings("unchecked")

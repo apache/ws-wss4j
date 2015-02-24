@@ -126,23 +126,6 @@ public class SignaturePartsTest extends org.junit.Assert {
         
         List<WSSecurityEngineResult> results = verify(signedDoc);
         
-        QName name = new QName("urn:foo.bar", "foobar");
-        WSSecurityUtil.checkAllElementsProtected(results, WSConstants.SIGN, new QName[]{name});
-        try {
-            name = new QName("urn:foo.bar", "foobar2");
-            WSSecurityUtil.checkAllElementsProtected(results, WSConstants.SIGN, new QName[]{name});
-            fail("Failure expected on a wrong protected part");
-        } catch (WSSecurityException ex) {
-            // expected
-        }
-        try {
-            name = new QName("urn:foo.bar", "foobar");
-            WSSecurityUtil.checkAllElementsProtected(results, WSConstants.ENCR, new QName[]{name});
-            fail("Failure expected on a wrong action");
-        } catch (WSSecurityException ex) {
-            // expected
-        }
-        
         WSSecurityEngineResult actionResult = 
             WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertTrue(actionResult != null);
@@ -156,6 +139,8 @@ public class SignaturePartsTest extends org.junit.Assert {
         assertEquals(WSConstants.RSA_SHA1, wsDataRef.getAlgorithm());
         assertNotNull(wsDataRef.getDigestValue());
         assertTrue(wsDataRef.getDigestValue().length > 0);
+        QName expectedQName = new QName("urn:foo.bar", "foobar");
+        assertEquals(expectedQName, wsDataRef.getName());
         
         assertEquals(WSConstants.SHA1, wsDataRef.getDigestAlgorithm());
         
@@ -474,39 +459,32 @@ public class SignaturePartsTest extends org.junit.Assert {
         
         QName fooName = new QName("urn:foo.bar", "foobar");
         QName bodyName = new QName(soapConstants.getEnvelopeURI(), "Body");
-        WSSecurityUtil.checkAllElementsProtected(results, WSConstants.SIGN, new QName[]{fooName});
-        WSSecurityUtil.checkAllElementsProtected(results, WSConstants.SIGN, new QName[]{bodyName});
-        WSSecurityUtil.checkAllElementsProtected(
-            results, 
-            WSConstants.SIGN, 
-            new QName[]{bodyName, fooName}
-        );
-        WSSecurityUtil.checkAllElementsProtected(
-            results, 
-            WSConstants.SIGN, 
-            new QName[]{fooName, bodyName}
-        );
-        try {
-            WSSecurityUtil.checkAllElementsProtected(
-                results, 
-                WSConstants.ENCR, 
-                new QName[]{fooName, bodyName}
-            );
-            fail("Failure expected on a wrong action");
-        } catch (WSSecurityException ex) {
-            // expected
+        QName headerName = new QName(soapConstants.getEnvelopeURI(), "Header");
+        
+        WSSecurityEngineResult actionResult = 
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        assertTrue(actionResult != null);
+        assertFalse(actionResult.isEmpty());
+        
+        @SuppressWarnings("unchecked")
+        final java.util.List<WSDataRef> refs =
+            (java.util.List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        assertTrue(refs != null && !refs.isEmpty());
+        
+        boolean foundFoo = false;
+        boolean foundBody = false;
+        boolean foundHeader = false;
+        for (WSDataRef ref : refs) {
+            if (fooName.equals(ref.getName())) {
+                foundFoo = true;
+            } else if (bodyName.equals(ref.getName())) {
+                foundBody = true;
+            } else if (headerName.equals(ref.getName())) {
+                foundHeader = true;
+            }
         }
-        try {
-            QName headerName = new QName(soapConstants.getEnvelopeURI(), "Header");
-            WSSecurityUtil.checkAllElementsProtected(
-                results, 
-                WSConstants.SIGN, 
-                new QName[]{fooName, bodyName, headerName}
-            );
-            fail("Failure expected on an unsatisfied requirement");
-        } catch (WSSecurityException ex) {
-            // expected
-        }
+        assertTrue(foundFoo && foundBody);
+        assertFalse(foundHeader);
     }
     
     
@@ -549,8 +527,17 @@ public class SignaturePartsTest extends org.junit.Assert {
         
         List<WSSecurityEngineResult> results = verify(signedDoc);
         
+        WSSecurityEngineResult actionResult = 
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        assertTrue(actionResult != null);
+        assertFalse(actionResult.isEmpty());
+        @SuppressWarnings("unchecked")
+        final List<WSDataRef> refs =
+            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        
+        WSDataRef wsDataRef = refs.get(0);
         QName bodyName = new QName(soapConstants.getEnvelopeURI(), "Body");
-        WSSecurityUtil.checkAllElementsProtected(results, WSConstants.SIGN, new QName[]{bodyName});
+        assertEquals(bodyName, wsDataRef.getName());
     }
     
     /**
