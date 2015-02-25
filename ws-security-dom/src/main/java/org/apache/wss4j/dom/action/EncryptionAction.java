@@ -58,7 +58,7 @@ public class EncryptionAction implements Action {
             wsEncrypt.setSymmetricEncAlgorithm(encryptionToken.getSymmetricAlgorithm());
         }
         if (encryptionToken.getKeyTransportAlgorithm() != null) {
-            wsEncrypt.setKeyEnc(encryptionToken.getKeyTransportAlgorithm());
+            wsEncrypt.setKeyEncAlgo(encryptionToken.getKeyTransportAlgorithm());
         }
         if (encryptionToken.getDigestAlgorithm() != null) {
             wsEncrypt.setDigestAlgorithm(encryptionToken.getDigestAlgorithm());

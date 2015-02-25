@@ -44,6 +44,7 @@ import java.util.List;
 public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
     private String symEncAlgo = WSConstants.AES_128;
+    private int derivedKeyLength = -1;
     
     public WSSecDKEncrypt() {
         super();
@@ -59,7 +60,6 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         // Setup the encrypted key
         //
         prepare(doc);
-        envelope = doc.getDocumentElement();
         //
         // prepend elements in the right order to the security header
         //
@@ -73,7 +73,8 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     
     public Element encrypt() throws WSSecurityException {
         if (getParts().isEmpty()) {
-            String soapNamespace = WSSecurityUtil.getSOAPNamespace(envelope);
+            String soapNamespace = 
+                WSSecurityUtil.getSOAPNamespace(document.getDocumentElement());
             WSEncryptionPart encP = 
                 new WSEncryptionPart(
                     WSConstants.ELEM_BODY, 
@@ -112,7 +113,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         
         KeyInfo keyInfo = createKeyInfo();
 
-        SecretKey key = KeyUtils.prepareSecretKey(symEncAlgo, derivedKeyBytes);
+        SecretKey key = getDerivedKey(symEncAlgo);
 
         List<String> encDataRefs = 
             WSSecEncrypt.doEncryption(
@@ -136,7 +137,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         SecurityTokenReference secToken = new SecurityTokenReference(document);
         secToken.addWSSENamespace();
         Reference ref = new Reference(document);
-        ref.setURI("#" + dktId);
+        ref.setURI("#" + getId());
         String ns = 
             ConversationConstants.getWSCNs(getWscVersion()) 
                 + ConversationConstants.TOKEN_TYPE_DERIVED_KEY_TOKEN;
@@ -163,7 +164,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
      * @param secHeader The security header.
      */
     public void addExternalRefElement(Element referenceList, WSSecHeader secHeader) {
-        Node node = dkt.getElement().getNextSibling();
+        Node node = getdktElement().getNextSibling();
         if (node != null && Node.ELEMENT_NODE == node.getNodeType()) {
             secHeader.getSecurityHeader().insertBefore(referenceList, node);
         } else {
@@ -182,12 +183,13 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         symEncAlgo = algo;
     }
 
-    /**
-     * @see org.apache.wss4j.dom.message.WSSecDerivedKeyBase#getDerivedKeyLength()
-     */
     protected int getDerivedKeyLength() throws WSSecurityException{
         return derivedKeyLength > 0 ? derivedKeyLength : 
             KeyUtils.getKeyLength(symEncAlgo);
+    }
+    
+    public void setDerivedKeyLength(int keyLength) {
+        derivedKeyLength = keyLength;
     }
     
 }

@@ -22,6 +22,7 @@ package org.apache.wss4j.dom.message;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
@@ -39,6 +40,8 @@ import org.w3c.dom.Element;
 import java.io.UnsupportedEncodingException;
 import java.security.cert.X509Certificate;
 
+import javax.crypto.SecretKey;
+
 /**
  * Base class for DerivedKey encryption and signature
  */
@@ -50,25 +53,15 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
     protected Document document;
     
     /**
+     * DerivedKeyToken of this builder
+     */
+    private DerivedKeyToken dkt;
+    
+    /**
      * Session key used as the secret in key derivation
      */
     private byte[] ephemeralKey;
      
-    /**
-     * DerivedKeyToken of this builder
-     */
-    protected DerivedKeyToken dkt;
-    
-    /**
-     * Raw bytes of the derived key
-     */
-    protected byte[] derivedKeyBytes; 
-    
-    /**
-     * wsu:Id of the wsc:DerivedKeyToken
-     */
-    protected String dktId;
-    
     /**
      * Client's label value
      */
@@ -78,11 +71,6 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
      * Service's label value
      */
     private String serviceLabel = ConversationConstants.DEFAULT_LABEL;
-    
-    /**
-     * soap:Envelope element
-     */
-    protected Element envelope;
     
     /**
      * The Token identifier of the token that the <code>DerivedKeyToken</code> 
@@ -97,21 +85,21 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
     private boolean tokenIdDirectId;
 
     /**
-     * The derived key will change depending on the sig/encr algorithm.
-     * Therefore the child classes are expected to provide this value.
-     * @return the derived key length
-     * @throws WSSecurityException
-     */
-    protected abstract int getDerivedKeyLength() throws WSSecurityException;
-   
-    /**
      * The wsse:SecurityTokenReference element to be used
      */
     private Element strElem;
     
-    private int wscVersion = ConversationConstants.DEFAULT_VERSION;
+    /**
+     * wsu:Id of the wsc:DerivedKeyToken
+     */
+    private String dktId;
     
-    protected int derivedKeyLength = -1;
+    /**
+     * Raw bytes of the derived key
+     */
+    private byte[] derivedKeyBytes; 
+    
+    private int wscVersion = ConversationConstants.DEFAULT_VERSION;
     
     private String customValueType;
     private X509Certificate useThisCert;
@@ -126,6 +114,14 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
         super(config);
         setKeyIdentifierType(0);
     }
+    
+    /**
+     * The derived key will change depending on the sig/encr algorithm.
+     * Therefore the child classes are expected to provide this value.
+     * @return the derived key length
+     * @throws WSSecurityException
+     */
+    protected abstract int getDerivedKeyLength() throws WSSecurityException;
     
     /**
      * @param ephemeralKey The ephemeralKey to set.
@@ -346,10 +342,6 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
         return dkt.getElement();
     }
 
-    public void setDerivedKeyLength(int keyLength) {
-        derivedKeyLength = keyLength;
-    }
-
     public void setCustomValueType(String customValueType) {
         this.customValueType = customValueType;
     }
@@ -389,5 +381,9 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
     
     public void setCrypto(Crypto crypto) {
         this.crypto = crypto;
+    }
+    
+    protected SecretKey getDerivedKey(String algorithm) {
+        return KeyUtils.prepareSecretKey(algorithm, derivedKeyBytes);
     }
 }

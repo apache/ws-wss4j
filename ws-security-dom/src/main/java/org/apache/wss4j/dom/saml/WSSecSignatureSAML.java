@@ -279,7 +279,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 "SAML signature");
         }
         
-        if (sigAlgo == null) {
+        if (getSignatureAlgorithm() == null) {
             PublicKey key = null;
             if (certs != null && certs[0] != null) {
                 key = certs[0].getPublicKey();
@@ -294,9 +294,9 @@ public class WSSecSignatureSAML extends WSSecSignature {
             String pubKeyAlgo = key.getAlgorithm();
             LOG.debug("automatic sig algo detection: " + pubKeyAlgo);
             if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
-                sigAlgo = WSConstants.DSA;
+                setSignatureAlgorithm(WSConstants.DSA);
             } else if (pubKeyAlgo.equalsIgnoreCase("RSA")) {
-                sigAlgo = WSConstants.RSA;
+                setSignatureAlgorithm(WSConstants.RSA);
             } else {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE,
@@ -309,13 +309,14 @@ public class WSSecSignatureSAML extends WSSecSignature {
         try {
             C14NMethodParameterSpec c14nSpec = null;
             if (getWsConfig().isAddInclusivePrefixes() 
-                && canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
+                && getSigCanonicalization().equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
                 List<String> prefixes = 
                     getInclusivePrefixes(secHeader.getSecurityHeader(), false);
                 c14nSpec = new ExcC14NParameterSpec(prefixes);
             }
             
-           c14nMethod = signatureFactory.newCanonicalizationMethod(canonAlgo, c14nSpec);
+           c14nMethod = 
+               signatureFactory.newCanonicalizationMethod(getSigCanonicalization(), c14nSpec);
         } catch (Exception ex) {
             LOG.error("", ex);
             throw new WSSecurityException(
@@ -324,9 +325,10 @@ public class WSSecSignatureSAML extends WSSecSignature {
         }
 
         keyInfoUri = getWsConfig().getIdAllocator().createSecureId("KeyId-", keyInfo);
-        secRef = new SecurityTokenReference(doc);
+        SecurityTokenReference secRef = new SecurityTokenReference(doc);
         strUri = getWsConfig().getIdAllocator().createSecureId("STRId-", secRef);
         secRef.setID(strUri);
+        setSecurityTokenReference(secRef);
         
         if (certs != null && certs.length != 0) {
             certUri = getWsConfig().getIdAllocator().createSecureId("CertId-", certs[0]);
@@ -502,12 +504,12 @@ public class WSSecSignatureSAML extends WSSecSignature {
             if (senderVouches) {
                 key = issuerCrypto.getPrivateKey(issuerKeyName, issuerKeyPW);
             } else if (secretKey != null) {
-                key = KeyUtils.prepareSecretKey(sigAlgo, secretKey);
+                key = KeyUtils.prepareSecretKey(getSignatureAlgorithm(), secretKey);
             } else {
                 key = userCrypto.getPrivateKey(user, password);
             }
             SignatureMethod signatureMethod = 
-                signatureFactory.newSignatureMethod(sigAlgo, null);
+                signatureFactory.newSignatureMethod(getSignatureAlgorithm(), null);
             SignedInfo signedInfo = 
                 signatureFactory.newSignedInfo(c14nMethod, signatureMethod, referenceList);
             
@@ -530,7 +532,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 signContext = new DOMSignContext(key, securityHeaderElement);
             }
             signContext.putNamespacePrefix(WSConstants.SIG_NS, WSConstants.SIG_PREFIX);
-            if (WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(canonAlgo)) {
+            if (WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(getSigCanonicalization())) {
                 signContext.putNamespacePrefix(
                     WSConstants.C14N_EXCL_OMIT_COMMENTS, 
                     WSConstants.C14N_EXCL_OMIT_COMMENTS_PREFIX
@@ -545,8 +547,10 @@ public class WSSecSignatureSAML extends WSSecSignature {
             if (secRefSaml != null && secRefSaml.getElement() != null) {
                 WSSecurityUtil.storeElementInContext((DOMSignContext)signContext, secRefSaml.getElement());
             }
-            if (secRef != null && secRef.getElement() != null) {
-                WSSecurityUtil.storeElementInContext((DOMSignContext)signContext, secRef.getElement());
+            if (getSecurityTokenReference() != null 
+                && getSecurityTokenReference().getElement() != null) {
+                WSSecurityUtil.storeElementInContext((DOMSignContext)signContext, 
+                                                     getSecurityTokenReference().getElement());
             }
             sig.sign(signContext);
             

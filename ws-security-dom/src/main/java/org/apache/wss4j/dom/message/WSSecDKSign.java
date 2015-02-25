@@ -73,6 +73,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     private KeyInfo keyInfo;
     private CanonicalizationMethod c14nMethod;
     private Element securityHeader;
+    private int derivedKeyLength = -1;
 
     public WSSecDKSign() {
         super();
@@ -156,7 +157,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         secRef.setID(strUri);
         
         Reference ref = new Reference(document);
-        ref.setURI("#" + dktId);
+        ref.setURI("#" + getId());
         String ns = 
             ConversationConstants.getWSCNs(getWscVersion()) 
             + ConversationConstants.TOKEN_TYPE_DERIVED_KEY_TOKEN;
@@ -240,8 +241,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         Element siblingElement
     ) throws WSSecurityException {
         try {
-            java.security.Key key = 
-                KeyUtils.prepareSecretKey(sigAlgo, derivedKeyBytes);
+            java.security.Key key = getDerivedKey(sigAlgo);
             SignatureMethod signatureMethod = 
                 signatureFactory.newSignatureMethod(sigAlgo, null);
             SignedInfo signedInfo = 
@@ -298,12 +298,13 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         }
     }
     
-    /**
-     * @see org.apache.wss4j.dom.message.WSSecDerivedKeyBase#getDerivedKeyLength()
-     */
     protected int getDerivedKeyLength() throws WSSecurityException {
         return derivedKeyLength > 0 ? derivedKeyLength : 
             KeyUtils.getKeyLength(sigAlgo);
+    }
+    
+    public void setDerivedKeyLength(int keyLength) {
+        derivedKeyLength = keyLength;
     }
     
     /**

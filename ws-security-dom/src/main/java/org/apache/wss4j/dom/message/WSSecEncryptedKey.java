@@ -68,16 +68,16 @@ public class WSSecEncryptedKey extends WSSecBase {
         org.slf4j.LoggerFactory.getLogger(WSSecEncryptedKey.class);
 
     protected Document document;
-
+    
     /**
-     * soap:Envelope element
+     * Encrypted bytes of the ephemeral key
      */
-    protected Element envelope;
+    protected byte[] encryptedEphemeralKey;
 
     /**
      * Session key used as the secret in key derivation
      */
-    protected byte[] ephemeralKey;
+    private byte[] ephemeralKey;
     
     /**
      * Symmetric key used in the EncryptedKey.
@@ -85,19 +85,14 @@ public class WSSecEncryptedKey extends WSSecBase {
     protected SecretKey symmetricKey;
 
     /**
-     * Encrypted bytes of the ephemeral key
-     */
-    protected byte[] encryptedEphemeralKey;
-
-    /**
      * Algorithm used to encrypt the ephemeral key
      */
-    protected String keyEncAlgo = WSConstants.KEYTRANSPORT_RSAOEP;
+    private String keyEncAlgo = WSConstants.KEYTRANSPORT_RSAOEP;
     
     /**
      * Algorithm to be used with the ephemeral key
      */
-    protected String symEncAlgo = WSConstants.AES_128;
+    private String symEncAlgo = WSConstants.AES_128;
     
     /**
      * Digest Algorithm to be used with RSA-OAEP. The default is SHA-1 (which is not
@@ -114,21 +109,21 @@ public class WSSecEncryptedKey extends WSSecBase {
     /**
      * xenc:EncryptedKey element
      */
-    protected Element encryptedKeyElement;
+    private Element encryptedKeyElement;
 
     /**
      * The Token identifier of the token that the <code>DerivedKeyToken</code>
      * is (or to be) derived from.
      */
-    protected String encKeyId;
+    private String encKeyId;
 
     /**
      * BinarySecurityToken to be included in the case where BST_DIRECT_REFERENCE
      * is used to refer to the asymmetric encryption cert
      */
-    protected BinarySecurity bstToken;
+    private BinarySecurity bstToken;
     
-    protected X509Certificate useThisCert;
+    private X509Certificate useThisCert;
     
     /**
      * Custom token value
@@ -188,20 +183,18 @@ public class WSSecEncryptedKey extends WSSecBase {
         document = doc;
 
         //
-        // Set up the ephemeral key
+        // Set up the symmetric key
         //
-        if (ephemeralKey == null) {
-            if (symmetricKey == null) {
+        if (symmetricKey == null) {
+            if (ephemeralKey != null) {
+                symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, ephemeralKey);
+            } else {
                 KeyGenerator keyGen = getKeyGenerator();
                 symmetricKey = keyGen.generateKey();
-            } 
-            ephemeralKey = symmetricKey.getEncoded();
+                ephemeralKey = symmetricKey.getEncoded();
+            }
         }
         
-        if (symmetricKey == null) {
-            symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, ephemeralKey);
-        }
-
         //
         // Get the certificate that contains the public key for the public key
         // algorithm that will encrypt the generated symmetric (session) key.
@@ -431,8 +424,6 @@ public class WSSecEncryptedKey extends WSSecBase {
 
         Element xencCipherValue = createCipherValue(document, encryptedKeyElement);
         xencCipherValue.appendChild(keyText);
-
-        envelope = document.getDocumentElement();
     }
     
     /**
@@ -600,6 +591,10 @@ public class WSSecEncryptedKey extends WSSecBase {
     public void setUseThisCert(X509Certificate cert) {
         useThisCert = cert;
     }
+    
+    public X509Certificate getUseThisCert() {
+        return useThisCert;
+    }
 
     /**
      * @return Returns the encryptedKeyElement.
@@ -628,6 +623,10 @@ public class WSSecEncryptedKey extends WSSecBase {
     
     public void setKeyEncAlgo(String keyEncAlgo) {
         this.keyEncAlgo = keyEncAlgo;
+    }
+    
+    public String getKeyEncAlgo() {
+        return keyEncAlgo;
     }
 
     /**

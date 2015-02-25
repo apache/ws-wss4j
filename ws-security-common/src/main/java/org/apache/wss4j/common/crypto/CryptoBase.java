@@ -62,8 +62,8 @@ public abstract class CryptoBase implements Crypto {
     private static final Constructor<?> BC_509CLASS_CONS;
 
     protected Map<String, CertificateFactory> certFactMap = new HashMap<>();
-    protected String defaultAlias = null;
-    protected String cryptoProvider = null;
+    private String defaultAlias = null;
+    private String cryptoProvider = null;
     
     static {
         Constructor<?> cons = null;

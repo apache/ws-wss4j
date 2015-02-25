@@ -76,7 +76,7 @@ public class MerlinDevice extends Merlin {
         String alias = properties.getProperty(KEYSTORE_ALIAS);
         if (alias != null) {
             alias = alias.trim();
-            defaultAlias = alias;
+            setDefaultX509Identifier(alias);
         }
         String keyStoreLocation = properties.getProperty(KEYSTORE_FILE);
         if (keyStoreLocation == null) {

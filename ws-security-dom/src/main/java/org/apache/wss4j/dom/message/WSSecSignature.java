@@ -77,26 +77,25 @@ public class WSSecSignature extends WSSecSignatureBase {
     private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(WSSecSignature.class);
 
-    protected boolean useSingleCert = true;
-    protected String sigAlgo;
-    protected String canonAlgo = WSConstants.C14N_EXCL_OMIT_COMMENTS;
-    protected byte[] signatureValue;
-    protected Document document;
-    protected WSDocInfo wsDocInfo;
-    protected String certUri;
-    protected String keyInfoUri;
-    protected SecurityTokenReference secRef;
-    protected String strUri;
-    protected BinarySecurity bstToken;
-    
     protected XMLSignatureFactory signatureFactory;
     protected KeyInfo keyInfo;
     protected CanonicalizationMethod c14nMethod;
     protected XMLSignature sig;
     protected byte[] secretKey;
-    protected String customTokenValueType;
-    protected String customTokenId;
+    protected Document document;
+    protected WSDocInfo wsDocInfo;
+    protected String strUri;
+    protected BinarySecurity bstToken;
+    protected String keyInfoUri;
+    protected String certUri;
+    protected byte[] signatureValue;
     
+    private boolean useSingleCert = true;
+    private String sigAlgo;
+    private String canonAlgo = WSConstants.C14N_EXCL_OMIT_COMMENTS;
+    private SecurityTokenReference secRef;
+    private String customTokenValueType;
+    private String customTokenId;
     private String encrKeySha1value;
     private Crypto crypto;
     private String digestAlgo = WSConstants.SHA1;

@@ -190,7 +190,7 @@ public class Merlin extends CryptoBase {
         String alias = properties.getProperty(prefix + KEYSTORE_ALIAS);
         if (alias != null) {
             alias = alias.trim();
-            defaultAlias = alias;
+            setDefaultX509Identifier(alias);
         }
         String keyStoreLocation = properties.getProperty(prefix + KEYSTORE_FILE);
         if (keyStoreLocation == null) {
@@ -527,8 +527,8 @@ public class Merlin extends CryptoBase {
      */
     @Override
     public String getDefaultX509Identifier() throws WSSecurityException {
-        if (defaultAlias != null) {
-            return defaultAlias;
+        if (super.getDefaultX509Identifier() != null) {
+            return super.getDefaultX509Identifier();
         }
         
         if (keystore != null) {
@@ -537,7 +537,7 @@ public class Merlin extends CryptoBase {
                 if (as.hasMoreElements()) {
                     String alias = as.nextElement();
                     if (!as.hasMoreElements()) {
-                        defaultAlias = alias;
+                        setDefaultX509Identifier(alias);
                         return alias;
                     }
                 }
