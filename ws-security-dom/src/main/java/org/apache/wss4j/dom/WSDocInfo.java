@@ -31,6 +31,7 @@ package org.apache.wss4j.dom;
  */
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.crypto.dom.DOMCryptoContext;
@@ -45,8 +46,8 @@ import org.w3c.dom.Element;
 public class WSDocInfo {
     private Document doc;
     private Crypto crypto;
-    private List<Element> tokenList;
-    private List<WSSecurityEngineResult> resultsList;
+    private final List<Element> tokenList = new ArrayList<>();
+    private final List<WSSecurityEngineResult> resultsList = new ArrayList<>();
     private CallbackLookup callbackLookup;
     private Element securityHeader;
 
@@ -68,15 +69,11 @@ public class WSDocInfo {
      */
     public void clear() {
         crypto = null;
-        if (tokenList != null && tokenList.size() > 0) {
-            tokenList.clear();
-        }
-        if (resultsList != null && resultsList.size() > 0) {
-            resultsList.clear();
-        }
-        
-        tokenList = null;
-        resultsList = null;
+        doc = null;
+        callbackLookup = null;
+        securityHeader = null;
+        tokenList.clear();
+        resultsList.clear();
     }
     
     /**
@@ -95,20 +92,18 @@ public class WSDocInfo {
      * @param checkMultipleElements check for a previously stored element with the same Id.
      */
     public void addTokenElement(Element element, boolean checkMultipleElements) throws WSSecurityException {
-        if (tokenList == null) {
-            tokenList = new ArrayList<>();
-        }
-        
-        if (checkMultipleElements) {
-            for (Element elem : tokenList) {
-                if (compareElementsById(element, elem)) {
-                    throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "duplicateError"
-                    );
+        if (element != null) {
+            if (checkMultipleElements) {
+                for (Element elem : tokenList) {
+                    if (compareElementsById(element, elem)) {
+                        throw new WSSecurityException(
+                            WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "duplicateError"
+                        );
+                    }
                 }
             }
+            tokenList.add(element);
         }
-        tokenList.add(element);
     }
     
     private boolean compareElementsById(Element firstElement, Element secondElement) {
@@ -151,7 +146,7 @@ public class WSDocInfo {
         } else if (id.charAt(0) == '#') {
             id = id.substring(1);
         }
-        if (tokenList != null) {
+        if (!tokenList.isEmpty()) {
             for (Element elem : tokenList) {
                 String cId = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
                 String samlId = elem.getAttributeNS(null, "AssertionID");
@@ -183,10 +178,9 @@ public class WSDocInfo {
      * @param result is the WSSecurityEngineResult to store
      */
     public void addResult(WSSecurityEngineResult result) {
-        if (resultsList == null) {
-            resultsList = new ArrayList<>();
+        if (result != null) {
+            resultsList.add(result);
         }
-        resultsList.add(result);
     }
     
     /**
@@ -201,13 +195,11 @@ public class WSDocInfo {
         } else if (id.charAt(0) == '#') {
             id = id.substring(1);
         }
-        if (resultsList != null) {
+        if (!resultsList.isEmpty()) {
             for (WSSecurityEngineResult result : resultsList) {
-                if (result != null) {
-                    String cId = (String)result.get(WSSecurityEngineResult.TAG_ID);
-                    if (id.equals(cId)) {
-                        return result;
-                    }
+                String cId = (String)result.get(WSSecurityEngineResult.TAG_ID);
+                if (id.equals(cId)) {
+                    return result;
                 }
             }
         }
@@ -218,15 +210,15 @@ public class WSDocInfo {
      * Get a list of WSSecurityEngineResults of the given Integer tag
      */
     public List<WSSecurityEngineResult> getResultsByTag(Integer tag) {
+        if (resultsList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        
         List<WSSecurityEngineResult> foundResults = new ArrayList<>();
-        if (resultsList != null) {
-            for (WSSecurityEngineResult result : resultsList) {
-                if (result != null) {
-                    Integer resultTag = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
-                    if (tag.intValue() == resultTag.intValue()) {
-                        foundResults.add(result);
-                    }
-                }
+        for (WSSecurityEngineResult result : resultsList) {
+            Integer resultTag = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
+            if (tag.intValue() == resultTag.intValue()) {
+                foundResults.add(result);
             }
         }
         return foundResults;
@@ -242,15 +234,12 @@ public class WSDocInfo {
         } else if (id.charAt(0) == '#') {
             id = id.substring(1);
         }
-        if (resultsList != null) {
-            for (WSSecurityEngineResult result : resultsList) {
-                if (result != null) {
-                    Integer resultTag = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
-                    String cId = (String)result.get(WSSecurityEngineResult.TAG_ID);
-                    if (tag.intValue() == resultTag.intValue() && id.equals(cId)) {
-                        return result;
-                    }
-                }
+        
+        for (WSSecurityEngineResult result : resultsList) {
+            Integer resultTag = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
+            String cId = (String)result.get(WSSecurityEngineResult.TAG_ID);
+            if (tag.intValue() == resultTag.intValue() && id.equals(cId)) {
+                return result;
             }
         }
         return null;

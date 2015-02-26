@@ -19,8 +19,8 @@
 
 package org.apache.wss4j.dom;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -410,7 +410,7 @@ public class WSSecurityEngine {
         final WSSConfig cfg = getWssConfig();
         Node node = securityHeader.getFirstChild();
         
-        List<WSSecurityEngineResult> returnResults = new ArrayList<>();
+        List<WSSecurityEngineResult> returnResults = new LinkedList<>();
         boolean foundTimestamp = false;
         while (node != null) {
             Node nextSibling = node.getNextSibling();
@@ -462,6 +462,8 @@ public class WSSecurityEngine {
             Element bodyElement = callbackLookupToUse.getSOAPBody();
             DOMSAMLUtil.validateSAMLResults(returnResults, requestData.getTlsCerts(), bodyElement);
         }
+        
+        wsDocInfo.clear();
         
         return returnResults;
     }
