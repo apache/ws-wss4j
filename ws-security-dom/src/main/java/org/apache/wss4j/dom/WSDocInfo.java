@@ -32,21 +32,28 @@ package org.apache.wss4j.dom;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.crypto.dom.DOMCryptoContext;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.message.CallbackLookup;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class WSDocInfo {
     private Document doc;
     private Crypto crypto;
-    private final List<Element> tokenList = new ArrayList<>();
+    
+    // Here we map the token "Id" to the token itself. The token "Id" is the key as it must be unique to guard
+    // against various wrapping attacks. The "Id" name/namespace is stored as part of the entry (along with the
+    // element), so that we know what namespace to use when setting the token on the crypto context for signature
+    // creation or validation
+    private final Map<String, TokenValue> tokenList = new HashMap<>();
+
     private final List<WSSecurityEngineResult> resultsList = new ArrayList<>();
     private CallbackLookup callbackLookup;
     private Element securityHeader;
@@ -92,46 +99,59 @@ public class WSDocInfo {
      * @param checkMultipleElements check for a previously stored element with the same Id.
      */
     public void addTokenElement(Element element, boolean checkMultipleElements) throws WSSecurityException {
-        if (element != null) {
-            if (checkMultipleElements) {
-                for (Element elem : tokenList) {
-                    if (compareElementsById(element, elem)) {
-                        throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "duplicateError"
-                        );
-                    }
+        if (element == null) {
+            return;
+        }
+        
+        if (element.hasAttributeNS(WSConstants.WSU_NS, "Id")) {
+            String id = element.getAttributeNS(WSConstants.WSU_NS, "Id");
+            TokenValue tokenValue = new TokenValue("Id", WSConstants.WSU_NS, element);
+            TokenValue previousValue = tokenList.put(id, tokenValue);
+            if (checkMultipleElements && previousValue != null) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "duplicateError"
+                );
+            }
+        }
+
+        if (element.hasAttributeNS(null, "Id")) {
+            String id = element.getAttributeNS(null, "Id");
+            TokenValue tokenValue = new TokenValue("Id", null, element);
+            TokenValue previousValue = tokenList.put(id, tokenValue);
+            if (checkMultipleElements && previousValue != null) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "duplicateError"
+                );
+            }
+        }
+
+        // SAML Assertions
+        if ("Assertion".equals(element.getLocalName())) {
+            if (WSConstants.SAML_NS.equals(element.getNamespaceURI())
+                && element.hasAttributeNS(null, "AssertionID")) {
+                String id = element.getAttributeNS(null, "AssertionID");
+                TokenValue tokenValue = new TokenValue("AssertionID", null, element);
+                TokenValue previousValue = tokenList.put(id, tokenValue);
+                if (checkMultipleElements && previousValue != null) {
+                    throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "duplicateError"
+                    );
+                }
+            } else if (WSConstants.SAML2_NS.equals(element.getNamespaceURI())
+                && element.hasAttributeNS(null, "ID")) {
+                String id = element.getAttributeNS(null, "ID");
+                TokenValue tokenValue = new TokenValue("ID", null, element);
+                TokenValue previousValue = tokenList.put(id, tokenValue);
+                if (checkMultipleElements && previousValue != null) {
+                    throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "duplicateError"
+                    );
                 }
             }
-            tokenList.add(element);
         }
+
     }
     
-    private boolean compareElementsById(Element firstElement, Element secondElement) {
-        if (firstElement.hasAttributeNS(WSConstants.WSU_NS, "Id")
-            && secondElement.hasAttributeNS(WSConstants.WSU_NS, "Id")) {
-            String id = firstElement.getAttributeNS(WSConstants.WSU_NS, "Id");
-            String id2 = secondElement.getAttributeNS(WSConstants.WSU_NS, "Id");
-            if (id.equals(id2)) {
-                return true;
-            }
-        }
-        if (firstElement.hasAttributeNS(null, "AssertionID")
-            && secondElement.hasAttributeNS(null, "AssertionID")) {
-            String id = firstElement.getAttributeNS(null, "AssertionID");
-            String id2 = secondElement.getAttributeNS(null, "AssertionID");
-            if (id.equals(id2)) {
-                return true;
-            }
-        }
-        if (firstElement.hasAttributeNS(null, "ID") && secondElement.hasAttributeNS(null, "ID")) {
-            String id = firstElement.getAttributeNS(null, "ID");
-            String id2 = secondElement.getAttributeNS(null, "ID");
-            if (id.equals(id2)) {
-                return true;
-            }
-        }
-        return false;
-    }
     
     /**
      * Get a token Element for the given Id. The Id can be either a wsu:Id or a 
@@ -146,18 +166,12 @@ public class WSDocInfo {
         } else if (id.charAt(0) == '#') {
             id = id.substring(1);
         }
-        if (!tokenList.isEmpty()) {
-            for (Element elem : tokenList) {
-                String cId = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
-                String samlId = elem.getAttributeNS(null, "AssertionID");
-                String samlId2 = elem.getAttributeNS(null, "ID");
-                if (elem.hasAttributeNS(WSConstants.WSU_NS, "Id") && id.equals(cId)
-                    || elem.hasAttributeNS(null, "AssertionID") && id.equals(samlId)
-                    || elem.hasAttributeNS(null, "ID") && id.equals(samlId2)) {
-                    return elem;
-                }
-            }
+        
+        TokenValue token = tokenList.get(id);
+        if (token != null) {
+            return token.getToken();
         }
+
         return null;
     }
 
@@ -166,21 +180,37 @@ public class WSDocInfo {
      * @param context
      */
     public void setTokensOnContext(DOMCryptoContext context) {
-        if (tokenList != null) {
-            for (Element elem : tokenList) {
-                WSSecurityUtil.storeElementInContext(context, elem);
+        if (!tokenList.isEmpty() && context != null) {
+            for (Map.Entry<String, TokenValue> entry : tokenList.entrySet()) {
+                TokenValue tokenValue = entry.getValue();
+                context.setIdAttributeNS(tokenValue.getToken(), tokenValue.getIdNamespace(),
+                                         tokenValue.getIdName());
             }
         }
     }
+    
+    public void setTokenOnContext(String uri, DOMCryptoContext context) {
+        String id = uri;
+        if (id == null || context == null) {
+            return;
+        } else if (id.charAt(0) == '#') {
+            id = id.substring(1);
+        }
+
+        TokenValue tokenValue = tokenList.get(id);
+        if (tokenValue != null) {
+            context.setIdAttributeNS(tokenValue.getToken(), tokenValue.getIdNamespace(),
+                                     tokenValue.getIdName());
+        }
+    }
+
     
     /**
      * Store a WSSecurityEngineResult for later retrieval. 
      * @param result is the WSSecurityEngineResult to store
      */
     public void addResult(WSSecurityEngineResult result) {
-        if (result != null) {
-            resultsList.add(result);
-        }
+        resultsList.add(result);
     }
     
     /**
@@ -235,11 +265,13 @@ public class WSDocInfo {
             id = id.substring(1);
         }
         
-        for (WSSecurityEngineResult result : resultsList) {
-            Integer resultTag = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
-            String cId = (String)result.get(WSSecurityEngineResult.TAG_ID);
-            if (tag.intValue() == resultTag.intValue() && id.equals(cId)) {
-                return result;
+        if (!resultsList.isEmpty()) {
+            for (WSSecurityEngineResult result : resultsList) {
+                Integer resultTag = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
+                String cId = (String)result.get(WSSecurityEngineResult.TAG_ID);
+                if (tag.intValue() == resultTag.intValue() && id.equals(cId)) {
+                    return result;
+                }
             }
         }
         return null;
@@ -297,4 +329,28 @@ public class WSDocInfo {
     public void setSecurityHeader(Element securityHeader) {
         this.securityHeader = securityHeader;
     }
+    
+    private static class TokenValue {
+        final String idName;
+        final String idNamespace;
+        final Element token;
+
+        public TokenValue(String idName, String idNamespace, Element token) {
+            this.idName = idName;
+            this.idNamespace = idNamespace;
+            this.token = token;
+        }
+
+        public String getIdName() {
+            return idName;
+        }
+
+        public String getIdNamespace() {
+            return idNamespace;
+        }
+        public Element getToken() {
+            return token;
+        }
+    }
+
 }

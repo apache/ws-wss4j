@@ -283,9 +283,6 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
             
             // Add the elements to sign to the Signature Context
             wsDocInfo.setTokensOnContext((DOMSignContext)signContext);
-            if (secRef != null && secRef.getElement() != null) {
-                WSSecurityUtil.storeElementInContext((DOMSignContext)signContext, secRef.getElement());
-            }
             
             sig.sign(signContext);
             

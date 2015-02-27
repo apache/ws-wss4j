@@ -544,14 +544,6 @@ public class WSSecSignatureSAML extends WSSecSignature {
             // Add the elements to sign to the Signature Context
             wsDocInfo.setTokensOnContext((DOMSignContext)signContext);
 
-            if (secRefSaml != null && secRefSaml.getElement() != null) {
-                WSSecurityUtil.storeElementInContext((DOMSignContext)signContext, secRefSaml.getElement());
-            }
-            if (getSecurityTokenReference() != null 
-                && getSecurityTokenReference().getElement() != null) {
-                WSSecurityUtil.storeElementInContext((DOMSignContext)signContext, 
-                                                     getSecurityTokenReference().getElement());
-            }
             sig.sign(signContext);
             
             signatureValue = sig.getSignatureValue().getValue();

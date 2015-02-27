@@ -466,10 +466,7 @@ public class SignatureProcessor implements Processor {
             String uri = reference.getURI();
             Element element = callbackLookup.getAndRegisterElement(uri, null, true, context);
             if (element == null) {
-                element = wsDocInfo.getTokenElement(uri);
-                if (element != null) {
-                    WSSecurityUtil.storeElementInContext(context, element);
-                }
+                wsDocInfo.setTokenOnContext(uri, context);
             }
         }
     }
