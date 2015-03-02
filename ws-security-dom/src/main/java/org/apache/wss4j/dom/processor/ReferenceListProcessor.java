@@ -117,7 +117,8 @@ public class ReferenceListProcessor implements Processor {
                     dataRefURI = dataRefURI.substring(1);
                 }
                 
-                if (wsDocInfo.getResultByTag(WSConstants.ENCR, dataRefURI) == null) {
+                // See whether we have already processed the encrypted node 
+                if (!wsDocInfo.hasResult(WSConstants.ENCR, dataRefURI)) {
                     WSDataRef dataRef = 
                         decryptDataRefEmbedded(
                             elem.getOwnerDocument(), dataRefURI, data, wsDocInfo, asymBinding);

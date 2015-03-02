@@ -52,7 +52,7 @@ public class WSDocInfo {
     // against various wrapping attacks. The "Id" name/namespace is stored as part of the entry (along with the
     // element), so that we know what namespace to use when setting the token on the crypto context for signature
     // creation or validation
-    private final Map<String, TokenValue> tokenList = new HashMap<>();
+    private final Map<String, TokenValue> tokens = new HashMap<>();
 
     private final List<WSSecurityEngineResult> resultsList = new ArrayList<>();
     private CallbackLookup callbackLookup;
@@ -79,7 +79,7 @@ public class WSDocInfo {
         doc = null;
         callbackLookup = null;
         securityHeader = null;
-        tokenList.clear();
+        tokens.clear();
         resultsList.clear();
     }
     
@@ -106,7 +106,7 @@ public class WSDocInfo {
         if (element.hasAttributeNS(WSConstants.WSU_NS, "Id")) {
             String id = element.getAttributeNS(WSConstants.WSU_NS, "Id");
             TokenValue tokenValue = new TokenValue("Id", WSConstants.WSU_NS, element);
-            TokenValue previousValue = tokenList.put(id, tokenValue);
+            TokenValue previousValue = tokens.put(id, tokenValue);
             if (checkMultipleElements && previousValue != null) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "duplicateError"
@@ -117,7 +117,7 @@ public class WSDocInfo {
         if (element.hasAttributeNS(null, "Id")) {
             String id = element.getAttributeNS(null, "Id");
             TokenValue tokenValue = new TokenValue("Id", null, element);
-            TokenValue previousValue = tokenList.put(id, tokenValue);
+            TokenValue previousValue = tokens.put(id, tokenValue);
             if (checkMultipleElements && previousValue != null) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "duplicateError"
@@ -131,7 +131,7 @@ public class WSDocInfo {
                 && element.hasAttributeNS(null, "AssertionID")) {
                 String id = element.getAttributeNS(null, "AssertionID");
                 TokenValue tokenValue = new TokenValue("AssertionID", null, element);
-                TokenValue previousValue = tokenList.put(id, tokenValue);
+                TokenValue previousValue = tokens.put(id, tokenValue);
                 if (checkMultipleElements && previousValue != null) {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "duplicateError"
@@ -141,7 +141,7 @@ public class WSDocInfo {
                 && element.hasAttributeNS(null, "ID")) {
                 String id = element.getAttributeNS(null, "ID");
                 TokenValue tokenValue = new TokenValue("ID", null, element);
-                TokenValue previousValue = tokenList.put(id, tokenValue);
+                TokenValue previousValue = tokens.put(id, tokenValue);
                 if (checkMultipleElements && previousValue != null) {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "duplicateError"
@@ -167,7 +167,7 @@ public class WSDocInfo {
             id = id.substring(1);
         }
         
-        TokenValue token = tokenList.get(id);
+        TokenValue token = tokens.get(id);
         if (token != null) {
             return token.getToken();
         }
@@ -180,8 +180,8 @@ public class WSDocInfo {
      * @param context
      */
     public void setTokensOnContext(DOMCryptoContext context) {
-        if (!tokenList.isEmpty() && context != null) {
-            for (Map.Entry<String, TokenValue> entry : tokenList.entrySet()) {
+        if (!tokens.isEmpty() && context != null) {
+            for (Map.Entry<String, TokenValue> entry : tokens.entrySet()) {
                 TokenValue tokenValue = entry.getValue();
                 context.setIdAttributeNS(tokenValue.getToken(), tokenValue.getIdNamespace(),
                                          tokenValue.getIdName());
@@ -197,7 +197,7 @@ public class WSDocInfo {
             id = id.substring(1);
         }
 
-        TokenValue tokenValue = tokenList.get(id);
+        TokenValue tokenValue = tokens.get(id);
         if (tokenValue != null) {
             context.setIdAttributeNS(tokenValue.getToken(), tokenValue.getIdNamespace(),
                                      tokenValue.getIdName());
@@ -255,12 +255,12 @@ public class WSDocInfo {
     }
     
     /**
-     * Get a WSSecurityEngineResult of the given Integer tag for the given Id
+     * See whether we have a WSSecurityEngineResult of the given Integer tag for the given Id
      */
-    public WSSecurityEngineResult getResultByTag(Integer tag, String uri) {
+    public boolean hasResult(Integer tag, String uri) {
         String id = uri;
         if (id == null || "".equals(uri)) {
-            return null;
+            return false;
         } else if (id.charAt(0) == '#') {
             id = id.substring(1);
         }
@@ -270,11 +270,11 @@ public class WSDocInfo {
                 Integer resultTag = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
                 String cId = (String)result.get(WSSecurityEngineResult.TAG_ID);
                 if (tag.intValue() == resultTag.intValue() && id.equals(cId)) {
-                    return result;
+                    return true;
                 }
             }
         }
-        return null;
+        return false;
     }
 
     /**
