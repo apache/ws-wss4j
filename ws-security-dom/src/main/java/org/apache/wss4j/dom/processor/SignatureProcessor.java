@@ -517,9 +517,8 @@ public class SignatureProcessor implements Processor {
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         List<WSDataRef> protectedRefs = new ArrayList<>();
-        List<?> referencesList = signedInfo.getReferences();
-        for (int i = 0; i < referencesList.size(); i++) {
-            Reference siRef = (Reference)referencesList.get(i);
+        for (Object reference : signedInfo.getReferences()) {
+            Reference siRef = (Reference)reference;
             String uri = siRef.getURI();
             
             if (!"".equals(uri)) {
@@ -582,11 +581,10 @@ public class SignatureProcessor implements Processor {
         RequestData requestData,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
-        List<?> transformsList = siRef.getTransforms();
         
-        for (int j = 0; j < transformsList.size(); j++) {
+        for (Object transformObject : siRef.getTransforms()) {
             
-            Transform transform = (Transform)transformsList.get(j);
+            Transform transform = (Transform)transformObject;
             
             if (STRTransform.TRANSFORM_URI.equals(transform.getAlgorithm())) {
                 NodeSetData data = (NodeSetData)siRef.getDereferencedData();
