@@ -54,7 +54,7 @@ public class WSDocInfo {
     // creation or validation
     private final Map<String, TokenValue> tokens = new HashMap<>();
 
-    private final List<WSSecurityEngineResult> resultsList = new ArrayList<>();
+    private final List<WSSecurityEngineResult> results = new ArrayList<>();
     private CallbackLookup callbackLookup;
     private Element securityHeader;
 
@@ -80,7 +80,7 @@ public class WSDocInfo {
         callbackLookup = null;
         securityHeader = null;
         tokens.clear();
-        resultsList.clear();
+        results.clear();
     }
     
     /**
@@ -210,7 +210,7 @@ public class WSDocInfo {
      * @param result is the WSSecurityEngineResult to store
      */
     public void addResult(WSSecurityEngineResult result) {
-        resultsList.add(result);
+        results.add(result);
     }
     
     /**
@@ -225,8 +225,8 @@ public class WSDocInfo {
         } else if (id.charAt(0) == '#') {
             id = id.substring(1);
         }
-        if (!resultsList.isEmpty()) {
-            for (WSSecurityEngineResult result : resultsList) {
+        if (!results.isEmpty()) {
+            for (WSSecurityEngineResult result : results) {
                 String cId = (String)result.get(WSSecurityEngineResult.TAG_ID);
                 if (id.equals(cId)) {
                     return result;
@@ -240,12 +240,12 @@ public class WSDocInfo {
      * Get a list of WSSecurityEngineResults of the given Integer tag
      */
     public List<WSSecurityEngineResult> getResultsByTag(Integer tag) {
-        if (resultsList.isEmpty()) {
+        if (results.isEmpty()) {
             return Collections.emptyList();
         }
         
         List<WSSecurityEngineResult> foundResults = new ArrayList<>();
-        for (WSSecurityEngineResult result : resultsList) {
+        for (WSSecurityEngineResult result : results) {
             Integer resultTag = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
             if (tag.intValue() == resultTag.intValue()) {
                 foundResults.add(result);
@@ -265,8 +265,8 @@ public class WSDocInfo {
             id = id.substring(1);
         }
         
-        if (!resultsList.isEmpty()) {
-            for (WSSecurityEngineResult result : resultsList) {
+        if (!results.isEmpty()) {
+            for (WSSecurityEngineResult result : results) {
                 Integer resultTag = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
                 String cId = (String)result.get(WSSecurityEngineResult.TAG_ID);
                 if (tag.intValue() == resultTag.intValue() && id.equals(cId)) {
