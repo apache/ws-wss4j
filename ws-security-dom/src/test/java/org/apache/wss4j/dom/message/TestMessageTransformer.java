@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.dom.message;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,7 +46,7 @@ public class TestMessageTransformer extends org.junit.Assert {
         SecurityTestUtil.cleanup();
     }
     
-    public static Element duplicateEncryptedDataInWsseHeader(Element saaj, boolean moveReferenceList) throws TransformerException {
+    public static Element duplicateEncryptedDataInWsseHeader(Element saaj, boolean moveReferenceList) throws TransformerException, IOException {
         if (moveReferenceList) {
             moveReferenceList(saaj);
         }
@@ -81,7 +82,7 @@ public class TestMessageTransformer extends org.junit.Assert {
         return newEncData;
     }
 
-    public static Element duplicateEncryptedDataInWsseWrapperHeader(Element saaj, boolean moveReferenceList) throws TransformerException {
+    public static Element duplicateEncryptedDataInWsseWrapperHeader(Element saaj, boolean moveReferenceList) throws TransformerException, IOException {
         if (moveReferenceList) {
             moveReferenceList(saaj);
         }
@@ -120,7 +121,7 @@ public class TestMessageTransformer extends org.junit.Assert {
         return newEncData;
     }
     
-    public static Element duplicateEncryptedDataInWrapperBody(Element saaj) throws TransformerException {
+    public static Element duplicateEncryptedDataInWrapperBody(Element saaj) throws TransformerException, IOException {
         Element body = getFirstChildElement(saaj, new QName("http://schemas.xmlsoap.org/soap/envelope/",
                                                             "Body"), true);
         Element encData = getFirstChildElement(body, new QName("http://www.w3.org/2001/04/xmlenc#",
@@ -155,7 +156,7 @@ public class TestMessageTransformer extends org.junit.Assert {
         return newEncData;
     }
     
-    public static Element duplicateEncryptedDataAfterWrapperBody(Element saaj) throws TransformerException {
+    public static Element duplicateEncryptedDataAfterWrapperBody(Element saaj) throws TransformerException, IOException {
         Element body = getFirstChildElement(saaj, new QName("http://schemas.xmlsoap.org/soap/envelope/",
                                                             "Body"), true);
         Element encData = getFirstChildElement(body, new QName("http://www.w3.org/2001/04/xmlenc#",
@@ -193,7 +194,7 @@ public class TestMessageTransformer extends org.junit.Assert {
     }
 
     public static Element duplicateEncryptedDataInExternalWrapperElement(Element saaj,
-                                                                         boolean moveReferenceList) throws TransformerException {
+                                                                         boolean moveReferenceList) throws TransformerException, IOException {
         if (moveReferenceList) {
             moveReferenceList(saaj);
         }
@@ -231,7 +232,7 @@ public class TestMessageTransformer extends org.junit.Assert {
         return newEncData;
     }
     
-    public static Element addEncryptedDataWithEmbeddedEncryptedKeyInWsseHeader(Element saaj) throws TransformerException {
+    public static Element addEncryptedDataWithEmbeddedEncryptedKeyInWsseHeader(Element saaj) throws TransformerException, IOException {
         moveReferenceList(saaj);
         Element body = getFirstChildElement(saaj, new QName("http://schemas.xmlsoap.org/soap/envelope/",
                                                             "Body"), true);
@@ -301,7 +302,7 @@ public class TestMessageTransformer extends org.junit.Assert {
         ref.getParentNode().appendChild(newRef);
     }
 
-    private static void print(Document doc) throws TransformerException {
+    private static void print(Document doc) throws TransformerException, IOException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After transformation....");
             String outputString = XMLUtils.PrettyDocumentToString(doc);

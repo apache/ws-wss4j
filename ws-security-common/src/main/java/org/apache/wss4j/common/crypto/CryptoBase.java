@@ -20,6 +20,7 @@
 package org.apache.wss4j.common.crypto;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.security.MessageDigest;
@@ -276,15 +277,15 @@ public abstract class CryptoBase implements Crypto {
      */
     public X509Certificate[] getCertificatesFromBytes(byte[] data)
         throws WSSecurityException {
-        InputStream in = new ByteArrayInputStream(data);
         CertPath path = null;
-        try {
+        try (InputStream in = new ByteArrayInputStream(data)) {
             path = getCertificateFactory().generateCertPath(in);
-        } catch (CertificateException e) {
+        } catch (CertificateException | IOException e) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "parseError", e
             );
         }
+        
         List<?> l = path.getCertificates();
         X509Certificate[] certs = new X509Certificate[l.size()];
         int i = 0;

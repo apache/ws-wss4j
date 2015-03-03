@@ -81,13 +81,14 @@ public class AttachmentTest extends org.junit.Assert {
     }
 
     protected byte[] readInputStream(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        int read = 0;
-        byte[] buf = new byte[4096];
-        while ((read = inputStream.read(buf)) != -1) {
-            byteArrayOutputStream.write(buf, 0, read);
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            int read = 0;
+            byte[] buf = new byte[4096];
+            while ((read = inputStream.read(buf)) != -1) {
+                byteArrayOutputStream.write(buf, 0, read);
+            }
+            return byteArrayOutputStream.toByteArray();
         }
-        return byteArrayOutputStream.toByteArray();
     }
 
     @org.junit.Test

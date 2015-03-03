@@ -28,6 +28,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateEncodingException;
@@ -91,9 +92,15 @@ public class X509Security extends BinarySecurity {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, "invalidCertData", 0);
         }
-        InputStream in = new ByteArrayInputStream(data);
-        cachedCert = certCrypto.loadCertificate(in);
-        return cachedCert;
+        try (InputStream in = new ByteArrayInputStream(data)) {
+            cachedCert = certCrypto.loadCertificate(in);
+            return cachedCert;
+        } catch (IOException e) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "parseError", e
+            );
+        }
+
     }
 
     /**

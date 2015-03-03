@@ -19,6 +19,7 @@
 package org.apache.wss4j.stax.impl.securityToken;
 
 import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConfigurationException;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
@@ -27,6 +28,9 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.impl.util.UnsynchronizedByteArrayInputStream;
 
 import javax.security.auth.callback.CallbackHandler;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.cert.X509Certificate;
 
 public class X509V3SecurityTokenImpl extends X509SecurityTokenImpl {
@@ -40,8 +44,12 @@ public class X509V3SecurityTokenImpl extends X509SecurityTokenImpl {
         super(WSSecurityTokenConstants.X509V3Token, wsInboundSecurityContext, crypto, callbackHandler, id,
                 WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier, securityProperties, true);
 
-        X509Certificate x509Certificate = getCrypto().loadCertificate(new UnsynchronizedByteArrayInputStream(binaryContent));
-        setX509Certificates(new X509Certificate[]{x509Certificate});
+        try (InputStream inputStream = new UnsynchronizedByteArrayInputStream(binaryContent)) {
+            X509Certificate x509Certificate = getCrypto().loadCertificate(inputStream);
+            setX509Certificates(new X509Certificate[]{x509Certificate});
+        } catch (IOException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "parseError", e);
+        }
 
         // Check to see if the certificates actually correspond to the decryption crypto
         if (getCrypto().getX509Identifier(getX509Certificates()[0]) == null) {

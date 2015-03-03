@@ -73,6 +73,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -174,14 +175,14 @@ public abstract class AbstractTestBase extends org.junit.Assert {
     }
 
     protected Document doOutboundSecurityWithWSS4J(InputStream sourceDocument, String action, Properties properties)
-            throws WSSecurityException, TransformerException {
+            throws WSSecurityException, TransformerException, IOException {
         Map<String, Object> context = doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties);
         return (Document) context.get(SECURED_DOCUMENT);
     }
 
     protected Map<String, Object> doOutboundSecurityWithWSS4J_1(
             InputStream sourceDocument, String action, final Properties properties
-    ) throws WSSecurityException, TransformerException {
+    ) throws WSSecurityException, TransformerException, IOException {
         CustomWSS4JHandler wss4JHandler = new CustomWSS4JHandler();
         final Map<String, Object> messageContext = getMessageContext(sourceDocument);
         messageContext.put(WSHandlerConstants.ACTION, action);
@@ -373,9 +374,10 @@ public abstract class AbstractTestBase extends org.junit.Assert {
          * Handles incoming web service requests and outgoing responses
          *
          * @throws TransformerException
+         * @throws IOException 
          */
         public boolean doSender(Map<String, Object> mc, RequestData reqData, boolean isRequest)
-                throws WSSecurityException, TransformerException {
+                throws WSSecurityException, TransformerException, IOException {
 
             /*
              * Get the action first.

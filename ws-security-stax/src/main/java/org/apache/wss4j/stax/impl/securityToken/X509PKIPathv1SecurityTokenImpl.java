@@ -27,6 +27,8 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.impl.util.UnsynchronizedByteArrayInputStream;
 
 import javax.security.auth.callback.CallbackHandler;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.cert.CertPath;
 import java.security.cert.Certificate;
@@ -47,8 +49,7 @@ public class X509PKIPathv1SecurityTokenImpl extends X509SecurityTokenImpl {
         super(WSSecurityTokenConstants.X509PkiPathV1Token, wsInboundSecurityContext, crypto,
                 callbackHandler, id, keyIdentifier, securityProperties, true);
 
-        InputStream in = new UnsynchronizedByteArrayInputStream(binaryContent);
-        try {
+        try (InputStream in = new UnsynchronizedByteArrayInputStream(binaryContent)) {
             CertPath certPath = getCrypto().getCertificateFactory().generateCertPath(in);
             List<? extends Certificate> l = certPath.getCertificates();
             X509Certificate[] certs = new X509Certificate[l.size()];
@@ -59,7 +60,7 @@ public class X509PKIPathv1SecurityTokenImpl extends X509SecurityTokenImpl {
             if (certs.length > 0) {
                 setX509Certificates(certs);
             }
-        } catch (CertificateException e) {
+        } catch (CertificateException | IOException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "parseError", e);
         }
     }

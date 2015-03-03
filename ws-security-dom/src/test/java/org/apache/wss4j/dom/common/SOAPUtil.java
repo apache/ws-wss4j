@@ -50,9 +50,10 @@ public class SOAPUtil {
      * Convert an SOAP Envelope as a String to a org.w3c.dom.Document.
      */
     public static org.w3c.dom.Document toSOAPPart(String xml) throws Exception {
-        InputStream in = new ByteArrayInputStream(xml.getBytes());
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        return builder.parse(in);
+        try (InputStream in = new ByteArrayInputStream(xml.getBytes())) {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            return builder.parse(in);
+        }
     }
     
 }

@@ -20,6 +20,7 @@ package org.apache.wss4j.stax.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Map;
@@ -128,7 +129,7 @@ public class SignatureCRLTest extends AbstractTestBase {
     @Override
     protected Map<String, Object> doOutboundSecurityWithWSS4J_1(
         InputStream sourceDocument, String action, final Properties properties
-    ) throws WSSecurityException, TransformerException {
+    ) throws WSSecurityException, TransformerException, IOException {
         CustomWSS4JHandler wss4JHandler = new CustomWSS4JHandler();
         final Map<String, Object> messageContext = getMessageContext(sourceDocument);
         messageContext.put(WSHandlerConstants.ACTION, action);

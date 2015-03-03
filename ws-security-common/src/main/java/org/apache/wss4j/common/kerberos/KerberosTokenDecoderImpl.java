@@ -173,12 +173,13 @@ public class KerberosTokenDecoderImpl implements KerberosTokenDecoder {
     }
 
     private static byte[] toByteArray(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        int read;
-        byte[] buf = new byte[1024];
-        while ((read = inputStream.read(buf)) != -1) {
-            byteArrayOutputStream.write(buf, 0, read);
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            int read;
+            byte[] buf = new byte[1024];
+            while ((read = inputStream.read(buf)) != -1) {
+                byteArrayOutputStream.write(buf, 0, read);
+            }
+            return byteArrayOutputStream.toByteArray();
         }
-        return byteArrayOutputStream.toByteArray();
     }
 }

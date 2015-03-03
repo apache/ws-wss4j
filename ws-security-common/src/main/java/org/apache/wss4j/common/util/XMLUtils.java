@@ -20,6 +20,7 @@ package org.apache.wss4j.common.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 
 import javax.xml.transform.Source;
@@ -87,10 +88,11 @@ public final class XMLUtils {
         return null;
     }
     
-    public static String PrettyDocumentToString(Document doc) throws TransformerException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ElementToStream(doc.getDocumentElement(), baos);
-        return new String(baos.toByteArray());
+    public static String PrettyDocumentToString(Document doc) throws IOException, TransformerException {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            ElementToStream(doc.getDocumentElement(), baos);
+            return new String(baos.toByteArray());
+        }
     }
 
     public static void ElementToStream(Element element, OutputStream out) 
@@ -107,20 +109,21 @@ public final class XMLUtils {
      *
      * @param source the resource to get
      */
-    public static InputSource sourceToInputSource(Source source) throws TransformerException {
+    public static InputSource sourceToInputSource(Source source) throws IOException, TransformerException {
         if (source instanceof SAXSource) {
             return ((SAXSource) source).getInputSource();
         } else if (source instanceof DOMSource) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             Node node = ((DOMSource) source).getNode();
             if (node instanceof Document) {
                 node = ((Document) node).getDocumentElement();
             }
             Element domElement = (Element) node;
-            ElementToStream(domElement, baos);
-            InputSource isource = new InputSource(source.getSystemId());
-            isource.setByteStream(new ByteArrayInputStream(baos.toByteArray()));
-            return isource;
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                ElementToStream(domElement, baos);
+                InputSource isource = new InputSource(source.getSystemId());
+                isource.setByteStream(new ByteArrayInputStream(baos.toByteArray()));
+                return isource;
+            }
         } else if (source instanceof StreamSource) {
             StreamSource ss = (StreamSource) source;
             InputSource isource = new InputSource(ss.getSystemId());

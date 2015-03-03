@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.processor;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -426,10 +427,15 @@ public class EncryptedKeyProcessor implements Processor {
                     if (token == null) {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidCertData", 0);
                     }
-                    InputStream in = new ByteArrayInputStream(token);
-                    X509Certificate cert = data.getDecCrypto().loadCertificate(in);
-                    if (cert != null) {
-                        return new X509Certificate[]{cert};
+                    try (InputStream in = new ByteArrayInputStream(token)) {
+                        X509Certificate cert = data.getDecCrypto().loadCertificate(in);
+                        if (cert != null) {
+                            return new X509Certificate[]{cert};
+                        }
+                    } catch (IOException e) {
+                        throw new WSSecurityException(
+                            WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "parseError", e
+                        );
                     }
                 }
             }
