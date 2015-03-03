@@ -21,7 +21,10 @@ package org.apache.wss4j.dom.str;
 
 import java.util.List;
 
+import javax.security.auth.callback.Callback;
+
 import org.apache.wss4j.common.bsp.BSPRule;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
@@ -247,5 +250,37 @@ public final class STRParserUtil {
         }
     }
 
-    
+    /**
+     * Get the Secret Key from a CallbackHandler
+     * @param id The id of the element
+     * @param type The type of the element (may be null)
+     * @param cb The CallbackHandler object
+     * @return A Secret Key
+     * @throws WSSecurityException
+     */
+    public static byte[] getSecretKeyFromToken(
+        String id,
+        String type,
+        int identifier,
+        RequestData data
+    ) throws WSSecurityException {
+        if (id.charAt(0) == '#') {
+            id = id.substring(1);
+        }
+        WSPasswordCallback pwcb = 
+            new WSPasswordCallback(id, null, type, identifier);
+        try {
+            Callback[] callbacks = new Callback[]{pwcb};
+            if (data.getCallbackHandler() != null) {
+                data.getCallbackHandler().handle(callbacks);
+                return pwcb.getKey();
+            }
+        } catch (Exception e) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILURE,
+                "noPassword", e, id);
+        }
+
+        return null;
+    }
 }

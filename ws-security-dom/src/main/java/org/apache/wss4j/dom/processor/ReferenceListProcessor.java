@@ -25,9 +25,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
@@ -60,6 +58,8 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.CallbackLookup;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.str.STRParser;
+import org.apache.wss4j.dom.str.STRParserParameters;
+import org.apache.wss4j.dom.str.STRParserResult;
 import org.apache.wss4j.dom.str.SecurityTokenRefSTRParser;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.encryption.XMLCipher;
@@ -182,15 +182,18 @@ public class ReferenceListProcessor implements Processor {
         if (secRefToken == null) {
             symmetricKey = X509Util.getSharedKey(keyInfoElement, symEncAlgo, data.getCallbackHandler());
         } else {
+            STRParserParameters parameters = new STRParserParameters();
+            parameters.setData(data);
+            parameters.setWsDocInfo(wsDocInfo);
+            parameters.setStrElement(secRefToken);
+            if (symEncAlgo != null) {
+                parameters.setDerivationKeyLength(KeyUtils.getKeyLength(symEncAlgo));
+            }
+            
             STRParser strParser = new SecurityTokenRefSTRParser();
-            Map<String, Object> parameters = new HashMap<String, Object>(1);
-            parameters.put(SecurityTokenRefSTRParser.SIGNATURE_METHOD, symEncAlgo);
-            strParser.parseSecurityTokenReference(
-                secRefToken, data,
-                wsDocInfo, parameters
-            );
-            byte[] secretKey = strParser.getSecretKey();
-            principal = strParser.getPrincipal();
+            STRParserResult parserResult = strParser.parseSecurityTokenReference(parameters);
+            byte[] secretKey = parserResult.getSecretKey();
+            principal = parserResult.getPrincipal();
             symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, secretKey);
         }
         

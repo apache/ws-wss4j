@@ -21,7 +21,6 @@ package org.apache.wss4j.dom.processor;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.w3c.dom.Element;
 import org.apache.wss4j.dom.WSConstants;
@@ -34,6 +33,8 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.DerivedKeyToken;
 import org.apache.wss4j.dom.str.DerivedKeyTokenSTRParser;
 import org.apache.wss4j.dom.str.STRParser;
+import org.apache.wss4j.dom.str.STRParserParameters;
+import org.apache.wss4j.dom.str.STRParserResult;
 
 /**
  * The processor to process <code>wsc:DerivedKeyToken</code>.
@@ -61,12 +62,14 @@ public class DerivedKeyTokenProcessor implements Processor {
         byte[] secret = null;
         Element secRefElement = dkt.getSecurityTokenReferenceElement();
         if (secRefElement != null) {
+            STRParserParameters parameters = new STRParserParameters();
+            parameters.setData(data);
+            parameters.setWsDocInfo(wsDocInfo);
+            parameters.setStrElement(secRefElement);
+            
             STRParser strParser = new DerivedKeyTokenSTRParser();
-            Map<String, Object> parameters = Collections.emptyMap();
-            strParser.parseSecurityTokenReference(
-                secRefElement, data, wsDocInfo, parameters
-            );
-            secret = strParser.getSecretKey();
+            STRParserResult parserResult = strParser.parseSecurityTokenReference(parameters);
+            secret = parserResult.getSecretKey();
         } else {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "noReference");
         }

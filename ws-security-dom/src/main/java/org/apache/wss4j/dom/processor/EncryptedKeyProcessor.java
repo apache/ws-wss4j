@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -57,6 +56,8 @@ import org.apache.wss4j.dom.message.token.DOMX509IssuerSerial;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.str.EncryptedKeySTRParser;
 import org.apache.wss4j.dom.str.STRParser;
+import org.apache.wss4j.dom.str.STRParserParameters;
+import org.apache.wss4j.dom.str.STRParserResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.exceptions.Base64DecodingException;
@@ -141,9 +142,31 @@ public class EncryptedKeyProcessor implements Processor {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noCipher");
         }
         
-        STRParser strParser = new EncryptedKeySTRParser();
-        X509Certificate[] certs = 
-            getCertificatesFromEncryptedKey(elem, data, wsDocInfo, strParser);
+        Element keyInfoChildElement = getKeyInfoChildElement(elem, data);
+        
+        X509Certificate[] certs = null;
+        STRParser.REFERENCE_TYPE referenceType = null;
+        if (SecurityTokenReference.SECURITY_TOKEN_REFERENCE.equals(keyInfoChildElement.getLocalName()) 
+            && WSConstants.WSSE_NS.equals(keyInfoChildElement.getNamespaceURI())) {
+            STRParserParameters parameters = new STRParserParameters();
+            parameters.setData(data);
+            parameters.setWsDocInfo(wsDocInfo);
+            parameters.setStrElement(keyInfoChildElement);
+            
+            STRParser strParser = new EncryptedKeySTRParser();
+            STRParserResult parserResult = strParser.parseSecurityTokenReference(parameters);
+
+            certs = parserResult.getCertificates();
+            referenceType = parserResult.getCertificatesReferenceType();
+        } else {
+            certs = getCertificatesFromX509Data(keyInfoChildElement, data);
+        }
+        
+        if (certs == null || certs.length < 1 || certs[0] == null) {
+            throw new WSSecurityException(
+                                          WSSecurityException.ErrorCode.FAILURE,
+                                          "noCertsFound", "decryption (KeyId)");
+        }
 
         // Check for compliance against the defined AlgorithmSuite
         if (algorithmSuite != null) {
@@ -234,7 +257,7 @@ public class EncryptedKeyProcessor implements Processor {
         if (!"".equals(tokenId)) {
             result.put(WSSecurityEngineResult.TAG_ID, tokenId);
         }
-        result.put(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE, strParser.getCertificatesReferenceType());
+        result.put(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE, referenceType);
         wsDocInfo.addResult(result);
         wsDocInfo.addTokenElement(elem);
         return Collections.singletonList(result);
@@ -348,20 +371,11 @@ public class EncryptedKeyProcessor implements Processor {
         return null;
     }
     
-    /**
-     * @return the Certificate(s) corresponding to the public key reference in the 
-     * EncryptedKey Element
-     */
-    private X509Certificate[] getCertificatesFromEncryptedKey(
-        Element xencEncryptedKey,
-        RequestData data,
-        WSDocInfo wsDocInfo,
-        STRParser strParser
+    private Element getKeyInfoChildElement(
+        Element xencEncryptedKey, RequestData data
     ) throws WSSecurityException {
         Element keyInfo = 
-            WSSecurityUtil.getDirectChildElement(
-                xencEncryptedKey, "KeyInfo", WSConstants.SIG_NS
-            );
+            WSSecurityUtil.getDirectChildElement(xencEncryptedKey, "KeyInfo", WSConstants.SIG_NS);
         if (keyInfo != null) {
             Element strElement = null;
 
@@ -378,55 +392,50 @@ public class EncryptedKeyProcessor implements Processor {
                 data.getBSPEnforcer().handleBSPRule(BSPRule.R5424);
             }
 
-            if (strElement == null || strParser == null) {
+            if (strElement == null) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY, "noSecTokRef"
                 );
             }
-            
-            X509Certificate[] certs = null;
-            if (SecurityTokenReference.SECURITY_TOKEN_REFERENCE.equals(strElement.getLocalName()) 
-                && WSConstants.WSSE_NS.equals(strElement.getNamespaceURI())) {
-                Map<String, Object> parameters = Collections.emptyMap();
-                strParser.parseSecurityTokenReference(strElement, data, wsDocInfo, parameters);
-                
-                certs = strParser.getCertificates();
-            } else if (WSConstants.SIG_NS.equals(strElement.getNamespaceURI())
-                && WSConstants.X509_DATA_LN.equals(strElement.getLocalName())) {
-                data.getBSPEnforcer().handleBSPRule(BSPRule.R5426);
-                
-                Element x509Child = getFirstElement(strElement);
-                
-                if (x509Child != null && WSConstants.SIG_NS.equals(x509Child.getNamespaceURI())) {
-                    if (WSConstants.X509_ISSUER_SERIAL_LN.equals(x509Child.getLocalName())) {
-                        DOMX509IssuerSerial issuerSerial = new DOMX509IssuerSerial(x509Child);
-                        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
-                        cryptoType.setIssuerSerial(issuerSerial.getIssuer(), issuerSerial.getSerialNumber());
-                        certs = data.getDecCrypto().getX509Certificates(cryptoType);
-                    } else if (WSConstants.X509_CERT_LN.equals(x509Child.getLocalName())) {
-                        byte[] token = getToken(x509Child);
-                        if (token == null) {
-                            throw new WSSecurityException(
-                                WSSecurityException.ErrorCode.FAILURE, "invalidCertData", 0);
-                        }
-                        InputStream in = new ByteArrayInputStream(token);
-                        X509Certificate cert = data.getDecCrypto().loadCertificate(in);
-                        if (cert != null) {
-                            certs = new X509Certificate[]{cert};
-                        }
-                    }
-                }
-            }
-            
-            if (certs == null || certs.length < 1 || certs[0] == null) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE,
-                    "noCertsFound", "decryption (KeyId)");
-            }
-            return certs;
+
+            return strElement;
         } else {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");
         }
+    }
+
+    private X509Certificate[] getCertificatesFromX509Data(
+        Element strElement,
+        RequestData data
+    ) throws WSSecurityException {
+
+        if (WSConstants.SIG_NS.equals(strElement.getNamespaceURI())
+            && WSConstants.X509_DATA_LN.equals(strElement.getLocalName())) {
+            data.getBSPEnforcer().handleBSPRule(BSPRule.R5426);
+
+            Element x509Child = getFirstElement(strElement);
+
+            if (x509Child != null && WSConstants.SIG_NS.equals(x509Child.getNamespaceURI())) {
+                if (WSConstants.X509_ISSUER_SERIAL_LN.equals(x509Child.getLocalName())) {
+                    DOMX509IssuerSerial issuerSerial = new DOMX509IssuerSerial(x509Child);
+                    CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
+                    cryptoType.setIssuerSerial(issuerSerial.getIssuer(), issuerSerial.getSerialNumber());
+                    return data.getDecCrypto().getX509Certificates(cryptoType);
+                } else if (WSConstants.X509_CERT_LN.equals(x509Child.getLocalName())) {
+                    byte[] token = getToken(x509Child);
+                    if (token == null) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidCertData", 0);
+                    }
+                    InputStream in = new ByteArrayInputStream(token);
+                    X509Certificate cert = data.getDecCrypto().loadCertificate(in);
+                    if (cert != null) {
+                        return new X509Certificate[]{cert};
+                    }
+                }
+            }
+        }
+
+        return null;
     }
     
     private Element getFirstElement(Element element) {
@@ -500,7 +509,7 @@ public class EncryptedKeyProcessor implements Processor {
         if (dataRefURIs == null || dataRefURIs.isEmpty()) {
             return null;
         }
-        List<WSDataRef> dataRefs = new ArrayList<>();
+        List<WSDataRef> dataRefs = new ArrayList<>(dataRefURIs.size());
         for (String dataRefURI : dataRefURIs) {
             WSDataRef dataRef = 
                 decryptDataRef(doc, dataRefURI, docInfo, decryptedBytes, data);

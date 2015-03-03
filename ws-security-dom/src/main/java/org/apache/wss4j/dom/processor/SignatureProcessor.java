@@ -29,9 +29,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.crypto.Data;
 import javax.xml.crypto.MarshalException;
@@ -77,6 +75,8 @@ import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.message.token.Timestamp;
 import org.apache.wss4j.dom.str.STRParser;
 import org.apache.wss4j.dom.str.STRParser.REFERENCE_TYPE;
+import org.apache.wss4j.dom.str.STRParserParameters;
+import org.apache.wss4j.dom.str.STRParserResult;
 import org.apache.wss4j.dom.str.SignatureSTRParser;
 import org.apache.wss4j.dom.transform.AttachmentContentSignatureTransform;
 import org.apache.wss4j.dom.transform.STRTransform;
@@ -158,19 +158,23 @@ public class SignatureProcessor implements Processor {
                     credential = validator.validate(credential, data);
                 }
             } else {
-                STRParser strParser = new SignatureSTRParser();
-                Map<String, Object> parameters = new HashMap<>(1);
-                parameters.put(SignatureSTRParser.SIGNATURE_METHOD, signatureMethod);
-                strParser.parseSecurityTokenReference(
-                    child, data, wsDocInfo, parameters
-                );
-                principal = strParser.getPrincipal();
-                certs = strParser.getCertificates();
-                publicKey = strParser.getPublicKey();
-                secretKey = strParser.getSecretKey();
-                referenceType = strParser.getCertificatesReferenceType();
+                STRParserParameters parameters = new STRParserParameters();
+                parameters.setData(data);
+                parameters.setWsDocInfo(wsDocInfo);
+                parameters.setStrElement(child);
+                if (signatureMethod != null) {
+                    parameters.setDerivationKeyLength(KeyUtils.getKeyLength(signatureMethod));
+                }
                 
-                boolean trusted = strParser.isTrustedCredential();
+                STRParser strParser = new SignatureSTRParser();
+                STRParserResult parserResult = strParser.parseSecurityTokenReference(parameters);
+                principal = parserResult.getPrincipal();
+                certs = parserResult.getCertificates();
+                publicKey = parserResult.getPublicKey();
+                secretKey = parserResult.getSecretKey();
+                referenceType = parserResult.getCertificatesReferenceType();
+                
+                boolean trusted = parserResult.isTrustedCredential();
                 if (trusted && LOG.isDebugEnabled()) {
                     LOG.debug("Direct Trust for SAML/BST credential");
                 }

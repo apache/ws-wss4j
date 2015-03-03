@@ -20,9 +20,7 @@
 package org.apache.wss4j.dom.saml;
 
 import java.security.Principal;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -42,6 +40,8 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.processor.EncryptedKeyProcessor;
 import org.apache.wss4j.dom.str.STRParser;
+import org.apache.wss4j.dom.str.STRParserParameters;
+import org.apache.wss4j.dom.str.STRParserResult;
 import org.apache.wss4j.dom.str.SignatureSTRParser;
 import org.apache.xml.security.utils.Base64;
 
@@ -97,16 +97,18 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
                                 "decoding.general", e);
                     }
                 } else if (SecurityTokenReference.STR_QNAME.equals(el)) {
-                    STRParser strParser = new SignatureSTRParser();
-                    Map<String, Object> parameters = Collections.emptyMap();
-                    strParser.parseSecurityTokenReference(
-                        (Element)node, data, docInfo, parameters
-                    );
-                    SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo(strParser.getCertificates());
-                    samlKeyInfo.setPublicKey(strParser.getPublicKey());
-                    samlKeyInfo.setSecret(strParser.getSecretKey());
+                    STRParserParameters parameters = new STRParserParameters();
+                    parameters.setData(data);
+                    parameters.setWsDocInfo(docInfo);
+                    parameters.setStrElement((Element)node);
                     
-                    Principal principal = strParser.getPrincipal();
+                    STRParser strParser = new SignatureSTRParser();
+                    STRParserResult parserResult = strParser.parseSecurityTokenReference(parameters);
+                    SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo(parserResult.getCertificates());
+                    samlKeyInfo.setPublicKey(parserResult.getPublicKey());
+                    samlKeyInfo.setSecret(parserResult.getSecretKey());
+                    
+                    Principal principal = parserResult.getPrincipal();
                     
                     // Check for compliance against the defined AlgorithmSuite
                     AlgorithmSuite algorithmSuite = data.getSamlAlgorithmSuite(); 

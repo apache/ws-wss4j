@@ -22,10 +22,8 @@ package org.apache.wss4j.dom.processor;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.crypto.SecretKey;
 import javax.xml.namespace.QName;
@@ -45,6 +43,8 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.str.STRParser;
+import org.apache.wss4j.dom.str.STRParserParameters;
+import org.apache.wss4j.dom.str.STRParserResult;
 import org.apache.wss4j.dom.str.SecurityTokenRefSTRParser;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 
@@ -101,15 +101,18 @@ public class EncryptedDataProcessor implements Processor {
         List<WSSecurityEngineResult> encrKeyResults = null;
         Principal principal = null;
         if (secRefToken != null) {
+            STRParserParameters parameters = new STRParserParameters();
+            parameters.setData(request);
+            parameters.setWsDocInfo(wsDocInfo);
+            parameters.setStrElement(secRefToken);
+            if (symEncAlgo != null) {
+                parameters.setDerivationKeyLength(KeyUtils.getKeyLength(symEncAlgo));
+            }
+            
             STRParser strParser = new SecurityTokenRefSTRParser();
-            Map<String, Object> parameters = new HashMap<String, Object>(1);
-            parameters.put(SecurityTokenRefSTRParser.SIGNATURE_METHOD, symEncAlgo);
-            strParser.parseSecurityTokenReference(
-                secRefToken, request,
-                wsDocInfo, parameters
-            );
-            byte[] secretKey = strParser.getSecretKey();
-            principal = strParser.getPrincipal();
+            STRParserResult parserResult = strParser.parseSecurityTokenReference(parameters);
+            byte[] secretKey = parserResult.getSecretKey();
+            principal = parserResult.getPrincipal();
             key = KeyUtils.prepareSecretKey(symEncAlgo, secretKey);
             encrKeyResults = new ArrayList<>();
         } else if (encryptedKeyElement != null) {
