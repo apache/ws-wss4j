@@ -101,10 +101,6 @@ public class ReferenceListProcessor implements Processor {
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         List<WSDataRef> dataRefs = new ArrayList<WSDataRef>();
-        //find out if there's an EncryptedKey in the doc (AsymmetricBinding)
-        Element wsseHeaderElement = wsDocInfo.getSecurityHeader();
-        boolean asymBinding = WSSecurityUtil.getDirectChildElement(
-            wsseHeaderElement, WSConstants.ENC_KEY_LN, WSConstants.ENC_NS) != null;
         for (Node node = elem.getFirstChild(); 
             node != null; 
             node = node.getNextSibling()
@@ -120,7 +116,7 @@ public class ReferenceListProcessor implements Processor {
                 if (wsDocInfo.getResultByTag(WSConstants.ENCR, dataRefURI) == null) {
                     WSDataRef dataRef = 
                         decryptDataRefEmbedded(
-                            elem.getOwnerDocument(), dataRefURI, data, wsDocInfo, asymBinding);
+                            elem.getOwnerDocument(), dataRefURI, data, wsDocInfo);
                     dataRefs.add(dataRef);
                 }
             }
@@ -137,8 +133,7 @@ public class ReferenceListProcessor implements Processor {
         Document doc, 
         String dataRefURI, 
         RequestData data,
-        WSDocInfo wsDocInfo,
-        boolean asymBinding
+        WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Found data reference: " + dataRefURI);
@@ -148,7 +143,7 @@ public class ReferenceListProcessor implements Processor {
         //
         Element encryptedDataElement = findEncryptedDataElement(doc, wsDocInfo, dataRefURI);
         
-        if (encryptedDataElement != null && asymBinding && data.isRequireSignedEncryptedDataElements()) {
+        if (encryptedDataElement != null && data.isRequireSignedEncryptedDataElements()) {
             List<WSSecurityEngineResult> signedResults = 
                 wsDocInfo.getResultsByTag(WSConstants.SIGN);
             WSSecurityUtil.verifySignedElement(encryptedDataElement, signedResults);
