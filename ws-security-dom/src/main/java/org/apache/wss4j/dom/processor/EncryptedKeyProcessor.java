@@ -28,7 +28,6 @@ import java.security.cert.X509Certificate;
 import java.security.spec.MGF1ParameterSpec;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.crypto.Cipher;
@@ -226,7 +225,8 @@ public class EncryptedKeyProcessor implements Processor {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
         }
         
-        List<String> dataRefURIs = getDataRefURIs(elem);
+        Element refList = 
+            WSSecurityUtil.getDirectChildElement(elem, "ReferenceList", WSConstants.ENC_NS);
         
         byte[] encryptedEphemeralKey = null;
         byte[] decryptedBytes = null;
@@ -237,11 +237,10 @@ public class EncryptedKeyProcessor implements Processor {
         } catch (IllegalStateException ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
         } catch (Exception ex) {
-            decryptedBytes = getRandomKey(dataRefURIs, elem.getOwnerDocument(), wsDocInfo);
+            decryptedBytes = getRandomKey(refList, wsDocInfo);
         }
 
-        List<WSDataRef> dataRefs = decryptDataRefs(dataRefURIs, elem.getOwnerDocument(), wsDocInfo,
-            decryptedBytes, data);
+        List<WSDataRef> dataRefs = decryptDataRefs(refList, wsDocInfo, decryptedBytes, data);
         
         WSSecurityEngineResult result = new WSSecurityEngineResult(
                 WSConstants.ENCR, 
@@ -267,19 +266,17 @@ public class EncryptedKeyProcessor implements Processor {
     /**
      * Generates a random secret key using the algorithm specified in the
      * first DataReference URI
-     * 
-     * @param dataRefURIs
-     * @param doc
-     * @param wsDocInfo
-     * @throws WSSecurityException
      */
-    private static byte[] getRandomKey(List<String> dataRefURIs, Document doc, WSDocInfo wsDocInfo) throws WSSecurityException {
+    private static byte[] getRandomKey(Element refList, WSDocInfo wsDocInfo) throws WSSecurityException {
         try {
             String alg = "AES";
             int size = 16;
-            if (!dataRefURIs.isEmpty()) {
-                String uri = dataRefURIs.iterator().next();
-                Element ee = ReferenceListProcessor.findEncryptedDataElement(doc, wsDocInfo, uri);
+            String uri = getFirstDataRefURI(refList);
+            
+            if (uri != null) {
+                Element ee = 
+                    ReferenceListProcessor.findEncryptedDataElement(refList.getOwnerDocument(), 
+                                                                    wsDocInfo, uri);
                 String algorithmURI = X509Util.getEncAlgo(ee);
                 alg = JCEMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
                 size = KeyUtils.getKeyLength(algorithmURI);
@@ -299,6 +296,24 @@ public class EncryptedKeyProcessor implements Processor {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
             }
         }
+    }
+    
+    private static String getFirstDataRefURI(Element refList) {
+        // Lookup the references that are encrypted with this key
+        if (refList != null) {
+            for (Node node = refList.getFirstChild(); node != null; node = node.getNextSibling()) {
+                if (Node.ELEMENT_NODE == node.getNodeType()
+                        && WSConstants.ENC_NS.equals(node.getNamespaceURI())
+                        && "DataReference".equals(node.getLocalName())) {
+                    String dataRefURI = ((Element) node).getAttributeNS(null, "URI");
+                    if (dataRefURI.charAt(0) == '#') {
+                        dataRefURI = dataRefURI.substring(1);
+                    }
+                    return dataRefURI;
+                }
+            }
+        }
+        return null;
     }
     
     /**
@@ -477,50 +492,35 @@ public class EncryptedKeyProcessor implements Processor {
     }
     
     /**
-     * Find the list of all URIs that this encrypted Key references
-     */
-    private List<String> getDataRefURIs(Element xencEncryptedKey) {
-        // Lookup the references that are encrypted with this key
-        Element refList = 
-            WSSecurityUtil.getDirectChildElement(
-                xencEncryptedKey, "ReferenceList", WSConstants.ENC_NS
-            );
-        List<String> dataRefURIs = new LinkedList<>();
-        if (refList != null) {
-            for (Node node = refList.getFirstChild(); node != null; node = node.getNextSibling()) {
-                if (Node.ELEMENT_NODE == node.getNodeType()
-                        && WSConstants.ENC_NS.equals(node.getNamespaceURI())
-                        && "DataReference".equals(node.getLocalName())) {
-                    String dataRefURI = ((Element) node).getAttributeNS(null, "URI");
-                    if (dataRefURI.charAt(0) == '#') {
-                        dataRefURI = dataRefURI.substring(1);
-                    }
-                    dataRefURIs.add(dataRefURI);
-                }
-            }
-        }
-        return dataRefURIs;
-    }
-    
-    /**
      * Decrypt all data references
      */
-    private List<WSDataRef> decryptDataRefs(List<String> dataRefURIs, Document doc,
-        WSDocInfo docInfo, byte[] decryptedBytes, RequestData data
+    private List<WSDataRef> decryptDataRefs(Element refList, WSDocInfo docInfo, 
+                                            byte[] decryptedBytes, RequestData data
     ) throws WSSecurityException {
         //
         // At this point we have the decrypted session (symmetric) key. According
         // to W3C XML-Enc this key is used to decrypt _any_ references contained in
         // the reference list
-        if (dataRefURIs == null || dataRefURIs.isEmpty()) {
+        if (refList == null) {
             return null;
         }
-        List<WSDataRef> dataRefs = new ArrayList<>(dataRefURIs.size());
-        for (String dataRefURI : dataRefURIs) {
-            WSDataRef dataRef = 
-                decryptDataRef(doc, dataRefURI, docInfo, decryptedBytes, data);
-            dataRefs.add(dataRef);
+        
+        List<WSDataRef> dataRefs = new ArrayList<>();
+        for (Node node = refList.getFirstChild(); node != null; node = node.getNextSibling()) {
+            if (Node.ELEMENT_NODE == node.getNodeType()
+                    && WSConstants.ENC_NS.equals(node.getNamespaceURI())
+                    && "DataReference".equals(node.getLocalName())) {
+                String dataRefURI = ((Element) node).getAttributeNS(null, "URI");
+                if (dataRefURI.charAt(0) == '#') {
+                    dataRefURI = dataRefURI.substring(1);
+                }
+                
+                WSDataRef dataRef = 
+                    decryptDataRef(refList.getOwnerDocument(), dataRefURI, docInfo, decryptedBytes, data);
+                dataRefs.add(dataRef);
+            }
         }
+        
         return dataRefs;
     }
 

@@ -230,7 +230,7 @@ public class SignatureProcessor implements Processor {
             buildProtectedRefs(
                 elem.getOwnerDocument(), xmlSignature.getSignedInfo(), data, wsDocInfo
             );
-        if (dataRefs.size() == 0) {
+        if (dataRefs.isEmpty()) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
         }
         
@@ -520,7 +520,7 @@ public class SignatureProcessor implements Processor {
         RequestData requestData,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
-        List<WSDataRef> protectedRefs = new ArrayList<>();
+        List<WSDataRef> protectedRefs = new ArrayList<>(signedInfo.getReferences().size());
         for (Object reference : signedInfo.getReferences()) {
             Reference siRef = (Reference)reference;
             String uri = siRef.getURI();
