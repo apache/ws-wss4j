@@ -34,9 +34,10 @@ import org.apache.wss4j.common.saml.builder.SAML1ComponentBuilder;
 import org.apache.wss4j.common.saml.builder.SAML2ComponentBuilder;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.InetAddressUtils;
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.signature.XMLSignature;
+import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.utils.Base64;
+import org.apache.xml.security.utils.XMLUtils;
 import org.joda.time.DateTime;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.saml.common.SAMLObjectContentReference;
@@ -750,18 +751,31 @@ public class SamlAssertionWrapper {
             sig = saml1.getSignature();
         }
         if (sig != null) {
-            Element signatureElement = sig.getDOM();
-            
-            try {
-                // Use XML-Security class to obtain SignatureValue
-                XMLSignature xmlSignature = new XMLSignature(signatureElement, "");
-                return xmlSignature.getSignatureValue();
-            } catch (XMLSecurityException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", e
-                );
+            return getSignatureValue(sig);
+        }
+        return null;
+    }
+    
+    private byte[] getSignatureValue(Signature signature) throws WSSecurityException {
+        Element signatureElement = signature.getDOM();
+        
+        if (signatureElement != null) {
+            Element signedInfoElem = XMLUtils.getNextElement(signatureElement.getFirstChild());
+            if (signedInfoElem != null) {
+                Element signatureValueElement = 
+                    XMLUtils.getNextElement(signedInfoElem.getNextSibling());
+                if (signatureValueElement != null) {
+                    try {
+                        return Base64.decode(signatureValueElement);
+                    } catch (Base64DecodingException ex) {
+                        throw new WSSecurityException(
+                            WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", ex
+                        );
+                    }
+                }
             }
         }
+        
         return null;
     }
 

@@ -32,10 +32,8 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,9 +60,9 @@ public abstract class CryptoBase implements Crypto {
                     
     private static final Constructor<?> BC_509CLASS_CONS;
 
-    protected Map<String, CertificateFactory> certFactMap = new HashMap<>();
-    private String defaultAlias = null;
-    private String cryptoProvider = null;
+    protected CertificateFactory certificateFactory;
+    private String defaultAlias;
+    private String cryptoProvider;
     
     static {
         Constructor<?> cons = null;
@@ -127,15 +125,10 @@ public abstract class CryptoBase implements Crypto {
     /**
      * Sets the CertificateFactory instance on this Crypto instance
      *
-     * @param provider the CertificateFactory provider name
      * @param certFactory the CertificateFactory the CertificateFactory instance to set
      */
-    public void setCertificateFactory(String provider, CertificateFactory certFactory) {
-        if (provider == null || provider.length() == 0) {
-            certFactMap.put(certFactory.getProvider().getName(), certFactory);
-        } else {
-            certFactMap.put(provider, certFactory);
-        }
+    public void setCertificateFactory(CertificateFactory certFactory) {
+        this.certificateFactory = certFactory;
     }
     
     /**
@@ -146,37 +139,28 @@ public abstract class CryptoBase implements Crypto {
      * @throws WSSecurityException
      */
     public CertificateFactory getCertificateFactory() throws WSSecurityException {
-        String provider = getCryptoProvider();
-
-        //Try to find a CertificateFactory that generates certs that are fully
-        //compatible with the certs in the KeyStore  (Sun -> Sun, BC -> BC, etc...)
-        CertificateFactory factory = null;
-        if (provider != null && provider.length() != 0) {
-            factory = certFactMap.get(provider);
-        } else {
-            factory = certFactMap.get("DEFAULT");
+        if (certificateFactory != null) {
+            return certificateFactory;
         }
-        if (factory == null) {
-            try {
-                if (provider == null || provider.length() == 0) {
-                    factory = CertificateFactory.getInstance("X.509");
-                    certFactMap.put("DEFAULT", factory);
-                } else {
-                    factory = CertificateFactory.getInstance("X.509", provider);
-                    certFactMap.put(provider, factory);
-                }
-                certFactMap.put(factory.getProvider().getName(), factory);
-            } catch (CertificateException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "unsupportedCertType", e
-                );
-            } catch (NoSuchProviderException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noSecProvider", e
-                );
+        
+        try {
+            String provider = getCryptoProvider();
+            if (provider == null || provider.length() == 0) {
+                certificateFactory = CertificateFactory.getInstance("X.509");
+            } else {
+                certificateFactory = CertificateFactory.getInstance("X.509", provider);
             }
+        } catch (CertificateException e) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "unsupportedCertType", e
+            );
+        } catch (NoSuchProviderException e) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noSecProvider", e
+            );
         }
-        return factory;
+        
+        return certificateFactory;
     }
 
     /**

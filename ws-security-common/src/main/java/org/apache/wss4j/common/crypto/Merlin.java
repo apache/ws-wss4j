@@ -356,7 +356,7 @@ public class Merlin extends CryptoBase {
      * @param input <code>InputStream</code> to read from
      * @throws WSSecurityException
      */
-    public KeyStore load(InputStream input, String storepass, String provider, String type) 
+    protected KeyStore load(InputStream input, String storepass, String provider, String type) 
         throws WSSecurityException {
         KeyStore ks = null;
         
@@ -448,65 +448,47 @@ public class Merlin extends CryptoBase {
      */
     @Override
     public CertificateFactory getCertificateFactory() throws WSSecurityException {
+        if (certificateFactory != null) {
+            return certificateFactory;
+        }
+        
         String provider = getCryptoProvider();
         String keyStoreProvider = null;
         if (keystore != null) {
             keyStoreProvider = keystore.getProvider().getName();
         }
-
-        //Try to find a CertificateFactory that generates certs that are fully
-        //compatible with the certs in the KeyStore  (Sun -> Sun, BC -> BC, etc...)
-        CertificateFactory factory = null;
-        if (provider != null) {
-            factory = certFactMap.get(provider);
-        } else if (keyStoreProvider != null) {
-            factory = 
-                certFactMap.get(mapKeystoreProviderToCertProvider(keyStoreProvider));
-            if (factory == null) {
-                factory = certFactMap.get(keyStoreProvider);                
-            }
-        } else {
-            factory = certFactMap.get("DEFAULT");
-        }
-        if (factory == null) {
-            try {
-                if (provider == null || provider.length() == 0) {
-                    if (keyStoreProvider != null && keyStoreProvider.length() != 0) {
-                        try {
-                            factory = 
-                                CertificateFactory.getInstance(
-                                    "X.509", mapKeystoreProviderToCertProvider(keyStoreProvider)
-                                );
-                            certFactMap.put(keyStoreProvider, factory);
-                            certFactMap.put(
-                                mapKeystoreProviderToCertProvider(keyStoreProvider), factory
+        
+        try {
+            if (provider == null || provider.length() == 0) {
+                if (keyStoreProvider != null && keyStoreProvider.length() != 0) {
+                    try {
+                        certificateFactory = 
+                            CertificateFactory.getInstance(
+                                "X.509", mapKeystoreProviderToCertProvider(keyStoreProvider)
                             );
-                        } catch (Exception ex) {
-                            LOG.debug(ex.getMessage(), ex);
-                            //Ignore, we'll just use the default since they didn't specify one.
-                            //Hopefully that will work for them.
-                        }
+                    } catch (Exception ex) {
+                        LOG.debug(ex.getMessage(), ex);
+                        //Ignore, we'll just use the default since they didn't specify one.
+                        //Hopefully that will work for them.
                     }
-                    if (factory == null) {
-                        factory = CertificateFactory.getInstance("X.509");
-                        certFactMap.put("DEFAULT", factory);
-                    }
-                } else {
-                    factory = CertificateFactory.getInstance("X.509", provider);
-                    certFactMap.put(provider, factory);
                 }
-                certFactMap.put(factory.getProvider().getName(), factory);
-            } catch (CertificateException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "unsupportedCertType", e
-                );
-            } catch (NoSuchProviderException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noSecProvider", e
-                );
+                if (certificateFactory == null) {
+                    certificateFactory = CertificateFactory.getInstance("X.509");
+                }
+            } else {
+                certificateFactory = CertificateFactory.getInstance("X.509", provider);
             }
+        } catch (CertificateException e) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "unsupportedCertType", e
+            );
+        } catch (NoSuchProviderException e) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noSecProvider", e
+            );
         }
-        return factory;
+
+        return certificateFactory;
     }
     
     private String mapKeystoreProviderToCertProvider(String s) {

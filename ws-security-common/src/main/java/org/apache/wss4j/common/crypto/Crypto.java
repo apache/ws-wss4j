@@ -72,10 +72,9 @@ public interface Crypto {
     /**
      * Sets the CertificateFactory instance on this Crypto instance
      *
-     * @param provider the CertificateFactory provider name
      * @param certFactory the CertificateFactory the CertificateFactory instance to set
      */
-    void setCertificateFactory(String provider, CertificateFactory certFactory);
+    void setCertificateFactory(CertificateFactory certFactory);
     
     /**
      * Get the CertificateFactory instance on this Crypto instance
