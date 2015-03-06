@@ -109,9 +109,7 @@ public class ReferenceListProcessor implements Processor {
                 && WSConstants.ENC_NS.equals(node.getNamespaceURI())
                 && "DataReference".equals(node.getLocalName())) {
                 String dataRefURI = ((Element) node).getAttributeNS(null, "URI");
-                if (dataRefURI.charAt(0) == '#') {
-                    dataRefURI = dataRefURI.substring(1);
-                }
+                dataRefURI = WSSecurityUtil.getIDFromReference(dataRefURI);
                 
                 // See whether we have already processed the encrypted node 
                 if (!wsDocInfo.hasResult(WSConstants.ENCR, dataRefURI)) {

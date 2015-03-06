@@ -21,9 +21,7 @@ package org.apache.wss4j.dom.message.token;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -53,7 +51,6 @@ import org.w3c.dom.Text;
 public class Timestamp {
     
     private Element element;
-    private List<Element> customElements = new ArrayList<>();
     private Date createdDate;
     private Date expiresDate;
     
@@ -110,7 +107,6 @@ public class Timestamp {
                     }
                 } else {
                     bspEnforcer.handleBSPRule(BSPRule.R3222);
-                    customElements.add(currentChildElement);
                 }
             }
         }
@@ -263,23 +259,6 @@ public class Timestamp {
         return expiresDate;
     }
 
-    /**
-     * Creates and adds a custom element to this Timestamp
-     */
-    public void addCustomElement(Document doc, Element customElement) {
-        customElements.add(customElement);
-        element.appendChild(customElement);
-    }
-
-    /**
-     * Get the the custom elements from this Timestamp
-     *
-     * @return the list containing the custom elements.
-     */
-    public List<Element> getCustomElements() {
-        return customElements;
-    }
-    
     /**
      * Set wsu:Id attribute of this timestamp
      * @param id

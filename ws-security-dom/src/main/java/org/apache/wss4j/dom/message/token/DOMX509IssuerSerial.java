@@ -21,11 +21,10 @@ package org.apache.wss4j.dom.message.token;
 
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.util.DOM2Writer;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.Text;
 
 import java.math.BigInteger;
 
@@ -49,13 +48,13 @@ public final class DOMX509IssuerSerial {
             WSSecurityUtil.getDirectChildElement(
                 element, WSConstants.X509_ISSUER_NAME_LN, WSConstants.SIG_NS
             );
-        issuer = getChildText(issuerNameElement);
+        issuer = XMLUtils.getElementText(issuerNameElement);
         
         Element serialNumberElement = 
             WSSecurityUtil.getDirectChildElement(
                 element, WSConstants.X509_SERIAL_NUMBER_LN, WSConstants.SIG_NS
             );
-        String serialNumberStr = getChildText(serialNumberElement);
+        String serialNumberStr = XMLUtils.getElementText(serialNumberElement);
         if (serialNumberStr != null) {
             serialNumber = new BigInteger(serialNumberStr);
         } else {
@@ -130,19 +129,4 @@ public final class DOMX509IssuerSerial {
         return DOM2Writer.nodeToString(element);
     }
     
-    
-    private String getChildText(Node parentNode) {
-        if (parentNode == null) {
-            return null;
-        }
-        Node node = parentNode.getFirstChild();
-        StringBuilder buffer = new StringBuilder();
-        while (node != null) {
-            if (Node.TEXT_NODE == node.getNodeType()) {
-                buffer.append(((Text)node).getData());
-            }
-            node = node.getNextSibling();
-        }
-        return buffer.toString();
-    }
 }

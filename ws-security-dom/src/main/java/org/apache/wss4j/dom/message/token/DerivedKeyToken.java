@@ -243,17 +243,19 @@ public class DerivedKeyToken {
      * @param properties The properties and values in a Map
      */
     public void setProperties(Map<String, String> properties) {
-        for (String key : properties.keySet()) {
-            String propertyName = properties.get(key); //Get the property name
-            //Check whether this property is already there
-            //If so change the value
-            Element node = 
-                WSSecurityUtil.findElement(elementProperties, propertyName, ns);
-            if (node != null) { //If the node is not null
-                Text node1 = getFirstNode(node);
-                node1.setData(properties.get(propertyName));
-            } else {
-                addProperty(propertyName, properties.get(propertyName));
+        if (properties != null && !properties.isEmpty()) {
+            for (String key : properties.keySet()) {
+                String propertyName = properties.get(key); //Get the property name
+                //Check whether this property is already there
+                //If so change the value
+                Element node = 
+                    WSSecurityUtil.findElement(elementProperties, propertyName, ns);
+                if (node != null) { //If the node is not null
+                    Text node1 = getFirstNode(node);
+                    node1.setData(properties.get(propertyName));
+                } else {
+                    addProperty(propertyName, properties.get(propertyName));
+                }
             }
         }
     }
@@ -486,9 +488,7 @@ public class DerivedKeyToken {
         SecurityTokenReference securityTokenReference = getSecurityTokenReference();
         if (securityTokenReference.containsReference()) {
             basetokenId = securityTokenReference.getReference().getURI();
-            if (basetokenId.charAt(0) == '#') {
-                basetokenId = basetokenId.substring(1);
-            }
+            basetokenId = WSSecurityUtil.getIDFromReference(basetokenId);
         } else {
             // KeyIdentifier
             basetokenId = securityTokenReference.getKeyIdentifierValue();

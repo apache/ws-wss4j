@@ -36,6 +36,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 import org.xml.sax.InputSource;
 
 public final class XMLUtils {
@@ -68,6 +69,30 @@ public final class XMLUtils {
                     && namespace.equals(currentChild.getNamespaceURI())) {
                 return (Element) currentChild;
             }
+        }
+        return null;
+    }
+    
+    /**
+     * Return the text content of an Element, or null if no such text content exists
+     */
+    public static String getElementText(Element e) {
+        if (e != null) {
+            Node node = e.getFirstChild();
+            StringBuilder builder = new StringBuilder();
+            boolean found = false;
+            while (node != null) {
+                if (Node.TEXT_NODE == node.getNodeType()) {
+                    found = true;
+                    builder.append(((Text)node).getData());
+                }
+                node = node.getNextSibling();
+            }
+            
+            if (!found) {
+                return null;
+            }
+            return builder.toString();
         }
         return null;
     }

@@ -26,6 +26,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
@@ -178,17 +179,12 @@ public class BinarySecurity {
      * @return the byte array containing token information
      */
     public byte[] getToken() {
-        Node node = element.getFirstChild();
-        StringBuilder builder = new StringBuilder();
-        while (node != null) {
-            if (Node.TEXT_NODE == node.getNodeType()) {
-                builder.append(((Text)node).getData());
-            }
-            node = node.getNextSibling();
-        }
-                
         try {
-            return Base64.decode(builder.toString());
+            String text = XMLUtils.getElementText(element);
+            if (text == null) {
+                return null;
+            }
+            return Base64.decode(text);
         } catch (Exception ex) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(ex.getMessage(), ex);

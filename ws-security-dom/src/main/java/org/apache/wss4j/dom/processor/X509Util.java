@@ -23,10 +23,10 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.Text;
 
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
@@ -84,16 +84,7 @@ public final class X509Util {
                 keyInfoElem, "KeyName", WSConstants.SIG_NS
             );
         if (keyNmElem != null) {
-            
-            Node node = keyNmElem.getFirstChild();
-            StringBuilder builder = new StringBuilder();
-            while (node != null) {
-                if (Node.TEXT_NODE == node.getNodeType()) {
-                    builder.append(((Text)node).getData());
-                }
-                node = node.getNextSibling();
-            }
-            keyName = builder.toString();
+            keyName = XMLUtils.getElementText(keyNmElem);
         }
         if (keyName == null || keyName.length() <= 0) {
             LOG.debug("No Key Name available");

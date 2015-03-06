@@ -39,13 +39,13 @@ import javax.crypto.spec.PSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.Text;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSDocInfo;
@@ -306,10 +306,7 @@ public class EncryptedKeyProcessor implements Processor {
                         && WSConstants.ENC_NS.equals(node.getNamespaceURI())
                         && "DataReference".equals(node.getLocalName())) {
                     String dataRefURI = ((Element) node).getAttributeNS(null, "URI");
-                    if (dataRefURI.charAt(0) == '#') {
-                        dataRefURI = dataRefURI.substring(1);
-                    }
-                    return dataRefURI;
+                    return WSSecurityUtil.getIDFromReference(dataRefURI);
                 }
             }
         }
@@ -324,17 +321,12 @@ public class EncryptedKeyProcessor implements Processor {
      * @throws WSSecurityException
      */
     private static byte[] getDecodedBase64EncodedData(Element element) throws WSSecurityException {
-        StringBuilder sb = new StringBuilder();
-        Node node = element.getFirstChild();
-        while (node != null) {
-            if (Node.TEXT_NODE == node.getNodeType()) {
-                sb.append(((Text) node).getData());
-            }
-            node = node.getNextSibling();
-        }
-        String encodedData = sb.toString();
         try {
-            return Base64.decode(encodedData);
+            String text = XMLUtils.getElementText(element);
+            if (text == null) {
+                return null;
+            }
+            return Base64.decode(text);
         } catch (Base64DecodingException e) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
@@ -438,7 +430,7 @@ public class EncryptedKeyProcessor implements Processor {
                     cryptoType.setIssuerSerial(issuerSerial.getIssuer(), issuerSerial.getSerialNumber());
                     return data.getDecCrypto().getX509Certificates(cryptoType);
                 } else if (WSConstants.X509_CERT_LN.equals(x509Child.getLocalName())) {
-                    byte[] token = getToken(x509Child);
+                    byte[] token = getDecodedBase64EncodedData(x509Child);
                     if (token == null) {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidCertData", 0);
                     }
@@ -471,26 +463,6 @@ public class EncryptedKeyProcessor implements Processor {
         return null;
     }
     
-    private byte[] getToken(Element element) {
-        Node node = element.getFirstChild();
-        StringBuilder builder = new StringBuilder();
-        while (node != null) {
-            if (Node.TEXT_NODE == node.getNodeType()) {
-                builder.append(((Text)node).getData());
-            }
-            node = node.getNextSibling();
-        }
-                
-        try {
-            return Base64.decode(builder.toString());
-        } catch (Exception ex) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(ex.getMessage(), ex);
-            }
-            return null;
-        }
-    }
-    
     /**
      * Decrypt all data references
      */
@@ -511,9 +483,7 @@ public class EncryptedKeyProcessor implements Processor {
                     && WSConstants.ENC_NS.equals(node.getNamespaceURI())
                     && "DataReference".equals(node.getLocalName())) {
                 String dataRefURI = ((Element) node).getAttributeNS(null, "URI");
-                if (dataRefURI.charAt(0) == '#') {
-                    dataRefURI = dataRefURI.substring(1);
-                }
+                dataRefURI = WSSecurityUtil.getIDFromReference(dataRefURI);
                 
                 WSDataRef dataRef = 
                     decryptDataRef(refList.getOwnerDocument(), dataRefURI, docInfo, decryptedBytes, data);

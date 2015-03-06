@@ -37,6 +37,7 @@ import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.message.token.X509Security;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Element;
 
 /**
@@ -66,9 +67,7 @@ public class EncryptedKeySTRParser implements STRParser {
         String uri = null;
         if (secRef.containsReference()) {
             uri = secRef.getReference().getURI();
-            if (uri.charAt(0) == '#') {
-                uri = uri.substring(1);
-            }
+            uri = WSSecurityUtil.getIDFromReference(uri);
         } else if (secRef.containsKeyIdentifier()) {
             uri = secRef.getKeyIdentifierValue();
         }

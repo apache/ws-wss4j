@@ -28,13 +28,13 @@ import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.message.CallbackLookup;
 import org.apache.wss4j.dom.message.DOMCallbackLookup;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.utils.Base64;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -251,10 +251,7 @@ public class SecurityTokenReference {
         String uri,
         String type
     ) throws WSSecurityException {
-        String id = uri;
-        if (id.charAt(0) == '#') {
-            id = id.substring(1);
-        }
+        String id = WSSecurityUtil.getIDFromReference(uri);
         //
         // Delegate finding the element to the CallbackLookup instance
         //
@@ -286,10 +283,7 @@ public class SecurityTokenReference {
         String uri,
         String type
     ) throws WSSecurityException {
-        String id = uri;
-        if (id.charAt(0) == '#') {
-            id = id.substring(1);
-        }
+        String id = WSSecurityUtil.getIDFromReference(uri);
         //
         // Try to find it from the WSDocInfo instance first
         //
@@ -486,14 +480,11 @@ public class SecurityTokenReference {
                 return new X509Certificate[]{cert};
             }
         } else if (THUMB_URI.equals(value)) {
-            Node node = getFirstElement().getFirstChild();
-            if (node == null) {
-                return null;
-            }
-            if (Node.TEXT_NODE == node.getNodeType()) {
+            String text = XMLUtils.getElementText(getFirstElement());
+            if (text != null) {
                 byte[] thumb;
                 try {
-                    thumb = Base64.decode(((Text) node).getData());
+                    thumb = Base64.decode(text);
                 } catch (Base64DecodingException e) {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
@@ -513,13 +504,7 @@ public class SecurityTokenReference {
     
     public String getKeyIdentifierValue() {
         if (containsKeyIdentifier()) {
-            Node node = getFirstElement().getFirstChild();
-            if (node == null) {
-                return null;
-            }
-            if (node.getNodeType() == Node.TEXT_NODE) {
-                return ((Text) node).getData();
-            }
+            return XMLUtils.getElementText(getFirstElement());
         } 
         return null;
     }
@@ -564,13 +549,10 @@ public class SecurityTokenReference {
         if (skiBytes != null) {
             return skiBytes;
         }
-        Node node = getFirstElement().getFirstChild();
-        if (node == null) {
-            return null;
-        }
-        if (node.getNodeType() == Node.TEXT_NODE) {
+        String text = XMLUtils.getElementText(getFirstElement());
+        if (text != null) {
             try {
-                skiBytes = Base64.decode(((Text) node).getData());
+                skiBytes = Base64.decode(text);
             } catch (Exception e) {
                 LOG.debug(e.getMessage(), e);
                 return null;
@@ -658,17 +640,7 @@ public class SecurityTokenReference {
      *         a <code>wsse:Reference</code> element
      */
     public boolean containsReference() {
-        return lengthReference() > 0;
-    }
-
-    /**
-     * Method lengthReference.
-     *
-     * @return number of <code>wsse:Reference</code> elements in
-     *         the <code>SecurityTokenReference</code>
-     */
-    public int lengthReference() {
-        return length(WSConstants.WSSE_NS, "Reference");
+        return containsElement(WSConstants.WSSE_NS, "Reference");
     }
 
     /**
@@ -678,7 +650,7 @@ public class SecurityTokenReference {
      *         a <code>ds:IssuerSerial</code> element
      */
     public boolean containsX509IssuerSerial() {
-        return lengthX509IssuerSerial() > 0;
+        return containsElement(WSConstants.SIG_NS, WSConstants.X509_ISSUER_SERIAL_LN);
     }
 
     /**
@@ -688,27 +660,7 @@ public class SecurityTokenReference {
      *         a <code>ds:X509Data</code> element
      */
     public boolean containsX509Data() {
-        return lengthX509Data() > 0;
-    }
-    
-    /**
-     * Method lengthX509IssuerSerial.
-     *
-     * @return number of <code>ds:IssuerSerial</code> elements in
-     *         the <code>SecurityTokenReference</code>
-     */
-    public int lengthX509IssuerSerial() {
-        return length(WSConstants.SIG_NS, WSConstants.X509_ISSUER_SERIAL_LN);
-    }
-
-    /**
-     * Method lengthX509Data.
-     *
-     * @return number of <code>ds:IssuerSerial</code> elements in
-     *         the <code>SecurityTokenReference</code>
-     */
-    public int lengthX509Data() {
-        return length(WSConstants.SIG_NS, WSConstants.X509_DATA_LN);
+        return containsElement(WSConstants.SIG_NS, WSConstants.X509_DATA_LN);
     }
     
     /**
@@ -718,28 +670,10 @@ public class SecurityTokenReference {
      *         a <code>wsse:KeyIdentifier</code> element
      */
     public boolean containsKeyIdentifier() {
-        return lengthKeyIdentifier() > 0;
+        return containsElement(WSConstants.WSSE_NS, "KeyIdentifier");
     }
     
-    /**
-     * Method lengthKeyIdentifier.
-     *
-     * @return number of <code>wsse:KeyIdentifier</code> elements in
-     *         the <code>SecurityTokenReference</code>
-     */
-    public int lengthKeyIdentifier() {
-        return length(WSConstants.WSSE_NS, "KeyIdentifier");
-    }
-
-    /**
-     * Method length.
-     *
-     * @param namespace
-     * @param localname
-     * @return number of elements with matching localname and namespace
-     */
-    public int length(String namespace, String localname) {
-        int result = 0;
+    private boolean containsElement(String namespace, String localname) {
         Node node = element.getFirstChild();
         while (node != null) {
             if (Node.ELEMENT_NODE == node.getNodeType()) {
@@ -749,12 +683,12 @@ public class SecurityTokenReference {
                     || namespace == null && ns == null)
                     && localname.equals(name)
                 ) {
-                    result++;
+                    return true;
                 }
             }
             node = node.getNextSibling();
         }
-        return result;
+        return false;
     }
 
     /**

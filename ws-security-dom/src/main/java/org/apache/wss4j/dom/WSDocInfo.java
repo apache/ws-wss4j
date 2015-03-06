@@ -41,6 +41,7 @@ import javax.xml.crypto.dom.DOMCryptoContext;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.message.CallbackLookup;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -160,11 +161,9 @@ public class WSDocInfo {
      * @return the token element or null if nothing found
      */
     public Element getTokenElement(String uri) {
-        String id = uri;
+        String id = WSSecurityUtil.getIDFromReference(uri);
         if (id == null) {
             return null;
-        } else if (id.charAt(0) == '#') {
-            id = id.substring(1);
         }
         
         TokenValue token = tokens.get(id);
@@ -190,11 +189,9 @@ public class WSDocInfo {
     }
     
     public void setTokenOnContext(String uri, DOMCryptoContext context) {
-        String id = uri;
+        String id = WSSecurityUtil.getIDFromReference(uri);
         if (id == null || context == null) {
             return;
-        } else if (id.charAt(0) == '#') {
-            id = id.substring(1);
         }
 
         TokenValue tokenValue = tokens.get(id);
@@ -219,12 +216,11 @@ public class WSDocInfo {
      * @return the WSSecurityEngineResult or null if nothing found
      */
     public WSSecurityEngineResult getResult(String uri) {
-        String id = uri;
+        String id = WSSecurityUtil.getIDFromReference(uri);
         if (id == null) {
             return null;
-        } else if (id.charAt(0) == '#') {
-            id = id.substring(1);
         }
+        
         if (!results.isEmpty()) {
             for (WSSecurityEngineResult result : results) {
                 String cId = (String)result.get(WSSecurityEngineResult.TAG_ID);
@@ -258,11 +254,9 @@ public class WSDocInfo {
      * See whether we have a WSSecurityEngineResult of the given Integer tag for the given Id
      */
     public boolean hasResult(Integer tag, String uri) {
-        String id = uri;
+        String id = WSSecurityUtil.getIDFromReference(uri);
         if (id == null || "".equals(uri)) {
             return false;
-        } else if (id.charAt(0) == '#') {
-            id = id.substring(1);
         }
         
         if (!results.isEmpty()) {

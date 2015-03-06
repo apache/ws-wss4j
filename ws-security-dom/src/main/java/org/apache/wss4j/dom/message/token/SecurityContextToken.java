@@ -22,7 +22,6 @@ package org.apache.wss4j.dom.message.token;
 import javax.xml.namespace.QName;
 
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
@@ -44,8 +43,6 @@ public class SecurityContextToken {
      * Identifier element
      */
     private Element elementIdentifier;
-    
-    private WSSConfig wssConfig;
     
     private String tokenType = WSConstants.WSC_SCT;
     
@@ -89,8 +86,6 @@ public class SecurityContextToken {
         String uuid = IDGenerator.generateID("uuid:");
         
         elementIdentifier.appendChild(doc.createTextNode(uuid));
-        
-        setID(getWSSConfig().getIdAllocator().createSecureId("sctId-", element));
     }
 
     /**
@@ -269,10 +264,4 @@ public class SecurityContextToken {
         return true;
     }
 
-    private WSSConfig getWSSConfig() {
-        if (wssConfig == null) {
-            wssConfig = WSSConfig.getNewInstance();
-        }
-        return wssConfig;
-    }
 }

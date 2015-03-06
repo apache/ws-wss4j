@@ -22,6 +22,7 @@ package org.apache.wss4j.dom.message;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
+import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -55,6 +56,14 @@ public class WSSecSecurityContextToken {
     private byte[] secret;
     
     private int wscVersion = ConversationConstants.DEFAULT_VERSION;
+    private WSSConfig wssConfig;
+    
+    public WSSecSecurityContextToken() {
+    }
+    
+    public WSSecSecurityContextToken(WSSConfig config) {
+        wssConfig = config;
+    }
 
     public void prepare(Document doc, Crypto crypto) throws WSSecurityException {
 
@@ -68,9 +77,10 @@ public class WSSecSecurityContextToken {
         }
 
         // The wsu:Id of the wsc:SecurityContextToken
-        if (sctId != null) {
-            sct.setID(sctId);
+        if (sctId == null) {
+            sctId = getWsConfig().getIdAllocator().createId("TS-", sct);
         }
+        sct.setID(sctId);
     }
 
     public void prependSCTElementToHeader(Document doc, WSSecHeader secHeader)
@@ -144,4 +154,10 @@ public class WSSecSecurityContextToken {
         this.wscVersion = wscVersion;
     }
     
+    private WSSConfig getWsConfig() {
+        if (wssConfig == null) {
+            wssConfig = WSSConfig.getNewInstance();
+        }
+        return wssConfig;
+    }
 }

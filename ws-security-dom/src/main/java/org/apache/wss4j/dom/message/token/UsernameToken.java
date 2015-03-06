@@ -42,6 +42,7 @@ import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.common.util.WSCurrentTimeSource;
 import org.apache.wss4j.common.util.WSTimeSource;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
@@ -72,7 +73,7 @@ public class UsernameToken {
         org.slf4j.LoggerFactory.getLogger(UsernameToken.class);
     private static final boolean DO_DEBUG = LOG.isDebugEnabled();
 
-    private Element element ;
+    private Element element;
     private Element elementUsername;
     private Element elementPassword;
     private Element elementNonce;
@@ -164,7 +165,7 @@ public class UsernameToken {
         
         // Guard against a malicious user sending a bogus iteration value
         if (elementIteration != null) {
-            String iter = nodeString(elementIteration);
+            String iter = XMLUtils.getElementText(elementIteration);
             if (iter != null) {
                 int iterInt = Integer.parseInt(iter);
                 if (iterInt < 0 || iterInt > 10000) {
@@ -391,7 +392,7 @@ public class UsernameToken {
      * @return the data from the user name element.
      */
     public String getName() {
-        return nodeString(elementUsername);
+        return XMLUtils.getElementText(elementUsername);
     }
 
     /**
@@ -411,7 +412,7 @@ public class UsernameToken {
      * @return the data from the nonce element.
      */
     public String getNonce() {
-        return nodeString(elementNonce);
+        return XMLUtils.getElementText(elementNonce);
     }
 
     /**
@@ -420,7 +421,7 @@ public class UsernameToken {
      * @return the data from the created time element.
      */
     public String getCreated() {
-        return nodeString(elementCreated);
+        return XMLUtils.getElementText(elementCreated);
     }
     
     /**
@@ -439,7 +440,7 @@ public class UsernameToken {
      * @return the password string or <code>null</code> if no such node exists.
      */
     public String getPassword() {
-        String password = nodeString(elementPassword);
+        String password = XMLUtils.getElementText(elementPassword);
         // See WSS-219
         if (password == null && elementPassword != null) {
             return "";
@@ -462,7 +463,7 @@ public class UsernameToken {
      * @throws WSSecurityException
      */
     public byte[] getSalt() throws WSSecurityException {
-        String salt = nodeString(elementSalt);
+        String salt = XMLUtils.getElementText(elementSalt);
         if (salt != null) {
             try {
                 return Base64.decode(salt);
@@ -483,7 +484,7 @@ public class UsernameToken {
      *         is returned.
      */
     public int getIteration() {
-        String iter = nodeString(elementIteration);
+        String iter = XMLUtils.getElementText(elementIteration);
         if (iter != null) {
             return Integer.parseInt(iter);
         }
@@ -639,34 +640,6 @@ public class UsernameToken {
     }
 
     /**
-     * Returns the data of an element as String or null if either the the element
-     * does not contain a Text node or the node is empty.
-     * 
-     * @param e DOM element
-     * @return Element text node data as String
-     */
-    private String nodeString(Element e) {
-        if (e != null) {
-            Node node = e.getFirstChild();
-            StringBuilder builder = new StringBuilder();
-            boolean found = false;
-            while (node != null) {
-                if (Node.TEXT_NODE == node.getNodeType()) {
-                    found = true;
-                    builder.append(((Text)node).getData());
-                }
-                node = node.getNextSibling();
-            }
-            
-            if (!found) {
-                return null;
-            }
-            return builder.toString();
-        }
-        return null;
-    }
-
-    /**
      * Returns the dom element of this <code>UsernameToken</code> object.
      * 
      * @return the <code>wsse:UsernameToken</code> element
@@ -725,7 +698,7 @@ public class UsernameToken {
             // we must have an iteration element to use this token for a derived key
             bspEnforcer.handleBSPRule(BSPRule.R4218);
         } else {
-            String iter = nodeString(elementIteration);
+            String iter = XMLUtils.getElementText(elementIteration);
             if (iter == null || Integer.parseInt(iter) < 1000) {
                 bspEnforcer.handleBSPRule(BSPRule.R4218);
             }

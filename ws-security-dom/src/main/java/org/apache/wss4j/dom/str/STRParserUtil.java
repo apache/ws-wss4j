@@ -39,6 +39,7 @@ import org.apache.wss4j.dom.message.token.PKIPathSecurity;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.message.token.X509Security;
 import org.apache.wss4j.dom.processor.Processor;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Element;
 
 /**
@@ -264,11 +265,9 @@ public final class STRParserUtil {
         int identifier,
         RequestData data
     ) throws WSSecurityException {
-        if (id.charAt(0) == '#') {
-            id = id.substring(1);
-        }
+        String uri = WSSecurityUtil.getIDFromReference(id);
         WSPasswordCallback pwcb = 
-            new WSPasswordCallback(id, null, type, identifier);
+            new WSPasswordCallback(uri, null, type, identifier);
         try {
             Callback[] callbacks = new Callback[]{pwcb};
             if (data.getCallbackHandler() != null) {
@@ -278,7 +277,7 @@ public final class STRParserUtil {
         } catch (Exception e) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,
-                "noPassword", e, id);
+                "noPassword", e, uri);
         }
 
         return null;

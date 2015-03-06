@@ -87,9 +87,7 @@ public class SignatureSTRParser implements STRParser {
         String uri = null;
         if (secRef.containsReference()) {
             uri = secRef.getReference().getURI();
-            if (uri.charAt(0) == '#') {
-                uri = uri.substring(1);
-            }
+            uri = WSSecurityUtil.getIDFromReference(uri);
         } else if (secRef.containsKeyIdentifier()) {
             uri = secRef.getKeyIdentifierValue();
         }
