@@ -78,7 +78,7 @@ public class WSSecSecurityContextToken {
 
         // The wsu:Id of the wsc:SecurityContextToken
         if (sctId == null) {
-            sctId = getWsConfig().getIdAllocator().createId("TS-", sct);
+            sctId = getWsConfig().getIdAllocator().createId("sctId-", sct);
         }
         sct.setID(sctId);
     }
