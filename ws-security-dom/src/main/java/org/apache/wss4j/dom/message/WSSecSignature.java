@@ -368,17 +368,10 @@ public class WSSecSignature extends WSSecSignatureBase {
 
         prepare(doc, cr, secHeader);
         if (getParts().isEmpty()) {
-            String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
-            WSEncryptionPart encP = 
-                new WSEncryptionPart(
-                    WSConstants.ELEM_BODY, 
-                    soapNamespace, 
-                    "Content"
-                );
-            getParts().add(encP);
+            getParts().add(WSSecurityUtil.getDefaultEncryptionPart(document));
         } else {
             for (WSEncryptionPart part : getParts()) {
-                if ("STRTransform".equals(part.getName()) && part.getId() == null) {
+                if (part.getId() == null && "STRTransform".equals(part.getName())) {
                     part.setId(strUri);
                 }
             }

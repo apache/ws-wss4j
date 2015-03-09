@@ -73,15 +73,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     
     public Element encrypt() throws WSSecurityException {
         if (getParts().isEmpty()) {
-            String soapNamespace = 
-                WSSecurityUtil.getSOAPNamespace(document.getDocumentElement());
-            WSEncryptionPart encP = 
-                new WSEncryptionPart(
-                    WSConstants.ELEM_BODY, 
-                    soapNamespace, 
-                    "Content"
-                );
-            getParts().add(encP);
+            getParts().add(WSSecurityUtil.getDefaultEncryptionPart(document));
         }
         
         return encryptForExternalRef(null, getParts());

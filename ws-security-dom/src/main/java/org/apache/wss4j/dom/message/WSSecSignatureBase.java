@@ -99,75 +99,9 @@ public class WSSecSignatureBase extends WSSecBase {
 
         //create separate list for attachment and append it after same document references
         //are processed.
-        List<javax.xml.crypto.dsig.Reference> attachmentReferenceList = new ArrayList<>();
-
-        for (WSEncryptionPart encPart : references) {
-            if (encPart.getId() != null && encPart.getId().startsWith("cid:")) {
-
-                if (attachmentCallbackHandler == null) {
-                    throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.FAILURE,
-                            "empty", "no attachment callbackhandler supplied"
-                    );
-                }
-
-                AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
-                //no mime type must be set for signature:
-                //attachmentCallback.setResultingMimeType(null);
-                String id = encPart.getId().substring(4);
-                attachmentRequestCallback.setAttachmentId(id);
-                try {
-                    attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
-                } catch (Exception e) {
-                    throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.FAILURE, e
-                    );
-                }
-                List<Attachment> attachments = attachmentRequestCallback.getAttachments();
-                for (int i = 0; i < attachments.size(); i++) {
-                    Attachment attachment = attachments.get(i);
-
-                    try {
-                        List<Transform> transforms = new ArrayList<>();
-
-                        AttachmentTransformParameterSpec attachmentTransformParameterSpec =
-                                new AttachmentTransformParameterSpec(
-                                        attachmentCallbackHandler,
-                                        attachment
-                                        );
-
-                        String attachmentSignatureTransform;
-                        if ("Element".equals(encPart.getEncModifier())) {
-                            attachmentSignatureTransform = WSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS;
-                        } else {
-                            attachmentSignatureTransform = WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS;
-                        }
-
-                        transforms.add(
-                                signatureFactory.newTransform(
-                                        attachmentSignatureTransform,
-                                        attachmentTransformParameterSpec)
-                        );
-
-                        javax.xml.crypto.dsig.Reference reference =
-                                signatureFactory.newReference("cid:" + attachment.getId(),
-                                        digestMethod,
-                                        transforms,
-                                        null,
-                                        null
-                                );
-
-                        attachmentReferenceList.add(reference);
-                    } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException e) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-                    }
-                }
-                break;
-            }
-        }
-
+        List<javax.xml.crypto.dsig.Reference> attachmentReferenceList = null;
         List<javax.xml.crypto.dsig.Reference> referenceList = new ArrayList<>();
-
+        
         for (WSEncryptionPart encPart : references) {
             String idToSign = encPart.getId();
             String elemName = encPart.getName();
@@ -178,8 +112,9 @@ public class WSSecSignatureBase extends WSSecBase {
             // names: "STRTransform": Setup the ds:Reference to use STR Transform
             //
             try {
-                //attachments are already processed in the above loop
-                if ("cid:Attachments".equals(idToSign)) {
+                if ("cid:Attachments".equals(idToSign) && attachmentReferenceList == null) {
+                    attachmentReferenceList = 
+                        addAttachmentReferences(encPart, digestMethod, signatureFactory);
                     continue;
                 }
                 if (idToSign != null) {
@@ -276,9 +211,70 @@ public class WSSecSignatureBase extends WSSecBase {
                 );
             }
         }
+        
         //append attachment references now
-        referenceList.addAll(attachmentReferenceList);
+        if (attachmentReferenceList != null) {
+            referenceList.addAll(attachmentReferenceList);
+        }
         return referenceList;
+    }
+    
+    private List<javax.xml.crypto.dsig.Reference> addAttachmentReferences(
+        WSEncryptionPart encPart, 
+        DigestMethod digestMethod,
+        XMLSignatureFactory signatureFactory
+    ) throws WSSecurityException {
+
+        if (attachmentCallbackHandler == null) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILURE,
+                "empty", "no attachment callbackhandler supplied"
+            );
+        }
+
+        AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
+        //no mime type must be set for signature:
+        //attachmentCallback.setResultingMimeType(null);
+        String id = encPart.getId().substring(4);
+        attachmentRequestCallback.setAttachmentId(id);
+        try {
+            attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
+        } catch (Exception e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        }
+        
+        List<javax.xml.crypto.dsig.Reference> attachmentReferenceList = new ArrayList<>();
+        for (Attachment attachment : attachmentRequestCallback.getAttachments()) {
+            try {
+                List<Transform> transforms = new ArrayList<>();
+
+                AttachmentTransformParameterSpec attachmentTransformParameterSpec =
+                    new AttachmentTransformParameterSpec(
+                        attachmentCallbackHandler, attachment
+                    );
+
+                String attachmentSignatureTransform = WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS;
+                if ("Element".equals(encPart.getEncModifier())) {
+                    attachmentSignatureTransform = WSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS;
+                }
+
+                transforms.add(
+                    signatureFactory.newTransform(
+                        attachmentSignatureTransform, attachmentTransformParameterSpec)
+                    );
+
+                javax.xml.crypto.dsig.Reference reference =
+                    signatureFactory.newReference(
+                        "cid:" + attachment.getId(), digestMethod, transforms, null, null
+                    );
+
+                attachmentReferenceList.add(reference);
+            } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+            }
+        }
+        
+        return attachmentReferenceList;
     }
     
     /**

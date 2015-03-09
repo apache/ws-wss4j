@@ -201,15 +201,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     
     public Element encrypt() throws WSSecurityException {
         if (getParts().isEmpty()) {
-            String soapNamespace = 
-                WSSecurityUtil.getSOAPNamespace(document.getDocumentElement());
-            WSEncryptionPart encP = 
-                new WSEncryptionPart(
-                    WSConstants.ELEM_BODY, 
-                    soapNamespace, 
-                    "Content"
-                );
-            getParts().add(encP);
+            getParts().add(WSSecurityUtil.getDefaultEncryptionPart(document));
         }
         
         return encryptForRef(null, getParts());
@@ -420,16 +412,12 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                             WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e
                     );
                 }
-                String attachmentEncryptedDataType;
+                String attachmentEncryptedDataType = WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY;
                 if ("Element".equals(encPart.getEncModifier())) {
                     attachmentEncryptedDataType = WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE;
-                } else {
-                    attachmentEncryptedDataType = WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY;
                 }
 
-                List<Attachment> attachments = attachmentRequestCallback.getAttachments();
-                for (int i = 0; i < attachments.size(); i++) {
-                    Attachment attachment = attachments.get(i);
+                for (Attachment attachment : attachmentRequestCallback.getAttachments()) {
 
                     final String attachmentId = attachment.getId();
                     String encEncryptedDataId = config.getIdAllocator().createId("ED-", attachmentId);
@@ -488,8 +476,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
                     }
 
-                    Map<String, String> headers = new HashMap<>();
-                    headers.putAll(attachment.getHeaders());
+                    Map<String, String> headers = new HashMap<>(attachment.getHeaders());
                     resultAttachment.setSourceStream(
                             AttachmentUtils.setupAttachmentEncryptionStream(
                                     cipher,

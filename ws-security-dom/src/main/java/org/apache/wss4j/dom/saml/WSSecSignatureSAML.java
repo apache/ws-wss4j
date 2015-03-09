@@ -120,11 +120,8 @@ public class WSSecSignatureSAML extends WSSecSignature {
 
         prepare(doc, uCrypto, samlAssertion, iCrypto, iKeyName, iKeyPW, secHeader);
 
-        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         if (getParts().isEmpty()) {
-            WSEncryptionPart encP = 
-                new WSEncryptionPart(WSConstants.ELEM_BODY, soapNamespace, "Content");
-            getParts().add(encP);
+            getParts().add(WSSecurityUtil.getDefaultEncryptionPart(doc));
         } else {
             for (WSEncryptionPart part : getParts()) {
                 if ("STRTransform".equals(part.getName()) && part.getId() == null) {
@@ -138,6 +135,8 @@ public class WSSecSignatureSAML extends WSSecSignature {
         // if it exists
         //
         if (secRefID != null) {
+            String soapNamespace = 
+                WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
             WSEncryptionPart encP =
                 new WSEncryptionPart("STRTransform", soapNamespace, "Content");
             encP.setId(secRefID);

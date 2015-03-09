@@ -544,6 +544,15 @@ public final class WSSecurityUtil {
         }
         return null;
     }
+    
+    /**
+     * Get the default encryption part - the SOAP Body of type "Content".
+     */
+    public static WSEncryptionPart getDefaultEncryptionPart(Document doc) {
+        String soapNamespace = 
+            WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+        return new WSEncryptionPart(WSConstants.ELEM_BODY, soapNamespace, "Content");
+    }
 
     /**
      * Turn a reference (eg "#5") into an ID (eg "5").

@@ -98,15 +98,8 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     public Document build(Document doc, WSSecHeader secHeader) throws WSSecurityException {
         
         prepare(doc, secHeader);
-        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         if (getParts().isEmpty()) {
-            WSEncryptionPart encP = 
-                new WSEncryptionPart(
-                    WSConstants.ELEM_BODY,
-                    soapNamespace, 
-                    "Content"
-                );
-            getParts().add(encP);
+            getParts().add(WSSecurityUtil.getDefaultEncryptionPart(document));
         } else {
             for (WSEncryptionPart part : getParts()) {
                 if ("STRTransform".equals(part.getName()) && part.getId() == null) {
