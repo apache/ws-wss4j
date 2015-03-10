@@ -34,10 +34,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.message.WSSecDKSign;
-import org.apache.wss4j.dom.message.WSSecEncryptedKey;
-import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -94,10 +91,7 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
             if (parts != null && !parts.isEmpty()) {
                 wsSign.getParts().addAll(parts);
             } else {
-                WSEncryptionPart encP = new WSEncryptionPart(reqData.getSoapConstants()
-                        .getBodyQName().getLocalPart(), reqData.getSoapConstants()
-                        .getEnvelopeURI(), "Content");
-                wsSign.getParts().add(encP);
+                wsSign.getParts().add(WSSecurityUtil.getDefaultEncryptionPart(doc));
             }
             
             wsSign.prepare(doc, reqData.getSecHeader());
@@ -146,62 +140,11 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
         String derivedKeyTokenReference = signatureToken.getDerivedKeyTokenReference();
 
         if ("EncryptedKey".equals(derivedKeyTokenReference)) {
-            wsSign.setCustomValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
-            // See if an EncryptionAction has already set up an EncryptedKey
-            if (reqData.getEncryptionToken() != null && reqData.getEncryptionToken().getKey() != null
-                && reqData.getEncryptionToken().getKeyIdentifier() != null) {
-                byte[] ek = reqData.getEncryptionToken().getKey();
-                String tokenIdentifier = reqData.getEncryptionToken().getKeyIdentifier();
-                wsSign.setExternalKey(ek, tokenIdentifier);
-                return null;
-            } else {
-                WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
-                encrKeyBuilder.setUserInfo(signatureToken.getUser());
-                if (signatureToken.getDerivedKeyIdentifier() != 0) {
-                    encrKeyBuilder.setKeyIdentifierType(signatureToken.getDerivedKeyIdentifier());
-                } else {
-                    encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-                }
-                encrKeyBuilder.prepare(doc, signatureToken.getCrypto());
-
-                byte[] ek = encrKeyBuilder.getEphemeralKey();
-                String tokenIdentifier = encrKeyBuilder.getId();
-
-                signatureToken.setKey(ek);
-                signatureToken.setKeyIdentifier(tokenIdentifier);
-               
-                wsSign.setExternalKey(ek, tokenIdentifier);
-                return encrKeyBuilder.getEncryptedKeyElement();
-            }
+            return setupEKReference(wsSign, passwordCallback, signatureToken, reqData.getEncryptionToken(),
+                                     reqData.isUse200512Namespace(), doc, null, null);
         } else if ("SecurityContextToken".equals(derivedKeyTokenReference)) {
-            if (reqData.isUse200512Namespace()) {
-                wsSign.setCustomValueType(WSConstants.WSC_SCT_05_12);
-            } else {
-                wsSign.setCustomValueType(WSConstants.WSC_SCT);
-            }
-            
-            // See if a EncryptionDerivedAction has already set up a SecurityContextToken
-            if (reqData.getEncryptionToken() != null && reqData.getEncryptionToken().getKey() != null
-                && reqData.getEncryptionToken().getKeyIdentifier() != null) {
-                byte[] secret = reqData.getEncryptionToken().getKey();
-                String tokenIdentifier = reqData.getEncryptionToken().getKeyIdentifier();
-                wsSign.setExternalKey(secret, tokenIdentifier);
-                return null;
-            }  else {
-                String tokenIdentifier = IDGenerator.generateID("uuid:");
-                wsSign.setExternalKey(passwordCallback.getKey(), tokenIdentifier);
-                
-                signatureToken.setKey(passwordCallback.getKey());
-                signatureToken.setKeyIdentifier(tokenIdentifier);
-                
-                int version = ConversationConstants.VERSION_05_12;
-                if (!reqData.isUse200512Namespace()) {
-                    version = ConversationConstants.VERSION_05_02;
-                }
-                
-                SecurityContextToken sct = new SecurityContextToken(version, doc, tokenIdentifier);
-                return sct.getElement();
-            }
+            return setupSCTReference(wsSign, passwordCallback, signatureToken, reqData.getEncryptionToken(),
+                                     reqData.isUse200512Namespace(), doc);
         } else {
             // DirectReference
 

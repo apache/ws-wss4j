@@ -24,9 +24,11 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -255,15 +257,17 @@ public abstract class WSHandler {
         if (wssConfig.isEnableSignatureConfirmation() 
             && isRequest && reqData.getSignatureValues().size() > 0) {
             @SuppressWarnings("unchecked")
-            List<byte[]> savedSignatures = 
-                (List<byte[]>)getProperty(reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV);
+            Set<Integer> savedSignatures = 
+                (Set<Integer>)getProperty(reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV);
             if (savedSignatures == null) {
-                savedSignatures = new ArrayList<>();
+                savedSignatures = new HashSet<>();
                 setProperty(
                     reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV, savedSignatures
                 );
             }
-            savedSignatures.addAll(reqData.getSignatureValues());
+            for (byte[] signatureValue : reqData.getSignatureValues()) {
+                savedSignatures.add(Arrays.hashCode(signatureValue));
+            }
         }
     }
     
@@ -420,8 +424,8 @@ public abstract class WSHandler {
         //
         // First get all Signature values stored during sending the request
         //
-        List<byte[]> savedSignatures = 
-            (List<byte[]>) getProperty(reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV);
+        Set<Integer> savedSignatures = 
+            (Set<Integer>) getProperty(reqData.getMsgContext(), WSHandlerConstants.SEND_SIGV);
         //
         // Now get all results that hold a SignatureConfirmation element from
         // the current run of receiver (we can have more than one run: if we
@@ -456,16 +460,10 @@ public abstract class WSHandler {
                         );
                     }
                 } else {
-                    boolean found = false;
-                    for (int j = 0; j < savedSignatures.size(); j++) {
-                        byte[] storedValue = savedSignatures.get(j);
-                        if (Arrays.equals(sigVal, storedValue)) {
-                            found = true;
-                            savedSignatures.remove(j);
-                            break;
-                        }
-                    }
-                    if (!found) {
+                    Integer hash = Arrays.hashCode(sigVal);
+                    if (savedSignatures.contains(hash)) {
+                        savedSignatures.remove(hash);
+                    } else {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                                 "Received a SignatureConfirmation element, but there are no matching"
                             + " stored signature values"
@@ -476,7 +474,7 @@ public abstract class WSHandler {
         }
 
         //
-        // the list holding the stored Signature values must be empty, otherwise we have an error
+        // the set holding the stored Signature values must be empty, otherwise we have an error
         //
         if (savedSignatures != null && !savedSignatures.isEmpty()) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",

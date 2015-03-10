@@ -24,7 +24,6 @@ import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.wss4j.dom.SOAPConstants;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.SignatureActionToken;
@@ -118,14 +117,8 @@ public class UsernameTokenSignedAction implements Action {
         if (signatureToken.getParts().size() > 0) {
             parts = signatureToken.getParts();
         } else {
-            SOAPConstants soapConstants = reqData.getSoapConstants();
-            if (soapConstants == null) {
-                soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-            }
-            parts = new ArrayList<>();
-            WSEncryptionPart encP = 
-                new WSEncryptionPart(WSConstants.ELEM_BODY, soapConstants.getEnvelopeURI(), "Content");
-            parts.add(encP);
+            parts = new ArrayList<>(1);
+            parts.add(WSSecurityUtil.getDefaultEncryptionPart(doc));
         }
         List<javax.xml.crypto.dsig.Reference> referenceList = 
             sign.addReferencesToSign(parts, reqData.getSecHeader());

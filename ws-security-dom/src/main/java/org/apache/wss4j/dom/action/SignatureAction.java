@@ -33,6 +33,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.message.WSSecSignature;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -134,11 +135,8 @@ public class SignatureAction implements Action {
             
             List<WSEncryptionPart> parts = signatureToken.getParts();
             if (parts == null || parts.isEmpty()) {
-                WSEncryptionPart encP = new WSEncryptionPart(reqData.getSoapConstants()
-                        .getBodyQName().getLocalPart(), reqData.getSoapConstants()
-                        .getEnvelopeURI(), "Content");
-                parts = new ArrayList<>();
-                parts.add(encP);
+                parts = new ArrayList<>(1);
+                parts.add(WSSecurityUtil.getDefaultEncryptionPart(doc));
             }
             
             List<javax.xml.crypto.dsig.Reference> referenceList =
