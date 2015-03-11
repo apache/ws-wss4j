@@ -39,7 +39,6 @@ import javax.security.auth.callback.CallbackHandler;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.action.Action;
 import org.apache.wss4j.common.EncryptionActionToken;
 import org.apache.wss4j.common.SignatureActionToken;
 import org.apache.wss4j.common.SignatureEncryptionActionToken;
@@ -169,10 +168,7 @@ public abstract class WSHandler {
             reqData.setSignatureToken(signatureToken);
         }
         if (signatureToken.getParts().isEmpty()) {
-            WSEncryptionPart encP = new WSEncryptionPart(reqData.getSoapConstants()
-                    .getBodyQName().getLocalPart(), reqData.getSoapConstants()
-                    .getEnvelopeURI(), "Content");
-            signatureToken.getParts().add(encP);
+            signatureToken.getParts().add(WSSecurityUtil.getDefaultEncryptionPart(doc));
         }
         /*
          * If SignatureConfirmation is enabled and this is a response then
@@ -214,38 +210,9 @@ public abstract class WSHandler {
                 LOG.debug("Performing Action: " + actionToDo.getAction());
             }
 
-            switch (actionToDo.getAction()) {
-            case WSConstants.UT:
-            case WSConstants.ENCR:
-            case WSConstants.SIGN:
-            case WSConstants.DKT_SIGN:
-            case WSConstants.DKT_ENCR:
-            case WSConstants.ST_SIGNED:
-            case WSConstants.ST_UNSIGNED:
-            case WSConstants.TS:
-            case WSConstants.UT_SIGN:
-            case WSConstants.CUSTOM_TOKEN:
+            if (WSConstants.NO_SECURITY != actionToDo.getAction()) {
                 wssConfig.getAction(actionToDo.getAction()).execute(
                     this, actionToDo.getActionToken(), doc, reqData);
-                break;
-                //
-                // Handle any "custom" actions, similarly,
-                // but to preserve behavior from previous
-                // versions, consume (but LOG. action lookup failures.
-                //
-            default:
-                Action doit = null;
-            try {
-                doit = wssConfig.getAction(actionToDo.getAction());
-            } catch (final WSSecurityException e) {
-                LOG.warn(
-                        "Error trying to locate a custom action (" + actionToDo + ")", 
-                        e
-                );
-            }
-            if (doit != null) {
-                doit.execute(this, actionToDo.getActionToken(), doc, reqData);
-            }
             }
         }
         

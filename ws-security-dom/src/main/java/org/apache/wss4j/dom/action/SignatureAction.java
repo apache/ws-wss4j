@@ -81,6 +81,8 @@ public class SignatureAction implements Action {
             wsSign.setSecretKey(passwordCallback.getKey());
         } else if (signatureToken.getKey() != null) {
             wsSign.setSecretKey(signatureToken.getKey());
+        } else if (signatureToken.getUser() == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSignatureUser");
         }
         
         if (signatureToken.getTokenId() != null) {

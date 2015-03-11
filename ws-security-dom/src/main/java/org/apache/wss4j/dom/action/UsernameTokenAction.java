@@ -45,6 +45,10 @@ public class UsernameTokenAction implements Action {
             username = passwordCallback.getIdentifier();
             password = passwordCallback.getPassword();
         }
+        
+        if (username == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noUser");
+        }
 
         WSSecUsernameToken builder = new WSSecUsernameToken(reqData.getWssConfig());
         builder.setPasswordType(reqData.getPwType());

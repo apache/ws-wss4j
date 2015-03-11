@@ -55,6 +55,10 @@ public class UsernameTokenSignedAction implements Action {
         WSPasswordCallback passwordCallback = 
             handler.getPasswordCB(reqData.getUsername(), WSConstants.UT_SIGN, callbackHandler, reqData);
 
+        if (reqData.getUsername() == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noUser");
+        }
+        
         WSSecUsernameToken builder = new WSSecUsernameToken(reqData.getWssConfig());
         
         int iterations = reqData.getDerivedKeyIterations();
