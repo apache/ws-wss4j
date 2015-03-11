@@ -48,8 +48,6 @@
         <woodstox.core.asl.version>4.4.1</woodstox.core.asl.version>
         <wsdl4j.version>1.6.3</wsdl4j.version>
         <xalan.version>2.7.2</xalan.version>
-        <xerces.version>2.11.0</xerces.version>
-        <xml.apis.version>1.4.01</xml.apis.version>
         <xmlsec.version>2.0.3</xmlsec.version>
         <xmlunit.version>1.6</xmlunit.version>
         
@@ -63,11 +61,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>xerces</groupId>
-                <artifactId>xercesImpl</artifactId>
-                <version>${xerces.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.apache.santuario</groupId>
                 <artifactId>xmlsec</artifactId>
@@ -122,11 +115,6 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>xml-apis</groupId>
-                <artifactId>xml-apis</artifactId>
-                <version>${xml.apis.version}</version>
             </dependency>
             <dependency>
                 <groupId>wsdl4j</groupId>
