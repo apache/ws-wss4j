@@ -132,6 +132,10 @@ public class EncryptionPartsTest extends org.junit.Assert {
         assertEquals(WSConstants.AES_128, wsDataRef.getAlgorithm());
         QName expectedQName = new QName("urn:foo.bar", "foobar");
         assertEquals(expectedQName, wsDataRef.getName());
+        
+        Element encryptedElement = wsDataRef.getEncryptedElement();
+        assertNotNull(encryptedElement);
+        assertEquals(WSConstants.ENC_NS, encryptedElement.getNamespaceURI());
     }
     
     @org.junit.Test

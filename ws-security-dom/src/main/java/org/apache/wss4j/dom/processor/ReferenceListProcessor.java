@@ -316,6 +316,7 @@ public class ReferenceListProcessor implements Processor {
     ) throws WSSecurityException {
 
         WSDataRef dataRef = new WSDataRef();
+        dataRef.setEncryptedElement(encData);
         dataRef.setWsuId(dataRefURI);
         dataRef.setAlgorithm(symEncAlgo);
 
