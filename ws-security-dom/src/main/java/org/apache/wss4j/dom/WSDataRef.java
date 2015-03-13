@@ -82,6 +82,11 @@ public class WSDataRef {
      * Whether the protected Reference is an Attachment or not
      */
     private boolean attachment;
+    
+    /**
+     * If this reference represents encrypted content, then this is the EncryptedData Element
+     */
+    private Element encryptedElement;
 
     /**
      * @return Id of the protected element
@@ -225,4 +230,11 @@ public class WSDataRef {
         this.digestValue = digestValue;
     }
 
+    public Element getEncryptedElement() {
+        return encryptedElement;
+    }
+
+    public void setEncryptedElement(Element encryptedElement) {
+        this.encryptedElement = encryptedElement;
+    }
 }
