@@ -25,9 +25,7 @@
         <artifactId>wss4j</artifactId>
         <version>2.1.0-SNAPSHOT</version>
     </parent>
-    <groupId>org.apache.wss4j</groupId>
     <artifactId>wss4j-parent</artifactId>
-    <version>2.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Apache WSS4J parent</name>
     <description>Apache WSS4J parent pom</description>
@@ -217,6 +215,44 @@
                             </manifestEntries>
                         </archive>
                     </configuration>
+                </plugin>
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <plugin>
+                	<groupId>org.eclipse.m2e</groupId>
+                	<artifactId>lifecycle-mapping</artifactId>
+                	<version>1.0.0</version>
+                	<configuration>
+                		<lifecycleMappingMetadata>
+                			<pluginExecutions>
+                				<pluginExecution>
+                					<pluginExecutionFilter>
+                						<groupId>org.apache.felix</groupId>
+                						<artifactId>maven-bundle-plugin</artifactId>
+                						<versionRange>[2.4.0,)</versionRange>
+                						<goals>
+                							<goal>cleanVersions</goal>
+                						</goals>
+                					</pluginExecutionFilter>
+                					<action>
+                						<ignore></ignore>
+                					</action>
+                				</pluginExecution>
+                				<pluginExecution>
+                					<pluginExecutionFilter>
+                						<groupId>org.apache.maven.plugins</groupId>
+                						<artifactId>maven-remote-resources-plugin</artifactId>
+                						<versionRange>[1.0.0,)</versionRange>
+                						<goals>
+                							<goal>process</goal>
+                						</goals>
+                					</pluginExecutionFilter>
+                					<action>
+                						<ignore></ignore>
+                					</action>
+                				</pluginExecution>
+                			</pluginExecutions>
+                		</lifecycleMappingMetadata>
+                	</configuration>
                 </plugin>
             </plugins>
         </pluginManagement>

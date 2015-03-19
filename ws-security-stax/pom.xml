@@ -26,9 +26,7 @@
         <relativePath>../parent/pom.xml</relativePath>
         <version>2.1.0-SNAPSHOT</version>
     </parent>
-    <groupId>org.apache.wss4j</groupId>
     <artifactId>wss4j-ws-security-stax</artifactId>
-    <version>2.1.0-SNAPSHOT</version>
     <name>Apache WSS4J Streaming WS-Security</name>
 
     <dependencies>
@@ -107,7 +105,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
                 <executions>
                     <execution>
                         <goals>
