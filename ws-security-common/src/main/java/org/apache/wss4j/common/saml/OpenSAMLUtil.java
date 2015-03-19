@@ -23,11 +23,14 @@ import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.opensaml.core.config.InitializationException;
-import org.opensaml.core.config.InitializationService;
+import org.opensaml.core.config.Configuration;
+import org.opensaml.core.config.ConfigurationService;
+import org.opensaml.core.config.provider.MapBasedConfiguration;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.XMLObjectBuilder;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
+import org.opensaml.core.xml.config.XMLConfigurationException;
+import org.opensaml.core.xml.config.XMLObjectProviderRegistry;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.core.xml.io.Marshaller;
 import org.opensaml.core.xml.io.MarshallerFactory;
@@ -35,6 +38,7 @@ import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.io.Unmarshaller;
 import org.opensaml.core.xml.io.UnmarshallerFactory;
 import org.opensaml.core.xml.io.UnmarshallingException;
+import org.opensaml.saml.config.SAMLConfiguration;
 import org.opensaml.xmlsec.signature.Signature;
 import org.opensaml.xmlsec.signature.support.SignatureException;
 import org.opensaml.xmlsec.signature.support.Signer;
@@ -66,39 +70,31 @@ public final class OpenSAMLUtil {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Initializing the opensaml2 library...");
             }
+            WSProviderConfig.init();
+
+            Configuration configuration = new MapBasedConfiguration();
+            ConfigurationService.setConfiguration(configuration);
+
+            XMLObjectProviderRegistry providerRegistry = new XMLObjectProviderRegistry();
+            configuration.register(XMLObjectProviderRegistry.class, providerRegistry, ConfigurationService.DEFAULT_PARTITION_NAME);
+
             try {
-                WSProviderConfig.init();
+                OpenSAMLBootstrap.bootstrap();
                 
-                try {
-                    tryInitWithClassLoader(Thread.currentThread().getContextClassLoader());
-                } catch (Throwable t) {
-                    tryInitWithClassLoader(InitializationService.class.getClassLoader());
-                }
+                SAMLConfiguration samlConfiguration = new SAMLConfiguration();
+                configuration.register(SAMLConfiguration.class, samlConfiguration, ConfigurationService.DEFAULT_PARTITION_NAME);
+
+                builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
+                marshallerFactory = XMLObjectProviderRegistrySupport.getMarshallerFactory();
+                unmarshallerFactory = XMLObjectProviderRegistrySupport.getUnmarshallerFactory();
                 
                 samlEngineInitialized = true;
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("opensaml3 library bootstrap complete");
                 }
-            } catch (InitializationException e) {
-                LOG.error(
-                    "Unable to bootstrap the opensaml3 library - all SAML operations will fail", 
-                    e
-                );
-             }
-        }
-    }
-    
-    private static void tryInitWithClassLoader(ClassLoader l) throws InitializationException {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(l);
-            InitializationService.initialize();
-            // OpenSAMLBootstrap.bootstrap();
-            builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
-            marshallerFactory = XMLObjectProviderRegistrySupport.getMarshallerFactory();
-            unmarshallerFactory = XMLObjectProviderRegistrySupport.getUnmarshallerFactory();
-        } finally {
-            Thread.currentThread().setContextClassLoader(loader);
+            } catch (XMLConfigurationException ex) {
+                LOG.error("Unable to bootstrap the opensaml3 library - all SAML operations will fail", ex);
+            }
         }
     }
 

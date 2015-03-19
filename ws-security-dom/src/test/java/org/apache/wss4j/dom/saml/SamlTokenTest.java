@@ -43,6 +43,7 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
@@ -840,12 +841,13 @@ public class SamlTokenTest extends org.junit.Assert {
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-        String assertionString = samlAssertion.assertionToString();
         
-        // Convert String to DOM + into an assertionWrapper
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
+        Document doc = dbf.newDocumentBuilder().newDocument();
+        String assertionString = DOM2Writer.nodeToString(samlAssertion.toDOM(doc));
         
+        // Convert String to DOM + into an assertionWrapper
         InputStream in = new ByteArrayInputStream(assertionString.getBytes());
         Document newDoc = dbf.newDocumentBuilder().parse(in);
         
