@@ -68,21 +68,37 @@ public final class OpenSAMLUtil {
             }
             try {
                 WSProviderConfig.init();
-                InitializationService.initialize();
-                // OpenSAMLBootstrap.bootstrap();
-                builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
-                marshallerFactory = XMLObjectProviderRegistrySupport.getMarshallerFactory();
-                unmarshallerFactory = XMLObjectProviderRegistrySupport.getUnmarshallerFactory();
+                
+                try {
+                    tryInitWithClassLoader(Thread.currentThread().getContextClassLoader());
+                } catch (Throwable t) {
+                    tryInitWithClassLoader(InitializationService.class.getClassLoader());
+                }
+                
                 samlEngineInitialized = true;
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("opensaml2 library bootstrap complete");
+                    LOG.debug("opensaml3 library bootstrap complete");
                 }
             } catch (InitializationException e) {
                 LOG.error(
-                    "Unable to bootstrap the opensaml2 library - all SAML operations will fail", 
+                    "Unable to bootstrap the opensaml3 library - all SAML operations will fail", 
                     e
                 );
              }
+        }
+    }
+    
+    private static void tryInitWithClassLoader(ClassLoader l) throws InitializationException {
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(l);
+            InitializationService.initialize();
+            // OpenSAMLBootstrap.bootstrap();
+            builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
+            marshallerFactory = XMLObjectProviderRegistrySupport.getMarshallerFactory();
+            unmarshallerFactory = XMLObjectProviderRegistrySupport.getUnmarshallerFactory();
+        } finally {
+            Thread.currentThread().setContextClassLoader(loader);
         }
     }
 
