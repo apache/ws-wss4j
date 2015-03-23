@@ -21,7 +21,6 @@ package org.apache.wss4j.dom.message;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.security.spec.MGF1ParameterSpec;
 
@@ -189,7 +188,7 @@ public class WSSecEncryptedKey extends WSSecBase {
             if (ephemeralKey != null) {
                 symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, ephemeralKey);
             } else {
-                KeyGenerator keyGen = getKeyGenerator();
+                KeyGenerator keyGen = KeyUtils.getKeyGenerator(symEncAlgo);
                 symmetricKey = keyGen.generateKey();
                 ephemeralKey = symmetricKey.getEncoded();
             }
@@ -435,34 +434,6 @@ public class WSSecEncryptedKey extends WSSecBase {
         
         bstAddedToSecurityHeader = false;
         bstToken.setID(IDGenerator.generateID(null));
-    }
-
-    protected KeyGenerator getKeyGenerator() throws WSSecurityException {
-        try {
-            //
-            // Assume AES as default, so initialize it
-            //
-            String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(symEncAlgo);
-            if (keyAlgorithm == null || "".equals(keyAlgorithm)) {
-                keyAlgorithm = JCEMapper.translateURItoJCEID(symEncAlgo);
-            }
-            KeyGenerator keyGen = KeyGenerator.getInstance(keyAlgorithm);
-            if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_128)
-                || symEncAlgo.equalsIgnoreCase(WSConstants.AES_128_GCM)) {
-                keyGen.init(128);
-            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_192)
-                || symEncAlgo.equalsIgnoreCase(WSConstants.AES_192_GCM)) {
-                keyGen.init(192);
-            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_256)
-                || symEncAlgo.equalsIgnoreCase(WSConstants.AES_256_GCM)) {
-                keyGen.init(256);
-            }
-            return keyGen;
-        } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, e
-            );
-        }
     }
 
     /**

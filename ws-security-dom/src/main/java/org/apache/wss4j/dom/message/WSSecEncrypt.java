@@ -122,7 +122,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 symmetricKey = 
                     KeyUtils.prepareSecretKey(getSymmetricEncAlgorithm(), getEphemeralKey());
             } else {
-                KeyGenerator keyGen = getKeyGenerator();
+                KeyGenerator keyGen = KeyUtils.getKeyGenerator(getSymmetricEncAlgorithm());
                 symmetricKey = keyGen.generateKey();
             }
         }

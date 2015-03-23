@@ -19,11 +19,15 @@
 
 package org.apache.wss4j.common.util;
 
+import java.security.NoSuchAlgorithmException;
+
+import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.xml.security.algorithms.JCEMapper;
+import org.apache.xml.security.encryption.XMLCipher;
 
 public final class KeyUtils {
     private static final org.slf4j.Logger LOG =
@@ -45,22 +49,22 @@ public final class KeyUtils {
     }
     
     /**
-     * Convert the raw key bytes into a SecretKey object of type symEncAlgo.
+     * Convert the raw key bytes into a SecretKey object of type algorithm.
      */
-    public static SecretKey prepareSecretKey(String symEncAlgo, byte[] rawKey) {
+    public static SecretKey prepareSecretKey(String algorithm, byte[] rawKey) {
         // Do an additional check on the keysize required by the encryption algorithm
         int size = 0;
         try {
-            size = getKeyLength(symEncAlgo);
+            size = getKeyLength(algorithm);
         } catch (Exception e) {
             // ignore - some unknown (to JCEMapper) encryption algorithm
             if (LOG.isDebugEnabled()) {
                 LOG.debug(e.getMessage());
             }
         }
-        String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(symEncAlgo);
+        String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(algorithm);
         SecretKeySpec keySpec;
-        if (size > 0 && !symEncAlgo.endsWith("gcm") && !symEncAlgo.contains("hmac-")) {
+        if (size > 0 && !algorithm.endsWith("gcm") && !algorithm.contains("hmac-")) {
             keySpec = 
                 new SecretKeySpec(
                     rawKey, 0, rawKey.length > size ? size : rawKey.length, keyAlgorithm
@@ -75,5 +79,33 @@ public final class KeyUtils {
             keySpec = new SecretKeySpec(rawKey, keyAlgorithm);
         }
         return keySpec;
-    }    
+    }
+    
+    public static KeyGenerator getKeyGenerator(String algorithm) throws WSSecurityException {
+        try {
+            //
+            // Assume AES as default, so initialize it
+            //
+            String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(algorithm);
+            if (keyAlgorithm == null || "".equals(keyAlgorithm)) {
+                keyAlgorithm = JCEMapper.translateURItoJCEID(algorithm);
+            }
+            KeyGenerator keyGen = KeyGenerator.getInstance(keyAlgorithm);
+            if (algorithm.equalsIgnoreCase(XMLCipher.AES_128)
+                || algorithm.equalsIgnoreCase(XMLCipher.AES_128_GCM)) {
+                keyGen.init(128);
+            } else if (algorithm.equalsIgnoreCase(XMLCipher.AES_192)
+                || algorithm.equalsIgnoreCase(XMLCipher.AES_192_GCM)) {
+                keyGen.init(192);
+            } else if (algorithm.equalsIgnoreCase(XMLCipher.AES_256)
+                || algorithm.equalsIgnoreCase(XMLCipher.AES_256_GCM)) {
+                keyGen.init(256);
+            }
+            return keyGen;
+        } catch (NoSuchAlgorithmException e) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, e
+            );
+        }
+    }
 }
