@@ -40,8 +40,8 @@ import javax.xml.crypto.dom.DOMCryptoContext;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.CallbackLookup;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -161,7 +161,7 @@ public class WSDocInfo {
      * @return the token element or null if nothing found
      */
     public Element getTokenElement(String uri) {
-        String id = WSSecurityUtil.getIDFromReference(uri);
+        String id = XMLUtils.getIDFromReference(uri);
         if (id == null) {
             return null;
         }
@@ -189,7 +189,7 @@ public class WSDocInfo {
     }
     
     public void setTokenOnContext(String uri, DOMCryptoContext context) {
-        String id = WSSecurityUtil.getIDFromReference(uri);
+        String id = XMLUtils.getIDFromReference(uri);
         if (id == null || context == null) {
             return;
         }
@@ -216,7 +216,7 @@ public class WSDocInfo {
      * @return the WSSecurityEngineResult or null if nothing found
      */
     public WSSecurityEngineResult getResult(String uri) {
-        String id = WSSecurityUtil.getIDFromReference(uri);
+        String id = XMLUtils.getIDFromReference(uri);
         if (id == null) {
             return null;
         }
@@ -254,7 +254,7 @@ public class WSDocInfo {
      * See whether we have a WSSecurityEngineResult of the given Integer tag for the given Id
      */
     public boolean hasResult(Integer tag, String uri) {
-        String id = WSSecurityUtil.getIDFromReference(uri);
+        String id = XMLUtils.getIDFromReference(uri);
         if (id == null || "".equals(uri)) {
             return false;
         }

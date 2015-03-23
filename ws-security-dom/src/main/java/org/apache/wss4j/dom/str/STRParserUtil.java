@@ -27,6 +27,7 @@ import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSecurityEngine;
@@ -39,7 +40,6 @@ import org.apache.wss4j.dom.message.token.PKIPathSecurity;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.message.token.X509Security;
 import org.apache.wss4j.dom.processor.Processor;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Element;
 
 /**
@@ -265,7 +265,7 @@ public final class STRParserUtil {
         int identifier,
         RequestData data
     ) throws WSSecurityException {
-        String uri = WSSecurityUtil.getIDFromReference(id);
+        String uri = XMLUtils.getIDFromReference(id);
         WSPasswordCallback pwcb = 
             new WSPasswordCallback(uri, null, type, identifier);
         try {

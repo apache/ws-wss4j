@@ -25,8 +25,8 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
@@ -84,7 +84,7 @@ public class SignatureConfirmation {
                 WSConstants.WSSE11_NS, 
                 WSConstants.WSSE11_PREFIX + ":"  + WSConstants.SIGNATURE_CONFIRMATION_LN
             );
-        WSSecurityUtil.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
+        XMLUtils.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
         if (signVal != null) {
             String sv = Base64.encode(signVal);
             element.setAttributeNS(null, SC_VALUE_ATTR, sv);
@@ -96,7 +96,7 @@ public class SignatureConfirmation {
      * efficiency purposes.
      */
     public void addWSUNamespace() {
-        WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+        XMLUtils.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
     }
 
     /**

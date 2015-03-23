@@ -36,10 +36,10 @@ import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.token.DOMX509Data;
+import org.apache.wss4j.common.token.DOMX509IssuerSerial;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.message.token.BinarySecurity;
-import org.apache.wss4j.dom.message.token.DOMX509Data;
-import org.apache.wss4j.dom.message.token.DOMX509IssuerSerial;
 import org.apache.wss4j.dom.message.token.Reference;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.message.token.X509Security;
@@ -238,7 +238,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         X509Certificate remoteCert,
         Crypto crypto
     ) throws WSSecurityException {
-        Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
+        Cipher cipher = KeyUtils.getCipherInstance(keyEncAlgo);
         try {
             OAEPParameterSpec oaepParameterSpec = null;
             if (WSConstants.KEYTRANSPORT_RSAOEP.equals(keyEncAlgo)
@@ -343,7 +343,7 @@ public class WSSecEncryptedKey extends WSSecBase {
                     document, issuer, serialNumber
                 );
             DOMX509Data domX509Data = new DOMX509Data(document, domIssuerSerial);
-            secToken.setX509Data(domX509Data);
+            secToken.setUnknownElement(domX509Data.getElement());
             
             if (includeEncryptionToken) {
                 addBST(remoteCert);
@@ -447,7 +447,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         Element encryptedKey = 
             doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptedKey");
 
-        WSSecurityUtil.setNamespace(encryptedKey, WSConstants.ENC_NS, WSConstants.ENC_PREFIX);
+        org.apache.wss4j.common.util.XMLUtils.setNamespace(encryptedKey, WSConstants.ENC_NS, WSConstants.ENC_PREFIX);
         Element encryptionMethod = 
             doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptionMethod");
         encryptionMethod.setAttributeNS(null, "Algorithm", keyTransportAlgo);

@@ -21,7 +21,9 @@ package org.apache.wss4j.common.util;
 
 import java.security.NoSuchAlgorithmException;
 
+import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -106,6 +108,39 @@ public final class KeyUtils {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, e
             );
+        }
+    }
+    
+    
+    /**
+     * Translate the "cipherAlgo" URI to a JCE ID, and return a javax.crypto.Cipher instance
+     * of this type. 
+     */
+    public static Cipher getCipherInstance(String cipherAlgo)
+        throws WSSecurityException {
+        try {
+            String keyAlgorithm = JCEMapper.translateURItoJCEID(cipherAlgo);
+            return Cipher.getInstance(keyAlgorithm);
+        } catch (NoSuchPaddingException ex) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp", 
+                ex, "No such padding: " + cipherAlgo);
+        } catch (NoSuchAlgorithmException ex) {
+            // Check to see if an RSA OAEP MGF-1 with SHA-1 algorithm was requested
+            // Some JDKs don't support RSA/ECB/OAEPPadding
+            if (XMLCipher.RSA_OAEP.equals(cipherAlgo)) {
+                try {
+                    return Cipher.getInstance("RSA/ECB/OAEPWithSHA1AndMGF1Padding");
+                } catch (Exception e) {
+                    throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                        e, "No such algorithm: " + cipherAlgo);
+                }
+            } else {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                    ex, "No such algorithm: " + cipherAlgo);
+            }
         }
     }
 }

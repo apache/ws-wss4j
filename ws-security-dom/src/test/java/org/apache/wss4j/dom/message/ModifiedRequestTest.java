@@ -328,7 +328,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
 
         Element body = WSSecurityUtil.findBodyElement(doc);
         Element encryptionMethod = 
-            WSSecurityUtil.findElement(body, "EncryptionMethod", WSConstants.ENC_NS);
+            XMLUtils.findElement(body, "EncryptionMethod", WSConstants.ENC_NS);
         encryptionMethod.setAttributeNS(null, "Algorithm", "http://new-algorithm");
         
         String outputString = 
@@ -363,7 +363,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
 
         Element body = WSSecurityUtil.findBodyElement(doc);
         Element cipherValue = 
-            WSSecurityUtil.findElement(body, "CipherValue", WSConstants.ENC_NS);
+            XMLUtils.findElement(body, "CipherValue", WSConstants.ENC_NS);
         String cipherText = cipherValue.getTextContent();
         
         StringBuilder stringBuilder = new StringBuilder(cipherText);
@@ -424,9 +424,9 @@ public class ModifiedRequestTest extends org.junit.Assert {
         Element securityHeader = 
             WSSecurityUtil.getSecurityHeader(encryptedDoc, "");
         Element encryptedTimestamp = 
-            WSSecurityUtil.findElement(securityHeader, "EncryptedData", WSConstants.ENC_NS);
+            XMLUtils.findElement(securityHeader, "EncryptedData", WSConstants.ENC_NS);
         Element cipherValue = 
-            WSSecurityUtil.findElement(encryptedTimestamp, "CipherValue", WSConstants.ENC_NS);
+            XMLUtils.findElement(encryptedTimestamp, "CipherValue", WSConstants.ENC_NS);
         String cipherText = cipherValue.getTextContent();
         
         StringBuilder stringBuilder = new StringBuilder(cipherText);
@@ -471,9 +471,9 @@ public class ModifiedRequestTest extends org.junit.Assert {
         Document encryptedDoc = builder.build(doc, wssCrypto, secHeader);
 
         Element encryptedKey = 
-                WSSecurityUtil.findElement(doc.getDocumentElement(), "EncryptedKey", WSConstants.ENC_NS);
+            XMLUtils.findElement(doc.getDocumentElement(), "EncryptedKey", WSConstants.ENC_NS);
         Element cipherValue = 
-            WSSecurityUtil.findElement(encryptedKey, "CipherValue", WSConstants.ENC_NS);
+            XMLUtils.findElement(encryptedKey, "CipherValue", WSConstants.ENC_NS);
         String cipherText = cipherValue.getTextContent();
         
         StringBuilder stringBuilder = new StringBuilder(cipherText);
@@ -531,7 +531,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         // Modify the Created text of the Timestamp element
         Element timestampElement = timestamp.getElement();
         Element createdValue = 
-            WSSecurityUtil.findElement(timestampElement, "Created", WSConstants.WSU_NS);
+            XMLUtils.findElement(timestampElement, "Created", WSConstants.WSU_NS);
         DateFormat zulu = new XmlSchemaDateFormat();
         
         XMLGregorianCalendar createdCalendar = 

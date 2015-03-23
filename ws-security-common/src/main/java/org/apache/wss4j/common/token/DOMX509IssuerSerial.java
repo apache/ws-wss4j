@@ -17,12 +17,11 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.message.token;
+package org.apache.wss4j.common.token;
 
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.xml.security.utils.Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -45,15 +44,12 @@ public final class DOMX509IssuerSerial {
         element = issuerSerialElement;
         
         Element issuerNameElement = 
-            WSSecurityUtil.getDirectChildElement(
-                element, WSConstants.X509_ISSUER_NAME_LN, WSConstants.SIG_NS
-            );
+            XMLUtils.getDirectChildElement(element, "X509IssuerName", Constants.SignatureSpecNS);
         issuer = XMLUtils.getElementText(issuerNameElement);
         
         Element serialNumberElement = 
-            WSSecurityUtil.getDirectChildElement(
-                element, WSConstants.X509_SERIAL_NUMBER_LN, WSConstants.SIG_NS
-            );
+            XMLUtils.getDirectChildElement(element, "X509SerialNumber", Constants.SignatureSpecNS);
+        
         String serialNumberStr = XMLUtils.getElementText(serialNumberElement);
         if (serialNumberStr != null) {
             serialNumber = new BigInteger(serialNumberStr);
@@ -77,21 +73,15 @@ public final class DOMX509IssuerSerial {
         this.serialNumber = serialNumber;
         
         element = 
-            doc.createElementNS(
-                WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.X509_ISSUER_SERIAL_LN
-            );
+            doc.createElementNS(Constants.SignatureSpecNS, "ds:X509IssuerSerial");
         
         Element issuerNameElement = 
-            doc.createElementNS(
-                WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.X509_ISSUER_NAME_LN
-            );
+            doc.createElementNS(Constants.SignatureSpecNS, "ds:X509IssuerName");
         issuerNameElement.appendChild(doc.createTextNode(this.issuer));
         element.appendChild(issuerNameElement);
         
         Element serialNumberElement = 
-            doc.createElementNS(
-                WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.X509_SERIAL_NUMBER_LN
-            );
+            doc.createElementNS(Constants.SignatureSpecNS, "ds:X509SerialNumber");
         serialNumberElement.appendChild(doc.createTextNode(serialNumber.toString()));
         element.appendChild(serialNumberElement);
     }

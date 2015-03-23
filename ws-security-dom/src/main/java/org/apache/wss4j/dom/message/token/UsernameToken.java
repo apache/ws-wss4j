@@ -113,27 +113,27 @@ public class UsernameToken {
             );
         }
         elementUsername = 
-            WSSecurityUtil.getDirectChildElement(
+            XMLUtils.getDirectChildElement(
                 element, WSConstants.USERNAME_LN, WSConstants.WSSE_NS
             );
         elementPassword = 
-            WSSecurityUtil.getDirectChildElement(
+            XMLUtils.getDirectChildElement(
                 element, WSConstants.PASSWORD_LN, WSConstants.WSSE_NS
             );
         elementNonce = 
-            WSSecurityUtil.getDirectChildElement(
+            XMLUtils.getDirectChildElement(
                 element, WSConstants.NONCE_LN, WSConstants.WSSE_NS
             );
         elementCreated = 
-            WSSecurityUtil.getDirectChildElement(
+            XMLUtils.getDirectChildElement(
                 element, WSConstants.CREATED_LN, WSConstants.WSU_NS
             );
         elementSalt = 
-            WSSecurityUtil.getDirectChildElement(
+            XMLUtils.getDirectChildElement(
                 element, WSConstants.SALT_LN, WSConstants.WSSE11_NS
             );
         elementIteration = 
-            WSSecurityUtil.getDirectChildElement(
+            XMLUtils.getDirectChildElement(
                 element, WSConstants.ITERATION_LN, WSConstants.WSSE11_NS
             );
         if (elementUsername == null) {
@@ -285,7 +285,7 @@ public class UsernameToken {
      * efficiency purposes.
      */
     public void addWSSENamespace() {
-        WSSecurityUtil.setNamespace(element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
+        XMLUtils.setNamespace(element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
     }
     
     /**
@@ -293,7 +293,7 @@ public class UsernameToken {
      * efficiency purposes.
      */
     public void addWSUNamespace() {
-        WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+        XMLUtils.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
     }
 
     /**
@@ -366,7 +366,7 @@ public class UsernameToken {
             doc.createElementNS(
                 WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX + ":" + WSConstants.SALT_LN
             );
-        WSSecurityUtil.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
+        XMLUtils.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
         elementSalt.appendChild(doc.createTextNode(Base64.encode(saltValue)));
         element.appendChild(elementSalt);
         return saltValue;
@@ -381,7 +381,7 @@ public class UsernameToken {
             doc.createElementNS(
                 WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX + ":" + WSConstants.ITERATION_LN
             );
-        WSSecurityUtil.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
+        XMLUtils.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
         elementIteration.appendChild(doc.createTextNode(text));
         element.appendChild(elementIteration);
     }

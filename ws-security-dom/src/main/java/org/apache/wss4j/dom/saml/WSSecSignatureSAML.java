@@ -45,12 +45,12 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.token.DOMX509Data;
+import org.apache.wss4j.common.token.DOMX509IssuerSerial;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
-import org.apache.wss4j.dom.message.token.DOMX509Data;
-import org.apache.wss4j.dom.message.token.DOMX509IssuerSerial;
 import org.apache.wss4j.dom.message.token.Reference;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.message.token.X509Security;
@@ -413,7 +413,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 final DOMX509IssuerSerial domIssuerSerial =
                         new DOMX509IssuerSerial(document, issuer, serialNumber);
                 final DOMX509Data domX509Data = new DOMX509Data(document, domIssuerSerial);
-                secRef.setX509Data(domX509Data);
+                secRef.setUnknownElement(domX509Data.getElement());
                 break;
 
             default:

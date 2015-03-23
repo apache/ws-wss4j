@@ -29,24 +29,19 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.CallbackLookup;
-import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
-import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
-
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -79,7 +74,7 @@ public final class WSSecurityUtil {
     public static Element getSecurityHeader(Document doc, String actor) throws WSSecurityException {
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         Element soapHeaderElement = 
-            getDirectChildElement(
+            XMLUtils.getDirectChildElement(
                 doc.getDocumentElement(), 
                 WSConstants.ELEM_HEADER, 
                 soapNamespace
@@ -159,38 +154,6 @@ public final class WSSecurityUtil {
         return false;
     }
 
-    
-    /**
-     * Gets a direct child with specified localname and namespace. <p/>
-     * 
-     * @param parentNode the node where to start the search
-     * @param localName local name of the child to get
-     * @param namespace the namespace of the child to get
-     * @return the node or <code>null</code> if not such node found
-     */
-    public static Element getDirectChildElement(
-        Node parentNode, 
-        String localName,
-        String namespace
-    ) {
-        if (parentNode == null) {
-            return null;
-        }
-        for (
-            Node currentChild = parentNode.getFirstChild(); 
-            currentChild != null; 
-            currentChild = currentChild.getNextSibling()
-        ) {
-            if (Node.ELEMENT_NODE == currentChild.getNodeType()
-                && localName.equals(currentChild.getLocalName())
-                && namespace.equals(currentChild.getNamespaceURI())) {
-                return (Element)currentChild;
-            }
-        }
-        return null;
-    }
-    
-    
     /**
      * Gets all direct children with specified localname and namespace. <p/>
      * 
@@ -230,7 +193,7 @@ public final class WSSecurityUtil {
     public static Element findBodyElement(Document doc) {
         Element docElement = doc.getDocumentElement();
         String ns = docElement.getNamespaceURI();
-        return getDirectChildElement(docElement, WSConstants.ELEM_BODY, ns);
+        return XMLUtils.getDirectChildElement(docElement, WSConstants.ELEM_BODY, ns);
     }
     
     
@@ -261,290 +224,8 @@ public final class WSSecurityUtil {
         return callbackLookup.getElements(part.getName(), part.getNamespace());
     }
     
-    /**
-     * Returns the first element that matches <code>name</code> and
-     * <code>namespace</code>. <p/> This is a replacement for a XPath lookup
-     * <code>//name</code> with the given namespace. It's somewhat faster than
-     * XPath, and we do not deal with prefixes, just with the real namespace URI
-     * 
-     * @param startNode Where to start the search
-     * @param name Local name of the element
-     * @param namespace Namespace URI of the element
-     * @return The found element or <code>null</code>
-     */
-    public static Element findElement(Node startNode, String name, String namespace) {
-        //
-        // Replace the formerly recursive implementation with a depth-first-loop
-        // lookup
-        //
-        if (startNode == null) {
-            return null;
-        }
-        Node startParent = startNode.getParentNode();
-        Node processedNode = null;
-
-        while (startNode != null) {
-            // start node processing at this point
-            if (startNode.getNodeType() == Node.ELEMENT_NODE
-                && startNode.getLocalName().equals(name)) {
-                String ns = startNode.getNamespaceURI();
-                if (ns != null && ns.equals(namespace)) {
-                    return (Element)startNode;
-                }
-
-                if ((namespace == null || namespace.length() == 0)
-                    && (ns == null || ns.length() == 0)) {
-                    return (Element)startNode;
-                }
-            }
-            processedNode = startNode;
-            startNode = startNode.getFirstChild();
-
-            // no child, this node is done.
-            if (startNode == null) {
-                // close node processing, get sibling
-                startNode = processedNode.getNextSibling();
-            }
-            // no more siblings, get parent, all children
-            // of parent are processed.
-            while (startNode == null) {
-                processedNode = processedNode.getParentNode();
-                if (processedNode == startParent) {
-                    return null;
-                }
-                // close parent node processing (processed node now)
-                startNode = processedNode.getNextSibling();
-            }
-        }
-        return null;
-    }
-    
-    /**
-     * Returns all elements that match <code>name</code> and <code>namespace</code>. 
-     * <p/> This is a replacement for a XPath lookup
-     * <code>//name</code> with the given namespace. It's somewhat faster than
-     * XPath, and we do not deal with prefixes, just with the real namespace URI
-     * 
-     * @param startNode Where to start the search
-     * @param name Local name of the element
-     * @param namespace Namespace URI of the element
-     * @return The found elements (or an empty list)
-     */
-    public static List<Element> findElements(Node startNode, String name, String namespace) {
-        //
-        // Replace the formerly recursive implementation with a depth-first-loop
-        // lookup
-        //
-        if (startNode == null) {
-            return null;
-        }
-        Node startParent = startNode.getParentNode();
-        Node processedNode = null;
-
-        List<Element> foundNodes = new ArrayList<>();
-        while (startNode != null) {
-            // start node processing at this point
-            if (startNode.getNodeType() == Node.ELEMENT_NODE
-                && startNode.getLocalName().equals(name)) {
-                String ns = startNode.getNamespaceURI();
-                if (ns != null && ns.equals(namespace)) {
-                    foundNodes.add((Element)startNode);
-                }
-
-                if ((namespace == null || namespace.length() == 0)
-                    && (ns == null || ns.length() == 0)) {
-                    foundNodes.add((Element)startNode);
-                }
-            }
-            processedNode = startNode;
-            startNode = startNode.getFirstChild();
-
-            // no child, this node is done.
-            if (startNode == null) {
-                // close node processing, get sibling
-                startNode = processedNode.getNextSibling();
-            }
-            // no more siblings, get parent, all children
-            // of parent are processed.
-            while (startNode == null) {
-                processedNode = processedNode.getParentNode();
-                if (processedNode == startParent) {
-                    return foundNodes;
-                }
-                // close parent node processing (processed node now)
-                startNode = processedNode.getNextSibling();
-            }
-        }
-        return foundNodes;
-    }
-    
-    /**
-     * Returns the single SAMLAssertion element that contains an AssertionID/ID that
-     * matches the supplied parameter.
-     * 
-     * @param startNode Where to start the search
-     * @param value Value of the AssertionID/ID attribute
-     * @return The found element if there was exactly one match, or
-     *         <code>null</code> otherwise
-     */
-    public static Element findSAMLAssertionElementById(Node startNode, String value) {
-        Element foundElement = null;
-
-        //
-        // Replace the formerly recursive implementation with a depth-first-loop
-        // lookup
-        //
-        if (startNode == null) {
-            return null;
-        }
-        Node startParent = startNode.getParentNode();
-        Node processedNode = null;
-
-        while (startNode != null) {
-            // start node processing at this point
-            if (startNode.getNodeType() == Node.ELEMENT_NODE) {
-                Element se = (Element) startNode;
-                if (se.hasAttributeNS(null, "ID") && value.equals(se.getAttributeNS(null, "ID"))
-                    || se.hasAttributeNS(null, "AssertionID") 
-                        && value.equals(se.getAttributeNS(null, "AssertionID"))) {
-                    if (foundElement == null) {
-                        foundElement = se; // Continue searching to find duplicates
-                    } else {
-                        LOG.warn("Multiple elements with the same 'ID' attribute value!");
-                        return null;
-                    }
-                }
-            }
-
-            processedNode = startNode;
-            startNode = startNode.getFirstChild();
-
-            // no child, this node is done.
-            if (startNode == null) {
-                // close node processing, get sibling
-                startNode = processedNode.getNextSibling();
-            }
-            // no more siblings, get parent, all children
-            // of parent are processed.
-            while (startNode == null) {
-                processedNode = processedNode.getParentNode();
-                if (processedNode == startParent) {
-                    return foundElement;
-                }
-                // close parent node processing (processed node now)
-                startNode = processedNode.getNextSibling();
-            }
-        }
-        return foundElement;
-    }
     
 
-    /**
-     * Returns the single element that contains an Id with value
-     * <code>uri</code> and <code>namespace</code>. The Id can be either a wsu:Id or an Id
-     * with no namespace. This is a replacement for a XPath Id lookup with the given namespace. 
-     * It's somewhat faster than XPath, and we do not deal with prefixes, just with the real
-     * namespace URI
-     * 
-     * If checkMultipleElements is true and there are multiple elements, we LOG.a 
-     * warning and return null as this can be used to get around the signature checking.
-     * 
-     * @param startNode Where to start the search
-     * @param value Value of the Id attribute
-     * @param checkMultipleElements If true then go through the entire tree and return 
-     *        null if there are multiple elements with the same Id
-     * @return The found element if there was exactly one match, or
-     *         <code>null</code> otherwise
-     */
-    public static Element findElementById(
-        Node startNode, String value, boolean checkMultipleElements
-    ) {
-        //
-        // Replace the formerly recursive implementation with a depth-first-loop lookup
-        //
-        Node startParent = startNode.getParentNode();
-        Node processedNode = null;
-        Element foundElement = null;
-        String id = getIDFromReference(value);
-
-        while (startNode != null) {
-            // start node processing at this point
-            if (startNode.getNodeType() == Node.ELEMENT_NODE) {
-                Element se = (Element) startNode;
-                // Try the wsu:Id first
-                String attributeNS = se.getAttributeNS(WSConstants.WSU_NS, "Id");
-                if ("".equals(attributeNS) || !id.equals(attributeNS)) {
-                    attributeNS = se.getAttributeNS(null, "Id");
-                }
-                if (!"".equals(attributeNS) && id.equals(attributeNS)) {
-                    if (!checkMultipleElements) {
-                        return se;
-                    } else if (foundElement == null) {
-                        foundElement = se; // Continue searching to find duplicates
-                    } else {
-                        LOG.warn("Multiple elements with the same 'Id' attribute value!");
-                        return null;
-                    }
-                }
-            }
-
-            processedNode = startNode;
-            startNode = startNode.getFirstChild();
-
-            // no child, this node is done.
-            if (startNode == null) {
-                // close node processing, get sibling
-                startNode = processedNode.getNextSibling();
-            }
-            // no more siblings, get parent, all children
-            // of parent are processed.
-            while (startNode == null) {
-                processedNode = processedNode.getParentNode();
-                if (processedNode == startParent) {
-                    return foundElement;
-                }
-                // close parent node processing (processed node now)
-                startNode = processedNode.getNextSibling();
-            }
-        }
-        return foundElement;
-    }
-
-    /**
-     * Set a namespace/prefix on an element if it is not set already. First off, it
-     * searches for the element for the prefix associated with the specified
-     * namespace. If the prefix isn't null, then this is returned. Otherwise, it
-     * creates a new attribute using the namespace/prefix passed as parameters.
-     * 
-     * @param element
-     * @param namespace
-     * @param prefix
-     * @return the prefix associated with the set namespace
-     */
-    public static String setNamespace(Element element, String namespace, String prefix) {
-        String pre = getPrefixNS(namespace, element);
-        if (pre != null) {
-            return pre;
-        }
-        element.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:" + prefix, namespace);
-        return prefix;
-    }
-
-    public static String getPrefixNS(String uri, Node e) {
-        while (e != null && e.getNodeType() == Element.ELEMENT_NODE) {
-            NamedNodeMap attrs = e.getAttributes();
-            for (int n = 0; n < attrs.getLength(); n++) {
-                Attr a = (Attr) attrs.item(n);
-                String name = a.getName();
-                if (name.startsWith("xmlns:") && a.getNodeValue().equals(uri)) {
-                    return name.substring("xmlns:".length());
-                }
-            }
-            e = e.getParentNode();
-        }
-        return null;
-    }
-    
     /**
      * Get the default encryption part - the SOAP Body of type "Content".
      */
@@ -554,27 +235,6 @@ public final class WSSecurityUtil {
         return new WSEncryptionPart(WSConstants.ELEM_BODY, soapNamespace, "Content");
     }
 
-    /**
-     * Turn a reference (eg "#5") into an ID (eg "5").
-     * 
-     * @param ref
-     * @return ref trimmed and with the leading "#" removed, or null if not
-     *         correctly formed
-     */
-    public static String getIDFromReference(String ref) {
-        if (ref == null) {
-            return null;
-        }
-        String id = ref.trim();
-        if (id.length() == 0) {
-            return null;
-        }
-        if (id.charAt(0) == '#') {
-            id = id.substring(1);
-        }
-        return id;
-    }
-    
     /**
      * create a new element in the same namespace <p/>
      * 
@@ -647,7 +307,7 @@ public final class WSSecurityUtil {
     ) throws WSSecurityException {
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         Element header = 
-            getDirectChildElement(
+            XMLUtils.getDirectChildElement(
                 doc.getDocumentElement(), 
                 WSConstants.ELEM_HEADER, 
                 soapNamespace
@@ -729,39 +389,6 @@ public final class WSSecurityUtil {
     public static String getSOAPNamespace(Element startElement) {
         return getSOAPConstants(startElement).getEnvelopeURI();
     }
-    
-    /**
-     * Translate the "cipherAlgo" URI to a JCE ID, and return a javax.crypto.Cipher instance
-     * of this type. 
-     */
-    public static Cipher getCipherInstance(String cipherAlgo)
-        throws WSSecurityException {
-        try {
-            String keyAlgorithm = JCEMapper.translateURItoJCEID(cipherAlgo);
-            return Cipher.getInstance(keyAlgorithm);
-        } catch (NoSuchPaddingException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp", 
-                ex, "No such padding: " + cipherAlgo);
-        } catch (NoSuchAlgorithmException ex) {
-            // Check to see if an RSA OAEP MGF-1 with SHA-1 algorithm was requested
-            // Some JDKs don't support RSA/ECB/OAEPPadding
-            if (WSConstants.KEYTRANSPORT_RSAOEP.equals(cipherAlgo)) {
-                try {
-                    return Cipher.getInstance("RSA/ECB/OAEPWithSHA1AndMGF1Padding");
-                } catch (Exception e) {
-                    throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
-                        e, "No such algorithm: " + cipherAlgo);
-                }
-            } else {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
-                    ex, "No such algorithm: " + cipherAlgo);
-            }
-        }
-    }
-    
 
     /**
      * Fetch the result of a given action from a given result list

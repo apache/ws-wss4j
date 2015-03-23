@@ -24,9 +24,9 @@ import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
 import org.w3c.dom.Element;
@@ -70,7 +70,7 @@ public class SecurityContextTokenProcessor implements Processor {
             result.put(WSSecurityEngineResult.TAG_SECRET, returnedCredential.getSecretKey());
         } else {
             String id = sct.getID();
-            id = WSSecurityUtil.getIDFromReference(id);
+            id = XMLUtils.getIDFromReference(id);
 
             byte[] secret = null;
             try {

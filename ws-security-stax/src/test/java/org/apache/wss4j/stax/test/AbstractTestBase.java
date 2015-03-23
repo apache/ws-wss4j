@@ -467,7 +467,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
              */
             org.apache.wss4j.dom.SOAPConstants soapConstants =
                     WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-            if (WSSecurityUtil.findElement(
+            if (XMLUtils.findElement(
                 doc.getDocumentElement(), "Fault", soapConstants.getEnvelopeURI()) != null
             ) {
                 return false;

@@ -23,6 +23,7 @@ import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.AttachmentResultCallback;
 import org.apache.wss4j.common.util.AttachmentUtils;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.WSEncryptionPart;
@@ -35,7 +36,9 @@ import org.apache.wss4j.dom.message.token.Reference;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.JCEMapper;
-import org.apache.xml.security.encryption.*;
+import org.apache.xml.security.encryption.EncryptedData;
+import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Attr;
@@ -53,7 +56,10 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 
 import java.security.cert.X509Certificate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Encrypts a parts of a message according to WS Specification, X509 profile,
@@ -253,7 +259,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             // then add the ENC namespace
             //
             if (!encryptSymmKey) {
-                WSSecurityUtil.setNamespace(
+                XMLUtils.setNamespace(
                     dataRef, WSConstants.ENC_NS, WSConstants.ENC_PREFIX
                 );
             }
@@ -529,9 +535,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                     doc.createElementNS(
                         WSConstants.WSSE11_NS, "wsse11:" + WSConstants.ENCRYPTED_HEADER
                     );
-                WSSecurityUtil.setNamespace(elem, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
+                XMLUtils.setNamespace(elem, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
                 String wsuPrefix = 
-                    WSSecurityUtil.setNamespace(elem, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+                    XMLUtils.setNamespace(elem, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
                 headerId = config.getIdAllocator().createId("EH-", elementToEncrypt);
                 elem.setAttributeNS(
                     WSConstants.WSU_NS, wsuPrefix + ":Id", headerId
@@ -551,7 +557,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                     if (attr.getNamespaceURI().equals(WSConstants.URI_SOAP11_ENV)
                         || attr.getNamespaceURI().equals(WSConstants.URI_SOAP12_ENV)) {                         
                         String soapEnvPrefix = 
-                            WSSecurityUtil.setNamespace(
+                            XMLUtils.setNamespace(
                                 elem, attr.getNamespaceURI(), WSConstants.DEFAULT_SOAP_PREFIX
                             );
                         elem.setAttributeNS(

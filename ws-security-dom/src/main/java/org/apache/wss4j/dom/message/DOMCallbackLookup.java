@@ -26,6 +26,7 @@ import javax.xml.crypto.dom.DOMCryptoContext;
 
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -76,7 +77,7 @@ public class DOMCallbackLookup implements CallbackLookup {
     public Element getAndRegisterElement(
         String id, String valueType, boolean checkMultipleElements, DOMCryptoContext context
     ) throws WSSecurityException {
-        String idToMatch = WSSecurityUtil.getIDFromReference(id);
+        String idToMatch = XMLUtils.getIDFromReference(id);
         
         //
         // Try the SOAP Body first
@@ -93,7 +94,7 @@ public class DOMCallbackLookup implements CallbackLookup {
         }
         // Otherwise do a general search
         Element foundElement = 
-            WSSecurityUtil.findElementById(doc.getDocumentElement(), idToMatch, checkMultipleElements);
+            XMLUtils.findElementById(doc.getDocumentElement(), idToMatch, checkMultipleElements);
         if (foundElement != null) {
             if (context != null) {
                 if (foundElement.hasAttributeNS(WSConstants.WSU_NS, "Id")
@@ -117,7 +118,7 @@ public class DOMCallbackLookup implements CallbackLookup {
             || "".equals(valueType)
             || valueType == null) {
             foundElement = 
-                WSSecurityUtil.findSAMLAssertionElementById(
+                XMLUtils.findSAMLAssertionElementById(
                     doc.getDocumentElement(), idToMatch
                 );
             if (foundElement != null) {
@@ -156,7 +157,7 @@ public class DOMCallbackLookup implements CallbackLookup {
             bodyElement.getNamespaceURI().equals(namespace)) {
             return Collections.singletonList(bodyElement);
         }
-        return WSSecurityUtil.findElements(doc.getDocumentElement(), localname, namespace);
+        return XMLUtils.findElements(doc.getDocumentElement(), localname, namespace);
     }
 
     

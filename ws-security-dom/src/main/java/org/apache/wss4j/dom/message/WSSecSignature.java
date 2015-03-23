@@ -26,10 +26,11 @@ import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.token.DOMX509Data;
+import org.apache.wss4j.common.token.DOMX509IssuerSerial;
 import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.token.BinarySecurity;
-import org.apache.wss4j.dom.message.token.DOMX509Data;
-import org.apache.wss4j.dom.message.token.DOMX509IssuerSerial;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.dom.message.token.PKIPathSecurity;
 import org.apache.wss4j.dom.message.token.Reference;
@@ -213,7 +214,7 @@ public class WSSecSignature extends WSSecSignatureBase {
                 DOMX509IssuerSerial domIssuerSerial = 
                     new DOMX509IssuerSerial(doc, issuer, serialNumber);
                 DOMX509Data domX509Data = new DOMX509Data(doc, domIssuerSerial);
-                secRef.setX509Data(domX509Data);
+                secRef.setUnknownElement(domX509Data.getElement());
                 
                 if (includeSignatureToken) {
                     addBST(certs);
@@ -424,10 +425,8 @@ public class WSSecSignature extends WSSecSignatureBase {
      */
     public Element getSignatureElement() {
         return
-            WSSecurityUtil.getDirectChildElement(
-                securityHeader,
-                WSConstants.SIG_LN,
-                WSConstants.SIG_NS
+            XMLUtils.getDirectChildElement(
+                securityHeader, WSConstants.SIG_LN, WSConstants.SIG_NS
             );
     }
     

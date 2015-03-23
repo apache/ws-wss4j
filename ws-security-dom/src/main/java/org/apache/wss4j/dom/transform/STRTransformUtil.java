@@ -25,9 +25,9 @@ import java.security.cert.X509Certificate;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.message.token.X509Security;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -122,12 +122,12 @@ public final class STRTransformUtil {
                 WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", e
             );
         }
-        String prefix = WSSecurityUtil.getPrefixNS(WSConstants.WSSE_NS, secRefE);
+        String prefix = XMLUtils.getPrefixNS(WSConstants.WSSE_NS, secRefE);
         if (prefix == null) {
             prefix = WSConstants.WSSE_PREFIX;
         }
         Element elem = doc.createElementNS(WSConstants.WSSE_NS, prefix + ":BinarySecurityToken");
-        WSSecurityUtil.setNamespace(elem, WSConstants.WSSE_NS, prefix);
+        XMLUtils.setNamespace(elem, WSConstants.WSSE_NS, prefix);
         // elem.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", "");
         elem.setAttributeNS(null, "ValueType", X509Security.X509_V3_TYPE);
         if (secRefEncType != null) {

@@ -27,6 +27,7 @@ import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.token.DOMX509IssuerSerial;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
@@ -114,7 +115,7 @@ public class SecurityTokenReference {
      * efficiency purposes.
      */
     public void addWSSENamespace() {
-        WSSecurityUtil.setNamespace(element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
+        XMLUtils.setNamespace(element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
     }
     
     /**
@@ -122,7 +123,7 @@ public class SecurityTokenReference {
      * efficiency purposes.
      */
     public void addWSUNamespace() {
-        WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+        XMLUtils.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
     }
     
     /**
@@ -131,7 +132,7 @@ public class SecurityTokenReference {
      */
     public void addTokenType(String tokenType) {
         if (tokenType != null) {
-            WSSecurityUtil.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
+            XMLUtils.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
             element.setAttributeNS(
                 WSConstants.WSSE11_NS, 
                 WSConstants.WSSE11_PREFIX + ":" + WSConstants.TOKEN_TYPE, 
@@ -251,7 +252,7 @@ public class SecurityTokenReference {
         String uri,
         String type
     ) throws WSSecurityException {
-        String id = WSSecurityUtil.getIDFromReference(uri);
+        String id = XMLUtils.getIDFromReference(uri);
         //
         // Delegate finding the element to the CallbackLookup instance
         //
@@ -283,7 +284,7 @@ public class SecurityTokenReference {
         String uri,
         String type
     ) throws WSSecurityException {
-        String id = WSSecurityUtil.getIDFromReference(uri);
+        String id = XMLUtils.getIDFromReference(uri);
         //
         // Try to find it from the WSDocInfo instance first
         //
@@ -561,22 +562,6 @@ public class SecurityTokenReference {
         return skiBytes;
     }
 
-
-    /**
-     * Sets the X509Data.
-     *
-     * @param domX509Data the {@link DOMX509Data} to put into this
-     *            SecurityTokenReference
-     */
-    public void setX509Data(DOMX509Data domX509Data) {
-        Element elem = getFirstElement();
-        if (elem != null) {
-            element.replaceChild(domX509Data.getElement(), elem);
-        } else {
-            element.appendChild(domX509Data.getElement());
-        }
-    }
-    
     
     /**
      * Set an unknown element.
@@ -624,7 +609,7 @@ public class SecurityTokenReference {
         }
         if (WSConstants.X509_DATA_LN.equals(elem.getLocalName())) {
             elem = 
-                WSSecurityUtil.findElement(
+                XMLUtils.findElement(
                     elem, WSConstants.X509_ISSUER_SERIAL_LN, WSConstants.SIG_NS
                 );
         }

@@ -29,13 +29,13 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
 import org.apache.wss4j.dom.message.token.Reference;
 import org.apache.wss4j.dom.message.token.UsernameToken;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
@@ -96,7 +96,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
     public void testUnsupportedAlgorithm() throws Exception {
         try {
             secEngine.getWssConfig();
-            WSSecurityUtil.getCipherInstance("Bad Algorithm");
+            KeyUtils.getCipherInstance("Bad Algorithm");
             fail("Failure expected on an unsupported algorithm");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM);

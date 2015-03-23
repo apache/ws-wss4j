@@ -24,7 +24,7 @@ import javax.xml.namespace.QName;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -76,7 +76,7 @@ public class Reference {
      * efficiency purposes, as the reference is embedded in a wsse:SecurityTokenReference.
      */
     public void addWSSENamespace() {
-        WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
+        XMLUtils.setNamespace(this.element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
     }
 
     /**

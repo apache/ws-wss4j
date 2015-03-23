@@ -25,6 +25,7 @@ import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.dom.message.token.Reference;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
@@ -174,10 +175,8 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
      */
     public Element getSignatureElement() {
         return
-            WSSecurityUtil.getDirectChildElement(
-                securityHeader,
-                WSConstants.SIG_LN,
-                WSConstants.SIG_NS
+            XMLUtils.getDirectChildElement(
+                securityHeader, WSConstants.SIG_LN, WSConstants.SIG_NS
             );
     }
     

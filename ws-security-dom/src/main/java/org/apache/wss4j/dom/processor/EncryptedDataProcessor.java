@@ -35,6 +35,7 @@ import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSDocInfo;
@@ -70,7 +71,7 @@ public class EncryptedDataProcessor implements Processor {
         final String encryptedDataId = elem.getAttributeNS(null, "Id");
 
         Element kiElem =
-            WSSecurityUtil.getDirectChildElement(elem, "KeyInfo", WSConstants.SIG_NS);
+            XMLUtils.getDirectChildElement(elem, "KeyInfo", WSConstants.SIG_NS);
         // KeyInfo cannot be null
         if (kiElem == null) {
             throw new WSSecurityException(
@@ -83,11 +84,11 @@ public class EncryptedDataProcessor implements Processor {
         
         // Get the Key either via a SecurityTokenReference or an EncryptedKey
         Element secRefToken = 
-            WSSecurityUtil.getDirectChildElement(
+            XMLUtils.getDirectChildElement(
                 kiElem, "SecurityTokenReference", WSConstants.WSSE_NS
             );
         Element encryptedKeyElement = 
-            WSSecurityUtil.getDirectChildElement(
+            XMLUtils.getDirectChildElement(
                 kiElem, WSConstants.ENC_KEY_LN, WSConstants.ENC_NS
             );
         

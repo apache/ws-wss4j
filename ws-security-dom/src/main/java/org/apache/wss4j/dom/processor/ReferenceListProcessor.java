@@ -38,6 +38,7 @@ import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.AttachmentResultCallback;
 import org.apache.wss4j.common.util.AttachmentUtils;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -109,7 +110,7 @@ public class ReferenceListProcessor implements Processor {
                 && WSConstants.ENC_NS.equals(node.getNamespaceURI())
                 && "DataReference".equals(node.getLocalName())) {
                 String dataRefURI = ((Element) node).getAttributeNS(null, "URI");
-                dataRefURI = WSSecurityUtil.getIDFromReference(dataRefURI);
+                dataRefURI = XMLUtils.getIDFromReference(dataRefURI);
                 
                 // See whether we have already processed the encrypted node 
                 if (!wsDocInfo.hasResult(WSConstants.ENCR, dataRefURI)) {
@@ -152,7 +153,7 @@ public class ReferenceListProcessor implements Processor {
         //
         String symEncAlgo = X509Util.getEncAlgo(encryptedDataElement);
         Element keyInfoElement =
-                WSSecurityUtil.getDirectChildElement(
+            XMLUtils.getDirectChildElement(
                     encryptedDataElement, "KeyInfo", WSConstants.SIG_NS
                 );
         // KeyInfo cannot be null
@@ -167,7 +168,7 @@ public class ReferenceListProcessor implements Processor {
         // shared key using a KeyName.
         //
         Element secRefToken = 
-            WSSecurityUtil.getDirectChildElement(
+            XMLUtils.getDirectChildElement(
                 keyInfoElement, "SecurityTokenReference", WSConstants.WSSE_NS
             );
         SecretKey symmetricKey = null;
@@ -399,11 +400,11 @@ public class ReferenceListProcessor implements Processor {
         dataRef.setAlgorithm(symEncAlgo);
         
         try {
-            Element cipherData = WSSecurityUtil.getDirectChildElement(encData, "CipherData", WSConstants.ENC_NS);
+            Element cipherData = XMLUtils.getDirectChildElement(encData, "CipherData", WSConstants.ENC_NS);
             if (cipherData == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
             }
-            Element cipherReference = WSSecurityUtil.getDirectChildElement(cipherData, "CipherReference", WSConstants.ENC_NS);
+            Element cipherReference = XMLUtils.getDirectChildElement(cipherData, "CipherReference", WSConstants.ENC_NS);
             if (cipherReference == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
             }

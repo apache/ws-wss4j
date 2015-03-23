@@ -24,7 +24,6 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -55,7 +54,7 @@ public final class X509Util {
 
     public static String getEncAlgo(Node encBodyData) throws WSSecurityException {
         Element tmpE = 
-            WSSecurityUtil.getDirectChildElement(
+            XMLUtils.getDirectChildElement(
                 encBodyData, "EncryptionMethod", WSConstants.ENC_NS
             );
         String symEncAlgo = null;
@@ -80,7 +79,7 @@ public final class X509Util {
     ) throws WSSecurityException {
         String keyName = null;
         Element keyNmElem = 
-            WSSecurityUtil.getDirectChildElement(
+            XMLUtils.getDirectChildElement(
                 keyInfoElem, "KeyName", WSConstants.SIG_NS
             );
         if (keyNmElem != null) {

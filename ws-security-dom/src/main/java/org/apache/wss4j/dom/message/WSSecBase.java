@@ -20,9 +20,9 @@
 package org.apache.wss4j.dom.message;
 
 import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -171,8 +171,7 @@ public class WSSecBase {
         
         if (id == null || id.length() == 0) {
             id = wssConfig.getIdAllocator().createId("id-", bodyElement);
-            String prefix = 
-                WSSecurityUtil.setNamespace(bodyElement, newAttrNs, newAttrPrefix);
+            String prefix = XMLUtils.setNamespace(bodyElement, newAttrNs, newAttrPrefix);
             bodyElement.setAttributeNS(newAttrNs, prefix + ":Id", id);
         }
         return id;

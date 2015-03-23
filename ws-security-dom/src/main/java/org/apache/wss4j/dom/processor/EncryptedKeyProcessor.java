@@ -44,6 +44,7 @@ import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.token.DOMX509IssuerSerial;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
@@ -52,7 +53,6 @@ import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.message.token.DOMX509IssuerSerial;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.str.EncryptedKeySTRParser;
 import org.apache.wss4j.dom.str.STRParser;
@@ -125,18 +125,18 @@ public class EncryptedKeyProcessor implements Processor {
         // Check BSP Compliance
         checkBSPCompliance(elem, encryptedKeyTransportMethod, data.getBSPEnforcer());
         
-        Cipher cipher = WSSecurityUtil.getCipherInstance(encryptedKeyTransportMethod);
+        Cipher cipher = KeyUtils.getCipherInstance(encryptedKeyTransportMethod);
         //
         // Now lookup CipherValue.
         //
         Element tmpE = 
-            WSSecurityUtil.getDirectChildElement(
+            XMLUtils.getDirectChildElement(
                 elem, "CipherData", WSConstants.ENC_NS
             );
         Element xencCipherValue = null;
         if (tmpE != null) {
             xencCipherValue = 
-                WSSecurityUtil.getDirectChildElement(tmpE, "CipherValue", WSConstants.ENC_NS);
+                XMLUtils.getDirectChildElement(tmpE, "CipherValue", WSConstants.ENC_NS);
         }
         if (xencCipherValue == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noCipher");
@@ -226,7 +226,7 @@ public class EncryptedKeyProcessor implements Processor {
         }
         
         Element refList = 
-            WSSecurityUtil.getDirectChildElement(elem, "ReferenceList", WSConstants.ENC_NS);
+            XMLUtils.getDirectChildElement(elem, "ReferenceList", WSConstants.ENC_NS);
         
         byte[] encryptedEphemeralKey = null;
         byte[] decryptedBytes = null;
@@ -306,7 +306,7 @@ public class EncryptedKeyProcessor implements Processor {
                         && WSConstants.ENC_NS.equals(node.getNamespaceURI())
                         && "DataReference".equals(node.getLocalName())) {
                     String dataRefURI = ((Element) node).getAttributeNS(null, "URI");
-                    return WSSecurityUtil.getIDFromReference(dataRefURI);
+                    return XMLUtils.getIDFromReference(dataRefURI);
                 }
             }
         }
@@ -336,12 +336,12 @@ public class EncryptedKeyProcessor implements Processor {
     
     private static String getDigestAlgorithm(Node encBodyData) throws WSSecurityException {
         Element tmpE = 
-            WSSecurityUtil.getDirectChildElement(
+            XMLUtils.getDirectChildElement(
                 encBodyData, "EncryptionMethod", WSConstants.ENC_NS
             );
         if (tmpE != null) {
             Element digestElement = 
-                WSSecurityUtil.getDirectChildElement(tmpE, "DigestMethod", WSConstants.SIG_NS);
+                XMLUtils.getDirectChildElement(tmpE, "DigestMethod", WSConstants.SIG_NS);
             if (digestElement != null) {
                 return digestElement.getAttributeNS(null, "Algorithm");
             }
@@ -351,12 +351,12 @@ public class EncryptedKeyProcessor implements Processor {
 
     private static String getMGFAlgorithm(Node encBodyData) throws WSSecurityException {
         Element tmpE =
-                WSSecurityUtil.getDirectChildElement(
+            XMLUtils.getDirectChildElement(
                         encBodyData, "EncryptionMethod", WSConstants.ENC_NS
                 );
         if (tmpE != null) {
             Element mgfElement =
-                    WSSecurityUtil.getDirectChildElement(tmpE, "MGF", WSConstants.ENC11_NS);
+                XMLUtils.getDirectChildElement(tmpE, "MGF", WSConstants.ENC11_NS);
             if (mgfElement != null) {
                 return mgfElement.getAttributeNS(null, "Algorithm");
             }
@@ -366,12 +366,12 @@ public class EncryptedKeyProcessor implements Processor {
 
     private static byte[] getPSource(Node encBodyData) throws WSSecurityException {
         Element tmpE =
-                WSSecurityUtil.getDirectChildElement(
+            XMLUtils.getDirectChildElement(
                         encBodyData, "EncryptionMethod", WSConstants.ENC_NS
                 );
         if (tmpE != null) {
             Element pSourceElement =
-                    WSSecurityUtil.getDirectChildElement(tmpE, "OAEPparams", WSConstants.ENC_NS);
+                XMLUtils.getDirectChildElement(tmpE, "OAEPparams", WSConstants.ENC_NS);
             if (pSourceElement != null) {
                 return getDecodedBase64EncodedData(pSourceElement);
             }
@@ -383,7 +383,7 @@ public class EncryptedKeyProcessor implements Processor {
         Element xencEncryptedKey, RequestData data
     ) throws WSSecurityException {
         Element keyInfo = 
-            WSSecurityUtil.getDirectChildElement(xencEncryptedKey, "KeyInfo", WSConstants.SIG_NS);
+            XMLUtils.getDirectChildElement(xencEncryptedKey, "KeyInfo", WSConstants.SIG_NS);
         if (keyInfo != null) {
             Element strElement = null;
 
@@ -483,7 +483,7 @@ public class EncryptedKeyProcessor implements Processor {
                     && WSConstants.ENC_NS.equals(node.getNamespaceURI())
                     && "DataReference".equals(node.getLocalName())) {
                 String dataRefURI = ((Element) node).getAttributeNS(null, "URI");
-                dataRefURI = WSSecurityUtil.getIDFromReference(dataRefURI);
+                dataRefURI = XMLUtils.getIDFromReference(dataRefURI);
                 
                 WSDataRef dataRef = 
                     decryptDataRef(refList.getOwnerDocument(), dataRefURI, docInfo, decryptedBytes, data);

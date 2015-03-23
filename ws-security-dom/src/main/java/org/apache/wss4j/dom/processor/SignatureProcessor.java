@@ -63,6 +63,7 @@ import org.apache.wss4j.common.principal.PublicKeyPrincipalImpl;
 import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSDocInfo;
@@ -81,7 +82,6 @@ import org.apache.wss4j.dom.str.SignatureSTRParser;
 import org.apache.wss4j.dom.transform.AttachmentContentSignatureTransform;
 import org.apache.wss4j.dom.transform.STRTransform;
 import org.apache.wss4j.dom.transform.STRTransformUtil;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
@@ -114,7 +114,7 @@ public class SignatureProcessor implements Processor {
             LOG.debug("Found signature element");
         }
         Element keyInfoElement = 
-            WSSecurityUtil.getDirectChildElement(
+            XMLUtils.getDirectChildElement(
                 elem,
                 "KeyInfo",
                 WSConstants.SIG_NS
@@ -484,14 +484,14 @@ public class SignatureProcessor implements Processor {
         Element signatureElement
     ) {
         Element signedInfoElement = 
-            WSSecurityUtil.getDirectChildElement(
+            XMLUtils.getDirectChildElement(
                 signatureElement,
                 "SignedInfo",
                 WSConstants.SIG_NS
             );
         if (signedInfoElement != null) {
             Element signatureMethodElement = 
-                WSSecurityUtil.getDirectChildElement(
+                XMLUtils.getDirectChildElement(
                     signedInfoElement,
                     "SignatureMethod",
                     WSConstants.SIG_NS
