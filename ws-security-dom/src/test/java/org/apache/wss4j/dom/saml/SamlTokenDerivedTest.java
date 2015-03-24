@@ -19,8 +19,22 @@
 
 package org.apache.wss4j.dom.saml;
 
+import java.security.cert.X509Certificate;
+import java.util.List;
+
+import javax.security.auth.callback.CallbackHandler;
+
 import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.builder.SAML1Constants;
+import org.apache.wss4j.common.token.SecurityTokenReference;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSSConfig;
@@ -30,24 +44,10 @@ import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
-import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoFactory;
-import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.SAMLCallback;
-import org.apache.wss4j.common.saml.SAMLUtil;
-import org.apache.wss4j.common.saml.builder.SAML1Constants;
-import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecDKSign;
 import org.apache.wss4j.dom.message.WSSecHeader;
-import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
-
-import java.security.cert.X509Certificate;
-import java.util.List;
-
-import javax.security.auth.callback.CallbackHandler;
 
 /**
  * Test-case for sending and processing a signed (sender vouches) SAML Assertion using a 
@@ -150,8 +150,8 @@ public class SamlTokenDerivedTest extends org.junit.Assert {
         String secRefID = wssConfig.getIdAllocator().createSecureId("STRSAMLId-", secRefSaml);
         secRefSaml.setID(secRefID);
 
-        org.apache.wss4j.dom.message.token.Reference ref = 
-            new org.apache.wss4j.dom.message.token.Reference(doc);
+        org.apache.wss4j.common.token.Reference ref = 
+            new org.apache.wss4j.common.token.Reference(doc);
         ref.setURI("#" + samlAssertion.getId());
         ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
         secRefSaml.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);

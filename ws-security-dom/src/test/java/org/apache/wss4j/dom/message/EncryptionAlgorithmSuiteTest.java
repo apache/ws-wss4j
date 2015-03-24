@@ -24,12 +24,11 @@ import java.util.List;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
@@ -42,6 +41,8 @@ import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * A set of test-cases for encrypting and decrypting SOAP requests when specifying an 
@@ -238,7 +239,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        byte[] encodedBytes = WSSecurityUtil.generateDigest(keyData);
+        byte[] encodedBytes = KeyUtils.generateDigest(keyData);
         String identifier = Base64.encode(encodedBytes);
         SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);

@@ -27,34 +27,34 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
-import org.w3c.dom.Element;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.token.BinarySecurity;
+import org.apache.wss4j.common.token.Reference;
+import org.apache.wss4j.common.token.SecurityTokenReference;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.message.token.DerivedKeyToken;
-import org.apache.wss4j.dom.message.token.Reference;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
-import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.processor.Processor;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.utils.Base64;
+import org.w3c.dom.Element;
 
 /**
  * This implementation of STRParser is for parsing a SecurityTokenReference element, found in the
@@ -179,7 +179,7 @@ public class SignatureSTRParser implements STRParser {
                 for (WSSecurityEngineResult bstResult : resultsList) {
                     BinarySecurity bstToken = 
                         (BinarySecurity)bstResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-                    byte[] tokenDigest = WSSecurityUtil.generateDigest(bstToken.getToken());
+                    byte[] tokenDigest = KeyUtils.generateDigest(bstToken.getToken());
                     if (Arrays.equals(tokenDigest, keyBytes)) {
                         secretKey = (byte[])bstResult.get(WSSecurityEngineResult.TAG_SECRET);
                         parserResult.setPrincipal((Principal)bstResult.get(WSSecurityEngineResult.TAG_PRINCIPAL));
@@ -217,7 +217,7 @@ public class SignatureSTRParser implements STRParser {
                             (X509Certificate[])bstResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
                         if (certs != null) {
                             try {
-                                byte[] digest = WSSecurityUtil.generateDigest(certs[0].getEncoded());
+                                byte[] digest = KeyUtils.generateDigest(certs[0].getEncoded());
                                 try {
                                     if (Arrays.equals(Base64.decode(kiValue), digest)) {
                                         parserResult.setPrincipal(
@@ -356,7 +356,8 @@ public class SignatureSTRParser implements STRParser {
             
             if (secretKey == null) {
                 Element token = 
-                    secRef.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, data.getCallbackHandler());
+                    STRParserUtil.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, data.getCallbackHandler(),
+                                                  uri, reference.getValueType());
                 QName el = new QName(token.getNamespaceURI(), token.getLocalName());
                 if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
                     Processor proc = data.getWssConfig().getProcessor(WSSecurityEngine.BINARY_TOKEN);
@@ -379,7 +380,7 @@ public class SignatureSTRParser implements STRParser {
                     // Just check to see whether the token was processed or not
                     //
                     Element processedToken = 
-                        secRef.findProcessedTokenElement(
+                        STRParserUtil.findProcessedTokenElement(
                             strElement.getOwnerDocument(), wsDocInfo, 
                             data.getCallbackHandler(), uri, secRef.getReference().getValueType()
                         );

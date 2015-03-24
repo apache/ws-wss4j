@@ -19,24 +19,33 @@
 
 package org.apache.wss4j.dom.message;
 
-import org.apache.wss4j.dom.SOAPConstants;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.WSDataRef;
-import org.apache.wss4j.dom.common.CustomHandler;
-import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
-import org.apache.wss4j.dom.common.SecretKeyCallbackHandler;
-import org.apache.wss4j.dom.common.SOAPUtil;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.security.auth.callback.CallbackHandler;
+
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.SOAPConstants;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDataRef;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.common.CustomHandler;
+import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
+import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecretKeyCallbackHandler;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
@@ -45,14 +54,6 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.security.auth.callback.CallbackHandler;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * A set of test-cases for encrypting and decrypting SOAP requests.
@@ -347,7 +348,7 @@ public class EncryptionTest extends org.junit.Assert {
         secHeader.insertSecurityHeader(doc);
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
         
-        byte[] encodedBytes = WSSecurityUtil.generateDigest(keyData);
+        byte[] encodedBytes = KeyUtils.generateDigest(keyData);
         String identifier = Base64.encode(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
      
@@ -382,7 +383,7 @@ public class EncryptionTest extends org.junit.Assert {
         secHeader.insertSecurityHeader(doc);        
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
         
-        byte[] encodedBytes = WSSecurityUtil.generateDigest(keyData);
+        byte[] encodedBytes = KeyUtils.generateDigest(keyData);
         String identifier = Base64.encode(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
      

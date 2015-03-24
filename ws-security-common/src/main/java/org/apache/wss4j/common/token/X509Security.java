@@ -17,10 +17,10 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.message.token;
+package org.apache.wss4j.common.token;
 
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.bsp.BSPEnforcer;
+import org.apache.wss4j.common.WSS4JConstants;
+import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.Merlin;
@@ -39,7 +39,7 @@ import java.security.cert.X509Certificate;
  */
 public class X509Security extends BinarySecurity {
     
-    public static final String X509_V3_TYPE = WSConstants.X509TOKEN_NS + "#X509v3";
+    public static final String X509_V3_TYPE = WSS4JConstants.X509TOKEN_NS + "#X509v3";
     
     /*
      * Stores the associated X.509 Certificate. This saves numerous

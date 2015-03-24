@@ -41,7 +41,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -53,11 +52,6 @@ public final class WSSecurityUtil {
     private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(WSSecurityUtil.class);
 
-    /**
-     * A cached MessageDigest object
-     */
-    private static MessageDigest digest;
-    
     private WSSecurityUtil() {
         // Complete
     }
@@ -587,26 +581,6 @@ public final class WSSecurityUtil {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                     "empty", ex,
                     "Error in generating nonce of length " + length
-            );
-        }
-    }
-    
-    /**
-     * Generate a (SHA1) digest of the input bytes. The MessageDigest instance that backs this
-     * method is cached for efficiency.  
-     * @param inputBytes the bytes to digest
-     * @return the digest of the input bytes
-     * @throws WSSecurityException
-     */
-    public static synchronized byte[] generateDigest(byte[] inputBytes) throws WSSecurityException {
-        try {
-            if (digest == null) {
-                digest = MessageDigest.getInstance("SHA-1");
-            }
-            return digest.digest(inputBytes);
-        } catch (Exception e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", e,
-                    "Error in generating digest"
             );
         }
     }

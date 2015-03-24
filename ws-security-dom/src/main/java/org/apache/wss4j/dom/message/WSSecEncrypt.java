@@ -19,21 +19,35 @@
 
 package org.apache.wss4j.dom.message;
 
-import org.apache.wss4j.common.ext.Attachment;
-import org.apache.wss4j.common.ext.AttachmentRequestCallback;
-import org.apache.wss4j.common.ext.AttachmentResultCallback;
-import org.apache.wss4j.common.util.AttachmentUtils;
-import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.ext.Attachment;
+import org.apache.wss4j.common.ext.AttachmentRequestCallback;
+import org.apache.wss4j.common.ext.AttachmentResultCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.token.Reference;
+import org.apache.wss4j.common.token.SecurityTokenReference;
+import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
-import org.apache.wss4j.dom.message.token.Reference;
-import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.EncryptedData;
@@ -46,20 +60,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Encrypts a parts of a message according to WS Specification, X509 profile,
@@ -596,7 +596,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             if (customReferenceValue != null) {
                 secToken.setKeyIdentifierEncKeySHA1(customReferenceValue);
             } else {
-                byte[] encodedBytes = WSSecurityUtil.generateDigest(encryptedEphemeralKey);
+                byte[] encodedBytes = KeyUtils.generateDigest(encryptedEphemeralKey);
                 secToken.setKeyIdentifierEncKeySHA1(Base64.encode(encodedBytes));
             }
             secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);

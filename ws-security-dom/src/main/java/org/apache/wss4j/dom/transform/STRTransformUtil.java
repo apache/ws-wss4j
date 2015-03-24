@@ -22,12 +22,14 @@ package org.apache.wss4j.dom.transform;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.token.Reference;
+import org.apache.wss4j.common.token.SecurityTokenReference;
+import org.apache.wss4j.common.token.X509Security;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.message.token.SecurityTokenReference;
-import org.apache.wss4j.dom.message.token.X509Security;
+import org.apache.wss4j.dom.str.STRParserUtil;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -66,7 +68,9 @@ public final class STRTransformUtil {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("STR: Reference");
             }
-            return secRef.getTokenElement(doc, wsDocInfo, null);
+            
+            Reference reference = secRef.getReference();
+            return STRParserUtil.getTokenElement(doc, wsDocInfo, null, reference.getURI(), reference.getValueType());
         }
         //
         // second case: IssuerSerial, lookup in keystore, wrap in BST according
@@ -94,7 +98,8 @@ public final class STRTransformUtil {
             }
             if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
-                return secRef.getTokenElement(doc, wsDocInfo, null);
+                return STRParserUtil.getTokenElement(doc, wsDocInfo, null, secRef.getKeyIdentifierValue(), 
+                                                     secRef.getKeyIdentifierValueType());
             } else {
                 X509Certificate[] certs = secRef.getKeyIdentifier(wsDocInfo.getCrypto());
                 if (certs == null || certs.length == 0 || certs[0] == null) {

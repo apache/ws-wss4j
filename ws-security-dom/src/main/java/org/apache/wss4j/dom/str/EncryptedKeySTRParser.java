@@ -25,18 +25,19 @@ import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.token.BinarySecurity;
+import org.apache.wss4j.common.token.Reference;
+import org.apache.wss4j.common.token.SecurityTokenReference;
+import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.message.token.BinarySecurity;
-import org.apache.wss4j.dom.message.token.SecurityTokenReference;
-import org.apache.wss4j.dom.message.token.X509Security;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
 import org.w3c.dom.Element;
 
@@ -158,8 +159,10 @@ public class EncryptedKeySTRParser implements STRParser {
             parserResult.setReferenceType(REFERENCE_TYPE.ISSUER_SERIAL);
             parserResult.setCerts(secRef.getX509IssuerSerial(crypto));
         } else if (secRef.containsReference()) {
+            Reference reference = secRef.getReference();
             Element bstElement = 
-                secRef.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, data.getCallbackHandler());
+                STRParserUtil.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, data.getCallbackHandler(),
+                                              reference.getURI(), reference.getValueType());
 
             // at this point ... check token type: Binary
             QName el = new QName(bstElement.getNamespaceURI(), bstElement.getLocalName());

@@ -34,6 +34,7 @@ import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
@@ -45,7 +46,6 @@ import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecretKeyCallbackHandler;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
@@ -148,7 +148,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         }
         
         SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
-        byte[] encodedBytes = WSSecurityUtil.generateDigest(keyData);
+        byte[] encodedBytes = KeyUtils.generateDigest(keyData);
         String identifier = Base64.encode(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
         
@@ -245,7 +245,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         }
         
         SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
-        byte[] encodedBytes = WSSecurityUtil.generateDigest(keyData);
+        byte[] encodedBytes = KeyUtils.generateDigest(keyData);
         String identifier = Base64.encode(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
         
@@ -358,7 +358,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         }
         
         SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
-        byte[] encodedBytes = WSSecurityUtil.generateDigest(keyData);
+        byte[] encodedBytes = KeyUtils.generateDigest(keyData);
         String identifier = Base64.encode(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
         
@@ -453,7 +453,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         }
         
         SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
-        byte[] encodedBytes = WSSecurityUtil.generateDigest(keyData);
+        byte[] encodedBytes = KeyUtils.generateDigest(keyData);
         String identifier = Base64.encode(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
         
@@ -593,7 +593,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         }
             
         SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
-        byte[] encodedBytes = WSSecurityUtil.generateDigest(keyData);
+        byte[] encodedBytes = KeyUtils.generateDigest(keyData);
         String identifier = Base64.encode(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
         

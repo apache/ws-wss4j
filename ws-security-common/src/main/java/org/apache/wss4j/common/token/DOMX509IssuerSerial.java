@@ -19,9 +19,9 @@
 
 package org.apache.wss4j.common.token;
 
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.xml.security.utils.Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -44,11 +44,11 @@ public final class DOMX509IssuerSerial {
         element = issuerSerialElement;
         
         Element issuerNameElement = 
-            XMLUtils.getDirectChildElement(element, "X509IssuerName", Constants.SignatureSpecNS);
+            XMLUtils.getDirectChildElement(element, "X509IssuerName", WSS4JConstants.SIG_NS);
         issuer = XMLUtils.getElementText(issuerNameElement);
         
         Element serialNumberElement = 
-            XMLUtils.getDirectChildElement(element, "X509SerialNumber", Constants.SignatureSpecNS);
+            XMLUtils.getDirectChildElement(element, "X509SerialNumber", WSS4JConstants.SIG_NS);
         
         String serialNumberStr = XMLUtils.getElementText(serialNumberElement);
         if (serialNumberStr != null) {
@@ -73,15 +73,15 @@ public final class DOMX509IssuerSerial {
         this.serialNumber = serialNumber;
         
         element = 
-            doc.createElementNS(Constants.SignatureSpecNS, "ds:X509IssuerSerial");
+            doc.createElementNS(WSS4JConstants.SIG_NS, "ds:X509IssuerSerial");
         
         Element issuerNameElement = 
-            doc.createElementNS(Constants.SignatureSpecNS, "ds:X509IssuerName");
+            doc.createElementNS(WSS4JConstants.SIG_NS, "ds:X509IssuerName");
         issuerNameElement.appendChild(doc.createTextNode(this.issuer));
         element.appendChild(issuerNameElement);
         
         Element serialNumberElement = 
-            doc.createElementNS(Constants.SignatureSpecNS, "ds:X509SerialNumber");
+            doc.createElementNS(WSS4JConstants.SIG_NS, "ds:X509SerialNumber");
         serialNumberElement.appendChild(doc.createTextNode(serialNumber.toString()));
         element.appendChild(serialNumberElement);
     }

@@ -19,21 +19,32 @@
 
 package org.apache.wss4j.dom.message;
 
-import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.bsp.BSPEnforcer;
-import org.apache.wss4j.dom.common.CustomHandler;
-import org.apache.wss4j.dom.common.EncodedPasswordCallbackHandler;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
-import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
-import org.apache.wss4j.dom.common.SOAPUtil;
+import java.io.IOException;
+import java.security.MessageDigest;
+import java.text.DateFormat;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
+
+import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.common.CustomHandler;
+import org.apache.wss4j.dom.common.EncodedPasswordCallbackHandler;
+import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
@@ -43,17 +54,6 @@ import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-
-import java.io.IOException;
-import java.security.MessageDigest;
-import java.text.DateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
 
 /**
  * WS-Security Test Case for UsernameTokens.

@@ -19,10 +19,10 @@
 
 package org.apache.wss4j.common.token;
 
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.xml.security.utils.Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -43,7 +43,7 @@ public final class DOMX509Data {
         //
         Element issuerSerialElement = 
             XMLUtils.getDirectChildElement(
-                element, "X509IssuerSerial", Constants.SignatureSpecNS
+                element, "X509IssuerSerial", WSS4JConstants.SIG_NS
             );
         x509IssuerSerial = new DOMX509IssuerSerial(issuerSerialElement);
     }
@@ -53,7 +53,7 @@ public final class DOMX509Data {
      */
     public DOMX509Data(Document doc, DOMX509IssuerSerial domIssuerSerial) {
         element = 
-            doc.createElementNS(Constants.SignatureSpecNS, "ds:X509Data");
+            doc.createElementNS(WSS4JConstants.SIG_NS, "ds:X509Data");
         
         element.appendChild(domIssuerSerial.getElement());
     }

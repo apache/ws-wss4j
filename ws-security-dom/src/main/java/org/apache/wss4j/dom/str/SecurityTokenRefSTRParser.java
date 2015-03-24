@@ -26,23 +26,23 @@ import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.token.BinarySecurity;
+import org.apache.wss4j.common.token.Reference;
+import org.apache.wss4j.common.token.SecurityTokenReference;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.message.token.DerivedKeyToken;
-import org.apache.wss4j.dom.message.token.Reference;
-import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.processor.Processor;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Element;
 
 /**
@@ -177,7 +177,8 @@ public class SecurityTokenRefSTRParser implements STRParser {
                                                     WSPasswordCallback.SECRET_KEY, data);
             if (secretKey == null) {
                 Element token = 
-                    secRef.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, data.getCallbackHandler());
+                    STRParserUtil.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, data.getCallbackHandler(),
+                                                  uri, reference.getValueType());
                 QName el = new QName(token.getNamespaceURI(), token.getLocalName());
                 if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
                     Processor proc = data.getWssConfig().getProcessor(WSSecurityEngine.BINARY_TOKEN);
@@ -221,7 +222,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
                     for (WSSecurityEngineResult bstResult : resultsList) {
                         BinarySecurity bstToken = 
                             (BinarySecurity)bstResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-                        byte[] tokenDigest = WSSecurityUtil.generateDigest(bstToken.getToken());
+                        byte[] tokenDigest = KeyUtils.generateDigest(bstToken.getToken());
                         if (Arrays.equals(tokenDigest, keyBytes)) {
                             secretKey = (byte[])bstResult.get(WSSecurityEngineResult.TAG_SECRET);
                             break;

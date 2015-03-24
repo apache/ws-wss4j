@@ -30,6 +30,8 @@ import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.token.BinarySecurity;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
@@ -314,7 +316,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         sign.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
         sign.setCustomTokenValueType(WSConstants.WSS_KRB_KI_VALUE_TYPE);
         
-        byte[] digestBytes = WSSecurityUtil.generateDigest(keyData);
+        byte[] digestBytes = KeyUtils.generateDigest(keyData);
         sign.setCustomTokenId(Base64.encode(digestBytes));
         sign.setSecretKey(keyData);
         
@@ -394,7 +396,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         builder.setEncryptSymmKey(false);
         builder.setCustomReferenceValue(WSConstants.WSS_KRB_KI_VALUE_TYPE);
         
-        byte[] digestBytes = WSSecurityUtil.generateDigest(keyData);
+        byte[] digestBytes = KeyUtils.generateDigest(keyData);
         builder.setEncKeyId(Base64.encode(digestBytes));
         
         Document encryptedDoc = builder.build(doc, crypto, secHeader);

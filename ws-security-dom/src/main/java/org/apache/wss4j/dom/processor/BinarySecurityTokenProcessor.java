@@ -24,20 +24,20 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
-import org.w3c.dom.Element;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
+import org.apache.wss4j.common.token.BinarySecurity;
+import org.apache.wss4j.common.token.PKIPathSecurity;
+import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
-import org.apache.wss4j.dom.message.token.PKIPathSecurity;
-import org.apache.wss4j.dom.message.token.X509Security;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
+import org.w3c.dom.Element;
 
 /**
  * Processor implementation to handle wsse:BinarySecurityToken elements

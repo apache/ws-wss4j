@@ -17,10 +17,10 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.message.token;
+package org.apache.wss4j.common.token;
 
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.bsp.BSPEnforcer;
+import org.apache.wss4j.common.WSS4JConstants;
+import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -33,7 +33,7 @@ import java.security.cert.X509Certificate;
  * PKIPath Security Token.
  */
 public class PKIPathSecurity extends BinarySecurity {
-    public static final String PKI_TYPE = WSConstants.X509TOKEN_NS + "#X509PKIPathv1";
+    public static final String PKI_TYPE = WSS4JConstants.X509TOKEN_NS + "#X509PKIPathv1";
 
     /**
      * Constructor.

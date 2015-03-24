@@ -26,17 +26,17 @@ import java.util.List;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.token.BinarySecurity;
+import org.apache.wss4j.common.token.SecurityTokenReference;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.message.token.BinarySecurity;
-import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 /**
  * This implementation of STRParser is for parsing a SecurityTokenReference element associated
@@ -156,7 +156,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                     for (WSSecurityEngineResult bstResult : resultsList) {
                         BinarySecurity bstToken = 
                             (BinarySecurity)bstResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-                        byte[] tokenDigest = WSSecurityUtil.generateDigest(bstToken.getToken());
+                        byte[] tokenDigest = KeyUtils.generateDigest(bstToken.getToken());
                         if (Arrays.equals(tokenDigest, keyBytes)) {
                             secretKey = (byte[])bstResult.get(WSSecurityEngineResult.TAG_SECRET);
                             break;

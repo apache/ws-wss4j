@@ -57,6 +57,8 @@ import org.apache.directory.server.core.kerberos.KeyDerivationInterceptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.kerberos.KerberosContextAndServiceNameCallback;
 import org.apache.wss4j.common.spnego.SpnegoTokenContext;
+import org.apache.wss4j.common.token.BinarySecurity;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
@@ -66,7 +68,6 @@ import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
-import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.KerberosTokenValidator;
@@ -467,7 +468,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         byte[] keyData = secretKey.getEncoded();
         sign.setSecretKey(keyData);
         
-        byte[] digestBytes = WSSecurityUtil.generateDigest(bst.getToken());
+        byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
         sign.setCustomTokenId(Base64.encode(digestBytes));
         
         Document signedDoc = sign.build(doc, null, secHeader);
@@ -688,7 +689,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         builder.setEncryptSymmKey(false);
         builder.setCustomReferenceValue(WSConstants.WSS_KRB_KI_VALUE_TYPE);
 
-        byte[] digestBytes = WSSecurityUtil.generateDigest(bst.getToken());
+        byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
         builder.setEncKeyId(Base64.encode(digestBytes));
         
         Document encryptedDoc = builder.build(doc, null, secHeader);
@@ -937,7 +938,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             byte[] keyData = secretKey.getEncoded();
             sign.setSecretKey(keyData);
 
-            byte[] digestBytes = WSSecurityUtil.generateDigest(bst.getToken());
+            byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
             sign.setCustomTokenId(Base64.encode(digestBytes));
 
             sign.build(doc, null, secHeader);
@@ -1199,7 +1200,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             builder.setEncryptSymmKey(false);
             builder.setCustomReferenceValue(WSConstants.WSS_KRB_KI_VALUE_TYPE);
 
-            byte[] digestBytes = WSSecurityUtil.generateDigest(bst.getToken());
+            byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
             builder.setEncKeyId(Base64.encode(digestBytes));
 
             builder.build(doc, null, secHeader);

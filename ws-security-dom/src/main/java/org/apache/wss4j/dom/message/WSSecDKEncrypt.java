@@ -19,23 +19,23 @@
 
 package org.apache.wss4j.dom.message;
 
+import java.util.List;
+
+import javax.crypto.SecretKey;
+
+import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.common.derivedKey.ConversationConstants;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.token.Reference;
+import org.apache.wss4j.common.token.SecurityTokenReference;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.common.WSEncryptionPart;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.common.derivedKey.ConversationConstants;
-import org.apache.wss4j.dom.message.token.Reference;
-import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.keys.KeyInfo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
-import javax.crypto.SecretKey;
-
-import java.util.List;
 
 /**
  * Encrypts and signs parts of a message with derived keys derived from a

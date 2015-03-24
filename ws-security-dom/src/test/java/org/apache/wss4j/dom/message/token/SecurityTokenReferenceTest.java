@@ -21,13 +21,15 @@ package org.apache.wss4j.dom.message.token;
 
 import java.util.Collections;
 
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.bsp.BSPEnforcer;
-import org.apache.wss4j.dom.common.SOAPUtil;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.token.Reference;
+import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.DOM2Writer;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

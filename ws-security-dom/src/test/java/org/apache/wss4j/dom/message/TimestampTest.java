@@ -19,31 +19,31 @@
 
 package org.apache.wss4j.dom.message;
 
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.bsp.BSPEnforcer;
-import org.apache.wss4j.dom.common.SOAPUtil;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.common.bsp.BSPRule;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.WSTimeSource;
-import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.message.token.Timestamp;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
-import org.apache.wss4j.dom.validate.NoOpValidator;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import org.apache.wss4j.common.bsp.BSPEnforcer;
+import org.apache.wss4j.common.bsp.BSPRule;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.WSTimeSource;
+import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.message.token.Timestamp;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
+import org.apache.wss4j.dom.validate.NoOpValidator;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * WS-Security Test Case for Timestamps.

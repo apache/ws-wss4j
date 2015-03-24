@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.message.token;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 
 /**

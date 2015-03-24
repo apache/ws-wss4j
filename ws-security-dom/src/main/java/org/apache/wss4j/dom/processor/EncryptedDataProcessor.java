@@ -28,7 +28,7 @@ import java.util.List;
 import javax.crypto.SecretKey;
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Element;
+import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
@@ -41,13 +41,13 @@ import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.str.STRParser;
 import org.apache.wss4j.dom.str.STRParserParameters;
 import org.apache.wss4j.dom.str.STRParserResult;
 import org.apache.wss4j.dom.str.SecurityTokenRefSTRParser;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.w3c.dom.Element;
 
 /**
  * This will process incoming <code>xenc:EncryptedData</code> elements.

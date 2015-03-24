@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.common.util;
 
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.Cipher;
@@ -35,6 +36,11 @@ public final class KeyUtils {
     private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(KeyUtils.class);
     private static final int MAX_SYMMETRIC_KEY_SIZE = 1024;
+    
+    /**
+     * A cached MessageDigest object
+     */
+    private static MessageDigest digest;
     
     private KeyUtils() {
         // complete
@@ -141,6 +147,26 @@ public final class KeyUtils {
                     WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
                     ex, "No such algorithm: " + cipherAlgo);
             }
+        }
+    }
+    
+    /**
+     * Generate a (SHA1) digest of the input bytes. The MessageDigest instance that backs this
+     * method is cached for efficiency.  
+     * @param inputBytes the bytes to digest
+     * @return the digest of the input bytes
+     * @throws WSSecurityException
+     */
+    public static synchronized byte[] generateDigest(byte[] inputBytes) throws WSSecurityException {
+        try {
+            if (digest == null) {
+                digest = MessageDigest.getInstance("SHA-1");
+            }
+            return digest.digest(inputBytes);
+        } catch (Exception e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", e,
+                    "Error in generating digest"
+            );
         }
     }
 }

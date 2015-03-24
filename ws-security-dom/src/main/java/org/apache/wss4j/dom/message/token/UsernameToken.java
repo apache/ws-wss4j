@@ -33,19 +33,20 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
+import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.DateUtil;
+import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.common.util.WSCurrentTimeSource;
 import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
@@ -605,7 +606,7 @@ public class UsernameToken {
 
             System.arraycopy(b3, 0, b4, offset, b3.length);
             
-            byte[] digestBytes = WSSecurityUtil.generateDigest(b4);
+            byte[] digestBytes = KeyUtils.generateDigest(b4);
             passwdDigest = Base64.encode(digestBytes);
         } catch (Exception e) {
             if (DO_DEBUG) {
@@ -910,7 +911,7 @@ public class UsernameToken {
             // Encoding Type must be equal to Base64Binary
             if (encodingType == null || "".equals(encodingType)) {
                 bspEnforcer.handleBSPRule(BSPRule.R4220);
-            } else if (!BinarySecurity.BASE64_ENCODING.equals(encodingType)) {
+            } else if (!WSConstants.BASE64_ENCODING.equals(encodingType)) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("The Username Token's nonce element has a bad encoding type");
                 }
