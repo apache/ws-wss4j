@@ -40,8 +40,8 @@ import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecHeader;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
 import java.util.Collections;
@@ -105,15 +105,15 @@ public class SamlTokenSVTest extends org.junit.Assert {
         }
         
         // Test we processed a SAML assertion
-        List<WSSecurityEngineResult> results = verify(signedDoc);
+        WSHandlerResult results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
         
         // Test we processed a signature (SAML assertion + SOAP body)
-        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
@@ -165,15 +165,15 @@ public class SamlTokenSVTest extends org.junit.Assert {
         }
         
         // Test we processed a SAML assertion
-        List<WSSecurityEngineResult> results = verify(signedDoc);
+        WSHandlerResult results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
         
         // Test we processed a signature (SAML assertion + SOAP body)
-        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
@@ -225,15 +225,15 @@ public class SamlTokenSVTest extends org.junit.Assert {
         }
         
         // Test we processed a SAML assertion
-        List<WSSecurityEngineResult> results = verify(signedDoc);
+        WSHandlerResult results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
         
         // Test we processed a signature (SAML assertion + SOAP body)
-        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
@@ -285,15 +285,15 @@ public class SamlTokenSVTest extends org.junit.Assert {
         }
         
         // Test we processed a SAML assertion
-        List<WSSecurityEngineResult> results = verify(signedDoc);
+        WSHandlerResult results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
         
         // Test we processed a signature (SAML assertion + SOAP body)
-        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
@@ -365,8 +365,8 @@ public class SamlTokenSVTest extends org.junit.Assert {
      * @param envelope 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
-        List<WSSecurityEngineResult> results = 
+    private WSHandlerResult verify(Document doc) throws Exception {
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);

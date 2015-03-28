@@ -48,6 +48,7 @@ import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
@@ -87,9 +88,10 @@ public class PrincipalTest extends org.junit.Assert {
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        List<WSSecurityEngineResult> results = verify(signedDoc, null);
+        WSHandlerResult results = verify(signedDoc, null);
         
-        Principal principal = (Principal)results.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
+        Principal principal = 
+            (Principal)results.getResults().get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(principal instanceof UsernameTokenPrincipal);
         assertTrue("wernerd".equals(principal.getName()));
         UsernameTokenPrincipal userPrincipal = (UsernameTokenPrincipal)principal;
@@ -118,10 +120,11 @@ public class PrincipalTest extends org.junit.Assert {
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             verify(signedDoc, new DummyValidator(), WSSecurityEngine.USERNAME_TOKEN, null);
         
-        Principal principal = (Principal)results.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
+        Principal principal = 
+            (Principal)results.getResults().get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(principal instanceof SAMLTokenPrincipal);
         assertTrue(principal.getName().contains("uid=joe"));
         assertTrue(((SAMLTokenPrincipal)principal).getToken() != null);
@@ -154,15 +157,17 @@ public class PrincipalTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = verify(unsignedDoc, null);
-        WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        WSHandlerResult results = verify(unsignedDoc, null);
+        
+        List<WSSecurityEngineResult> samlResults = 
+            results.getActionResults().get(WSConstants.ST_UNSIGNED);
+        WSSecurityEngineResult actionResult = samlResults.get(0);
+
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
         
-        Principal principal = 
-            (Principal)results.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
+        Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(principal instanceof SAMLTokenPrincipal);
         assertTrue(principal.getName().contains("uid=joe"));
         assertTrue(((SAMLTokenPrincipal)principal).getToken() != null);
@@ -195,15 +200,17 @@ public class PrincipalTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = verify(unsignedDoc, null);
-        WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        WSHandlerResult results = verify(unsignedDoc, null);
+        
+        List<WSSecurityEngineResult> samlResults = 
+            results.getActionResults().get(WSConstants.ST_UNSIGNED);
+        WSSecurityEngineResult actionResult = samlResults.get(0);
+        
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
         
-        Principal principal = 
-            (Principal)results.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
+        Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(principal instanceof SAMLTokenPrincipal);
         assertTrue(principal.getName().contains("uid=joe"));
         assertTrue(((SAMLTokenPrincipal)principal).getToken() != null);
@@ -237,16 +244,18 @@ public class PrincipalTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             verify(unsignedDoc, new DummyValidator(), WSSecurityEngine.SAML_TOKEN, null);
-        WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        
+        List<WSSecurityEngineResult> samlResults = 
+            results.getActionResults().get(WSConstants.ST_UNSIGNED);
+        WSSecurityEngineResult actionResult = samlResults.get(0);
+
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
         
-        Principal principal = 
-            (Principal)results.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
+        Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(principal instanceof SAMLTokenPrincipal);
         assertTrue(principal.getName().contains("uid=joe"));
         assertTrue(((SAMLTokenPrincipal)principal).getToken() != null);
@@ -278,16 +287,18 @@ public class PrincipalTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             verify(doc, new DummyValidator(), WSSecurityEngine.BINARY_TOKEN, crypto);
-        WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
+        
+        List<WSSecurityEngineResult> bstResults = 
+            results.getActionResults().get(WSConstants.BST);
+        WSSecurityEngineResult actionResult = bstResults.get(0);
+
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         assertNotNull(token);
         
-        Principal principal = 
-            (Principal)results.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
+        Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(principal instanceof SAMLTokenPrincipal);
         assertTrue(principal.getName().contains("uid=joe"));
         assertTrue(((SAMLTokenPrincipal)principal).getToken() != null);
@@ -296,7 +307,7 @@ public class PrincipalTest extends org.junit.Assert {
     /**
      * Verifies the soap envelope
      */
-    private List<WSSecurityEngineResult> verify(
+    private WSHandlerResult verify(
         Document doc,
         Crypto crypto
     ) throws Exception {
@@ -306,7 +317,7 @@ public class PrincipalTest extends org.junit.Assert {
     /**
      * Verifies the soap envelope
      */
-    private List<WSSecurityEngineResult> verify(
+    private WSHandlerResult verify(
         Document doc, 
         Validator validator,
         QName validatorName,

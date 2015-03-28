@@ -20,7 +20,6 @@
 package org.apache.wss4j.dom.message;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Properties;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -34,7 +33,6 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
@@ -42,6 +40,7 @@ import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.w3c.dom.Document;
 
 
@@ -189,7 +188,7 @@ public class PasswordEncryptorTest extends org.junit.Assert {
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+    private WSHandlerResult verify(Document doc) throws Exception {
         return secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
     }
 

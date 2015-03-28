@@ -21,7 +21,6 @@ package org.apache.wss4j.dom.message;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -49,6 +48,7 @@ import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.str.STRParser.REFERENCE_TYPE;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
@@ -157,7 +157,7 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         assertFalse(outputString.contains("counter_port_type"));
-        List<WSSecurityEngineResult> results = verify(
+        WSHandlerResult results = verify(
             encryptedDoc,
             keystoreCallbackHandler,
             new javax.xml.namespace.QName(
@@ -167,7 +167,7 @@ public class EncryptionTest extends org.junit.Assert {
         );
         
         WSSecurityEngineResult actionResult =
-                WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
+                results.getActionResults().get(WSConstants.ENCR).get(0);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
         REFERENCE_TYPE referenceType = 
@@ -205,11 +205,11 @@ public class EncryptionTest extends org.junit.Assert {
         assertFalse(outputString.contains("counter_port_type"));
         
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
         
         WSSecurityEngineResult actionResult =
-                WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
+                results.getActionResults().get(WSConstants.ENCR).get(0);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
         REFERENCE_TYPE referenceType = 
@@ -286,10 +286,10 @@ public class EncryptionTest extends org.junit.Assert {
         assertTrue(outputString.contains("#ThumbprintSHA1"));
     
         LOG.info("After Encrypting ThumbprintSHA1....");
-        List<WSSecurityEngineResult> results = verify(encryptedDoc, encCrypto, keystoreCallbackHandler);
+        WSHandlerResult results = verify(encryptedDoc, encCrypto, keystoreCallbackHandler);
         
         WSSecurityEngineResult actionResult =
-                WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
+                results.getActionResults().get(WSConstants.ENCR).get(0);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
         REFERENCE_TYPE referenceType = 
@@ -503,14 +503,14 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         assertFalse(outputString.contains("counter_port_type"));
-        List<WSSecurityEngineResult> results = verify(encryptedDoc, crypto, keystoreCallbackHandler);
+        WSHandlerResult results = verify(encryptedDoc, crypto, keystoreCallbackHandler);
         
         outputString = 
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         assertTrue(outputString.contains("counter_port_type"));
         
         WSSecurityEngineResult actionResult =
-                WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
+                results.getActionResults().get(WSConstants.ENCR).get(0);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
         REFERENCE_TYPE referenceType = 
@@ -584,7 +584,7 @@ public class EncryptionTest extends org.junit.Assert {
         data.setCallbackHandler(keystoreCallbackHandler);
         data.setDecCrypto(crypto);
         data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3209));
-        newEngine.processSecurityHeader(encryptedDoc, "", data);
+        newEngine.processSecurityHeader(encryptedDoc, data);
     }
     
     /**
@@ -651,11 +651,11 @@ public class EncryptionTest extends org.junit.Assert {
         assertTrue(!outputString.contains("counter_port_type") ? true : false);
         
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
         
         WSSecurityEngineResult actionResult =
-                WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
+                results.getActionResults().get(WSConstants.ENCR).get(0);
         assertNotNull(actionResult);
     }
     
@@ -694,10 +694,10 @@ public class EncryptionTest extends org.junit.Assert {
      * @throws Exception
      *             Thrown when there is a problem in verification
      */
-    private List<WSSecurityEngineResult> verify(
+    private WSHandlerResult verify(
         Document doc, Crypto decCrypto, CallbackHandler handler
     ) throws Exception {
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(doc, null, handler, decCrypto);
         if (LOG.isDebugEnabled()) {
             String outputString = 
@@ -715,12 +715,12 @@ public class EncryptionTest extends org.junit.Assert {
      * @throws Exception Thrown when there is a problem in verification
      */
     @SuppressWarnings("unchecked")
-    private List<WSSecurityEngineResult> verify(
+    private WSHandlerResult verify(
         Document doc,
         CallbackHandler handler,
         javax.xml.namespace.QName expectedEncryptedElement
     ) throws Exception {
-        final java.util.List<WSSecurityEngineResult> results = 
+        final WSHandlerResult results = 
             secEngine.processSecurityHeader(doc, null, handler, null, crypto);
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
@@ -734,7 +734,7 @@ public class EncryptionTest extends org.junit.Assert {
         // (as a QName)
         //
         boolean encrypted = false;
-        for (java.util.Iterator<WSSecurityEngineResult> ipos = results.iterator(); 
+        for (java.util.Iterator<WSSecurityEngineResult> ipos = results.getResults().iterator(); 
             ipos.hasNext();) {
             final WSSecurityEngineResult result = ipos.next();
             final Integer action = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);

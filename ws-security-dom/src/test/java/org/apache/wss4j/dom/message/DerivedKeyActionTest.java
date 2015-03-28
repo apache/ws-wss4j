@@ -35,7 +35,6 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
@@ -44,6 +43,7 @@ import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.junit.Assert;
 
 /**
@@ -556,13 +556,13 @@ public class DerivedKeyActionTest extends org.junit.Assert {
         verify(doc, secretKeyCallbackHandler);
     }
 
-    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+    private WSHandlerResult verify(Document doc) throws Exception {
         return verify(doc, callbackHandler);
     }
 
-    private List<WSSecurityEngineResult> verify(Document doc, CallbackHandler cbHandler) throws Exception {
+    private WSHandlerResult verify(Document doc, CallbackHandler cbHandler) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(doc, null, cbHandler, crypto);
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);

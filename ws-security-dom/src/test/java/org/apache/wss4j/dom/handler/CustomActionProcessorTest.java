@@ -93,10 +93,10 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         );
         final WSSecurityEngine engine = new WSSecurityEngine();
         engine.setWssConfig(cfg);
-        final List<WSSecurityEngineResult> results = 
+        final WSHandlerResult results = 
             engine.processSecurityHeader(doc, null, null, crypto);
         boolean found = false;
-        for (WSSecurityEngineResult result : results) {
+        for (WSSecurityEngineResult result : results.getResults()) {
             Object obj = result.get("foo");
             if (obj != null) {
                 if (obj.getClass().getName().equals(p)) {
@@ -140,10 +140,10 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         );
         final WSSecurityEngine engine = new WSSecurityEngine();
         engine.setWssConfig(cfg);
-        final List<WSSecurityEngineResult> results = 
+        final WSHandlerResult results = 
             engine.processSecurityHeader(doc, null, null, crypto);
         boolean found = false;
-        for (WSSecurityEngineResult result : results) {
+        for (WSSecurityEngineResult result : results.getResults()) {
             Object obj = result.get("foo");
             if (obj != null) {
                 if (obj.getClass().getName().equals(CustomProcessor.class.getName())) {

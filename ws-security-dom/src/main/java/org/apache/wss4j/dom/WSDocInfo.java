@@ -33,6 +33,7 @@ package org.apache.wss4j.dom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -55,7 +56,8 @@ public class WSDocInfo {
     // creation or validation
     private final Map<String, TokenValue> tokens = new HashMap<>();
 
-    private final List<WSSecurityEngineResult> results = new ArrayList<>();
+    private final List<WSSecurityEngineResult> results = new LinkedList<>();
+    private final Map<Integer, List<WSSecurityEngineResult>> actionResults = new HashMap<>();
     private CallbackLookup callbackLookup;
     private Element securityHeader;
 
@@ -82,6 +84,7 @@ public class WSDocInfo {
         securityHeader = null;
         tokens.clear();
         results.clear();
+        actionResults.clear();
     }
     
     /**
@@ -208,6 +211,37 @@ public class WSDocInfo {
      */
     public void addResult(WSSecurityEngineResult result) {
         results.add(result);
+        Integer resultTag = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
+        if (resultTag != null) {
+            List<WSSecurityEngineResult> storedResults = actionResults.get(resultTag);
+            if (storedResults == null) {
+                storedResults = new ArrayList<>();
+            }
+            storedResults.add(result);
+            actionResults.put(resultTag, storedResults);
+        }
+    }
+    
+    /**
+     * Get a copy of the security results list. Modifying the subsequent list does not
+     * change the internal results list.
+     */
+    public List<WSSecurityEngineResult> getResults() {
+        if (results.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return new ArrayList<>(results);
+    }
+    
+    /**
+     * Return a copy of the map between security actions + results. Modifying the subsequent
+     * map does not change the internal map.
+     */
+    public Map<Integer, List<WSSecurityEngineResult>> getActionResults() {
+        if (actionResults.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return new HashMap<>(actionResults);
     }
     
     /**
@@ -233,21 +267,14 @@ public class WSDocInfo {
     }
     
     /**
-     * Get a list of WSSecurityEngineResults of the given Integer tag
+     * Get a unmodifiable list of WSSecurityEngineResults of the given Integer tag
      */
     public List<WSSecurityEngineResult> getResultsByTag(Integer tag) {
-        if (results.isEmpty()) {
+        if (actionResults.isEmpty() || !actionResults.containsKey(tag)) {
             return Collections.emptyList();
         }
         
-        List<WSSecurityEngineResult> foundResults = new ArrayList<>();
-        for (WSSecurityEngineResult result : results) {
-            Integer resultTag = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
-            if (tag.intValue() == resultTag.intValue()) {
-                foundResults.add(result);
-            }
-        }
-        return foundResults;
+        return Collections.unmodifiableList(actionResults.get(tag));
     }
     
     /**
@@ -259,15 +286,15 @@ public class WSDocInfo {
             return false;
         }
         
-        if (!results.isEmpty()) {
-            for (WSSecurityEngineResult result : results) {
-                Integer resultTag = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
+        if (!actionResults.isEmpty() && actionResults.containsKey(tag)) {
+            for (WSSecurityEngineResult result : actionResults.get(tag)) {
                 String cId = (String)result.get(WSSecurityEngineResult.TAG_ID);
-                if (tag.intValue() == resultTag.intValue() && id.equals(cId)) {
+                if (id.equals(cId)) {
                     return true;
                 }
             }
         }
+
         return false;
     }
 

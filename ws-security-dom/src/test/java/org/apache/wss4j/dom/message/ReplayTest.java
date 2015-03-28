@@ -26,7 +26,6 @@ import javax.security.auth.callback.CallbackHandler;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
@@ -44,6 +43,7 @@ import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
 import org.w3c.dom.Document;
@@ -545,7 +545,7 @@ public class ReplayTest extends org.junit.Assert {
      * @param wssConfig
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private List<WSSecurityEngineResult> verify(
+    private WSHandlerResult verify(
         Document doc, WSSConfig wssConfig, RequestData data
     ) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();

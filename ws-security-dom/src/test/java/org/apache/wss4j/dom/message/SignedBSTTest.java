@@ -32,13 +32,13 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
@@ -154,8 +154,9 @@ public class SignedBSTTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = verify(doc);
-        assertTrue(handler.checkResults(results, Collections.singletonList(WSConstants.SIGN)));
+        WSHandlerResult results = verify(doc);
+        assertTrue(handler.checkResults(results.getResults(), 
+                                        Collections.singletonList(WSConstants.SIGN)));
     }
 
     /**
@@ -165,8 +166,8 @@ public class SignedBSTTest extends org.junit.Assert {
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
-        List<WSSecurityEngineResult> results = 
+    private WSHandlerResult verify(Document doc) throws Exception {
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(doc, null, null, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");

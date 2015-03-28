@@ -44,6 +44,7 @@ import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.saml.WSSecSignatureSAML;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
@@ -188,7 +189,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         //
         // Check the signature...this should pass
         //
-        List<WSSecurityEngineResult> results = verify(signedDoc);
+        WSHandlerResult results = verify(signedDoc);
         
         //
         // Finally we need to check that the Element that was signed is what we expect to be signed
@@ -204,7 +205,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
             ).item(0);
         
         List<WSSecurityEngineResult> signedResults = 
-            WSSecurityUtil.fetchAllActionResults(results, WSConstants.SIGN);
+            results.getActionResults().get(WSConstants.SIGN);
         try {
             WSSecurityUtil.verifySignedElement((org.w3c.dom.Element)valueNode, signedResults);
             fail("Failure expected on the required element not being signed");
@@ -626,7 +627,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
      * @param doc soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private List<WSSecurityEngineResult>  verify(Document doc) throws Exception {
+    private WSHandlerResult verify(Document doc) throws Exception {
         return secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
     }
 

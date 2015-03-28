@@ -30,6 +30,7 @@ import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -42,7 +43,6 @@ import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecHeader;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -129,11 +129,11 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         assertTrue(outputString.contains("http://www.w3.org/2001/04/xmlenc#sha256"));
         assertTrue(outputString.contains("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"));
         
-        List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto);
+        WSHandlerResult results = verify(signedDoc, trustCrypto);
         
         // Test we processed a SAML assertion
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
+            results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
@@ -150,7 +150,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Header/wsse:Security/saml1:Assertion", xpath);
         
         // Test we processed a signature (SOAP body)
-        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         refs = (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
@@ -199,18 +199,18 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         }
         
         /* https://issues.apache.org/jira/browse/WSS-265 */
-        List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto);
+        WSHandlerResult results = verify(signedDoc, trustCrypto);
         
         // Test we processed a SAML assertion
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
+            results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
         assertTrue(receivedAssertion.isSigned());
         
         // Test we processed a signature (SOAP body)
-        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         @SuppressWarnings("unchecked")
@@ -262,18 +262,18 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         assertTrue(outputString.contains("http://www.w3.org/2001/04/xmlenc#sha256"));
         assertTrue(outputString.contains("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"));
         
-        List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto);
+        WSHandlerResult results = verify(signedDoc, trustCrypto);
         
         // Test we processed a SAML assertion
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
+            results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
         assertTrue(receivedSamlAssertion.isSigned());
         
         // Test we processed a signature (SOAP body)
-        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
@@ -324,18 +324,18 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         }
         
         /* https://issues.apache.org/jira/browse/WSS-265 */
-        List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto);
+        WSHandlerResult results = verify(signedDoc, trustCrypto);
         
         // Test we processed a SAML assertion
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
+            results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
         assertTrue(receivedAssertion.isSigned());
         
         // Test we processed a signature (SOAP body)
-        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         @SuppressWarnings("unchecked")
@@ -388,16 +388,16 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         }
         assertTrue(outputString.contains("X509IssuerSerial"));
         
-        List<WSSecurityEngineResult> results = verify(signedDoc, userCrypto);
+        WSHandlerResult results = verify(signedDoc, userCrypto);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
+            results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
         assertTrue(receivedSamlAssertion.isSigned());
         
         // Test we processed a signature (SOAP body)
-        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
@@ -449,16 +449,16 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         }
         assertTrue(outputString.contains("KeyValue"));
         
-        List<WSSecurityEngineResult> results = verify(signedDoc, userCrypto);
+        WSHandlerResult results = verify(signedDoc, userCrypto);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
+            results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
         assert receivedSamlAssertion.isSigned();
         
         // Test we processed a signature (SOAP body)
-        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
@@ -510,16 +510,16 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         }
         assertTrue(outputString.contains("KeyValue"));
         
-        List<WSSecurityEngineResult> results = verify(signedDoc, userCrypto);
+        WSHandlerResult results = verify(signedDoc, userCrypto);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
+            results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
         assertTrue(receivedSamlAssertion.isSigned());
         
         // Test we processed a signature (SOAP body)
-        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
@@ -575,18 +575,18 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto);
+        WSHandlerResult results = verify(signedDoc, trustCrypto);
         
         // Test we processed a SAML assertion
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
+            results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
         assertTrue(receivedSamlAssertion.isSigned());
         
         // Test we processed a signature (SOAP body)
-        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
@@ -653,18 +653,18 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         System.out.println(outputString);
         
         /* https://issues.apache.org/jira/browse/WSS-265 */
-        List<WSSecurityEngineResult> results = verify(signedDoc, trustCrypto);
+        WSHandlerResult results = verify(signedDoc, trustCrypto);
         
         // Test we processed a SAML assertion
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
+            results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedAssertion != null);
         assertTrue(receivedAssertion.isSigned());
         
         // Test we processed a signature (SOAP body)
-        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+        actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         @SuppressWarnings("unchecked")
@@ -683,8 +683,8 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
      * @param doc
      * @throws Exception Thrown when there is a problem in verification
      */
-    private List<WSSecurityEngineResult> verify(Document doc, Crypto sigCrypto) throws Exception {
-        List<WSSecurityEngineResult> results = 
+    private WSHandlerResult verify(Document doc, Crypto sigCrypto) throws Exception {
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(
                 doc, null, callbackHandler, sigCrypto, userCrypto
             );

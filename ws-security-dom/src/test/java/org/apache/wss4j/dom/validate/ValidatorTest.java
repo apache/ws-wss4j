@@ -45,6 +45,7 @@ import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
@@ -130,7 +131,7 @@ public class ValidatorTest extends org.junit.Assert {
         data.setSigVerCrypto(cryptoCA);
         data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3063));
         try {
-            newEngine.processSecurityHeader(signedDoc, "", data);
+            newEngine.processSecurityHeader(signedDoc, data);
             fail("Failure expected on issuer serial");
         } catch (WSSecurityException ex) {
             // expected
@@ -141,7 +142,7 @@ public class ValidatorTest extends org.junit.Assert {
         config.setValidator(WSSecurityEngine.SIGNATURE, NoOpValidator.class);
         newEngine.setWssConfig(config);
         data.setWssConfig(config);
-        newEngine.processSecurityHeader(signedDoc, "", data);
+        newEngine.processSecurityHeader(signedDoc, data);
     }
     
     /**
@@ -210,11 +211,13 @@ public class ValidatorTest extends org.junit.Assert {
         config.setValidator(WSSecurityEngine.BINARY_TOKEN, new BSTValidator());
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(config);
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(doc, null, null, crypto);
         
-        WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
+        List<WSSecurityEngineResult> bstResults = 
+            results.getActionResults().get(WSConstants.BST);
+        WSSecurityEngineResult actionResult = bstResults.get(0);
+
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         assertTrue(token != null);
@@ -258,11 +261,13 @@ public class ValidatorTest extends org.junit.Assert {
         }
         
         config.setValidator(WSSecurityEngine.BINARY_TOKEN, new BSTValidator());
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(doc, null, null, crypto);
         
-        WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
+        List<WSSecurityEngineResult> bstResults = 
+            results.getActionResults().get(WSConstants.BST);
+        WSSecurityEngineResult actionResult = bstResults.get(0);
+        
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         assertTrue(token != null);
@@ -276,7 +281,7 @@ public class ValidatorTest extends org.junit.Assert {
      * @param wssConfig
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private java.util.List<WSSecurityEngineResult> verify(
+    private WSHandlerResult verify(
         Document doc, WSSConfig wssConfig, CallbackHandler cb, Crypto crypto
     ) throws Exception {
         secEngine.setWssConfig(wssConfig);

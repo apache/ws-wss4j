@@ -184,12 +184,11 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         //
         // Verify the inbound request, and create a response with a Signature Confirmation
         //
-        List<WSSecurityEngineResult> results = verify(doc);
+        WSHandlerResult results = verify(doc);
         doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
-        WSHandlerResult handlerResult = new WSHandlerResult(null, results);
         List<WSHandlerResult> receivedResults = new ArrayList<>();
-        receivedResults.add(handlerResult);
+        receivedResults.add(results);
         msgContext.put(WSHandlerConstants.RECV_RESULTS, receivedResults);
         action = new HandlerAction(WSConstants.NO_SECURITY);
         handler.send(
@@ -242,12 +241,11 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         //
         // Verify the inbound request, and create a response with a Signature Confirmation
         //
-        List<WSSecurityEngineResult> results = verify(doc);
+        WSHandlerResult results = verify(doc);
         doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
-        WSHandlerResult handlerResult = new WSHandlerResult(null, results);
         List<WSHandlerResult> receivedResults = new ArrayList<>();
-        receivedResults.add(handlerResult);
+        receivedResults.add(results);
         msgContext.put(WSHandlerConstants.RECV_RESULTS, receivedResults);
         handler.send(
             doc, 
@@ -267,10 +265,10 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         //
         results = verify(doc);
         WSSecurityEngineResult scResult = 
-            WSSecurityUtil.fetchActionResult(results, WSConstants.SC);
+            results.getActionResults().get(WSConstants.SC).get(0);
         assertTrue(scResult != null);
         assertTrue(scResult.get(WSSecurityEngineResult.TAG_SIGNATURE_CONFIRMATION) != null);
-        handler.signatureConfirmation(reqData, results);
+        handler.signatureConfirmation(reqData, results.getResults());
     }
     
     
@@ -279,8 +277,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
      * the BSP compliance is enabled.
      */
     @org.junit.Test
-    public void
-    testWsuId() throws Exception {
+    public void testWsuId() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -309,7 +306,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         data.setCallbackHandler(callbackHandler);
         data.setSigVerCrypto(crypto);
         data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R5441));
-        newEngine.processSecurityHeader(doc, "", data);
+        newEngine.processSecurityHeader(doc, data);
     }
     
     
@@ -320,8 +317,8 @@ public class SignatureConfirmationTest extends org.junit.Assert {
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
-        List<WSSecurityEngineResult> results = 
+    private WSHandlerResult verify(Document doc) throws Exception {
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");

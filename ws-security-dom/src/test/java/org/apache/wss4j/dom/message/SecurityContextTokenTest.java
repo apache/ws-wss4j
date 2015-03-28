@@ -19,8 +19,6 @@
 
 package org.apache.wss4j.dom.message;
 
-import java.util.List;
-
 import javax.xml.crypto.dsig.SignatureMethod;
 
 import org.apache.wss4j.dom.WSConstants;
@@ -29,6 +27,7 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SecretKeyCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
@@ -124,10 +123,10 @@ public class SecurityContextTokenTest extends org.junit.Assert {
                 LOG.debug(out);
             }
 
-            List<WSSecurityEngineResult> results = verify(doc);
+            WSHandlerResult results = verify(doc);
             
             WSSecurityEngineResult actionResult =
-                WSSecurityUtil.fetchActionResult(results, WSConstants.SCT);
+                results.getActionResults().get(WSConstants.SCT).get(0);
             SecurityContextToken receivedToken = 
                 (SecurityContextToken) actionResult.get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
             assertTrue(receivedToken != null);
@@ -174,10 +173,10 @@ public class SecurityContextTokenTest extends org.junit.Assert {
                 LOG.debug(out);
             }
 
-            List<WSSecurityEngineResult> results = verify(doc);
+            WSHandlerResult results = verify(doc);
             
             WSSecurityEngineResult actionResult =
-                WSSecurityUtil.fetchActionResult(results, WSConstants.SCT);
+                results.getActionResults().get(WSConstants.SCT).get(0);
             SecurityContextToken receivedToken = 
                 (SecurityContextToken) actionResult.get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
             assertTrue(receivedToken != null);
@@ -370,8 +369,8 @@ public class SecurityContextTokenTest extends org.junit.Assert {
      * @throws Exception
      *             Thrown when there is a problem in verification
      */
-    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
-        List<WSSecurityEngineResult> results = 
+    private WSHandlerResult verify(Document doc) throws Exception {
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);

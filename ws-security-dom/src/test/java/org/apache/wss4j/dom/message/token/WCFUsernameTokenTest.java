@@ -30,11 +30,11 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.w3c.dom.Document;
 
 
@@ -119,27 +119,27 @@ public class WCFUsernameTokenTest extends org.junit.Assert {
     /**
      * Verifies the soap envelope
      */
-    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+    private WSHandlerResult verify(Document doc) throws Exception {
         return verify(doc, new ArrayList<BSPRule>(0));
     }
     
     /**
      * Verifies the soap envelope
      */
-    private List<WSSecurityEngineResult> verify(
+    private WSHandlerResult verify(
         Document doc, List<BSPRule> ignoredRules
     ) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         RequestData requestData = new RequestData();
         requestData.setIgnoredBSPRules(ignoredRules);
         requestData.setCallbackHandler(callbackHandler);
-        return secEngine.processSecurityHeader(doc, "", requestData);
+        return secEngine.processSecurityHeader(doc, requestData);
     }
     
     /**
      * Verifies the soap envelope
      */
-    private List<WSSecurityEngineResult> verify(
+    private WSHandlerResult verify(
         Document doc, WSSConfig wssConfig, List<BSPRule> ignoredRules
     ) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
@@ -147,7 +147,7 @@ public class WCFUsernameTokenTest extends org.junit.Assert {
         requestData.setWssConfig(wssConfig);
         requestData.setIgnoredBSPRules(ignoredRules);
         requestData.setCallbackHandler(callbackHandler);
-        return secEngine.processSecurityHeader(doc, "", requestData);
+        return secEngine.processSecurityHeader(doc, requestData);
     }
     
 

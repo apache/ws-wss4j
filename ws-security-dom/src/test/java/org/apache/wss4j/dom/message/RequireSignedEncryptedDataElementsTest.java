@@ -20,7 +20,6 @@
 package org.apache.wss4j.dom.message;
 
 import java.text.MessageFormat;
-import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.TreeMap;
@@ -29,7 +28,6 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
@@ -40,6 +38,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -350,9 +349,9 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
     }
 
     
-    private List<WSSecurityEngineResult> verify(Document doc, RequestData reqData) throws Exception {
+    private WSHandlerResult verify(Document doc, RequestData reqData) throws Exception {
         Element elem = WSSecurityUtil.getSecurityHeader(doc, null);
-        List<WSSecurityEngineResult> resultList = 
+        WSHandlerResult resultList = 
             secEngine.processSecurityHeader(elem, reqData);
         if (LOG.isDebugEnabled()) {
             String outputString = 

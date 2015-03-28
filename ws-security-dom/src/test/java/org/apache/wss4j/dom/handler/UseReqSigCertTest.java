@@ -28,7 +28,6 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
@@ -90,10 +89,9 @@ public class UseReqSigCertTest extends org.junit.Assert {
         }
         
         // Process the request
-        List<WSSecurityEngineResult> results = processRequest(doc);
-        WSHandlerResult rResult = new WSHandlerResult("", results);
+        WSHandlerResult results = processRequest(doc);
         List<WSHandlerResult> handlerResults = new ArrayList<>();
-        handlerResults.add(0, rResult);
+        handlerResults.add(0, results);
         
         // Send the response
         sendResponse(handlerResults);
@@ -136,10 +134,9 @@ public class UseReqSigCertTest extends org.junit.Assert {
         }
         
         // Process the request
-        List<WSSecurityEngineResult> results = processRequest(doc);
-        WSHandlerResult rResult = new WSHandlerResult("", results);
+        WSHandlerResult results = processRequest(doc);
         List<WSHandlerResult> handlerResults = new ArrayList<>();
-        handlerResults.add(0, rResult);
+        handlerResults.add(0, results);
         
         // Send the response
         sendResponse(handlerResults);
@@ -182,16 +179,15 @@ public class UseReqSigCertTest extends org.junit.Assert {
         }
         
         // Process the request
-        List<WSSecurityEngineResult> results = processRequest(doc);
-        WSHandlerResult rResult = new WSHandlerResult("", results);
+        WSHandlerResult results = processRequest(doc);
         List<WSHandlerResult> handlerResults = new ArrayList<>();
-        handlerResults.add(0, rResult);
+        handlerResults.add(0, results);
         
         // Send the response
         sendResponse(handlerResults);
     }
     
-    private List<WSSecurityEngineResult> processRequest(Document doc) throws WSSecurityException {
+    private WSHandlerResult processRequest(Document doc) throws WSSecurityException {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
@@ -207,7 +203,7 @@ public class UseReqSigCertTest extends org.junit.Assert {
         handler.receive(receivedActions, reqData);
         
         WSSecurityEngine securityEngine = new WSSecurityEngine();
-        return securityEngine.processSecurityHeader(doc, "", reqData);
+        return securityEngine.processSecurityHeader(doc, reqData);
     }
     
     private void sendResponse(List<WSHandlerResult> handlerResults) throws Exception {

@@ -31,6 +31,7 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -139,12 +140,12 @@ public class EncryptedKeyDataRefTest extends org.junit.Assert {
     private void checkDataRef(Document doc) throws Exception {
         
         // Retrieve the wsResults List 
-        List<WSSecurityEngineResult> wsResults = 
+        WSHandlerResult wsResults = 
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         boolean found = false;
                 
-        for (int i = 0; i < wsResults.size(); i++) {
-            WSSecurityEngineResult wsSecEngineResult = wsResults.get(i);
+        for (int i = 0; i < wsResults.getResults().size(); i++) {
+            WSSecurityEngineResult wsSecEngineResult = wsResults.getResults().get(i);
             int action = (Integer)
                     wsSecEngineResult.get(WSSecurityEngineResult.TAG_ACTION);
             

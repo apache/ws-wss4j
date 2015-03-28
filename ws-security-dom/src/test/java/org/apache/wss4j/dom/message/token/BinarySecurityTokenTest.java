@@ -25,6 +25,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -39,7 +40,6 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
 import java.security.cert.X509Certificate;
-import java.util.List;
 
 /**
  * This is a test for constructing and processing BinarySecurityTokens.
@@ -85,11 +85,11 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
         
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(WSSConfig.getNewInstance());
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(doc, null, null, crypto);
         
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
+            results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         assertNotNull(token);
@@ -126,11 +126,11 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
         
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(WSSConfig.getNewInstance());
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(doc, null, null, crypto);
         
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
+            results.getActionResults().get(WSConstants.BST).get(0);
         PKIPathSecurity token =
             (PKIPathSecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         assertNotNull(token);
@@ -176,10 +176,10 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
         secHeader.insertSecurityHeader(doc);
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
         
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(doc, null, null, crypto);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
+            results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         assertNotNull(token);

@@ -34,6 +34,7 @@ import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.message.WSSecHeader;
@@ -50,7 +51,6 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.xml.crypto.dsig.SignatureMethod;
 
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * This is a test for the Kerberos Token Profile 1.1
@@ -200,9 +200,9 @@ public class BSTKerberosTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = verify(doc);
-        WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
+        WSHandlerResult results = verify(doc);
+        WSSecurityEngineResult actionResult = 
+            results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         assertTrue(token != null);
@@ -417,8 +417,8 @@ public class BSTKerberosTest extends org.junit.Assert {
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
-        List<WSSecurityEngineResult> results = 
+    private WSHandlerResult verify(Document doc) throws Exception {
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");

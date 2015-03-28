@@ -30,6 +30,7 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.Merlin;
@@ -121,10 +122,10 @@ public class SignaturePartsTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = verify(signedDoc);
+        WSHandlerResult results = verify(signedDoc);
         
         WSSecurityEngineResult actionResult = 
-            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+            results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
@@ -322,17 +323,17 @@ public class SignaturePartsTest extends org.junit.Assert {
         trustStore.load(input, "security".toCharArray());
         ((Merlin)trustCrypto).setTrustStore(trustStore);
         
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(doc, null, null, trustCrypto);
         WSSecurityEngineResult stUnsignedActionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
+            results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) stUnsignedActionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
         assertTrue(receivedSamlAssertion.isSigned());
         
         WSSecurityEngineResult signActionResult = 
-            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+            results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(signActionResult != null);
         assertFalse(signActionResult.isEmpty());
         final List<WSDataRef> refs =
@@ -438,14 +439,14 @@ public class SignaturePartsTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = verify(signedDoc);
+        WSHandlerResult results = verify(signedDoc);
         
         QName fooName = new QName("urn:foo.bar", "foobar");
         QName bodyName = new QName(soapConstants.getEnvelopeURI(), "Body");
         QName headerName = new QName(soapConstants.getEnvelopeURI(), "Header");
         
         WSSecurityEngineResult actionResult = 
-            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+            results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         
@@ -506,10 +507,10 @@ public class SignaturePartsTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = verify(signedDoc);
+        WSHandlerResult results = verify(signedDoc);
         
         WSSecurityEngineResult actionResult = 
-            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+            results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         @SuppressWarnings("unchecked")
@@ -560,8 +561,8 @@ public class SignaturePartsTest extends org.junit.Assert {
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
-        List<WSSecurityEngineResult> results = 
+    private WSHandlerResult verify(Document doc) throws Exception {
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(doc, null, null, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");

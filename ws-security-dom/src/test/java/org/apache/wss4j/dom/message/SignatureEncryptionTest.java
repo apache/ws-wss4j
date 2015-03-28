@@ -31,11 +31,11 @@ import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -172,13 +172,13 @@ public class SignatureEncryptionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = verify(encryptedSignedDoc);
+        WSHandlerResult results = verify(encryptedSignedDoc);
         
         List<WSSecurityEngineResult> sigSecEngResults = 
-            WSSecurityUtil.fetchAllActionResults(results, WSConstants.SIGN);
+            results.getActionResults().get(WSConstants.SIGN);
         
         List<WSSecurityEngineResult> encSecEngResults = 
-            WSSecurityUtil.fetchAllActionResults(results, WSConstants.ENCR);
+            results.getActionResults().get(WSConstants.ENCR);
         
         assertEquals(1, sigSecEngResults.size());
         assertEquals(1, encSecEngResults.size());
@@ -397,7 +397,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         handler.receive(receivingActions, reqData);
         
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        newEngine.processSecurityHeader(doc, null, reqData);
+        newEngine.processSecurityHeader(doc, reqData);
     }
     
     @org.junit.Test
@@ -442,7 +442,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         handler.receive(receivingActions, reqData);
         
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        newEngine.processSecurityHeader(doc, null, reqData);
+        newEngine.processSecurityHeader(doc, reqData);
     }
 
     /**
@@ -455,8 +455,8 @@ public class SignatureEncryptionTest extends org.junit.Assert {
      * @throws Exception
      *             Thrown when there is a problem in verification
      */
-    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
-        List<WSSecurityEngineResult> resultList = 
+    private WSHandlerResult verify(Document doc) throws Exception {
+        WSHandlerResult resultList = 
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         if (LOG.isDebugEnabled()) {
             String outputString = 

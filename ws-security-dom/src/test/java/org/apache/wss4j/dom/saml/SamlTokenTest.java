@@ -61,9 +61,9 @@ import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
 import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.EncryptedKey;
@@ -112,10 +112,11 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
         
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             createAndVerifyMessage(callbackHandler, true);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
@@ -133,11 +134,11 @@ public class SamlTokenTest extends org.junit.Assert {
         SAMLElementCallbackHandler callbackHandler = new SAMLElementCallbackHandler();
         callbackHandler.setIssuer("www.example.com");
         
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             createAndVerifyMessage(callbackHandler, true);
-        
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+        
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
@@ -154,11 +155,11 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.ATTR);
         callbackHandler.setIssuer("www.example.com");
         
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             createAndVerifyMessage(callbackHandler, true);
-        
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+        
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
@@ -175,11 +176,11 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setIssuer("www.example.com");
         callbackHandler.setResource("http://resource.org");
 
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             createAndVerifyMessage(callbackHandler, true);
-        
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+        
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
@@ -195,11 +196,11 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
 
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             createAndVerifyMessage(callbackHandler, true);
-        
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+        
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
@@ -215,11 +216,11 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.ATTR);
         callbackHandler.setIssuer("www.example.com");
 
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             createAndVerifyMessage(callbackHandler, true);
-        
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+        
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
@@ -236,11 +237,11 @@ public class SamlTokenTest extends org.junit.Assert {
         callbackHandler.setIssuer("www.example.com");
         callbackHandler.setResource("http://resource.org");
         
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             createAndVerifyMessage(callbackHandler, true);
-        
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+        
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
@@ -277,9 +278,10 @@ public class SamlTokenTest extends org.junit.Assert {
         }
         assertFalse (outputString.contains("Signature"));
         
-        List<WSSecurityEngineResult> results = verify(doc);
+        WSHandlerResult results = verify(doc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+        
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
@@ -345,9 +347,10 @@ public class SamlTokenTest extends org.junit.Assert {
         }
         assertTrue(outputString.contains(SAML1Constants.NAMEID_FORMAT_EMAIL_ADDRESS));
         
-        List<WSSecurityEngineResult> results = verify(unsignedDoc);
+        WSHandlerResult results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+        
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
@@ -385,9 +388,10 @@ public class SamlTokenTest extends org.junit.Assert {
         }
         assertTrue(outputString.contains(SAML1Constants.NAMEID_FORMAT_EMAIL_ADDRESS));
         
-        List<WSSecurityEngineResult> results = verify(unsignedDoc);
+        WSHandlerResult results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+        
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
@@ -426,9 +430,10 @@ public class SamlTokenTest extends org.junit.Assert {
         assertTrue(outputString.contains("12.34.56.78"));
         assertTrue(outputString.contains("test-dns"));
         
-        List<WSSecurityEngineResult> results = verify(unsignedDoc);
+        WSHandlerResult results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+        
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
@@ -466,9 +471,10 @@ public class SamlTokenTest extends org.junit.Assert {
         }
         assertTrue(outputString.contains("SessionNotOnOrAfter"));
         
-        List<WSSecurityEngineResult> results = verify(unsignedDoc);
+        WSHandlerResult results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+        
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
@@ -507,9 +513,10 @@ public class SamlTokenTest extends org.junit.Assert {
         assertTrue(outputString.contains("12.34.56.78"));
         assertTrue(outputString.contains("test-dns"));
         
-        List<WSSecurityEngineResult> results = verify(unsignedDoc);
+        WSHandlerResult results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+        
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
@@ -547,9 +554,10 @@ public class SamlTokenTest extends org.junit.Assert {
         }
         assertTrue(outputString.contains("http://resource.org"));
         
-        List<WSSecurityEngineResult> results = verify(unsignedDoc);
+        WSHandlerResult results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+        
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
@@ -606,9 +614,10 @@ public class SamlTokenTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = verify(unsignedDoc);
+        WSHandlerResult results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+        
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
@@ -639,11 +648,10 @@ public class SamlTokenTest extends org.junit.Assert {
         attributeValues.add(attributeValue);
         callbackHandler.setCustomAttributeValues(attributeValues);
 
-        List<WSSecurityEngineResult> results = 
-            createAndVerifyMessage(callbackHandler, true);
-        
+        WSHandlerResult results = createAndVerifyMessage(callbackHandler, true);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+        
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
@@ -687,9 +695,10 @@ public class SamlTokenTest extends org.junit.Assert {
         }
         assertTrue(outputString.contains("http://recipient.apache.org"));
         
-        List<WSSecurityEngineResult> results = verify(unsignedDoc);
+        WSHandlerResult results = createAndVerifyMessage(callbackHandler, true);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+        
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
@@ -744,18 +753,19 @@ public class SamlTokenTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(doc, null, new KeystoreCallbackHandler(), crypto);
         
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+        
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
         assertTrue(receivedSamlAssertion.getElement() != null);
         assertTrue("Assertion".equals(receivedSamlAssertion.getElement().getLocalName()));
         
-        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
+        actionResult = results.getActionResults().get(WSConstants.ENCR).get(0);
         assertTrue(actionResult != null);
     }
     
@@ -817,18 +827,18 @@ public class SamlTokenTest extends org.junit.Assert {
         config.setValidateSamlSubjectConfirmation(false);
         newEngine.setWssConfig(config);
         
-        List<WSSecurityEngineResult> results = 
-            newEngine.processSecurityHeader(doc, "", data);
+        WSHandlerResult results = newEngine.processSecurityHeader(doc, data);
         
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+        
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
         assertTrue(receivedSamlAssertion.getElement() != null);
         assertTrue("Assertion".equals(receivedSamlAssertion.getElement().getLocalName()));
         
-        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
+        actionResult = results.getActionResults().get(WSConstants.ENCR).get(0);
         assertTrue(actionResult != null);
     }
     
@@ -1024,9 +1034,10 @@ public class SamlTokenTest extends org.junit.Assert {
         }
         assertTrue(outputString.contains("Advice"));
         
-        List<WSSecurityEngineResult> results = verify(unsignedDoc);
+        WSHandlerResult results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+        
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
@@ -1091,7 +1102,7 @@ public class SamlTokenTest extends org.junit.Assert {
         cipher.doFinal(document, elementToEncrypt, content);
     }
     
-    private List<WSSecurityEngineResult> createAndVerifyMessage(
+    private WSHandlerResult createAndVerifyMessage(
         CallbackHandler samlCallbackHandler, boolean success
     ) throws Exception {
         SAMLCallback samlCallback = new SAMLCallback();
@@ -1113,7 +1124,7 @@ public class SamlTokenTest extends org.junit.Assert {
         }
 
         try {
-            List<WSSecurityEngineResult> results = verify(unsignedDoc);
+            WSHandlerResult results = verify(unsignedDoc);
             if (!success) {
                 fail("Failure expected in processing the SAML assertion");
             }
@@ -1132,8 +1143,8 @@ public class SamlTokenTest extends org.junit.Assert {
      * @param envelope 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
-        List<WSSecurityEngineResult> results = 
+    private WSHandlerResult verify(Document doc) throws Exception {
+        WSHandlerResult results = 
                 secEngine.processSecurityHeader(doc, null, null, null);
         String outputString = 
                 XMLUtils.PrettyDocumentToString(doc);

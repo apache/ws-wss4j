@@ -19,8 +19,6 @@
 
 package org.apache.wss4j.dom.message;
 
-import java.util.List;
-
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.dom.WSConstants;
@@ -30,6 +28,7 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -101,9 +100,9 @@ public class EncryptedDataInHeaderTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = verify(doc);
+        WSHandlerResult results = verify(doc);
         WSSecurityEngineResult actionResult = 
-            WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
+            results.getActionResults().get(WSConstants.ENCR).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
     }
@@ -116,8 +115,8 @@ public class EncryptedDataInHeaderTest extends org.junit.Assert {
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
-        List<WSSecurityEngineResult> results = 
+    private WSHandlerResult verify(Document doc) throws Exception {
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(doc, null, callbackHandler, null, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verified and decrypted message:");

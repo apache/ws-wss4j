@@ -486,13 +486,14 @@ public abstract class AbstractTestBase extends org.junit.Assert {
              */
             WSSConfig wssConfig = WSSConfig.getNewInstance();
             reqData.setWssConfig(wssConfig);
+            reqData.setActor(actor);
             doReceiverAction(actions, reqData);
 
             Element elem = WSSecurityUtil.getSecurityHeader(doc, actor);
 
             WSSecurityEngine secEngine = new WSSecurityEngine();
             secEngine.setWssConfig(wssConfig);
-            List<WSSecurityEngineResult> wsResult = null;
+            WSHandlerResult wsResult = null;
             try {
                 wsResult = secEngine.processSecurityHeader(elem, reqData);
             } catch (WSSecurityException ex) {
@@ -503,7 +504,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
                         "WSS4JHandler: security processing failed", ex
                 );
             }
-            if (wsResult == null || wsResult.size() == 0) {
+            if (wsResult.getResults() == null || wsResult.getResults().size() == 0) {
                 // no security header found
                 if (actions.isEmpty()) {
                     return true;
@@ -514,7 +515,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
                 }
             }
             if (reqData.getWssConfig().isEnableSignatureConfirmation() && !isRequest) {
-                checkSignatureConfirmation(reqData, wsResult);
+                checkSignatureConfirmation(reqData, wsResult.getResults());
             }
 
             if (doDebug) {
@@ -524,7 +525,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
             /*
              * now check the security actions: do they match, in right order?
              */
-            if (!checkReceiverResults(wsResult, actions)) {
+            if (!checkReceiverResults(wsResult.getResults(), actions)) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                         "WSS4JHandler: security processing failed (actions mismatch)"
                 );
@@ -540,8 +541,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
                 results = new ArrayList<WSHandlerResult>();
                 mc.put(WSHandlerConstants.RECV_RESULTS, results);
             }
-            WSHandlerResult rResult = new WSHandlerResult(actor, wsResult);
-            results.add(0, rResult);
+            results.add(0, wsResult);
             if (doDebug) {
                 log.debug("WSS4JHandler: exit invoke()");
             }
@@ -551,9 +551,9 @@ public abstract class AbstractTestBase extends org.junit.Assert {
 
         @Override
         protected boolean checkReceiverResults(
-                List<WSSecurityEngineResult> wsResult, List<Integer> actions
+            List<WSSecurityEngineResult> wsResult, List<Integer> actions
         ) {
-            List<WSSecurityEngineResult> wsSecurityEngineResults = new ArrayList<WSSecurityEngineResult>();
+            List<WSSecurityEngineResult> wsSecurityEngineResults = new ArrayList<>();
             for (WSSecurityEngineResult result : wsResult) {
                 boolean found = false;
                 for (WSSecurityEngineResult res : wsSecurityEngineResults) {

@@ -39,7 +39,6 @@ import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
 import org.apache.wss4j.dom.message.token.Timestamp;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -96,10 +95,10 @@ public class CustomTokenTest extends org.junit.Assert {
         }
         
         WSSecurityEngine secEngine = new WSSecurityEngine();
-        List<WSSecurityEngineResult> wsResults = 
+        WSHandlerResult wsResults = 
             secEngine.processSecurityHeader(doc, null, null, null);
         WSSecurityEngineResult actionResult = 
-            WSSecurityUtil.fetchActionResult(wsResults, WSConstants.TS);
+            wsResults.getActionResults().get(WSConstants.TS).get(0);
         assertTrue(actionResult != null);
         
         Timestamp receivedTimestamp = 

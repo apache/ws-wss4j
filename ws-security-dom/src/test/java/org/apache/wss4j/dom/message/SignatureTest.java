@@ -44,6 +44,7 @@ import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.str.STRParser.REFERENCE_TYPE;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -96,10 +97,10 @@ public class SignatureTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         LOG.info("After Signing IS....");
-        List<WSSecurityEngineResult> results = verify(signedDoc);
+        WSHandlerResult results = verify(signedDoc);
         
         WSSecurityEngineResult actionResult =
-                WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+            results.getActionResults().get(WSConstants.SIGN).get(0);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
         REFERENCE_TYPE referenceType = 
@@ -126,10 +127,10 @@ public class SignatureTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         LOG.info("After Signing IS....");
-        List<WSSecurityEngineResult> results = verify(signedDoc);
+        WSHandlerResult results = verify(signedDoc);
         
         WSSecurityEngineResult actionResult =
-                WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+            results.getActionResults().get(WSConstants.SIGN).get(0);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
         REFERENCE_TYPE referenceType = 
@@ -220,7 +221,7 @@ public class SignatureTest extends org.junit.Assert {
         ignoredRules.add(BSPRule.R5404);
         ignoredRules.add(BSPRule.R5406);
         data.setIgnoredBSPRules(ignoredRules);
-        newEngine.processSecurityHeader(doc, "", data);
+        newEngine.processSecurityHeader(doc, data);
     }
     
     /**
@@ -276,10 +277,10 @@ public class SignatureTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = verify(signedDoc);
+        WSHandlerResult results = verify(signedDoc);
         
         WSSecurityEngineResult actionResult =
-                WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+            results.getActionResults().get(WSConstants.SIGN).get(0);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
         REFERENCE_TYPE referenceType = 
@@ -342,11 +343,11 @@ public class SignatureTest extends org.junit.Assert {
         }
         
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             newEngine.processSecurityHeader(doc, null, null, crypto);
 
         WSSecurityEngineResult actionResult =
-                WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+            results.getActionResults().get(WSConstants.SIGN).get(0);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
         REFERENCE_TYPE referenceType = 
@@ -382,10 +383,10 @@ public class SignatureTest extends org.junit.Assert {
         }
         LOG.info("After Signing ThumbprintSHA1....");
         
-        List<WSSecurityEngineResult> results = verify(signedDoc);
+        WSHandlerResult results = verify(signedDoc);
         
         WSSecurityEngineResult actionResult =
-                WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+            results.getActionResults().get(WSConstants.SIGN).get(0);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
         REFERENCE_TYPE referenceType = 
@@ -415,10 +416,10 @@ public class SignatureTest extends org.junit.Assert {
         }
         LOG.info("After Signing ThumbprintSHA1....");
         
-        List<WSSecurityEngineResult> results = verify(signedDoc);
+        WSHandlerResult results = verify(signedDoc);
         
         WSSecurityEngineResult actionResult =
-                WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+            results.getActionResults().get(WSConstants.SIGN).get(0);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
         REFERENCE_TYPE referenceType = 
@@ -769,12 +770,12 @@ public class SignatureTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = verify(doc);
-        
+        WSHandlerResult results = verify(doc);
+            
         List<Integer> receivedActions = new ArrayList<>();
         receivedActions.add(WSConstants.SIGN);
         receivedActions.add(WSConstants.TS);
-        assertTrue(handler.checkResults(results, receivedActions));
+        assertTrue(handler.checkResults(results.getResults(), receivedActions));
     }
     
     @org.junit.Test
@@ -890,9 +891,10 @@ public class SignatureTest extends org.junit.Assert {
         data.setIgnoredBSPRules(disabledRules);
         
         WSSecurityEngine newSecEngine = new WSSecurityEngine();
-        List<WSSecurityEngineResult> results = 
-            newSecEngine.processSecurityHeader(doc, "", data);
-        assertTrue(handler.checkResults(results, Collections.singletonList(WSConstants.SIGN)));
+        WSHandlerResult results = 
+            newSecEngine.processSecurityHeader(doc, data);
+        assertTrue(handler.checkResults(results.getResults(), 
+                                        Collections.singletonList(WSConstants.SIGN)));
     }
     
     @org.junit.Test
@@ -927,7 +929,7 @@ public class SignatureTest extends org.junit.Assert {
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+    private WSHandlerResult verify(Document doc) throws Exception {
         return secEngine.processSecurityHeader(doc, null, null, crypto);
     }
 

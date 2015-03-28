@@ -38,8 +38,8 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.Timestamp;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.wss4j.dom.validate.NoOpValidator;
 import org.w3c.dom.Document;
@@ -81,9 +81,9 @@ public class TimestampTest extends org.junit.Assert {
         //
         // Do some processing
         //
-        List<WSSecurityEngineResult> wsResult = verify(createdDoc, WSSConfig.getNewInstance());
+        WSHandlerResult wsResult = verify(createdDoc, WSSConfig.getNewInstance());
         WSSecurityEngineResult actionResult = 
-            WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
+            wsResult.getActionResults().get(WSConstants.TS).get(0);
         assertTrue(actionResult != null);
         
         Timestamp receivedTimestamp = 
@@ -119,9 +119,9 @@ public class TimestampTest extends org.junit.Assert {
         //
         // Do some processing
         //
-        List<WSSecurityEngineResult> wsResult = verify(createdDoc, WSSConfig.getNewInstance());
+        WSHandlerResult wsResult = verify(createdDoc, WSSConfig.getNewInstance());
         WSSecurityEngineResult actionResult = 
-            WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
+            wsResult.getActionResults().get(WSConstants.TS).get(0);
         assertTrue(actionResult != null);
         
         Timestamp receivedTimestamp = 
@@ -816,9 +816,9 @@ public class TimestampTest extends org.junit.Assert {
         //
         // Do some processing
         //
-        List<WSSecurityEngineResult> wsResult = verify(createdDoc, WSSConfig.getNewInstance());
+        WSHandlerResult wsResult = verify(createdDoc, WSSConfig.getNewInstance());
         WSSecurityEngineResult actionResult = 
-            WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
+            wsResult.getActionResults().get(WSConstants.TS).get(0);
         assertTrue(actionResult != null);
     }
     
@@ -840,9 +840,9 @@ public class TimestampTest extends org.junit.Assert {
             //
             // Do some processing
             //
-            List<WSSecurityEngineResult> wsResult = verify(createdDoc, WSSConfig.getNewInstance());
+            WSHandlerResult wsResult = verify(createdDoc, WSSConfig.getNewInstance());
             WSSecurityEngineResult actionResult = 
-                WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
+                wsResult.getActionResults().get(WSConstants.TS).get(0);
             assertTrue(actionResult != null);
         } finally {
             Locale.setDefault(defaultLocale);
@@ -852,38 +852,38 @@ public class TimestampTest extends org.junit.Assert {
     /**
      * Verifies the soap envelope
      */
-    private List<WSSecurityEngineResult> verify(
+    private WSHandlerResult verify(
         Document doc, WSSConfig wssConfig
     ) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         RequestData requestData = new RequestData();
         requestData.setWssConfig(wssConfig);
-        return secEngine.processSecurityHeader(doc, "", requestData);
+        return secEngine.processSecurityHeader(doc, requestData);
     }
     
     /**
      * Verifies the soap envelope
      */
-    private List<WSSecurityEngineResult> verify(
+    private WSHandlerResult verify(
         Document doc, List<BSPRule> ignoredRules
     ) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         RequestData requestData = new RequestData();
         requestData.setIgnoredBSPRules(ignoredRules);
-        return secEngine.processSecurityHeader(doc, "", requestData);
+        return secEngine.processSecurityHeader(doc, requestData);
     }
     
     /**
      * Verifies the soap envelope
      */
-    private List<WSSecurityEngineResult> verify(
+    private WSHandlerResult verify(
         Document doc, WSSConfig wssConfig, List<BSPRule> ignoredRules
     ) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         RequestData requestData = new RequestData();
         requestData.setWssConfig(wssConfig);
         requestData.setIgnoredBSPRules(ignoredRules);
-        return secEngine.processSecurityHeader(doc, "", requestData);
+        return secEngine.processSecurityHeader(doc, requestData);
     }
     
     

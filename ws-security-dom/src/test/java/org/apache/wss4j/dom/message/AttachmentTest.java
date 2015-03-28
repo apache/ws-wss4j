@@ -47,10 +47,10 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.junit.Assert;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -1085,12 +1085,12 @@ public class AttachmentTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private List<WSSecurityEngineResult> verify(Document doc, CallbackHandler attachmentCallbackHandler) throws Exception {
+    private WSHandlerResult verify(Document doc, CallbackHandler attachmentCallbackHandler) throws Exception {
         RequestData requestData = new RequestData();
         requestData.setAttachmentCallbackHandler(attachmentCallbackHandler);
         requestData.setSigVerCrypto(crypto);
         requestData.setDecCrypto(crypto);
         requestData.setCallbackHandler(new KeystoreCallbackHandler());
-        return secEngine.processSecurityHeader(doc, null, requestData);
+        return secEngine.processSecurityHeader(doc, requestData);
     }
 }

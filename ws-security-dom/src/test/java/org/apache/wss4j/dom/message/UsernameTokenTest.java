@@ -24,7 +24,6 @@ import java.security.MessageDigest;
 import java.text.DateFormat;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -48,8 +47,8 @@ import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.UsernameToken;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
@@ -140,9 +139,9 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         }
         LOG.info("After adding UsernameToken PW Digest....");
         
-        List<WSSecurityEngineResult> results = verify(signedDoc);
+        WSHandlerResult results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.UT);
+            results.getActionResults().get(WSConstants.UT).get(0);
         UsernameToken receivedToken = 
             (UsernameToken) actionResult.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
         assertTrue(receivedToken != null);
@@ -432,9 +431,9 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         }
         LOG.info("After adding UsernameToken PW Text....");
 
-        List<WSSecurityEngineResult> results = verify(signedDoc);
+        WSHandlerResult results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.UT);
+            results.getActionResults().get(WSConstants.UT).get(0);
         UsernameToken receivedToken = 
             (UsernameToken) actionResult.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
         assertTrue(receivedToken != null);
@@ -529,7 +528,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         RequestData data = new RequestData();
         data.setCallbackHandler(callbackHandler);
         data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R4201));
-        newEngine.processSecurityHeader(doc, "", data);
+        newEngine.processSecurityHeader(doc, data);
     }
     
     /**
@@ -573,9 +572,9 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = verify(signedDoc, true);
+        WSHandlerResult results = verify(signedDoc, true);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.UT_NOPASSWORD);
+            results.getActionResults().get(WSConstants.UT_NOPASSWORD).get(0);
         UsernameToken receivedToken = 
             (UsernameToken) actionResult.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
         assertTrue(receivedToken != null);
@@ -919,7 +918,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         RequestData data = new RequestData();
         data.setCallbackHandler(callbackHandler);
         data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R4225));
-        newEngine.processSecurityHeader(doc, "", data);
+        newEngine.processSecurityHeader(doc, data);
     }
     
     /**
@@ -962,7 +961,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         RequestData data = new RequestData();
         data.setCallbackHandler(callbackHandler);
         data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R4223));
-        newEngine.processSecurityHeader(doc, "", data);
+        newEngine.processSecurityHeader(doc, data);
     }
     
     /**
@@ -1005,7 +1004,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         RequestData data = new RequestData();
         data.setCallbackHandler(callbackHandler);
         data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R4222));
-        newEngine.processSecurityHeader(doc, "", data);
+        newEngine.processSecurityHeader(doc, data);
     }
     
     /**
@@ -1049,7 +1048,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         RequestData data = new RequestData();
         data.setCallbackHandler(callbackHandler);
         data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R4221));
-        newEngine.processSecurityHeader(doc, "", data);
+        newEngine.processSecurityHeader(doc, data);
     }
     
     @org.junit.Test
@@ -1124,7 +1123,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     }
 
     
-    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+    private WSHandlerResult verify(Document doc) throws Exception {
         return verify(doc, false);
     }
     
@@ -1134,7 +1133,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private List<WSSecurityEngineResult> verify(Document doc, boolean allowUsernameTokenDerivedKeys) throws Exception {
+    private WSHandlerResult verify(Document doc, boolean allowUsernameTokenDerivedKeys) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         WSSConfig config = WSSConfig.getNewInstance();
         config.setAllowUsernameTokenNoPassword(allowUsernameTokenDerivedKeys);

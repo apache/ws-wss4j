@@ -33,7 +33,6 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.CustomSamlAssertionValidator;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
@@ -43,6 +42,7 @@ import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 
 /**
  * Test-case for sending SAML Assertions using the "action" approach.
@@ -179,10 +179,10 @@ public class SamlTokenActionTest extends org.junit.Assert {
         verify(doc, callbackHandler);
     }
     
-    private List<WSSecurityEngineResult> verify(
+    private WSHandlerResult verify(
         Document doc, CallbackHandler callbackHandler
     ) throws Exception {
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);

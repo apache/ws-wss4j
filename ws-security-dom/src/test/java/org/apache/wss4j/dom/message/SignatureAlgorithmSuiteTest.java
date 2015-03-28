@@ -37,11 +37,11 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecretKeyCallbackHandler;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
@@ -278,7 +278,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         return algorithmSuite;
     }
 
-    private List<WSSecurityEngineResult> verify(
+    private WSHandlerResult verify(
         Element securityHeader, AlgorithmSuite algorithmSuite, Crypto sigVerCrypto
     ) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();

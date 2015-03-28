@@ -39,7 +39,6 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.CombinedCallbackHandler;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
@@ -600,7 +599,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         verify(doc, secretKeyCallbackHandler);
     }
 
-    private List<WSSecurityEngineResult> verify(
+    private WSHandlerResult verify(
         Document doc, CallbackHandler callbackHandler
     ) throws Exception {
         return secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);

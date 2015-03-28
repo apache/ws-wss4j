@@ -22,7 +22,6 @@ package org.apache.wss4j.dom.message;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -42,6 +41,7 @@ import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
@@ -370,9 +370,9 @@ public class UTDerivedKeyTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = verify(signedDoc);
+        WSHandlerResult results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+            results.getActionResults().get(WSConstants.SIGN).get(0);
         java.security.Principal principal = 
             (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         // System.out.println(principal.getName());
@@ -423,11 +423,11 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         WSSecurityEngine newEngine = new WSSecurityEngine();
         newEngine.getWssConfig().setPasswordsAreEncoded(true);
         newEngine.getWssConfig().setAllowUsernameTokenNoPassword(true);
-        List<WSSecurityEngineResult> results =  newEngine.processSecurityHeader(
+        WSHandlerResult results = newEngine.processSecurityHeader(
             signedDoc, null, new EncodedPasswordCallbackHandler(), null
         );
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+            results.getActionResults().get(WSConstants.SIGN).get(0);
         java.security.Principal principal = 
             (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         // System.out.println(principal.getName());
@@ -688,7 +688,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         WSSecurityEngine engine = new WSSecurityEngine();
         config.setAllowUsernameTokenNoPassword(true);
         engine.setWssConfig(config);
-        engine.processSecurityHeader(doc, "", data);
+        engine.processSecurityHeader(doc, data);
     }
 
     
@@ -751,7 +751,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         config.setAllowUsernameTokenNoPassword(true);
         newEngine.setWssConfig(config);
         data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R4214));
-        newEngine.processSecurityHeader(encryptedDoc, "", data);
+        newEngine.processSecurityHeader(encryptedDoc, data);
     }
 
     
@@ -817,7 +817,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         WSSConfig config = WSSConfig.getNewInstance();
         config.setAllowUsernameTokenNoPassword(true);
         newEngine.setWssConfig(config);
-        newEngine.processSecurityHeader(encryptedDoc, "", data);
+        newEngine.processSecurityHeader(encryptedDoc, data);
     }
 
     
@@ -827,11 +827,11 @@ public class UTDerivedKeyTest extends org.junit.Assert {
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+    private WSHandlerResult verify(Document doc) throws Exception {
         return verify(doc, true);
     }
     
-    private List<WSSecurityEngineResult> verify(
+    private WSHandlerResult verify(
         Document doc, 
         boolean allowUsernameTokenDerivedKeys
     ) throws Exception {

@@ -34,13 +34,12 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;
 
 import java.util.Collections;
-import java.util.List;
 
 /**
  * WS-Security Test Case for UsernameToken Key Derivation, as defined in the 
@@ -99,9 +98,9 @@ public class UTSignatureTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = verify(signedDoc);
+        WSHandlerResult results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.UT_SIGN);
+            results.getActionResults().get(WSConstants.UT_SIGN).get(0);
         java.security.Principal principal = 
             (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(principal.getName().contains("bob"));
@@ -189,9 +188,9 @@ public class UTSignatureTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = verify(doc);
+        WSHandlerResult results = verify(doc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.UT_SIGN);
+            results.getActionResults().get(WSConstants.UT_SIGN).get(0);
         java.security.Principal principal = 
             (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(principal.getName().contains("bob"));
@@ -233,9 +232,9 @@ public class UTSignatureTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<WSSecurityEngineResult> results = verify(doc);
+        WSHandlerResult results = verify(doc);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.UT_SIGN);
+            results.getActionResults().get(WSConstants.UT_SIGN).get(0);
         java.security.Principal principal = 
             (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(principal.getName().contains("bob"));
@@ -247,11 +246,11 @@ public class UTSignatureTest extends org.junit.Assert {
      * @param doc soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+    private WSHandlerResult verify(Document doc) throws Exception {
         return verify(doc, true);
     }
     
-    private List<WSSecurityEngineResult> verify(
+    private WSHandlerResult verify(
         Document doc, 
         boolean allowUsernameTokenDerivedKeys
     ) throws Exception {

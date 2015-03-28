@@ -20,7 +20,6 @@
 package org.apache.wss4j.dom.message;
 
 import java.util.Collections;
-import java.util.List;
 
 import org.apache.wss4j.common.principal.PublicKeyPrincipal;
 import org.w3c.dom.Document;
@@ -35,7 +34,7 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 
 /**
  * This class tests signing where the the public key is transmitted in the message via
@@ -81,11 +80,11 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         RequestData data = new RequestData();
         data.setSigVerCrypto(crypto);
         data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R5417));
-        final List<WSSecurityEngineResult> results = 
-            secEngine.processSecurityHeader(signedDoc, "", data);
+        final WSHandlerResult results = 
+            secEngine.processSecurityHeader(signedDoc, data);
 
         WSSecurityEngineResult actionResult = 
-            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+            results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
         
         java.security.Principal principal = 
@@ -125,7 +124,7 @@ public class SignatureKeyValueTest extends org.junit.Assert {
             RequestData data = new RequestData();
             data.setSigVerCrypto(crypto);
             data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R5417));
-            secEngine.processSecurityHeader(signedDoc, "", data);
+            secEngine.processSecurityHeader(signedDoc, data);
             fail("Failure expected on bad public key");
         } catch (Exception ex) {
             // expected
@@ -158,11 +157,11 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         RequestData data = new RequestData();
         data.setSigVerCrypto(crypto);
         data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R5417));
-        final List<WSSecurityEngineResult> results = 
-            secEngine.processSecurityHeader(signedDoc, "", data);
+        final WSHandlerResult results = 
+            secEngine.processSecurityHeader(signedDoc, data);
         
         WSSecurityEngineResult actionResult = 
-            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+            results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
         
         java.security.Principal principal = 

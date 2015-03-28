@@ -65,6 +65,7 @@ import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
@@ -259,10 +260,10 @@ public class KerberosTest extends AbstractLdapTestUnit {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
 
-        List<WSSecurityEngineResult> results =
+        WSHandlerResult results =
             secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
+            results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         Assert.assertTrue(token != null);
@@ -412,10 +413,10 @@ public class KerberosTest extends AbstractLdapTestUnit {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
         
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
+            results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         Assert.assertTrue(token != null);
@@ -490,10 +491,10 @@ public class KerberosTest extends AbstractLdapTestUnit {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
         
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
+            results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         Assert.assertTrue(token != null);
@@ -563,10 +564,10 @@ public class KerberosTest extends AbstractLdapTestUnit {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
         
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(encryptedDoc, null, callbackHandler, null);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
+            results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         Assert.assertTrue(token != null);
@@ -636,10 +637,10 @@ public class KerberosTest extends AbstractLdapTestUnit {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
         
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(encryptedDoc, null, callbackHandler, null);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
+            results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         Assert.assertTrue(token != null);
@@ -711,10 +712,10 @@ public class KerberosTest extends AbstractLdapTestUnit {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
         
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(encryptedDoc, null, callbackHandler, null);
         WSSecurityEngineResult actionResult =
-            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
+            results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         Assert.assertTrue(token != null);
@@ -793,10 +794,10 @@ public class KerberosTest extends AbstractLdapTestUnit {
                 }
             };
 
-            List<WSSecurityEngineResult> results =
+            WSHandlerResult results =
                     secEngine.processSecurityHeader(document, null, callbackHandler, null);
             WSSecurityEngineResult actionResult =
-                    WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
+                    results.getActionResults().get(WSConstants.BST).get(0);
             BinarySecurity token =
                     (BinarySecurity) actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
             Assert.assertTrue(token != null);
@@ -1059,10 +1060,10 @@ public class KerberosTest extends AbstractLdapTestUnit {
                 }
             };
 
-            List<WSSecurityEngineResult> results =
+            WSHandlerResult results =
                     secEngine.processSecurityHeader(document, null, callbackHandler, null);
             WSSecurityEngineResult actionResult =
-                    WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
+                    results.getActionResults().get(WSConstants.BST).get(0);
             BinarySecurity token =
                     (BinarySecurity) actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
             Assert.assertTrue(token != null);

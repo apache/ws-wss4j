@@ -20,7 +20,6 @@
 package org.apache.wss4j.dom.message;
 
 import java.security.cert.X509Certificate;
-import java.util.List;
 
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
@@ -32,6 +31,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -104,9 +104,9 @@ public class SignatureCRLTest extends org.junit.Assert {
         //
         // Verify the signature
         //
-        List<WSSecurityEngineResult> results = verify(signedDoc, cryptoCA, false);
+        WSHandlerResult results = verify(signedDoc, cryptoCA, false);
         WSSecurityEngineResult result = 
-            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
+            results.getActionResults().get(WSConstants.SIGN).get(0);
         X509Certificate cert = 
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertTrue (cert != null);
@@ -186,14 +186,13 @@ public class SignatureCRLTest extends org.junit.Assert {
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private List<WSSecurityEngineResult> 
-    verify(Document doc, Crypto crypto, boolean revocationEnabled) throws Exception {
+    private WSHandlerResult verify(Document doc, Crypto crypto, boolean revocationEnabled) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         RequestData reqData = new RequestData();
         reqData.setSigVerCrypto(crypto);
         reqData.setEnableRevocation(revocationEnabled);
         Element securityHeader = WSSecurityUtil.getSecurityHeader(doc, null);
-        List<WSSecurityEngineResult> results = 
+        WSHandlerResult results = 
             secEngine.processSecurityHeader(securityHeader, reqData);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
