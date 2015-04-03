@@ -46,14 +46,14 @@ import org.apache.wss4j.common.ext.WSSecurityException;
  * functionality of the Crypto interface.
  */
 public abstract class CryptoBase implements Crypto {
-    public static final String SKI_OID = "2.5.29.14";
+    public static final String SKI_OID = "2.5.29.14";  //NOPMD - not an IP address
     /**
      * OID For the NameConstraints Extension to X.509
      *
      * http://java.sun.com/j2se/1.4.2/docs/api/
      * http://www.ietf.org/rfc/rfc3280.txt (s. 4.2.1.11)
      */
-    public static final String NAME_CONSTRAINTS_OID = "2.5.29.30";
+    public static final String NAME_CONSTRAINTS_OID = "2.5.29.30";  //NOPMD - not an IP address
     
     private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(CryptoBase.class);
@@ -69,8 +69,8 @@ public abstract class CryptoBase implements Crypto {
         try {
             Class<?> c = Class.forName("org.bouncycastle.asn1.x500.X500Name");
             cons = c.getConstructor(new Class[] {String.class});
-        } catch (Exception e) {
-            //ignore
+        } catch (Exception e) { //NOPMD
+          //ignore
         }
         BC_509CLASS_CONS = cons;
     }
@@ -288,7 +288,7 @@ public abstract class CryptoBase implements Crypto {
         if (BC_509CLASS_CONS != null) {
              try {
                  return BC_509CLASS_CONS.newInstance(s);
-             } catch (Exception e) {
+             } catch (Exception e) { //NOPMD
                  //ignore
              }
         }
