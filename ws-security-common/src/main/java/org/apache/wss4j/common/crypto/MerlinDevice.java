@@ -53,41 +53,56 @@ public class MerlinDevice extends Merlin {
     }
     
     @Override
-    public void loadProperties(Properties properties, ClassLoader loader,  PasswordEncryptor passwordEncryptor) 
+    public void loadProperties(Properties properties, ClassLoader loader, PasswordEncryptor passwordEncryptor) 
         throws WSSecurityException, IOException {
         if (properties == null) {
             return;
         }
         this.properties = properties;
+        this.passwordEncryptor = passwordEncryptor;
+        
+        String prefix = PREFIX;
+        for (Object key : properties.keySet()) {
+            if (key instanceof String) {
+                String propKey = (String)key;
+                if (propKey.startsWith(PREFIX)) {
+                    break;
+                } else if (propKey.startsWith(OLD_PREFIX)) {
+                    prefix = OLD_PREFIX;
+                    break;
+                }
+            }
+        }
+        
         //
         // Load the provider(s)
         //
-        String provider = properties.getProperty(CRYPTO_KEYSTORE_PROVIDER);
+        String provider = properties.getProperty(prefix + CRYPTO_KEYSTORE_PROVIDER);
         if (provider != null) {
             provider = provider.trim();
         }
-        String certProvider = properties.getProperty(CRYPTO_CERT_PROVIDER);
+        String certProvider = properties.getProperty(prefix + CRYPTO_CERT_PROVIDER);
         if (certProvider != null) {
             setCryptoProvider(certProvider);
         }
         //
         // Load the KeyStore
         //
-        String alias = properties.getProperty(KEYSTORE_ALIAS);
+        String alias = properties.getProperty(prefix + KEYSTORE_ALIAS);
         if (alias != null) {
             alias = alias.trim();
             defaultAlias = alias;
         }
-        String keyStoreLocation = properties.getProperty(KEYSTORE_FILE);
+        String keyStoreLocation = properties.getProperty(prefix + KEYSTORE_FILE);
         if (keyStoreLocation == null) {
-            keyStoreLocation = properties.getProperty(OLD_KEYSTORE_FILE);
+            keyStoreLocation = properties.getProperty(prefix + OLD_KEYSTORE_FILE);
         }
-        String keyStorePassword = properties.getProperty(KEYSTORE_PASSWORD, "security");
+        String keyStorePassword = properties.getProperty(prefix + KEYSTORE_PASSWORD, "security");
         if (keyStorePassword != null) {
             keyStorePassword = keyStorePassword.trim();
             keyStorePassword = decryptPassword(keyStorePassword, passwordEncryptor);
         }
-        String keyStoreType = properties.getProperty(KEYSTORE_TYPE, KeyStore.getDefaultType());
+        String keyStoreType = properties.getProperty(prefix + KEYSTORE_TYPE, KeyStore.getDefaultType());
         if (keyStoreType != null) {
             keyStoreType = keyStoreType.trim();
         }
@@ -115,20 +130,20 @@ public class MerlinDevice extends Merlin {
         //
         // Load the TrustStore
         //
-        String trustStorePassword = properties.getProperty(TRUSTSTORE_PASSWORD, "changeit");
+        String trustStorePassword = properties.getProperty(prefix + TRUSTSTORE_PASSWORD, "changeit");
         if (trustStorePassword != null) {
             trustStorePassword = trustStorePassword.trim();
             trustStorePassword = decryptPassword(trustStorePassword, passwordEncryptor);
         }
-        String trustStoreType = properties.getProperty(TRUSTSTORE_TYPE, KeyStore.getDefaultType());
+        String trustStoreType = properties.getProperty(prefix + TRUSTSTORE_TYPE, KeyStore.getDefaultType());
         if (trustStoreType != null) {
             trustStoreType = trustStoreType.trim();
         }
-        String loadCacerts = properties.getProperty(LOAD_CA_CERTS, "false");
+        String loadCacerts = properties.getProperty(prefix + LOAD_CA_CERTS, "false");
         if (loadCacerts != null) {
             loadCacerts = loadCacerts.trim();
         }
-        String trustStoreLocation = properties.getProperty(TRUSTSTORE_FILE);
+        String trustStoreLocation = properties.getProperty(prefix + TRUSTSTORE_FILE);
         if (trustStoreLocation != null) {
             trustStoreLocation = trustStoreLocation.trim();
             InputStream is = loadInputStream(loader, trustStoreLocation);
@@ -154,7 +169,7 @@ public class MerlinDevice extends Merlin {
             }
             InputStream is = new FileInputStream(cacertsPath);
             try {
-                String cacertsPasswd = properties.getProperty(TRUSTSTORE_PASSWORD, "changeit");
+                String cacertsPasswd = properties.getProperty(prefix + TRUSTSTORE_PASSWORD, "changeit");
                 if (cacertsPasswd != null) {
                     cacertsPasswd = cacertsPasswd.trim();
                     cacertsPasswd = decryptPassword(cacertsPasswd, passwordEncryptor);
@@ -175,7 +190,7 @@ public class MerlinDevice extends Merlin {
         //
         // Load the CRL file
         //
-        String crlLocation = properties.getProperty(X509_CRL_FILE);
+        String crlLocation = properties.getProperty(prefix + X509_CRL_FILE);
         if (crlLocation != null) {
             crlLocation = crlLocation.trim();
             InputStream is = loadInputStream(loader, crlLocation);
