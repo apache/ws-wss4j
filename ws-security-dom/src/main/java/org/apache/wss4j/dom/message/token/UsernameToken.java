@@ -50,6 +50,7 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.utils.Base64;
+import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -661,6 +662,9 @@ public class UsernameToken {
                 if (Node.TEXT_NODE == node.getNodeType()) {
                     found = true;
                     builder.append(((Text)node).getData());
+                } else if (Node.CDATA_SECTION_NODE == node.getNodeType()) {
+                    found = true;
+                    builder.append(((CDATASection)node).getData());
                 }
                 node = node.getNextSibling();
             }
