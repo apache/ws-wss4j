@@ -515,7 +515,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
                 }
             }
             if (reqData.getWssConfig().isEnableSignatureConfirmation() && !isRequest) {
-                checkSignatureConfirmation(reqData, wsResult.getResults());
+                checkSignatureConfirmation(reqData, wsResult);
             }
 
             if (doDebug) {

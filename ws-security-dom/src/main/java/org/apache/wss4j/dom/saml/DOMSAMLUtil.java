@@ -35,7 +35,7 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.w3c.dom.Element;
 
 /**
@@ -51,25 +51,29 @@ public final class DOMSAMLUtil  {
     }
     
     public static void validateSAMLResults(
-        List<WSSecurityEngineResult> results,
+        WSHandlerResult handlerResults,
         Certificate[] tlsCerts,
         Element body
     ) throws WSSecurityException {
-        final List<Integer> samlActions = new ArrayList<>(2);
-        samlActions.add(WSConstants.ST_SIGNED);
-        samlActions.add(WSConstants.ST_UNSIGNED);
-        List<WSSecurityEngineResult> samlResults = 
-            WSSecurityUtil.fetchAllActionResults(results, samlActions);
+        List<WSSecurityEngineResult> samlResults = new ArrayList<>();
+        if (handlerResults.getActionResults().containsKey(WSConstants.ST_SIGNED)) {
+            samlResults.addAll(handlerResults.getActionResults().get(WSConstants.ST_SIGNED));
+        }
+        if (handlerResults.getActionResults().containsKey(WSConstants.ST_UNSIGNED)) {
+            samlResults.addAll(handlerResults.getActionResults().get(WSConstants.ST_UNSIGNED));
+        }
 
         if (samlResults.isEmpty()) {
             return;
         }
 
-        final List<Integer> signedActions = new ArrayList<>(2);
-        signedActions.add(WSConstants.SIGN);
-        signedActions.add(WSConstants.UT_SIGN);
-        List<WSSecurityEngineResult> signedResults = 
-            WSSecurityUtil.fetchAllActionResults(results, signedActions);
+        List<WSSecurityEngineResult> signedResults = new ArrayList<>();
+        if (handlerResults.getActionResults().containsKey(WSConstants.SIGN)) {
+            signedResults.addAll(handlerResults.getActionResults().get(WSConstants.SIGN));
+        }
+        if (handlerResults.getActionResults().containsKey(WSConstants.UT_SIGN)) {
+            signedResults.addAll(handlerResults.getActionResults().get(WSConstants.UT_SIGN));
+        }
 
         for (WSSecurityEngineResult samlResult : samlResults) {
             SamlAssertionWrapper assertionWrapper = 

@@ -24,6 +24,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.w3c.dom.Document;
 
 import java.util.HashMap;
@@ -104,9 +105,9 @@ public class CustomHandler extends WSHandler {
 
     public void signatureConfirmation(
         RequestData requestData,
-        List<WSSecurityEngineResult> results
+        WSHandlerResult handlerResults
     ) throws WSSecurityException {
-        checkSignatureConfirmation(requestData, results);
+        checkSignatureConfirmation(requestData, handlerResults);
     }
     
     public boolean checkResults(

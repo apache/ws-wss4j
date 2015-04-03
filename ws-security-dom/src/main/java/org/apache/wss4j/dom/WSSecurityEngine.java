@@ -453,14 +453,14 @@ public class WSSecurityEngine {
             }
         }
         
+        WSHandlerResult handlerResult = 
+            new WSHandlerResult(requestData.getActor(), returnResults, wsDocInfo.getActionResults());
+        
         // Validate SAML Subject Confirmation requirements
         if (wssConfig.isValidateSamlSubjectConfirmation()) {
             Element bodyElement = callbackLookupToUse.getSOAPBody();
-            DOMSAMLUtil.validateSAMLResults(returnResults, requestData.getTlsCerts(), bodyElement);
+            DOMSAMLUtil.validateSAMLResults(handlerResult, requestData.getTlsCerts(), bodyElement);
         }
-        
-        WSHandlerResult handlerResult = 
-            new WSHandlerResult(requestData.getActor(), returnResults, wsDocInfo.getActionResults());
         
         wsDocInfo.clear();
         

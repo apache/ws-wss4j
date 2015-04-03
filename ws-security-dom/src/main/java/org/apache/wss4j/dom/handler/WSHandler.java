@@ -383,7 +383,7 @@ public abstract class WSHandler {
     @SuppressWarnings("unchecked")
     protected void checkSignatureConfirmation(
         RequestData reqData,
-        List<WSSecurityEngineResult> resultList
+        WSHandlerResult handlerResults
     ) throws WSSecurityException{
         if (doDebug) {
             LOG.debug("Check Signature confirmation");
@@ -399,7 +399,7 @@ public abstract class WSHandler {
         // have several security header blocks with different actors/roles)
         //
         List<WSSecurityEngineResult> sigConf = 
-            WSSecurityUtil.fetchAllActionResults(resultList, WSConstants.SC);
+            handlerResults.getActionResults().get(WSConstants.SC);
         //
         // now loop over all SignatureConfirmation results and check:
         // - if there is a signature value and no Signature value generated in request: error
@@ -407,35 +407,37 @@ public abstract class WSHandler {
         // 
         //  If a matching value found: remove from vector of stored signature values
         //
-        for (WSSecurityEngineResult result : sigConf) {
-            SignatureConfirmation sc = 
-                (SignatureConfirmation)result.get(
-                    WSSecurityEngineResult.TAG_SIGNATURE_CONFIRMATION
-                );
-
-            byte[] sigVal = sc.getSignatureValue();
-            if (sigVal != null) {
-                if (savedSignatures == null || savedSignatures.size() == 0) {
-                    //
-                    // If there are no stored signature values, and we've received a 
-                    // SignatureConfirmation element then throw an Exception
-                    //
-                    if (sigVal.length != 0) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "empty",
-                                "Received a SignatureConfirmation element, but there are no stored"
-                             + " signature values"
-                        );
-                    }
-                } else {
-                    Integer hash = Arrays.hashCode(sigVal);
-                    if (savedSignatures.contains(hash)) {
-                        savedSignatures.remove(hash);
+        if (sigConf != null) {
+            for (WSSecurityEngineResult result : sigConf) {
+                SignatureConfirmation sc = 
+                    (SignatureConfirmation)result.get(
+                        WSSecurityEngineResult.TAG_SIGNATURE_CONFIRMATION
+                    );
+    
+                byte[] sigVal = sc.getSignatureValue();
+                if (sigVal != null) {
+                    if (savedSignatures == null || savedSignatures.size() == 0) {
+                        //
+                        // If there are no stored signature values, and we've received a 
+                        // SignatureConfirmation element then throw an Exception
+                        //
+                        if (sigVal.length != 0) {
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "empty",
+                                    "Received a SignatureConfirmation element, but there are no stored"
+                                 + " signature values"
+                            );
+                        }
                     } else {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
-                                "Received a SignatureConfirmation element, but there are no matching"
-                            + " stored signature values"
-                        );
-                    } 
+                        Integer hash = Arrays.hashCode(sigVal);
+                        if (savedSignatures.contains(hash)) {
+                            savedSignatures.remove(hash);
+                        } else {
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
+                                    "Received a SignatureConfirmation element, but there are no matching"
+                                + " stored signature values"
+                            );
+                        } 
+                    }
                 }
             }
         }

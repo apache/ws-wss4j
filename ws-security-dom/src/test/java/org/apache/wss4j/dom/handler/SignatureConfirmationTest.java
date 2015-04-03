@@ -268,7 +268,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.SC).get(0);
         assertTrue(scResult != null);
         assertTrue(scResult.get(WSSecurityEngineResult.TAG_SIGNATURE_CONFIRMATION) != null);
-        handler.signatureConfirmation(reqData, results.getResults());
+        handler.signatureConfirmation(reqData, results);
     }
     
     
