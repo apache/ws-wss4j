@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -865,12 +866,6 @@ public class Merlin extends CryptoBase {
                 }
             }
 
-            PKIXParameters param = new PKIXParameters(set);
-            param.setRevocationEnabled(enableRevocation);
-            if (enableRevocation && crlCertStore != null) {
-                param.addCertStore(crlCertStore);
-            }
-
             // Verify the trust path using the above settings
             String provider = getCryptoProvider();
             CertPathValidator validator = null;
@@ -879,6 +874,8 @@ public class Merlin extends CryptoBase {
             } else {
                 validator = CertPathValidator.getInstance("PKIX", provider);
             }
+            
+            PKIXParameters param = createPKIXParameters(set, enableRevocation);
             validator.validate(path, param);
             return true;
         } catch (java.security.NoSuchProviderException e) {
@@ -897,7 +894,7 @@ public class Merlin extends CryptoBase {
                     WSSecurityException.FAILURE, "certpath", 
                     new Object[] { e.getMessage() }, e
                 );
-        } catch (java.security.InvalidAlgorithmParameterException e) {
+        } catch (InvalidAlgorithmParameterException e) {
                 throw new WSSecurityException(
                     WSSecurityException.FAILURE, "certpath",
                     new Object[] { e.getMessage() }, e
@@ -919,6 +916,19 @@ public class Merlin extends CryptoBase {
                     new Object[] { e.getMessage() }, e
                 );
         }
+    }
+    
+    // Separated out to allow subclasses to override it
+    protected PKIXParameters createPKIXParameters(
+        Set<TrustAnchor> trustAnchors, boolean enableRevocation
+    ) throws InvalidAlgorithmParameterException {
+        PKIXParameters param = new PKIXParameters(trustAnchors);
+        param.setRevocationEnabled(enableRevocation);
+        if (enableRevocation && crlCertStore != null) {
+            param.addCertStore(crlCertStore);
+        }
+        
+        return param;
     }
     
     /**
