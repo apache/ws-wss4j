@@ -57,8 +57,11 @@ public class X509IssuerSerialTokenImpl extends X509SecurityTokenImpl {
             cryptoType.setIssuerSerial(
                     x509IssuerSerialType.getX509IssuerName(), x509IssuerSerialType.getX509SerialNumber()
             );
-            X509Certificate[] certs = getCrypto().getX509Certificates(cryptoType);
-            setX509Certificates(certs);
+            X509Certificate[] certs = null;
+            if (getCrypto() != null) {
+                certs = getCrypto().getX509Certificates(cryptoType);
+                setX509Certificates(certs);
+            }
             if (certs == null || certs.length == 0) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE);
             }

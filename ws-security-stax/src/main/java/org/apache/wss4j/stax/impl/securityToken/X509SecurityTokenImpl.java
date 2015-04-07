@@ -95,7 +95,7 @@ public abstract class X509SecurityTokenImpl
     public X509Certificate[] getX509Certificates() throws XMLSecurityException {
         if (super.getX509Certificates() == null) {
             String alias = getAlias();
-            if (super.getX509Certificates() == null && alias != null) {
+            if (alias != null) {
                 CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
                 cryptoType.setAlias(alias);
                 setX509Certificates(getCrypto().getX509Certificates(cryptoType));
@@ -182,9 +182,8 @@ public abstract class X509SecurityTokenImpl
         TokenType storedTokenType = super.getTokenType();
         // Just check to see whether the cert version is "1"
         if (WSSecurityTokenConstants.X509V3Token.equals(storedTokenType)) {
-            X509Certificate[] certs;
             try {
-                certs = super.getX509Certificates();
+                X509Certificate[] certs = super.getX509Certificates();
                 if (certs != null && certs.length > 0 && certs[0].getVersion() == 1) {
                     return WSSecurityTokenConstants.X509V1Token;
                 }
