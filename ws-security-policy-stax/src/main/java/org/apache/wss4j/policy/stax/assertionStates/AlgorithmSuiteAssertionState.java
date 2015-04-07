@@ -194,6 +194,7 @@ public class AlgorithmSuiteAssertionState extends AssertionState implements Asse
         } else if (WSSConstants.SigTransform.equals(keyUsage)) {
             if (algorithmSuite.getC14n() != null
                 && !algorithmSuite.getC14n().getValue().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())
+                && !WSSConstants.NS_C14N_EXCL.equals(algorithmSuiteSecurityEvent.getAlgorithmURI())
                 && !WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(algorithmSuiteSecurityEvent.getAlgorithmURI())
                 && !WSSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(algorithmSuiteSecurityEvent.getAlgorithmURI())
                 && !WSSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
@@ -228,6 +229,9 @@ public class AlgorithmSuiteAssertionState extends AssertionState implements Asse
             String namespace = algorithmSuite.getAlgorithmSuiteType().getNamespace();
             String name = algorithmSuite.getAlgorithmSuiteType().getName();
             policyAsserter.assertPolicy(new QName(namespace, name));
+            if (algorithmSuite.getC14n() != null) {
+                policyAsserter.assertPolicy(new QName(namespace, algorithmSuite.getC14n().name()));
+            }
         }
         
         return isAsserted();

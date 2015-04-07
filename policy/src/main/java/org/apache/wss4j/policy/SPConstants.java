@@ -329,7 +329,7 @@ public abstract class SPConstants {
 
     public final static String XPATH20 = "http://www.w3.org/2002/06/xmldsig-filter2";
 
-    public final static String C14N = "http://www.w3.org/2001/10/xml-c14n#";
+    public final static String C14N = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
 
     public final static String C14N11 = "http://www.w3.org/2006/12/xml-c14n11";
 
