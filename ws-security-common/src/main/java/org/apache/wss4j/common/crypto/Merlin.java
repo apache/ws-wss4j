@@ -958,20 +958,17 @@ public class Merlin extends CryptoBase {
         try {
             for (Enumeration<String> e = store.aliases(); e.hasMoreElements();) {
                 String alias = e.nextElement();
-                Certificate cert = null;
                 Certificate[] certs = store.getCertificateChain(alias);
                 if (certs == null || certs.length == 0) {
                     // no cert chain, so lets check if getCertificate gives us a result.
-                    cert = store.getCertificate(alias);
-                    if (cert == null) {
-                        continue;
+                    Certificate cert = store.getCertificate(alias);
+                    if (cert != null) {
+                        certs = new Certificate[]{cert};
                     }
-                    certs = new Certificate[]{cert};
-                } else {
-                    cert = certs[0];
                 }
-                if (cert instanceof X509Certificate) {
-                    X509Certificate x509cert = (X509Certificate) cert;
+                
+                if (certs != null && certs.length > 0 && certs[0] instanceof X509Certificate) {
+                    X509Certificate x509cert = (X509Certificate) certs[0];
                     if (x509cert.getSerialNumber().compareTo(serialNumber) == 0) {
                         Object certName = 
                             createBCX509Name(x509cert.getIssuerX500Principal().getName());
@@ -1042,20 +1039,17 @@ public class Merlin extends CryptoBase {
         try {
             for (Enumeration<String> e = store.aliases(); e.hasMoreElements();) {
                 String alias = e.nextElement();
-                Certificate cert = null;
                 Certificate[] certs = store.getCertificateChain(alias);
                 if (certs == null || certs.length == 0) {
                     // no cert chain, so lets check if getCertificate gives us a result.
-                    cert = store.getCertificate(alias);
-                    if (cert == null) {
-                        continue;
+                    Certificate cert = store.getCertificate(alias);
+                    if (cert != null) {
+                        certs = new Certificate[]{cert};
                     }
-                    certs = new Certificate[]{cert};
-                } else {
-                    cert = certs[0];
                 }
-                if (cert instanceof X509Certificate) {
-                    X509Certificate x509cert = (X509Certificate) cert;
+                
+                if (certs != null && certs.length > 0 && certs[0] instanceof X509Certificate) {
+                    X509Certificate x509cert = (X509Certificate) certs[0];
                     try {
                         sha.update(x509cert.getEncoded());
                     } catch (CertificateEncodingException ex) {
@@ -1121,20 +1115,17 @@ public class Merlin extends CryptoBase {
         try {
             for (Enumeration<String> e = store.aliases(); e.hasMoreElements();) {
                 String alias = e.nextElement();
-                Certificate cert = null;
                 Certificate[] certs = store.getCertificateChain(alias);
                 if (certs == null || certs.length == 0) {
                     // no cert chain, so lets check if getCertificate gives us a result.
-                    cert = store.getCertificate(alias);
-                    if (cert == null) {
-                        continue;
+                    Certificate cert = store.getCertificate(alias);
+                    if (cert != null) {
+                        certs = new Certificate[]{cert};
                     }
-                    certs = new Certificate[]{cert};
-                } else {
-                    cert = certs[0];
                 }
-                if (cert instanceof X509Certificate) {
-                    X509Certificate x509cert = (X509Certificate) cert;
+                
+                if (certs != null && certs.length > 0 && certs[0] instanceof X509Certificate) {
+                    X509Certificate x509cert = (X509Certificate) certs[0];
                     byte[] data = getSKIBytesFromCert(x509cert);
                     if (data.length == skiBytes.length && Arrays.equals(data, skiBytes)) {
                         return certs;
@@ -1252,21 +1243,16 @@ public class Merlin extends CryptoBase {
             for (Enumeration<String> e = keyStoreToSearch.aliases(); e.hasMoreElements();) {
                 String alias = e.nextElement();
                 Certificate[] certs = keyStoreToSearch.getCertificateChain(alias);
-                Certificate cert;
                 if (certs == null || certs.length == 0) {
                     // no cert chain, so lets check if getCertificate gives us a result.
-                    cert = keyStoreToSearch.getCertificate(alias);
-                    if (cert == null) {
-                        continue;
+                    Certificate cert = keyStoreToSearch.getCertificate(alias);
+                    if (cert != null) {
+                        certs = new Certificate[]{cert};
                     }
-                } else {
-                    cert = certs[0];
                 }
-                if (!(cert instanceof X509Certificate)) {
-                    continue;
-                }
-                X509Certificate x509cert = (X509Certificate) cert;
-                if (publicKey.equals(x509cert.getPublicKey())) {
+                
+                if (certs != null && certs.length > 0 && certs[0] instanceof X509Certificate
+                    && publicKey.equals(((X509Certificate)certs[0]).getPublicKey())) {
                     return true;
                 }
             }
@@ -1288,20 +1274,16 @@ public class Merlin extends CryptoBase {
         try {
             for (Enumeration<String> e = store.aliases(); e.hasMoreElements();) {
                 String alias = e.nextElement();
-                Certificate cert = null;
                 Certificate[] certs = store.getCertificateChain(alias);
                 if (certs == null || certs.length == 0) {
                     // no cert chain, so lets check if getCertificate gives us a result.
-                    cert = store.getCertificate(alias);
-                    if (cert == null) {
-                        continue;
+                    Certificate cert = store.getCertificate(alias);
+                    if (cert != null) {
+                        certs = new Certificate[]{cert};
                     }
-                    certs = new Certificate[]{cert};
-                } else {
-                    cert = certs[0];
                 }
-                if (cert instanceof X509Certificate) {
-                    X500Principal foundRDN = ((X509Certificate) cert).getSubjectX500Principal();
+                if (certs != null && certs.length > 0 && certs[0] instanceof X509Certificate) {
+                    X500Principal foundRDN = ((X509Certificate)certs[0]).getSubjectX500Principal();
                     Object certName = createBCX509Name(foundRDN.getName());
 
                     if (subjectRDN.equals(certName)) {
@@ -1349,20 +1331,15 @@ public class Merlin extends CryptoBase {
                 String alias = e.nextElement();
                 
                 Certificate[] certs = store.getCertificateChain(alias);
-                Certificate retrievedCert = null;
                 if (certs == null || certs.length == 0) {
                     // no cert chain, so lets check if getCertificate gives us a  result.
-                    retrievedCert = store.getCertificate(alias);
-                    if (retrievedCert == null) {
-                        continue;
+                    Certificate retrievedCert = store.getCertificate(alias);
+                    if (retrievedCert != null) {
+                        certs = new Certificate[]{retrievedCert};
                     }
-                } else {
-                    retrievedCert = certs[0];
                 }
-                if (!(retrievedCert instanceof X509Certificate)) {
-                    continue;
-                }
-                if (retrievedCert.equals(cert)) {
+                
+                if (certs != null && certs.length > 0 && certs[0].equals(cert)) {
                     return alias;
                 }
             }
