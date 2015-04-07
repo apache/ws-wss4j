@@ -48,7 +48,10 @@ public class X509SKISecurityTokenImpl extends X509SecurityTokenImpl {
         if (this.alias == null) {
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.SKI_BYTES);
             cryptoType.setBytes(binaryContent);
-            X509Certificate[] certs = getCrypto().getX509Certificates(cryptoType);
+            X509Certificate[] certs = null;
+            if (getCrypto() != null) {
+                certs = getCrypto().getX509Certificates(cryptoType);
+            }
             if (certs == null || certs.length == 0) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE);
             }

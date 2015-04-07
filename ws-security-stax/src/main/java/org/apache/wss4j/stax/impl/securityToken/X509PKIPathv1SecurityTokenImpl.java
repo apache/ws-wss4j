@@ -66,7 +66,7 @@ public class X509PKIPathv1SecurityTokenImpl extends X509SecurityTokenImpl {
 
     @Override
     protected String getAlias() throws XMLSecurityException {
-        if (this.alias == null) {
+        if (this.alias == null && getCrypto() != null) {
             this.alias = getCrypto().getX509Identifier(getX509Certificates()[0]);
         }
         return this.alias;

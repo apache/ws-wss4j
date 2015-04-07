@@ -48,7 +48,10 @@ public class X509ThumbprintSHA1SecurityTokenImpl extends X509SecurityTokenImpl {
         if (this.alias == null) {
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.THUMBPRINT_SHA1);
             cryptoType.setBytes(binaryContent);
-            X509Certificate[] certs = getCrypto().getX509Certificates(cryptoType);
+            X509Certificate[] certs = null;
+            if (getCrypto() != null) {
+                certs = getCrypto().getX509Certificates(cryptoType);
+            }
             if (certs == null || certs.length == 0) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE);
             }
