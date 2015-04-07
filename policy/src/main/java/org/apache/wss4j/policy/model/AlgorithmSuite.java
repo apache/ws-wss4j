@@ -472,9 +472,6 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 }
                 C14NType c14NType = C14NType.lookUp(assertionName);
                 if (c14NType != null) {
-                    if (algorithmSuite.getC14n() == C14NType.InclusiveC14N) {
-                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
-                    }
                     algorithmSuite.setC14n(c14NType);
                     continue;
                 }
