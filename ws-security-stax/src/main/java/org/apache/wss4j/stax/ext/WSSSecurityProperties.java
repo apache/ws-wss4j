@@ -117,6 +117,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private boolean validateSamlSubjectConfirmation = true;
     private Collection<Pattern> subjectDNPatterns = new ArrayList<Pattern>();
     private List<String> audienceRestrictions = new ArrayList<String>();
+    private boolean requireTimestampExpires;
 
     private CallbackHandler attachmentCallbackHandler;
     private Object msgContext;
@@ -180,6 +181,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.attachmentCallbackHandler = wssSecurityProperties.attachmentCallbackHandler;
         this.msgContext = wssSecurityProperties.msgContext;
         this.audienceRestrictions = wssSecurityProperties.audienceRestrictions;
+        this.requireTimestampExpires = wssSecurityProperties.requireTimestampExpires;
     }
 
     /**
@@ -979,5 +981,13 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public void setMsgContext(Object msgContext) {
         this.msgContext = msgContext;
+    }
+
+    public boolean isRequireTimestampExpires() {
+        return requireTimestampExpires;
+    }
+
+    public void setRequireTimestampExpires(boolean requireTimestampExpires) {
+        this.requireTimestampExpires = requireTimestampExpires;
     }
 }

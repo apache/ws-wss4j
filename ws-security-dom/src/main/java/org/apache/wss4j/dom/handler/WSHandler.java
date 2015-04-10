@@ -351,6 +351,7 @@ public abstract class WSHandler {
             decodeDecryptionParameter(reqData);
         }
         decodeRequireSignedEncryptedDataElements(reqData);
+        decodeRequireTimestampExpires(reqData);
     }
 
     protected boolean checkReceiverResults(
@@ -927,6 +928,13 @@ public abstract class WSHandler {
         throws WSSecurityException {
         reqData.setRequireSignedEncryptedDataElements(decodeBooleanConfigValue(
             reqData, WSHandlerConstants.REQUIRE_SIGNED_ENCRYPTED_DATA_ELEMENTS, false
+        ));
+    }
+    
+    protected void decodeRequireTimestampExpires(RequestData reqData) 
+        throws WSSecurityException {
+        reqData.setRequireTimestampExpires(decodeBooleanConfigValue(
+            reqData, WSHandlerConstants.REQUIRE_TIMESTAMP_EXPIRES, false
         ));
     }
 

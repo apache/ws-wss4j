@@ -64,6 +64,9 @@ public class TimestampValidatorImpl implements TimestampValidator {
                 }
                 log.debug("Timestamp expires: " + expires);
                 expiresDate = expires.toGregorianCalendar().getTime();
+            } else if (tokenContext.getWssSecurityProperties().isRequireTimestampExpires()) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidTimestamp",
+                    "The received Timestamp does not contain an expires Element");
             }
 
             Date rightNow = new Date();

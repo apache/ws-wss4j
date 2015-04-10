@@ -129,6 +129,50 @@ public class TimestampTest extends org.junit.Assert {
         assertTrue(receivedTimestamp != null);
     }
     
+    @org.junit.Test
+    public void testInvalidTimestampNoExpires() throws Exception {
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        WSSecTimestamp timestamp = new WSSecTimestamp();
+        timestamp.setTimeToLive(0);
+        Document createdDoc = timestamp.build(doc, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(createdDoc);
+            LOG.debug(outputString);
+        }
+        
+        //
+        // Do some processing
+        //
+        WSSecurityEngine secEngine = new WSSecurityEngine();
+        RequestData requestData = new RequestData();
+        requestData.setWssConfig(WSSConfig.getNewInstance());
+        requestData.setRequireTimestampExpires(true);
+        try {
+            secEngine.processSecurityHeader(doc, "", requestData);
+            fail("Failure expected on no Expires Element");
+        } catch (WSSecurityException ex) {
+            // expected
+        }
+
+        requestData.setWssConfig(WSSConfig.getNewInstance());
+        requestData.setRequireTimestampExpires(false);
+        List<WSSecurityEngineResult> wsResult = secEngine.processSecurityHeader(doc, "", requestData);
+
+        WSSecurityEngineResult actionResult = 
+            WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
+        assertTrue(actionResult != null);
+        
+        Timestamp receivedTimestamp = 
+            (Timestamp)actionResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
+        assertTrue(receivedTimestamp != null);
+    }
+    
     
     /**
      * This is a test for processing an expired Timestamp.

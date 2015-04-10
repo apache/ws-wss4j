@@ -64,6 +64,13 @@ public class TimestampValidator implements Validator {
                 "invalidTimestamp",
                 "The security semantics of the message have expired");
         }
+        
+        if (data.isRequireTimestampExpires() && timeStamp.getExpires() == null) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.SECURITY_ERROR,
+                "invalidTimestamp",
+                "The received Timestamp does not contain an expires Element");
+        }
         return credential;
     }
     
