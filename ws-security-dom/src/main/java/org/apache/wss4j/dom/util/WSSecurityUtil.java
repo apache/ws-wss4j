@@ -56,6 +56,14 @@ public final class WSSecurityUtil {
         // Complete
     }
     
+    public static Element getSOAPHeader(Document doc) {
+        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+        return 
+            XMLUtils.getDirectChildElement(
+                doc.getDocumentElement(), WSConstants.ELEM_HEADER, soapNamespace
+            );
+    }
+    
     /**
      * Returns the first WS-Security header element for a given actor. Only one
      * WS-Security header is allowed for an actor.
@@ -66,17 +74,12 @@ public final class WSSecurityUtil {
      *         if not such element found
      */
     public static Element getSecurityHeader(Document doc, String actor) throws WSSecurityException {
-        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
-        Element soapHeaderElement = 
-            XMLUtils.getDirectChildElement(
-                doc.getDocumentElement(), 
-                WSConstants.ELEM_HEADER, 
-                soapNamespace
-            );
+        Element soapHeaderElement = getSOAPHeader(doc);
         if (soapHeaderElement == null) { // no SOAP header at all
             return null;
         }
         
+        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         return getSecurityHeader(soapHeaderElement, actor, WSConstants.URI_SOAP12_ENV.equals(soapNamespace));
     }
     
