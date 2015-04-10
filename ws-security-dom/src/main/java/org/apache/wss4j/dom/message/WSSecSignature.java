@@ -53,7 +53,6 @@ import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.dom.transform.STRTransform;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -105,14 +104,10 @@ public class WSSecSignature extends WSSecSignatureBase {
     private boolean useCustomSecRef;
     private boolean bstAddedToSecurityHeader;
     private boolean includeSignatureToken;
+    private boolean addInclusivePrefixes = true;
 
     public WSSecSignature() {
         super();
-        init();
-    }
-    
-    public WSSecSignature(WSSConfig config) {
-        super(config);
         init();
     }
     
@@ -161,8 +156,7 @@ public class WSSecSignature extends WSSecSignatureBase {
 
         try {
             C14NMethodParameterSpec c14nSpec = null;
-            if (getWsConfig().isAddInclusivePrefixes() 
-                && canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
+            if (addInclusivePrefixes && canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
                 List<String> prefixes = 
                     getInclusivePrefixes(secHeader.getSecurityHeader(), false);
                 c14nSpec = new ExcC14NParameterSpec(prefixes);
@@ -176,10 +170,10 @@ public class WSSecSignature extends WSSecSignatureBase {
             );
         }
 
-        keyInfoUri = getWsConfig().getIdAllocator().createSecureId("KI-", keyInfo);
+        keyInfoUri = getIdAllocator().createSecureId("KI-", keyInfo);
         if (!useCustomSecRef) {
             secRef = new SecurityTokenReference(doc);
-            strUri = getWsConfig().getIdAllocator().createSecureId("STR-", secRef);
+            strUri = getIdAllocator().createSecureId("STR-", secRef);
             secRef.setID(strUri);
             
             //
@@ -413,7 +407,7 @@ public class WSSecSignature extends WSSecSignatureBase {
                 wsDocInfo,
                 signatureFactory, 
                 secHeader, 
-                getWsConfig(), 
+                addInclusivePrefixes, 
                 digestAlgo
             );
     }
@@ -525,7 +519,7 @@ public class WSSecSignature extends WSSecSignatureBase {
                     signedInfo, 
                     keyInfo,
                     null,
-                    getWsConfig().getIdAllocator().createId("SIG-", null),
+                    getIdAllocator().createId("SIG-", null),
                     null);
             
             //
@@ -806,7 +800,7 @@ public class WSSecSignature extends WSSecSignatureBase {
                         "noUserCertsFound",
                         user, "signature");
             }
-            certUri = getWsConfig().getIdAllocator().createSecureId("X509-", certs[0]);  
+            certUri = getIdAllocator().createSecureId("X509-", certs[0]);  
             //
             // If no signature algorithm was set try to detect it according to the
             // data stored in the certificate.
@@ -835,6 +829,14 @@ public class WSSecSignature extends WSSecSignatureBase {
 
     public void setIncludeSignatureToken(boolean includeSignatureToken) {
         this.includeSignatureToken = includeSignatureToken;
+    }
+
+    public boolean isAddInclusivePrefixes() {
+        return addInclusivePrefixes;
+    }
+
+    public void setAddInclusivePrefixes(boolean addInclusivePrefixes) {
+        this.addInclusivePrefixes = addInclusivePrefixes;
     }
     
 }

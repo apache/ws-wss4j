@@ -50,7 +50,6 @@ import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
@@ -78,13 +77,6 @@ public class WSSecSignatureSAML extends WSSecSignature {
      */
     public WSSecSignatureSAML() {
         super();
-        doDebug = LOG.isDebugEnabled();
-    }
-    /**
-     * Constructor.
-     */
-    public WSSecSignatureSAML(WSSConfig config) {
-        super(config);
         doDebug = LOG.isDebugEnabled();
     }
 
@@ -257,7 +249,6 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 SignatureActionToken actionToken = new SignatureActionToken();
                 data.setSignatureToken(actionToken);
                 actionToken.setCrypto(userCrypto);
-                data.setWssConfig(getWsConfig());
                 SAMLKeyInfo samlKeyInfo = 
                     SAMLUtil.getCredentialFromSubject(
                             samlAssertion, new WSSSAMLKeyInfoProcessor(data, wsDocInfo),
@@ -307,8 +298,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         
         try {
             C14NMethodParameterSpec c14nSpec = null;
-            if (getWsConfig().isAddInclusivePrefixes() 
-                && getSigCanonicalization().equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
+            if (isAddInclusivePrefixes() && getSigCanonicalization().equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
                 List<String> prefixes = 
                     getInclusivePrefixes(secHeader.getSecurityHeader(), false);
                 c14nSpec = new ExcC14NParameterSpec(prefixes);
@@ -323,14 +313,14 @@ public class WSSecSignatureSAML extends WSSecSignature {
             );
         }
 
-        keyInfoUri = getWsConfig().getIdAllocator().createSecureId("KeyId-", keyInfo);
+        keyInfoUri = getIdAllocator().createSecureId("KeyId-", keyInfo);
         SecurityTokenReference secRef = new SecurityTokenReference(doc);
-        strUri = getWsConfig().getIdAllocator().createSecureId("STRId-", secRef);
+        strUri = getIdAllocator().createSecureId("STRId-", secRef);
         secRef.setID(strUri);
         setSecurityTokenReference(secRef);
         
         if (certs != null && certs.length != 0) {
-            certUri = getWsConfig().getIdAllocator().createSecureId("CertId-", certs[0]);
+            certUri = getIdAllocator().createSecureId("CertId-", certs[0]);
         }
         
         //
@@ -344,7 +334,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         try {
             if (senderVouches) {
                 secRefSaml = new SecurityTokenReference(doc);
-                secRefID = getWsConfig().getIdAllocator().createSecureId("STRSAMLId-", secRefSaml);
+                secRefID = getIdAllocator().createSecureId("STRSAMLId-", secRefSaml);
                 secRefSaml.setID(secRefID);
 
                 if (useDirectReferenceToAssertion) {
@@ -516,7 +506,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                     signedInfo, 
                     keyInfo,
                     null,
-                    getWsConfig().getIdAllocator().createId("SIG-", null),
+                    getIdAllocator().createId("SIG-", null),
                     null);
             
             Element securityHeaderElement = secHeader.getSecurityHeader();

@@ -29,6 +29,7 @@ import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -78,7 +79,6 @@ public class SamlNegativeTest extends org.junit.Assert {
     
     public SamlNegativeTest() throws Exception {
         WSSConfig config = WSSConfig.getNewInstance();
-        config.setValidateSamlSubjectConfirmation(false);
         secEngine.setWssConfig(config);
         
         // Load the issuer keystore
@@ -386,10 +386,14 @@ public class SamlNegativeTest extends org.junit.Assert {
      * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc, Crypto sigCrypto) throws Exception {
-        WSHandlerResult results = 
-            secEngine.processSecurityHeader(
-                doc, null, callbackHandler, sigCrypto, userCrypto
-            );
+        RequestData requestData = new RequestData();
+        requestData.setCallbackHandler(callbackHandler);
+        requestData.setDecCrypto(userCrypto);
+        requestData.setSigVerCrypto(sigCrypto);
+        requestData.setValidateSamlSubjectConfirmation(false);
+        
+        WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
+        
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);

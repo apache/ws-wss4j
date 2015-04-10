@@ -20,7 +20,6 @@
 package org.apache.wss4j.dom.message;
 
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;
@@ -107,11 +106,6 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
     
     public WSSecDerivedKeyBase() {
         super();
-        setKeyIdentifierType(0);
-    }
-    
-    public WSSecDerivedKeyBase(WSSConfig config) {
-        super(config);
         setKeyIdentifierType(0);
     }
     
@@ -229,7 +223,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
         
         // Add the DKTs
         dkt = new DerivedKeyToken(wscVersion, document);
-        dktId = getWsConfig().getIdAllocator().createId("DK-", dkt);
+        dktId = getIdAllocator().createId("DK-", dkt);
         
         dkt.setOffset(offset);
         dkt.setLength(length);
@@ -238,7 +232,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
         
         if (strElem == null) {
             SecurityTokenReference secRef = new SecurityTokenReference(document);
-            String strUri = getWsConfig().getIdAllocator().createSecureId("STR-", secRef);
+            String strUri = getIdAllocator().createSecureId("STR-", secRef);
             secRef.setID(strUri);
             
             X509Certificate[] certs = getSigningCerts();

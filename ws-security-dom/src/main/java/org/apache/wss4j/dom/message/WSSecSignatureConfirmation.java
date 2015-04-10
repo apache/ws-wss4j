@@ -19,7 +19,6 @@
 
 package org.apache.wss4j.dom.message;
 
-import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.message.token.SignatureConfirmation;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -38,10 +37,6 @@ public class WSSecSignatureConfirmation extends WSSecBase {
 
     public WSSecSignatureConfirmation() {
         super();
-    }
-    
-    public WSSecSignatureConfirmation(WSSConfig config) {
-        super(config);
     }
     
     /**
@@ -65,7 +60,7 @@ public class WSSecSignatureConfirmation extends WSSecBase {
      */
     public void prepare(Document doc) {
         sc = new SignatureConfirmation(doc, signatureValue);
-        sc.setID(getWsConfig().getIdAllocator().createId("SC-", sc));
+        sc.setID(getIdAllocator().createId("SC-", sc));
     }
     
     /**

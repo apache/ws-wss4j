@@ -19,11 +19,13 @@
 
 package org.apache.wss4j.dom.message;
 
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.message.token.Timestamp;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import org.apache.wss4j.common.util.WSCurrentTimeSource;
+import org.apache.wss4j.common.util.WSTimeSource;
+import org.apache.wss4j.dom.message.token.Timestamp;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 /**
  * Builds a WS Timestamp and inserts it into the SOAP Envelope. Refer to the WS
@@ -37,13 +39,11 @@ public class WSSecTimestamp extends WSSecBase {
     private Timestamp ts;
 
     private int timeToLive = 300; // time between Created and Expires
+    private boolean precisionInMilliSeconds = true;
+    private WSTimeSource wsTimeSource = new WSCurrentTimeSource();
     
     public WSSecTimestamp() {
         super();
-    }
-    
-    public WSSecTimestamp(WSSConfig config) {
-        super(config);
     }
     
     /**
@@ -68,9 +68,8 @@ public class WSSecTimestamp extends WSSecBase {
      * @param doc The SOAP envelope as W3C document
      */
     public void prepare(Document doc) {
-        ts = new Timestamp(getWsConfig().isPrecisionInMilliSeconds(), doc, 
-                           getWsConfig().getCurrentTime(), timeToLive);
-        String tsId = getWsConfig().getIdAllocator().createId("TS-", ts);
+        ts = new Timestamp(precisionInMilliSeconds, doc, wsTimeSource, timeToLive);
+        String tsId = getIdAllocator().createId("TS-", ts);
         ts.setID(tsId);
     }
 
@@ -123,6 +122,14 @@ public class WSSecTimestamp extends WSSecBase {
         return ts.getID();
     }
     
+    public WSTimeSource getWsTimeSource() {
+        return wsTimeSource;
+    }
+
+    public void setWsTimeSource(WSTimeSource wsTimeSource) {
+        this.wsTimeSource = wsTimeSource;
+    }
+
     /**
      * Get the timestamp element generated during <code>prepare()</code>.
      */
@@ -131,5 +138,13 @@ public class WSSecTimestamp extends WSSecBase {
             return null;
         }
         return ts.getElement();
+    }
+
+    public boolean isPrecisionInMilliSeconds() {
+        return precisionInMilliSeconds;
+    }
+
+    public void setPrecisionInMilliSeconds(boolean precisionInMilliSeconds) {
+        this.precisionInMilliSeconds = precisionInMilliSeconds;
     }
 }

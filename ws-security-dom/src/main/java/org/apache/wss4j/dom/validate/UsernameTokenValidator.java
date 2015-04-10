@@ -25,7 +25,6 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
@@ -61,15 +60,9 @@ public class UsernameTokenValidator implements Validator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCredential");
         }
         
-        boolean handleCustomPasswordTypes = false;
-        boolean passwordsAreEncoded = false;
-        String requiredPasswordType = null;
-        WSSConfig wssConfig = data.getWssConfig();
-        if (wssConfig != null) {
-            handleCustomPasswordTypes = wssConfig.getHandleCustomPasswordTypes();
-            passwordsAreEncoded = wssConfig.getPasswordsAreEncoded();
-            requiredPasswordType = wssConfig.getRequiredPasswordType();
-        }
+        boolean handleCustomPasswordTypes = data.isHandleCustomPasswordTypes();
+        boolean passwordsAreEncoded = data.isEncodePasswords();
+        String requiredPasswordType = data.getRequiredPasswordType();
         
         UsernameToken usernameToken = credential.getUsernametoken();
         usernameToken.setPasswordsAreEncoded(passwordsAreEncoded);
@@ -214,12 +207,7 @@ public class UsernameTokenValidator implements Validator {
     protected void verifyUnknownPassword(UsernameToken usernameToken,
                                          RequestData data) throws WSSecurityException {
         
-        boolean allowUsernameTokenDerivedKeys = false;
-        WSSConfig wssConfig = data.getWssConfig();
-        if (wssConfig != null) {
-            allowUsernameTokenDerivedKeys = wssConfig.isAllowUsernameTokenNoPassword();
-        }
-        
+        boolean allowUsernameTokenDerivedKeys = data.isAllowUsernameTokenNoPassword();
         if (!allowUsernameTokenDerivedKeys) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Authentication failed as the received UsernameToken does not "

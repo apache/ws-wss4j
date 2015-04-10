@@ -99,7 +99,6 @@ public class SamlTokenTest extends org.junit.Assert {
         WSSConfig config = WSSConfig.getNewInstance();
         config.setValidator(WSSecurityEngine.SAML_TOKEN, new CustomSamlAssertionValidator());
         config.setValidator(WSSecurityEngine.SAML2_TOKEN, new CustomSamlAssertionValidator());
-        config.setValidateSamlSubjectConfirmation(false);
         secEngine.setWssConfig(config);
     }
     
@@ -753,8 +752,12 @@ public class SamlTokenTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        WSHandlerResult results = 
-            secEngine.processSecurityHeader(doc, null, new KeystoreCallbackHandler(), crypto);
+        RequestData requestData = new RequestData();
+        requestData.setValidateSamlSubjectConfirmation(false);
+        requestData.setCallbackHandler(new KeystoreCallbackHandler());
+        requestData.setDecCrypto(crypto);
+        requestData.setSigVerCrypto(crypto);
+        WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
         
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
@@ -819,12 +822,13 @@ public class SamlTokenTest extends org.junit.Assert {
         ignoredRules.add(BSPRule.R5426);
         data.setIgnoredBSPRules(ignoredRules);
         data.setCallbackHandler(new KeystoreCallbackHandler());
+        data.setValidateSamlSubjectConfirmation(false);
+        
         WSSecurityEngine newEngine = new WSSecurityEngine();
         
         WSSConfig config = WSSConfig.getNewInstance();
         config.setValidator(WSSecurityEngine.SAML_TOKEN, new CustomSamlAssertionValidator());
         config.setValidator(WSSecurityEngine.SAML2_TOKEN, new CustomSamlAssertionValidator());
-        config.setValidateSamlSubjectConfirmation(false);
         newEngine.setWssConfig(config);
         
         WSHandlerResult results = newEngine.processSecurityHeader(doc, data);
@@ -890,11 +894,13 @@ public class SamlTokenTest extends org.junit.Assert {
         assertionValidator.setRequiredSubjectConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         config.setValidator(WSSecurityEngine.SAML_TOKEN, assertionValidator);
         config.setValidator(WSSecurityEngine.SAML2_TOKEN, assertionValidator);
-        config.setValidateSamlSubjectConfirmation(false);
         
         WSSecurityEngine newEngine = new WSSecurityEngine();
         newEngine.setWssConfig(config);
-        newEngine.processSecurityHeader(unsignedDoc, null, null, null);
+        RequestData requestData = new RequestData();
+        requestData.setValidateSamlSubjectConfirmation(false);
+        
+        newEngine.processSecurityHeader(doc, requestData);
         
         // Now create a Bearer assertion
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
@@ -951,10 +957,13 @@ public class SamlTokenTest extends org.junit.Assert {
         assertionValidator.setRequireStandardSubjectConfirmationMethod(false);
         config.setValidator(WSSecurityEngine.SAML_TOKEN, assertionValidator);
         config.setValidator(WSSecurityEngine.SAML2_TOKEN, assertionValidator);
-        config.setValidateSamlSubjectConfirmation(false);
         
         newEngine.setWssConfig(config);
-        newEngine.processSecurityHeader(unsignedDoc, null, null, null);
+        
+        RequestData requestData = new RequestData();
+        requestData.setValidateSamlSubjectConfirmation(false);
+        
+        newEngine.processSecurityHeader(doc, requestData);
     }
     
     @org.junit.Test
@@ -990,10 +999,13 @@ public class SamlTokenTest extends org.junit.Assert {
         assertionValidator.setRequireBearerSignature(false);
         config.setValidator(WSSecurityEngine.SAML_TOKEN, assertionValidator);
         config.setValidator(WSSecurityEngine.SAML2_TOKEN, assertionValidator);
-        config.setValidateSamlSubjectConfirmation(false);
         
         newEngine.setWssConfig(config);
-        newEngine.processSecurityHeader(unsignedDoc, null, null, null);
+        
+        RequestData requestData = new RequestData();
+        requestData.setValidateSamlSubjectConfirmation(false);
+        
+        newEngine.processSecurityHeader(doc, requestData);
     }
     
     @org.junit.Test
@@ -1144,8 +1156,10 @@ public class SamlTokenTest extends org.junit.Assert {
      * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc) throws Exception {
-        WSHandlerResult results = 
-                secEngine.processSecurityHeader(doc, null, null, null);
+        RequestData requestData = new RequestData();
+        requestData.setValidateSamlSubjectConfirmation(false);
+        
+        WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
         String outputString = 
                 XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);

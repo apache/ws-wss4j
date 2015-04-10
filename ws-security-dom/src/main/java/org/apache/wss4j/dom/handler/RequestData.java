@@ -63,7 +63,6 @@ public class RequestData {
     private Crypto decCrypto;
     private SignatureActionToken signatureToken;
     private EncryptionActionToken encryptionToken;
-    private int timeToLive = 300;   // Timestamp: time in seconds between creation and expiry
     private WSSConfig wssConfig;
     private List<byte[]> signatureValues = new ArrayList<>();
     private WSSecHeader secHeader;
@@ -95,43 +94,104 @@ public class RequestData {
     private boolean use200512Namespace = true;
     private final List<String> audienceRestrictions = new ArrayList<>();
     private boolean requireTimestampExpires;
+    
+    /**
+     * Whether to add an InclusiveNamespaces PrefixList as a CanonicalizationMethod
+     * child when generating Signatures using WSConstants.C14N_EXCL_OMIT_COMMENTS.
+     * The default is true.
+     */
+    private boolean addInclusivePrefixes = true;
 
-    public void clear() {
-        soapConstants = null;
-        actor = username = pwType = null;
-        decCrypto = sigVerCrypto = null;
-        signatureToken = null;
-        encryptionToken = null;
-        wssConfig = null;
-        signatureValues.clear();
-        derivedKeyIterations = UsernameToken.DEFAULT_ITERATION;
-        useDerivedKeyForMAC = true;
-        callback = null;
-        attachmentCallbackHandler = null;
-        enableRevocation = false;
-        timestampReplayCache = null;
-        nonceReplayCache = null;
-        samlOneTimeUseReplayCache = null;
-        subjectDNPatterns.clear();
-        ignoredBSPRules.clear();
-        appendSignatureAfterTimestamp = false;
-        algorithmSuite = null;
-        samlAlgorithmSuite = null;
-        setOriginalSignatureActionPosition(0);
-        setDisableBSPEnforcement(false);
-        allowRSA15KeyTransportAlgorithm = false;
-        setAddUsernameTokenNonce(false);
-        setAddUsernameTokenCreated(false);
-        setTlsCerts(null);
-        enableTimestampReplayCache = true;
-        enableNonceReplayCache = true;
-        setEnableSamlOneTimeUseReplayCache(true);
-        passwordEncryptor = null;
-        derivedKeyTokenReference = null;
-        setUse200512Namespace(true);
-        audienceRestrictions.clear();
-        requireTimestampExpires = false;
-    }
+    /**
+     * Set the timestamp precision mode. If set to <code>true</code> then use
+     * timestamps with milliseconds, otherwise omit the milliseconds. As per XML
+     * Date/Time specification the default is to include the milliseconds.
+     */
+    private boolean precisionInMilliSeconds = true;
+
+    private boolean enableSignatureConfirmation;
+
+    /**
+     * If set to true then the timestamp handling will throw an exception if the
+     * timestamp contains an expires element and the semantics are expired.
+     * 
+     * If set to false, no exception will be thrown, even if the semantics are
+     * expired.
+     */
+    private boolean timeStampStrict = true;
+    
+    /**
+     * If this value is not null, then username token handling will throw an 
+     * exception if the password type of the Username Token does not match this value
+     */
+    private String requiredPasswordType;
+    
+    /**
+     * This variable controls whether a UsernameToken with no password element is allowed. 
+     * The default value is "false". Set it to "true" to allow deriving keys from UsernameTokens 
+     * or to support UsernameTokens for purposes other than authentication.
+     */
+    private boolean allowUsernameTokenNoPassword;
+    
+    /**
+     * The time in seconds between creation and expiry for a Timestamp. The default
+     * is 300 seconds (5 minutes).
+     */
+    private int timeStampTTL = 300;
+    
+    /**
+     * The time in seconds in the future within which the Created time of an incoming 
+     * Timestamp is valid. The default is 60 seconds.
+     */
+    private int timeStampFutureTTL = 60;
+    
+    /**
+     * The time in seconds between creation and expiry for a UsernameToken Created
+     * element. The default is 300 seconds (5 minutes).
+     */
+    private int utTTL = 300;
+    
+    /**
+     * The time in seconds in the future within which the Created time of an incoming 
+     * UsernameToken is valid. The default is 60 seconds.
+     */
+    private int utFutureTTL = 60;
+    
+    /**
+     * This variable controls whether types other than PasswordDigest or PasswordText
+     * are allowed when processing UsernameTokens. 
+     * 
+     * By default this is set to false so that the user doesn't have to explicitly
+     * reject custom token types in the callback handler.
+     */
+    private boolean handleCustomPasswordTypes;
+    
+    /**
+     * This variable controls whether (wsse) namespace qualified password types are
+     * accepted when processing UsernameTokens.
+     * 
+     * By default this is set to false.
+     */
+    private boolean allowNamespaceQualifiedPasswordTypes;
+    
+    /**
+     * Whether the password should be treated as a binary value.  This
+     * is needed to properly handle password equivalence for UsernameToken
+     * passwords.  Binary passwords are Base64 encoded so they can be
+     * treated as strings in most places, but when the password digest
+     * is calculated or a key is derived from the password, the password
+     * will be Base64 decoded before being used. This is most useful for
+     * hashed passwords as password equivalents.
+     *
+     * See https://issues.apache.org/jira/browse/WSS-239
+     */
+    private boolean encodePasswords;
+    
+    /**
+     * Whether to validate the SubjectConfirmation requirements of a received SAML Token
+     * (sender-vouches or holder-of-key). The default is true.
+     */
+    private boolean validateSamlSubjectConfirmation = true;
 
     public boolean isEnableTimestampReplayCache() {
         return enableTimestampReplayCache;
@@ -203,14 +263,6 @@ public class RequestData {
 
     public void setDecCrypto(Crypto decCrypto) {
         this.decCrypto = decCrypto;
-    }
-
-    public int getTimeToLive() {
-        return timeToLive;
-    }
-
-    public void setTimeToLive(int timeToLive) {
-        this.timeToLive = timeToLive;
     }
 
     /**
@@ -590,5 +642,116 @@ public class RequestData {
     public void setRequireTimestampExpires(boolean requireTimestampExpires) {
         this.requireTimestampExpires = requireTimestampExpires;
     }
+
+    public boolean isValidateSamlSubjectConfirmation() {
+        return validateSamlSubjectConfirmation;
+    }
+
+    public void setValidateSamlSubjectConfirmation(boolean validateSamlSubjectConfirmation) {
+        this.validateSamlSubjectConfirmation = validateSamlSubjectConfirmation;
+    }
+
+    public boolean isAllowNamespaceQualifiedPasswordTypes() {
+        return allowNamespaceQualifiedPasswordTypes;
+    }
+
+    public void setAllowNamespaceQualifiedPasswordTypes(boolean allowNamespaceQualifiedPasswordTypes) {
+        this.allowNamespaceQualifiedPasswordTypes = allowNamespaceQualifiedPasswordTypes;
+    }
+
+    public int getUtFutureTTL() {
+        return utFutureTTL;
+    }
+
+    public void setUtFutureTTL(int utFutureTTL) {
+        this.utFutureTTL = utFutureTTL;
+    }
+
+    public boolean isHandleCustomPasswordTypes() {
+        return handleCustomPasswordTypes;
+    }
+
+    public void setHandleCustomPasswordTypes(boolean handleCustomPasswordTypes) {
+        this.handleCustomPasswordTypes = handleCustomPasswordTypes;
+    }
+
+    public int getUtTTL() {
+        return utTTL;
+    }
+
+    public void setUtTTL(int utTTL) {
+        this.utTTL = utTTL;
+    }
+
+    public int getTimeStampTTL() {
+        return timeStampTTL;
+    }
+
+    public void setTimeStampTTL(int timeStampTTL) {
+        this.timeStampTTL = timeStampTTL;
+    }
+
+    public int getTimeStampFutureTTL() {
+        return timeStampFutureTTL;
+    }
+
+    public void setTimeStampFutureTTL(int timeStampFutureTTL) {
+        this.timeStampFutureTTL = timeStampFutureTTL;
+    }
+
+    public boolean isAllowUsernameTokenNoPassword() {
+        return allowUsernameTokenNoPassword;
+    }
+
+    public void setAllowUsernameTokenNoPassword(boolean allowUsernameTokenNoPassword) {
+        this.allowUsernameTokenNoPassword = allowUsernameTokenNoPassword;
+    }
+
+    public boolean isTimeStampStrict() {
+        return timeStampStrict;
+    }
+
+    public void setTimeStampStrict(boolean timeStampStrict) {
+        this.timeStampStrict = timeStampStrict;
+    }
+
+    public boolean isAddInclusivePrefixes() {
+        return addInclusivePrefixes;
+    }
+
+    public void setAddInclusivePrefixes(boolean addInclusivePrefixes) {
+        this.addInclusivePrefixes = addInclusivePrefixes;
+    }
+
+    public boolean isPrecisionInMilliSeconds() {
+        return precisionInMilliSeconds;
+    }
+
+    public void setPrecisionInMilliSeconds(boolean precisionInMilliSeconds) {
+        this.precisionInMilliSeconds = precisionInMilliSeconds;
+    }
         
+    public boolean isEnableSignatureConfirmation() {
+        return enableSignatureConfirmation;
+    }
+
+    public void setEnableSignatureConfirmation(boolean enableSignatureConfirmation) {
+        this.enableSignatureConfirmation = enableSignatureConfirmation;
+    }
+
+    public String getRequiredPasswordType() {
+        return requiredPasswordType;
+    }
+
+    public void setRequiredPasswordType(String requiredPasswordType) {
+        this.requiredPasswordType = requiredPasswordType;
+    }
+
+    public boolean isEncodePasswords() {
+        return encodePasswords;
+    }
+
+    public void setEncodePasswords(boolean encodePasswords) {
+        this.encodePasswords = encodePasswords;
+    }
 }

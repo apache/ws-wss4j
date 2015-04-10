@@ -84,7 +84,9 @@ public class SAMLTokenSignedAction implements Action {
                 samlCallback.getSignatureDigestAlgorithm()
             );
         }
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(reqData.getWssConfig());
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        wsSign.setIdAllocator(reqData.getWssConfig().getIdAllocator());
+        wsSign.setAddInclusivePrefixes(reqData.isAddInclusivePrefixes());
 
         CallbackHandler callbackHandler = 
             handler.getPasswordCallbackHandler(reqData);

@@ -29,6 +29,7 @@ import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -59,7 +60,6 @@ public class SamlTokenHOKTest extends org.junit.Assert {
     
     public SamlTokenHOKTest() throws Exception {
         WSSConfig config = WSSConfig.getNewInstance();
-        config.setValidateSamlSubjectConfirmation(false);
         secEngine.setWssConfig(config);
         
         crypto = CryptoFactory.getInstance("crypto.properties");
@@ -137,9 +137,14 @@ public class SamlTokenHOKTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
+        RequestData requestData = new RequestData();
+        requestData.setValidateSamlSubjectConfirmation(false);
+        requestData.setCallbackHandler(new KeystoreCallbackHandler());
         Crypto decCrypto = CryptoFactory.getInstance("wss40.properties");
-        WSHandlerResult results = 
-            secEngine.processSecurityHeader(doc, null, new KeystoreCallbackHandler(), crypto, decCrypto);
+        requestData.setDecCrypto(decCrypto);
+        requestData.setSigVerCrypto(crypto);
+        
+        WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
@@ -224,9 +229,14 @@ public class SamlTokenHOKTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
+        RequestData requestData = new RequestData();
+        requestData.setValidateSamlSubjectConfirmation(false);
+        requestData.setCallbackHandler(new KeystoreCallbackHandler());
         Crypto decCrypto = CryptoFactory.getInstance("wss40.properties");
-        WSHandlerResult results = 
-            secEngine.processSecurityHeader(doc, null, new KeystoreCallbackHandler(), crypto, decCrypto);
+        requestData.setDecCrypto(decCrypto);
+        requestData.setSigVerCrypto(crypto);
+        WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
+        
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
@@ -246,8 +256,13 @@ public class SamlTokenHOKTest extends org.junit.Assert {
      * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc) throws Exception {
-        WSHandlerResult results = 
-            secEngine.processSecurityHeader(doc, null, null, crypto);
+        RequestData requestData = new RequestData();
+        requestData.setDecCrypto(crypto);
+        requestData.setSigVerCrypto(crypto);
+        requestData.setValidateSamlSubjectConfirmation(false);
+        
+        WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
+
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);

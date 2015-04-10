@@ -20,7 +20,6 @@
 package org.apache.wss4j.dom.validate;
 
 
-import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.Timestamp;
@@ -45,15 +44,9 @@ public class TimestampValidator implements Validator {
         if (data.getWssConfig() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", "WSSConfig cannot be null");
         }
-        WSSConfig wssConfig = data.getWssConfig();
-        boolean timeStampStrict = true;
-        int timeStampTTL = 300;
-        int futureTimeToLive = 60;
-        if (wssConfig != null) {
-            timeStampStrict = wssConfig.isTimeStampStrict();
-            timeStampTTL = wssConfig.getTimeStampTTL();
-            futureTimeToLive = wssConfig.getTimeStampFutureTTL();
-        }
+        boolean timeStampStrict = data.isTimeStampStrict();
+        int timeStampTTL = data.getTimeStampTTL();
+        int futureTimeToLive = data.getTimeStampFutureTTL();
         
         Timestamp timeStamp = credential.getTimestamp();
         // Validate whether the security semantics have expired

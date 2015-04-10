@@ -84,41 +84,46 @@ public abstract class WSHandler {
             boolean isRequest
     ) throws WSSecurityException {
 
-        boolean mu = decodeMustUnderstand(reqData);
-
         WSSConfig wssConfig = reqData.getWssConfig();
         if (wssConfig == null) {
             wssConfig = WSSConfig.getNewInstance();
             reqData.setWssConfig(wssConfig);
         }
-        wssConfig.setPasswordsAreEncoded(decodeUseEncodedPasswords(reqData));
-        wssConfig.setPrecisionInMilliSeconds(decodeTimestampPrecision(reqData));
-
+        
         Object mc = reqData.getMsgContext();
+        reqData.setEncodePasswords(
+            decodeBooleanConfigValue(mc, WSHandlerConstants.USE_ENCODED_PASSWORDS, false)
+        );
+        reqData.setPrecisionInMilliSeconds(
+            decodeBooleanConfigValue(mc, WSHandlerConstants.TIMESTAMP_PRECISION, true)
+        );
+        reqData.setAddInclusivePrefixes(
+            decodeBooleanConfigValue(mc, WSHandlerConstants.ADD_INCLUSIVE_PREFIXES, true)
+        );
+        reqData.setEnableSignatureConfirmation(
+            decodeBooleanConfigValue(mc, WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, false)
+        );
+        reqData.setTimeStampTTL(decodeTimeToLive(reqData, true));
+
         String actor = getString(WSHandlerConstants.ACTOR, mc);
         reqData.setActor(actor);
 
+        boolean mu = decodeBooleanConfigValue(mc, WSHandlerConstants.MUST_UNDERSTAND, true);
         WSSecHeader secHeader = new WSSecHeader(actor, mu);
         secHeader.insertSecurityHeader(doc);
-
         reqData.setSecHeader(secHeader);
         reqData.setSoapConstants(WSSecurityUtil.getSOAPConstants(doc.getDocumentElement()));
-        wssConfig.setAddInclusivePrefixes(decodeAddInclusivePrefixes(reqData));
 
         // Load CallbackHandler
         if (reqData.getCallbackHandler() == null) {
-            CallbackHandler passwordCallbackHandler = 
-                getPasswordCallbackHandler(reqData);
+            CallbackHandler passwordCallbackHandler = getPasswordCallbackHandler(reqData);
             reqData.setCallbackHandler(passwordCallbackHandler);
         }
         
-        boolean enableSigConf = decodeEnableSignatureConfirmation(reqData);
-        wssConfig.setEnableSignatureConfirmation(enableSigConf);
-
         // Perform configuration
         for (HandlerAction actionToDo : actions) {
             if (actionToDo.getAction() == WSConstants.SC) {
-                wssConfig.setEnableSignatureConfirmation(true);
+                reqData.setEnableSignatureConfirmation(true);
             } else if (actionToDo.getAction() == WSConstants.UT 
                 && actionToDo.getActionToken() == null) {
                 decodeUTParameter(reqData);
@@ -176,7 +181,7 @@ public abstract class WSHandler {
          * parts. They will be signed automatically during a (probably) defined
          * SIGN action.
          */
-        if (wssConfig.isEnableSignatureConfirmation() && !isRequest) {
+        if (reqData.isEnableSignatureConfirmation() && !isRequest) {
             String done = 
                 (String)getProperty(reqData.getMsgContext(), WSHandlerConstants.SIG_CONF_DONE);
             if (done == null) {
@@ -221,7 +226,7 @@ public abstract class WSHandler {
          * already gathered values because of chained handlers, e.g. for
          * other actors.
          */
-        if (wssConfig.isEnableSignatureConfirmation() 
+        if (reqData.isEnableSignatureConfirmation() 
             && isRequest && reqData.getSignatureValues().size() > 0) {
             @SuppressWarnings("unchecked")
             Set<Integer> savedSignatures = 
@@ -276,40 +281,48 @@ public abstract class WSHandler {
             wssConfig = WSSConfig.getNewInstance();
             reqData.setWssConfig(wssConfig);
         }
-        boolean enableSigConf = decodeEnableSignatureConfirmation(reqData);
-        wssConfig.setEnableSignatureConfirmation(
+        
+        Object mc = reqData.getMsgContext();
+        boolean enableSigConf = 
+            decodeBooleanConfigValue(mc, WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, false);
+        reqData.setEnableSignatureConfirmation(
             enableSigConf || actions.contains(WSConstants.SC)
         );
-        wssConfig.setTimeStampStrict(decodeTimestampStrict(reqData));
-        String passwordType = decodePasswordType(reqData);
-        wssConfig.setRequiredPasswordType(passwordType);
+        reqData.setTimeStampStrict(
+            decodeBooleanConfigValue(mc, WSHandlerConstants.TIMESTAMP_STRICT, true)
+        );
+        reqData.setRequiredPasswordType(decodePasswordType(reqData));
             
-        wssConfig.setTimeStampTTL(decodeTimeToLive(reqData, true));
-        wssConfig.setTimeStampFutureTTL(decodeFutureTimeToLive(reqData, true));
-        wssConfig.setUtTTL(decodeTimeToLive(reqData, false));
-        wssConfig.setUtFutureTTL(decodeFutureTimeToLive(reqData, false));
+        reqData.setTimeStampTTL(decodeTimeToLive(reqData, true));
+        reqData.setTimeStampFutureTTL(decodeFutureTimeToLive(reqData, true));
+        reqData.setUtTTL(decodeTimeToLive(reqData, false));
+        reqData.setUtFutureTTL(decodeFutureTimeToLive(reqData, false));
         
-        wssConfig.setHandleCustomPasswordTypes(decodeCustomPasswordTypes(reqData));
-        wssConfig.setPasswordsAreEncoded(decodeUseEncodedPasswords(reqData));
-        wssConfig.setAllowNamespaceQualifiedPasswordTypes(
-            decodeNamespaceQualifiedPasswordTypes(reqData)
+        reqData.setHandleCustomPasswordTypes(
+            decodeBooleanConfigValue(mc, WSHandlerConstants.HANDLE_CUSTOM_PASSWORD_TYPES, false)
         );
-        wssConfig.setAllowUsernameTokenNoPassword(
-            decodeAllowUsernameTokenNoPassword(reqData)
+        reqData.setEncodePasswords(
+            decodeBooleanConfigValue(mc, WSHandlerConstants.USE_ENCODED_PASSWORDS, false)
         );
-        wssConfig.setValidateSamlSubjectConfirmation(
-            decodeSamlSubjectConfirmationValidation(reqData)
+        reqData.setAllowNamespaceQualifiedPasswordTypes(
+            decodeBooleanConfigValue(mc, WSHandlerConstants.ALLOW_NAMESPACE_QUALIFIED_PASSWORD_TYPES, false)
+        );
+        reqData.setAllowUsernameTokenNoPassword(
+            decodeBooleanConfigValue(mc, WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD, false)
+        );
+        reqData.setValidateSamlSubjectConfirmation(
+            decodeBooleanConfigValue(mc, WSHandlerConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, true)
         );
         
-        boolean bspCompliant = decodeBSPCompliance(reqData);
+        boolean bspCompliant = 
+            decodeBooleanConfigValue(mc, WSHandlerConstants.IS_BSP_COMPLIANT, true);
         if (!bspCompliant) {
             reqData.setDisableBSPEnforcement(true);
         }
         
         // Load CallbackHandler
         if (reqData.getCallbackHandler() == null) {
-            CallbackHandler passwordCallbackHandler = 
-                getPasswordCallbackHandler(reqData);
+            CallbackHandler passwordCallbackHandler = getPasswordCallbackHandler(reqData);
             reqData.setCallbackHandler(passwordCallbackHandler);
         }
 
@@ -321,8 +334,14 @@ public abstract class WSHandler {
         if (actions.contains(WSConstants.ENCR)) {
             decodeDecryptionParameter(reqData);
         }
-        decodeRequireSignedEncryptedDataElements(reqData);
-        decodeRequireTimestampExpires(reqData);
+        reqData.setRequireSignedEncryptedDataElements(
+            decodeBooleanConfigValue(
+                mc, WSHandlerConstants.REQUIRE_SIGNED_ENCRYPTED_DATA_ELEMENTS, false
+            )
+        );
+        reqData.setRequireTimestampExpires(
+            decodeBooleanConfigValue(mc, WSHandlerConstants.REQUIRE_TIMESTAMP_EXPIRES, false)
+        );
     }
 
     protected boolean checkReceiverResults(
@@ -472,11 +491,11 @@ public abstract class WSHandler {
         }
         
         boolean addNonce = 
-            decodeBooleanConfigValue(reqData, WSHandlerConstants.ADD_USERNAMETOKEN_NONCE, false);
+            decodeBooleanConfigValue(mc, WSHandlerConstants.ADD_USERNAMETOKEN_NONCE, false);
         reqData.setAddUsernameTokenNonce(addNonce);
         
         boolean addCreated = 
-            decodeBooleanConfigValue(reqData, WSHandlerConstants.ADD_USERNAMETOKEN_CREATED, false);
+            decodeBooleanConfigValue(mc, WSHandlerConstants.ADD_USERNAMETOKEN_CREATED, false);
         reqData.setAddUsernameTokenCreated(addCreated);
         
         String derivedMAC = getString(WSHandlerConstants.USE_DERIVED_KEY_FOR_MAC, mc);
@@ -565,7 +584,8 @@ public abstract class WSHandler {
         String c14nAlgo = getString(WSHandlerConstants.SIG_C14N_ALGO, mc);
         actionToken.setC14nAlgorithm(c14nAlgo);
         
-        boolean use200512Namespace = decodeUse200512Namespace(reqData);
+        boolean use200512Namespace = 
+            decodeBooleanConfigValue(mc, WSHandlerConstants.USE_2005_12_NAMESPACE, true);
         reqData.setUse200512Namespace(use200512Namespace);
 
         String parts = getString(WSHandlerConstants.SIGNATURE_PARTS, mc);
@@ -577,10 +597,12 @@ public abstract class WSHandler {
             splitEncParts(false, parts, actionToken.getParts(), reqData);
         }
         
-        boolean useSingleCert = decodeUseSingleCertificate(reqData);
+        boolean useSingleCert = 
+            decodeBooleanConfigValue(mc, WSHandlerConstants.USE_SINGLE_CERTIFICATE, true);
         actionToken.setUseSingleCert(useSingleCert);
         
-        boolean includeToken = decodeIncludeSignatureToken(reqData);
+        boolean includeToken = 
+            decodeBooleanConfigValue(mc, WSHandlerConstants.INCLUDE_SIGNATURE_TOKEN, false);
         actionToken.setIncludeToken(includeToken);
     }
 
@@ -679,7 +701,8 @@ public abstract class WSHandler {
             }
         }
         
-        boolean use200512Namespace = decodeUse200512Namespace(reqData);
+        boolean use200512Namespace = 
+            decodeBooleanConfigValue(mc, WSHandlerConstants.USE_2005_12_NAMESPACE, true);
         reqData.setUse200512Namespace(use200512Namespace);
         
         String digestAlgo = getString(WSHandlerConstants.ENC_DIGEST_ALGO, mc);
@@ -716,7 +739,8 @@ public abstract class WSHandler {
             splitEncParts(false, encParts, actionToken.getParts(), reqData);
         }
         
-        boolean includeToken = decodeIncludeEncryptionToken(reqData);
+        boolean includeToken = 
+            decodeBooleanConfigValue(mc, WSHandlerConstants.INCLUDE_ENCRYPTION_TOKEN, false);
         actionToken.setIncludeToken(includeToken);
     }
 
@@ -770,27 +794,6 @@ public abstract class WSHandler {
         return defaultFutureTimeToLive;
     }
     
-    protected boolean decodeAddInclusivePrefixes(RequestData reqData)
-        throws WSSecurityException {
-        return decodeBooleanConfigValue(
-            reqData, WSHandlerConstants.ADD_INCLUSIVE_PREFIXES, true
-        );
-    }
-    
-    protected boolean decodeSamlSubjectConfirmationValidation(RequestData reqData)
-        throws WSSecurityException {
-        return decodeBooleanConfigValue(
-            reqData, WSHandlerConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, true
-        );
-    }
-    
-    protected boolean decodeBSPCompliance(RequestData reqData)
-        throws WSSecurityException {
-        return decodeBooleanConfigValue(
-            reqData, WSHandlerConstants.IS_BSP_COMPLIANT, true
-        );
-    } 
-    
     protected String decodePasswordType(RequestData reqData) throws WSSecurityException {
         String type = getString(WSHandlerConstants.PASSWORD_TYPE, reqData.getMsgContext());
         if (type != null) {
@@ -803,113 +806,11 @@ public abstract class WSHandler {
         return null;
     }
     
-    protected boolean decodeMustUnderstand(RequestData reqData) 
-        throws WSSecurityException {
-        return decodeBooleanConfigValue(
-            reqData, WSHandlerConstants.MUST_UNDERSTAND, true
-        );
-    }
-
-    protected boolean decodeEnableSignatureConfirmation(
-        RequestData reqData
-    ) throws WSSecurityException {
-        return decodeBooleanConfigValue(
-            reqData, WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, false
-        );
-    }
-    
-    protected boolean decodeTimestampPrecision(
-        RequestData reqData
-    ) throws WSSecurityException {
-        return decodeBooleanConfigValue(
-            reqData, WSHandlerConstants.TIMESTAMP_PRECISION, true
-        );
-    }
-    
-    protected boolean decodeCustomPasswordTypes(
-        RequestData reqData
-    ) throws WSSecurityException {
-        return decodeBooleanConfigValue(
-            reqData, WSHandlerConstants.HANDLE_CUSTOM_PASSWORD_TYPES, false
-        );
-    }
-    
-    protected boolean decodeAllowUsernameTokenNoPassword(
-        RequestData reqData
-        ) throws WSSecurityException {
-        return decodeBooleanConfigValue(
-            reqData, WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD, false
-        );
-    }
-
-    protected boolean decodeUseEncodedPasswords(RequestData reqData) 
-        throws WSSecurityException {
-        return decodeBooleanConfigValue(
-            reqData, WSHandlerConstants.USE_ENCODED_PASSWORDS, false
-        );
-    }
-    
-    protected boolean decodeNamespaceQualifiedPasswordTypes(RequestData reqData) 
-        throws WSSecurityException {
-        return decodeBooleanConfigValue(
-            reqData, WSHandlerConstants.ALLOW_NAMESPACE_QUALIFIED_PASSWORD_TYPES, false
-        );
-    }
-
-    protected boolean decodeTimestampStrict(RequestData reqData) 
-        throws WSSecurityException {
-        return decodeBooleanConfigValue(
-            reqData, WSHandlerConstants.TIMESTAMP_STRICT, true
-        );
-    }
-    
-    protected boolean decodeUse200512Namespace(RequestData reqData) 
-        throws WSSecurityException {
-        return decodeBooleanConfigValue(
-            reqData, WSHandlerConstants.USE_2005_12_NAMESPACE, true
-        );
-    }
-    
-    protected boolean decodeUseSingleCertificate(RequestData reqData) 
-        throws WSSecurityException {
-        return decodeBooleanConfigValue(
-            reqData, WSHandlerConstants.USE_SINGLE_CERTIFICATE, true
-        );
-    }
-    
-    protected boolean decodeIncludeSignatureToken(RequestData reqData) 
-        throws WSSecurityException {
-        return decodeBooleanConfigValue(
-            reqData, WSHandlerConstants.INCLUDE_SIGNATURE_TOKEN, false
-        );
-    }
-    
-    protected boolean decodeIncludeEncryptionToken(RequestData reqData) 
-        throws WSSecurityException {
-        return decodeBooleanConfigValue(
-            reqData, WSHandlerConstants.INCLUDE_ENCRYPTION_TOKEN, false
-        );
-    }
-    
-    protected void decodeRequireSignedEncryptedDataElements(RequestData reqData) 
-        throws WSSecurityException {
-        reqData.setRequireSignedEncryptedDataElements(decodeBooleanConfigValue(
-            reqData, WSHandlerConstants.REQUIRE_SIGNED_ENCRYPTED_DATA_ELEMENTS, false
-        ));
-    }
-    
-    protected void decodeRequireTimestampExpires(RequestData reqData) 
-        throws WSSecurityException {
-        reqData.setRequireTimestampExpires(decodeBooleanConfigValue(
-            reqData, WSHandlerConstants.REQUIRE_TIMESTAMP_EXPIRES, false
-        ));
-    }
-
     protected boolean decodeBooleanConfigValue(
-        RequestData reqData, String configTag, boolean defaultToTrue
+        Object messageContext, String configTag, boolean defaultToTrue
     ) throws WSSecurityException {
 
-        String value = getString(configTag, reqData.getMsgContext());
+        String value = getString(configTag, messageContext);
 
         if (value == null) {
             return defaultToTrue;
@@ -1374,7 +1275,7 @@ public abstract class WSHandler {
         }
         boolean enableRevocation = 
             decodeBooleanConfigValue(
-                reqData, WSHandlerConstants.ENABLE_REVOCATION, false
+                reqData.getMsgContext(), WSHandlerConstants.ENABLE_REVOCATION, false
             );
         reqData.setEnableRevocation(enableRevocation);
         
@@ -1410,7 +1311,8 @@ public abstract class WSHandler {
         
         boolean allowRsa15 = 
             decodeBooleanConfigValue(
-                reqData, WSHandlerConstants.ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM, false
+                reqData.getMsgContext(), WSHandlerConstants.ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM, 
+                false
             );
         reqData.setAllowRSA15KeyTransportAlgorithm(allowRsa15);
     }

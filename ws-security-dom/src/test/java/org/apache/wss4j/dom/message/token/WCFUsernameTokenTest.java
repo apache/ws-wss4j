@@ -110,9 +110,11 @@ public class WCFUsernameTokenTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setAllowNamespaceQualifiedPasswordTypes(true);
-        verify(doc, config, Collections.singletonList(BSPRule.R4201));
+        RequestData requestData = new RequestData();
+        requestData.setAllowNamespaceQualifiedPasswordTypes(true);
+        requestData.setWssConfig(WSSConfig.getNewInstance());
+        requestData.setIgnoredBSPRules(Collections.singletonList(BSPRule.R4201));
+        verify(doc, requestData);
     }
     
     
@@ -140,12 +142,9 @@ public class WCFUsernameTokenTest extends org.junit.Assert {
      * Verifies the soap envelope
      */
     private WSHandlerResult verify(
-        Document doc, WSSConfig wssConfig, List<BSPRule> ignoredRules
+        Document doc, RequestData requestData
     ) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
-        RequestData requestData = new RequestData();
-        requestData.setWssConfig(wssConfig);
-        requestData.setIgnoredBSPRules(ignoredRules);
         requestData.setCallbackHandler(callbackHandler);
         return secEngine.processSecurityHeader(doc, requestData);
     }

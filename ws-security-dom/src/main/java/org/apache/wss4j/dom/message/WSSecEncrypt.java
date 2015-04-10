@@ -46,7 +46,7 @@ import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WsuIdAllocator;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.JCEMapper;
@@ -96,10 +96,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
  
     public WSSecEncrypt() {
         super();
-    }
-    
-    public WSSecEncrypt(WSSConfig config) {
-        super(config);
     }
     
     /**
@@ -245,7 +241,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         SecretKeySpec secretKeySpec = new SecretKeySpec(symmetricKey.getEncoded(), symmetricKey.getAlgorithm());
         List<String> encDataRefs = 
             doEncryption(
-                document, getWsConfig(), keyInfo, secretKeySpec, getSymmetricEncAlgorithm(), references, 
+                document, getIdAllocator(), keyInfo, secretKeySpec, getSymmetricEncAlgorithm(), references, 
                     callbackLookup, attachmentCallbackHandler, attachmentEncryptedDataElements
             );
         if (dataRef == null) {
@@ -308,7 +304,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     /**
      * Perform encryption on the SOAP envelope.
      * @param doc The document containing the SOAP envelope as document element
-     * @param config The WSSConfig from which to generate wsu:ID's
+     * @param idAllocator A WsuIdAllocator used to generate wsu:ID's
      * @param keyInfo The KeyInfo object to set in EncryptedData
      * @param secretKey The SecretKey object with which to encrypt data
      * @param encryptionAlgorithm The encryption algorithm URI to use
@@ -318,7 +314,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      */
     public static List<String> doEncryption(
         Document doc,
-        WSSConfig config,
+        WsuIdAllocator idAllocator,
         KeyInfo keyInfo,
         SecretKey secretKey,
         String encryptionAlgorithm,
@@ -326,13 +322,13 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         CallbackLookup callbackLookup
     ) throws WSSecurityException {
         return doEncryption(
-                doc, config, keyInfo, secretKey, encryptionAlgorithm,
+                doc, idAllocator, keyInfo, secretKey, encryptionAlgorithm,
                 references, callbackLookup, null, null);
     }
 
     public static List<String> doEncryption(
             Document doc,
-            WSSConfig config,
+            WsuIdAllocator idAllocator,
             KeyInfo keyInfo,
             SecretKey secretKey,
             String encryptionAlgorithm,
@@ -379,7 +375,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
             for (Element elementToEncrypt : elementsToEncrypt) {
                 String id = 
-                    encryptElement(doc, elementToEncrypt, encPart.getEncModifier(), config, xmlCipher,
+                    encryptElement(doc, elementToEncrypt, encPart.getEncModifier(), idAllocator, xmlCipher,
                                    secretKey, keyInfo);
                 encPart.setEncId(id);
                 encDataRef.add("#" + id);
@@ -426,7 +422,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 for (Attachment attachment : attachmentRequestCallback.getAttachments()) {
 
                     final String attachmentId = attachment.getId();
-                    String encEncryptedDataId = config.getIdAllocator().createId("ED-", attachmentId);
+                    String encEncryptedDataId = idAllocator.createId("ED-", attachmentId);
                     encDataRef.add("#" + encEncryptedDataId);
 
                     Element encryptedData =
@@ -516,7 +512,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         Document doc,
         Element elementToEncrypt,
         String modifier,
-        WSSConfig config,
+        WsuIdAllocator idAllocator,
         XMLCipher xmlCipher,
         SecretKey secretKey,
         KeyInfo keyInfo
@@ -526,8 +522,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         //
         // Encrypt data, and set necessary attributes in xenc:EncryptedData
         //
-        String xencEncryptedDataId = 
-            config.getIdAllocator().createId("ED-", elementToEncrypt);
+        String xencEncryptedDataId = idAllocator.createId("ED-", elementToEncrypt);
         try {
             String headerId = "";
             if ("Header".equals(modifier)) {
@@ -538,7 +533,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 XMLUtils.setNamespace(elem, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
                 String wsuPrefix = 
                     XMLUtils.setNamespace(elem, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
-                headerId = config.getIdAllocator().createId("EH-", elementToEncrypt);
+                headerId = idAllocator.createId("EH-", elementToEncrypt);
                 elem.setAttributeNS(
                     WSConstants.WSU_NS, wsuPrefix + ":Id", headerId
                 );

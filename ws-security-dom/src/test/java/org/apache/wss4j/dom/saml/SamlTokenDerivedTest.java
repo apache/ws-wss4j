@@ -44,6 +44,7 @@ import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecDKSign;
 import org.apache.wss4j.dom.message.WSSecHeader;
@@ -68,7 +69,6 @@ public class SamlTokenDerivedTest extends org.junit.Assert {
     
     public SamlTokenDerivedTest() throws Exception {
         WSSConfig config = WSSConfig.getNewInstance();
-        config.setValidateSamlSubjectConfirmation(false);
         secEngine.setWssConfig(config);
         crypto = CryptoFactory.getInstance("crypto.properties");
     }
@@ -204,8 +204,14 @@ public class SamlTokenDerivedTest extends org.junit.Assert {
      * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc) throws Exception {
-        WSHandlerResult results = 
-            secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
+        RequestData requestData = new RequestData();
+        requestData.setCallbackHandler(callbackHandler);
+        requestData.setDecCrypto(crypto);
+        requestData.setSigVerCrypto(crypto);
+        requestData.setValidateSamlSubjectConfirmation(false);
+        
+        WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
+        
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);

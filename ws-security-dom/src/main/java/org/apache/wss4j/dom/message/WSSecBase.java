@@ -23,6 +23,7 @@ import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WsuIdAllocator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -44,17 +45,13 @@ public class WSSecBase {
     protected CallbackLookup callbackLookup;
     protected CallbackHandler attachmentCallbackHandler;
 
-    private WSSConfig wssConfig;
+    private WsuIdAllocator idAllocator;
     private final List<WSEncryptionPart> parts = new ArrayList<>();
 
     
     public WSSecBase() {
     }
     
-    public WSSecBase(WSSConfig config) {
-        wssConfig = config;
-    }
-
     /**
      * @param callbackLookup The CallbackLookup object to retrieve elements
      */
@@ -102,21 +99,6 @@ public class WSSecBase {
      */
     public int getKeyIdentifierType() {
         return keyIdentifierType;
-    }
-
-    /**
-     * @param wsConfig
-     *            The wsConfig to set.
-     */
-    public void setWsConfig(WSSConfig wsConfig) {
-        this.wssConfig = wsConfig;
-    }
-    
-    public WSSConfig getWsConfig() {
-        if (wssConfig == null) {
-            wssConfig = WSSConfig.getNewInstance();
-        }
-        return wssConfig;
     }
 
     public void setAttachmentCallbackHandler(CallbackHandler attachmentCallbackHandler) {
@@ -170,7 +152,7 @@ public class WSSecBase {
         }
         
         if (id == null || id.length() == 0) {
-            id = wssConfig.getIdAllocator().createId("id-", bodyElement);
+            id = getIdAllocator().createId("id-", bodyElement);
             String prefix = XMLUtils.setNamespace(bodyElement, newAttrNs, newAttrPrefix);
             bodyElement.setAttributeNS(newAttrNs, prefix + ":Id", id);
         }
@@ -192,6 +174,17 @@ public class WSSecBase {
     public void setUserInfo(String user, String password) {
         this.user = user;
         this.password = password;
+    }
+
+    public WsuIdAllocator getIdAllocator() {
+        if (idAllocator != null) {
+            return idAllocator;
+        }
+        return WSSConfig.DEFAULT_ID_ALLOCATOR;
+    }
+
+    public void setIdAllocator(WsuIdAllocator idAllocator) {
+        this.idAllocator = idAllocator;
     }
     
 }

@@ -64,7 +64,6 @@ public class SamlConditionsTest extends org.junit.Assert {
         WSSConfig config = WSSConfig.getNewInstance();
         config.setValidator(WSSecurityEngine.SAML_TOKEN, new CustomSamlAssertionValidator());
         config.setValidator(WSSecurityEngine.SAML2_TOKEN, new CustomSamlAssertionValidator());
-        config.setValidateSamlSubjectConfirmation(false);
         secEngine.setWssConfig(config);
     }
     
@@ -492,10 +491,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         WSSecurityEngine newEngine = new WSSecurityEngine();
         RequestData data = new RequestData();
         data.setAudienceRestrictions(audiences);
-        
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setValidateSamlSubjectConfirmation(false);
-        newEngine.setWssConfig(config);
+        data.setValidateSamlSubjectConfirmation(false);
         
         try {
             newEngine.processSecurityHeader(doc, data);
@@ -555,10 +551,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         WSSecurityEngine newEngine = new WSSecurityEngine();
         RequestData data = new RequestData();
         data.setAudienceRestrictions(audiences);
-        
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setValidateSamlSubjectConfirmation(false);
-        newEngine.setWssConfig(config);
+        data.setValidateSamlSubjectConfirmation(false);
         
         try {
             newEngine.processSecurityHeader(doc, data);
@@ -671,10 +664,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         WSSecurityEngine newEngine = new WSSecurityEngine();
         RequestData data = new RequestData();
         data.setAudienceRestrictions(audiences);
-        
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setValidateSamlSubjectConfirmation(false);
-        newEngine.setWssConfig(config);
+        data.setValidateSamlSubjectConfirmation(false);
         
         try {
             newEngine.processSecurityHeader(doc, data);
@@ -730,8 +720,10 @@ public class SamlConditionsTest extends org.junit.Assert {
      * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc) throws Exception {
-        WSHandlerResult results = 
-            secEngine.processSecurityHeader(doc, null, null, null);
+        RequestData requestData = new RequestData();
+        requestData.setValidateSamlSubjectConfirmation(false);
+        
+        WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);

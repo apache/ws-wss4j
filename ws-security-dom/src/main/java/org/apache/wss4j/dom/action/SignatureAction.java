@@ -57,7 +57,9 @@ public class SignatureAction implements Action {
         
         WSPasswordCallback passwordCallback = 
             handler.getPasswordCB(signatureToken.getUser(), WSConstants.SIGN, callbackHandler, reqData);
-        WSSecSignature wsSign = new WSSecSignature(reqData.getWssConfig());
+        WSSecSignature wsSign = new WSSecSignature();
+        wsSign.setIdAllocator(reqData.getWssConfig().getIdAllocator());
+        wsSign.setAddInclusivePrefixes(reqData.isAddInclusivePrefixes());
 
         if (signatureToken.getKeyIdentifierId() != 0) {
             wsSign.setKeyIdentifierType(signatureToken.getKeyIdentifierId());

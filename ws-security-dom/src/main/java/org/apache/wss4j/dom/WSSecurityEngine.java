@@ -457,7 +457,7 @@ public class WSSecurityEngine {
             new WSHandlerResult(requestData.getActor(), returnResults, wsDocInfo.getActionResults());
         
         // Validate SAML Subject Confirmation requirements
-        if (wssConfig.isValidateSamlSubjectConfirmation()) {
+        if (requestData.isValidateSamlSubjectConfirmation()) {
             Element bodyElement = callbackLookupToUse.getSOAPBody();
             DOMSAMLUtil.validateSAMLResults(handlerResult, requestData.getTlsCerts(), bodyElement);
         }

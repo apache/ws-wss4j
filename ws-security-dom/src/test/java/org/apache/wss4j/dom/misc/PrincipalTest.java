@@ -323,16 +323,20 @@ public class PrincipalTest extends org.junit.Assert {
         QName validatorName,
         Crypto crypto
     ) throws Exception {
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setValidateSamlSubjectConfirmation(false);
+        RequestData requestData = new RequestData();
+        requestData.setCallbackHandler(callbackHandler);
+        requestData.setDecCrypto(crypto);
+        requestData.setSigVerCrypto(crypto);
+        requestData.setValidateSamlSubjectConfirmation(false);
         
         WSSecurityEngine secEngine = new WSSecurityEngine();
+        WSSConfig config = WSSConfig.getNewInstance();
         secEngine.setWssConfig(config);
         
         if (validator != null && validatorName != null) {
             config.setValidator(validatorName, validator);
         }
-        return secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
+        return secEngine.processSecurityHeader(doc, requestData);
     }
     
     /**

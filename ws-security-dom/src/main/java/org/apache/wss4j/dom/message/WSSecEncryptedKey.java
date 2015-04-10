@@ -42,7 +42,6 @@ import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
@@ -141,10 +140,6 @@ public class WSSecEncryptedKey extends WSSecBase {
         super();
     }
     
-    public WSSecEncryptedKey(WSSConfig config) {
-        super(config);
-    }
-
     /**
      * Set the user name to get the encryption certificate.
      * 

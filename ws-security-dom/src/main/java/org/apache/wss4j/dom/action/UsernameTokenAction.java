@@ -50,9 +50,12 @@ public class UsernameTokenAction implements Action {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noUser");
         }
 
-        WSSecUsernameToken builder = new WSSecUsernameToken(reqData.getWssConfig());
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setIdAllocator(reqData.getWssConfig().getIdAllocator());
+        builder.setPrecisionInMilliSeconds(reqData.isPrecisionInMilliSeconds());
+        builder.setWsTimeSource(reqData.getWssConfig().getCurrentTime());
         builder.setPasswordType(reqData.getPwType());
-        builder.setPasswordsAreEncoded(reqData.getWssConfig().getPasswordsAreEncoded());
+        builder.setPasswordsAreEncoded(reqData.isEncodePasswords());
         builder.setUserInfo(username, password);
 
         if (reqData.isAddUsernameTokenNonce()) {

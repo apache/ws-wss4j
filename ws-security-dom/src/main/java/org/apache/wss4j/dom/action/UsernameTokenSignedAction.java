@@ -59,7 +59,10 @@ public class UsernameTokenSignedAction implements Action {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noUser");
         }
         
-        WSSecUsernameToken builder = new WSSecUsernameToken(reqData.getWssConfig());
+        WSSecUsernameToken builder = new WSSecUsernameToken();
+        builder.setIdAllocator(reqData.getWssConfig().getIdAllocator());
+        builder.setPrecisionInMilliSeconds(reqData.isPrecisionInMilliSeconds());
+        builder.setWsTimeSource(reqData.getWssConfig().getCurrentTime());
         
         int iterations = reqData.getDerivedKeyIterations();
         boolean useMac = reqData.isUseDerivedKeyForMAC();
@@ -94,7 +97,10 @@ public class UsernameTokenSignedAction implements Action {
             signatureToken = reqData.getSignatureToken();
         }
         
-        WSSecSignature sign = new WSSecSignature(reqData.getWssConfig());
+        WSSecSignature sign = new WSSecSignature();
+        sign.setIdAllocator(reqData.getWssConfig().getIdAllocator());
+        sign.setAddInclusivePrefixes(reqData.isAddInclusivePrefixes());
+        
         sign.setCustomTokenValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
         sign.setCustomTokenId(builder.getId());
         sign.setSecretKey(builder.getDerivedKey());

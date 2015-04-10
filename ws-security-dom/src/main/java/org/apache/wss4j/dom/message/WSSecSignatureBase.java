@@ -40,7 +40,6 @@ import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.transform.AttachmentTransformParameterSpec;
 import org.apache.wss4j.dom.transform.STRTransform;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -62,10 +61,6 @@ public class WSSecSignatureBase extends WSSecBase {
         super();
     }
     
-    public WSSecSignatureBase(WSSConfig config) {
-        super(config);
-    }
-    
     /**
      * This method adds references to the Signature.
      * 
@@ -84,7 +79,7 @@ public class WSSecSignatureBase extends WSSecBase {
         WSDocInfo wsDocInfo,
         XMLSignatureFactory signatureFactory,
         WSSecHeader secHeader,
-        WSSConfig wssConfig,
+        boolean addInclusivePrefixes,
         String digestAlgo
     ) throws WSSecurityException {
         DigestMethod digestMethod;
@@ -136,7 +131,7 @@ public class WSSecSignatureBase extends WSSecBase {
                             }
                             element = callbackLookup.getElement(idToSign, null, false);
                         }
-                        if (wssConfig.isAddInclusivePrefixes()) {
+                        if (addInclusivePrefixes) {
                             List<String> prefixes = getInclusivePrefixes(element);
                             transformSpec = new ExcC14NParameterSpec(prefixes);
                         }
@@ -183,7 +178,7 @@ public class WSSecSignatureBase extends WSSecBase {
                     }
                     for (Element elementToSign : elementsToSign) {
                         TransformParameterSpec transformSpec = null;
-                        if (wssConfig.isAddInclusivePrefixes()) {
+                        if (addInclusivePrefixes) {
                             List<String> prefixes = getInclusivePrefixes(elementToSign);
                             transformSpec = new ExcC14NParameterSpec(prefixes);
                         }

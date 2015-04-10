@@ -36,7 +36,6 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.CustomHandler;
@@ -191,8 +190,10 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         LOG.info("After adding UsernameToken PW Digest....");
 
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        newEngine.getWssConfig().setPasswordsAreEncoded(true);
-        newEngine.processSecurityHeader(signedDoc, null, new EncodedPasswordCallbackHandler(), null);
+        RequestData requestData = new RequestData();
+        requestData.setEncodePasswords(true);
+        requestData.setCallbackHandler(new EncodedPasswordCallbackHandler());
+        newEngine.processSecurityHeader(signedDoc, requestData);
     }
     
     /**
@@ -275,13 +276,13 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             LOG.debug(outputString);
         }
         
-        WSSecurityEngine secEngine = new WSSecurityEngine();
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setUtTTL(-1);
-        secEngine.setWssConfig(config);
+        RequestData requestData = new RequestData();
+        requestData.setUtTTL(-1);
+        requestData.setCallbackHandler(callbackHandler);
         
         try {
-            secEngine.processSecurityHeader(doc, null, callbackHandler, null);
+            WSSecurityEngine secEngine = new WSSecurityEngine();
+            secEngine.processSecurityHeader(doc, requestData);
             fail("The UsernameToken validation should have failed");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
@@ -343,10 +344,11 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         
         // This should not
         try {
-            WSSConfig config = WSSConfig.getNewInstance();
-            config.setUtFutureTTL(0);
-            secEngine.setWssConfig(config);
-            secEngine.processSecurityHeader(doc, null, callbackHandler, null);
+            RequestData requestData = new RequestData();
+            requestData.setUtFutureTTL(0);
+            requestData.setCallbackHandler(callbackHandler);
+            
+            secEngine.processSecurityHeader(doc, requestData);
             fail("The UsernameToken validation should have failed");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
@@ -675,11 +677,13 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         //
         // Configure so that custom token types are accepted
         //
-        WSSConfig cfg = WSSConfig.getNewInstance();
-        cfg.setHandleCustomPasswordTypes(true);
         WSSecurityEngine secEngine = new WSSecurityEngine();
-        secEngine.setWssConfig(cfg);
-        secEngine.processSecurityHeader(doc, null, callbackHandler, null);
+        
+        RequestData requestData = new RequestData();
+        requestData.setHandleCustomPasswordTypes(true);
+        requestData.setCallbackHandler(callbackHandler);
+        
+        secEngine.processSecurityHeader(doc, requestData);
     }
     
     
@@ -1092,7 +1096,6 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        WSSConfig config = WSSConfig.getNewInstance();
         WSTimeSource spoofedTimeSource = new WSTimeSource() {
 
             public Date now() {
@@ -1102,9 +1105,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             }
             
         };
-        config.setCurrentTime(spoofedTimeSource);
         
-        builder.setWsConfig(config);
+        builder.setWsTimeSource(spoofedTimeSource);
         Document signedDoc = builder.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
@@ -1135,10 +1137,12 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
      */
     private WSHandlerResult verify(Document doc, boolean allowUsernameTokenDerivedKeys) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setAllowUsernameTokenNoPassword(allowUsernameTokenDerivedKeys);
-        secEngine.setWssConfig(config);
-        return secEngine.processSecurityHeader(doc, null, callbackHandler, null);
+        
+        RequestData requestData = new RequestData();
+        requestData.setAllowUsernameTokenNoPassword(allowUsernameTokenDerivedKeys);
+        requestData.setCallbackHandler(callbackHandler);
+        
+        return secEngine.processSecurityHeader(doc, requestData);
     }
     
     /**

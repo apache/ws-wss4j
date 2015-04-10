@@ -30,7 +30,6 @@ import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.keys.KeyInfo;
 import org.w3c.dom.Document;
@@ -48,10 +47,6 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     
     public WSSecDKEncrypt() {
         super();
-    }
-    
-    public WSSecDKEncrypt(WSSConfig config) {
-        super(config);
     }
     
     public Document build(Document doc, WSSecHeader secHeader) throws WSSecurityException {
@@ -109,7 +104,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
         List<String> encDataRefs = 
             WSSecEncrypt.doEncryption(
-                document, getWsConfig(), keyInfo, key, symEncAlgo, references, callbackLookup
+                document, getIdAllocator(), keyInfo, key, symEncAlgo, references, callbackLookup
             );
         if (dataRef == null) {
             dataRef = 

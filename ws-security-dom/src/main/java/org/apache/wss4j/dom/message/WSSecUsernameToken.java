@@ -20,9 +20,10 @@
 package org.apache.wss4j.dom.message;
 
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.UsernameTokenUtil;
+import org.apache.wss4j.common.util.WSCurrentTimeSource;
+import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.exceptions.Base64DecodingException;
@@ -48,12 +49,11 @@ public class WSSecUsernameToken extends WSSecBase {
     private byte[] saltValue;
     private int iteration = UsernameToken.DEFAULT_ITERATION;
     private boolean passwordsAreEncoded;
+    private boolean precisionInMilliSeconds = true;
+    private WSTimeSource wsTimeSource = new WSCurrentTimeSource();
 
     public WSSecUsernameToken() {
         super();
-    }
-    public WSSecUsernameToken(WSSConfig config) {
-        super(config);
     }
 
     /**
@@ -169,8 +169,7 @@ public class WSSecUsernameToken extends WSSecBase {
      * @param doc The SOAP envelope as W3C document
      */
     public void prepare(Document doc) {
-        ut = new UsernameToken(getWsConfig().isPrecisionInMilliSeconds(), doc, 
-                               getWsConfig().getCurrentTime(), passwordType);
+        ut = new UsernameToken(precisionInMilliSeconds, doc, wsTimeSource, passwordType);
         ut.setPasswordsAreEncoded(passwordsAreEncoded);
         ut.setName(user);
         if (useDerivedKey) {
@@ -183,9 +182,9 @@ public class WSSecUsernameToken extends WSSecBase {
             ut.addNonce(doc);
         }
         if (created) {
-            ut.addCreated(getWsConfig().isPrecisionInMilliSeconds(), getWsConfig().getCurrentTime(), doc);
+            ut.addCreated(precisionInMilliSeconds, wsTimeSource, doc);
         }
-        ut.setID(getWsConfig().getIdAllocator().createId("UsernameToken-", ut));
+        ut.setID(getIdAllocator().createId("UsernameToken-", ut));
     }
 
     /**
@@ -249,5 +248,21 @@ public class WSSecUsernameToken extends WSSecBase {
      */
     public Element getUsernameTokenElement() {
        return ut.getElement(); 
+    }
+
+    public boolean isPrecisionInMilliSeconds() {
+        return precisionInMilliSeconds;
+    }
+
+    public void setPrecisionInMilliSeconds(boolean precisionInMilliSeconds) {
+        this.precisionInMilliSeconds = precisionInMilliSeconds;
+    }
+
+    public WSTimeSource getWsTimeSource() {
+        return wsTimeSource;
+    }
+
+    public void setWsTimeSource(WSTimeSource wsTimeSource) {
+        this.wsTimeSource = wsTimeSource;
     }
 }

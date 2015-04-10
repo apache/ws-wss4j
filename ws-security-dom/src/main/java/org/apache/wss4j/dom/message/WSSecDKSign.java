@@ -36,6 +36,9 @@ import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -45,11 +48,8 @@ import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.transform.STRTransform;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * Builder to sign with derived keys
@@ -75,14 +75,10 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     private CanonicalizationMethod c14nMethod;
     private Element securityHeader;
     private int derivedKeyLength = -1;
+    private boolean addInclusivePrefixes = true;
 
     public WSSecDKSign() {
         super();
-        init();
-    }
-    
-    public WSSecDKSign(WSSConfig config) {
-        super(config);
         init();
     }
     
@@ -129,8 +125,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         
         try {
             C14NMethodParameterSpec c14nSpec = null;
-            if (getWsConfig().isAddInclusivePrefixes() 
-                && canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
+            if (addInclusivePrefixes && canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
                 List<String> prefixes = 
                     getInclusivePrefixes(secHeader.getSecurityHeader(), false);
                 c14nSpec = new ExcC14NParameterSpec(prefixes);
@@ -144,10 +139,10 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
             );
         }
 
-        keyInfoUri = getWsConfig().getIdAllocator().createSecureId("KI-", keyInfo);
+        keyInfoUri = getIdAllocator().createSecureId("KI-", keyInfo);
         
         secRef = new SecurityTokenReference(doc);
-        strUri = getWsConfig().getIdAllocator().createSecureId("STR-", secRef);
+        strUri = getIdAllocator().createSecureId("STR-", secRef);
         secRef.setID(strUri);
         
         Reference ref = new Reference(document);
@@ -198,7 +193,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                 wsDocInfo,
                 signatureFactory, 
                 secHeader, 
-                getWsConfig(), 
+                addInclusivePrefixes, 
                 digestAlgo
             );
     }
@@ -243,7 +238,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                     signedInfo, 
                     keyInfo,
                     null,
-                    getWsConfig().getIdAllocator().createId("SIG-", null),
+                    getIdAllocator().createId("SIG-", null),
                     null);
             
             //
@@ -374,4 +369,11 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         return canonAlgo;
     }
     
+    public boolean isAddInclusivePrefixes() {
+        return addInclusivePrefixes;
+    }
+
+    public void setAddInclusivePrefixes(boolean addInclusivePrefixes) {
+        this.addInclusivePrefixes = addInclusivePrefixes;
+    }
 }

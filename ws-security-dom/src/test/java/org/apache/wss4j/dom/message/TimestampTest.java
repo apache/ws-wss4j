@@ -81,7 +81,7 @@ public class TimestampTest extends org.junit.Assert {
         //
         // Do some processing
         //
-        WSHandlerResult wsResult = verify(createdDoc, WSSConfig.getNewInstance());
+        WSHandlerResult wsResult = verify(createdDoc);
         WSSecurityEngineResult actionResult = 
             wsResult.getActionResults().get(WSConstants.TS).get(0);
         assertTrue(actionResult != null);
@@ -119,7 +119,7 @@ public class TimestampTest extends org.junit.Assert {
         //
         // Do some processing
         //
-        WSHandlerResult wsResult = verify(createdDoc, WSSConfig.getNewInstance());
+        WSHandlerResult wsResult = verify(createdDoc);
         WSSecurityEngineResult actionResult = 
             wsResult.getActionResults().get(WSConstants.TS).get(0);
         assertTrue(actionResult != null);
@@ -194,7 +194,7 @@ public class TimestampTest extends org.junit.Assert {
         }
         
         try {
-            verify(createdDoc, WSSConfig.getNewInstance());
+            verify(createdDoc);
             fail("Expected failure on an expired timestamp");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
@@ -225,10 +225,11 @@ public class TimestampTest extends org.junit.Assert {
         //
         // Do some processing
         //
-        WSSConfig wssConfig = WSSConfig.getNewInstance();
-        wssConfig.setTimeStampTTL(-1);
+        RequestData requestData = new RequestData();
+        requestData.setWssConfig(WSSConfig.getNewInstance());
+        requestData.setTimeStampTTL(-1);
         try {
-            verify(createdDoc, wssConfig);
+            verify(createdDoc, requestData);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
@@ -274,11 +275,11 @@ public class TimestampTest extends org.junit.Assert {
         //
         // Do some processing
         //
-        WSSConfig config = WSSConfig.getNewInstance();
-        verify(doc, config);
+        RequestData requestData = new RequestData();
+        requestData.setWssConfig(WSSConfig.getNewInstance());
+        requestData.setTimeStampFutureTTL(0);
         try {
-            config.setTimeStampFutureTTL(0);
-            verify(doc, config);
+            verify(doc, requestData);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
@@ -322,9 +323,8 @@ public class TimestampTest extends org.junit.Assert {
         //
         // Do some processing
         //
-        WSSConfig config = WSSConfig.getNewInstance();
         try {
-            verify(doc, config);
+            verify(doc);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
@@ -380,7 +380,7 @@ public class TimestampTest extends org.junit.Assert {
         // Do some processing
         //
         try {
-            verify(doc, WSSConfig.getNewInstance());
+            verify(doc);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
             //
@@ -414,9 +414,8 @@ public class TimestampTest extends org.junit.Assert {
         //
         // Do some processing
         //
-        WSSConfig wssConfig = WSSConfig.getNewInstance();
         try {
-            verify(createdDoc, wssConfig);
+            verify(createdDoc);
             fail("Expected failure on multiple timestamps");
         } catch (WSSecurityException ex) {
             // expected
@@ -462,7 +461,7 @@ public class TimestampTest extends org.junit.Assert {
         // Do some processing
         //
         try {
-            verify(doc, WSSConfig.getNewInstance());
+            verify(doc);
             fail("The timestamp validation should have failed on multiple Created elements");
         } catch (WSSecurityException ex) {
             // expected
@@ -509,7 +508,7 @@ public class TimestampTest extends org.junit.Assert {
         // Do some processing
         //
         try {
-            verify(doc, WSSConfig.getNewInstance());
+            verify(doc);
             fail("The timestamp validation should have failed on no Created element");
         } catch (WSSecurityException ex) {
             // expected
@@ -569,7 +568,7 @@ public class TimestampTest extends org.junit.Assert {
         // Do some processing
         //
         try {
-            verify(doc, WSSConfig.getNewInstance());
+            verify(doc);
             fail("The timestamp validation should have failed on multiple Expires elements");
         } catch (WSSecurityException ex) {
             // expected
@@ -623,7 +622,7 @@ public class TimestampTest extends org.junit.Assert {
         // Do some processing
         //
         try {
-            verify(doc, WSSConfig.getNewInstance());
+            verify(doc);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
             // expected
@@ -670,7 +669,7 @@ public class TimestampTest extends org.junit.Assert {
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         wssConfig.setValidator(WSSecurityEngine.TIMESTAMP, new NoOpValidator());
         try {
-            verify(doc, wssConfig);
+            verify(doc, wssConfig, new ArrayList<BSPRule>());
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
             //assertTrue(ex.getMessage().contains("Unparseable date"));
@@ -716,16 +715,16 @@ public class TimestampTest extends org.junit.Assert {
         //
         // Do some processing
         //
-        WSSConfig wssConfig = WSSConfig.getNewInstance();
-        wssConfig.setValidator(WSSecurityEngine.TIMESTAMP, new NoOpValidator());
         try {
-            verify(doc, WSSConfig.getNewInstance());
+            verify(doc);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
             //
         }
         
         // Now it should pass...
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        wssConfig.setValidator(WSSecurityEngine.TIMESTAMP, new NoOpValidator());
         verify(doc, wssConfig, Collections.singletonList(BSPRule.R3225));
     }
     
@@ -781,7 +780,7 @@ public class TimestampTest extends org.junit.Assert {
         // Do some processing
         //
         try {
-            verify(doc, WSSConfig.getNewInstance());
+            verify(doc);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
             //
@@ -804,7 +803,6 @@ public class TimestampTest extends org.junit.Assert {
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);
         
-        WSSConfig config = WSSConfig.getNewInstance();
         WSTimeSource spoofedTimeSource = new WSTimeSource() {
 
             public Date now() {
@@ -814,9 +812,8 @@ public class TimestampTest extends org.junit.Assert {
             }
             
         };
-        config.setCurrentTime(spoofedTimeSource);
+        timestamp.setWsTimeSource(spoofedTimeSource);
         
-        timestamp.setWsConfig(config);
         Document createdDoc = timestamp.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
@@ -829,7 +826,7 @@ public class TimestampTest extends org.junit.Assert {
         // Do some processing
         //
         try {
-            verify(createdDoc, WSSConfig.getNewInstance());
+            verify(createdDoc);
             fail("Expected failure on an expired timestamp");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
@@ -843,10 +840,8 @@ public class TimestampTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
-        WSSConfig wssConfig = WSSConfig.getNewInstance();
-        wssConfig.setPrecisionInMilliSeconds(false);
         WSSecTimestamp timestamp = new WSSecTimestamp();
-        timestamp.setWsConfig(wssConfig);
+        timestamp.setPrecisionInMilliSeconds(false);
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
 
@@ -859,7 +854,7 @@ public class TimestampTest extends org.junit.Assert {
         //
         // Do some processing
         //
-        WSHandlerResult wsResult = verify(createdDoc, WSSConfig.getNewInstance());
+        WSHandlerResult wsResult = verify(createdDoc);
         WSSecurityEngineResult actionResult = 
             wsResult.getActionResults().get(WSConstants.TS).get(0);
         assertTrue(actionResult != null);
@@ -883,7 +878,7 @@ public class TimestampTest extends org.junit.Assert {
             //
             // Do some processing
             //
-            WSHandlerResult wsResult = verify(createdDoc, WSSConfig.getNewInstance());
+            WSHandlerResult wsResult = verify(createdDoc);
             WSSecurityEngineResult actionResult = 
                 wsResult.getActionResults().get(WSConstants.TS).get(0);
             assertTrue(actionResult != null);
@@ -896,11 +891,18 @@ public class TimestampTest extends org.junit.Assert {
      * Verifies the soap envelope
      */
     private WSHandlerResult verify(
-        Document doc, WSSConfig wssConfig
+        Document doc
     ) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         RequestData requestData = new RequestData();
-        requestData.setWssConfig(wssConfig);
+        requestData.setWssConfig(WSSConfig.getNewInstance());
+        return secEngine.processSecurityHeader(doc, requestData);
+    }
+    
+    private WSHandlerResult verify(
+        Document doc, RequestData requestData
+    ) throws Exception {
+        WSSecurityEngine secEngine = new WSSecurityEngine();
         return secEngine.processSecurityHeader(doc, requestData);
     }
     

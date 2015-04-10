@@ -232,10 +232,8 @@ public class SignatureTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testSignatureInclusivePrefixes() throws Exception {
-        WSSConfig wssConfig = WSSConfig.getNewInstance();
-        wssConfig.setAddInclusivePrefixes(true);
         WSSecSignature builder = new WSSecSignature();
-        builder.setWsConfig(wssConfig);
+        builder.setAddInclusivePrefixes(true);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);

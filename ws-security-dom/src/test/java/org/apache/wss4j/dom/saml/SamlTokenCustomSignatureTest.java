@@ -278,14 +278,12 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
      */
     private WSHandlerResult verify(Document doc) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setValidateSamlSubjectConfirmation(false);
-        secEngine.setWssConfig(config);
+        RequestData requestData = new RequestData();
+        requestData.setDecCrypto(crypto);
+        requestData.setSigVerCrypto(crypto);
+        requestData.setValidateSamlSubjectConfirmation(false);
         
-        WSHandlerResult results = 
-            secEngine.processSecurityHeader(
-                doc, null, null, crypto
-            );
+        WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
         String outputString = XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         return results;

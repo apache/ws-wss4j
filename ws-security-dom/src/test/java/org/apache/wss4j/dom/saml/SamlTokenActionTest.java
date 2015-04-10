@@ -63,7 +63,6 @@ public class SamlTokenActionTest extends org.junit.Assert {
         crypto = CryptoFactory.getInstance("wss40.properties");
         config.setValidator(WSSecurityEngine.SAML_TOKEN, new CustomSamlAssertionValidator());
         config.setValidator(WSSecurityEngine.SAML2_TOKEN, new CustomSamlAssertionValidator());
-        config.setValidateSamlSubjectConfirmation(false);
         secEngine.setWssConfig(config);
     }
     
@@ -182,8 +181,13 @@ public class SamlTokenActionTest extends org.junit.Assert {
     private WSHandlerResult verify(
         Document doc, CallbackHandler callbackHandler
     ) throws Exception {
-        WSHandlerResult results = 
-            secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
+        RequestData requestData = new RequestData();
+        requestData.setCallbackHandler(callbackHandler);
+        requestData.setDecCrypto(crypto);
+        requestData.setSigVerCrypto(crypto);
+        requestData.setValidateSamlSubjectConfirmation(false);
+        
+        WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);

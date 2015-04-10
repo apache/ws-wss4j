@@ -59,7 +59,9 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
         
         WSPasswordCallback passwordCallback = 
             handler.getPasswordCB(signatureToken.getUser(), WSConstants.DKT_SIGN, callbackHandler, reqData);
-        WSSecDKSign wsSign = new WSSecDKSign(reqData.getWssConfig());
+        WSSecDKSign wsSign = new WSSecDKSign();
+        wsSign.setIdAllocator(reqData.getWssConfig().getIdAllocator());
+        wsSign.setAddInclusivePrefixes(reqData.isAddInclusivePrefixes());
 
         if (signatureToken.getSignatureAlgorithm() != null) {
             wsSign.setSignatureAlgorithm(signatureToken.getSignatureAlgorithm());

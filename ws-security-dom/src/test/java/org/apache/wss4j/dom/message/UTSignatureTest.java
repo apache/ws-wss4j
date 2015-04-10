@@ -255,10 +255,14 @@ public class UTSignatureTest extends org.junit.Assert {
         boolean allowUsernameTokenDerivedKeys
     ) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
-        WSSConfig config = WSSConfig.getNewInstance();
-        config.setAllowUsernameTokenNoPassword(allowUsernameTokenDerivedKeys);
-        secEngine.setWssConfig(config);
-        return secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
+        
+        RequestData requestData = new RequestData();
+        requestData.setAllowUsernameTokenNoPassword(allowUsernameTokenDerivedKeys);
+        requestData.setCallbackHandler(callbackHandler);
+        requestData.setSigVerCrypto(crypto);
+        requestData.setDecCrypto(crypto);
+        
+        return secEngine.processSecurityHeader(doc, requestData);
     }
 
 }
