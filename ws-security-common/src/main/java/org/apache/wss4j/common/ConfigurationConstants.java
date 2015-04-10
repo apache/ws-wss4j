@@ -454,6 +454,12 @@ public class ConfigurationConstants {
     public static final String TIMESTAMP_STRICT = "timestampStrict";
     
     /**
+     * Set the value of this parameter to true to require that a Timestamp must have
+     * an "Expires" Element. The default is "false".
+     */
+    public static final String REQUIRE_TIMESTAMP_EXPIRES = "requireTimestampExpires";
+    
+    /**
      * Defines whether to encrypt the symmetric encryption key or not. If true
      * (the default), the symmetric key used for encryption is encrypted in turn,
      * and inserted into the security header in an "EncryptedKey" structure. If

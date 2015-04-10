@@ -72,7 +72,7 @@ public class RequestData {
     private CallbackHandler callback;
     private CallbackHandler attachmentCallbackHandler;
     private boolean enableRevocation;
-    protected boolean requireSignedEncryptedDataElements;
+    private boolean requireSignedEncryptedDataElements;
     private ReplayCache timestampReplayCache;
     private ReplayCache nonceReplayCache;
     private ReplayCache samlOneTimeUseReplayCache;
@@ -94,6 +94,7 @@ public class RequestData {
     private String derivedKeyTokenReference;
     private boolean use200512Namespace = true;
     private final List<String> audienceRestrictions = new ArrayList<>();
+    private boolean requireTimestampExpires;
 
     public void clear() {
         soapConstants = null;
@@ -129,6 +130,7 @@ public class RequestData {
         derivedKeyTokenReference = null;
         setUse200512Namespace(true);
         audienceRestrictions.clear();
+        requireTimestampExpires = false;
     }
 
     public boolean isEnableTimestampReplayCache() {
@@ -579,6 +581,14 @@ public class RequestData {
 
     public void setUse200512Namespace(boolean use200512Namespace) {
         this.use200512Namespace = use200512Namespace;
+    }
+
+    public boolean isRequireTimestampExpires() {
+        return requireTimestampExpires;
+    }
+
+    public void setRequireTimestampExpires(boolean requireTimestampExpires) {
+        this.requireTimestampExpires = requireTimestampExpires;
     }
         
 }

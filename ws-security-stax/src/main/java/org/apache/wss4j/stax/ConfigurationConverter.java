@@ -467,6 +467,10 @@ public final class ConfigurationConverter {
         boolean use200512Namespace = 
             decodeBooleanConfigValue(ConfigurationConstants.USE_2005_12_NAMESPACE, true, config);
         properties.setUse200512Namespace(use200512Namespace);
+        
+        boolean requireTimestampExpires = 
+            decodeBooleanConfigValue(ConfigurationConstants.REQUIRE_TIMESTAMP_EXPIRES, false, config);
+        properties.setRequireTimestampExpires(requireTimestampExpires);
     }
     
     public static void parseNonBooleanProperties(
