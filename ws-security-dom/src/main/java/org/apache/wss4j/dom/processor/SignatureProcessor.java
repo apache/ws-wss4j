@@ -409,7 +409,7 @@ public class SignatureProcessor implements Processor {
             }
             
             // Test for replay attacks
-            testMessageReplay(elem, xmlSignature.getSignatureValue().getValue(), data, wsDocInfo);
+            testMessageReplay(elem, xmlSignature.getSignatureValue().getValue(), key, data, wsDocInfo);
             
             setElementsOnContext(xmlSignature, (DOMValidateContext)context, wsDocInfo, elem.getOwnerDocument());
             boolean signatureOk = xmlSignature.validate(context);
@@ -628,9 +628,11 @@ public class SignatureProcessor implements Processor {
     }
     
     /**
-     * Test for a replayed message. The cache key is the Timestamp Created String and the signature value.
+     * Test for a replayed message. The cache key is the Timestamp Created String, the signature 
+     * value, and the encoded value of the signing key.
      * @param signatureElement
      * @param signatureValue
+     * @param key
      * @param requestData
      * @param wsDocInfo
      * @throws WSSecurityException
@@ -638,6 +640,7 @@ public class SignatureProcessor implements Processor {
     private void testMessageReplay(
         Element signatureElement,
         byte[] signatureValue,
+        Key key,
         RequestData requestData,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
@@ -671,7 +674,8 @@ public class SignatureProcessor implements Processor {
         // Test for replay attacks
         Date created = timeStamp.getCreated();
         DateFormat zulu = new XmlSchemaDateFormat();
-        String identifier = zulu.format(created) + "" + Arrays.hashCode(signatureValue);
+        String identifier = zulu.format(created) + "" + Arrays.hashCode(signatureValue)
+            + "" + Arrays.hashCode(key.getEncoded());
 
         if (replayCache.contains(identifier)) {
             throw new WSSecurityException(
@@ -680,7 +684,7 @@ public class SignatureProcessor implements Processor {
                 "A replay attack has been detected");
         }
 
-        // Store the Timestamp/SignatureValue combination in the cache
+        // Store the Timestamp/SignatureValue/Key combination in the cache
         Date expires = timeStamp.getExpires();
         if (expires != null) {
             Date rightNow = new Date();
