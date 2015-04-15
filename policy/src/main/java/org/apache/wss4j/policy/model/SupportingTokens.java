@@ -21,16 +21,18 @@ package org.apache.wss4j.policy.model;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
+import org.apache.neethi.PolicyContainingAssertion;
 import org.apache.wss4j.policy.SPConstants;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class SupportingTokens extends AbstractTokenWrapper {
+public class SupportingTokens extends AbstractSecurityAssertion implements PolicyContainingAssertion {
 
     private SupportingTokenType supportingTokenType;
     private final List<AbstractToken> tokens = new ArrayList<>();
@@ -39,10 +41,12 @@ public class SupportingTokens extends AbstractTokenWrapper {
     private SignedElements signedElements;
     private EncryptedParts encryptedParts;
     private EncryptedElements encryptedElements;
+    private Policy nestedPolicy;
 
     public SupportingTokens(SPConstants.SPVersion version, SupportingTokenType supportingTokenType, Policy nestedPolicy) {
-        super(version, nestedPolicy);
+        super(version);
         this.supportingTokenType = supportingTokenType;
+        this.nestedPolicy = nestedPolicy;
 
         parseNestedPolicy(nestedPolicy, this);
     }
@@ -65,6 +69,11 @@ public class SupportingTokens extends AbstractTokenWrapper {
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
         return new SupportingTokens(getVersion(), getSupportingTokenType(), nestedPolicy);
+    }
+    
+    @Override
+    public Policy getPolicy() {
+        return nestedPolicy;
     }
 
     protected void parseNestedPolicy(Policy nestedPolicy, SupportingTokens supportingTokens) {
@@ -205,4 +214,5 @@ public class SupportingTokens extends AbstractTokenWrapper {
         }
         return false;
     }
+
 }
