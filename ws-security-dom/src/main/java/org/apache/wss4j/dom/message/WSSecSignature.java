@@ -174,6 +174,8 @@ public class WSSecSignature extends WSSecSignatureBase {
         if (!useCustomSecRef) {
             secRef = new SecurityTokenReference(doc);
             strUri = getIdAllocator().createSecureId("STR-", secRef);
+            secRef.addWSSENamespace();
+            secRef.addWSUNamespace();
             secRef.setID(strUri);
             
             //
