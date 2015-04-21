@@ -46,7 +46,7 @@
         <woodstox.core.asl.version>4.4.1</woodstox.core.asl.version>
         <wsdl4j.version>1.6.3</wsdl4j.version>
         <xalan.version>2.7.2</xalan.version>
-        <xmlsec.version>2.0.3</xmlsec.version>
+        <xmlsec.version>2.0.4</xmlsec.version>
         <xmlunit.version>1.6</xmlunit.version>
         
         <!-- OSGi related properties -->
