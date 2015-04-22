@@ -5,6 +5,46 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.0.3
+=============
+
+Bug
+
+    [WSS-514] - Missing CUSTOM_TOKEN action in WSSecurityUtil#decodeHandlerAction @l961
+    [WSS-517] - Cannot resolve WSS signature reference URI that points to AssertionID attribute of SAML 1.1 token
+    [WSS-519] - SAML 2.0 - WSS4J is expecting SecurityTokenReference under KeyInfo in EcryptedAssertion element
+
+Improvement
+
+    [WSS-515] - Add support for creating SAML Assertions with "Advice" Elements
+    [WSS-518] - WSConfig static initializer attempts to modify JCE Providers fail in JVM with restrictive security policies
+    [WSS-521] - Validate that a SAML Assertion "IssueInstant" is not "in the future"
+    [WSS-522] - Enforce security constraints on SAML AuthnStatement attributes
+    [WSS-523] - Add the ability to supply AudienceRestrictions when validating SAML tokens
+    [WSS-524] - Set a default TTL of 30 minutes on a SAML Assertion with no NotOnOrAfter Condition
+    [WSS-525] - Provide a means of unifying all error messages
+
+
+Release 2.0.2
+=============
+
+Bug
+
+    [WSS-508] - When using "add inclusive prefixes" and EXC C14N - signature cannot be validated
+    [WSS-513] - Fails to parse Timestamp headers in Thai locale
+
+Improvement
+
+    [WSS-499] - Re-enable KerberosTests
+    [WSS-510] - Provide a way of requiring a particular SAML subject confirmation method
+    [WSS-511] - Provide a (default) way of requiring at least one standard Subject Confirmation Method
+    [WSS-512] - Provide a configurable way of enforcing that SAML Bearer Tokens must have an internal signature
+
+New Feature
+
+    [WSS-507] - ThreadLocal based Security Provider proxy
+
+
 Release 2.0.1
 =============
 
