@@ -21,6 +21,7 @@ package org.apache.wss4j.common.util;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -126,7 +127,12 @@ public final class KeyUtils {
         throws WSSecurityException {
         try {
             String keyAlgorithm = JCEMapper.translateURItoJCEID(cipherAlgo);
-            return Cipher.getInstance(keyAlgorithm);
+            String provider = JCEMapper.getProviderId();
+            
+            if (provider == null) {
+                return Cipher.getInstance(keyAlgorithm);
+            }
+            return Cipher.getInstance(keyAlgorithm, provider);
         } catch (NoSuchPaddingException ex) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp", 
@@ -147,6 +153,10 @@ public final class KeyUtils {
                     WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
                     ex, "No such algorithm: " + cipherAlgo);
             }
+        } catch (NoSuchProviderException ex) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                ex, "No such provider " + JCEMapper.getProviderId() + " for: " + cipherAlgo);
         }
     }
     
