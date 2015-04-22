@@ -26,15 +26,16 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.message.token.SecurityTokenReference;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -166,10 +167,10 @@ public class DerivedKeyTest extends org.junit.Assert {
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        WSHandlerResult results = verify(doc);
+        List<WSSecurityEngineResult> results = verify(doc);
         
         WSSecurityEngineResult actionResult = 
-            results.getActionResults().get(WSConstants.SIGN).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         assertTrue(actionResult.get(WSSecurityEngineResult.TAG_SECRET) != null);
@@ -208,10 +209,10 @@ public class DerivedKeyTest extends org.junit.Assert {
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        WSHandlerResult results = verify(doc);
+        List<WSSecurityEngineResult> results = verify(doc);
         
         WSSecurityEngineResult actionResult = 
-            results.getActionResults().get(WSConstants.SIGN).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         assertTrue(actionResult.get(WSSecurityEngineResult.TAG_SECRET) != null);
@@ -249,10 +250,10 @@ public class DerivedKeyTest extends org.junit.Assert {
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        WSHandlerResult results = verify(doc);
+        List<WSSecurityEngineResult> results = verify(doc);
         
         WSSecurityEngineResult actionResult = 
-            results.getActionResults().get(WSConstants.SIGN).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         assertTrue(actionResult.get(WSSecurityEngineResult.TAG_SECRET) != null);
@@ -348,8 +349,8 @@ public class DerivedKeyTest extends org.junit.Assert {
      * @param envelope 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private WSHandlerResult verify(Document doc) throws Exception {
-        WSHandlerResult results = 
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);

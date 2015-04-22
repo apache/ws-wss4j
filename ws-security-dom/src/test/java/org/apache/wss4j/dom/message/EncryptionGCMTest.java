@@ -35,7 +35,6 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.w3c.dom.Document;
 
 import java.util.ArrayList;
@@ -185,13 +184,14 @@ public class EncryptionGCMTest extends org.junit.Assert {
         javax.xml.namespace.QName expectedEncryptedElement
     ) throws Exception {
         RequestData requestData = new RequestData();
-        List<BSPRule> bspRules = new ArrayList<>();
+        List<BSPRule> bspRules = new ArrayList<BSPRule>();
         bspRules.add(BSPRule.R5621);
         bspRules.add(BSPRule.R5620);
         requestData.setIgnoredBSPRules(bspRules);
         requestData.setCallbackHandler(handler);
         requestData.setDecCrypto(crypto);
-        final WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
+        final java.util.List<WSSecurityEngineResult> results =
+            secEngine.processSecurityHeader(doc, null, requestData);
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
@@ -204,7 +204,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
         // (as a QName)
         //
         boolean encrypted = false;
-        for (java.util.Iterator<WSSecurityEngineResult> ipos = results.getResults().iterator(); 
+        for (java.util.Iterator<WSSecurityEngineResult> ipos = results.iterator(); 
             ipos.hasNext();) {
             final WSSecurityEngineResult result = ipos.next();
             final Integer action = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);

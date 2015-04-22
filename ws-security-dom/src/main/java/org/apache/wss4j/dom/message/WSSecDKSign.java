@@ -19,7 +19,22 @@
 
 package org.apache.wss4j.dom.message;
 
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDocInfo;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.wss4j.common.derivedKey.ConversationConstants;
+import org.apache.wss4j.dom.message.token.Reference;
+import org.apache.wss4j.dom.message.token.SecurityTokenReference;
+import org.apache.wss4j.dom.transform.STRTransform;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import java.security.NoSuchProviderException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.crypto.XMLStructure;
@@ -27,29 +42,14 @@ import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.SignatureMethod;
 import javax.xml.crypto.dsig.SignedInfo;
-import javax.xml.crypto.dsig.XMLSignContext;
 import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.XMLSignContext;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import org.apache.wss4j.common.WSEncryptionPart;
-import org.apache.wss4j.common.derivedKey.ConversationConstants;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.token.Reference;
-import org.apache.wss4j.common.token.SecurityTokenReference;
-import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.transform.STRTransform;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 /**
  * Builder to sign with derived keys
@@ -74,11 +74,14 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     private KeyInfo keyInfo;
     private CanonicalizationMethod c14nMethod;
     private Element securityHeader;
-    private int derivedKeyLength = -1;
-    private boolean addInclusivePrefixes = true;
 
     public WSSecDKSign() {
         super();
+        init();
+    }
+    
+    public WSSecDKSign(WSSConfig config) {
+        super(config);
         init();
     }
     
@@ -95,10 +98,18 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     public Document build(Document doc, WSSecHeader secHeader) throws WSSecurityException {
         
         prepare(doc, secHeader);
-        if (getParts().isEmpty()) {
-            getParts().add(WSSecurityUtil.getDefaultEncryptionPart(document));
+        String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+        if (parts == null) {
+            parts = new ArrayList<WSEncryptionPart>(1);
+            WSEncryptionPart encP = 
+                new WSEncryptionPart(
+                    WSConstants.ELEM_BODY,
+                    soapNamespace, 
+                    "Content"
+                );
+            parts.add(encP);
         } else {
-            for (WSEncryptionPart part : getParts()) {
+            for (WSEncryptionPart part : parts) {
                 if ("STRTransform".equals(part.getName()) && part.getId() == null) {
                     part.setId(strUri);
                 }
@@ -106,7 +117,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         }
         
         List<javax.xml.crypto.dsig.Reference> referenceList = 
-            addReferencesToSign(getParts(), secHeader);
+            addReferencesToSign(parts, secHeader);
         computeSignature(referenceList);
         
         //
@@ -125,7 +136,8 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         
         try {
             C14NMethodParameterSpec c14nSpec = null;
-            if (addInclusivePrefixes && canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
+            if (getWsConfig().isAddInclusivePrefixes() 
+                && canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
                 List<String> prefixes = 
                     getInclusivePrefixes(secHeader.getSecurityHeader(), false);
                 c14nSpec = new ExcC14NParameterSpec(prefixes);
@@ -139,14 +151,14 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
             );
         }
 
-        keyInfoUri = getIdAllocator().createSecureId("KI-", keyInfo);
+        keyInfoUri = getWsConfig().getIdAllocator().createSecureId("KI-", keyInfo);
         
         secRef = new SecurityTokenReference(doc);
-        strUri = getIdAllocator().createSecureId("STR-", secRef);
+        strUri = getWsConfig().getIdAllocator().createSecureId("STR-", secRef);
         secRef.setID(strUri);
         
         Reference ref = new Reference(document);
-        ref.setURI("#" + getId());
+        ref.setURI("#" + dktId);
         String ns = 
             ConversationConstants.getWSCNs(getWscVersion()) 
             + ConversationConstants.TOKEN_TYPE_DERIVED_KEY_TOKEN;
@@ -170,8 +182,10 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
      */
     public Element getSignatureElement() {
         return
-            XMLUtils.getDirectChildElement(
-                securityHeader, WSConstants.SIG_LN, WSConstants.SIG_NS
+            WSSecurityUtil.getDirectChildElement(
+                securityHeader,
+                WSConstants.SIG_LN,
+                WSConstants.SIG_NS
             );
     }
     
@@ -193,7 +207,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                 wsDocInfo,
                 signatureFactory, 
                 secHeader, 
-                addInclusivePrefixes, 
+                getWsConfig(), 
                 digestAlgo
             );
     }
@@ -228,7 +242,8 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         Element siblingElement
     ) throws WSSecurityException {
         try {
-            java.security.Key key = getDerivedKey(sigAlgo);
+            java.security.Key key = 
+                KeyUtils.prepareSecretKey(sigAlgo, derivedKeyBytes);
             SignatureMethod signatureMethod = 
                 signatureFactory.newSignatureMethod(sigAlgo, null);
             SignedInfo signedInfo = 
@@ -238,7 +253,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                     signedInfo, 
                     keyInfo,
                     null,
-                    getIdAllocator().createId("SIG-", null),
+                    getWsConfig().getIdAllocator().createId("SIG-", null),
                     null);
             
             //
@@ -270,6 +285,9 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
             
             // Add the elements to sign to the Signature Context
             wsDocInfo.setTokensOnContext((DOMSignContext)signContext);
+            if (secRef != null && secRef.getElement() != null) {
+                WSSecurityUtil.storeElementInContext((DOMSignContext)signContext, secRef.getElement());
+            }
             
             sig.sign(signContext);
             
@@ -282,13 +300,12 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         }
     }
     
+    /**
+     * @see org.apache.wss4j.dom.message.WSSecDerivedKeyBase#getDerivedKeyLength()
+     */
     protected int getDerivedKeyLength() throws WSSecurityException {
         return derivedKeyLength > 0 ? derivedKeyLength : 
             KeyUtils.getKeyLength(sigAlgo);
-    }
-    
-    public void setDerivedKeyLength(int keyLength) {
-        derivedKeyLength = keyLength;
     }
     
     /**
@@ -369,11 +386,4 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         return canonAlgo;
     }
     
-    public boolean isAddInclusivePrefixes() {
-        return addInclusivePrefixes;
-    }
-
-    public void setAddInclusivePrefixes(boolean addInclusivePrefixes) {
-        this.addInclusivePrefixes = addInclusivePrefixes;
-    }
 }

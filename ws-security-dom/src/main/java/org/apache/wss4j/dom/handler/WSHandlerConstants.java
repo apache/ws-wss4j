@@ -98,7 +98,7 @@ public final class WSHandlerConstants extends ConfigurationConstants {
      * </ul>
      * See {@link #SIG_KEY_ID} {@link #ENC_KEY_ID}.
      */
-    private static Map<String, Integer> keyIdentifier = new HashMap<>();
+    private static Map<String, Integer> keyIdentifier = new HashMap<String, Integer>();
 
     static {
         keyIdentifier.put("DirectReference", WSConstants.BST_DIRECT_REFERENCE);

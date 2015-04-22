@@ -229,11 +229,11 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                 final X509Certificate x509Certificate = securityToken.getKeyWrappingToken().getX509Certificates()[0];
                 final String encryptionKeyTransportAlgorithm = getSecurityProperties().getEncryptionKeyTransportAlgorithm();
 
-                List<XMLSecAttribute> attributes = new ArrayList<>(1);
+                List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
                 attributes.add(createAttribute(WSSConstants.ATT_NULL_Id, securityToken.getId()));
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, true, attributes);
 
-                attributes = new ArrayList<>(1);
+                attributes = new ArrayList<XMLSecAttribute>(1);
                 attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, encryptionKeyTransportAlgorithm));
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_xenc_EncryptionMethod, false, attributes);
 
@@ -251,14 +251,14 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
                     String encryptionKeyTransportDigestAlgorithm = getSecurityProperties().getEncryptionKeyTransportDigestAlgorithm();
                     if (encryptionKeyTransportDigestAlgorithm != null) {
-                        attributes = new ArrayList<>(1);
+                        attributes = new ArrayList<XMLSecAttribute>(1);
                         attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm, encryptionKeyTransportDigestAlgorithm));
                         createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_DigestMethod, true, attributes);
                         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_DigestMethod);
                     }
 
                     if (encryptionKeyTransportMGFAlgorithm != null) {
-                        attributes = new ArrayList<>(1);
+                        attributes = new ArrayList<XMLSecAttribute>(1);
                         attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm, encryptionKeyTransportMGFAlgorithm));
                         createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc11_MGF, true, attributes);
                         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc11_MGF);
@@ -326,16 +326,24 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                         callback.setKey(encryptedEphemeralKey);
                         try {
                             ((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler().handle(new Callback[]{callback});
-                        } catch (IOException | UnsupportedCallbackException e) { // NOPMD
+                        } catch (IOException e) { // NOPMD
+                            // Do nothing
+                        } catch (UnsupportedCallbackException e) { // NOPMD
                             // Do nothing
                         }
                     }
 
                     createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(encryptedEphemeralKey));
 
-                } catch (NoSuchPaddingException | NoSuchAlgorithmException
-                    | InvalidKeyException | IllegalBlockSizeException
-                    | InvalidAlgorithmParameterException e) {
+                } catch (NoSuchPaddingException e) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+                } catch (NoSuchAlgorithmException e) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+                } catch (InvalidKeyException e) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+                } catch (IllegalBlockSizeException e) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+                } catch (InvalidAlgorithmParameterException e) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
                 }
 
@@ -362,7 +370,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                 return;
             } 
             
-            List<XMLSecAttribute> attributes = new ArrayList<>(2);
+            List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
             attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
             if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier) && !useSingleCertificate) {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_X509PKIPathv1));

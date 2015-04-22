@@ -23,6 +23,7 @@ import java.util.Collections;
 
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
@@ -69,31 +70,29 @@ public class PasswordTypeTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         WSSecurityEngine secEngine = new WSSecurityEngine();
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
         
         //
         // It should pass with PASSWORD_DIGEST
         //
-        RequestData requestData = new RequestData();
-        requestData.setCallbackHandler(callbackHandler);
-        requestData.setRequiredPasswordType(WSConstants.PASSWORD_DIGEST);
-        secEngine.processSecurityHeader(doc, requestData);
+        wssConfig.setRequiredPasswordType(WSConstants.PASSWORD_DIGEST);
+        secEngine.setWssConfig(wssConfig);
+        secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         
         //
         // It should pass with null
         //
-        requestData = new RequestData();
-        requestData.setCallbackHandler(callbackHandler);
-        requestData.setRequiredPasswordType(null);
-        secEngine.processSecurityHeader(doc, requestData);
+        wssConfig.setRequiredPasswordType(null);
+        secEngine.setWssConfig(wssConfig);
+        secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         
         //
         // It should fail with PASSWORD_TEXT
         //
         try {
-            requestData = new RequestData();
-            requestData.setCallbackHandler(callbackHandler);
-            requestData.setRequiredPasswordType(WSConstants.PASSWORD_TEXT);
-            secEngine.processSecurityHeader(doc, requestData);
+            wssConfig.setRequiredPasswordType(WSConstants.PASSWORD_TEXT);
+            secEngine.setWssConfig(wssConfig);
+            secEngine.processSecurityHeader(doc, null, callbackHandler, null);
             fail("Expected failure on the wrong password type");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
@@ -121,31 +120,29 @@ public class PasswordTypeTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         WSSecurityEngine secEngine = new WSSecurityEngine();
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
         
         //
         // It should pass with PASSWORD_TEXT
         //
-        RequestData requestData = new RequestData();
-        requestData.setCallbackHandler(callbackHandler);
-        requestData.setRequiredPasswordType(WSConstants.PASSWORD_TEXT);
-        secEngine.processSecurityHeader(doc, requestData);
+        wssConfig.setRequiredPasswordType(WSConstants.PASSWORD_TEXT);
+        secEngine.setWssConfig(wssConfig);
+        secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         
         //
         // It should pass with null
         //
-        requestData = new RequestData();
-        requestData.setCallbackHandler(callbackHandler);
-        requestData.setRequiredPasswordType(null);
-        secEngine.processSecurityHeader(doc, requestData);
+        wssConfig.setRequiredPasswordType(null);
+        secEngine.setWssConfig(wssConfig);
+        secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         
         //
         // It should fail with PASSWORD_DIGEST
         //
         try {
-            requestData = new RequestData();
-            requestData.setCallbackHandler(callbackHandler);
-            requestData.setRequiredPasswordType(WSConstants.PASSWORD_DIGEST);
-            secEngine.processSecurityHeader(doc, requestData);
+            wssConfig.setRequiredPasswordType(WSConstants.PASSWORD_DIGEST);
+            secEngine.setWssConfig(wssConfig);
+            secEngine.processSecurityHeader(doc, null, callbackHandler, null);
             fail("Expected failure on the wrong password type");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
@@ -191,10 +188,10 @@ public class PasswordTypeTest extends org.junit.Assert {
         reqData.setMsgContext(config);
         handler.receive(Collections.singletonList(WSConstants.UT), reqData);
         WSSecurityEngine secEngine = new WSSecurityEngine();
-        reqData.setCallbackHandler(callbackHandler);
+        secEngine.setWssConfig(reqData.getWssConfig());
         
         try {
-            secEngine.processSecurityHeader(doc, reqData);
+            secEngine.processSecurityHeader(doc, null, callbackHandler, null);
             fail("Expected failure on the wrong password type");
         } catch (WSSecurityException ex) {
             // expected

@@ -31,6 +31,7 @@ import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
+import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
@@ -130,9 +131,16 @@ public class UsernameTokenProcessor implements Processor {
         Validator validator,
         RequestData data
     ) throws WSSecurityException {
-        boolean allowNamespaceQualifiedPasswordTypes = data.isAllowNamespaceQualifiedPasswordTypes();
-        int utTTL = data.getUtTTL();
-        int futureTimeToLive = data.getUtFutureTTL();
+        boolean allowNamespaceQualifiedPasswordTypes = false;
+        WSSConfig wssConfig = data.getWssConfig();
+        int utTTL = 300;
+        int futureTimeToLive = 60;
+        if (wssConfig != null) {
+            allowNamespaceQualifiedPasswordTypes = 
+                wssConfig.getAllowNamespaceQualifiedPasswordTypes();
+            utTTL = wssConfig.getUtTTL();
+            futureTimeToLive = wssConfig.getUtFutureTTL();
+        }
         
         //
         // Parse and validate the UsernameToken element

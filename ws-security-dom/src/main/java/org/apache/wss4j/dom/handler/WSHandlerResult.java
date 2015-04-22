@@ -20,25 +20,20 @@
 package org.apache.wss4j.dom.handler;
 
 import java.util.List;
-import java.util.Map;
-
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 
 public class WSHandlerResult {
-    private final String actor;
-    private final List<WSSecurityEngineResult> wsSecurityResults;
-    private final Map<Integer, List<WSSecurityEngineResult>> actionResults;
+    private String actor;
+    private List<WSSecurityEngineResult> wsSecurityResults;
 
     /**
      * constructor
      * @param actor
      * @param results
      */ 
-    public WSHandlerResult(String actor, List<WSSecurityEngineResult> results,
-                           Map<Integer, List<WSSecurityEngineResult>> actionResults) {
+    public WSHandlerResult(String actor, List<WSSecurityEngineResult> results) {
         this.actor = actor;
         this.wsSecurityResults = results;
-        this.actionResults = actionResults;
     }
 
     /**
@@ -55,9 +50,5 @@ public class WSHandlerResult {
      */
     public List<WSSecurityEngineResult> getResults() {
         return wsSecurityResults;
-    }
-    
-    public Map<Integer, List<WSSecurityEngineResult>> getActionResults() {
-        return actionResults;
     }
 }

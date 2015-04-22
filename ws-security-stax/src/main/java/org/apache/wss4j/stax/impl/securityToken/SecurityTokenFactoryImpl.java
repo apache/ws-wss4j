@@ -418,7 +418,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             final InboundSecurityToken inboundSecurityToken,
             final WSSecurityTokenConstants.KeyIdentifier keyIdentifier) {
 
-        List<Class<?>> implementedInterfaces = new ArrayList<>();
+        List<Class<?>> implementedInterfaces = new ArrayList<Class<?>>();
         getImplementedInterfaces(inboundSecurityToken.getClass(), implementedInterfaces);
         Class<?>[] interfaces = implementedInterfaces.toArray(new Class<?>[implementedInterfaces.size()]);
 

@@ -216,7 +216,9 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
         try {
             XMLSecurityHeaderHandler xmlSecurityHeaderHandler = clazz.newInstance();
             xmlSecurityHeaderHandler.handle(inputProcessorChain, securityProperties, eventQueue, index);
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
+        } catch (IllegalAccessException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
         } catch (WSSecurityException e) {
             throw e;

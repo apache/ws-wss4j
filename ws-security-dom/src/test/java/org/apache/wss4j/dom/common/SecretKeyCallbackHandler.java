@@ -21,13 +21,12 @@ package org.apache.wss4j.dom.common;
 
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +36,7 @@ import java.util.Map;
  */
 public class SecretKeyCallbackHandler implements CallbackHandler {
     
-    private Map<String, byte[]> secrets = new HashMap<>();
+    private Map<String, byte[]> secrets = new HashMap<String, byte[]>();
     private byte[] outboundSecret = null;
     
     public void handle(Callback[] callbacks)
@@ -66,7 +65,7 @@ public class SecretKeyCallbackHandler implements CallbackHandler {
     
     public void setOutboundSecret(byte[] secret) throws WSSecurityException {
         outboundSecret = secret;
-        byte[] encodedBytes = KeyUtils.generateDigest(outboundSecret);
+        byte[] encodedBytes = WSSecurityUtil.generateDigest(outboundSecret);
         String identifier = Base64.encode(encodedBytes);
         addSecretKey(identifier, outboundSecret);
     }

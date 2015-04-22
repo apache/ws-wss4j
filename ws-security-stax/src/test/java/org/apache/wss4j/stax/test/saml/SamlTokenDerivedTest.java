@@ -27,11 +27,11 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
-import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.message.WSSecDKSign;
 import org.apache.wss4j.dom.message.WSSecHeader;
+import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.InboundWSSec;
@@ -55,6 +55,8 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SamlTokenDerivedTest extends AbstractTestBase {
 
@@ -155,8 +157,8 @@ public class SamlTokenDerivedTest extends AbstractTestBase {
         String secRefID = wssConfig.getIdAllocator().createSecureId("STRSAMLId-", secRefSaml);
         secRefSaml.setID(secRefID);
 
-        org.apache.wss4j.common.token.Reference ref =
-                new org.apache.wss4j.common.token.Reference(doc);
+        org.apache.wss4j.dom.message.token.Reference ref =
+                new org.apache.wss4j.dom.message.token.Reference(doc);
         ref.setURI("#" + samlAssertion.getId());
         ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
         secRefSaml.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
@@ -185,7 +187,7 @@ public class SamlTokenDerivedTest extends AbstractTestBase {
                 crypto.getPrivateKey("transmitter", "default");
         sigBuilder.setExternalKey(key.getEncoded(), secToken.getElement());
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-        
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>(2);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         WSEncryptionPart encP =
                 new WSEncryptionPart(
@@ -193,12 +195,12 @@ public class SamlTokenDerivedTest extends AbstractTestBase {
                         soapNamespace,
                         "Content"
                 );
-        sigBuilder.getParts().add(encP);
-
+        parts.add(encP);
         encP = new WSEncryptionPart("STRTransform", "", "Element");
         encP.setId(secRefSaml.getID());
         encP.setElement(secRefSaml.getElement());
-        sigBuilder.getParts().add(encP);
+        parts.add(encP);
+        sigBuilder.setParts(parts);
 
         return sigBuilder;
     }

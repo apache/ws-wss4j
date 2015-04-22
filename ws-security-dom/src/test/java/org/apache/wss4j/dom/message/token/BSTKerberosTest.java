@@ -30,11 +30,8 @@ import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.token.BinarySecurity;
-import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.message.WSSecHeader;
@@ -50,7 +47,9 @@ import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.crypto.dsig.SignatureMethod;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * This is a test for the Kerberos Token Profile 1.1
@@ -124,9 +123,11 @@ public class BSTKerberosTest extends org.junit.Assert {
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         
+        java.util.List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(bst.getID());
-        sign.getParts().add(encP);
+        parts.add(encP);
+        sign.setParts(parts);
         
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
@@ -164,8 +165,10 @@ public class BSTKerberosTest extends org.junit.Assert {
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         
-        sign.getParts().add(new WSEncryptionPart(bst.getID()));
-        sign.getParts().add(new WSEncryptionPart(timestamp.getId()));
+        java.util.List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        parts.add(new WSEncryptionPart(bst.getID()));
+        parts.add(new WSEncryptionPart(timestamp.getId()));
+        sign.setParts(parts);
         
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
@@ -200,9 +203,9 @@ public class BSTKerberosTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        WSHandlerResult results = verify(doc);
-        WSSecurityEngineResult actionResult = 
-            results.getActionResults().get(WSConstants.BST).get(0);
+        List<WSSecurityEngineResult> results = verify(doc);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         assertTrue(token != null);
@@ -316,7 +319,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         sign.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
         sign.setCustomTokenValueType(WSConstants.WSS_KRB_KI_VALUE_TYPE);
         
-        byte[] digestBytes = KeyUtils.generateDigest(keyData);
+        byte[] digestBytes = WSSecurityUtil.generateDigest(keyData);
         sign.setCustomTokenId(Base64.encode(digestBytes));
         sign.setSecretKey(keyData);
         
@@ -396,7 +399,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         builder.setEncryptSymmKey(false);
         builder.setCustomReferenceValue(WSConstants.WSS_KRB_KI_VALUE_TYPE);
         
-        byte[] digestBytes = KeyUtils.generateDigest(keyData);
+        byte[] digestBytes = WSSecurityUtil.generateDigest(keyData);
         builder.setEncKeyId(Base64.encode(digestBytes));
         
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
@@ -417,8 +420,8 @@ public class BSTKerberosTest extends org.junit.Assert {
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private WSHandlerResult verify(Document doc) throws Exception {
-        WSHandlerResult results = 
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");

@@ -30,6 +30,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
@@ -82,7 +83,7 @@ public class SignatureUTAliasTest extends org.junit.Assert implements CallbackHa
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<>();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         actions.add(new HandlerAction(WSConstants.UT));
         actions.add(new HandlerAction(WSConstants.SIGN));
         handler.send(
@@ -111,8 +112,8 @@ public class SignatureUTAliasTest extends org.junit.Assert implements CallbackHa
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private WSHandlerResult verify(Document doc) throws Exception {
-        WSHandlerResult results = 
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(
                 doc, null, this, CryptoFactory.getInstance("wss40CA.properties")
             );

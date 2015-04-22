@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.message;
 
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 
@@ -43,6 +44,10 @@ public class WSSecSAMLToken extends WSSecBase {
 
     public WSSecSAMLToken() {
         super();
+    }
+    
+    public WSSecSAMLToken(WSSConfig config) {
+        super(config);
     }
     
     /**

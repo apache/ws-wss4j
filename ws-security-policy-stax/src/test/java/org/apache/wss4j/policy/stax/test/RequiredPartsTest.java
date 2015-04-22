@@ -42,7 +42,7 @@ public class RequiredPartsTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         RequiredPartSecurityEvent requiredPartSecurityEvent = new RequiredPartSecurityEvent();
-        List<QName> headerPath = new ArrayList<>();
+        List<QName> headerPath = new ArrayList<QName>();
         headerPath.addAll(WSSConstants.SOAP_11_HEADER_PATH);
         headerPath.add(new QName("http://example.org", "a"));
         requiredPartSecurityEvent.setElementPath(headerPath);
@@ -50,7 +50,7 @@ public class RequiredPartsTest extends AbstractPolicyTestBase {
 
         //additional requiredParts are also allowed!
         requiredPartSecurityEvent = new RequiredPartSecurityEvent();
-        headerPath = new ArrayList<>();
+        headerPath = new ArrayList<QName>();
         headerPath.addAll(WSSConstants.SOAP_11_HEADER_PATH);
         headerPath.add(new QName("http://example.org", "b"));
         requiredPartSecurityEvent.setElementPath(headerPath);
@@ -72,7 +72,7 @@ public class RequiredPartsTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
         RequiredPartSecurityEvent requiredPartSecurityEvent = new RequiredPartSecurityEvent();
-        List<QName> headerPath = new ArrayList<>();
+        List<QName> headerPath = new ArrayList<QName>();
         headerPath.addAll(WSSConstants.SOAP_11_HEADER_PATH);
         headerPath.add(new QName("http://example.org", "b"));
         requiredPartSecurityEvent.setElementPath(headerPath);

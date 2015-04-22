@@ -19,6 +19,8 @@
 
 package org.apache.wss4j.dom.saml;
 
+import java.util.List;
+
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -29,11 +31,11 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
 import org.apache.wss4j.common.saml.SAMLCallback;
@@ -199,15 +201,18 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         return algorithmSuite;
     }
 
-    private WSHandlerResult verify(
+    private List<WSSecurityEngineResult> verify(
         Element securityHeader, AlgorithmSuite algorithmSuite, Crypto sigVerCrypto,
         boolean saml2
     ) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setValidateSamlSubjectConfirmation(false);
+        secEngine.setWssConfig(config);
+        
         RequestData data = new RequestData();
         data.setSigVerCrypto(sigVerCrypto);
         data.setSamlAlgorithmSuite(algorithmSuite);
-        data.setValidateSamlSubjectConfirmation(false);
         
         return secEngine.processSecurityHeader(securityHeader, data);
     }

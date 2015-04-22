@@ -52,7 +52,7 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
-import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.common.SAMLVersion;
 
 public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implements SamlSecurityToken {
 
@@ -76,10 +76,11 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
                 new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
             try {
                 securityProperties.getCallbackHandler().handle(new Callback[]{pwcb});
-            } catch (IOException | UnsupportedCallbackException e) {
+            } catch (IOException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noPassword", e);
+            } catch (UnsupportedCallbackException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noPassword", e);
             }
-            
             Element assertionElem = pwcb.getCustomToken();
             if (assertionElem != null && "Assertion".equals(assertionElem.getLocalName())
                 && (WSSConstants.NS_SAML.equals(assertionElem.getNamespaceURI())

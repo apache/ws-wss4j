@@ -29,8 +29,6 @@ import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.saml.SAMLCallback;
@@ -40,7 +38,10 @@ import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
+
+import java.util.List;
 
 /**
  * Test-case for sending and processing a signed (holder-of-key) SAML Assertion. These tests
@@ -60,6 +61,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
     
     public SamlTokenHOKTest() throws Exception {
         WSSConfig config = WSSConfig.getNewInstance();
+        config.setValidateSamlSubjectConfirmation(false);
         secEngine.setWssConfig(config);
         
         crypto = CryptoFactory.getInstance("crypto.properties");
@@ -96,9 +98,9 @@ public class SamlTokenHOKTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        WSHandlerResult results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
-            results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
@@ -137,20 +139,15 @@ public class SamlTokenHOKTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        RequestData requestData = new RequestData();
-        requestData.setValidateSamlSubjectConfirmation(false);
-        requestData.setCallbackHandler(new KeystoreCallbackHandler());
         Crypto decCrypto = CryptoFactory.getInstance("wss40.properties");
-        requestData.setDecCrypto(decCrypto);
-        requestData.setSigVerCrypto(crypto);
-        
-        WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
+        List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(doc, null, new KeystoreCallbackHandler(), crypto, decCrypto);
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         
         WSSecurityEngineResult actionResult =
-            results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
@@ -188,9 +185,9 @@ public class SamlTokenHOKTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        WSHandlerResult results = verify(unsignedDoc);
+        List<WSSecurityEngineResult> results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
-            results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
@@ -229,20 +226,15 @@ public class SamlTokenHOKTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        RequestData requestData = new RequestData();
-        requestData.setValidateSamlSubjectConfirmation(false);
-        requestData.setCallbackHandler(new KeystoreCallbackHandler());
         Crypto decCrypto = CryptoFactory.getInstance("wss40.properties");
-        requestData.setDecCrypto(decCrypto);
-        requestData.setSigVerCrypto(crypto);
-        WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
-        
+        List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(doc, null, new KeystoreCallbackHandler(), crypto, decCrypto);
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         
         WSSecurityEngineResult actionResult =
-            results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
@@ -255,14 +247,9 @@ public class SamlTokenHOKTest extends org.junit.Assert {
      * @param envelope 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private WSHandlerResult verify(Document doc) throws Exception {
-        RequestData requestData = new RequestData();
-        requestData.setDecCrypto(crypto);
-        requestData.setSigVerCrypto(crypto);
-        requestData.setValidateSamlSubjectConfirmation(false);
-        
-        WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
-
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(doc, null, null, crypto);
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);

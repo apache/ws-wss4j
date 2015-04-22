@@ -31,7 +31,7 @@ import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.joda.time.DateTime;
-import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.common.SAMLVersion;
 
 /**
  * This class validates a SAML Assertion, which is wrapped in an "SamlAssertionWrapper" instance.
@@ -277,9 +277,7 @@ public class SamlAssertionValidator extends SignatureTrustValidator {
      * Validate the samlAssertion against schemas/profiles
      */
     protected void validateAssertion(SamlAssertionWrapper samlAssertion) throws WSSecurityException {
-        if (validateSignatureAgainstProfile) {
-            samlAssertion.validateSignatureAgainstProfile();
-        }
+        samlAssertion.validateAssertion(validateSignatureAgainstProfile);
     }
 
     /**

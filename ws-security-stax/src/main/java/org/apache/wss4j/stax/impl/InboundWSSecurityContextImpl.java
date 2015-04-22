@@ -152,7 +152,8 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
 
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = null;
 
-        List<TokenSecurityEvent<? extends InboundSecurityToken>> tokenSecurityEvents = new ArrayList<>();
+        List<TokenSecurityEvent<? extends InboundSecurityToken>> tokenSecurityEvents =
+                new ArrayList<TokenSecurityEvent<? extends InboundSecurityToken>>();
         Iterator<SecurityEvent> securityEventIterator = securityEventDeque.iterator();
         while (securityEventIterator.hasNext()) {
             SecurityEvent securityEvent = securityEventIterator.next();
@@ -199,24 +200,24 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
             TokenSecurityEvent<? extends InboundSecurityToken> tokenSecurityEvent = supportingTokensIterator.next();
             List<InboundSecurityToken> signingSecurityTokens = isSignedToken(tokenSecurityEvent, securityEventDeque, httpsTokenSecurityEvent);
 
-            List<QName> signatureElementPath = new ArrayList<>(4);
+            List<QName> signatureElementPath = new ArrayList<QName>(4);
             signatureElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
             signatureElementPath.add(WSSConstants.TAG_dsig_Signature);
             boolean signsSignature = signsElement(tokenSecurityEvent, signatureElementPath, securityEventDeque);
             boolean encryptsSignature = encryptsElement(tokenSecurityEvent, signatureElementPath, securityEventDeque);
 
-            List<QName> signatureConfirmationElementPath = new ArrayList<>(4);
+            List<QName> signatureConfirmationElementPath = new ArrayList<QName>(4);
             signatureConfirmationElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
             signatureConfirmationElementPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
             boolean signsSignatureConfirmation = signsElement(tokenSecurityEvent, signatureConfirmationElementPath, securityEventDeque);
             boolean encryptsSignatureConfirmation = encryptsElement(tokenSecurityEvent, signatureConfirmationElementPath, securityEventDeque);
 
-            List<QName> timestampElementPath = new ArrayList<>(4);
+            List<QName> timestampElementPath = new ArrayList<QName>(4);
             timestampElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
             timestampElementPath.add(WSSConstants.TAG_wsu_Timestamp);
             boolean signsTimestamp = signsElement(tokenSecurityEvent, timestampElementPath, securityEventDeque);
 
-            List<QName> usernameTokenElementPath = new ArrayList<>(4);
+            List<QName> usernameTokenElementPath = new ArrayList<QName>(4);
             usernameTokenElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
             usernameTokenElementPath.add(WSSConstants.TAG_wsse_UsernameToken);
             boolean encryptsUsernameToken = encryptsElement(tokenSecurityEvent, usernameTokenElementPath, securityEventDeque);
@@ -356,7 +357,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
             TokenSecurityEvent<? extends InboundSecurityToken> tokenSecurityEvent,
             List<TokenSecurityEvent<? extends InboundSecurityToken>> tokenSecurityEventList) {
         if (tokenSecurityEventList == Collections.<TokenSecurityEvent<? extends InboundSecurityToken>>emptyList()) {
-            tokenSecurityEventList = new ArrayList<>();
+            tokenSecurityEventList = new ArrayList<TokenSecurityEvent<? extends InboundSecurityToken>>();
         }
         tokenSecurityEventList.add(tokenSecurityEvent);
         return tokenSecurityEventList;
@@ -429,7 +430,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
     }
 
     private List<InboundSecurityToken> getSigningToken(TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent, Deque<SecurityEvent> securityEventDeque) throws XMLSecurityException {
-        List<InboundSecurityToken> signingSecurityTokens = new ArrayList<>();
+        List<InboundSecurityToken> signingSecurityTokens = new ArrayList<InboundSecurityToken>();
 
         for (Iterator<SecurityEvent> iterator = securityEventDeque.iterator(); iterator.hasNext(); ) {
             SecurityEvent securityEvent = iterator.next();
@@ -464,7 +465,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
     private List<InboundSecurityToken> isSignedToken(TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent,
                                               Deque<SecurityEvent> securityEventDeque,
                                               HttpsTokenSecurityEvent httpsTokenSecurityEvent) throws XMLSecurityException {
-        List<InboundSecurityToken> securityTokenList = new ArrayList<>();
+        List<InboundSecurityToken> securityTokenList = new ArrayList<InboundSecurityToken>();
         if (httpsTokenSecurityEvent != null) {
             securityTokenList.add(httpsTokenSecurityEvent.getSecurityToken());
             return securityTokenList;
@@ -490,7 +491,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
                                                  Deque<SecurityEvent> securityEventDeque,
                                                  HttpsTokenSecurityEvent httpsTokenSecurityEvent) throws XMLSecurityException {
 
-        List<InboundSecurityToken> securityTokenList = new ArrayList<>();
+        List<InboundSecurityToken> securityTokenList = new ArrayList<InboundSecurityToken>();
         if (httpsTokenSecurityEvent != null) {
             securityTokenList.add(httpsTokenSecurityEvent.getSecurityToken());
             return securityTokenList;
@@ -588,7 +589,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
 
     @Override
     public void ignoredBSPRules(List<BSPRule> bspRules) {
-        ignoredBSPRules = new ArrayList<>(bspRules);
+        ignoredBSPRules = new ArrayList<BSPRule>(bspRules);
     }
 
     public boolean isDisableBSPEnforcement() {

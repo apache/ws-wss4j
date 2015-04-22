@@ -24,8 +24,9 @@ import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
@@ -34,37 +35,35 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-import org.apache.wss4j.common.bsp.BSPEnforcer;
-import org.apache.wss4j.common.bsp.BSPRule;
-import org.apache.wss4j.common.crypto.AlgorithmSuite;
-import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.AttachmentResultCallback;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
-import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.AttachmentUtils;
-import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSDataRef;
-import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.message.CallbackLookup;
-import org.apache.wss4j.dom.str.STRParser;
-import org.apache.wss4j.dom.str.STRParserParameters;
-import org.apache.wss4j.dom.str.STRParserResult;
-import org.apache.wss4j.dom.str.SecurityTokenRefSTRParser;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.JCEMapper;
-import org.apache.xml.security.encryption.XMLCipher;
-import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.apache.wss4j.common.bsp.BSPRule;
+import org.apache.wss4j.common.crypto.AlgorithmSuite;
+import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
+import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDataRef;
+import org.apache.wss4j.dom.WSDocInfo;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.bsp.BSPEnforcer;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.message.CallbackLookup;
+import org.apache.wss4j.dom.message.DOMCallbackLookup;
+import org.apache.wss4j.dom.message.token.SecurityTokenReference;
+import org.apache.wss4j.dom.str.STRParser;
+import org.apache.wss4j.dom.str.SecurityTokenRefSTRParser;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.encryption.XMLEncryptionException;
 
 public class ReferenceListProcessor implements Processor {
     private static final org.slf4j.Logger LOG = 
@@ -87,7 +86,7 @@ public class ReferenceListProcessor implements Processor {
         }
         wsDocInfo.addTokenElement(elem);
         wsDocInfo.addResult(result);
-        return Collections.singletonList(result);
+        return java.util.Collections.singletonList(result);
     }
 
     /**
@@ -101,7 +100,7 @@ public class ReferenceListProcessor implements Processor {
         RequestData data,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
-        List<WSDataRef> dataRefs = new ArrayList<>();
+        List<WSDataRef> dataRefs = new ArrayList<WSDataRef>();
         for (Node node = elem.getFirstChild(); 
             node != null; 
             node = node.getNextSibling()
@@ -110,10 +109,11 @@ public class ReferenceListProcessor implements Processor {
                 && WSConstants.ENC_NS.equals(node.getNamespaceURI())
                 && "DataReference".equals(node.getLocalName())) {
                 String dataRefURI = ((Element) node).getAttributeNS(null, "URI");
-                dataRefURI = XMLUtils.getIDFromReference(dataRefURI);
+                if (dataRefURI.charAt(0) == '#') {
+                    dataRefURI = dataRefURI.substring(1);
+                }
                 
-                // See whether we have already processed the encrypted node 
-                if (!wsDocInfo.hasResult(WSConstants.ENCR, dataRefURI)) {
+                if (wsDocInfo.getResultByTag(WSConstants.ENCR, dataRefURI) == null) {
                     WSDataRef dataRef = 
                         decryptDataRefEmbedded(
                             elem.getOwnerDocument(), dataRefURI, data, wsDocInfo);
@@ -153,7 +153,7 @@ public class ReferenceListProcessor implements Processor {
         //
         String symEncAlgo = X509Util.getEncAlgo(encryptedDataElement);
         Element keyInfoElement =
-            XMLUtils.getDirectChildElement(
+                WSSecurityUtil.getDirectChildElement(
                     encryptedDataElement, "KeyInfo", WSConstants.SIG_NS
                 );
         // KeyInfo cannot be null
@@ -168,7 +168,7 @@ public class ReferenceListProcessor implements Processor {
         // shared key using a KeyName.
         //
         Element secRefToken = 
-            XMLUtils.getDirectChildElement(
+            WSSecurityUtil.getDirectChildElement(
                 keyInfoElement, "SecurityTokenReference", WSConstants.WSSE_NS
             );
         SecretKey symmetricKey = null;
@@ -176,18 +176,15 @@ public class ReferenceListProcessor implements Processor {
         if (secRefToken == null) {
             symmetricKey = X509Util.getSharedKey(keyInfoElement, symEncAlgo, data.getCallbackHandler());
         } else {
-            STRParserParameters parameters = new STRParserParameters();
-            parameters.setData(data);
-            parameters.setWsDocInfo(wsDocInfo);
-            parameters.setStrElement(secRefToken);
-            if (symEncAlgo != null) {
-                parameters.setDerivationKeyLength(KeyUtils.getKeyLength(symEncAlgo));
-            }
-            
             STRParser strParser = new SecurityTokenRefSTRParser();
-            STRParserResult parserResult = strParser.parseSecurityTokenReference(parameters);
-            byte[] secretKey = parserResult.getSecretKey();
-            principal = parserResult.getPrincipal();
+            Map<String, Object> parameters = new HashMap<String, Object>();
+            parameters.put(SecurityTokenRefSTRParser.SIGNATURE_METHOD, symEncAlgo);
+            strParser.parseSecurityTokenReference(
+                secRefToken, data,
+                wsDocInfo, parameters
+            );
+            byte[] secretKey = strParser.getSecretKey();
+            principal = strParser.getPrincipal();
             symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, secretKey);
         }
         
@@ -279,6 +276,9 @@ public class ReferenceListProcessor implements Processor {
         String dataRefURI
     ) throws WSSecurityException {
         CallbackLookup callbackLookup = wsDocInfo.getCallbackLookup();
+        if (callbackLookup == null) {
+            callbackLookup = new DOMCallbackLookup(doc);
+        }
         Element encryptedDataElement = 
             callbackLookup.getElement(dataRefURI, null, true);
         if (encryptedDataElement == null) {
@@ -321,13 +321,94 @@ public class ReferenceListProcessor implements Processor {
         dataRef.setWsuId(dataRefURI);
         dataRef.setAlgorithm(symEncAlgo);
 
-        // See if it is an attachment, and handle that differently
         String typeStr = encData.getAttributeNS(null, "Type");
         if (typeStr != null &&
             (WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY.equals(typeStr) ||
             WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE.equals(typeStr))) {
 
-            return decryptAttachment(dataRefURI, encData, symmetricKey, symEncAlgo, requestData);
+            try {
+                Element cipherData = WSSecurityUtil.getDirectChildElement(encData, "CipherData", WSConstants.ENC_NS);
+                if (cipherData == null) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+                }
+                Element cipherReference = WSSecurityUtil.getDirectChildElement(cipherData, "CipherReference", WSConstants.ENC_NS);
+                if (cipherReference == null) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+                }
+                String uri = cipherReference.getAttributeNS(null, "URI");
+                if (uri == null || uri.length() < 5) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+                }
+                if (!uri.startsWith("cid:")) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+                }
+                dataRef.setWsuId(uri);
+                dataRef.setAttachment(true);
+
+                CallbackHandler attachmentCallbackHandler = requestData.getAttachmentCallbackHandler();
+                if (attachmentCallbackHandler == null) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+                }
+
+                final String attachmentId = uri.substring(4);
+
+                AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
+                attachmentRequestCallback.setAttachmentId(attachmentId);
+
+                attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
+                List<Attachment> attachments = attachmentRequestCallback.getAttachments();
+                if (attachments == null || attachments.isEmpty() || !attachmentId.equals(attachments.get(0).getId())) {
+                    throw new WSSecurityException(
+                            WSSecurityException.ErrorCode.INVALID_SECURITY,
+                            "empty", "Attachment not found"
+                    );
+                }
+                Attachment attachment = attachments.get(0);
+
+                final String encAlgo = X509Util.getEncAlgo(encData);
+                final String jceAlgorithm =
+                        JCEMapper.translateURItoJCEID(encAlgo);
+                final Cipher cipher = Cipher.getInstance(jceAlgorithm);
+
+                InputStream attachmentInputStream =
+                        AttachmentUtils.setupAttachmentDecryptionStream(
+                                encAlgo, cipher, symmetricKey, attachment.getSourceStream());
+
+                Attachment resultAttachment = new Attachment();
+                resultAttachment.setId(attachment.getId());
+                resultAttachment.setMimeType(encData.getAttributeNS(null, "MimeType"));
+                resultAttachment.setSourceStream(attachmentInputStream);
+                resultAttachment.addHeaders(attachment.getHeaders());
+
+                if (WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE.equals(typeStr)) {
+                    AttachmentUtils.readAndReplaceEncryptedAttachmentHeaders(
+                            resultAttachment.getHeaders(), attachmentInputStream);
+                }
+
+                AttachmentResultCallback attachmentResultCallback = new AttachmentResultCallback();
+                attachmentResultCallback.setAttachment(resultAttachment);
+                attachmentResultCallback.setAttachmentId(resultAttachment.getId());
+                attachmentCallbackHandler.handle(new Callback[]{attachmentResultCallback});
+
+            } catch (UnsupportedCallbackException e) {
+                throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILED_CHECK, e);
+            } catch (IOException e) {
+                throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILED_CHECK, e);
+            } catch (NoSuchAlgorithmException e) {
+                throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILED_CHECK, e);
+            } catch (NoSuchPaddingException e) {
+                throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILED_CHECK, e);
+            }
+
+            dataRef.setContent(true);
+            // Remove this EncryptedData from the security header to avoid processing it again
+            encData.getParentNode().removeChild(encData);
+            
+            return dataRef;
         }
 
         boolean content = X509Util.isContent(encData);
@@ -387,95 +468,11 @@ public class ReferenceListProcessor implements Processor {
         return dataRef;
     }
     
-    private static WSDataRef
-    decryptAttachment(
-        String dataRefURI,
-        Element encData,
-        SecretKey symmetricKey,
-        String symEncAlgo,
-        RequestData requestData
-    ) throws WSSecurityException {
-        WSDataRef dataRef = new WSDataRef();
-        dataRef.setWsuId(dataRefURI);
-        dataRef.setAlgorithm(symEncAlgo);
-        
-        try {
-            Element cipherData = XMLUtils.getDirectChildElement(encData, "CipherData", WSConstants.ENC_NS);
-            if (cipherData == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
-            }
-            Element cipherReference = XMLUtils.getDirectChildElement(cipherData, "CipherReference", WSConstants.ENC_NS);
-            if (cipherReference == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
-            }
-            String uri = cipherReference.getAttributeNS(null, "URI");
-            if (uri == null || uri.length() < 5) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
-            }
-            if (!uri.startsWith("cid:")) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
-            }
-            dataRef.setWsuId(uri);
-            dataRef.setAttachment(true);
-
-            CallbackHandler attachmentCallbackHandler = requestData.getAttachmentCallbackHandler();
-            if (attachmentCallbackHandler == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
-            }
-
-            final String attachmentId = uri.substring(4);
-
-            AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
-            attachmentRequestCallback.setAttachmentId(attachmentId);
-
-            attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
-            List<Attachment> attachments = attachmentRequestCallback.getAttachments();
-            if (attachments == null || attachments.isEmpty() || !attachmentId.equals(attachments.get(0).getId())) {
-                throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.INVALID_SECURITY,
-                        "empty", "Attachment not found"
-                );
-            }
-            Attachment attachment = attachments.get(0);
-
-            final String encAlgo = X509Util.getEncAlgo(encData);
-            final String jceAlgorithm =
-                    JCEMapper.translateURItoJCEID(encAlgo);
-            final Cipher cipher = Cipher.getInstance(jceAlgorithm);
-
-            InputStream attachmentInputStream =
-                    AttachmentUtils.setupAttachmentDecryptionStream(
-                            encAlgo, cipher, symmetricKey, attachment.getSourceStream());
-
-            Attachment resultAttachment = new Attachment();
-            resultAttachment.setId(attachment.getId());
-            resultAttachment.setMimeType(encData.getAttributeNS(null, "MimeType"));
-            resultAttachment.setSourceStream(attachmentInputStream);
-            resultAttachment.addHeaders(attachment.getHeaders());
-
-            String typeStr = encData.getAttributeNS(null, "Type");
-            if (WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE.equals(typeStr)) {
-                AttachmentUtils.readAndReplaceEncryptedAttachmentHeaders(
-                        resultAttachment.getHeaders(), attachmentInputStream);
-            }
-
-            AttachmentResultCallback attachmentResultCallback = new AttachmentResultCallback();
-            attachmentResultCallback.setAttachment(resultAttachment);
-            attachmentResultCallback.setAttachmentId(resultAttachment.getId());
-            attachmentCallbackHandler.handle(new Callback[]{attachmentResultCallback});
-
-        } catch (UnsupportedCallbackException | IOException
-            | NoSuchAlgorithmException | NoSuchPaddingException e) {
-            throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILED_CHECK, e);
-        }
-
-        dataRef.setContent(true);
-        // Remove this EncryptedData from the security header to avoid processing it again
-        encData.getParentNode().removeChild(encData);
-        
-        return dataRef;
+    
+    public String getId() {
+        return null;
     }
+
     
     /**
      * @param decryptedNode the decrypted node

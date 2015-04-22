@@ -85,7 +85,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
     private static final Long maximumAllowedDecompressedBytes =
             Long.valueOf(ConfigurationProperties.getProperty("MaximumAllowedDecompressedBytes"));
 
-    private List<DeferredAttachment> attachmentReferences = new ArrayList<>();
+    private List<DeferredAttachment> attachmentReferences = new ArrayList<DeferredAttachment>();
 
     public DecryptInputProcessor(KeyInfoType keyInfoType, ReferenceList referenceList,
                                  WSSSecurityProperties securityProperties, WSInboundSecurityContext securityContext)
@@ -141,8 +141,13 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
                     inputStream = new LimitingInputStream(
                             constructor.newInstance(inputStream),
                             maximumAllowedDecompressedBytes);
-                } catch (InvocationTargetException | NoSuchMethodException
-                    | InstantiationException | IllegalAccessException e) {
+                } catch (InvocationTargetException e) {
+                    throw new XMLSecurityException(e);
+                } catch (NoSuchMethodException e) {
+                    throw new XMLSecurityException(e);
+                } catch (InstantiationException e) {
+                    throw new XMLSecurityException(e);
+                } catch (IllegalAccessException e) {
                     throw new XMLSecurityException(e);
                 }
             }

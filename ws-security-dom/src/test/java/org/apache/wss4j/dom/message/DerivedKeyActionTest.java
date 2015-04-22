@@ -35,6 +35,7 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
@@ -43,7 +44,6 @@ import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.junit.Assert;
 
 /**
@@ -417,7 +417,7 @@ public class DerivedKeyActionTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<>();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         actions.add(new HandlerAction(WSConstants.DKT_SIGN));
         actions.add(new HandlerAction(WSConstants.DKT_ENCR));
         handler.send(
@@ -453,7 +453,7 @@ public class DerivedKeyActionTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<>();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         actions.add(new HandlerAction(WSConstants.DKT_ENCR));
         actions.add(new HandlerAction(WSConstants.DKT_SIGN));
         handler.send(
@@ -495,7 +495,7 @@ public class DerivedKeyActionTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<>();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         actions.add(new HandlerAction(WSConstants.DKT_SIGN));
         actions.add(new HandlerAction(WSConstants.DKT_ENCR));
         handler.send(
@@ -537,7 +537,7 @@ public class DerivedKeyActionTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<>();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         actions.add(new HandlerAction(WSConstants.DKT_ENCR));
         actions.add(new HandlerAction(WSConstants.DKT_SIGN));
         handler.send(
@@ -556,13 +556,13 @@ public class DerivedKeyActionTest extends org.junit.Assert {
         verify(doc, secretKeyCallbackHandler);
     }
 
-    private WSHandlerResult verify(Document doc) throws Exception {
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
         return verify(doc, callbackHandler);
     }
 
-    private WSHandlerResult verify(Document doc, CallbackHandler cbHandler) throws Exception {
+    private List<WSSecurityEngineResult> verify(Document doc, CallbackHandler cbHandler) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
-        WSHandlerResult results = 
+        List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(doc, null, cbHandler, crypto);
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);

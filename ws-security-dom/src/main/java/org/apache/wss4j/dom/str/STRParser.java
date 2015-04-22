@@ -19,7 +19,16 @@
 
 package org.apache.wss4j.dom.str;
 
+import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.handler.RequestData;
+
+import org.w3c.dom.Element;
+
+import java.security.Principal;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.Map;
 
 /**
  * This interface describes a pluggable way of extracting credentials from SecurityTokenReference
@@ -42,10 +51,56 @@ public interface STRParser {
     /**
      * Parse a SecurityTokenReference element and extract credentials.
      * 
-     * @param parameters The parameters to parse
-     * @return the STRParserResult Object containing the parsing results
+     * @param strElement The SecurityTokenReference element
+     * @param data the RequestData associated with the request
+     * @param wsDocInfo The WSDocInfo object to access previous processing results
+     * @param parameters A set of implementation-specific parameters
      * @throws WSSecurityException
      */
-    STRParserResult parseSecurityTokenReference(STRParserParameters parameters) throws WSSecurityException;
+    void parseSecurityTokenReference(
+        Element strElement,
+        RequestData data,
+        WSDocInfo wsDocInfo,
+        Map<String, Object> parameters
+    ) throws WSSecurityException;
+    
+    /**
+     * Get the X509Certificates associated with this SecurityTokenReference
+     * @return the X509Certificates associated with this SecurityTokenReference
+     */
+    X509Certificate[] getCertificates();
+    
+    /**
+     * Get the Principal associated with this SecurityTokenReference
+     * @return the Principal associated with this SecurityTokenReference
+     */
+    Principal getPrincipal();
+    
+    /**
+     * Get the PublicKey associated with this SecurityTokenReference
+     * @return the PublicKey associated with this SecurityTokenReference
+     */
+    PublicKey getPublicKey();
+    
+    /**
+     * Get the Secret Key associated with this SecurityTokenReference
+     * @return the Secret Key associated with this SecurityTokenReference
+     */
+    byte[] getSecretKey();
+    
+    /**
+     * Get whether the returned credential is already trusted or not. This is currently
+     * applicable in the case of a credential extracted from a trusted HOK SAML Assertion,
+     * and a BinarySecurityToken that has been processed by a Validator. In these cases,
+     * the SignatureProcessor does not need to verify trust on the credential.
+     * @return true if trust has already been verified on the returned Credential
+     */
+    boolean isTrustedCredential();
+
+    /**
+     * Get how the certificates were referenced
+     * @return how the certificates were referenced
+     */
+    REFERENCE_TYPE getCertificatesReferenceType();
     
 }

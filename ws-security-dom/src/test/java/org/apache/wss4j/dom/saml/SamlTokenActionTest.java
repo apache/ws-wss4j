@@ -33,6 +33,7 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.CustomSamlAssertionValidator;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
@@ -42,7 +43,6 @@ import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 
 /**
  * Test-case for sending SAML Assertions using the "action" approach.
@@ -63,6 +63,7 @@ public class SamlTokenActionTest extends org.junit.Assert {
         crypto = CryptoFactory.getInstance("wss40.properties");
         config.setValidator(WSSecurityEngine.SAML_TOKEN, new CustomSamlAssertionValidator());
         config.setValidator(WSSecurityEngine.SAML2_TOKEN, new CustomSamlAssertionValidator());
+        config.setValidateSamlSubjectConfirmation(false);
         secEngine.setWssConfig(config);
     }
     
@@ -161,7 +162,7 @@ public class SamlTokenActionTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<>();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         actions.add(new HandlerAction(WSConstants.ST_UNSIGNED));
         actions.add(new HandlerAction(WSConstants.SIGN));
         handler.send(
@@ -178,16 +179,11 @@ public class SamlTokenActionTest extends org.junit.Assert {
         verify(doc, callbackHandler);
     }
     
-    private WSHandlerResult verify(
+    private List<WSSecurityEngineResult> verify(
         Document doc, CallbackHandler callbackHandler
     ) throws Exception {
-        RequestData requestData = new RequestData();
-        requestData.setCallbackHandler(callbackHandler);
-        requestData.setDecCrypto(crypto);
-        requestData.setSigVerCrypto(crypto);
-        requestData.setValidateSamlSubjectConfirmation(false);
-        
-        WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
+        List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);

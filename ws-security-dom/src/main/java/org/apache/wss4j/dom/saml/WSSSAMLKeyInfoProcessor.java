@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.saml;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -27,21 +28,20 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
+
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLKeyInfoProcessor;
-import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.processor.EncryptedKeyProcessor;
 import org.apache.wss4j.dom.str.STRParser;
-import org.apache.wss4j.dom.str.STRParserParameters;
-import org.apache.wss4j.dom.str.STRParserResult;
 import org.apache.wss4j.dom.str.SignatureSTRParser;
 import org.apache.xml.security.utils.Base64;
 
@@ -97,18 +97,15 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
                                 "decoding.general", e);
                     }
                 } else if (SecurityTokenReference.STR_QNAME.equals(el)) {
-                    STRParserParameters parameters = new STRParserParameters();
-                    parameters.setData(data);
-                    parameters.setWsDocInfo(docInfo);
-                    parameters.setStrElement((Element)node);
-                    
                     STRParser strParser = new SignatureSTRParser();
-                    STRParserResult parserResult = strParser.parseSecurityTokenReference(parameters);
-                    SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo(parserResult.getCertificates());
-                    samlKeyInfo.setPublicKey(parserResult.getPublicKey());
-                    samlKeyInfo.setSecret(parserResult.getSecretKey());
+                    strParser.parseSecurityTokenReference(
+                        (Element)node, data, docInfo, new HashMap<String, Object>()
+                    );
+                    SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo(strParser.getCertificates());
+                    samlKeyInfo.setPublicKey(strParser.getPublicKey());
+                    samlKeyInfo.setSecret(strParser.getSecretKey());
                     
-                    Principal principal = parserResult.getPrincipal();
+                    Principal principal = strParser.getPrincipal();
                     
                     // Check for compliance against the defined AlgorithmSuite
                     AlgorithmSuite algorithmSuite = data.getSamlAlgorithmSuite(); 

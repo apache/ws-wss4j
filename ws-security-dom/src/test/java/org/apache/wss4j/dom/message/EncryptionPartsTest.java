@@ -28,7 +28,6 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -42,6 +41,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * This is some unit tests for encryption using encryption using parts. Note that the "soapMsg" below
@@ -100,12 +100,14 @@ public class EncryptionPartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
                 "urn:foo.bar",
                 "");
-        encrypt.getParts().add(encP);
+        parts.add(encP);
+        encrypt.setParts(parts);
         
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
         
@@ -115,10 +117,10 @@ public class EncryptionPartsTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        WSHandlerResult results = verify(encryptedDoc);
+        List<WSSecurityEngineResult> results = verify(encryptedDoc);
         
         WSSecurityEngineResult actionResult = 
-            results.getActionResults().get(WSConstants.ENCR).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         final java.util.List<WSDataRef> refs =
@@ -149,13 +151,14 @@ public class EncryptionPartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
                 "urn:foo.bar",
                 "");
         encP.setRequired(false);
-        encrypt.getParts().add(encP);
+        parts.add(encP);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         encP = 
             new WSEncryptionPart(
@@ -163,7 +166,8 @@ public class EncryptionPartsTest extends org.junit.Assert {
                 soapNamespace, 
                 "Content"
             );
-        encrypt.getParts().add(encP);
+        parts.add(encP);
+        encrypt.setParts(parts);
         
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
         
@@ -186,13 +190,14 @@ public class EncryptionPartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
                 "urn:foo.bar",
                 "");
         encP.setRequired(false);
-        encrypt.getParts().add(encP);
+        parts.add(encP);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         encP = 
             new WSEncryptionPart(
@@ -200,7 +205,8 @@ public class EncryptionPartsTest extends org.junit.Assert {
                 soapNamespace, 
                 "Content"
             );
-        encrypt.getParts().add(encP);
+        parts.add(encP);
+        encrypt.setParts(parts);
         
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
         
@@ -223,12 +229,13 @@ public class EncryptionPartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
                 "urn:foo.bar",
                 "");
-        encrypt.getParts().add(encP);
+        parts.add(encP);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         encP = 
             new WSEncryptionPart(
@@ -236,7 +243,8 @@ public class EncryptionPartsTest extends org.junit.Assert {
                 soapNamespace, 
                 "Content"
             );
-        encrypt.getParts().add(encP);
+        parts.add(encP);
+        encrypt.setParts(parts);
         
         try {
             encrypt.build(doc, crypto, secHeader);
@@ -261,12 +269,14 @@ public class EncryptionPartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
                 "urn:foo.bar",
                 "Header");
-        encrypt.getParts().add(encP);
+        parts.add(encP);
+        encrypt.setParts(parts);
         
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
         
@@ -278,10 +288,10 @@ public class EncryptionPartsTest extends org.junit.Assert {
         assertTrue(outputString.contains("wsse11:EncryptedHeader"));
         assertFalse(outputString.contains("foo:foobar"));
         
-        WSHandlerResult results = verify(encryptedDoc);
+        List<WSSecurityEngineResult> results = verify(encryptedDoc);
         
         WSSecurityEngineResult actionResult =
-                results.getActionResults().get(WSConstants.ENCR).get(0);
+                WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         final java.util.List<WSDataRef> refs =
@@ -309,12 +319,14 @@ public class EncryptionPartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar2",
                 "urn:foo.bar",
                 "");
-        encrypt.getParts().add(encP);
+        parts.add(encP);
+        encrypt.setParts(parts);
         
         try {
             encrypt.build(doc, crypto, secHeader);
@@ -339,12 +351,14 @@ public class EncryptionPartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
                 "urn:foo.bar2",
                 "");
-        encrypt.getParts().add(encP);
+        parts.add(encP);
+        encrypt.setParts(parts);
         
         try {
             encrypt.build(doc, crypto, secHeader);
@@ -370,18 +384,20 @@ public class EncryptionPartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 soapConstants.getBodyQName().getLocalPart(),    // define the body
                 soapConstants.getEnvelopeURI(),
                 "");
-        encrypt.getParts().add(encP);
+        parts.add(encP);
         WSEncryptionPart encP2 =
             new WSEncryptionPart(
                 "foobar",
                 "urn:foo.bar",
                 "");
-        encrypt.getParts().add(encP2);
+        parts.add(encP2);
+        encrypt.setParts(parts);
         
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
         
@@ -391,14 +407,14 @@ public class EncryptionPartsTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        WSHandlerResult results = verify(encryptedDoc);
+        List<WSSecurityEngineResult> results = verify(encryptedDoc);
         
         QName fooName = new QName("urn:foo.bar", "foobar");
         QName bodyName = new QName(soapConstants.getEnvelopeURI(), "Body");
         QName headerName = new QName(soapConstants.getEnvelopeURI(), "Header");
         
         WSSecurityEngineResult actionResult = 
-            results.getActionResults().get(WSConstants.ENCR).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         
@@ -439,6 +455,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         // Give wrong names to make sure it's picking up the element
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -448,7 +465,8 @@ public class EncryptionPartsTest extends org.junit.Assert {
         Element bodyElement = WSSecurityUtil.findBodyElement(doc);
         assertTrue(bodyElement != null && "Body".equals(bodyElement.getLocalName()));
         encP.setElement(bodyElement);
-        encrypt.getParts().add(encP);
+        parts.add(encP);
+        encrypt.setParts(parts);
         
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
         
@@ -458,10 +476,10 @@ public class EncryptionPartsTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         assertTrue (!outputString.contains("testMethod"));
-        WSHandlerResult results = verify(encryptedDoc);
+        List<WSSecurityEngineResult> results = verify(encryptedDoc);
         
         WSSecurityEngineResult actionResult = 
-            results.getActionResults().get(WSConstants.ENCR).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         @SuppressWarnings("unchecked")
@@ -486,12 +504,14 @@ public class EncryptionPartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "testMethod",
                 "http://axis/service/security/test6/LogTestService8",
                 "");
-        encrypt.getParts().add(encP);
+        parts.add(encP);
+        encrypt.setParts(parts);
         
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
         
@@ -518,8 +538,8 @@ public class EncryptionPartsTest extends org.junit.Assert {
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private WSHandlerResult verify(Document doc) throws Exception {
-        WSHandlerResult results = 
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(doc, null, callbackHandler, null, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verified and decrypted message:");

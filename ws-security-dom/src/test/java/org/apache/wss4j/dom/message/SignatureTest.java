@@ -30,8 +30,6 @@ import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.token.Reference;
-import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
@@ -44,7 +42,8 @@ import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.message.token.Reference;
+import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.str.STRParser.REFERENCE_TYPE;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
@@ -97,10 +96,10 @@ public class SignatureTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         LOG.info("After Signing IS....");
-        WSHandlerResult results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
         
         WSSecurityEngineResult actionResult =
-            results.getActionResults().get(WSConstants.SIGN).get(0);
+                WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
         REFERENCE_TYPE referenceType = 
@@ -127,10 +126,10 @@ public class SignatureTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         LOG.info("After Signing IS....");
-        WSHandlerResult results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
         
         WSSecurityEngineResult actionResult =
-            results.getActionResults().get(WSConstants.SIGN).get(0);
+                WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
         REFERENCE_TYPE referenceType = 
@@ -217,11 +216,11 @@ public class SignatureTest extends org.junit.Assert {
         
         RequestData data = new RequestData();
         data.setSigVerCrypto(crypto);
-        List<BSPRule> ignoredRules = new ArrayList<>();
+        List<BSPRule> ignoredRules = new ArrayList<BSPRule>();
         ignoredRules.add(BSPRule.R5404);
         ignoredRules.add(BSPRule.R5406);
         data.setIgnoredBSPRules(ignoredRules);
-        newEngine.processSecurityHeader(doc, data);
+        newEngine.processSecurityHeader(doc, "", data);
     }
     
     /**
@@ -232,8 +231,10 @@ public class SignatureTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testSignatureInclusivePrefixes() throws Exception {
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        wssConfig.setAddInclusivePrefixes(true);
         WSSecSignature builder = new WSSecSignature();
-        builder.setAddInclusivePrefixes(true);
+        builder.setWsConfig(wssConfig);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -275,10 +276,10 @@ public class SignatureTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        WSHandlerResult results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
         
         WSSecurityEngineResult actionResult =
-            results.getActionResults().get(WSConstants.SIGN).get(0);
+                WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
         REFERENCE_TYPE referenceType = 
@@ -341,11 +342,11 @@ public class SignatureTest extends org.junit.Assert {
         }
         
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        WSHandlerResult results = 
+        List<WSSecurityEngineResult> results = 
             newEngine.processSecurityHeader(doc, null, null, crypto);
 
         WSSecurityEngineResult actionResult =
-            results.getActionResults().get(WSConstants.SIGN).get(0);
+                WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
         REFERENCE_TYPE referenceType = 
@@ -381,10 +382,10 @@ public class SignatureTest extends org.junit.Assert {
         }
         LOG.info("After Signing ThumbprintSHA1....");
         
-        WSHandlerResult results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
         
         WSSecurityEngineResult actionResult =
-            results.getActionResults().get(WSConstants.SIGN).get(0);
+                WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
         REFERENCE_TYPE referenceType = 
@@ -414,10 +415,10 @@ public class SignatureTest extends org.junit.Assert {
         }
         LOG.info("After Signing ThumbprintSHA1....");
         
-        WSHandlerResult results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
         
         WSSecurityEngineResult actionResult =
-            results.getActionResults().get(WSConstants.SIGN).get(0);
+                WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
         REFERENCE_TYPE referenceType = 
@@ -468,12 +469,14 @@ public class SignatureTest extends org.junit.Assert {
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp",
                 WSConstants.WSU_NS,
                 "");
-        builder.getParts().add(encP);
+        parts.add(encP);
+        builder.setParts(parts);
         
         Document signedDoc = builder.build(createdDoc, crypto, secHeader);
         org.w3c.dom.Element secHeaderElement = secHeader.getSecurityHeader();
@@ -616,20 +619,22 @@ public class SignatureTest extends org.junit.Assert {
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
         
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp",
                 WSConstants.WSU_NS,
                 "");
-        builder.getParts().add(encP);
+        parts.add(encP);
+        
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setParts(parts);
         
         builder.prepare(createdDoc, crypto, secHeader);
         
         List<javax.xml.crypto.dsig.Reference> referenceList = 
-            builder.addReferencesToSign(builder.getParts(), secHeader);
+            builder.addReferencesToSign(parts, secHeader);
 
         builder.computeSignature(referenceList, false, null);
         
@@ -752,7 +757,7 @@ public class SignatureTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<>();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         actions.add(new HandlerAction(WSConstants.SIGN));
         actions.add(new HandlerAction(WSConstants.TS));
         handler.send(
@@ -768,12 +773,12 @@ public class SignatureTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        WSHandlerResult results = verify(doc);
-            
-        List<Integer> receivedActions = new ArrayList<>();
+        List<WSSecurityEngineResult> results = verify(doc);
+        
+        List<Integer> receivedActions = new ArrayList<Integer>();
         receivedActions.add(WSConstants.SIGN);
         receivedActions.add(WSConstants.TS);
-        assertTrue(handler.checkResults(results.getResults(), receivedActions));
+        assertTrue(handler.checkResults(results, receivedActions));
     }
     
     @org.junit.Test
@@ -795,7 +800,7 @@ public class SignatureTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<>();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         actions.add(new HandlerAction(WSConstants.SIGN));
         actions.add(new HandlerAction(WSConstants.ENCR));
         actions.add(new HandlerAction(WSConstants.TS));
@@ -832,7 +837,7 @@ public class SignatureTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<>();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         actions.add(new HandlerAction(WSConstants.ENCR));
         actions.add(new HandlerAction(WSConstants.SIGN));
         actions.add(new HandlerAction(WSConstants.TS));
@@ -883,16 +888,15 @@ public class SignatureTest extends org.junit.Assert {
         data.setWssConfig(WSSConfig.getNewInstance());
         data.setSigVerCrypto(crypto);
         
-        List<BSPRule> disabledRules = new ArrayList<>();
+        List<BSPRule> disabledRules = new ArrayList<BSPRule>();
         disabledRules.add(BSPRule.R5404);
         disabledRules.add(BSPRule.R5406);
         data.setIgnoredBSPRules(disabledRules);
         
         WSSecurityEngine newSecEngine = new WSSecurityEngine();
-        WSHandlerResult results = 
-            newSecEngine.processSecurityHeader(doc, data);
-        assertTrue(handler.checkResults(results.getResults(), 
-                                        Collections.singletonList(WSConstants.SIGN)));
+        List<WSSecurityEngineResult> results = 
+            newSecEngine.processSecurityHeader(doc, "", data);
+        assertTrue(handler.checkResults(results, Collections.singletonList(WSConstants.SIGN)));
     }
     
     @org.junit.Test
@@ -927,7 +931,7 @@ public class SignatureTest extends org.junit.Assert {
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private WSHandlerResult verify(Document doc) throws Exception {
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
         return secEngine.processSecurityHeader(doc, null, null, crypto);
     }
 

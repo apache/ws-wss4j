@@ -22,14 +22,12 @@ package org.apache.wss4j.dom.transform;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.token.Reference;
-import org.apache.wss4j.common.token.SecurityTokenReference;
-import org.apache.wss4j.common.token.X509Security;
-import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.str.STRParserUtil;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.message.token.SecurityTokenReference;
+import org.apache.wss4j.dom.message.token.X509Security;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -68,9 +66,7 @@ public final class STRTransformUtil {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("STR: Reference");
             }
-            
-            Reference reference = secRef.getReference();
-            return STRParserUtil.getTokenElement(doc, wsDocInfo, null, reference.getURI(), reference.getValueType());
+            return secRef.getTokenElement(doc, wsDocInfo, null);
         }
         //
         // second case: IssuerSerial, lookup in keystore, wrap in BST according
@@ -98,8 +94,7 @@ public final class STRTransformUtil {
             }
             if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
-                return STRParserUtil.getTokenElement(doc, wsDocInfo, null, secRef.getKeyIdentifierValue(), 
-                                                     secRef.getKeyIdentifierValueType());
+                return secRef.getTokenElement(doc, wsDocInfo, null);
             } else {
                 X509Certificate[] certs = secRef.getKeyIdentifier(wsDocInfo.getCrypto());
                 if (certs == null || certs.length == 0 || certs[0] == null) {
@@ -127,12 +122,12 @@ public final class STRTransformUtil {
                 WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", e
             );
         }
-        String prefix = XMLUtils.getPrefixNS(WSConstants.WSSE_NS, secRefE);
+        String prefix = WSSecurityUtil.getPrefixNS(WSConstants.WSSE_NS, secRefE);
         if (prefix == null) {
             prefix = WSConstants.WSSE_PREFIX;
         }
         Element elem = doc.createElementNS(WSConstants.WSSE_NS, prefix + ":BinarySecurityToken");
-        XMLUtils.setNamespace(elem, WSConstants.WSSE_NS, prefix);
+        WSSecurityUtil.setNamespace(elem, WSConstants.WSSE_NS, prefix);
         // elem.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", "");
         elem.setAttributeNS(null, "ValueType", X509Security.X509_V3_TYPE);
         if (secRefEncType != null) {

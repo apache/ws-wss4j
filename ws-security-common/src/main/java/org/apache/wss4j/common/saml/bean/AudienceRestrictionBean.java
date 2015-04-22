@@ -26,7 +26,7 @@ import java.util.List;
  * Class AudienceRestrictionBean represents a SAML AudienceRestriction object
  */
 public class AudienceRestrictionBean {
-    private final List<String> audienceURIs = new ArrayList<>();
+    private final List<String> audienceURIs = new ArrayList<String>();
 
     /**
      * Constructor AudienceRestrictionBean creates a new AudienceRestrictionBean instance.

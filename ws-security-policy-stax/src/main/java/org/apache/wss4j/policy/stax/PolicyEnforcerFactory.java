@@ -107,9 +107,9 @@ public class PolicyEnforcerFactory {
     private final Map<Element, Policy> elementPolicyCache;
 
     private PolicyEnforcerFactory(List<AssertionBuilder<Element>> customAssertionBuilders) {
-        elementPolicyCache = new HashMap<>();
+        elementPolicyCache = new HashMap<Element, Policy>();
 
-        assertionBuilders = new ArrayList<>();
+        assertionBuilders = new ArrayList<AssertionBuilder<Element>>();
         assertionBuilders.add(new AlgorithmSuiteBuilder());
         assertionBuilders.add(new AsymmetricBindingBuilder());
         assertionBuilders.add(new ContentEncryptedElementsBuilder());
@@ -210,7 +210,7 @@ public class PolicyEnforcerFactory {
 
     private List<OperationPolicy> findPoliciesByOperation(Definition wsdlDefinition) throws WSSPolicyException {
 
-        List<OperationPolicy> operationPolicyList = new ArrayList<>();
+        List<OperationPolicy> operationPolicyList = new ArrayList<OperationPolicy>();
         @SuppressWarnings({"unchecked", "rawtypes"})
         Iterator<Map.Entry> services = wsdlDefinition.getAllServices().entrySet().iterator();
         while (services.hasNext()) {
@@ -262,7 +262,7 @@ public class PolicyEnforcerFactory {
     }
 
     private Policy getPolicy(Service service, Port port, Binding binding, BindingOperation bindingOperation, Operation operation) throws WSSPolicyException {
-        List<Policy> policies = new ArrayList<>();
+        List<Policy> policies = new ArrayList<Policy>();
 
         Policy servicePolicy = findPolicies(service);
         if (servicePolicy != null) {
@@ -306,7 +306,7 @@ public class PolicyEnforcerFactory {
 
     private Policy findPortTypePolicy(Binding binding, Operation operation) throws WSSPolicyException {
 
-        List<Policy> policies = new ArrayList<>();
+        List<Policy> policies = new ArrayList<Policy>();
 
         PortType portType = binding.getPortType();
         Policy portTypePolicy = findPolicies(portType);
@@ -353,7 +353,7 @@ public class PolicyEnforcerFactory {
             return new Policy();
         }
 
-        List<Policy> policies = new ArrayList<>();
+        List<Policy> policies = new ArrayList<Policy>();
 
         @SuppressWarnings("unchecked")
         List<ExtensibilityElement> extensibilityElements = wsdlElement.getExtensibilityElements();

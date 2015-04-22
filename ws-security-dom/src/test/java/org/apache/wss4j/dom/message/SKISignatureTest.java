@@ -19,17 +19,19 @@
 
 package org.apache.wss4j.dom.message;
 
+import java.util.List;
+
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.str.STRParser.REFERENCE_TYPE;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
 /**
@@ -83,10 +85,10 @@ public class SKISignatureTest extends org.junit.Assert {
 
         LOG.info("After SigningDSA_SKIDirect....");
         
-        WSHandlerResult results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
         
         WSSecurityEngineResult actionResult =
-            results.getActionResults().get(WSConstants.SIGN).get(0);
+                WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
         REFERENCE_TYPE referenceType = 
@@ -168,7 +170,7 @@ public class SKISignatureTest extends org.junit.Assert {
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private WSHandlerResult verify(Document doc) throws Exception {
+    private  List<WSSecurityEngineResult> verify(Document doc) throws Exception {
         return secEngine.processSecurityHeader(doc, null, null, crypto);
     }
 }

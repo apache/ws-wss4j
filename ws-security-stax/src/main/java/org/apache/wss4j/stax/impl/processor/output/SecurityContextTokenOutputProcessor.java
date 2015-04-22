@@ -158,7 +158,7 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
 
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-                List<XMLSecAttribute> attributes = new ArrayList<>(1);
+                List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(1);
                 attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, securityToken.getId()));
                 QName identifierName = getIdentifierName();
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, true, attributes);

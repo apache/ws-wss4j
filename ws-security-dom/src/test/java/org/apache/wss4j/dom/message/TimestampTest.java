@@ -19,31 +19,31 @@
 
 package org.apache.wss4j.dom.message;
 
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.bsp.BSPEnforcer;
+import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.common.bsp.BSPRule;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.WSTimeSource;
+import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.message.token.Timestamp;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
+import org.apache.wss4j.dom.validate.NoOpValidator;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
-import org.apache.wss4j.common.bsp.BSPEnforcer;
-import org.apache.wss4j.common.bsp.BSPRule;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.WSTimeSource;
-import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.common.SOAPUtil;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.message.token.Timestamp;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
-import org.apache.wss4j.dom.validate.NoOpValidator;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * WS-Security Test Case for Timestamps.
@@ -81,9 +81,9 @@ public class TimestampTest extends org.junit.Assert {
         //
         // Do some processing
         //
-        WSHandlerResult wsResult = verify(createdDoc);
+        List<WSSecurityEngineResult> wsResult = verify(createdDoc, WSSConfig.getNewInstance());
         WSSecurityEngineResult actionResult = 
-            wsResult.getActionResults().get(WSConstants.TS).get(0);
+            WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
         assertTrue(actionResult != null);
         
         Timestamp receivedTimestamp = 
@@ -119,9 +119,9 @@ public class TimestampTest extends org.junit.Assert {
         //
         // Do some processing
         //
-        WSHandlerResult wsResult = verify(createdDoc);
+        List<WSSecurityEngineResult> wsResult = verify(createdDoc, WSSConfig.getNewInstance());
         WSSecurityEngineResult actionResult = 
-            wsResult.getActionResults().get(WSConstants.TS).get(0);
+            WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
         assertTrue(actionResult != null);
         
         Timestamp receivedTimestamp = 
@@ -154,7 +154,7 @@ public class TimestampTest extends org.junit.Assert {
         requestData.setWssConfig(WSSConfig.getNewInstance());
         requestData.setRequireTimestampExpires(true);
         try {
-            secEngine.processSecurityHeader(doc, requestData);
+            secEngine.processSecurityHeader(doc, "", requestData);
             fail("Failure expected on no Expires Element");
         } catch (WSSecurityException ex) {
             // expected
@@ -162,9 +162,10 @@ public class TimestampTest extends org.junit.Assert {
 
         requestData.setWssConfig(WSSConfig.getNewInstance());
         requestData.setRequireTimestampExpires(false);
-        WSHandlerResult wsResult = secEngine.processSecurityHeader(doc, requestData);
+        List<WSSecurityEngineResult> wsResult = secEngine.processSecurityHeader(doc, "", requestData);
+
         WSSecurityEngineResult actionResult = 
-            wsResult.getActionResults().get(WSConstants.TS).get(0);
+            WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
         assertTrue(actionResult != null);
         
         Timestamp receivedTimestamp = 
@@ -194,7 +195,7 @@ public class TimestampTest extends org.junit.Assert {
         }
         
         try {
-            verify(createdDoc);
+            verify(createdDoc, WSSConfig.getNewInstance());
             fail("Expected failure on an expired timestamp");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
@@ -225,11 +226,10 @@ public class TimestampTest extends org.junit.Assert {
         //
         // Do some processing
         //
-        RequestData requestData = new RequestData();
-        requestData.setWssConfig(WSSConfig.getNewInstance());
-        requestData.setTimeStampTTL(-1);
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        wssConfig.setTimeStampTTL(-1);
         try {
-            verify(createdDoc, requestData);
+            verify(createdDoc, wssConfig);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
@@ -275,11 +275,11 @@ public class TimestampTest extends org.junit.Assert {
         //
         // Do some processing
         //
-        RequestData requestData = new RequestData();
-        requestData.setWssConfig(WSSConfig.getNewInstance());
-        requestData.setTimeStampFutureTTL(0);
+        WSSConfig config = WSSConfig.getNewInstance();
+        verify(doc, config);
         try {
-            verify(doc, requestData);
+            config.setTimeStampFutureTTL(0);
+            verify(doc, config);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
@@ -323,8 +323,9 @@ public class TimestampTest extends org.junit.Assert {
         //
         // Do some processing
         //
+        WSSConfig config = WSSConfig.getNewInstance();
         try {
-            verify(doc);
+            verify(doc, config);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
@@ -380,7 +381,7 @@ public class TimestampTest extends org.junit.Assert {
         // Do some processing
         //
         try {
-            verify(doc);
+            verify(doc, WSSConfig.getNewInstance());
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
             //
@@ -414,8 +415,9 @@ public class TimestampTest extends org.junit.Assert {
         //
         // Do some processing
         //
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
         try {
-            verify(createdDoc);
+            verify(createdDoc, wssConfig);
             fail("Expected failure on multiple timestamps");
         } catch (WSSecurityException ex) {
             // expected
@@ -461,7 +463,7 @@ public class TimestampTest extends org.junit.Assert {
         // Do some processing
         //
         try {
-            verify(doc);
+            verify(doc, WSSConfig.getNewInstance());
             fail("The timestamp validation should have failed on multiple Created elements");
         } catch (WSSecurityException ex) {
             // expected
@@ -508,13 +510,13 @@ public class TimestampTest extends org.junit.Assert {
         // Do some processing
         //
         try {
-            verify(doc);
+            verify(doc, WSSConfig.getNewInstance());
             fail("The timestamp validation should have failed on no Created element");
         } catch (WSSecurityException ex) {
             // expected
         }
         
-        List<BSPRule> rules = new ArrayList<>();
+        List<BSPRule> rules = new ArrayList<BSPRule>();
         rules.add(BSPRule.R3203);
         rules.add(BSPRule.R3221);
         verify(doc, rules);
@@ -568,7 +570,7 @@ public class TimestampTest extends org.junit.Assert {
         // Do some processing
         //
         try {
-            verify(doc);
+            verify(doc, WSSConfig.getNewInstance());
             fail("The timestamp validation should have failed on multiple Expires elements");
         } catch (WSSecurityException ex) {
             // expected
@@ -622,7 +624,7 @@ public class TimestampTest extends org.junit.Assert {
         // Do some processing
         //
         try {
-            verify(doc);
+            verify(doc, WSSConfig.getNewInstance());
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
             // expected
@@ -669,7 +671,7 @@ public class TimestampTest extends org.junit.Assert {
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         wssConfig.setValidator(WSSecurityEngine.TIMESTAMP, new NoOpValidator());
         try {
-            verify(doc, wssConfig, new ArrayList<BSPRule>());
+            verify(doc, wssConfig);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
             //assertTrue(ex.getMessage().contains("Unparseable date"));
@@ -715,16 +717,16 @@ public class TimestampTest extends org.junit.Assert {
         //
         // Do some processing
         //
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        wssConfig.setValidator(WSSecurityEngine.TIMESTAMP, new NoOpValidator());
         try {
-            verify(doc);
+            verify(doc, WSSConfig.getNewInstance());
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
             //
         }
         
         // Now it should pass...
-        WSSConfig wssConfig = WSSConfig.getNewInstance();
-        wssConfig.setValidator(WSSecurityEngine.TIMESTAMP, new NoOpValidator());
         verify(doc, wssConfig, Collections.singletonList(BSPRule.R3225));
     }
     
@@ -780,7 +782,7 @@ public class TimestampTest extends org.junit.Assert {
         // Do some processing
         //
         try {
-            verify(doc);
+            verify(doc, WSSConfig.getNewInstance());
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
             //
@@ -803,6 +805,7 @@ public class TimestampTest extends org.junit.Assert {
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);
         
+        WSSConfig config = WSSConfig.getNewInstance();
         WSTimeSource spoofedTimeSource = new WSTimeSource() {
 
             public Date now() {
@@ -812,8 +815,9 @@ public class TimestampTest extends org.junit.Assert {
             }
             
         };
-        timestamp.setWsTimeSource(spoofedTimeSource);
+        config.setCurrentTime(spoofedTimeSource);
         
+        timestamp.setWsConfig(config);
         Document createdDoc = timestamp.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
@@ -826,7 +830,7 @@ public class TimestampTest extends org.junit.Assert {
         // Do some processing
         //
         try {
-            verify(createdDoc);
+            verify(createdDoc, WSSConfig.getNewInstance());
             fail("Expected failure on an expired timestamp");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
@@ -840,8 +844,10 @@ public class TimestampTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
+        WSSConfig wssConfig = WSSConfig.getNewInstance();
+        wssConfig.setPrecisionInMilliSeconds(false);
         WSSecTimestamp timestamp = new WSSecTimestamp();
-        timestamp.setPrecisionInMilliSeconds(false);
+        timestamp.setWsConfig(wssConfig);
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
 
@@ -854,9 +860,9 @@ public class TimestampTest extends org.junit.Assert {
         //
         // Do some processing
         //
-        WSHandlerResult wsResult = verify(createdDoc);
+        List<WSSecurityEngineResult> wsResult = verify(createdDoc, WSSConfig.getNewInstance());
         WSSecurityEngineResult actionResult = 
-            wsResult.getActionResults().get(WSConstants.TS).get(0);
+            WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
         assertTrue(actionResult != null);
     }
     
@@ -878,9 +884,9 @@ public class TimestampTest extends org.junit.Assert {
             //
             // Do some processing
             //
-            WSHandlerResult wsResult = verify(createdDoc);
+            List<WSSecurityEngineResult> wsResult = verify(createdDoc, WSSConfig.getNewInstance());
             WSSecurityEngineResult actionResult = 
-                wsResult.getActionResults().get(WSConstants.TS).get(0);
+                WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
             assertTrue(actionResult != null);
         } finally {
             Locale.setDefault(defaultLocale);
@@ -890,45 +896,38 @@ public class TimestampTest extends org.junit.Assert {
     /**
      * Verifies the soap envelope
      */
-    private WSHandlerResult verify(
-        Document doc
+    private List<WSSecurityEngineResult> verify(
+        Document doc, WSSConfig wssConfig
     ) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         RequestData requestData = new RequestData();
-        requestData.setWssConfig(WSSConfig.getNewInstance());
-        return secEngine.processSecurityHeader(doc, requestData);
-    }
-    
-    private WSHandlerResult verify(
-        Document doc, RequestData requestData
-    ) throws Exception {
-        WSSecurityEngine secEngine = new WSSecurityEngine();
-        return secEngine.processSecurityHeader(doc, requestData);
+        requestData.setWssConfig(wssConfig);
+        return secEngine.processSecurityHeader(doc, "", requestData);
     }
     
     /**
      * Verifies the soap envelope
      */
-    private WSHandlerResult verify(
+    private List<WSSecurityEngineResult> verify(
         Document doc, List<BSPRule> ignoredRules
     ) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         RequestData requestData = new RequestData();
         requestData.setIgnoredBSPRules(ignoredRules);
-        return secEngine.processSecurityHeader(doc, requestData);
+        return secEngine.processSecurityHeader(doc, "", requestData);
     }
     
     /**
      * Verifies the soap envelope
      */
-    private WSHandlerResult verify(
+    private List<WSSecurityEngineResult> verify(
         Document doc, WSSConfig wssConfig, List<BSPRule> ignoredRules
     ) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         RequestData requestData = new RequestData();
         requestData.setWssConfig(wssConfig);
         requestData.setIgnoredBSPRules(ignoredRules);
-        return secEngine.processSecurityHeader(doc, requestData);
+        return secEngine.processSecurityHeader(doc, "", requestData);
     }
     
     

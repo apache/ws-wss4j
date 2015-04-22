@@ -26,8 +26,8 @@ import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
 import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.opensaml.common.SAMLVersion;
 import org.apache.wss4j.common.saml.bean.Version;
-import org.opensaml.saml.common.SAMLVersion;
 import org.w3c.dom.Element;
 
 import javax.security.auth.callback.Callback;
@@ -109,9 +109,9 @@ public class SAMLCallback implements Callback {
      * Constructor SAMLCallback creates a new SAMLCallback instance.
      */
     public SAMLCallback() {
-        authenticationStatementData = new ArrayList<>();
-        attributeStatementData = new ArrayList<>();
-        authDecisionStatementData = new ArrayList<>();
+        authenticationStatementData = new ArrayList<AuthenticationStatementBean>();
+        attributeStatementData = new ArrayList<AttributeStatementBean>();
+        authDecisionStatementData = new ArrayList<AuthDecisionStatementBean>();
     }
 
     /**

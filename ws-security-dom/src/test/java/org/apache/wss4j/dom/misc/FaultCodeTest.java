@@ -19,31 +19,31 @@
 
 package org.apache.wss4j.dom.misc;
 
-import java.io.IOException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.bsp.BSPEnforcer;
+import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.message.WSSecEncrypt;
+import org.apache.wss4j.dom.message.WSSecHeader;
+import org.apache.wss4j.dom.message.WSSecTimestamp;
+import org.apache.wss4j.dom.message.WSSecUsernameToken;
+import org.apache.wss4j.dom.message.token.Reference;
+import org.apache.wss4j.dom.message.token.UsernameToken;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 
-import org.apache.wss4j.common.bsp.BSPEnforcer;
-import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoFactory;
-import org.apache.wss4j.common.ext.WSPasswordCallback;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.token.Reference;
-import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.common.SOAPUtil;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
-import org.apache.wss4j.dom.message.WSSecEncrypt;
-import org.apache.wss4j.dom.message.WSSecHeader;
-import org.apache.wss4j.dom.message.WSSecTimestamp;
-import org.apache.wss4j.dom.message.WSSecUsernameToken;
-import org.apache.wss4j.dom.message.token.UsernameToken;
-import org.w3c.dom.Document;
+import java.io.IOException;
 
 /**
  * WS-Security Test Case for fault codes. The SOAP Message Security specification 1.1 defines
@@ -69,7 +69,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
      */
     @org.junit.Test
     public void testFailedCheck() throws Exception {
-        WSSecEncrypt builder = new WSSecEncrypt();
+        WSSecEncrypt builder = new WSSecEncrypt(secEngine.getWssConfig());
         builder.setUserInfo("wss40", "security");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -96,7 +96,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
     public void testUnsupportedAlgorithm() throws Exception {
         try {
             secEngine.getWssConfig();
-            KeyUtils.getCipherInstance("Bad Algorithm");
+            WSSecurityUtil.getCipherInstance("Bad Algorithm");
             fail("Failure expected on an unsupported algorithm");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM);
@@ -112,7 +112,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
      */
     @org.junit.Test
     public void testMessageExpired() throws Exception {
-        WSSecTimestamp builder = new WSSecTimestamp();
+        WSSecTimestamp builder = new WSSecTimestamp(secEngine.getWssConfig());
         builder.setTimeToLive(-1);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -137,7 +137,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
      */
     @org.junit.Test
     public void testFailedAuthentication() throws Exception {
-        WSSecUsernameToken builder = new WSSecUsernameToken();
+        WSSecUsernameToken builder = new WSSecUsernameToken(secEngine.getWssConfig());
         builder.addCreated();
         builder.addNonce();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -164,7 +164,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
      */
     @org.junit.Test
     public void testInvalidSecurityToken() throws Exception {
-        WSSecUsernameToken builder = new WSSecUsernameToken();
+        WSSecUsernameToken builder = new WSSecUsernameToken(secEngine.getWssConfig());
         builder.addCreated();
         builder.addNonce();
         builder.setUserInfo(null, "security");

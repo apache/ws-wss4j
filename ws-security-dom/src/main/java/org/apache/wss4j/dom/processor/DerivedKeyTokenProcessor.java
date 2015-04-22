@@ -19,7 +19,6 @@
 
 package org.apache.wss4j.dom.processor;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.w3c.dom.Element;
@@ -33,8 +32,6 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.DerivedKeyToken;
 import org.apache.wss4j.dom.str.DerivedKeyTokenSTRParser;
 import org.apache.wss4j.dom.str.STRParser;
-import org.apache.wss4j.dom.str.STRParserParameters;
-import org.apache.wss4j.dom.str.STRParserResult;
 
 /**
  * The processor to process <code>wsc:DerivedKeyToken</code>.
@@ -62,14 +59,11 @@ public class DerivedKeyTokenProcessor implements Processor {
         byte[] secret = null;
         Element secRefElement = dkt.getSecurityTokenReferenceElement();
         if (secRefElement != null) {
-            STRParserParameters parameters = new STRParserParameters();
-            parameters.setData(data);
-            parameters.setWsDocInfo(wsDocInfo);
-            parameters.setStrElement(secRefElement);
-            
             STRParser strParser = new DerivedKeyTokenSTRParser();
-            STRParserResult parserResult = strParser.parseSecurityTokenReference(parameters);
-            secret = parserResult.getSecretKey();
+            strParser.parseSecurityTokenReference(
+                secRefElement, data, wsDocInfo, null
+            );
+            secret = strParser.getSecretKey();
         } else {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "noReference");
         }
@@ -91,7 +85,7 @@ public class DerivedKeyTokenProcessor implements Processor {
         result.put(WSSecurityEngineResult.TAG_SECRET, secret);
         result.put(WSSecurityEngineResult.TAG_TOKEN_ELEMENT, dkt.getElement());
         wsDocInfo.addResult(result);
-        return Collections.singletonList(result);
+        return java.util.Collections.singletonList(result);
     }
 
 

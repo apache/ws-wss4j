@@ -37,8 +37,7 @@ public class SAMLTokenUnsignedAction implements Action {
     public void execute(WSHandler handler, SecurityActionToken actionToken,
                         Document doc, RequestData reqData)
             throws WSSecurityException {
-        WSSecSAMLToken builder = new WSSecSAMLToken();
-        builder.setIdAllocator(reqData.getWssConfig().getIdAllocator());
+        WSSecSAMLToken builder = new WSSecSAMLToken(reqData.getWssConfig());
 
         CallbackHandler samlCallbackHandler = 
                 handler.getCallbackHandler(

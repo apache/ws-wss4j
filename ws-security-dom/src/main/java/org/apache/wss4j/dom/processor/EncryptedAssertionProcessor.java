@@ -25,12 +25,13 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
+
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 /**
  * This will process incoming <code>saml2:EncryptedAssertion</code> elements. EncryptedKey
@@ -51,7 +52,7 @@ public class EncryptedAssertionProcessor implements Processor {
         }
         
         Element encryptedDataElement =
-            XMLUtils.getDirectChildElement(elem, WSConstants.ENC_DATA_LN, WSConstants.ENC_NS);
+            WSSecurityUtil.getDirectChildElement(elem, WSConstants.ENC_DATA_LN, WSConstants.ENC_NS);
         if (encryptedDataElement == null) {
             // Maybe it has already been decrypted...
             return Collections.emptyList();

@@ -39,6 +39,7 @@ import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
 import org.apache.wss4j.dom.message.token.Timestamp;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -79,7 +80,7 @@ public class CustomTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<>();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         actions.add(new HandlerAction(WSConstants.CUSTOM_TOKEN, null));
         handler.send(
             doc, 
@@ -95,10 +96,10 @@ public class CustomTokenTest extends org.junit.Assert {
         }
         
         WSSecurityEngine secEngine = new WSSecurityEngine();
-        WSHandlerResult wsResults = 
+        List<WSSecurityEngineResult> wsResults = 
             secEngine.processSecurityHeader(doc, null, null, null);
         WSSecurityEngineResult actionResult = 
-            wsResults.getActionResults().get(WSConstants.TS).get(0);
+            WSSecurityUtil.fetchActionResult(wsResults, WSConstants.TS);
         assertTrue(actionResult != null);
         
         Timestamp receivedTimestamp = 

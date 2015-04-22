@@ -130,7 +130,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                                 "empty", "First transform must be Attachment[Content|Complete]SignatureTransform"
                         );
                     }
-                    Map<String, Object> transformerProperties = new HashMap<>(2);
+                    Map<String, Object> transformerProperties = new HashMap<String, Object>(2);
                     transformerProperties.put(
                             AttachmentContentSignatureTransform.ATTACHMENT, attachment);
                     transformer.setProperties(transformerProperties);
@@ -349,7 +349,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
 
                     Map<String, Object> transformerProperties = null;
                     if (inclusiveNamespacesType != null) {
-                        transformerProperties = new HashMap<>();
+                        transformerProperties = new HashMap<String, Object>();
                         transformerProperties.put(
                                 Canonicalizer20010315_Excl.INCLUSIVE_NAMESPACES_PREFIX_LIST,
                                 inclusiveNamespacesType.getPrefixList());
@@ -370,7 +370,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
 
             Map<String, Object> transformerProperties = null;
             if (inclusiveNamespacesType != null) {
-                transformerProperties = new HashMap<>();
+                transformerProperties = new HashMap<String, Object>();
                 transformerProperties.put(
                         Canonicalizer20010315_Excl.INCLUSIVE_NAMESPACES_PREFIX_LIST,
                         inclusiveNamespacesType.getPrefixList());

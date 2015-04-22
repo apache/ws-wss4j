@@ -255,7 +255,7 @@ public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
             }
         }
 
-        List<AssertionBuilder<Element>> customAssertionBuilders = new ArrayList<>();
+        List<AssertionBuilder<Element>> customAssertionBuilders = new ArrayList<AssertionBuilder<Element>>();
         customAssertionBuilders.add(new GCMAlgorithmSuiteBuilder());
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString, false, customAssertionBuilders);
 

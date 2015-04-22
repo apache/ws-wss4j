@@ -19,41 +19,40 @@
 
 package org.apache.wss4j.dom.message;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.security.auth.callback.CallbackHandler;
-
+import org.apache.wss4j.dom.SOAPConstants;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.WSDataRef;
+import org.apache.wss4j.dom.common.CustomHandler;
+import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
+import org.apache.wss4j.dom.common.SecretKeyCallbackHandler;
+import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.SOAPConstants;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSDataRef;
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
-import org.apache.wss4j.dom.common.CustomHandler;
-import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
-import org.apache.wss4j.dom.common.SOAPUtil;
-import org.apache.wss4j.dom.common.SecretKeyCallbackHandler;
-import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.str.STRParser.REFERENCE_TYPE;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.security.auth.callback.CallbackHandler;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * A set of test-cases for encrypting and decrypting SOAP requests.
@@ -126,7 +125,6 @@ public class EncryptionTest extends org.junit.Assert {
         }
         assertFalse(outputString.contains("counter_port_type"));
         verify(encryptedDoc, keystoreCallbackHandler, SOAP_BODY);
-        builder.getParts().clear();
 
         /*
          * second run, same Junit set up, but change encryption method, 
@@ -137,13 +135,13 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         builder.setSymmetricKey(null);
-        
+        java.util.List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP = 
             new WSEncryptionPart(
                 "add", "http://ws.apache.org/counter/counter_port_type", "Element"
             );
-        builder.getParts().add(encP);
-        
+        parts.add(encP);
+        builder.setParts(parts);
         doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);        
@@ -157,7 +155,7 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         assertFalse(outputString.contains("counter_port_type"));
-        WSHandlerResult results = verify(
+        List<WSSecurityEngineResult> results = verify(
             encryptedDoc,
             keystoreCallbackHandler,
             new javax.xml.namespace.QName(
@@ -167,7 +165,7 @@ public class EncryptionTest extends org.junit.Assert {
         );
         
         WSSecurityEngineResult actionResult =
-                results.getActionResults().get(WSConstants.ENCR).get(0);
+                WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
         REFERENCE_TYPE referenceType = 
@@ -188,7 +186,7 @@ public class EncryptionTest extends org.junit.Assert {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
-        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOEP);
+        builder.setKeyEnc(WSConstants.KEYTRANSPORT_RSAOEP);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);        
@@ -205,11 +203,11 @@ public class EncryptionTest extends org.junit.Assert {
         assertFalse(outputString.contains("counter_port_type"));
         
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        WSHandlerResult results = 
+        List<WSSecurityEngineResult> results = 
             newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
         
         WSSecurityEngineResult actionResult =
-                results.getActionResults().get(WSConstants.ENCR).get(0);
+                WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
         REFERENCE_TYPE referenceType = 
@@ -286,10 +284,10 @@ public class EncryptionTest extends org.junit.Assert {
         assertTrue(outputString.contains("#ThumbprintSHA1"));
     
         LOG.info("After Encrypting ThumbprintSHA1....");
-        WSHandlerResult results = verify(encryptedDoc, encCrypto, keystoreCallbackHandler);
+        List<WSSecurityEngineResult> results = verify(encryptedDoc, encCrypto, keystoreCallbackHandler);
         
         WSSecurityEngineResult actionResult =
-                results.getActionResults().get(WSConstants.ENCR).get(0);
+                WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
         REFERENCE_TYPE referenceType = 
@@ -348,7 +346,7 @@ public class EncryptionTest extends org.junit.Assert {
         secHeader.insertSecurityHeader(doc);
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
         
-        byte[] encodedBytes = KeyUtils.generateDigest(keyData);
+        byte[] encodedBytes = WSSecurityUtil.generateDigest(keyData);
         String identifier = Base64.encode(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
      
@@ -383,7 +381,7 @@ public class EncryptionTest extends org.junit.Assert {
         secHeader.insertSecurityHeader(doc);        
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
         
-        byte[] encodedBytes = KeyUtils.generateDigest(keyData);
+        byte[] encodedBytes = WSSecurityUtil.generateDigest(keyData);
         String identifier = Base64.encode(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
      
@@ -471,10 +469,11 @@ public class EncryptionTest extends org.junit.Assert {
          */
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
                 .getDocumentElement());
+        java.util.List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP = new WSEncryptionPart(soapConstants
                 .getBodyQName().getLocalPart(), soapConstants.getEnvelopeURI(),
                 "Content");
-        builder.getParts().add(encP);
+        parts.add(encP);
 
         /*
          * Encrypt the parts (Body), create EncryptedData elements that reference
@@ -482,7 +481,7 @@ public class EncryptionTest extends org.junit.Assert {
          * Security header. Be sure that the ReferenceList is after the
          * EncryptedKey element in the Security header (strict layout)
          */
-        Element refs = builder.encrypt();
+        Element refs = builder.encryptForRef(null, parts);
         builder.addExternalRefElement(refs, secHeader);
 
         /*
@@ -503,14 +502,14 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         assertFalse(outputString.contains("counter_port_type"));
-        WSHandlerResult results = verify(encryptedDoc, crypto, keystoreCallbackHandler);
+        List<WSSecurityEngineResult> results = verify(encryptedDoc, crypto, keystoreCallbackHandler);
         
         outputString = 
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         assertTrue(outputString.contains("counter_port_type"));
         
         WSSecurityEngineResult actionResult =
-                results.getActionResults().get(WSConstants.ENCR).get(0);
+                WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
         REFERENCE_TYPE referenceType = 
@@ -539,7 +538,7 @@ public class EncryptionTest extends org.junit.Assert {
          */
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
                 .getDocumentElement());
-        java.util.List<WSEncryptionPart> parts = new ArrayList<>();
+        java.util.List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP = new WSEncryptionPart(soapConstants
                 .getBodyQName().getLocalPart(), soapConstants.getEnvelopeURI(),
                 "Content");
@@ -551,7 +550,7 @@ public class EncryptionTest extends org.junit.Assert {
          * Security header. Be sure that the ReferenceList is after the
          * EncryptedKey element in the Security header (strict layout)
          */
-        Element refs = builder.encrypt();
+        Element refs = builder.encryptForRef(null, parts);
         builder.addExternalRefElement(refs, secHeader);
 
         /*
@@ -584,7 +583,7 @@ public class EncryptionTest extends org.junit.Assert {
         data.setCallbackHandler(keystoreCallbackHandler);
         data.setDecCrypto(crypto);
         data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3209));
-        newEngine.processSecurityHeader(encryptedDoc, data);
+        newEngine.processSecurityHeader(encryptedDoc, "", data);
     }
     
     /**
@@ -604,13 +603,13 @@ public class EncryptionTest extends org.junit.Assert {
 
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
                 .getDocumentElement());
-        java.util.List<WSEncryptionPart> parts = new ArrayList<>();
+        java.util.List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP = new WSEncryptionPart(soapConstants
                 .getBodyQName().getLocalPart(), soapConstants.getEnvelopeURI(),
                 "Content");
         parts.add(encP);
 
-        builder.encrypt();
+        builder.encryptForRef(null, parts);
 
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
@@ -633,7 +632,7 @@ public class EncryptionTest extends org.junit.Assert {
     public void testEncryptionDecryptionOAEPSHA256() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
-        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOEP);
+        builder.setKeyEnc(WSConstants.KEYTRANSPORT_RSAOEP);
         builder.setDigestAlgorithm(WSConstants.SHA256);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -651,11 +650,11 @@ public class EncryptionTest extends org.junit.Assert {
         assertTrue(!outputString.contains("counter_port_type") ? true : false);
         
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        WSHandlerResult results = 
+        List<WSSecurityEngineResult> results = 
             newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
         
         WSSecurityEngineResult actionResult =
-                results.getActionResults().get(WSConstants.ENCR).get(0);
+                WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
         assertNotNull(actionResult);
     }
     
@@ -665,7 +664,7 @@ public class EncryptionTest extends org.junit.Assert {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("regexp");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOEP);
+        builder.setKeyEnc(WSConstants.KEYTRANSPORT_RSAOEP);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);        
@@ -694,10 +693,10 @@ public class EncryptionTest extends org.junit.Assert {
      * @throws Exception
      *             Thrown when there is a problem in verification
      */
-    private WSHandlerResult verify(
+    private List<WSSecurityEngineResult> verify(
         Document doc, Crypto decCrypto, CallbackHandler handler
     ) throws Exception {
-        WSHandlerResult results = 
+        List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(doc, null, handler, decCrypto);
         if (LOG.isDebugEnabled()) {
             String outputString = 
@@ -715,12 +714,12 @@ public class EncryptionTest extends org.junit.Assert {
      * @throws Exception Thrown when there is a problem in verification
      */
     @SuppressWarnings("unchecked")
-    private WSHandlerResult verify(
+    private List<WSSecurityEngineResult> verify(
         Document doc,
         CallbackHandler handler,
         javax.xml.namespace.QName expectedEncryptedElement
     ) throws Exception {
-        final WSHandlerResult results = 
+        final java.util.List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(doc, null, handler, null, crypto);
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
@@ -734,7 +733,7 @@ public class EncryptionTest extends org.junit.Assert {
         // (as a QName)
         //
         boolean encrypted = false;
-        for (java.util.Iterator<WSSecurityEngineResult> ipos = results.getResults().iterator(); 
+        for (java.util.Iterator<WSSecurityEngineResult> ipos = results.iterator(); 
             ipos.hasNext();) {
             final WSSecurityEngineResult result = ipos.next();
             final Integer action = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);

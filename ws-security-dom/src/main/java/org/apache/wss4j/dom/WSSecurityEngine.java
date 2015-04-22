@@ -22,7 +22,6 @@ package org.apache.wss4j.dom;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
@@ -32,9 +31,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.CallbackLookup;
-import org.apache.wss4j.dom.message.DOMCallbackLookup;
 import org.apache.wss4j.dom.processor.Processor;
 import org.apache.wss4j.dom.saml.DOMSAMLUtil;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -198,12 +195,12 @@ public class WSSecurityEngine {
      *               encryption and UsernameToken handling
      * @param crypto the object that implements the access to the keystore and the
      *               handling of certificates.
-     * @return a WSHandlerResult Object containing the results of processing the security header
+     * @return a result list
      * @throws WSSecurityException
      * @see WSSecurityEngine#processSecurityHeader(Element securityHeader, CallbackHandler cb,
      * Crypto sigVerCrypto, Crypto decCrypto)
      */
-    public WSHandlerResult processSecurityHeader(
+    public List<WSSecurityEngineResult> processSecurityHeader(
         Document doc,
         String actor,
         CallbackHandler cb,
@@ -229,12 +226,12 @@ public class WSSecurityEngine {
      *                  handling of certificates for Signature verification
      * @param decCrypto the object that implements the access to the keystore and the
      *                  handling of certificates for Decryption
-     * @return a WSHandlerResult Object containing the results of processing the security header
+     * @return a result list
      * @throws WSSecurityException
      * @see WSSecurityEngine#processSecurityHeader(
      * Element securityHeader, CallbackHandler cb, Crypto sigVerCrypto, Crypto decCrypto)
      */
-    public WSHandlerResult processSecurityHeader(
+    public List<WSSecurityEngineResult> processSecurityHeader(
         Document doc,
         String actor,
         CallbackHandler cb,
@@ -249,13 +246,13 @@ public class WSSecurityEngine {
         if (actor == null) {
             actor = "";
         }
-        WSHandlerResult wsResult = null;
+        List<WSSecurityEngineResult> wsResult = null;
         Element elem = WSSecurityUtil.getSecurityHeader(doc, actor);
         if (elem != null) {
             if (doDebug) {
                 LOG.debug("Processing WS-Security header for '" + actor + "' actor.");
             }
-            wsResult = processSecurityHeader(elem, actor, cb, sigVerCrypto, decCrypto);
+            wsResult = processSecurityHeader(elem, cb, sigVerCrypto, decCrypto);
         }
         return wsResult;
     }
@@ -292,18 +289,20 @@ public class WSSecurityEngine {
      *                       handling of certificates used for Signature verification
      * @param decCrypto      the object that implements the access to the keystore and the
      *                       handling of certificates used for Decryption
-     * @return a WSHandlerResult Object containing the results of processing the security header
+     * @return a List of {@link WSSecurityEngineResult}. Each element in the
+     *         the List represents the result of a security action. The elements
+     *         are ordered according to the sequence of the security actions in the
+     *         wsse:Signature header. The List may be empty if no security processing
+     *         was performed.
      * @throws WSSecurityException
      */
-    public WSHandlerResult processSecurityHeader(
+    public List<WSSecurityEngineResult> processSecurityHeader(
         Element securityHeader,
-        String actor,
         CallbackHandler cb,
         Crypto sigVerCrypto,
         Crypto decCrypto
     ) throws WSSecurityException { 
         RequestData data = new RequestData();
-        data.setActor(actor);
         data.setWssConfig(getWssConfig());
         data.setDecCrypto(decCrypto);
         data.setSigVerCrypto(sigVerCrypto);
@@ -319,20 +318,22 @@ public class WSSecurityEngine {
      * defined actor.
      *
      * @param doc       the SOAP envelope as {@link Document}
+     * @param actor     the engine works on behalf of this <code>actor</code>. Refer
+     *                  to the SOAP specification about <code>actor</code> or <code>role
+     *                  </code>
      * @param requestData    the RequestData associated with the request.  It should
      *                       be able to provide the callback handler, cryptos, etc...
      *                       as needed by the processing
-     * @return a WSHandlerResult Object containing the results of processing the security header
+     * @return a result list
      * @throws WSSecurityException
      */
-    public WSHandlerResult processSecurityHeader(
-        Document doc, RequestData requestData
+    public List<WSSecurityEngineResult> processSecurityHeader(
+        Document doc, String actor, RequestData requestData
     ) throws WSSecurityException {
-        if (requestData.getActor() == null) {
-            requestData.setActor("");
+        if (actor == null) {
+            actor = "";
         }
-        String actor = requestData.getActor();
-        WSHandlerResult wsResult = null;
+        List<WSSecurityEngineResult> wsResult = null;
         Element elem = WSSecurityUtil.getSecurityHeader(doc, actor);
         if (elem != null) {
             if (doDebug) {
@@ -372,17 +373,19 @@ public class WSSecurityEngine {
      * @param requestData    the RequestData associated with the request.  It should
      *                       be able to provide the callback handler, cryptos, etc...
      *                       as needed by the processing
-     * @return a WSHandlerResult Object containing the results of processing the security header
+     * @return a List of {@link WSSecurityEngineResult}. Each element in the
+     *         the List represents the result of a security action. The elements
+     *         are ordered according to the sequence of the security actions in the
+     *         wsse:Signature header. The List may be empty if no security processing
+     *         was performed.
      * @throws WSSecurityException
      */
-    public WSHandlerResult processSecurityHeader(
+    public List<WSSecurityEngineResult> processSecurityHeader(
         Element securityHeader,
         RequestData requestData
     ) throws WSSecurityException {
         if (securityHeader == null) {
-            List<WSSecurityEngineResult> results = Collections.emptyList();
-            Map<Integer, List<WSSecurityEngineResult>> actionResults = Collections.emptyMap();
-            return new WSHandlerResult(null, results, actionResults);
+            return Collections.emptyList();
         }
     
         if (requestData.getWssConfig() == null) {
@@ -395,18 +398,14 @@ public class WSSecurityEngine {
         // (no need for encryption --- yet)
         //
         WSDocInfo wsDocInfo = new WSDocInfo(securityHeader.getOwnerDocument());
-        CallbackLookup callbackLookupToUse = callbackLookup;
-        if (callbackLookupToUse == null) {
-            callbackLookupToUse = new DOMCallbackLookup(securityHeader.getOwnerDocument());
-        }
-        wsDocInfo.setCallbackLookup(callbackLookupToUse);
+        wsDocInfo.setCallbackLookup(callbackLookup);
         wsDocInfo.setCrypto(requestData.getSigVerCrypto());
         wsDocInfo.setSecurityHeader(securityHeader);
 
         final WSSConfig cfg = getWssConfig();
         Node node = securityHeader.getFirstChild();
         
-        List<WSSecurityEngineResult> returnResults = new LinkedList<>();
+        List<WSSecurityEngineResult> returnResults = new LinkedList<WSSecurityEngineResult>();
         boolean foundTimestamp = false;
         while (node != null) {
             Node nextSibling = node.getNextSibling();
@@ -453,17 +452,14 @@ public class WSSecurityEngine {
             }
         }
         
-        WSHandlerResult handlerResult = 
-            new WSHandlerResult(requestData.getActor(), returnResults, wsDocInfo.getActionResults());
-        
         // Validate SAML Subject Confirmation requirements
-        if (requestData.isValidateSamlSubjectConfirmation()) {
-            Element bodyElement = callbackLookupToUse.getSOAPBody();
-            DOMSAMLUtil.validateSAMLResults(handlerResult, requestData.getTlsCerts(), bodyElement);
+        if (wssConfig.isValidateSamlSubjectConfirmation()) {
+            Element bodyElement = 
+                WSSecurityUtil.findBodyElement(securityHeader.getOwnerDocument());
+            
+            DOMSAMLUtil.validateSAMLResults(returnResults, requestData.getTlsCerts(), bodyElement);
         }
         
-        wsDocInfo.clear();
-        
-        return handlerResult;
+        return returnResults;
     }
 }

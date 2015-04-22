@@ -27,14 +27,12 @@ import javax.xml.namespace.QName;
 
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.derivedKey.AlgoFactory;
 import org.apache.wss4j.common.derivedKey.DerivationAlgorithm;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
-import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
@@ -93,7 +91,7 @@ public class DerivedKeyToken {
         ns = ConversationConstants.getWSCNs(version);
         element = 
             doc.createElementNS(ns, "wsc:" + ConversationConstants.DERIVED_KEY_TOKEN_LN);
-        XMLUtils.setNamespace(element, ns, ConversationConstants.WSC_PREFIX);
+        WSSecurityUtil.setNamespace(element, ns, ConversationConstants.WSC_PREFIX);
         bspEnforcer = new BSPEnforcer();
     }
 
@@ -117,7 +115,7 @@ public class DerivedKeyToken {
             );
         }
         elementSecurityTokenReference = 
-            XMLUtils.getDirectChildElement(
+            WSSecurityUtil.getDirectChildElement(
                 element,
                 ConversationConstants.SECURITY_TOKEN_REFERENCE_LN,
                 WSConstants.WSSE_NS
@@ -126,27 +124,27 @@ public class DerivedKeyToken {
         ns = el.getNamespaceURI();
         
         elementProperties = 
-            XMLUtils.getDirectChildElement(
+            WSSecurityUtil.getDirectChildElement(
                 element, ConversationConstants.PROPERTIES_LN, ns
             );
         elementGeneration = 
-            XMLUtils.getDirectChildElement(
+            WSSecurityUtil.getDirectChildElement(
                 element, ConversationConstants.GENERATION_LN, ns
             );
         elementOffset = 
-            XMLUtils.getDirectChildElement(
+            WSSecurityUtil.getDirectChildElement(
                 element, ConversationConstants.OFFSET_LN, ns
             );
         elementLength = 
-            XMLUtils.getDirectChildElement(
+            WSSecurityUtil.getDirectChildElement(
                 element, ConversationConstants.LENGTH_LN, ns
             );
         elementLabel = 
-            XMLUtils.getDirectChildElement(
+            WSSecurityUtil.getDirectChildElement(
                 element, ConversationConstants.LABEL_LN, ns
             );
         elementNonce = 
-            XMLUtils.getDirectChildElement(
+            WSSecurityUtil.getDirectChildElement(
                 element, ConversationConstants.NONCE_LN, ns
             );
     }
@@ -156,7 +154,7 @@ public class DerivedKeyToken {
      * efficiency purposes.
      */
     public void addWSUNamespace() {
-        XMLUtils.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+        WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
     }
 
     /**
@@ -231,7 +229,7 @@ public class DerivedKeyToken {
      * @param nonce Value of the Properties/Nonce element
      */
     public void setProperties(String name, String label, String nonce) {
-        Map<String, String> table = new HashMap<>();
+        Map<String, String> table = new HashMap<String, String>();
         table.put("Name", name);
         table.put("Label", label);
         table.put("Nonce", nonce);
@@ -245,26 +243,24 @@ public class DerivedKeyToken {
      * @param properties The properties and values in a Map
      */
     public void setProperties(Map<String, String> properties) {
-        if (properties != null && !properties.isEmpty()) {
-            for (String key : properties.keySet()) {
-                String propertyName = properties.get(key); //Get the property name
-                //Check whether this property is already there
-                //If so change the value
-                Element node = 
-                    XMLUtils.findElement(elementProperties, propertyName, ns);
-                if (node != null) { //If the node is not null
-                    Text node1 = getFirstNode(node);
-                    node1.setData(properties.get(propertyName));
-                } else {
-                    addProperty(propertyName, properties.get(propertyName));
-                }
+        for (String key : properties.keySet()) {
+            String propertyName = properties.get(key); //Get the property name
+            //Check whether this property is already there
+            //If so change the value
+            Element node = 
+                WSSecurityUtil.findElement(elementProperties, propertyName, ns);
+            if (node != null) { //If the node is not null
+                Text node1 = getFirstNode(node);
+                node1.setData(properties.get(propertyName));
+            } else {
+                addProperty(propertyName, properties.get(propertyName));
             }
         }
     }
 
     public Map<String, String> getProperties() {
         if (elementProperties != null) {
-            Map<String, String> table = new HashMap<>();
+            Map<String, String> table = new HashMap<String, String>();
             Node node = elementProperties.getFirstChild();
             while (node != null) {
                 if (Node.ELEMENT_NODE == node.getNodeType()) {
@@ -490,7 +486,9 @@ public class DerivedKeyToken {
         SecurityTokenReference securityTokenReference = getSecurityTokenReference();
         if (securityTokenReference.containsReference()) {
             basetokenId = securityTokenReference.getReference().getURI();
-            basetokenId = XMLUtils.getIDFromReference(basetokenId);
+            if (basetokenId.charAt(0) == '#') {
+                basetokenId = basetokenId.substring(1);
+            }
         } else {
             // KeyIdentifier
             basetokenId = securityTokenReference.getKeyIdentifierValue();

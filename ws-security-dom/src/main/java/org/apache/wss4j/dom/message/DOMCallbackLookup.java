@@ -26,7 +26,6 @@ import javax.xml.crypto.dom.DOMCryptoContext;
 
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -77,12 +76,12 @@ public class DOMCallbackLookup implements CallbackLookup {
     public Element getAndRegisterElement(
         String id, String valueType, boolean checkMultipleElements, DOMCryptoContext context
     ) throws WSSecurityException {
-        String idToMatch = XMLUtils.getIDFromReference(id);
+        String idToMatch = WSSecurityUtil.getIDFromReference(id);
         
         //
         // Try the SOAP Body first
         //
-        Element bodyElement = getSOAPBody();
+        Element bodyElement = WSSecurityUtil.findBodyElement(doc);
         if (bodyElement != null) {
             String cId = bodyElement.getAttributeNS(WSConstants.WSU_NS, "Id");
             if (cId.equals(idToMatch)) {
@@ -94,7 +93,7 @@ public class DOMCallbackLookup implements CallbackLookup {
         }
         // Otherwise do a general search
         Element foundElement = 
-            XMLUtils.findElementById(doc.getDocumentElement(), idToMatch, checkMultipleElements);
+            WSSecurityUtil.findElementById(doc.getDocumentElement(), idToMatch, checkMultipleElements);
         if (foundElement != null) {
             if (context != null) {
                 if (foundElement.hasAttributeNS(WSConstants.WSU_NS, "Id")
@@ -118,7 +117,7 @@ public class DOMCallbackLookup implements CallbackLookup {
             || "".equals(valueType)
             || valueType == null) {
             foundElement = 
-                XMLUtils.findSAMLAssertionElementById(
+                WSSecurityUtil.findSAMLAssertionElementById(
                     doc.getDocumentElement(), idToMatch
                 );
             if (foundElement != null) {
@@ -152,19 +151,11 @@ public class DOMCallbackLookup implements CallbackLookup {
         //
         // Try the SOAP Body first
         //
-        Element bodyElement = getSOAPBody();
+        Element bodyElement = WSSecurityUtil.findBodyElement(doc);
         if (WSConstants.ELEM_BODY.equals(localname) &&
             bodyElement.getNamespaceURI().equals(namespace)) {
             return Collections.singletonList(bodyElement);
         }
-        return XMLUtils.findElements(doc.getDocumentElement(), localname, namespace);
-    }
-
-    
-    /**
-     * Get the SOAP Body
-     */
-    public Element getSOAPBody() {
-        return WSSecurityUtil.findBodyElement(doc);
+        return WSSecurityUtil.findElements(doc.getDocumentElement(), localname, namespace);
     }
 }

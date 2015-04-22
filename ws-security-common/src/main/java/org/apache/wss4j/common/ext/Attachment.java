@@ -26,7 +26,7 @@ public class Attachment {
 
     private String id;
     private String mimeType;
-    private final Map<String, String> headers = new HashMap<>();
+    private final Map<String, String> headers = new HashMap<String, String>();
     private InputStream sourceStream;
 
     public String getId() {

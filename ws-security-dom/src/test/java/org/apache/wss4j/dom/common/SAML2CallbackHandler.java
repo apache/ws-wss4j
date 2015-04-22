@@ -31,7 +31,6 @@ import org.apache.wss4j.common.saml.builder.SAML2Constants;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
-
 import java.io.IOException;
 
 /**

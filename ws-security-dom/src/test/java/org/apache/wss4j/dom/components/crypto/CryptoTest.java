@@ -67,7 +67,7 @@ public class CryptoTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testCustomCrypto() throws Exception {
-        java.util.Map<Object, Object> tmp = new java.util.TreeMap<>();
+        java.util.Map<Object, Object> tmp = new java.util.TreeMap<Object, Object>();
         Crypto crypto = CryptoFactory.getInstance(
             org.apache.wss4j.dom.common.CustomCrypto.class,
             tmp
@@ -156,7 +156,8 @@ public class CryptoTest extends org.junit.Assert {
     }
     
     /**
-     * WSS-102 -- ensure Merlin with null properties can be instantiated
+     * WSS-102 -- ensure Merlin will null properties
+     * can be instantiated
      */
     private static class NullPropertiesCrypto extends Merlin {
         public NullPropertiesCrypto() 

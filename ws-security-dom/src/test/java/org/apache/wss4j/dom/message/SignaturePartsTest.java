@@ -30,7 +30,6 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.Merlin;
@@ -49,6 +48,7 @@ import org.w3c.dom.Element;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.util.List;
+import java.util.ArrayList;
 
 import javax.xml.namespace.QName;
 
@@ -107,12 +107,14 @@ public class SignaturePartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
                 "urn:foo.bar",
                 "");
-        sign.getParts().add(encP);
+        parts.add(encP);
+        sign.setParts(parts);
         
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
@@ -122,10 +124,10 @@ public class SignaturePartsTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        WSHandlerResult results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
         
         WSSecurityEngineResult actionResult = 
-            results.getActionResults().get(WSConstants.SIGN).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
@@ -165,13 +167,14 @@ public class SignaturePartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
                 "urn:foo.bar",
                 "");
         encP.setRequired(false);
-        sign.getParts().add(encP);
+        parts.add(encP);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         encP = 
             new WSEncryptionPart(
@@ -179,7 +182,8 @@ public class SignaturePartsTest extends org.junit.Assert {
                 soapNamespace, 
                 "Content"
             );
-        sign.getParts().add(encP);
+        parts.add(encP);
+        sign.setParts(parts);
         
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
@@ -203,13 +207,14 @@ public class SignaturePartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
                 "urn:foo.bar",
                 "");
         encP.setRequired(false);
-        sign.getParts().add(encP);
+        parts.add(encP);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         encP = 
             new WSEncryptionPart(
@@ -217,7 +222,8 @@ public class SignaturePartsTest extends org.junit.Assert {
                 soapNamespace, 
                 "Content"
             );
-        sign.getParts().add(encP);
+        parts.add(encP);
+        sign.setParts(parts);
         
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
@@ -241,12 +247,13 @@ public class SignaturePartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
                 "urn:foo.bar",
                 "");
-        sign.getParts().add(encP);
+        parts.add(encP);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         encP = 
             new WSEncryptionPart(
@@ -254,7 +261,8 @@ public class SignaturePartsTest extends org.junit.Assert {
                 soapNamespace, 
                 "Content"
             );
-        sign.getParts().add(encP);
+        parts.add(encP);
+        sign.setParts(parts);
         
         try {
             sign.build(doc, crypto, secHeader);
@@ -300,9 +308,11 @@ public class SignaturePartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart("STRTransform", "", "Element");
-        wsSign.getParts().add(encP);
+        parts.add(encP);
+        wsSign.setParts(parts);
 
         //
         // set up for keyHolder
@@ -323,17 +333,17 @@ public class SignaturePartsTest extends org.junit.Assert {
         trustStore.load(input, "security".toCharArray());
         ((Merlin)trustCrypto).setTrustStore(trustStore);
         
-        WSHandlerResult results = 
+        List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(doc, null, null, trustCrypto);
         WSSecurityEngineResult stUnsignedActionResult =
-            results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_SIGNED);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) stUnsignedActionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
         assertTrue(receivedSamlAssertion.isSigned());
         
         WSSecurityEngineResult signActionResult = 
-            results.getActionResults().get(WSConstants.SIGN).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertTrue(signActionResult != null);
         assertFalse(signActionResult.isEmpty());
         final List<WSDataRef> refs =
@@ -358,12 +368,14 @@ public class SignaturePartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar2",
                 "urn:foo.bar",
                 "");
-        sign.getParts().add(encP);
+        parts.add(encP);
+        sign.setParts(parts);
         
         try {
             sign.build(doc, crypto, secHeader);
@@ -387,12 +399,14 @@ public class SignaturePartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
                 "urn:foo.bar2",
                 "");
-        sign.getParts().add(encP);
+        parts.add(encP);
+        sign.setParts(parts);
         
         try {
             sign.build(doc, crypto, secHeader);
@@ -418,18 +432,20 @@ public class SignaturePartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 soapConstants.getBodyQName().getLocalPart(),    // define the body
                 soapConstants.getEnvelopeURI(),
                 "");
-        sign.getParts().add(encP);
+        parts.add(encP);
         WSEncryptionPart encP2 =
             new WSEncryptionPart(
                 "foobar",
                 "urn:foo.bar",
                 "");
-        sign.getParts().add(encP2);
+        parts.add(encP2);
+        sign.setParts(parts);
         
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
@@ -439,14 +455,14 @@ public class SignaturePartsTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        WSHandlerResult results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
         
         QName fooName = new QName("urn:foo.bar", "foobar");
         QName bodyName = new QName(soapConstants.getEnvelopeURI(), "Body");
         QName headerName = new QName(soapConstants.getEnvelopeURI(), "Header");
         
         WSSecurityEngineResult actionResult = 
-            results.getActionResults().get(WSConstants.SIGN).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         
@@ -488,6 +504,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         // Give wrong names to make sure it's picking up the element
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -497,7 +514,8 @@ public class SignaturePartsTest extends org.junit.Assert {
         Element bodyElement = WSSecurityUtil.findBodyElement(doc);
         assertTrue(bodyElement != null && "Body".equals(bodyElement.getLocalName()));
         encP.setElement(bodyElement);
-        sign.getParts().add(encP);
+        parts.add(encP);
+        sign.setParts(parts);
         
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
@@ -507,10 +525,10 @@ public class SignaturePartsTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        WSHandlerResult results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
         
         WSSecurityEngineResult actionResult = 
-            results.getActionResults().get(WSConstants.SIGN).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         @SuppressWarnings("unchecked")
@@ -535,12 +553,14 @@ public class SignaturePartsTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "testMethod",
                 "http://axis/service/security/test6/LogTestService8",
                 "");
-        sign.getParts().add(encP);
+        parts.add(encP);
+        sign.setParts(parts);
         
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
@@ -561,8 +581,8 @@ public class SignaturePartsTest extends org.junit.Assert {
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private WSHandlerResult verify(Document doc) throws Exception {
-        WSHandlerResult results = 
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(doc, null, null, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");

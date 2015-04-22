@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
-import javax.xml.bind.ValidationException;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -34,35 +33,35 @@ import org.apache.wss4j.common.saml.builder.SAML1ComponentBuilder;
 import org.apache.wss4j.common.saml.builder.SAML2ComponentBuilder;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.InetAddressUtils;
-import org.apache.xml.security.exceptions.Base64DecodingException;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.signature.XMLSignature;
+import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
-import org.apache.xml.security.utils.Base64;
-import org.apache.xml.security.utils.XMLUtils;
 import org.joda.time.DateTime;
-import org.opensaml.core.xml.XMLObject;
-import org.opensaml.saml.common.SAMLObjectContentReference;
-import org.opensaml.saml.common.SAMLVersion;
-import org.opensaml.saml.common.SignableSAMLObject;
-import org.opensaml.saml.saml1.core.AttributeStatement;
-import org.opensaml.saml.saml1.core.AuthenticationStatement;
-import org.opensaml.saml.saml1.core.AuthorizationDecisionStatement;
-import org.opensaml.saml.saml1.core.ConfirmationMethod;
-import org.opensaml.saml.saml1.core.Statement;
-import org.opensaml.saml.saml1.core.Subject;
-import org.opensaml.saml.saml1.core.SubjectConfirmation;
-import org.opensaml.saml.saml1.core.SubjectStatement;
-import org.opensaml.saml.saml2.core.AuthnStatement;
-import org.opensaml.saml.saml2.core.AuthzDecisionStatement;
-import org.opensaml.saml.saml2.core.Issuer;
-import org.opensaml.saml.security.impl.SAMLSignatureProfileValidator;
-import org.opensaml.security.credential.BasicCredential;
-import org.opensaml.security.x509.BasicX509Credential;
-import org.opensaml.xmlsec.keyinfo.impl.X509KeyInfoGeneratorFactory;
-import org.opensaml.xmlsec.signature.KeyInfo;
-import org.opensaml.xmlsec.signature.Signature;
-import org.opensaml.xmlsec.signature.support.SignatureConstants;
-import org.opensaml.xmlsec.signature.support.SignatureException;
-import org.opensaml.xmlsec.signature.support.SignatureValidator;
+import org.opensaml.common.SAMLVersion;
+import org.opensaml.common.SignableSAMLObject;
+import org.opensaml.common.impl.SAMLObjectContentReference;
+import org.opensaml.saml1.core.AttributeStatement;
+import org.opensaml.saml1.core.AuthenticationStatement;
+import org.opensaml.saml1.core.AuthorizationDecisionStatement;
+import org.opensaml.saml1.core.ConfirmationMethod;
+import org.opensaml.saml1.core.Statement;
+import org.opensaml.saml1.core.Subject;
+import org.opensaml.saml1.core.SubjectConfirmation;
+import org.opensaml.saml1.core.SubjectStatement;
+import org.opensaml.saml2.core.AuthnStatement;
+import org.opensaml.saml2.core.AuthzDecisionStatement;
+import org.opensaml.saml2.core.Issuer;
+import org.opensaml.security.SAMLSignatureProfileValidator;
+import org.opensaml.xml.XMLObject;
+import org.opensaml.xml.security.x509.BasicX509Credential;
+import org.opensaml.xml.security.x509.X509KeyInfoGeneratorFactory;
+import org.opensaml.xml.signature.KeyInfo;
+import org.opensaml.xml.signature.Signature;
+import org.opensaml.xml.signature.SignatureConstants;
+import org.opensaml.xml.signature.SignatureValidator;
+import org.opensaml.xml.validation.ValidationException;
+import org.opensaml.xml.validation.ValidatorSuite;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -85,12 +84,12 @@ public class SamlAssertionWrapper {
     /**
      * Typed SAML v1.1 assertion
      */
-    private org.opensaml.saml.saml1.core.Assertion saml1 = null;
+    private org.opensaml.saml1.core.Assertion saml1 = null;
 
     /**
      * Typed SAML v2.0 assertion
      */
-    private org.opensaml.saml.saml2.core.Assertion saml2 = null;
+    private org.opensaml.saml2.core.Assertion saml2 = null;
 
     /**
      * Which SAML specification to use (currently, only v1.1 and v2.0 are supported)
@@ -155,7 +154,7 @@ public class SamlAssertionWrapper {
      *
      * @param saml2 of type Assertion
      */
-    public SamlAssertionWrapper(org.opensaml.saml.saml2.core.Assertion saml2) {
+    public SamlAssertionWrapper(org.opensaml.saml2.core.Assertion saml2) {
         this((XMLObject)saml2);
     }
 
@@ -164,7 +163,7 @@ public class SamlAssertionWrapper {
      *
      * @param saml1 of type Assertion
      */
-    public SamlAssertionWrapper(org.opensaml.saml.saml1.core.Assertion saml1) {
+    public SamlAssertionWrapper(org.opensaml.saml1.core.Assertion saml1) {
         this((XMLObject)saml1);
     }
 
@@ -180,11 +179,11 @@ public class SamlAssertionWrapper {
         OpenSAMLUtil.initSamlEngine();
         
         this.xmlObject = xmlObject;
-        if (xmlObject instanceof org.opensaml.saml.saml1.core.Assertion) {
-            this.saml1 = (org.opensaml.saml.saml1.core.Assertion) xmlObject;
+        if (xmlObject instanceof org.opensaml.saml1.core.Assertion) {
+            this.saml1 = (org.opensaml.saml1.core.Assertion) xmlObject;
             samlVersion = SAMLVersion.VERSION_11;
-        } else if (xmlObject instanceof org.opensaml.saml.saml2.core.Assertion) {
-            this.saml2 = (org.opensaml.saml.saml2.core.Assertion) xmlObject;
+        } else if (xmlObject instanceof org.opensaml.saml2.core.Assertion) {
+            this.saml2 = (org.opensaml.saml2.core.Assertion) xmlObject;
             samlVersion = SAMLVersion.VERSION_20;
         } else {
             LOG.error(
@@ -220,7 +219,7 @@ public class SamlAssertionWrapper {
      *
      * @return the saml1 (type Assertion) of this SamlAssertionWrapper object.
      */
-    public org.opensaml.saml.saml1.core.Assertion getSaml1() {
+    public org.opensaml.saml1.core.Assertion getSaml1() {
         return saml1;
     }
 
@@ -229,7 +228,7 @@ public class SamlAssertionWrapper {
      *
      * @return the saml2 (type Assertion) of this SamlAssertionWrapper object.
      */
-    public org.opensaml.saml.saml2.core.Assertion getSaml2() {
+    public org.opensaml.saml2.core.Assertion getSaml2() {
         return saml2;
     }
 
@@ -334,7 +333,7 @@ public class SamlAssertionWrapper {
      */
     public String getSubjectName() {
         if (saml2 != null) {
-            org.opensaml.saml.saml2.core.Subject subject = saml2.getSubject();
+            org.opensaml.saml2.core.Subject subject = saml2.getSubject();
             if (subject != null && subject.getNameID() != null) {
                 return subject.getNameID().getValue();
             }
@@ -357,7 +356,7 @@ public class SamlAssertionWrapper {
                 }
             }
             if (samlSubject != null && samlSubject.getNameIdentifier() != null) {
-                return samlSubject.getNameIdentifier().getValue();
+                return samlSubject.getNameIdentifier().getNameIdentifier();
             }
         }
         LOG.error(
@@ -374,16 +373,16 @@ public class SamlAssertionWrapper {
      * @return the confirmationMethods of this SamlAssertionWrapper object.
      */
     public List<String> getConfirmationMethods() {
-        List<String> methods = new ArrayList<>();
+        List<String> methods = new ArrayList<String>();
         if (saml2 != null) {
-            org.opensaml.saml.saml2.core.Subject subject = saml2.getSubject();
-            List<org.opensaml.saml.saml2.core.SubjectConfirmation> confirmations = 
+            org.opensaml.saml2.core.Subject subject = saml2.getSubject();
+            List<org.opensaml.saml2.core.SubjectConfirmation> confirmations = 
                 subject.getSubjectConfirmations();
-            for (org.opensaml.saml.saml2.core.SubjectConfirmation confirmation : confirmations) {
+            for (org.opensaml.saml2.core.SubjectConfirmation confirmation : confirmations) {
                 methods.add(confirmation.getMethod());
             }
         } else if (saml1 != null) {
-            List<SubjectStatement> subjectStatements = new ArrayList<>();
+            List<SubjectStatement> subjectStatements = new ArrayList<SubjectStatement>();
             subjectStatements.addAll(saml1.getSubjectStatements());
             subjectStatements.addAll(saml1.getAuthenticationStatements());
             subjectStatements.addAll(saml1.getAttributeStatements());
@@ -556,8 +555,9 @@ public class SamlAssertionWrapper {
 
         signature.setSignatureAlgorithm(sigAlgo);
 
-        BasicX509Credential signingCredential = 
-            new BasicX509Credential(issuerCerts[0], privateKey);
+        BasicX509Credential signingCredential = new BasicX509Credential();
+        signingCredential.setEntityCertificate(issuerCerts[0]);
+        signingCredential.setPrivateKey(privateKey);
 
         signature.setSigningCredential(signingCredential);
 
@@ -571,7 +571,7 @@ public class SamlAssertionWrapper {
             KeyInfo keyInfo = kiFactory.newInstance().generate(
                     signingCredential);
             signature.setKeyInfo(keyInfo);
-        } catch (org.opensaml.security.SecurityException ex) {
+        } catch (org.opensaml.xml.security.SecurityException ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", ex,
                     "Error generating KeyInfo from signing credential");
         }
@@ -621,20 +621,21 @@ public class SamlAssertionWrapper {
                 );
             }
 
-            BasicCredential credential = null;
+            BasicX509Credential credential = new BasicX509Credential();
             if (samlKeyInfo.getCerts() != null) {
-                credential = new BasicX509Credential(samlKeyInfo.getCerts()[0]);
+                credential.setEntityCertificate(samlKeyInfo.getCerts()[0]);
             } else if (samlKeyInfo.getPublicKey() != null) {
-                credential = new BasicCredential(samlKeyInfo.getPublicKey());
+                credential.setPublicKey(samlKeyInfo.getPublicKey());
             } else {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
                     "cannot get certificate or key"
                 );
             }
+            SignatureValidator sigValidator = new SignatureValidator(credential);
             try {
-                SignatureValidator.validate(sig, credential);
-            } catch (SignatureException ex) {
+                sigValidator.validate(sig);
+            } catch (ValidationException ex) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                         "empty", ex, "SAML signature validation failed");
             }
@@ -655,7 +656,7 @@ public class SamlAssertionWrapper {
             SAMLSignatureProfileValidator validator = new SAMLSignatureProfileValidator();
             try {
                 validator.validate(sig);
-            } catch (SignatureException ex) {
+            } catch (ValidationException ex) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
                     "empty", ex, "SAML signature validation failed");
             }
@@ -751,31 +752,22 @@ public class SamlAssertionWrapper {
             sig = saml1.getSignature();
         }
         if (sig != null) {
-            return getSignatureValue(sig);
-        }
-        return null;
-    }
-    
-    private byte[] getSignatureValue(Signature signature) throws WSSecurityException {
-        Element signatureElement = signature.getDOM();
-        
-        if (signatureElement != null) {
-            Element signedInfoElem = XMLUtils.getNextElement(signatureElement.getFirstChild());
-            if (signedInfoElem != null) {
-                Element signatureValueElement = 
-                    XMLUtils.getNextElement(signedInfoElem.getNextSibling());
-                if (signatureValueElement != null) {
-                    try {
-                        return Base64.decode(signatureValueElement);
-                    } catch (Base64DecodingException ex) {
-                        throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", ex
-                        );
-                    }
-                }
+            Element signatureElement = sig.getDOM();
+            
+            try {
+                // Use XML-Security class to obtain SignatureValue
+                XMLSignature xmlSignature = new XMLSignature(signatureElement, "");
+                return xmlSignature.getSignatureValue();
+            } catch (XMLSignatureException e) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", e
+                );
+            } catch (XMLSecurityException e) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", e
+                );
             }
         }
-        
         return null;
     }
 
@@ -871,16 +863,16 @@ public class SamlAssertionWrapper {
         }
         
         if (getSamlVersion().equals(SAMLVersion.VERSION_20) && getSaml2().getConditions() != null) {
-            org.opensaml.saml.saml2.core.Conditions conditions = getSaml2().getConditions();
+            org.opensaml.saml2.core.Conditions conditions = getSaml2().getConditions();
             if (conditions != null && conditions.getAudienceRestrictions() != null
                 && !conditions.getAudienceRestrictions().isEmpty()) {
                 boolean foundAddress = false;
-                for (org.opensaml.saml.saml2.core.AudienceRestriction audienceRestriction 
+                for (org.opensaml.saml2.core.AudienceRestriction audienceRestriction 
                     : conditions.getAudienceRestrictions()) {
                     if (audienceRestriction.getAudiences() != null) {
-                        List<org.opensaml.saml.saml2.core.Audience> audiences = 
+                        List<org.opensaml.saml2.core.Audience> audiences = 
                             audienceRestriction.getAudiences();
-                        for (org.opensaml.saml.saml2.core.Audience audience : audiences) {
+                        for (org.opensaml.saml2.core.Audience audience : audiences) {
                             String audienceURI = audience.getAudienceURI();
                             if (audienceRestrictions.contains(audienceURI)) {
                                 foundAddress = true;
@@ -895,16 +887,16 @@ public class SamlAssertionWrapper {
                 }
             }
         } else if (getSamlVersion().equals(SAMLVersion.VERSION_11) && getSaml1().getConditions() != null) {
-            org.opensaml.saml.saml1.core.Conditions conditions = getSaml1().getConditions();
+            org.opensaml.saml1.core.Conditions conditions = getSaml1().getConditions();
             if (conditions != null && conditions.getAudienceRestrictionConditions() != null
                 && !conditions.getAudienceRestrictionConditions().isEmpty()) {
                 boolean foundAddress = false;
-                for (org.opensaml.saml.saml1.core.AudienceRestrictionCondition audienceRestriction 
+                for (org.opensaml.saml1.core.AudienceRestrictionCondition audienceRestriction 
                     : conditions.getAudienceRestrictionConditions()) {
                     if (audienceRestriction.getAudiences() != null) {
-                        List<org.opensaml.saml.saml1.core.Audience> audiences = 
+                        List<org.opensaml.saml1.core.Audience> audiences = 
                             audienceRestriction.getAudiences();
-                        for (org.opensaml.saml.saml1.core.Audience audience : audiences) {
+                        for (org.opensaml.saml1.core.Audience audience : audiences) {
                             String audienceURI = audience.getUri();
                             if (audienceRestrictions.contains(audienceURI)) {
                                 foundAddress = true;
@@ -990,15 +982,55 @@ public class SamlAssertionWrapper {
     }
     
     /**
+     * Validate the samlAssertion against schemas/profiles
+     */
+    public void validateAssertion(boolean validateSignatureAgainstProfile) throws WSSecurityException {
+        if (validateSignatureAgainstProfile) {
+            validateSignatureAgainstProfile();
+        }
+        
+        if (getSaml1() != null) {
+            ValidatorSuite schemaValidators = 
+                org.opensaml.Configuration.getValidatorSuite("saml1-schema-validator");
+            ValidatorSuite specValidators = 
+                org.opensaml.Configuration.getValidatorSuite("saml1-spec-validator");
+            try {
+                schemaValidators.validate(getSaml1());
+                specValidators.validate(getSaml1());
+            } catch (ValidationException e) {
+                LOG.debug("Saml Validation error: " + e.getMessage(), e);
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", e
+                );
+            }
+        } else if (getSaml2() != null) {
+            ValidatorSuite schemaValidators = 
+                org.opensaml.Configuration.getValidatorSuite("saml2-core-schema-validator");
+            ValidatorSuite specValidators = 
+                org.opensaml.Configuration.getValidatorSuite("saml2-core-spec-validator");
+            try {
+                schemaValidators.validate(getSaml2());
+                specValidators.validate(getSaml2());
+            } catch (ValidationException e) {
+                LOG.debug("Saml Validation error: " + e.getMessage(), e);
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", e
+                );
+            }
+        }
+    }
+
+    
+    /**
      * Parse the DOM Element into Opensaml objects.
      */
     private void parseElement(Element element) throws WSSecurityException {
         this.xmlObject = OpenSAMLUtil.fromDom(element);
-        if (xmlObject instanceof org.opensaml.saml.saml1.core.Assertion) {
-            this.saml1 = (org.opensaml.saml.saml1.core.Assertion) xmlObject;
+        if (xmlObject instanceof org.opensaml.saml1.core.Assertion) {
+            this.saml1 = (org.opensaml.saml1.core.Assertion) xmlObject;
             samlVersion = SAMLVersion.VERSION_11;
-        } else if (xmlObject instanceof org.opensaml.saml.saml2.core.Assertion) {
-            this.saml2 = (org.opensaml.saml.saml2.core.Assertion) xmlObject;
+        } else if (xmlObject instanceof org.opensaml.saml2.core.Assertion) {
+            this.saml2 = (org.opensaml.saml2.core.Assertion) xmlObject;
             samlVersion = SAMLVersion.VERSION_20;
         } else {
             LOG.error(
@@ -1049,16 +1081,16 @@ public class SamlAssertionWrapper {
                 saml1.getAuthorizationDecisionStatements().addAll(authDecisionStatements);
     
                 // Build the complete assertion
-                org.opensaml.saml.saml1.core.Conditions conditions = 
+                org.opensaml.saml1.core.Conditions conditions = 
                     SAML1ComponentBuilder.createSamlv1Conditions(samlCallback.getConditions());
                 saml1.setConditions(conditions);
                 
                 if (samlCallback.getAdvice() != null) {
-                    org.opensaml.saml.saml1.core.Advice advice = 
+                    org.opensaml.saml1.core.Advice advice = 
                         SAML1ComponentBuilder.createAdvice(samlCallback.getAdvice());
                     saml1.setAdvice(advice);
                 }
-            } catch (org.opensaml.security.SecurityException ex) {
+            } catch (org.opensaml.xml.security.SecurityException ex) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", ex,
                         "Error generating KeyInfo from signing credential"
                 );
@@ -1080,7 +1112,7 @@ public class SamlAssertionWrapper {
             saml2.getAuthnStatements().addAll(authnStatements);
 
             // Attribute statement(s)
-            List<org.opensaml.saml.saml2.core.AttributeStatement> attributeStatements = 
+            List<org.opensaml.saml2.core.AttributeStatement> attributeStatements = 
                 SAML2ComponentBuilder.createAttributeStatement(
                     samlCallback.getAttributeStatementData()
                 );
@@ -1097,21 +1129,21 @@ public class SamlAssertionWrapper {
             saml2.setIssuer(samlIssuer);
             
             try {
-                org.opensaml.saml.saml2.core.Subject subject = 
+                org.opensaml.saml2.core.Subject subject = 
                     SAML2ComponentBuilder.createSaml2Subject(samlCallback.getSubject());
                 saml2.setSubject(subject);
-            } catch (org.opensaml.security.SecurityException ex) {
+            } catch (org.opensaml.xml.security.SecurityException ex) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", ex,
                         "Error generating KeyInfo from signing credential"
                 );
             }
             
-            org.opensaml.saml.saml2.core.Conditions conditions = 
+            org.opensaml.saml2.core.Conditions conditions = 
                 SAML2ComponentBuilder.createConditions(samlCallback.getConditions());
             saml2.setConditions(conditions);
             
             if (samlCallback.getAdvice() != null) {
-                org.opensaml.saml.saml2.core.Advice advice = 
+                org.opensaml.saml2.core.Advice advice = 
                     SAML2ComponentBuilder.createAdvice(samlCallback.getAdvice());
                 saml2.setAdvice(advice);
             }

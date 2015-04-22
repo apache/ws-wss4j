@@ -17,13 +17,15 @@
  * under the License.
  */
 
-package org.apache.wss4j.common.token;
+package org.apache.wss4j.dom.message.token;
 
-import org.apache.wss4j.common.WSS4JConstants;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 
 import java.math.BigInteger;
 
@@ -44,13 +46,16 @@ public final class DOMX509IssuerSerial {
         element = issuerSerialElement;
         
         Element issuerNameElement = 
-            XMLUtils.getDirectChildElement(element, "X509IssuerName", WSS4JConstants.SIG_NS);
-        issuer = XMLUtils.getElementText(issuerNameElement);
+            WSSecurityUtil.getDirectChildElement(
+                element, WSConstants.X509_ISSUER_NAME_LN, WSConstants.SIG_NS
+            );
+        issuer = getChildText(issuerNameElement);
         
         Element serialNumberElement = 
-            XMLUtils.getDirectChildElement(element, "X509SerialNumber", WSS4JConstants.SIG_NS);
-        
-        String serialNumberStr = XMLUtils.getElementText(serialNumberElement);
+            WSSecurityUtil.getDirectChildElement(
+                element, WSConstants.X509_SERIAL_NUMBER_LN, WSConstants.SIG_NS
+            );
+        String serialNumberStr = getChildText(serialNumberElement);
         if (serialNumberStr != null) {
             serialNumber = new BigInteger(serialNumberStr);
         } else {
@@ -73,15 +78,21 @@ public final class DOMX509IssuerSerial {
         this.serialNumber = serialNumber;
         
         element = 
-            doc.createElementNS(WSS4JConstants.SIG_NS, "ds:X509IssuerSerial");
+            doc.createElementNS(
+                WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.X509_ISSUER_SERIAL_LN
+            );
         
         Element issuerNameElement = 
-            doc.createElementNS(WSS4JConstants.SIG_NS, "ds:X509IssuerName");
+            doc.createElementNS(
+                WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.X509_ISSUER_NAME_LN
+            );
         issuerNameElement.appendChild(doc.createTextNode(this.issuer));
         element.appendChild(issuerNameElement);
         
         Element serialNumberElement = 
-            doc.createElementNS(WSS4JConstants.SIG_NS, "ds:X509SerialNumber");
+            doc.createElementNS(
+                WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.X509_SERIAL_NUMBER_LN
+            );
         serialNumberElement.appendChild(doc.createTextNode(serialNumber.toString()));
         element.appendChild(serialNumberElement);
     }
@@ -119,4 +130,19 @@ public final class DOMX509IssuerSerial {
         return DOM2Writer.nodeToString(element);
     }
     
+    
+    private String getChildText(Node parentNode) {
+        if (parentNode == null) {
+            return null;
+        }
+        Node node = parentNode.getFirstChild();
+        StringBuilder buffer = new StringBuilder();
+        while (node != null) {
+            if (Node.TEXT_NODE == node.getNodeType()) {
+                buffer.append(((Text)node).getData());
+            }
+            node = node.getNextSibling();
+        }
+        return buffer.toString();
+    }
 }

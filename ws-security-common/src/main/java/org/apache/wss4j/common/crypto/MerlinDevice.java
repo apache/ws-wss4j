@@ -91,7 +91,7 @@ public class MerlinDevice extends Merlin {
         String alias = properties.getProperty(prefix + KEYSTORE_ALIAS);
         if (alias != null) {
             alias = alias.trim();
-            setDefaultX509Identifier(alias);
+            defaultAlias = alias;
         }
         String keyStoreLocation = properties.getProperty(prefix + KEYSTORE_FILE);
         if (keyStoreLocation == null) {
@@ -108,14 +108,19 @@ public class MerlinDevice extends Merlin {
         }
         if (keyStoreLocation != null) {
             keyStoreLocation = keyStoreLocation.trim();
+            InputStream is = loadInputStream(loader, keyStoreLocation);
 
-            try (InputStream is = loadInputStream(loader, keyStoreLocation)) {
+            try {
                 keystore = load(is, keyStorePassword, provider, keyStoreType);
                 if (DO_DEBUG) {
                     LOG.debug(
                         "The KeyStore " + keyStoreLocation + " of type " + keyStoreType 
                         + " has been loaded"
                     );
+                }
+            } finally {
+                if (is != null) {
+                    is.close();
                 }
             }
         } else {
@@ -141,8 +146,9 @@ public class MerlinDevice extends Merlin {
         String trustStoreLocation = properties.getProperty(prefix + TRUSTSTORE_FILE);
         if (trustStoreLocation != null) {
             trustStoreLocation = trustStoreLocation.trim();
+            InputStream is = loadInputStream(loader, trustStoreLocation);
 
-            try (InputStream is = loadInputStream(loader, trustStoreLocation)) {
+            try {
                 truststore = load(is, trustStorePassword, provider, trustStoreType);
                 if (DO_DEBUG) {
                     LOG.debug(
@@ -151,13 +157,18 @@ public class MerlinDevice extends Merlin {
                     );
                 }
                 loadCACerts = false;
+            } finally {
+                if (is != null) {
+                    is.close();
+                }
             }
         } else if (Boolean.valueOf(loadCacerts)) {
             String cacertsPath = System.getProperty("java.home") + "/lib/security/cacerts";
             if (cacertsPath != null) {
                 cacertsPath = cacertsPath.trim();
             }
-            try (InputStream is = new FileInputStream(cacertsPath)) {
+            InputStream is = new FileInputStream(cacertsPath);
+            try {
                 String cacertsPasswd = properties.getProperty(prefix + TRUSTSTORE_PASSWORD, "changeit");
                 if (cacertsPasswd != null) {
                     cacertsPasswd = cacertsPasswd.trim();
@@ -168,6 +179,10 @@ public class MerlinDevice extends Merlin {
                     LOG.debug("CA certs have been loaded");
                 }
                 loadCACerts = true;
+            } finally {
+                if (is != null) {
+                    is.close();
+                }
             }
         } else {
             truststore = load(null, trustStorePassword, provider, trustStoreType);
@@ -178,8 +193,9 @@ public class MerlinDevice extends Merlin {
         String crlLocation = properties.getProperty(prefix + X509_CRL_FILE);
         if (crlLocation != null) {
             crlLocation = crlLocation.trim();
+            InputStream is = loadInputStream(loader, crlLocation);
 
-            try (InputStream is = loadInputStream(loader, crlLocation)) {
+            try {
                 CertificateFactory cf = getCertificateFactory();
                 X509CRL crl = (X509CRL)cf.generateCRL(is);
                 
@@ -206,7 +222,11 @@ public class MerlinDevice extends Merlin {
                 if (DO_DEBUG) {
                     LOG.debug(e.getMessage(), e);
                 }
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "failedCredentialLoad", e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "ioError00", e);
+            } finally {
+                if (is != null) {
+                    is.close();
+                }
             }
         }
     }

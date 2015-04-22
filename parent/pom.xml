@@ -23,9 +23,11 @@
     <parent>
         <groupId>org.apache.wss4j</groupId>
         <artifactId>wss4j</artifactId>
-        <version>2.1.1-SNAPSHOT</version>
+        <version>2.0.4</version>
     </parent>
+    <groupId>org.apache.wss4j</groupId>
     <artifactId>wss4j-parent</artifactId>
+    <version>2.0.4</version>
     <packaging>pom</packaging>
     <name>Apache WSS4J parent</name>
     <description>Apache WSS4J parent pom</description>
@@ -35,17 +37,19 @@
         <apacheds.version>2.0.0-M19</apacheds.version>
         <bcprov.version>1.52</bcprov.version>
         <commons.compress.version>1.4.1</commons.compress.version>
-        <ehcache.version>2.9.0</ehcache.version>
+        <ehcache.version>2.8.5</ehcache.version>
         <geronimo.javamail.version>1.7.1</geronimo.javamail.version>
         <jasypt.version>1.9.2</jasypt.version>
         <junit.version>4.12</junit.version>
         <log4j.version>1.2.17</log4j.version>
         <neethi.version>3.0.3</neethi.version>
-        <opensaml.version>3.1.0</opensaml.version>
+        <opensaml.version>2.6.1</opensaml.version>
         <slf4j.version>1.7.9</slf4j.version>
         <woodstox.core.asl.version>4.4.1</woodstox.core.asl.version>
         <wsdl4j.version>1.6.3</wsdl4j.version>
         <xalan.version>2.7.2</xalan.version>
+        <xerces.version>2.11.0</xerces.version>
+        <xml.apis.version>1.4.01</xml.apis.version>
         <xmlsec.version>2.0.4</xmlsec.version>
         <xmlunit.version>1.6</xmlunit.version>
         
@@ -59,6 +63,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>xerces</groupId>
+                <artifactId>xercesImpl</artifactId>
+                <version>${xerces.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.santuario</groupId>
                 <artifactId>xmlsec</artifactId>
@@ -78,6 +87,11 @@
                 <groupId>org.codehaus.woodstox</groupId>
                 <artifactId>woodstox-core-asl</artifactId>
                 <version>${woodstox.core.asl.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opensaml</groupId>
+                <artifactId>opensaml</artifactId>
+                <version>${opensaml.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
@@ -113,6 +127,11 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>xml-apis</groupId>
+                <artifactId>xml-apis</artifactId>
+                <version>${xml.apis.version}</version>
             </dependency>
             <dependency>
                 <groupId>wsdl4j</groupId>
@@ -215,44 +234,6 @@
                             </manifestEntries>
                         </archive>
                     </configuration>
-                </plugin>
-                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-                <plugin>
-                	<groupId>org.eclipse.m2e</groupId>
-                	<artifactId>lifecycle-mapping</artifactId>
-                	<version>1.0.0</version>
-                	<configuration>
-                		<lifecycleMappingMetadata>
-                			<pluginExecutions>
-                				<pluginExecution>
-                					<pluginExecutionFilter>
-                						<groupId>org.apache.felix</groupId>
-                						<artifactId>maven-bundle-plugin</artifactId>
-                						<versionRange>[2.4.0,)</versionRange>
-                						<goals>
-                							<goal>cleanVersions</goal>
-                						</goals>
-                					</pluginExecutionFilter>
-                					<action>
-                						<ignore />
-                					</action>
-                				</pluginExecution>
-                				<pluginExecution>
-                					<pluginExecutionFilter>
-                						<groupId>org.apache.maven.plugins</groupId>
-                						<artifactId>maven-remote-resources-plugin</artifactId>
-                						<versionRange>[1.0.0,)</versionRange>
-                						<goals>
-                							<goal>process</goal>
-                						</goals>
-                					</pluginExecutionFilter>
-                					<action>
-                						<ignore />
-                					</action>
-                				</pluginExecution>
-                			</pluginExecutions>
-                		</lifecycleMappingMetadata>
-                	</configuration>
                 </plugin>
             </plugins>
         </pluginManagement>

@@ -40,11 +40,11 @@ import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
-import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 
@@ -104,7 +104,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
 
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
-        byte[] encodedBytes = KeyUtils.generateDigest(keyData);
+        byte[] encodedBytes = WSSecurityUtil.generateDigest(keyData);
         String identifier = Base64.encode(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
         

@@ -35,15 +35,14 @@ import javax.security.auth.kerberos.KerberosTicket;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
-import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.ext.WSSecurityException.ErrorCode;
 import org.apache.wss4j.common.kerberos.KerberosClientExceptionAction;
 import org.apache.wss4j.common.kerberos.KerberosContext;
 import org.apache.wss4j.common.kerberos.KerberosContextAndServiceNameCallback;
-import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.ietf.jgss.GSSCredential;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -121,9 +120,11 @@ public class KerberosSecurity extends BinarySecurity {
         KerberosContextAndServiceNameCallback contextAndServiceNameCallback = new KerberosContextAndServiceNameCallback();
         try {
             callbackHandler.handle(new Callback[]{contextAndServiceNameCallback});
-        } catch (IOException | UnsupportedCallbackException e) {
+        } catch (IOException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-        }
+        } catch (UnsupportedCallbackException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        } 
 
         String jaasLoginModuleName = contextAndServiceNameCallback.getContextName();
         if (jaasLoginModuleName == null) {

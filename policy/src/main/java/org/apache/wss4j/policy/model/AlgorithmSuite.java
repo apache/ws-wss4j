@@ -31,7 +31,7 @@ import java.util.*;
 
 public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyContainingAssertion {
 
-    protected static final Map<String, AlgorithmSuiteType> algorithmSuiteTypes = new HashMap<>();
+    protected static final Map<String, AlgorithmSuiteType> algorithmSuiteTypes = new HashMap<String, AlgorithmSuiteType>();
 
     static {
         algorithmSuiteTypes.put("Basic256", new AlgorithmSuiteType(
@@ -299,7 +299,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         XPathFilter20(SPConstants.XPATH20),
         AbsXPath(SPConstants.ABS_XPATH);
 
-        private static final Map<String, XPathType> lookup = new HashMap<>();
+        private static final Map<String, XPathType> lookup = new HashMap<String, XPathType>();
 
         static {
             for (XPathType u : EnumSet.allOf(XPathType.class))
@@ -326,7 +326,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         InclusiveC14N(SPConstants.C14N),
         InclusiveC14N11(SPConstants.C14N11);
 
-        private static final Map<String, C14NType> lookup = new HashMap<>();
+        private static final Map<String, C14NType> lookup = new HashMap<String, C14NType>();
 
         static {
             for (C14NType u : EnumSet.allOf(C14NType.class))
@@ -352,7 +352,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         SOAPNormalizationNone(null),
         SOAPNormalization10(SPConstants.SOAP_NORMALIZATION_10);
 
-        private static final Map<String, SOAPNormType> lookup = new HashMap<>();
+        private static final Map<String, SOAPNormType> lookup = new HashMap<String, SOAPNormType>();
 
         static {
             for (SOAPNormType u : EnumSet.allOf(SOAPNormType.class))
@@ -378,7 +378,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         STRTransformNone(null),
         STRTransform10(SPConstants.STR_TRANSFORM_10);
 
-        private static final Map<String, STRType> lookup = new HashMap<>();
+        private static final Map<String, STRType> lookup = new HashMap<String, STRType>();
 
         static {
             for (STRType u : EnumSet.allOf(STRType.class))

@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.processor;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -31,7 +32,6 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -96,11 +96,12 @@ public class ReferenceListDataRefTest extends org.junit.Assert {
         /*
          * Set up the parts structure to encrypt the body
          */
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP = 
             new WSEncryptionPart(
                 "add", "http://ws.apache.org/counter/counter_port_type", "Element"
             );
-        builder.getParts().add(encP);
+        parts.add(encP);
 
         /*
          * Encrypt the element (testMethod), create EncryptedData elements that reference
@@ -108,7 +109,7 @@ public class ReferenceListDataRefTest extends org.junit.Assert {
          * Security header. Be sure that the ReferenceList is after the
          * EncryptedKey element in the Security header (strict layout)
          */
-        Element refs = builder.encrypt();
+        Element refs = builder.encryptForRef(null, parts);
         builder.addExternalRefElement(refs, secHeader);
 
         /*
@@ -136,12 +137,12 @@ public class ReferenceListDataRefTest extends org.junit.Assert {
     private void checkDataRef(Document doc) throws Exception {
         
         // Retrieve the wsResults List 
-        WSHandlerResult wsResults = 
+        List<WSSecurityEngineResult> wsResults = 
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         boolean found = false;
                 
-        for (int i = 0; i < wsResults.getResults().size(); i++) {
-            WSSecurityEngineResult wsSecEngineResult = wsResults.getResults().get(i);
+        for (int i = 0; i < wsResults.size(); i++) {
+            WSSecurityEngineResult wsSecEngineResult = wsResults.get(i);
             int action = (Integer)
                     wsSecEngineResult.get(WSSecurityEngineResult.TAG_ACTION);
             

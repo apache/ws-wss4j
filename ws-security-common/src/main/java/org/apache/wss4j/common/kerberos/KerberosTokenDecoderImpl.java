@@ -153,7 +153,9 @@ public class KerberosTokenDecoderImpl implements KerberosTokenDecoder {
                                                       KeyUsage.getTypeByOrdinal(2));
             
             this.encTicketPart = KerberosDecoder.decodeEncTicketPart(dec);
-        } catch (KerberosException | IOException e) {
+        } catch (KerberosException e) {
+            throw new KerberosTokenDecoderException(e);
+        } catch (IOException e) {
             throw new KerberosTokenDecoderException(e);
         }
     }
@@ -173,13 +175,12 @@ public class KerberosTokenDecoderImpl implements KerberosTokenDecoder {
     }
 
     private static byte[] toByteArray(InputStream inputStream) throws IOException {
-        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-            int read;
-            byte[] buf = new byte[1024];
-            while ((read = inputStream.read(buf)) != -1) {
-                byteArrayOutputStream.write(buf, 0, read);
-            }
-            return byteArrayOutputStream.toByteArray();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        int read;
+        byte[] buf = new byte[1024];
+        while ((read = inputStream.read(buf)) != -1) {
+            byteArrayOutputStream.write(buf, 0, read);
         }
+        return byteArrayOutputStream.toByteArray();
     }
 }

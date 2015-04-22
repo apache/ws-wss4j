@@ -23,14 +23,13 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.AbstractSAMLCallbackHandler;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -55,6 +54,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.util.List;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -79,6 +79,7 @@ public class SamlNegativeTest extends org.junit.Assert {
     
     public SamlNegativeTest() throws Exception {
         WSSConfig config = WSSConfig.getNewInstance();
+        config.setValidateSamlSubjectConfirmation(false);
         secEngine.setWssConfig(config);
         
         // Load the issuer keystore
@@ -385,15 +386,11 @@ public class SamlNegativeTest extends org.junit.Assert {
      * @param doc
      * @throws Exception Thrown when there is a problem in verification
      */
-    private WSHandlerResult verify(Document doc, Crypto sigCrypto) throws Exception {
-        RequestData requestData = new RequestData();
-        requestData.setCallbackHandler(callbackHandler);
-        requestData.setDecCrypto(userCrypto);
-        requestData.setSigVerCrypto(sigCrypto);
-        requestData.setValidateSamlSubjectConfirmation(false);
-        
-        WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
-        
+    private List<WSSecurityEngineResult> verify(Document doc, Crypto sigCrypto) throws Exception {
+        List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(
+                doc, null, callbackHandler, sigCrypto, userCrypto
+            );
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);

@@ -29,7 +29,7 @@ import org.apache.wss4j.policy.model.SamlToken;
 import org.apache.wss4j.policy.stax.PolicyAsserter;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.common.SAMLVersion;
 import org.apache.wss4j.stax.securityEvent.SamlTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;

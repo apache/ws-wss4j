@@ -17,17 +17,17 @@
  * under the License.
  */
 
-package org.apache.wss4j.common.token;
+package org.apache.wss4j.dom.message.token;
 
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.apache.wss4j.common.WSS4JConstants;
-import org.apache.wss4j.common.bsp.BSPEnforcer;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.bsp.BSPEnforcer;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -42,8 +42,9 @@ import javax.xml.namespace.QName;
  * Binary Security Token.
  */
 public class BinarySecurity {
-    public static final QName TOKEN_BST = new QName(WSS4JConstants.WSSE_NS, "BinarySecurityToken");
-    public static final QName TOKEN_KI = new QName(WSS4JConstants.WSSE_NS, "KeyIdentifier");
+    public static final QName TOKEN_BST = new QName(WSConstants.WSSE_NS, "BinarySecurityToken");
+    public static final QName TOKEN_KI = new QName(WSConstants.WSSE_NS, "KeyIdentifier");
+    public static final String BASE64_ENCODING = WSConstants.SOAPMESSAGE_NS + "#Base64Binary";
     private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(BinarySecurity.class);
     
@@ -68,7 +69,7 @@ public class BinarySecurity {
             bspEnforcer.handleBSPRule(BSPRule.R3029);
         }
         
-        if (!WSS4JConstants.BASE64_ENCODING.equals(encoding)) {
+        if (!BASE64_ENCODING.equals(encoding)) {
             bspEnforcer.handleBSPRule(BSPRule.R3030);
         }
         
@@ -84,8 +85,8 @@ public class BinarySecurity {
      * @param doc 
      */
     public BinarySecurity(Document doc) {
-        element = doc.createElementNS(WSS4JConstants.WSSE_NS, "wsse:BinarySecurityToken");
-        setEncodingType(WSS4JConstants.BASE64_ENCODING);
+        element = doc.createElementNS(WSConstants.WSSE_NS, "wsse:BinarySecurityToken");
+        setEncodingType(BASE64_ENCODING);
         element.appendChild(doc.createTextNode(""));
     }
     
@@ -103,9 +104,13 @@ public class BinarySecurity {
 
         try {
             callbackHandler.handle(callback);
-        } catch (IOException | UnsupportedCallbackException e) {
+        } catch (IOException e) {
             throw new IllegalStateException(
-                "Exception while creating a token element", e
+                "IOException while creating a token element", e
+            );
+        } catch (UnsupportedCallbackException e) {
+            throw new IllegalStateException(
+                "UnsupportedCallbackException while creating a token element", e
             );
         }
         element = callback[0].getTokenElement();
@@ -120,7 +125,7 @@ public class BinarySecurity {
      * efficiency purposes.
      */
     public void addWSSENamespace() {
-        XMLUtils.setNamespace(element, WSS4JConstants.WSSE_NS, WSS4JConstants.WSSE_PREFIX);
+        WSSecurityUtil.setNamespace(element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
     }
     
     /**
@@ -128,7 +133,7 @@ public class BinarySecurity {
      * efficiency purposes.
      */
     public void addWSUNamespace() {
-        XMLUtils.setNamespace(element, WSS4JConstants.WSU_NS, WSS4JConstants.WSU_PREFIX);
+        WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
     }
 
     /**
@@ -177,12 +182,17 @@ public class BinarySecurity {
      * @return the byte array containing token information
      */
     public byte[] getToken() {
-        try {
-            String text = XMLUtils.getElementText(element);
-            if (text == null) {
-                return null;
+        Node node = element.getFirstChild();
+        StringBuilder builder = new StringBuilder();
+        while (node != null) {
+            if (Node.TEXT_NODE == node.getNodeType()) {
+                builder.append(((Text)node).getData());
             }
-            return Base64.decode(text);
+            node = node.getNextSibling();
+        }
+                
+        try {
+            return Base64.decode(builder.toString());
         } catch (Exception ex) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(ex.getMessage(), ex);
@@ -229,7 +239,7 @@ public class BinarySecurity {
      * @return the WSU ID of this element
      */
     public String getID() {
-        return element.getAttributeNS(WSS4JConstants.WSU_NS, "Id");
+        return element.getAttributeNS(WSConstants.WSU_NS, "Id");
     }
 
     /**
@@ -238,7 +248,7 @@ public class BinarySecurity {
      * @param id 
      */
     public void setID(String id) {
-        element.setAttributeNS(WSS4JConstants.WSU_NS, WSS4JConstants.WSU_PREFIX + ":Id", id);
+        element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
     }
 
     /**

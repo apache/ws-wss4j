@@ -33,7 +33,6 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.message.WSSecSignature;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -57,9 +56,7 @@ public class SignatureAction implements Action {
         
         WSPasswordCallback passwordCallback = 
             handler.getPasswordCB(signatureToken.getUser(), WSConstants.SIGN, callbackHandler, reqData);
-        WSSecSignature wsSign = new WSSecSignature();
-        wsSign.setIdAllocator(reqData.getWssConfig().getIdAllocator());
-        wsSign.setAddInclusivePrefixes(reqData.isAddInclusivePrefixes());
+        WSSecSignature wsSign = new WSSecSignature(reqData.getWssConfig());
 
         if (signatureToken.getKeyIdentifierId() != 0) {
             wsSign.setKeyIdentifierType(signatureToken.getKeyIdentifierId());
@@ -83,8 +80,6 @@ public class SignatureAction implements Action {
             wsSign.setSecretKey(passwordCallback.getKey());
         } else if (signatureToken.getKey() != null) {
             wsSign.setSecretKey(signatureToken.getKey());
-        } else if (signatureToken.getUser() == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSignatureUser");
         }
         
         if (signatureToken.getTokenId() != null) {
@@ -139,8 +134,11 @@ public class SignatureAction implements Action {
             
             List<WSEncryptionPart> parts = signatureToken.getParts();
             if (parts == null || parts.isEmpty()) {
-                parts = new ArrayList<>(1);
-                parts.add(WSSecurityUtil.getDefaultEncryptionPart(doc));
+                WSEncryptionPart encP = new WSEncryptionPart(reqData.getSoapConstants()
+                        .getBodyQName().getLocalPart(), reqData.getSoapConstants()
+                        .getEnvelopeURI(), "Content");
+                parts = new ArrayList<WSEncryptionPart>();
+                parts.add(encP);
             }
             
             List<javax.xml.crypto.dsig.Reference> referenceList =

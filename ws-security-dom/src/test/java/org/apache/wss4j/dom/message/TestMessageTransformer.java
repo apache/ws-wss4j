@@ -19,7 +19,6 @@
 
 package org.apache.wss4j.dom.message;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,7 +45,7 @@ public class TestMessageTransformer extends org.junit.Assert {
         SecurityTestUtil.cleanup();
     }
     
-    public static Element duplicateEncryptedDataInWsseHeader(Element saaj, boolean moveReferenceList) throws TransformerException, IOException {
+    public static Element duplicateEncryptedDataInWsseHeader(Element saaj, boolean moveReferenceList) throws TransformerException {
         if (moveReferenceList) {
             moveReferenceList(saaj);
         }
@@ -82,7 +81,7 @@ public class TestMessageTransformer extends org.junit.Assert {
         return newEncData;
     }
 
-    public static Element duplicateEncryptedDataInWsseWrapperHeader(Element saaj, boolean moveReferenceList) throws TransformerException, IOException {
+    public static Element duplicateEncryptedDataInWsseWrapperHeader(Element saaj, boolean moveReferenceList) throws TransformerException {
         if (moveReferenceList) {
             moveReferenceList(saaj);
         }
@@ -121,7 +120,7 @@ public class TestMessageTransformer extends org.junit.Assert {
         return newEncData;
     }
     
-    public static Element duplicateEncryptedDataInWrapperBody(Element saaj) throws TransformerException, IOException {
+    public static Element duplicateEncryptedDataInWrapperBody(Element saaj) throws TransformerException {
         Element body = getFirstChildElement(saaj, new QName("http://schemas.xmlsoap.org/soap/envelope/",
                                                             "Body"), true);
         Element encData = getFirstChildElement(body, new QName("http://www.w3.org/2001/04/xmlenc#",
@@ -156,7 +155,7 @@ public class TestMessageTransformer extends org.junit.Assert {
         return newEncData;
     }
     
-    public static Element duplicateEncryptedDataAfterWrapperBody(Element saaj) throws TransformerException, IOException {
+    public static Element duplicateEncryptedDataAfterWrapperBody(Element saaj) throws TransformerException {
         Element body = getFirstChildElement(saaj, new QName("http://schemas.xmlsoap.org/soap/envelope/",
                                                             "Body"), true);
         Element encData = getFirstChildElement(body, new QName("http://www.w3.org/2001/04/xmlenc#",
@@ -194,7 +193,7 @@ public class TestMessageTransformer extends org.junit.Assert {
     }
 
     public static Element duplicateEncryptedDataInExternalWrapperElement(Element saaj,
-                                                                         boolean moveReferenceList) throws TransformerException, IOException {
+                                                                         boolean moveReferenceList) throws TransformerException {
         if (moveReferenceList) {
             moveReferenceList(saaj);
         }
@@ -232,7 +231,7 @@ public class TestMessageTransformer extends org.junit.Assert {
         return newEncData;
     }
     
-    public static Element addEncryptedDataWithEmbeddedEncryptedKeyInWsseHeader(Element saaj) throws TransformerException, IOException {
+    public static Element addEncryptedDataWithEmbeddedEncryptedKeyInWsseHeader(Element saaj) throws TransformerException {
         moveReferenceList(saaj);
         Element body = getFirstChildElement(saaj, new QName("http://schemas.xmlsoap.org/soap/envelope/",
                                                             "Body"), true);
@@ -302,7 +301,7 @@ public class TestMessageTransformer extends org.junit.Assert {
         ref.getParentNode().appendChild(newRef);
     }
 
-    private static void print(Document doc) throws TransformerException, IOException {
+    private static void print(Document doc) throws TransformerException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After transformation....");
             String outputString = XMLUtils.PrettyDocumentToString(doc);
@@ -344,7 +343,7 @@ public class TestMessageTransformer extends org.junit.Assert {
     }
 
     private static List<Element> getChildElements(Node node, QName nodeName, boolean recursive) {
-        List<Element> list = new LinkedList<>();
+        List<Element> list = new LinkedList<Element>();
 
         NodeList nlist = node.getChildNodes();
         int len = nlist.getLength();

@@ -30,8 +30,10 @@ import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecSignatureConfirmation;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SignatureConfirmationAction implements Action {
@@ -50,43 +52,46 @@ public class SignatureConfirmationAction implements Action {
             (List<WSHandlerResult>) handler.getProperty(
                 reqData.getMsgContext(), WSHandlerConstants.RECV_RESULTS
             );
-        if (results == null || results.isEmpty()) {
+        if (results == null) {
             return;
         }
-        
+        //
+        // Loop over all the (signature) results gathered by all the processors, and store
+        // them in a list.
+        //
+        final List<Integer> actions = new ArrayList<Integer>(3);
+        actions.add(WSConstants.SIGN);
+        actions.add(WSConstants.ST_SIGNED);
+        actions.add(WSConstants.UT_SIGN);
+        List<WSSecurityEngineResult> signatureActions = new ArrayList<WSSecurityEngineResult>();
+        for (WSHandlerResult wshResult : results) {
+            List<WSSecurityEngineResult> resultList = wshResult.getResults();
+
+            signatureActions.addAll(
+                WSSecurityUtil.fetchAllActionResults(resultList, actions)
+            );
+        }
         //
         // prepare a SignatureConfirmation token
         //
-        WSSecSignatureConfirmation wsc = new WSSecSignatureConfirmation();
-        wsc.setIdAllocator(reqData.getWssConfig().getIdAllocator());
+        WSSecSignatureConfirmation wsc = new WSSecSignatureConfirmation(reqData.getWssConfig());
         SignatureActionToken signatureToken = (SignatureActionToken)actionToken;
         if (signatureToken == null) {
             signatureToken = reqData.getSignatureToken();
         }
         List<WSEncryptionPart> signatureParts = signatureToken.getParts();
-        
-        //
-        // Loop over all the (signature) results gathered by all the processors
-        //
-        boolean signatureAdded = false;
-        for (WSHandlerResult wshResult : results) {
-            List<WSSecurityEngineResult> resultList = wshResult.getResults();
-
-            for (WSSecurityEngineResult result : resultList) {
-                int resultAction = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
-                
-                // See if it's a signature action
-                if (WSConstants.SIGN == resultAction || WSConstants.ST_SIGNED == resultAction
-                    || WSConstants.UT_SIGN == resultAction) {
-                    byte[] sigVal = (byte[]) result.get(WSSecurityEngineResult.TAG_SIGNATURE_VALUE);
-                    wsc.build(doc, sigVal, reqData.getSecHeader());
-                    signatureParts.add(new WSEncryptionPart(wsc.getId()));
-                    signatureAdded = true;
-                }
+        if (signatureActions.size() > 0) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Signature Confirmation: number of Signature results: "
+                        + signatureActions.size());
             }
-        }
-
-        if (!signatureAdded) {
+            for (int i = 0; i < signatureActions.size(); i++) {
+                WSSecurityEngineResult wsr = signatureActions.get(i);
+                byte[] sigVal = (byte[]) wsr.get(WSSecurityEngineResult.TAG_SIGNATURE_VALUE);
+                wsc.build(doc, sigVal, reqData.getSecHeader());
+                signatureParts.add(new WSEncryptionPart(wsc.getId()));
+            }
+        } else {
             wsc.build(doc, null, reqData.getSecHeader());
             signatureParts.add(new WSEncryptionPart(wsc.getId()));
         }

@@ -112,7 +112,7 @@ public class NSStack {
         if (stack[top] == null) {
             return null;
         }
-        List<Mapping> clone = new ArrayList<>();
+        List<Mapping> clone = new ArrayList<Mapping>();
         for (Mapping map = topOfFrame(); map != null; map = next()) {
             clone.add(map);
         }

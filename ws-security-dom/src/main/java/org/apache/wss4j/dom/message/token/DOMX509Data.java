@@ -17,12 +17,12 @@
  * under the License.
  */
 
-package org.apache.wss4j.common.token;
+package org.apache.wss4j.dom.message.token;
 
-import org.apache.wss4j.common.WSS4JConstants;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -42,8 +42,8 @@ public final class DOMX509Data {
         // Parse X509IssuerSerial child
         //
         Element issuerSerialElement = 
-            XMLUtils.getDirectChildElement(
-                element, "X509IssuerSerial", WSS4JConstants.SIG_NS
+            WSSecurityUtil.getDirectChildElement(
+                element, WSConstants.X509_ISSUER_SERIAL_LN, WSConstants.SIG_NS
             );
         x509IssuerSerial = new DOMX509IssuerSerial(issuerSerialElement);
     }
@@ -53,7 +53,9 @@ public final class DOMX509Data {
      */
     public DOMX509Data(Document doc, DOMX509IssuerSerial domIssuerSerial) {
         element = 
-            doc.createElementNS(WSS4JConstants.SIG_NS, "ds:X509Data");
+            doc.createElementNS(
+                WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.X509_DATA_LN
+            );
         
         element.appendChild(domIssuerSerial.getElement());
     }

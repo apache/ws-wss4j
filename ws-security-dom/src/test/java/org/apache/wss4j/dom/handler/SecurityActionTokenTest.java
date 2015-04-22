@@ -34,17 +34,18 @@ import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.CombinedCallbackHandler;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecretKeyCallbackHandler;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
@@ -95,7 +96,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<>();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         actions.add(new HandlerAction(WSConstants.SIGN, actionToken));
         handler.send(
             doc, 
@@ -131,7 +132,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<>();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         actions.add(new HandlerAction(WSConstants.SIGN, actionToken));
         handler.send(
             doc, 
@@ -147,7 +148,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         }
         
         SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
-        byte[] encodedBytes = KeyUtils.generateDigest(keyData);
+        byte[] encodedBytes = WSSecurityUtil.generateDigest(keyData);
         String identifier = Base64.encode(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
         
@@ -180,7 +181,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<>();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         actions.add(new HandlerAction(WSConstants.SIGN, actionToken));
         actions.add(new HandlerAction(WSConstants.SIGN, actionToken2));
         actions.add(new HandlerAction(WSConstants.TS, null));
@@ -226,7 +227,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<>();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         actions.add(new HandlerAction(WSConstants.SIGN, actionToken));
         actions.add(new HandlerAction(WSConstants.SIGN, actionToken2));
         actions.add(new HandlerAction(WSConstants.TS, null));
@@ -244,7 +245,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         }
         
         SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
-        byte[] encodedBytes = KeyUtils.generateDigest(keyData);
+        byte[] encodedBytes = WSSecurityUtil.generateDigest(keyData);
         String identifier = Base64.encode(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
         
@@ -268,7 +269,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<>();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         actions.add(new HandlerAction(WSConstants.ENCR, actionToken));
         handler.send(
             doc, 
@@ -304,7 +305,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<>();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         actions.add(new HandlerAction(WSConstants.ENCR, actionToken));
         handler.send(
             doc, 
@@ -341,7 +342,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<>();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         actions.add(new HandlerAction(WSConstants.ENCR, actionToken));
         handler.send(
             doc, 
@@ -357,7 +358,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         }
         
         SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
-        byte[] encodedBytes = KeyUtils.generateDigest(keyData);
+        byte[] encodedBytes = WSSecurityUtil.generateDigest(keyData);
         String identifier = Base64.encode(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
         
@@ -388,7 +389,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<>();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         actions.add(new HandlerAction(WSConstants.ENCR, actionToken));
         actions.add(new HandlerAction(WSConstants.TS, null));
         actions.add(new HandlerAction(WSConstants.ENCR, actionToken2));
@@ -434,7 +435,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<>();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         actions.add(new HandlerAction(WSConstants.ENCR, actionToken));
         actions.add(new HandlerAction(WSConstants.TS, null));
         actions.add(new HandlerAction(WSConstants.ENCR, actionToken2));
@@ -452,7 +453,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         }
         
         SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
-        byte[] encodedBytes = KeyUtils.generateDigest(keyData);
+        byte[] encodedBytes = WSSecurityUtil.generateDigest(keyData);
         String identifier = Base64.encode(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
         
@@ -485,7 +486,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<>();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         actions.add(new HandlerAction(WSConstants.SIGN, actionToken));
         actions.add(new HandlerAction(WSConstants.ENCR, actionToken2));
         handler.send(
@@ -532,7 +533,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<>();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         actions.add(new HandlerAction(WSConstants.SIGN, actionToken2));
         actions.add(new HandlerAction(WSConstants.ENCR, actionToken));
         handler.send(
@@ -575,7 +576,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> actions = new ArrayList<>();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         actions.add(new HandlerAction(WSConstants.SIGN, actionToken2));
         actions.add(new HandlerAction(WSConstants.ENCR, actionToken));
         handler.send(
@@ -592,14 +593,14 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         }
             
         SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
-        byte[] encodedBytes = KeyUtils.generateDigest(keyData);
+        byte[] encodedBytes = WSSecurityUtil.generateDigest(keyData);
         String identifier = Base64.encode(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
         
         verify(doc, secretKeyCallbackHandler);
     }
 
-    private WSHandlerResult verify(
+    private List<WSSecurityEngineResult> verify(
         Document doc, CallbackHandler callbackHandler
     ) throws Exception {
         return secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);

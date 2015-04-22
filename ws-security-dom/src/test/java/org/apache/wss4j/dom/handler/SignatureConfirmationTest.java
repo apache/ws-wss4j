@@ -22,7 +22,6 @@ package org.apache.wss4j.dom.handler;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -41,6 +40,7 @@ import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.token.SignatureConfirmation;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -95,11 +95,11 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         }
 
         msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
-        Set<Integer> savedSignatures = 
-            (Set<Integer>)msgContext.get(WSHandlerConstants.SEND_SIGV);
+        List<byte[]> savedSignatures = 
+            (List<byte[]>)msgContext.get(WSHandlerConstants.SEND_SIGV);
         assertTrue(savedSignatures != null && savedSignatures.size() == 1);
-        Integer signatureValue = savedSignatures.iterator().next();
-        assertTrue(signatureValue != null && signatureValue != 0);
+        byte[] signatureValue = savedSignatures.get(0);
+        assertTrue(signatureValue != null && signatureValue.length > 0);
     }
     
     
@@ -136,8 +136,8 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         }
 
         msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
-        Set<Integer> savedSignatures = 
-            (Set<Integer>)msgContext.get(WSHandlerConstants.SEND_SIGV);
+        List<byte[]> savedSignatures = 
+            (List<byte[]>)msgContext.get(WSHandlerConstants.SEND_SIGV);
         assertTrue(savedSignatures == null);
     }
     
@@ -175,20 +175,21 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         }
 
         msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
-        Set<Integer> savedSignatures = 
-            (Set<Integer>)msgContext.get(WSHandlerConstants.SEND_SIGV);
+        List<byte[]> savedSignatures = 
+            (List<byte[]>)msgContext.get(WSHandlerConstants.SEND_SIGV);
         assertTrue(savedSignatures != null && savedSignatures.size() == 1);
-        Integer signatureValue = savedSignatures.iterator().next();
-        assertTrue(signatureValue != null && signatureValue != 0);
+        byte[] signatureValue = savedSignatures.get(0);
+        assertTrue(signatureValue != null && signatureValue.length > 0);
         
         //
         // Verify the inbound request, and create a response with a Signature Confirmation
         //
-        WSHandlerResult results = verify(doc);
+        List<WSSecurityEngineResult> results = verify(doc);
         doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
-        List<WSHandlerResult> receivedResults = new ArrayList<>();
-        receivedResults.add(results);
+        WSHandlerResult handlerResult = new WSHandlerResult(null, results);
+        List<WSHandlerResult> receivedResults = new ArrayList<WSHandlerResult>();
+        receivedResults.add(handlerResult);
         msgContext.put(WSHandlerConstants.RECV_RESULTS, receivedResults);
         action = new HandlerAction(WSConstants.NO_SECURITY);
         handler.send(
@@ -204,6 +205,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         assertTrue(outputString.contains("SignatureConfirmation"));
+        assertTrue(outputString.contains(Base64.encode(signatureValue)));
     }
     
     
@@ -241,11 +243,12 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         //
         // Verify the inbound request, and create a response with a Signature Confirmation
         //
-        WSHandlerResult results = verify(doc);
+        List<WSSecurityEngineResult> results = verify(doc);
         doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         msgContext = (java.util.Map<String, Object>)reqData.getMsgContext();
-        List<WSHandlerResult> receivedResults = new ArrayList<>();
-        receivedResults.add(results);
+        WSHandlerResult handlerResult = new WSHandlerResult(null, results);
+        List<WSHandlerResult> receivedResults = new ArrayList<WSHandlerResult>();
+        receivedResults.add(handlerResult);
         msgContext.put(WSHandlerConstants.RECV_RESULTS, receivedResults);
         handler.send(
             doc, 
@@ -265,7 +268,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         //
         results = verify(doc);
         WSSecurityEngineResult scResult = 
-            results.getActionResults().get(WSConstants.SC).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SC);
         assertTrue(scResult != null);
         assertTrue(scResult.get(WSSecurityEngineResult.TAG_SIGNATURE_CONFIRMATION) != null);
         handler.signatureConfirmation(reqData, results);
@@ -277,7 +280,8 @@ public class SignatureConfirmationTest extends org.junit.Assert {
      * the BSP compliance is enabled.
      */
     @org.junit.Test
-    public void testWsuId() throws Exception {
+    public void
+    testWsuId() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -306,7 +310,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         data.setCallbackHandler(callbackHandler);
         data.setSigVerCrypto(crypto);
         data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R5441));
-        newEngine.processSecurityHeader(doc, data);
+        newEngine.processSecurityHeader(doc, "", data);
     }
     
     
@@ -317,8 +321,8 @@ public class SignatureConfirmationTest extends org.junit.Assert {
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private WSHandlerResult verify(Document doc) throws Exception {
-        WSHandlerResult results = 
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");

@@ -140,7 +140,11 @@ public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityTok
                 kerberosTokenDecoder.setSubject(subject);
                 return kerberosTokenDecoder;            	
             }
-        } catch (LoginException | UnsupportedCallbackException | IOException e) {
+        } catch (LoginException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        } catch (UnsupportedCallbackException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        } catch (IOException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
     }

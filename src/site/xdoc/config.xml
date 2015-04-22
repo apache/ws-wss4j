@@ -4,8 +4,8 @@
 <section name="WSS4J configuration">
 <p>
 This page describes how to use configure Apache WSS4J. This page only applies
-to WSS4J 2.1.x, 2.0.x and 1.6.x, a lot of the properties have changed since
-WSS4J 1.5.x.
+to WSS4J 2.0.x and 1.6.x, a lot of the properties have changed since WSS4J
+1.5.x.
 </p>
 <subsection name="Crypto properties">
 <p>
@@ -29,9 +29,9 @@ For more information on the Crypto implementations see the
 <a href="http://ws.apache.org/wss4j/topics.html#Crypto_Interface">Special
 Topics page</a>. It is possible to instantiate a Crypto implementation
 directly, but it can also be loaded via a properties file. For Apache WSS4J
-2.0.0 onwards, the property names ${PREFIX} below is "org.apache.wss4j.crypto".
-For Apache WSS4J 1.6.X, the property names ${PREFIX} below is
-"org.apache.ws.security.crypto". WSS4J 2.0.0 onwards will also accept the older
+2.0.0 the property names ${PREFIX} below is "org.apache.wss4j.crypto". For
+Apache WSS4J 1.6.X, the property names ${PREFIX} below is
+"org.apache.ws.security.crypto". WSS4J 2.0.0 will also accept the older
 ${PREFIX} value. The property values for the standard Merlin implementation
 are as follows:
 </p>
@@ -527,12 +527,6 @@ construct a BinarySecurityToken. Default is "true".</td>
 <td>Set whether to enable strict Timestamp handling, i.e. throw an exception if
 the current receiver time is past the Expires time of the Timestamp. Default
 is "true".</td>
-</tr>
-<tr>
-<td><b>WSS4J 2.0.4/2.1.0</b> REQUIRE_TIMESTAMP_EXPIRES</td>
-<td>requireTimestampExpires</td>
-<td>Set the value of this parameter to true to require that a Timestamp must
-have an "Expires" Element. The default is "false".</td>
 </tr>
 <tr>
 <td>ENC_SYM_ENC_KEY</td>

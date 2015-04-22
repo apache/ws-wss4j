@@ -61,9 +61,9 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private String actor;
     private CallbackHandler callbackHandler;
     private CallbackHandler samlCallbackHandler;
-    private final List<BSPRule> ignoredBSPRules = new LinkedList<>();
+    private final List<BSPRule> ignoredBSPRules = new LinkedList<BSPRule>();
     private boolean disableBSPEnforcement;
-    private final Map<QName, Validator> validators = new HashMap<>();
+    private final Map<QName, Validator> validators = new HashMap<QName, Validator>();
 
     private Integer timestampTTL = 300;
     private Integer timeStampFutureTTL = 60;
@@ -115,8 +115,8 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private boolean enableNonceReplayCache = true;
     private boolean enableSamlOneTimeUseReplayCache = true;
     private boolean validateSamlSubjectConfirmation = true;
-    private Collection<Pattern> subjectDNPatterns = new ArrayList<>();
-    private List<String> audienceRestrictions = new ArrayList<>();
+    private Collection<Pattern> subjectDNPatterns = new ArrayList<Pattern>();
+    private List<String> audienceRestrictions = new ArrayList<String>();
     private boolean requireTimestampExpires;
 
     private CallbackHandler attachmentCallbackHandler;

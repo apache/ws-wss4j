@@ -17,14 +17,14 @@
  * under the License.
  */
 
-package org.apache.wss4j.common.token;
+package org.apache.wss4j.dom.message.token;
 
 import javax.xml.namespace.QName;
 
-import org.apache.wss4j.common.WSS4JConstants;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
  * Reference.
  */
 public class Reference {
-    public static final QName TOKEN = new QName(WSS4JConstants.WSSE_NS, "Reference");
+    public static final QName TOKEN = new QName(WSConstants.WSSE_NS, "Reference");
     private Element element;
     
     /**
@@ -68,7 +68,7 @@ public class Reference {
      * @param doc 
      */
     public Reference(Document doc) {
-        element = doc.createElementNS(WSS4JConstants.WSSE_NS, "wsse:Reference");
+        element = doc.createElementNS(WSConstants.WSSE_NS, "wsse:Reference");
     }
     
     /**
@@ -76,7 +76,7 @@ public class Reference {
      * efficiency purposes, as the reference is embedded in a wsse:SecurityTokenReference.
      */
     public void addWSSENamespace() {
-        XMLUtils.setNamespace(this.element, WSS4JConstants.WSSE_NS, WSS4JConstants.WSSE_PREFIX);
+        WSSecurityUtil.setNamespace(this.element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
     }
 
     /**

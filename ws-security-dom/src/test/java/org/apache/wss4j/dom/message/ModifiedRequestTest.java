@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.message;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -44,7 +45,6 @@ import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.saml.WSSecSignatureSAML;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
@@ -100,12 +100,14 @@ public class ModifiedRequestTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "value",
                 "http://blah.com",
                 "");
-        builder.getParts().add(encP);
+        parts.add(encP);
+        builder.setParts(parts);
         
         Document signedDoc = builder.build(doc, crypto, secHeader);
         
@@ -155,12 +157,14 @@ public class ModifiedRequestTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "value",
                 "http://blah.com",
                 "");
-        builder.getParts().add(encP);
+        parts.add(encP);
+        builder.setParts(parts);
         
         Document signedDoc = builder.build(doc, crypto, secHeader);
         
@@ -189,7 +193,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         //
         // Check the signature...this should pass
         //
-        WSHandlerResult results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
         
         //
         // Finally we need to check that the Element that was signed is what we expect to be signed
@@ -205,7 +209,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
             ).item(0);
         
         List<WSSecurityEngineResult> signedResults = 
-            results.getActionResults().get(WSConstants.SIGN);
+            WSSecurityUtil.fetchAllActionResults(results, WSConstants.SIGN);
         try {
             WSSecurityUtil.verifySignedElement((org.w3c.dom.Element)valueNode, signedResults);
             fail("Failure expected on the required element not being signed");
@@ -274,20 +278,22 @@ public class ModifiedRequestTest extends org.junit.Assert {
         usernameToken.setUserInfo("wss86", "security");
         Document createdDoc = usernameToken.build(doc, secHeader);
         
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "UsernameToken",
                 WSConstants.WSSE_NS,
                 "");
-        builder.getParts().add(encP);
+        parts.add(encP);
+        
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setParts(parts);
         
         builder.prepare(createdDoc, crypto, secHeader);
         
         List<javax.xml.crypto.dsig.Reference> referenceList = 
-            builder.addReferencesToSign(builder.getParts(), secHeader);
+            builder.addReferencesToSign(parts, secHeader);
 
         builder.computeSignature(referenceList, false, null);
         
@@ -329,7 +335,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
 
         Element body = WSSecurityUtil.findBodyElement(doc);
         Element encryptionMethod = 
-            XMLUtils.findElement(body, "EncryptionMethod", WSConstants.ENC_NS);
+            WSSecurityUtil.findElement(body, "EncryptionMethod", WSConstants.ENC_NS);
         encryptionMethod.setAttributeNS(null, "Algorithm", "http://new-algorithm");
         
         String outputString = 
@@ -364,7 +370,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
 
         Element body = WSSecurityUtil.findBodyElement(doc);
         Element cipherValue = 
-            XMLUtils.findElement(body, "CipherValue", WSConstants.ENC_NS);
+            WSSecurityUtil.findElement(body, "CipherValue", WSConstants.ENC_NS);
         String cipherText = cipherValue.getTextContent();
         
         StringBuilder stringBuilder = new StringBuilder(cipherText);
@@ -413,21 +419,23 @@ public class ModifiedRequestTest extends org.junit.Assert {
         timestamp.setTimeToLive(300);
         timestamp.build(doc, secHeader);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp",
                 WSConstants.WSU_NS,
                 "");
-        builder.getParts().add(encP);
+        parts.add(encP);
+        builder.setParts(parts);
         
         Document encryptedDoc = builder.build(doc, wssCrypto, secHeader);
 
         Element securityHeader = 
             WSSecurityUtil.getSecurityHeader(encryptedDoc, "");
         Element encryptedTimestamp = 
-            XMLUtils.findElement(securityHeader, "EncryptedData", WSConstants.ENC_NS);
+            WSSecurityUtil.findElement(securityHeader, "EncryptedData", WSConstants.ENC_NS);
         Element cipherValue = 
-            XMLUtils.findElement(encryptedTimestamp, "CipherValue", WSConstants.ENC_NS);
+            WSSecurityUtil.findElement(encryptedTimestamp, "CipherValue", WSConstants.ENC_NS);
         String cipherText = cipherValue.getTextContent();
         
         StringBuilder stringBuilder = new StringBuilder(cipherText);
@@ -472,9 +480,9 @@ public class ModifiedRequestTest extends org.junit.Assert {
         Document encryptedDoc = builder.build(doc, wssCrypto, secHeader);
 
         Element encryptedKey = 
-            XMLUtils.findElement(doc.getDocumentElement(), "EncryptedKey", WSConstants.ENC_NS);
+                WSSecurityUtil.findElement(doc.getDocumentElement(), "EncryptedKey", WSConstants.ENC_NS);
         Element cipherValue = 
-            XMLUtils.findElement(encryptedKey, "CipherValue", WSConstants.ENC_NS);
+            WSSecurityUtil.findElement(encryptedKey, "CipherValue", WSConstants.ENC_NS);
         String cipherText = cipherValue.getTextContent();
         
         StringBuilder stringBuilder = new StringBuilder(cipherText);
@@ -520,19 +528,21 @@ public class ModifiedRequestTest extends org.junit.Assert {
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp",
                 WSConstants.WSU_NS,
                 "");
-        builder.getParts().add(encP);
+        parts.add(encP);
+        builder.setParts(parts);
         
         Document signedDoc = builder.build(createdDoc, crypto, secHeader);
         
         // Modify the Created text of the Timestamp element
         Element timestampElement = timestamp.getElement();
         Element createdValue = 
-            XMLUtils.findElement(timestampElement, "Created", WSConstants.WSU_NS);
+            WSSecurityUtil.findElement(timestampElement, "Created", WSConstants.WSU_NS);
         DateFormat zulu = new XmlSchemaDateFormat();
         
         XMLGregorianCalendar createdCalendar = 
@@ -627,7 +637,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
      * @param doc soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private WSHandlerResult verify(Document doc) throws Exception {
+    private List<WSSecurityEngineResult>  verify(Document doc) throws Exception {
         return secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
     }
 

@@ -27,7 +27,6 @@ import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.CertificateStore;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -37,6 +36,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
 import java.security.cert.X509Certificate;
@@ -93,10 +93,9 @@ public class CertificateStoreTest extends org.junit.Assert {
         //
         // Verify the signature
         //
-        WSHandlerResult results = verify(signedDoc, receiverCrypto);
-        List<WSSecurityEngineResult> signatureResults = 
-            results.getActionResults().get(WSConstants.SIGN);
-        WSSecurityEngineResult result = signatureResults.get(0);
+        List<WSSecurityEngineResult> results = verify(signedDoc, receiverCrypto);
+        WSSecurityEngineResult result = 
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         X509Certificate cert = 
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertTrue (cert != null);
@@ -130,11 +129,11 @@ public class CertificateStoreTest extends org.junit.Assert {
         data.setCallbackHandler(keystoreCallbackHandler);
         data.setSigVerCrypto(receiverCrypto);
         data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3063));
-        WSHandlerResult results = newEngine.processSecurityHeader(signedDoc, data);
+        List<WSSecurityEngineResult> results = 
+            newEngine.processSecurityHeader(signedDoc, "", data);
         
-        List<WSSecurityEngineResult> signatureResults = 
-            results.getActionResults().get(WSConstants.SIGN);
-        WSSecurityEngineResult result = signatureResults.get(0);
+        WSSecurityEngineResult result = 
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         X509Certificate cert = 
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertTrue (cert != null);
@@ -164,11 +163,9 @@ public class CertificateStoreTest extends org.junit.Assert {
         //
         // Verify the signature
         //
-        WSHandlerResult results = verify(signedDoc, receiverCrypto);
-        
-        List<WSSecurityEngineResult> signatureResults = 
-            results.getActionResults().get(WSConstants.SIGN);
-        WSSecurityEngineResult result = signatureResults.get(0);
+        List<WSSecurityEngineResult> results = verify(signedDoc, receiverCrypto);
+        WSSecurityEngineResult result = 
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         X509Certificate cert = 
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertTrue (cert != null);
@@ -198,11 +195,9 @@ public class CertificateStoreTest extends org.junit.Assert {
         //
         // Verify the signature
         //
-        WSHandlerResult results = verify(signedDoc, receiverCrypto);
-        List<WSSecurityEngineResult> signatureResults = 
-            results.getActionResults().get(WSConstants.SIGN);
-        WSSecurityEngineResult result = signatureResults.get(0);
-        
+        List<WSSecurityEngineResult> results = verify(signedDoc, receiverCrypto);
+        WSSecurityEngineResult result = 
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         X509Certificate cert = 
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertTrue (cert != null);
@@ -232,11 +227,9 @@ public class CertificateStoreTest extends org.junit.Assert {
         //
         // Verify the signature
         //
-        WSHandlerResult results = verify(signedDoc, receiverCrypto);
-        
-        List<WSSecurityEngineResult> signatureResults = 
-            results.getActionResults().get(WSConstants.SIGN);
-        WSSecurityEngineResult result = signatureResults.get(0);
+        List<WSSecurityEngineResult> results = verify(signedDoc, receiverCrypto);
+        WSSecurityEngineResult result = 
+            WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         X509Certificate cert = 
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertTrue (cert != null);
@@ -281,8 +274,9 @@ public class CertificateStoreTest extends org.junit.Assert {
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private WSHandlerResult verify(Document doc, Crypto crypto) throws Exception {
-        WSHandlerResult results = secEngine.processSecurityHeader(
+    private List<WSSecurityEngineResult> 
+    verify(Document doc, Crypto crypto) throws Exception {
+        List<WSSecurityEngineResult> results = secEngine.processSecurityHeader(
             doc, null, keystoreCallbackHandler, crypto
         );
         if (LOG.isDebugEnabled()) {

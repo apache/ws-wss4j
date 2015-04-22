@@ -19,22 +19,8 @@
 
 package org.apache.wss4j.dom.saml;
 
-import java.security.cert.X509Certificate;
-import java.util.List;
-
-import javax.security.auth.callback.CallbackHandler;
-
 import org.apache.wss4j.common.WSEncryptionPart;
-import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoFactory;
-import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.SAMLCallback;
-import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.saml.builder.SAML1Constants;
-import org.apache.wss4j.common.token.SecurityTokenReference;
-import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSSConfig;
@@ -44,12 +30,25 @@ import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.builder.SAML1Constants;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecDKSign;
 import org.apache.wss4j.dom.message.WSSecHeader;
+import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
+
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.security.auth.callback.CallbackHandler;
 
 /**
  * Test-case for sending and processing a signed (sender vouches) SAML Assertion using a 
@@ -69,6 +68,7 @@ public class SamlTokenDerivedTest extends org.junit.Assert {
     
     public SamlTokenDerivedTest() throws Exception {
         WSSConfig config = WSSConfig.getNewInstance();
+        config.setValidateSamlSubjectConfirmation(false);
         secEngine.setWssConfig(config);
         crypto = CryptoFactory.getInstance("crypto.properties");
     }
@@ -115,15 +115,15 @@ public class SamlTokenDerivedTest extends org.junit.Assert {
         }
         
         // Test we processed a SAML assertion
-        WSHandlerResult results = verify(signedDoc);
+        List<WSSecurityEngineResult> results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
-            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         assertTrue(receivedSamlAssertion != null);
         
         // Test we processed a signature (SAML assertion + SOAP body)
-        actionResult = results.getActionResults().get(WSConstants.SIGN).get(0);
+        actionResult = WSSecurityUtil.fetchActionResult(results, WSConstants.SIGN);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
@@ -151,8 +151,8 @@ public class SamlTokenDerivedTest extends org.junit.Assert {
         String secRefID = wssConfig.getIdAllocator().createSecureId("STRSAMLId-", secRefSaml);
         secRefSaml.setID(secRefID);
 
-        org.apache.wss4j.common.token.Reference ref = 
-            new org.apache.wss4j.common.token.Reference(doc);
+        org.apache.wss4j.dom.message.token.Reference ref = 
+            new org.apache.wss4j.dom.message.token.Reference(doc);
         ref.setURI("#" + samlAssertion.getId());
         ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
         secRefSaml.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
@@ -180,6 +180,7 @@ public class SamlTokenDerivedTest extends org.junit.Assert {
             crypto.getPrivateKey("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sigBuilder.setExternalKey(key.getEncoded(), secToken.getElement());
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>(2);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         WSEncryptionPart encP = 
             new WSEncryptionPart(
@@ -187,11 +188,12 @@ public class SamlTokenDerivedTest extends org.junit.Assert {
                 soapNamespace, 
                 "Content"
             );
-        sigBuilder.getParts().add(encP);
+        parts.add(encP);
         encP = new WSEncryptionPart("STRTransform", "", "Element");
         encP.setId(secRefSaml.getID());
         encP.setElement(secRefSaml.getElement());
-        sigBuilder.getParts().add(encP);
+        parts.add(encP);
+        sigBuilder.setParts(parts);
         
         return sigBuilder;
     }
@@ -203,15 +205,9 @@ public class SamlTokenDerivedTest extends org.junit.Assert {
      * @param envelope 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private WSHandlerResult verify(Document doc) throws Exception {
-        RequestData requestData = new RequestData();
-        requestData.setCallbackHandler(callbackHandler);
-        requestData.setDecCrypto(crypto);
-        requestData.setSigVerCrypto(crypto);
-        requestData.setValidateSamlSubjectConfirmation(false);
-        
-        WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
-        
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);

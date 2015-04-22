@@ -35,7 +35,7 @@ public class AttributeBean {
      * Constructor SamlAttribute creates a new SamlAttribute instance.
      */
     public AttributeBean() {
-        attributeValues = new ArrayList<>();
+        attributeValues = new ArrayList<Object>();
     }
 
     /**
@@ -125,7 +125,7 @@ public class AttributeBean {
     
     public void addAttributeValue(Object attributeValue) {
         if (attributeValues == null) {
-            attributeValues = new ArrayList<>();
+            attributeValues = new ArrayList<Object>();
         }
         attributeValues.add(attributeValue);
     }

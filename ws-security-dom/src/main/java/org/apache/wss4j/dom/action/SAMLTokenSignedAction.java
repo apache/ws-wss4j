@@ -45,10 +45,12 @@ public class SAMLTokenSignedAction implements Action {
                         Document doc, RequestData reqData)
             throws WSSecurityException {
         Crypto crypto = null;
-        
-        // it is possible and legal that we do not have a signature crypto here - thus ignore the exception. 
-        // This is usually the case for the SAML option "sender vouches". In this case no user crypto is
-        // required.
+        /*
+        * it is possible and legal that we do not have a signature
+        * crypto here - thus ignore the exception. This is usually
+        * the case for the SAML option "sender vouches". In this case
+        * no user crypto is required.
+        */
         try {
             crypto = handler.loadSignatureCrypto(reqData);
         } catch (Exception ex) {
@@ -84,9 +86,7 @@ public class SAMLTokenSignedAction implements Action {
                 samlCallback.getSignatureDigestAlgorithm()
             );
         }
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
-        wsSign.setIdAllocator(reqData.getWssConfig().getIdAllocator());
-        wsSign.setAddInclusivePrefixes(reqData.isAddInclusivePrefixes());
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(reqData.getWssConfig());
 
         CallbackHandler callbackHandler = 
             handler.getPasswordCallbackHandler(reqData);
@@ -115,8 +115,14 @@ public class SAMLTokenSignedAction implements Action {
             wsSign.setSigCanonicalization(signatureToken.getC14nAlgorithm());
         }
 
+         /*
+         * required to add support for the 
+         * signatureParts parameter.
+         * If not set WSSecSignatureSAML
+         * defaults to only sign the body.
+         */
         if (signatureToken.getParts().size() > 0) {
-            wsSign.getParts().addAll(signatureToken.getParts());
+            wsSign.setParts(signatureToken.getParts());
         }
 
         try {
@@ -130,8 +136,7 @@ public class SAMLTokenSignedAction implements Action {
                     reqData.getSecHeader());
             reqData.getSignatureValues().add(wsSign.getSignatureValue());
         } catch (WSSecurityException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", e, 
-                                          "Error when signing the SAML token: ");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", e, "Error when signing the SAML token: ");
         }
     }
 

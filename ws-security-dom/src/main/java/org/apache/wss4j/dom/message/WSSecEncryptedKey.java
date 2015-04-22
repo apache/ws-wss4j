@@ -21,6 +21,7 @@ package org.apache.wss4j.dom.message;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.security.spec.MGF1ParameterSpec;
 
@@ -31,17 +32,18 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
 
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.token.BinarySecurity;
-import org.apache.wss4j.common.token.DOMX509Data;
-import org.apache.wss4j.common.token.DOMX509IssuerSerial;
-import org.apache.wss4j.common.token.Reference;
-import org.apache.wss4j.common.token.SecurityTokenReference;
-import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.message.token.BinarySecurity;
+import org.apache.wss4j.dom.message.token.DOMX509Data;
+import org.apache.wss4j.dom.message.token.DOMX509IssuerSerial;
+import org.apache.wss4j.dom.message.token.Reference;
+import org.apache.wss4j.dom.message.token.SecurityTokenReference;
+import org.apache.wss4j.dom.message.token.X509Security;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
@@ -66,16 +68,16 @@ public class WSSecEncryptedKey extends WSSecBase {
         org.slf4j.LoggerFactory.getLogger(WSSecEncryptedKey.class);
 
     protected Document document;
-    
+
     /**
-     * Encrypted bytes of the ephemeral key
+     * soap:Envelope element
      */
-    protected byte[] encryptedEphemeralKey;
+    protected Element envelope;
 
     /**
      * Session key used as the secret in key derivation
      */
-    private byte[] ephemeralKey;
+    protected byte[] ephemeralKey;
     
     /**
      * Symmetric key used in the EncryptedKey.
@@ -83,14 +85,19 @@ public class WSSecEncryptedKey extends WSSecBase {
     protected SecretKey symmetricKey;
 
     /**
+     * Encrypted bytes of the ephemeral key
+     */
+    protected byte[] encryptedEphemeralKey;
+
+    /**
      * Algorithm used to encrypt the ephemeral key
      */
-    private String keyEncAlgo = WSConstants.KEYTRANSPORT_RSAOEP;
+    protected String keyEncAlgo = WSConstants.KEYTRANSPORT_RSAOEP;
     
     /**
      * Algorithm to be used with the ephemeral key
      */
-    private String symEncAlgo = WSConstants.AES_128;
+    protected String symEncAlgo = WSConstants.AES_128;
     
     /**
      * Digest Algorithm to be used with RSA-OAEP. The default is SHA-1 (which is not
@@ -107,21 +114,21 @@ public class WSSecEncryptedKey extends WSSecBase {
     /**
      * xenc:EncryptedKey element
      */
-    private Element encryptedKeyElement;
+    protected Element encryptedKeyElement;
 
     /**
      * The Token identifier of the token that the <code>DerivedKeyToken</code>
      * is (or to be) derived from.
      */
-    private String encKeyId;
+    protected String encKeyId;
 
     /**
      * BinarySecurityToken to be included in the case where BST_DIRECT_REFERENCE
      * is used to refer to the asymmetric encryption cert
      */
-    private BinarySecurity bstToken;
+    protected BinarySecurity bstToken;
     
-    private X509Certificate useThisCert;
+    protected X509Certificate useThisCert;
     
     /**
      * Custom token value
@@ -140,6 +147,10 @@ public class WSSecEncryptedKey extends WSSecBase {
         super();
     }
     
+    public WSSecEncryptedKey(WSSConfig config) {
+        super(config);
+    }
+
     /**
      * Set the user name to get the encryption certificate.
      * 
@@ -177,18 +188,20 @@ public class WSSecEncryptedKey extends WSSecBase {
         document = doc;
 
         //
-        // Set up the symmetric key
+        // Set up the ephemeral key
         //
-        if (symmetricKey == null) {
-            if (ephemeralKey != null) {
-                symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, ephemeralKey);
-            } else {
-                KeyGenerator keyGen = KeyUtils.getKeyGenerator(symEncAlgo);
+        if (ephemeralKey == null) {
+            if (symmetricKey == null) {
+                KeyGenerator keyGen = getKeyGenerator();
                 symmetricKey = keyGen.generateKey();
-                ephemeralKey = symmetricKey.getEncoded();
-            }
+            } 
+            ephemeralKey = symmetricKey.getEncoded();
         }
         
+        if (symmetricKey == null) {
+            symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, ephemeralKey);
+        }
+
         //
         // Get the certificate that contains the public key for the public key
         // algorithm that will encrypt the generated symmetric (session) key.
@@ -233,7 +246,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         X509Certificate remoteCert,
         Crypto crypto
     ) throws WSSecurityException {
-        Cipher cipher = KeyUtils.getCipherInstance(keyEncAlgo);
+        Cipher cipher = WSSecurityUtil.getCipherInstance(keyEncAlgo);
         try {
             OAEPParameterSpec oaepParameterSpec = null;
             if (WSConstants.KEYTRANSPORT_RSAOEP.equals(keyEncAlgo)
@@ -266,7 +279,11 @@ public class WSSecEncryptedKey extends WSSecBase {
             } else {
                 cipher.init(Cipher.WRAP_MODE, remoteCert.getPublicKey(), oaepParameterSpec);
             }
-        } catch (InvalidKeyException | InvalidAlgorithmParameterException e) {
+        } catch (InvalidKeyException e) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e
+            );
+        } catch (InvalidAlgorithmParameterException e) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e
             );
@@ -280,7 +297,15 @@ public class WSSecEncryptedKey extends WSSecBase {
         
         try {
             encryptedEphemeralKey = cipher.wrap(secretKey);
-        } catch (IllegalStateException | IllegalBlockSizeException | InvalidKeyException ex) {
+        } catch (IllegalStateException ex) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
+            );
+        } catch (IllegalBlockSizeException ex) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
+            );
+        } catch (InvalidKeyException ex) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
             );
@@ -338,7 +363,7 @@ public class WSSecEncryptedKey extends WSSecBase {
                     document, issuer, serialNumber
                 );
             DOMX509Data domX509Data = new DOMX509Data(document, domIssuerSerial);
-            secToken.setUnknownElement(domX509Data.getElement());
+            secToken.setX509Data(domX509Data);
             
             if (includeEncryptionToken) {
                 addBST(remoteCert);
@@ -418,6 +443,8 @@ public class WSSecEncryptedKey extends WSSecBase {
 
         Element xencCipherValue = createCipherValue(document, encryptedKeyElement);
         xencCipherValue.appendChild(keyText);
+
+        envelope = document.getDocumentElement();
     }
     
     /**
@@ -431,6 +458,34 @@ public class WSSecEncryptedKey extends WSSecBase {
         bstToken.setID(IDGenerator.generateID(null));
     }
 
+    protected KeyGenerator getKeyGenerator() throws WSSecurityException {
+        try {
+            //
+            // Assume AES as default, so initialize it
+            //
+            String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(symEncAlgo);
+            if (keyAlgorithm == null || "".equals(keyAlgorithm)) {
+                keyAlgorithm = JCEMapper.translateURItoJCEID(symEncAlgo);
+            }
+            KeyGenerator keyGen = KeyGenerator.getInstance(keyAlgorithm);
+            if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_128)
+                || symEncAlgo.equalsIgnoreCase(WSConstants.AES_128_GCM)) {
+                keyGen.init(128);
+            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_192)
+                || symEncAlgo.equalsIgnoreCase(WSConstants.AES_192_GCM)) {
+                keyGen.init(192);
+            } else if (symEncAlgo.equalsIgnoreCase(WSConstants.AES_256)
+                || symEncAlgo.equalsIgnoreCase(WSConstants.AES_256_GCM)) {
+                keyGen.init(256);
+            }
+            return keyGen;
+        } catch (NoSuchAlgorithmException e) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, e
+            );
+        }
+    }
+
     /**
      * Create DOM subtree for <code>xenc:EncryptedKey</code>
      * 
@@ -442,7 +497,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         Element encryptedKey = 
             doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptedKey");
 
-        org.apache.wss4j.common.util.XMLUtils.setNamespace(encryptedKey, WSConstants.ENC_NS, WSConstants.ENC_PREFIX);
+        WSSecurityUtil.setNamespace(encryptedKey, WSConstants.ENC_NS, WSConstants.ENC_PREFIX);
         Element encryptionMethod = 
             doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptionMethod");
         encryptionMethod.setAttributeNS(null, "Algorithm", keyTransportAlgo);
@@ -557,10 +612,6 @@ public class WSSecEncryptedKey extends WSSecBase {
     public void setUseThisCert(X509Certificate cert) {
         useThisCert = cert;
     }
-    
-    public X509Certificate getUseThisCert() {
-        return useThisCert;
-    }
 
     /**
      * @return Returns the encryptedKeyElement.
@@ -589,10 +640,6 @@ public class WSSecEncryptedKey extends WSSecBase {
     
     public void setKeyEncAlgo(String keyEncAlgo) {
         this.keyEncAlgo = keyEncAlgo;
-    }
-    
-    public String getKeyEncAlgo() {
-        return keyEncAlgo;
     }
 
     /**

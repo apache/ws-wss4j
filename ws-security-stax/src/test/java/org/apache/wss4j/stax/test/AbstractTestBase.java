@@ -73,7 +73,6 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -175,14 +174,14 @@ public abstract class AbstractTestBase extends org.junit.Assert {
     }
 
     protected Document doOutboundSecurityWithWSS4J(InputStream sourceDocument, String action, Properties properties)
-            throws WSSecurityException, TransformerException, IOException {
+            throws WSSecurityException, TransformerException {
         Map<String, Object> context = doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties);
         return (Document) context.get(SECURED_DOCUMENT);
     }
 
     protected Map<String, Object> doOutboundSecurityWithWSS4J_1(
             InputStream sourceDocument, String action, final Properties properties
-    ) throws WSSecurityException, TransformerException, IOException {
+    ) throws WSSecurityException, TransformerException {
         CustomWSS4JHandler wss4JHandler = new CustomWSS4JHandler();
         final Map<String, Object> messageContext = getMessageContext(sourceDocument);
         messageContext.put(WSHandlerConstants.ACTION, action);
@@ -374,10 +373,9 @@ public abstract class AbstractTestBase extends org.junit.Assert {
          * Handles incoming web service requests and outgoing responses
          *
          * @throws TransformerException
-         * @throws IOException 
          */
         public boolean doSender(Map<String, Object> mc, RequestData reqData, boolean isRequest)
-                throws WSSecurityException, TransformerException, IOException {
+                throws WSSecurityException, TransformerException {
 
             /*
              * Get the action first.
@@ -467,7 +465,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
              */
             org.apache.wss4j.dom.SOAPConstants soapConstants =
                     WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-            if (XMLUtils.findElement(
+            if (WSSecurityUtil.findElement(
                 doc.getDocumentElement(), "Fault", soapConstants.getEnvelopeURI()) != null
             ) {
                 return false;
@@ -486,14 +484,13 @@ public abstract class AbstractTestBase extends org.junit.Assert {
              */
             WSSConfig wssConfig = WSSConfig.getNewInstance();
             reqData.setWssConfig(wssConfig);
-            reqData.setActor(actor);
             doReceiverAction(actions, reqData);
 
             Element elem = WSSecurityUtil.getSecurityHeader(doc, actor);
 
             WSSecurityEngine secEngine = new WSSecurityEngine();
             secEngine.setWssConfig(wssConfig);
-            WSHandlerResult wsResult = null;
+            List<WSSecurityEngineResult> wsResult = null;
             try {
                 wsResult = secEngine.processSecurityHeader(elem, reqData);
             } catch (WSSecurityException ex) {
@@ -504,7 +501,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
                         "WSS4JHandler: security processing failed", ex
                 );
             }
-            if (wsResult.getResults() == null || wsResult.getResults().size() == 0) {
+            if (wsResult == null || wsResult.size() == 0) {
                 // no security header found
                 if (actions.isEmpty()) {
                     return true;
@@ -514,7 +511,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
                     );
                 }
             }
-            if (reqData.isEnableSignatureConfirmation() && !isRequest) {
+            if (reqData.getWssConfig().isEnableSignatureConfirmation() && !isRequest) {
                 checkSignatureConfirmation(reqData, wsResult);
             }
 
@@ -525,7 +522,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
             /*
              * now check the security actions: do they match, in right order?
              */
-            if (!checkReceiverResults(wsResult.getResults(), actions)) {
+            if (!checkReceiverResults(wsResult, actions)) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                         "WSS4JHandler: security processing failed (actions mismatch)"
                 );
@@ -541,7 +538,8 @@ public abstract class AbstractTestBase extends org.junit.Assert {
                 results = new ArrayList<WSHandlerResult>();
                 mc.put(WSHandlerConstants.RECV_RESULTS, results);
             }
-            results.add(0, wsResult);
+            WSHandlerResult rResult = new WSHandlerResult(actor, wsResult);
+            results.add(0, rResult);
             if (doDebug) {
                 log.debug("WSS4JHandler: exit invoke()");
             }
@@ -551,9 +549,9 @@ public abstract class AbstractTestBase extends org.junit.Assert {
 
         @Override
         protected boolean checkReceiverResults(
-            List<WSSecurityEngineResult> wsResult, List<Integer> actions
+                List<WSSecurityEngineResult> wsResult, List<Integer> actions
         ) {
-            List<WSSecurityEngineResult> wsSecurityEngineResults = new ArrayList<>();
+            List<WSSecurityEngineResult> wsSecurityEngineResults = new ArrayList<WSSecurityEngineResult>();
             for (WSSecurityEngineResult result : wsResult) {
                 boolean found = false;
                 for (WSSecurityEngineResult res : wsSecurityEngineResults) {

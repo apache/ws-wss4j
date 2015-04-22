@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import org.apache.wss4j.dom.SOAPConstants;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.SignatureActionToken;
@@ -55,14 +56,7 @@ public class UsernameTokenSignedAction implements Action {
         WSPasswordCallback passwordCallback = 
             handler.getPasswordCB(reqData.getUsername(), WSConstants.UT_SIGN, callbackHandler, reqData);
 
-        if (reqData.getUsername() == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noUser");
-        }
-        
-        WSSecUsernameToken builder = new WSSecUsernameToken();
-        builder.setIdAllocator(reqData.getWssConfig().getIdAllocator());
-        builder.setPrecisionInMilliSeconds(reqData.isPrecisionInMilliSeconds());
-        builder.setWsTimeSource(reqData.getWssConfig().getCurrentTime());
+        WSSecUsernameToken builder = new WSSecUsernameToken(reqData.getWssConfig());
         
         int iterations = reqData.getDerivedKeyIterations();
         boolean useMac = reqData.isUseDerivedKeyForMAC();
@@ -97,10 +91,7 @@ public class UsernameTokenSignedAction implements Action {
             signatureToken = reqData.getSignatureToken();
         }
         
-        WSSecSignature sign = new WSSecSignature();
-        sign.setIdAllocator(reqData.getWssConfig().getIdAllocator());
-        sign.setAddInclusivePrefixes(reqData.isAddInclusivePrefixes());
-        
+        WSSecSignature sign = new WSSecSignature(reqData.getWssConfig());
         sign.setCustomTokenValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
         sign.setCustomTokenId(builder.getId());
         sign.setSecretKey(builder.getDerivedKey());
@@ -127,8 +118,14 @@ public class UsernameTokenSignedAction implements Action {
         if (signatureToken.getParts().size() > 0) {
             parts = signatureToken.getParts();
         } else {
-            parts = new ArrayList<>(1);
-            parts.add(WSSecurityUtil.getDefaultEncryptionPart(doc));
+            SOAPConstants soapConstants = reqData.getSoapConstants();
+            if (soapConstants == null) {
+                soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
+            }
+            parts = new ArrayList<WSEncryptionPart>();
+            WSEncryptionPart encP = 
+                new WSEncryptionPart(WSConstants.ELEM_BODY, soapConstants.getEnvelopeURI(), "Content");
+            parts.add(encP);
         }
         List<javax.xml.crypto.dsig.Reference> referenceList = 
             sign.addReferencesToSign(parts, reqData.getSecHeader());

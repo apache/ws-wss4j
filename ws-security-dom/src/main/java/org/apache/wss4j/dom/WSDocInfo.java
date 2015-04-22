@@ -31,33 +31,22 @@ package org.apache.wss4j.dom;
  */
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.crypto.dom.DOMCryptoContext;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.CallbackLookup;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class WSDocInfo {
     private Document doc;
     private Crypto crypto;
-    
-    // Here we map the token "Id" to the token itself. The token "Id" is the key as it must be unique to guard
-    // against various wrapping attacks. The "Id" name/namespace is stored as part of the entry (along with the
-    // element), so that we know what namespace to use when setting the token on the crypto context for signature
-    // creation or validation
-    private final Map<String, TokenValue> tokens = new HashMap<>();
-
-    private final List<WSSecurityEngineResult> results = new LinkedList<>();
-    private final Map<Integer, List<WSSecurityEngineResult>> actionResults = new HashMap<>();
+    private List<Element> tokenList;
+    private List<WSSecurityEngineResult> resultsList;
     private CallbackLookup callbackLookup;
     private Element securityHeader;
 
@@ -79,12 +68,15 @@ public class WSDocInfo {
      */
     public void clear() {
         crypto = null;
-        doc = null;
-        callbackLookup = null;
-        securityHeader = null;
-        tokens.clear();
-        results.clear();
-        actionResults.clear();
+        if (tokenList != null && tokenList.size() > 0) {
+            tokenList.clear();
+        }
+        if (resultsList != null && resultsList.size() > 0) {
+            resultsList.clear();
+        }
+        
+        tokenList = null;
+        resultsList = null;
     }
     
     /**
@@ -103,59 +95,48 @@ public class WSDocInfo {
      * @param checkMultipleElements check for a previously stored element with the same Id.
      */
     public void addTokenElement(Element element, boolean checkMultipleElements) throws WSSecurityException {
-        if (element == null) {
-            return;
+        if (tokenList == null) {
+            tokenList = new ArrayList<Element>();
         }
         
-        if (element.hasAttributeNS(WSConstants.WSU_NS, "Id")) {
-            String id = element.getAttributeNS(WSConstants.WSU_NS, "Id");
-            TokenValue tokenValue = new TokenValue("Id", WSConstants.WSU_NS, element);
-            TokenValue previousValue = tokens.put(id, tokenValue);
-            if (checkMultipleElements && previousValue != null) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "duplicateError"
-                );
-            }
-        }
-
-        if (element.hasAttributeNS(null, "Id")) {
-            String id = element.getAttributeNS(null, "Id");
-            TokenValue tokenValue = new TokenValue("Id", null, element);
-            TokenValue previousValue = tokens.put(id, tokenValue);
-            if (checkMultipleElements && previousValue != null) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "duplicateError"
-                );
-            }
-        }
-
-        // SAML Assertions
-        if ("Assertion".equals(element.getLocalName())) {
-            if (WSConstants.SAML_NS.equals(element.getNamespaceURI())
-                && element.hasAttributeNS(null, "AssertionID")) {
-                String id = element.getAttributeNS(null, "AssertionID");
-                TokenValue tokenValue = new TokenValue("AssertionID", null, element);
-                TokenValue previousValue = tokens.put(id, tokenValue);
-                if (checkMultipleElements && previousValue != null) {
-                    throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "duplicateError"
-                    );
-                }
-            } else if (WSConstants.SAML2_NS.equals(element.getNamespaceURI())
-                && element.hasAttributeNS(null, "ID")) {
-                String id = element.getAttributeNS(null, "ID");
-                TokenValue tokenValue = new TokenValue("ID", null, element);
-                TokenValue previousValue = tokens.put(id, tokenValue);
-                if (checkMultipleElements && previousValue != null) {
+        if (checkMultipleElements) {
+            for (Element elem : tokenList) {
+                if (compareElementsById(element, elem)) {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "duplicateError"
                     );
                 }
             }
         }
-
+        tokenList.add(element);
     }
     
+    private boolean compareElementsById(Element firstElement, Element secondElement) {
+        if (firstElement.hasAttributeNS(WSConstants.WSU_NS, "Id")
+            && secondElement.hasAttributeNS(WSConstants.WSU_NS, "Id")) {
+            String id = firstElement.getAttributeNS(WSConstants.WSU_NS, "Id");
+            String id2 = secondElement.getAttributeNS(WSConstants.WSU_NS, "Id");
+            if (id.equals(id2)) {
+                return true;
+            }
+        }
+        if (firstElement.hasAttributeNS(null, "AssertionID")
+            && secondElement.hasAttributeNS(null, "AssertionID")) {
+            String id = firstElement.getAttributeNS(null, "AssertionID");
+            String id2 = secondElement.getAttributeNS(null, "AssertionID");
+            if (id.equals(id2)) {
+                return true;
+            }
+        }
+        if (firstElement.hasAttributeNS(null, "ID") && secondElement.hasAttributeNS(null, "ID")) {
+            String id = firstElement.getAttributeNS(null, "ID");
+            String id2 = secondElement.getAttributeNS(null, "ID");
+            if (id.equals(id2)) {
+                return true;
+            }
+        }
+        return false;
+    }
     
     /**
      * Get a token Element for the given Id. The Id can be either a wsu:Id or a 
@@ -164,16 +145,24 @@ public class WSDocInfo {
      * @return the token element or null if nothing found
      */
     public Element getTokenElement(String uri) {
-        String id = XMLUtils.getIDFromReference(uri);
+        String id = uri;
         if (id == null) {
             return null;
+        } else if (id.charAt(0) == '#') {
+            id = id.substring(1);
         }
-        
-        TokenValue token = tokens.get(id);
-        if (token != null) {
-            return token.getToken();
+        if (tokenList != null) {
+            for (Element elem : tokenList) {
+                String cId = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
+                String samlId = elem.getAttributeNS(null, "AssertionID");
+                String samlId2 = elem.getAttributeNS(null, "ID");
+                if (elem.hasAttributeNS(WSConstants.WSU_NS, "Id") && id.equals(cId)
+                    || elem.hasAttributeNS(null, "AssertionID") && id.equals(samlId)
+                    || elem.hasAttributeNS(null, "ID") && id.equals(samlId2)) {
+                    return elem;
+                }
+            }
         }
-
         return null;
     }
 
@@ -182,66 +171,22 @@ public class WSDocInfo {
      * @param context
      */
     public void setTokensOnContext(DOMCryptoContext context) {
-        if (!tokens.isEmpty() && context != null) {
-            for (Map.Entry<String, TokenValue> entry : tokens.entrySet()) {
-                TokenValue tokenValue = entry.getValue();
-                context.setIdAttributeNS(tokenValue.getToken(), tokenValue.getIdNamespace(),
-                                         tokenValue.getIdName());
+        if (tokenList != null) {
+            for (Element elem : tokenList) {
+                WSSecurityUtil.storeElementInContext(context, elem);
             }
         }
     }
-    
-    public void setTokenOnContext(String uri, DOMCryptoContext context) {
-        String id = XMLUtils.getIDFromReference(uri);
-        if (id == null || context == null) {
-            return;
-        }
-
-        TokenValue tokenValue = tokens.get(id);
-        if (tokenValue != null) {
-            context.setIdAttributeNS(tokenValue.getToken(), tokenValue.getIdNamespace(),
-                                     tokenValue.getIdName());
-        }
-    }
-
     
     /**
      * Store a WSSecurityEngineResult for later retrieval. 
      * @param result is the WSSecurityEngineResult to store
      */
     public void addResult(WSSecurityEngineResult result) {
-        results.add(result);
-        Integer resultTag = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
-        if (resultTag != null) {
-            List<WSSecurityEngineResult> storedResults = actionResults.get(resultTag);
-            if (storedResults == null) {
-                storedResults = new ArrayList<>();
-            }
-            storedResults.add(result);
-            actionResults.put(resultTag, storedResults);
+        if (resultsList == null) {
+            resultsList = new ArrayList<WSSecurityEngineResult>();
         }
-    }
-    
-    /**
-     * Get a copy of the security results list. Modifying the subsequent list does not
-     * change the internal results list.
-     */
-    public List<WSSecurityEngineResult> getResults() {
-        if (results.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return new ArrayList<>(results);
-    }
-    
-    /**
-     * Return a copy of the map between security actions + results. Modifying the subsequent
-     * map does not change the internal map.
-     */
-    public Map<Integer, List<WSSecurityEngineResult>> getActionResults() {
-        if (actionResults.isEmpty()) {
-            return Collections.emptyMap();
-        }
-        return new HashMap<>(actionResults);
+        resultsList.add(result);
     }
     
     /**
@@ -250,16 +195,19 @@ public class WSDocInfo {
      * @return the WSSecurityEngineResult or null if nothing found
      */
     public WSSecurityEngineResult getResult(String uri) {
-        String id = XMLUtils.getIDFromReference(uri);
+        String id = uri;
         if (id == null) {
             return null;
+        } else if (id.charAt(0) == '#') {
+            id = id.substring(1);
         }
-        
-        if (!results.isEmpty()) {
-            for (WSSecurityEngineResult result : results) {
-                String cId = (String)result.get(WSSecurityEngineResult.TAG_ID);
-                if (id.equals(cId)) {
-                    return result;
+        if (resultsList != null) {
+            for (WSSecurityEngineResult result : resultsList) {
+                if (result != null) {
+                    String cId = (String)result.get(WSSecurityEngineResult.TAG_ID);
+                    if (id.equals(cId)) {
+                        return result;
+                    }
                 }
             }
         }
@@ -267,35 +215,45 @@ public class WSDocInfo {
     }
     
     /**
-     * Get a unmodifiable list of WSSecurityEngineResults of the given Integer tag
+     * Get a list of WSSecurityEngineResults of the given Integer tag
      */
     public List<WSSecurityEngineResult> getResultsByTag(Integer tag) {
-        if (actionResults.isEmpty() || !actionResults.containsKey(tag)) {
-            return Collections.emptyList();
-        }
-        
-        return Collections.unmodifiableList(actionResults.get(tag));
-    }
-    
-    /**
-     * See whether we have a WSSecurityEngineResult of the given Integer tag for the given Id
-     */
-    public boolean hasResult(Integer tag, String uri) {
-        String id = XMLUtils.getIDFromReference(uri);
-        if (id == null || "".equals(uri)) {
-            return false;
-        }
-        
-        if (!actionResults.isEmpty() && actionResults.containsKey(tag)) {
-            for (WSSecurityEngineResult result : actionResults.get(tag)) {
-                String cId = (String)result.get(WSSecurityEngineResult.TAG_ID);
-                if (id.equals(cId)) {
-                    return true;
+        List<WSSecurityEngineResult> foundResults = new ArrayList<WSSecurityEngineResult>();
+        if (resultsList != null) {
+            for (WSSecurityEngineResult result : resultsList) {
+                if (result != null) {
+                    Integer resultTag = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
+                    if (tag.intValue() == resultTag.intValue()) {
+                        foundResults.add(result);
+                    }
                 }
             }
         }
-
-        return false;
+        return foundResults;
+    }
+    
+    /**
+     * Get a WSSecurityEngineResult of the given Integer tag for the given Id
+     */
+    public WSSecurityEngineResult getResultByTag(Integer tag, String uri) {
+        String id = uri;
+        if (id == null || "".equals(uri)) {
+            return null;
+        } else if (id.charAt(0) == '#') {
+            id = id.substring(1);
+        }
+        if (resultsList != null) {
+            for (WSSecurityEngineResult result : resultsList) {
+                if (result != null) {
+                    Integer resultTag = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
+                    String cId = (String)result.get(WSSecurityEngineResult.TAG_ID);
+                    if (tag.intValue() == resultTag.intValue() && id.equals(cId)) {
+                        return result;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -350,28 +308,4 @@ public class WSDocInfo {
     public void setSecurityHeader(Element securityHeader) {
         this.securityHeader = securityHeader;
     }
-    
-    private static class TokenValue {
-        final String idName;
-        final String idNamespace;
-        final Element token;
-
-        public TokenValue(String idName, String idNamespace, Element token) {
-            this.idName = idName;
-            this.idNamespace = idNamespace;
-            this.token = token;
-        }
-
-        public String getIdName() {
-            return idName;
-        }
-
-        public String getIdNamespace() {
-            return idNamespace;
-        }
-        public Element getToken() {
-            return token;
-        }
-    }
-
 }

@@ -39,7 +39,7 @@ public abstract class AbstractToken extends AbstractSecurityAssertion implements
         RequireExplicitDerivedKeys,
         RequireImpliedDerivedKeys;
 
-        private static final Map<String, X509Token.DerivedKeys> lookup = new HashMap<>();
+        private static final Map<String, X509Token.DerivedKeys> lookup = new HashMap<String, X509Token.DerivedKeys>();
 
         static {
             for (DerivedKeys u : EnumSet.allOf(DerivedKeys.class))

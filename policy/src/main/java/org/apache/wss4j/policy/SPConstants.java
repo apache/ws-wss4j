@@ -47,7 +47,7 @@ public abstract class SPConstants {
             this.prefix = prefix;
         }
 
-        private static final Map<String, SPVersion> lookup = new HashMap<>();
+        private static final Map<String, SPVersion> lookup = new HashMap<String, SPVersion>();
 
         static {
             for (SPVersion spVersion : EnumSet.allOf(SPVersion.class))
@@ -503,7 +503,7 @@ public abstract class SPConstants {
         INCLUDE_TOKEN_ALWAYS_TO_INITIATOR,
         INCLUDE_TOKEN_ALWAYS;
 
-        private static final Map<String, IncludeTokenType> lookup = new HashMap<>();
+        private static final Map<String, IncludeTokenType> lookup = new HashMap<String, IncludeTokenType>();
 
         static {
             for (IncludeTokenType u : EnumSet.allOf(IncludeTokenType.class))

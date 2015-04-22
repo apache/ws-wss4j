@@ -50,7 +50,7 @@ public class AlgorithmSuite {
 
     public void addSignatureMethod(String signatureMethod) {
         if (signatureMethods.isEmpty()) {
-            signatureMethods = new HashSet<>();
+            signatureMethods = new HashSet<String>();
         }
         signatureMethods.add(signatureMethod);
     }
@@ -61,7 +61,7 @@ public class AlgorithmSuite {
     
     public void addC14nAlgorithm(String c14nAlgorithm) {
         if (c14nAlgorithms.isEmpty()) {
-            c14nAlgorithms = new HashSet<>();
+            c14nAlgorithms = new HashSet<String>();
         }
         c14nAlgorithms.add(c14nAlgorithm);
     }
@@ -72,7 +72,7 @@ public class AlgorithmSuite {
     
     public void addDigestAlgorithm(String digestAlgorithm) {
         if (digestAlgorithms.isEmpty()) {
-            digestAlgorithms = new HashSet<>();
+            digestAlgorithms = new HashSet<String>();
         }
         digestAlgorithms.add(digestAlgorithm);
     }
@@ -83,7 +83,7 @@ public class AlgorithmSuite {
     
     public void addTransformAlgorithm(String transformAlgorithm) {
         if (transformAlgorithms.isEmpty()) {
-            transformAlgorithms = new HashSet<>();
+            transformAlgorithms = new HashSet<String>();
         }
         transformAlgorithms.add(transformAlgorithm);
     }
@@ -94,7 +94,7 @@ public class AlgorithmSuite {
     
     public void addEncryptionMethod(String encryptionMethod) {
         if (encryptionMethods.isEmpty()) {
-            encryptionMethods = new HashSet<>();
+            encryptionMethods = new HashSet<String>();
         }
         encryptionMethods.add(encryptionMethod);
     }
@@ -105,7 +105,7 @@ public class AlgorithmSuite {
     
     public void addKeyWrapAlgorithm(String keyWrapAlgorithm) {
         if (keyWrapAlgorithms.isEmpty()) {
-            keyWrapAlgorithms = new HashSet<>();
+            keyWrapAlgorithms = new HashSet<String>();
         }
         keyWrapAlgorithms.add(keyWrapAlgorithm);
     }
@@ -116,7 +116,7 @@ public class AlgorithmSuite {
     
     public void addDerivedKeyAlgorithm(String derivedKeyAlgorithm) {
         if (derivedKeyAlgorithms.isEmpty()) {
-            derivedKeyAlgorithms = new HashSet<>();
+            derivedKeyAlgorithms = new HashSet<String>();
         }
         derivedKeyAlgorithms.add(derivedKeyAlgorithm);
     }

@@ -73,9 +73,4 @@ public interface CallbackLookup {
     List<Element> getElements(
         String localname, String namespace
     ) throws WSSecurityException;
-    
-    /**
-     * Get the SOAP Body
-     */
-    Element getSOAPBody();
 }

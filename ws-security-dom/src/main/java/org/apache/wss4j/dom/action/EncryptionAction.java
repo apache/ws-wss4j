@@ -40,8 +40,7 @@ public class EncryptionAction implements Action {
     public void execute(WSHandler handler, SecurityActionToken actionToken,
                         Document doc, RequestData reqData)
             throws WSSecurityException {
-        WSSecEncrypt wsEncrypt = new WSSecEncrypt();
-        wsEncrypt.setIdAllocator(reqData.getWssConfig().getIdAllocator());
+        WSSecEncrypt wsEncrypt = new WSSecEncrypt(reqData.getWssConfig());
 
         EncryptionActionToken encryptionToken = null;
         if (actionToken instanceof EncryptionActionToken) {
@@ -59,7 +58,7 @@ public class EncryptionAction implements Action {
             wsEncrypt.setSymmetricEncAlgorithm(encryptionToken.getSymmetricAlgorithm());
         }
         if (encryptionToken.getKeyTransportAlgorithm() != null) {
-            wsEncrypt.setKeyEncAlgo(encryptionToken.getKeyTransportAlgorithm());
+            wsEncrypt.setKeyEnc(encryptionToken.getKeyTransportAlgorithm());
         }
         if (encryptionToken.getDigestAlgorithm() != null) {
             wsEncrypt.setDigestAlgorithm(encryptionToken.getDigestAlgorithm());
@@ -84,7 +83,7 @@ public class EncryptionAction implements Action {
             }
         }
         if (encryptionToken.getParts().size() > 0) {
-            wsEncrypt.getParts().addAll(encryptionToken.getParts());
+            wsEncrypt.setParts(encryptionToken.getParts());
         }
         
         wsEncrypt.setEncryptSymmKey(encryptionToken.isEncSymmetricEncryptionKey());

@@ -24,7 +24,6 @@ import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.validate.Credential;
@@ -70,8 +69,9 @@ public class SecurityContextTokenProcessor implements Processor {
             result.put(WSSecurityEngineResult.TAG_SECRET, returnedCredential.getSecretKey());
         } else {
             String id = sct.getID();
-            id = XMLUtils.getIDFromReference(id);
-
+            if (!"".equals(id) && id.charAt(0) == '#') {
+                id = id.substring(1);
+            }
             byte[] secret = null;
             try {
                 secret = getSecret(data.getCallbackHandler(), sct.getIdentifier());
@@ -109,7 +109,13 @@ public class SecurityContextTokenProcessor implements Processor {
         try {
             Callback[] callbacks = new Callback[]{callback};
             cb.handle(callbacks);
-        } catch (IOException | UnsupportedCallbackException e) {
+        } catch (IOException e) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILURE, 
+                "noKey",
+                e,
+                identifier);
+        } catch (UnsupportedCallbackException e) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, 
                 "noKey",

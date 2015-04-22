@@ -5,11 +5,13 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
-Release 2.1.0
+Release 2.0.4
 =============
 
 Bug
 
+    [WSS-526] - MerlinDevice uses incorrect property names
+    [WSS-527] - When using WSS4JStaxInInterceptor giving NullPointer Exception in X509IssuerSerialTokenImpl.java:60
     [WSS-535] - Add WSSE and WSU xmlns definitions to signature's SecurityTokenReference
     [WSS-536] - WSSecurityUtil.getCipherInstance() does not use configured provider
 

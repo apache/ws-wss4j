@@ -20,16 +20,13 @@
 package org.apache.wss4j.dom.message;
 
 import org.apache.wss4j.common.WSEncryptionPart;
-import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.WsuIdAllocator;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import javax.security.auth.callback.CallbackHandler;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,19 +36,28 @@ import java.util.List;
  */
 public class WSSecBase {
     protected String user;
+
     protected String password;
+
     protected int keyIdentifierType = WSConstants.ISSUER_SERIAL;
+
+    protected List<WSEncryptionPart> parts;
+
     protected boolean doDebug;
+    
     protected CallbackLookup callbackLookup;
+
+    private WSSConfig wssConfig;
+
     protected CallbackHandler attachmentCallbackHandler;
-
-    private WsuIdAllocator idAllocator;
-    private final List<WSEncryptionPart> parts = new ArrayList<>();
-
     
     public WSSecBase() {
     }
     
+    public WSSecBase(WSSConfig config) {
+        wssConfig = config;
+    }
+
     /**
      * @param callbackLookup The CallbackLookup object to retrieve elements
      */
@@ -60,10 +66,12 @@ public class WSSecBase {
     }
     
     /**
-     * Get which parts of the message to encrypt/sign.
+     * Set which parts of the message to encrypt/sign. <p/>
+     * 
+     * @param parts The list containing the WSEncryptionPart objects
      */
-    public List<WSEncryptionPart> getParts() {
-        return parts;
+    public void setParts(List<WSEncryptionPart> parts) {
+        this.parts = parts;
     }
 
     /**
@@ -101,6 +109,21 @@ public class WSSecBase {
         return keyIdentifierType;
     }
 
+    /**
+     * @param wsConfig
+     *            The wsConfig to set.
+     */
+    public void setWsConfig(WSSConfig wsConfig) {
+        this.wssConfig = wsConfig;
+    }
+    
+    public WSSConfig getWsConfig() {
+        if (wssConfig == null) {
+            wssConfig = WSSConfig.getNewInstance();
+        }
+        return wssConfig;
+    }
+
     public void setAttachmentCallbackHandler(CallbackHandler attachmentCallbackHandler) {
         this.attachmentCallbackHandler = attachmentCallbackHandler;
     }
@@ -116,10 +139,7 @@ public class WSSecBase {
      * @throws Exception
      */
     protected String setBodyID(Document doc) throws Exception {
-        if (callbackLookup == null) {
-            callbackLookup = new DOMCallbackLookup(doc);
-        }
-        Element bodyElement = callbackLookup.getSOAPBody();
+        Element bodyElement = WSSecurityUtil.findBodyElement(doc);
         if (bodyElement == null) {
             throw new Exception("SOAP Body Element node not found");
         }
@@ -152,8 +172,9 @@ public class WSSecBase {
         }
         
         if (id == null || id.length() == 0) {
-            id = getIdAllocator().createId("id-", bodyElement);
-            String prefix = XMLUtils.setNamespace(bodyElement, newAttrNs, newAttrPrefix);
+            id = wssConfig.getIdAllocator().createId("id-", bodyElement);
+            String prefix = 
+                WSSecurityUtil.setNamespace(bodyElement, newAttrNs, newAttrPrefix);
             bodyElement.setAttributeNS(newAttrNs, prefix + ":Id", id);
         }
         return id;
@@ -174,17 +195,6 @@ public class WSSecBase {
     public void setUserInfo(String user, String password) {
         this.user = user;
         this.password = password;
-    }
-
-    public WsuIdAllocator getIdAllocator() {
-        if (idAllocator != null) {
-            return idAllocator;
-        }
-        return WSSConfig.DEFAULT_ID_ALLOCATOR;
-    }
-
-    public void setIdAllocator(WsuIdAllocator idAllocator) {
-        this.idAllocator = idAllocator;
     }
     
 }

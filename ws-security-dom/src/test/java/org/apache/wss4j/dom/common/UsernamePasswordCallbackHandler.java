@@ -34,7 +34,7 @@ import java.util.Map;
  */
 public class UsernamePasswordCallbackHandler implements CallbackHandler {
     
-    private Map<String, String> users = new HashMap<>();
+    private Map<String, String> users = new HashMap<String, String>();
     
     public UsernamePasswordCallbackHandler() {
         users.put("wernerd", "verySecret");

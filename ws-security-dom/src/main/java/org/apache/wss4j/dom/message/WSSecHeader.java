@@ -20,7 +20,6 @@ package org.apache.wss4j.dom.message;
 
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -139,7 +138,7 @@ public class WSSecHeader {
 
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         String soapPrefix = 
-            XMLUtils.setNamespace(
+            WSSecurityUtil.setNamespace(
                 securityHeader, soapNamespace, WSConstants.DEFAULT_SOAP_PREFIX
             );
         
@@ -165,7 +164,7 @@ public class WSSecHeader {
                 mustUnderstandLocal
             );
         }
-        XMLUtils.setNamespace(securityHeader, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+        WSSecurityUtil.setNamespace(securityHeader, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
         
         return securityHeader;
     }

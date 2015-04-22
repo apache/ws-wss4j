@@ -59,11 +59,10 @@ import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenFactory;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
-import org.opensaml.security.credential.BasicCredential;
-import org.opensaml.security.x509.BasicX509Credential;
-import org.opensaml.xmlsec.signature.Signature;
-import org.opensaml.xmlsec.signature.support.SignatureException;
-import org.opensaml.xmlsec.signature.support.SignatureValidator;
+import org.opensaml.xml.security.x509.BasicX509Credential;
+import org.opensaml.xml.signature.Signature;
+import org.opensaml.xml.signature.SignatureValidator;
+import org.opensaml.xml.validation.ValidationException;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -81,7 +80,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Comment;
 import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.ProcessingInstruction;
-
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -94,8 +92,8 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
     private static final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
-    private static final List<QName> saml1TokenPath = new ArrayList<>(WSSConstants.WSSE_SECURITY_HEADER_PATH);
-    private static final List<QName> saml2TokenPath = new ArrayList<>(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+    private static final List<QName> saml1TokenPath = new ArrayList<QName>(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+    private static final List<QName> saml2TokenPath = new ArrayList<QName>(WSSConstants.WSSE_SECURITY_HEADER_PATH);
 
     static {
         documentBuilderFactory.setNamespaceAware(true);
@@ -139,20 +137,21 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
             samlTokenValidator.validate(sigSecurityToken, wssSecurityProperties);
 
-            BasicCredential credential = null;
+            BasicX509Credential credential = new BasicX509Credential();
             if (sigSecurityToken.getX509Certificates() != null) {
-                credential = new BasicX509Credential(sigSecurityToken.getX509Certificates()[0]);
+                credential.setEntityCertificate(sigSecurityToken.getX509Certificates()[0]);
             } else if (sigSecurityToken.getPublicKey() != null) {
-                credential = new BasicCredential(sigSecurityToken.getPublicKey());
+                credential.setPublicKey(sigSecurityToken.getPublicKey());
             } else {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
                         "cannot get certificate or key"
                 );
             }
+            SignatureValidator sigValidator = new SignatureValidator(credential);
             try {
-                SignatureValidator.validate(signature, credential);
-            } catch (SignatureException ex) {
+                sigValidator.validate(signature);
+            } catch (ValidationException ex) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                         "empty", ex, "SAML signature validation failed");
             }
@@ -573,7 +572,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         private SamlAssertionWrapper samlAssertionWrapper;
         private SecurityTokenProvider<InboundSecurityToken> securityTokenProvider;
         private InboundSecurityToken subjectSecurityToken;
-        private List<SignedElementSecurityEvent> samlTokenSignedElementSecurityEvents = new ArrayList<>();
+        private List<SignedElementSecurityEvent> samlTokenSignedElementSecurityEvents = new ArrayList<SignedElementSecurityEvent>();
         private SignedPartSecurityEvent bodySignedPartSecurityEvent;
 
         SAMLTokenVerifierInputProcessor(XMLSecurityProperties securityProperties, SamlAssertionWrapper samlAssertionWrapper,

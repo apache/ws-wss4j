@@ -568,8 +568,10 @@ public class AttachmentTest extends AbstractTestBase {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
-        encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
-        encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Content"));
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        parts.add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        parts.add(new WSEncryptionPart("cid:Attachments", "Content"));
+        encrypt.setParts(parts);
 
         String attachmentId = UUID.randomUUID().toString();
         final Attachment attachment = new Attachment();
@@ -584,7 +586,7 @@ public class AttachmentTest extends AbstractTestBase {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
         encrypt.prepare(doc, CryptoFactory.getInstance("transmitter-crypto.properties"));
-        Element refs = encrypt.encrypt();
+        Element refs = encrypt.encryptForRef(null, parts);
         encrypt.addAttachmentEncryptedDataElements(secHeader);
         encrypt.addExternalRefElement(refs, secHeader);
         encrypt.prependToHeader(secHeader);

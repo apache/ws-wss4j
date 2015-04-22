@@ -54,13 +54,13 @@ public class SignedElementsBuilder implements AssertionBuilder<Element> {
     }
 
     protected List<XPath> getXPathExpressions(Element element, SPConstants.SPVersion spVersion) {
-        List<XPath> xPaths = new ArrayList<>();
+        List<XPath> xPaths = new ArrayList<XPath>();
 
         Element child = SPUtils.getFirstChildElement(element);
         while (child != null) {
             if (SPConstants.XPATH_EXPR.equals(child.getLocalName())
                     && spVersion.getSPConstants().getXPathExpression().getNamespaceURI().equals(child.getNamespaceURI())) {
-                Map<String, String> declaredNamespaces = new HashMap<>();
+                Map<String, String> declaredNamespaces = new HashMap<String, String>();
                 addDeclaredNamespaces(child, declaredNamespaces);
                 xPaths.add(new XPath(child.getTextContent().trim(), XPath.Version.V1, null, declaredNamespaces));
             }
@@ -70,13 +70,13 @@ public class SignedElementsBuilder implements AssertionBuilder<Element> {
     }
 
     protected List<XPath> getXPath2Expressions(Element element, SPConstants.SPVersion spVersion) {
-        List<XPath> xPaths = new ArrayList<>();
+        List<XPath> xPaths = new ArrayList<XPath>();
 
         Element child = SPUtils.getFirstChildElement(element);
         while (child != null) {
             if (SPConstants.XPATH2_EXPR.equals(child.getLocalName())
                     && spVersion.getSPConstants().getXPath2Expression().getNamespaceURI().equals(child.getNamespaceURI())) {
-                Map<String, String> declaredNamespaces = new HashMap<>();
+                Map<String, String> declaredNamespaces = new HashMap<String, String>();
                 addDeclaredNamespaces(child, declaredNamespaces);
                 String filter = child.getAttributeNS(null, SPConstants.FILTER);
                 if (filter == null || "".equals(filter)) {

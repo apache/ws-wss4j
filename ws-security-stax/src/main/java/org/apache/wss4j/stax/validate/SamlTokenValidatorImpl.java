@@ -33,7 +33,7 @@ import org.apache.wss4j.stax.impl.securityToken.SamlSecurityTokenImpl;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.joda.time.DateTime;
-import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.common.SAMLVersion;
 
 public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implements SamlTokenValidator {
     
@@ -273,9 +273,7 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
      * Validate the samlAssertion against schemas/profiles
      */
     protected void validateAssertion(SamlAssertionWrapper samlAssertion) throws WSSecurityException {
-        if (validateSignatureAgainstProfile) {
-            samlAssertion.validateSignatureAgainstProfile();
-        }
+        samlAssertion.validateAssertion(validateSignatureAgainstProfile);
     }
 
     public boolean isRequireStandardSubjectConfirmationMethod() {

@@ -39,7 +39,7 @@ public class MemoryReplayCache implements ReplayCache {
     
     public static final long DEFAULT_TTL = 60L * 5L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
-    private final SortedMap<Date, List<String>> cache = new TreeMap<>();
+    private final SortedMap<Date, List<String>> cache = new TreeMap<Date, List<String>>();
     private final Set<String> ids = Collections.synchronizedSet(new HashSet<String>());
     
     /**
@@ -72,7 +72,7 @@ public class MemoryReplayCache implements ReplayCache {
         synchronized (cache) {
             List<String> list = cache.get(expires);
             if (list == null) {
-                list = new ArrayList<>(1);
+                list = new ArrayList<String>(1);
                 cache.put(expires, list);
             }
             list.add(identifier);

@@ -28,8 +28,6 @@ import java.util.List;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -60,8 +58,7 @@ import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
-import org.apache.xml.security.utils.XMLUtils;
-import org.opensaml.saml.common.SAMLVersion;
+import org.opensaml.common.SAMLVersion;
 import org.w3c.dom.Element;
 
 public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
@@ -406,13 +403,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 }
                 WSSUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
 
-                try {
-                    DocumentBuilder db = XMLUtils.createDocumentBuilder(false);
-                    outputDOMElement(samlAssertionWrapper.toDOM(db.newDocument()), subOutputProcessorChain);
-                } catch (ParserConfigurationException ex) {
-                    LOG.debug("Error writing out SAML Assertion", ex);
-                    throw new XMLSecurityException(ex);
-                }
+                outputDOMElement(samlAssertionWrapper.toDOM(null), subOutputProcessorChain);
                 if (includeSTR) {
                     WSSUtils.updateSecurityHeaderOrder(
                             outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, getAction(), false);                    
@@ -439,7 +430,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             OutputProcessorChain outputProcessorChain, SamlAssertionWrapper samlAssertionWrapper,
             String referenceId, String tokenId) throws XMLStreamException, XMLSecurityException {
 
-        List<XMLSecAttribute> attributes = new ArrayList<>(2);
+        List<XMLSecAttribute> attributes = new ArrayList<XMLSecAttribute>(2);
         WSSecurityTokenConstants.TokenType tokenType = WSSecurityTokenConstants.Saml11Token;
         if (samlAssertionWrapper.getSamlVersion() == SAMLVersion.VERSION_11) {
             attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE));

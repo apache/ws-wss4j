@@ -20,25 +20,26 @@
 package org.apache.wss4j.dom.message;
 
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.wss4j.common.WSEncryptionPart;
-import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoFactory;
-import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.token.X509Security;
-import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.message.token.X509Security;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
@@ -89,27 +90,29 @@ public class SignedBSTTest extends org.junit.Assert {
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setX509Certificate(certs[0]);
 
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         // Add SOAP Body
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 WSConstants.ELEM_BODY, soapNamespace, "Content"
             );
-        sign.getParts().add(encP);
+        parts.add(encP);
         // Add BST
         encP =
             new WSEncryptionPart(
                 WSConstants.BINARY_TOKEN_LN, WSConstants.WSSE_NS, "Element"
             );
         encP.setElement(bst.getElement());
-        sign.getParts().add(encP);
+        parts.add(encP);
+        sign.setParts(parts);
         
         sign.setCustomTokenId(bst.getID());
         sign.setCustomTokenValueType(bst.getValueType());
         sign.prepare(doc, crypto, secHeader);
         
         List<javax.xml.crypto.dsig.Reference> referenceList = 
-            sign.addReferencesToSign(sign.getParts(), secHeader);
+            sign.addReferencesToSign(parts, secHeader);
         sign.computeSignature(referenceList, false, null);
         
         if (LOG.isDebugEnabled()) {
@@ -154,9 +157,8 @@ public class SignedBSTTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        WSHandlerResult results = verify(doc);
-        assertTrue(handler.checkResults(results.getResults(), 
-                                        Collections.singletonList(WSConstants.SIGN)));
+        List<WSSecurityEngineResult> results = verify(doc);
+        assertTrue(handler.checkResults(results, Collections.singletonList(WSConstants.SIGN)));
     }
 
     /**
@@ -166,8 +168,8 @@ public class SignedBSTTest extends org.junit.Assert {
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private WSHandlerResult verify(Document doc) throws Exception {
-        WSHandlerResult results = 
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(doc, null, null, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");

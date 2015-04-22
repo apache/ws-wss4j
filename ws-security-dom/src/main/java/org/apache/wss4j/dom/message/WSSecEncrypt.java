@@ -19,11 +19,30 @@
 
 package org.apache.wss4j.dom.message;
 
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.apache.wss4j.common.ext.Attachment;
+import org.apache.wss4j.common.ext.AttachmentRequestCallback;
+import org.apache.wss4j.common.ext.AttachmentResultCallback;
+import org.apache.wss4j.common.util.AttachmentUtils;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.wss4j.dom.message.token.KerberosSecurity;
+import org.apache.wss4j.dom.message.token.Reference;
+import org.apache.wss4j.dom.message.token.SecurityTokenReference;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.xml.security.algorithms.JCEMapper;
+import org.apache.xml.security.encryption.*;
+import org.apache.xml.security.keys.KeyInfo;
+import org.apache.xml.security.utils.Base64;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -33,33 +52,8 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.wss4j.common.WSEncryptionPart;
-import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.ext.Attachment;
-import org.apache.wss4j.common.ext.AttachmentRequestCallback;
-import org.apache.wss4j.common.ext.AttachmentResultCallback;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.token.Reference;
-import org.apache.wss4j.common.token.SecurityTokenReference;
-import org.apache.wss4j.common.util.AttachmentUtils;
-import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WsuIdAllocator;
-import org.apache.wss4j.dom.message.token.KerberosSecurity;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.xml.security.algorithms.JCEMapper;
-import org.apache.xml.security.encryption.EncryptedData;
-import org.apache.xml.security.encryption.XMLCipher;
-import org.apache.xml.security.encryption.XMLEncryptionException;
-import org.apache.xml.security.keys.KeyInfo;
-import org.apache.xml.security.utils.Base64;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
+import java.security.cert.X509Certificate;
+import java.util.*;
 
 /**
  * Encrypts a parts of a message according to WS Specification, X509 profile,
@@ -98,6 +92,23 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         super();
     }
     
+    public WSSecEncrypt(WSSConfig config) {
+        super(config);
+    }
+    
+    /**
+     * Sets the algorithm to encode the symmetric key.
+     * 
+     * Default is the <code>WSConstants.KEYTRANSPORT_RSAOEP</code> algorithm.
+     * 
+     * @param keyEnc specifies the key encoding algorithm.
+     * @see WSConstants#KEYTRANSPORT_RSA15
+     * @see WSConstants#KEYTRANSPORT_RSAOEP
+     */
+    public void setKeyEnc(String keyEnc) {
+        keyEncAlgo = keyEnc;
+    }
+
     /**
      * Initialize a WSSec Encrypt.
      * 
@@ -114,27 +125,30 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      */
     public void prepare(Document doc, Crypto crypto) throws WSSecurityException {
         document = doc;
-        attachmentEncryptedDataElements = new ArrayList<>();
 
         //
-        // Set up the symmetric key
+        // If no external key (symmetricalKey) was set generate an encryption
+        // key (session key) for this Encrypt element. This key will be
+        // encrypted using the public key of the receiver
         //
-        if (symmetricKey == null) {
-            if (getEphemeralKey() != null) {
-                symmetricKey = 
-                    KeyUtils.prepareSecretKey(getSymmetricEncAlgorithm(), getEphemeralKey());
-            } else {
-                KeyGenerator keyGen = KeyUtils.getKeyGenerator(getSymmetricEncAlgorithm());
+        if (ephemeralKey == null) {
+            if (symmetricKey == null) {
+                KeyGenerator keyGen = getKeyGenerator();
                 symmetricKey = keyGen.generateKey();
-            }
+            } 
+            ephemeralKey = symmetricKey.getEncoded();
         }
+
+        attachmentEncryptedDataElements = new ArrayList<Element>();
+        
+        symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, ephemeralKey);
         
         //
         // Get the certificate that contains the public key for the public key
         // algorithm that will encrypt the generated symmetric (session) key.
         //
         if (encryptSymmKey) {
-            X509Certificate remoteCert = getUseThisCert();
+            X509Certificate remoteCert = useThisCert;
             if (remoteCert == null) {
                 CryptoType cryptoType = null;
                 if (keyIdentifierType == WSConstants.ENDPOINT_KEY_IDENTIFIER) {
@@ -155,7 +169,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             }
             prepareInternal(symmetricKey, remoteCert, crypto);
         } else {
-            encryptedEphemeralKey = symmetricKey.getEncoded();
+            encryptedEphemeralKey = ephemeralKey;
         }
     }
     
@@ -181,32 +195,42 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
         prepare(doc, crypto);
         
+        if (envelope == null) {
+            envelope = document.getDocumentElement();
+        }
+        
+        if (parts == null) {
+            parts = new ArrayList<WSEncryptionPart>(1);
+            String soapNamespace = WSSecurityUtil.getSOAPNamespace(envelope);
+            WSEncryptionPart encP = 
+                new WSEncryptionPart(
+                    WSConstants.ELEM_BODY, 
+                    soapNamespace, 
+                    "Content"
+                );
+            parts.add(encP);
+        }
+
         if (doDebug) {
             LOG.debug("Beginning Encryption...");
         }
         
-        Element refs = encrypt();
+        Element refs = encryptForRef(null, parts);
 
         addAttachmentEncryptedDataElements(secHeader);
-        if (getEncryptedKeyElement() != null) {
+        if (encryptedKeyElement != null) {
             addInternalRefElement(refs);
             prependToHeader(secHeader); 
         } else {
             addExternalRefElement(refs, secHeader);
         }
 
-        prependBSTElementToHeader(secHeader);
+        if (bstToken != null) {
+            prependBSTElementToHeader(secHeader);
+        }
 
         LOG.debug("Encryption complete.");
         return doc;
-    }
-    
-    public Element encrypt() throws WSSecurityException {
-        if (getParts().isEmpty()) {
-            getParts().add(WSSecurityUtil.getDefaultEncryptionPart(document));
-        }
-        
-        return encryptForRef(null, getParts());
     }
     
     /**
@@ -234,6 +258,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         Element dataRef, 
         List<WSEncryptionPart> references
     ) throws WSSecurityException {
+
         KeyInfo keyInfo = createKeyInfo();
         //the sun/oracle jce provider doesn't like a foreign SecretKey impl.
         //this occurs e.g. with a kerberos session-key. It doesn't matter for the bouncy-castle provider
@@ -241,8 +266,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         SecretKeySpec secretKeySpec = new SecretKeySpec(symmetricKey.getEncoded(), symmetricKey.getAlgorithm());
         List<String> encDataRefs = 
             doEncryption(
-                document, getIdAllocator(), keyInfo, secretKeySpec, getSymmetricEncAlgorithm(), references, 
-                    callbackLookup, attachmentCallbackHandler, attachmentEncryptedDataElements
+                document, getWsConfig(), keyInfo, secretKeySpec, symEncAlgo, references, callbackLookup,
+                    attachmentCallbackHandler, attachmentEncryptedDataElements
             );
         if (dataRef == null) {
             dataRef = 
@@ -255,7 +280,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             // then add the ENC namespace
             //
             if (!encryptSymmKey) {
-                XMLUtils.setNamespace(
+                WSSecurityUtil.setNamespace(
                     dataRef, WSConstants.ENC_NS, WSConstants.ENC_PREFIX
                 );
             }
@@ -273,7 +298,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * @param dataRef The internal <code>enc:Reference</code> element
      */
     public void addInternalRefElement(Element dataRef) {
-        getEncryptedKeyElement().appendChild(dataRef);
+        encryptedKeyElement.appendChild(dataRef);
     }
 
     /**
@@ -304,7 +329,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     /**
      * Perform encryption on the SOAP envelope.
      * @param doc The document containing the SOAP envelope as document element
-     * @param idAllocator A WsuIdAllocator used to generate wsu:ID's
+     * @param config The WSSConfig from which to generate wsu:ID's
      * @param keyInfo The KeyInfo object to set in EncryptedData
      * @param secretKey The SecretKey object with which to encrypt data
      * @param encryptionAlgorithm The encryption algorithm URI to use
@@ -314,7 +339,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      */
     public static List<String> doEncryption(
         Document doc,
-        WsuIdAllocator idAllocator,
+        WSSConfig config,
         KeyInfo keyInfo,
         SecretKey secretKey,
         String encryptionAlgorithm,
@@ -322,13 +347,13 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         CallbackLookup callbackLookup
     ) throws WSSecurityException {
         return doEncryption(
-                doc, idAllocator, keyInfo, secretKey, encryptionAlgorithm,
+                doc, config, keyInfo, secretKey, encryptionAlgorithm,
                 references, callbackLookup, null, null);
     }
 
     public static List<String> doEncryption(
             Document doc,
-            WsuIdAllocator idAllocator,
+            WSSConfig config,
             KeyInfo keyInfo,
             SecretKey secretKey,
             String encryptionAlgorithm,
@@ -347,7 +372,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             );
         }
 
-        List<String> encDataRef = new ArrayList<>();
+        List<String> encDataRef = new ArrayList<String>();
         WSEncryptionPart attachmentEncryptionPart = null;
         for (int part = 0; part < references.size(); part++) {
             WSEncryptionPart encPart = references.get(part);
@@ -377,7 +402,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
             for (Element elementToEncrypt : elementsToEncrypt) {
                 String id = 
-                    encryptElement(doc, elementToEncrypt, encPart.getEncModifier(), idAllocator, xmlCipher,
+                    encryptElement(doc, elementToEncrypt, encPart.getEncModifier(), config, xmlCipher,
                                    secretKey, keyInfo);
                 encPart.setEncId(id);
                 encDataRef.add("#" + id);
@@ -399,8 +424,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
             if (attachmentCallbackHandler == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE,
-                    "empty", "no attachment callbackhandler supplied"
+                        WSSecurityException.ErrorCode.FAILURE,
+                        "empty", "no attachment callbackhandler supplied"
                 );
             }
 
@@ -411,37 +436,41 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
             } catch (Exception e) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e
+                        WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e
                 );
             }
-            String attachmentEncryptedDataType = WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY;
+            String attachmentEncryptedDataType;
             if ("Element".equals(attachmentEncryptionPart.getEncModifier())) {
                 attachmentEncryptedDataType = WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE;
+            } else {
+                attachmentEncryptedDataType = WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY;
             }
 
-            for (Attachment attachment : attachmentRequestCallback.getAttachments()) {
+            List<Attachment> attachments = attachmentRequestCallback.getAttachments();
+            for (int i = 0; i < attachments.size(); i++) {
+                Attachment attachment = attachments.get(i);
 
                 final String attachmentId = attachment.getId();
-                String encEncryptedDataId = idAllocator.createId("ED-", attachmentId);
+                String encEncryptedDataId = config.getIdAllocator().createId("ED-", attachmentId);
                 encDataRef.add("#" + encEncryptedDataId);
 
                 Element encryptedData =
-                    doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptedData");
+                        doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptedData");
                 encryptedData.setAttributeNS(null, "Id", encEncryptedDataId);
                 encryptedData.setAttributeNS(null, "MimeType", attachment.getMimeType());
                 encryptedData.setAttributeNS(null, "Type", attachmentEncryptedDataType);
 
                 Element encryptionMethod =
-                    doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptionMethod");
+                        doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptionMethod");
                 encryptionMethod.setAttributeNS(null, "Algorithm", encryptionAlgorithm);
 
                 encryptedData.appendChild(encryptionMethod);
                 encryptedData.appendChild(keyInfo.getElement());
 
                 Element cipherData =
-                    doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":CipherData");
+                        doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":CipherData");
                 Element cipherReference =
-                    doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":CipherReference");
+                        doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":CipherReference");
                 cipherReference.setAttributeNS(null, "URI", "cid:" + attachmentId);
 
                 Element transforms = doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":Transforms");
@@ -466,8 +495,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
                     // The Spec mandates a 96-bit IV for GCM algorithms
                     if (XMLCipher.AES_128_GCM.equals(encryptionAlgorithm)
-                        || XMLCipher.AES_192_GCM.equals(encryptionAlgorithm)
-                        || XMLCipher.AES_256_GCM.equals(encryptionAlgorithm)) {
+                            || XMLCipher.AES_192_GCM.equals(encryptionAlgorithm)
+                            || XMLCipher.AES_256_GCM.equals(encryptionAlgorithm)) {
                         byte[] temp = WSSecurityUtil.generateNonce(12);
                         IvParameterSpec paramSpec = new IvParameterSpec(temp);
                         cipher.init(Cipher.ENCRYPT_MODE, secretKey, paramSpec);
@@ -478,12 +507,15 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
                 }
 
-                Map<String, String> headers = new HashMap<>(attachment.getHeaders());
+                Map<String, String> headers = new HashMap<String, String>();
+                headers.putAll(attachment.getHeaders());
                 resultAttachment.setSourceStream(
-                    AttachmentUtils.setupAttachmentEncryptionStream(
-                        cipher, "Element".equals(attachmentEncryptionPart.getEncModifier()),
-                        attachment, headers
-                    )
+                        AttachmentUtils.setupAttachmentEncryptionStream(
+                                cipher,
+                                "Element".equals(attachmentEncryptionPart.getEncModifier()),
+                                attachment,
+                                headers
+                        )
                 );
                 resultAttachment.addHeaders(headers);
 
@@ -508,7 +540,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         Document doc,
         Element elementToEncrypt,
         String modifier,
-        WsuIdAllocator idAllocator,
+        WSSConfig config,
         XMLCipher xmlCipher,
         SecretKey secretKey,
         KeyInfo keyInfo
@@ -518,7 +550,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         //
         // Encrypt data, and set necessary attributes in xenc:EncryptedData
         //
-        String xencEncryptedDataId = idAllocator.createId("ED-", elementToEncrypt);
+        String xencEncryptedDataId = 
+            config.getIdAllocator().createId("ED-", elementToEncrypt);
         try {
             String headerId = "";
             if ("Header".equals(modifier) 
@@ -527,10 +560,10 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                     doc.createElementNS(
                         WSConstants.WSSE11_NS, "wsse11:" + WSConstants.ENCRYPTED_HEADER
                     );
-                XMLUtils.setNamespace(elem, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
+                WSSecurityUtil.setNamespace(elem, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
                 String wsuPrefix = 
-                    XMLUtils.setNamespace(elem, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
-                headerId = idAllocator.createId("EH-", elementToEncrypt);
+                    WSSecurityUtil.setNamespace(elem, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+                headerId = config.getIdAllocator().createId("EH-", elementToEncrypt);
                 elem.setAttributeNS(
                     WSConstants.WSU_NS, wsuPrefix + ":Id", headerId
                 );
@@ -549,7 +582,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                     if (attr.getNamespaceURI().equals(WSConstants.URI_SOAP11_ENV)
                         || attr.getNamespaceURI().equals(WSConstants.URI_SOAP12_ENV)) {                         
                         String soapEnvPrefix = 
-                            XMLUtils.setNamespace(
+                            WSSecurityUtil.setNamespace(
                                 elem, attr.getNamespaceURI(), WSConstants.DEFAULT_SOAP_PREFIX
                             );
                         elem.setAttributeNS(
@@ -588,7 +621,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             if (customReferenceValue != null) {
                 secToken.setKeyIdentifierEncKeySHA1(customReferenceValue);
             } else {
-                byte[] encodedBytes = KeyUtils.generateDigest(encryptedEphemeralKey);
+                byte[] encodedBytes = WSSecurityUtil.generateDigest(encryptedEphemeralKey);
                 secToken.setKeyIdentifierEncKeySHA1(Base64.encode(encodedBytes));
             }
             secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
@@ -597,19 +630,19 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             SecurityTokenReference secToken = new SecurityTokenReference(document);
             secToken.addWSSENamespace();
             secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
-            secToken.setKeyIdentifier(WSConstants.WSS_SAML_KI_VALUE_TYPE, getId());
+            secToken.setKeyIdentifier(WSConstants.WSS_SAML_KI_VALUE_TYPE, encKeyId);
             keyInfo.addUnknownElement(secToken.getElement());
         } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customReferenceValue)) {
             SecurityTokenReference secToken = new SecurityTokenReference(document);
             secToken.addWSSENamespace();
             secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
-            secToken.setKeyIdentifier(WSConstants.WSS_SAML2_KI_VALUE_TYPE, getId());
+            secToken.setKeyIdentifier(WSConstants.WSS_SAML2_KI_VALUE_TYPE, encKeyId);
             keyInfo.addUnknownElement(secToken.getElement());
         } else if (WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(customReferenceValue)) {
             SecurityTokenReference secToken = new SecurityTokenReference(document);
             secToken.addWSSENamespace();
             secToken.addTokenType(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
-            secToken.setKeyIdentifier(customReferenceValue, getId(), true);
+            secToken.setKeyIdentifier(customReferenceValue, encKeyId, true);
             keyInfo.addUnknownElement(secToken.getElement());
         } else if (securityTokenReference != null) {
             Element tmpE = securityTokenReference.getElement();
@@ -617,14 +650,14 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 WSConstants.XMLNS_NS, "xmlns:" + tmpE.getPrefix(), tmpE.getNamespaceURI()
             );
             keyInfo.addUnknownElement(securityTokenReference.getElement());
-        } else if (getId() != null) {
+        } else if (encKeyId != null) {
             SecurityTokenReference secToken = new SecurityTokenReference(document);
             secToken.addWSSENamespace();
             Reference ref = new Reference(document);
             if (encKeyIdDirectId) {
-                ref.setURI(getId());
+                ref.setURI(encKeyId);
             } else {
-                ref.setURI("#" + getId());                    
+                ref.setURI("#" + encKeyId);                    
             }
             if (customReferenceValue != null) {
                 ref.setValueType(customReferenceValue);

@@ -28,12 +28,12 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
+import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.stax.ConfigurationConverter;
 import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.InboundWSSec;
@@ -53,13 +53,13 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opensaml.core.xml.XMLObjectBuilder;
-import org.opensaml.core.xml.XMLObjectBuilderFactory;
-import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
-import org.opensaml.core.xml.schema.XSAny;
-import org.opensaml.saml.common.SAMLObjectBuilder;
-import org.opensaml.saml.saml2.core.AttributeValue;
-import org.opensaml.saml.saml2.core.Conditions;
+import org.opensaml.Configuration;
+import org.opensaml.common.SAMLObjectBuilder;
+import org.opensaml.saml2.core.AttributeValue;
+import org.opensaml.saml2.core.Conditions;
+import org.opensaml.xml.XMLObjectBuilder;
+import org.opensaml.xml.XMLObjectBuilderFactory;
+import org.opensaml.xml.schema.XSAny;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -750,7 +750,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             callbackHandler.setSamlVersion(Version.SAML_20);
 
             // Create and add a custom Attribute (conditions Object)
-            XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
+            XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
 
             SAMLObjectBuilder<Conditions> conditionsV2Builder =
                     (SAMLObjectBuilder<Conditions>) builderFactory.getBuilder(Conditions.DEFAULT_ELEMENT_NAME);
@@ -759,8 +759,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             conditions.setNotBefore(newNotBefore);
             conditions.setNotOnOrAfter(newNotBefore.plusMinutes(5));
 
-            XMLObjectBuilder<XSAny> xsAnyBuilder = 
-                (XMLObjectBuilder<XSAny>)builderFactory.getBuilder(XSAny.TYPE_NAME);
+            XMLObjectBuilder<XSAny> xsAnyBuilder = builderFactory.getBuilder(XSAny.TYPE_NAME);
             XSAny attributeValue = xsAnyBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             attributeValue.getUnknownXMLObjects().add(conditions);
 

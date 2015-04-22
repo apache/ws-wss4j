@@ -35,7 +35,7 @@ import java.util.List;
 public class SupportingTokens extends AbstractSecurityAssertion implements PolicyContainingAssertion {
 
     private SupportingTokenType supportingTokenType;
-    private final List<AbstractToken> tokens = new ArrayList<>();
+    private final List<AbstractToken> tokens = new ArrayList<AbstractToken>();
     private AlgorithmSuite algorithmSuite;
     private SignedParts signedParts;
     private SignedElements signedElements;

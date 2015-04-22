@@ -16,12 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.common.bsp;
+package org.apache.wss4j.dom.bsp;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 
 /**
@@ -40,7 +41,7 @@ public class BSPEnforcer {
     }
     
     public BSPEnforcer(List<BSPRule> bspRules) {
-        ignoredBSPRules = new ArrayList<>(bspRules);
+        ignoredBSPRules = new ArrayList<BSPRule>(bspRules);
     }
     
     public BSPEnforcer(boolean disableBSPRules) {
@@ -62,7 +63,7 @@ public class BSPEnforcer {
     }
 
     public void setIgnoredBSPRules(List<BSPRule> bspRules) {
-        ignoredBSPRules = new ArrayList<>(bspRules);
+        ignoredBSPRules = new ArrayList<BSPRule>(bspRules);
     }
     
     public void setDisableBSPRules(boolean disableBSPRules) {

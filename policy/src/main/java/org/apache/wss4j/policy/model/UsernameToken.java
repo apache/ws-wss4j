@@ -32,7 +32,7 @@ public class UsernameToken extends AbstractToken {
         NoPassword,
         HashPassword;
 
-        private static final Map<String, PasswordType> lookup = new HashMap<>();
+        private static final Map<String, PasswordType> lookup = new HashMap<String, PasswordType>();
 
         static {
             for (PasswordType u : EnumSet.allOf(PasswordType.class))
@@ -48,7 +48,7 @@ public class UsernameToken extends AbstractToken {
         WssUsernameToken10,
         WssUsernameToken11;
 
-        private static final Map<String, UsernameTokenType> lookup = new HashMap<>();
+        private static final Map<String, UsernameTokenType> lookup = new HashMap<String, UsernameTokenType>();
 
         static {
             for (UsernameTokenType u : EnumSet.allOf(UsernameTokenType.class))

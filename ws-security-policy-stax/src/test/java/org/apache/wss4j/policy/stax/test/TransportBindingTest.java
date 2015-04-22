@@ -56,7 +56,7 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
 
         RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
-        List<QName> headerPath = new ArrayList<>();
+        List<QName> headerPath = new ArrayList<QName>();
         headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         headerPath.add(WSSConstants.TAG_wsu_Timestamp);
         requiredElementSecurityEvent.setElementPath(headerPath);
@@ -72,18 +72,18 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
         operationSecurityEvent.setOperation(new QName("definitions"));
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, protectionOrder);
-        headerPath = new ArrayList<>();
+        headerPath = new ArrayList<QName>();
         headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         headerPath.add(WSSConstants.TAG_dsig_Signature);
         requiredElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
         encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, protectionOrder);
-        headerPath = new ArrayList<>();
+        headerPath = new ArrayList<QName>();
         headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         headerPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
         requiredElementSecurityEvent.setElementPath(headerPath);
@@ -152,7 +152,7 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
 
         RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
-        List<QName> headerPath = new ArrayList<>();
+        List<QName> headerPath = new ArrayList<QName>();
         headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         headerPath.add(WSSConstants.TAG_wsu_Timestamp);
         requiredElementSecurityEvent.setElementPath(headerPath);
@@ -164,11 +164,11 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, false, protectionOrder);
-        headerPath = new ArrayList<>();
+        headerPath = new ArrayList<QName>();
         headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         headerPath.add(WSSConstants.TAG_dsig_Signature);
         encryptedElementSecurityEvent.setElementPath(headerPath);
@@ -199,7 +199,7 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
 
         RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
-        List<QName> headerPath = new ArrayList<>();
+        List<QName> headerPath = new ArrayList<QName>();
         headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         headerPath.add(WSSConstants.TAG_wsu_Timestamp);
         requiredElementSecurityEvent.setElementPath(headerPath);
@@ -211,18 +211,18 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, protectionOrder);
-        headerPath = new ArrayList<>();
+        headerPath = new ArrayList<QName>();
         headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         headerPath.add(WSSConstants.TAG_dsig_Signature);
         encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
         encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, protectionOrder);
-        headerPath = new ArrayList<>();
+        headerPath = new ArrayList<QName>();
         headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         headerPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
         encryptedElementSecurityEvent.setElementPath(headerPath);

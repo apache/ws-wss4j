@@ -43,7 +43,7 @@ import java.util.*;
 
 public class TokenProtectionTest extends AbstractPolicyTestBase {
 
-    private static List<WSSecurityTokenConstants.TokenUsage> tokenUsages = new ArrayList<>();
+    private static List<WSSecurityTokenConstants.TokenUsage> tokenUsages = new ArrayList<WSSecurityTokenConstants.TokenUsage>();
 
     static {
         tokenUsages.add(WSSecurityTokenConstants.TokenUsage_Signature);
@@ -75,18 +75,18 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
                         "</sp:AsymmetricBinding>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
-        List<QName> bstPath = new ArrayList<>();
+        List<QName> bstPath = new ArrayList<QName>();
         bstPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         bstPath.add(WSSConstants.TAG_wsse_BinarySecurityToken);
 
-        List<QName> sigPath = new ArrayList<>();
+        List<QName> sigPath = new ArrayList<QName>();
         sigPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         sigPath.add(WSSConstants.TAG_dsig_Signature);
 
-        List<SecurityToken> securityTokens = new LinkedList<>();
+        List<SecurityToken> securityTokens = new LinkedList<SecurityToken>();
 
         for (int i = 0; i < tokenUsages.size(); i++) {
             WSSecurityTokenConstants.TokenUsage tokenUsage = tokenUsages.get(i);
@@ -154,18 +154,18 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
                         "</sp:AsymmetricBinding>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
-        List<QName> bstPath = new ArrayList<>();
+        List<QName> bstPath = new ArrayList<QName>();
         bstPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         bstPath.add(WSSConstants.TAG_wsse_BinarySecurityToken);
 
-        List<QName> sigPath = new ArrayList<>();
+        List<QName> sigPath = new ArrayList<QName>();
         sigPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         sigPath.add(WSSConstants.TAG_dsig_Signature);
 
-        List<SecurityToken> securityTokens = new LinkedList<>();
+        List<SecurityToken> securityTokens = new LinkedList<SecurityToken>();
 
         for (int i = 0; i < tokenUsages.size(); i++) {
             WSSecurityTokenConstants.TokenUsage tokenUsage = tokenUsages.get(i);
@@ -235,7 +235,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
 
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
         X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
-        List<QName> path = new ArrayList<>();
+        List<QName> path = new ArrayList<QName>();
         path.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         path.add(WSSConstants.TAG_wsse_BinarySecurityToken);
         securityToken.setElementPath(path);
@@ -243,7 +243,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
         SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(securityToken, false, protectionOrder);
@@ -281,7 +281,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
 
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
         X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
-        List<QName> path = new ArrayList<>();
+        List<QName> path = new ArrayList<QName>();
         path.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         path.add(WSSConstants.TAG_wsse_BinarySecurityToken);
         securityToken.setElementPath(path);
@@ -289,7 +289,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
         SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(getX509Token(WSSecurityTokenConstants.X509V3Token), false, protectionOrder);
@@ -327,14 +327,14 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
 
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
         X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
-        List<QName> path = new ArrayList<>();
+        List<QName> path = new ArrayList<QName>();
         path.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         path.add(WSSConstants.TAG_wsse_BinarySecurityToken);
         securityToken.setElementPath(path);
         securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
         SignedElementSecurityEvent signedElementSecurityEvent = new SignedElementSecurityEvent(getX509Token(WSSecurityTokenConstants.X509V3Token), false, protectionOrder);
@@ -372,14 +372,14 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
                         "</sp:AsymmetricBinding>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
-        List<QName> bstPath = new ArrayList<>();
+        List<QName> bstPath = new ArrayList<QName>();
         bstPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         bstPath.add(WSSConstants.TAG_wsse_BinarySecurityToken);
 
-        List<SecurityToken> securityTokens = new LinkedList<>();
+        List<SecurityToken> securityTokens = new LinkedList<SecurityToken>();
 
         for (int i = 0; i < tokenUsages.size(); i++) {
             WSSecurityTokenConstants.TokenUsage tokenUsage = tokenUsages.get(i);
@@ -448,14 +448,14 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
                         "</sp:AsymmetricBinding>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
-        List<QName> bstPath = new ArrayList<>();
+        List<QName> bstPath = new ArrayList<QName>();
         bstPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         bstPath.add(WSSConstants.TAG_wsse_BinarySecurityToken);
 
-        List<QName> sigPath = new ArrayList<>();
+        List<QName> sigPath = new ArrayList<QName>();
         sigPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         sigPath.add(WSSConstants.TAG_dsig_Signature);
 
@@ -510,18 +510,18 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
                         "</sp:SymmetricBinding>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
-        List<QName> bstPath = new ArrayList<>();
+        List<QName> bstPath = new ArrayList<QName>();
         bstPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         bstPath.add(WSSConstants.TAG_wsse_BinarySecurityToken);
 
-        List<QName> ekPath = new ArrayList<>();
+        List<QName> ekPath = new ArrayList<QName>();
         ekPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         ekPath.add(WSSConstants.TAG_xenc_EncryptedKey);
 
-        List<QName> sigPath = new ArrayList<>();
+        List<QName> sigPath = new ArrayList<QName>();
         sigPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         sigPath.add(WSSConstants.TAG_dsig_Signature);
 
@@ -577,18 +577,18 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
                         "</sp:SymmetricBinding>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
-        List<QName> bstPath = new ArrayList<>();
+        List<QName> bstPath = new ArrayList<QName>();
         bstPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         bstPath.add(WSSConstants.TAG_wsse_BinarySecurityToken);
 
-        List<QName> ekPath = new ArrayList<>();
+        List<QName> ekPath = new ArrayList<QName>();
         ekPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         ekPath.add(WSSConstants.TAG_xenc_EncryptedKey);
 
-        List<QName> sigPath = new ArrayList<>();
+        List<QName> sigPath = new ArrayList<QName>();
         sigPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         sigPath.add(WSSConstants.TAG_dsig_Signature);
 
@@ -650,18 +650,18 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
                         "</sp:SymmetricBinding>";
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
 
-        List<QName> bstPath = new ArrayList<>();
+        List<QName> bstPath = new ArrayList<QName>();
         bstPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         bstPath.add(WSSConstants.TAG_wsse_BinarySecurityToken);
 
-        List<QName> ekPath = new ArrayList<>();
+        List<QName> ekPath = new ArrayList<QName>();
         ekPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         ekPath.add(WSSConstants.TAG_xenc_EncryptedKey);
 
-        List<QName> sigPath = new ArrayList<>();
+        List<QName> sigPath = new ArrayList<QName>();
         sigPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         sigPath.add(WSSConstants.TAG_dsig_Signature);
 

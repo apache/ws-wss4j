@@ -19,7 +19,7 @@
 
 package org.apache.wss4j.dom.message.token;
 
-import org.apache.wss4j.common.bsp.BSPEnforcer;
+import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 
 /**

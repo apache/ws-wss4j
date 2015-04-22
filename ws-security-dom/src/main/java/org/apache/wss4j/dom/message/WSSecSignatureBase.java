@@ -40,6 +40,7 @@ import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
+import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.transform.AttachmentTransformParameterSpec;
 import org.apache.wss4j.dom.transform.STRTransform;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -61,6 +62,10 @@ public class WSSecSignatureBase extends WSSecBase {
         super();
     }
     
+    public WSSecSignatureBase(WSSConfig config) {
+        super(config);
+    }
+    
     /**
      * This method adds references to the Signature.
      * 
@@ -79,7 +84,7 @@ public class WSSecSignatureBase extends WSSecBase {
         WSDocInfo wsDocInfo,
         XMLSignatureFactory signatureFactory,
         WSSecHeader secHeader,
-        boolean addInclusivePrefixes,
+        WSSConfig wssConfig,
         String digestAlgo
     ) throws WSSecurityException {
         DigestMethod digestMethod;
@@ -94,9 +99,77 @@ public class WSSecSignatureBase extends WSSecBase {
 
         //create separate list for attachment and append it after same document references
         //are processed.
-        List<javax.xml.crypto.dsig.Reference> attachmentReferenceList = null;
-        List<javax.xml.crypto.dsig.Reference> referenceList = new ArrayList<>();
-        
+        List<javax.xml.crypto.dsig.Reference> attachmentReferenceList = new ArrayList<javax.xml.crypto.dsig.Reference>();
+
+        for (WSEncryptionPart encPart : references) {
+            if (encPart.getId() != null && encPart.getId().startsWith("cid:")) {
+
+                if (attachmentCallbackHandler == null) {
+                    throw new WSSecurityException(
+                            WSSecurityException.ErrorCode.FAILURE,
+                            "empty", "no attachment callbackhandler supplied"
+                    );
+                }
+
+                AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
+                //no mime type must be set for signature:
+                //attachmentCallback.setResultingMimeType(null);
+                String id = encPart.getId().substring(4);
+                attachmentRequestCallback.setAttachmentId(id);
+                try {
+                    attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
+                } catch (Exception e) {
+                    throw new WSSecurityException(
+                            WSSecurityException.ErrorCode.FAILURE, e
+                    );
+                }
+                List<Attachment> attachments = attachmentRequestCallback.getAttachments();
+                for (int i = 0; i < attachments.size(); i++) {
+                    Attachment attachment = attachments.get(i);
+
+                    try {
+                        List<Transform> transforms = new ArrayList<Transform>();
+
+                        AttachmentTransformParameterSpec attachmentTransformParameterSpec =
+                                new AttachmentTransformParameterSpec(
+                                        attachmentCallbackHandler,
+                                        attachment
+                                        );
+
+                        String attachmentSignatureTransform;
+                        if ("Element".equals(encPart.getEncModifier())) {
+                            attachmentSignatureTransform = WSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS;
+                        } else {
+                            attachmentSignatureTransform = WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS;
+                        }
+
+                        transforms.add(
+                                signatureFactory.newTransform(
+                                        attachmentSignatureTransform,
+                                        attachmentTransformParameterSpec)
+                        );
+
+                        javax.xml.crypto.dsig.Reference reference =
+                                signatureFactory.newReference("cid:" + attachment.getId(),
+                                        digestMethod,
+                                        transforms,
+                                        null,
+                                        null
+                                );
+
+                        attachmentReferenceList.add(reference);
+                    } catch (InvalidAlgorithmParameterException e) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+                    } catch (NoSuchAlgorithmException e) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+                    }
+                }
+                break;
+            }
+        }
+
+        List<javax.xml.crypto.dsig.Reference> referenceList = new ArrayList<javax.xml.crypto.dsig.Reference>();
+
         for (WSEncryptionPart encPart : references) {
             String idToSign = encPart.getId();
             String elemName = encPart.getName();
@@ -107,9 +180,8 @@ public class WSSecSignatureBase extends WSSecBase {
             // names: "STRTransform": Setup the ds:Reference to use STR Transform
             //
             try {
-                if ("cid:Attachments".equals(idToSign) && attachmentReferenceList == null) {
-                    attachmentReferenceList = 
-                        addAttachmentReferences(encPart, digestMethod, signatureFactory);
+                //attachments are already processed in the above loop
+                if ("cid:Attachments".equals(idToSign)) {
                     continue;
                 }
                 if (idToSign != null) {
@@ -131,7 +203,7 @@ public class WSSecSignatureBase extends WSSecBase {
                             }
                             element = callbackLookup.getElement(idToSign, null, false);
                         }
-                        if (addInclusivePrefixes) {
+                        if (wssConfig.isAddInclusivePrefixes()) {
                             List<String> prefixes = getInclusivePrefixes(element);
                             transformSpec = new ExcC14NParameterSpec(prefixes);
                         }
@@ -178,7 +250,7 @@ public class WSSecSignatureBase extends WSSecBase {
                     }
                     for (Element elementToSign : elementsToSign) {
                         TransformParameterSpec transformSpec = null;
-                        if (addInclusivePrefixes) {
+                        if (wssConfig.isAddInclusivePrefixes()) {
                             List<String> prefixes = getInclusivePrefixes(elementToSign);
                             transformSpec = new ExcC14NParameterSpec(prefixes);
                         }
@@ -206,70 +278,9 @@ public class WSSecSignatureBase extends WSSecBase {
                 );
             }
         }
-        
         //append attachment references now
-        if (attachmentReferenceList != null) {
-            referenceList.addAll(attachmentReferenceList);
-        }
+        referenceList.addAll(attachmentReferenceList);
         return referenceList;
-    }
-    
-    private List<javax.xml.crypto.dsig.Reference> addAttachmentReferences(
-        WSEncryptionPart encPart, 
-        DigestMethod digestMethod,
-        XMLSignatureFactory signatureFactory
-    ) throws WSSecurityException {
-
-        if (attachmentCallbackHandler == null) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE,
-                "empty", "no attachment callbackhandler supplied"
-            );
-        }
-
-        AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
-        //no mime type must be set for signature:
-        //attachmentCallback.setResultingMimeType(null);
-        String id = encPart.getId().substring(4);
-        attachmentRequestCallback.setAttachmentId(id);
-        try {
-            attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
-        } catch (Exception e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-        }
-        
-        List<javax.xml.crypto.dsig.Reference> attachmentReferenceList = new ArrayList<>();
-        for (Attachment attachment : attachmentRequestCallback.getAttachments()) {
-            try {
-                List<Transform> transforms = new ArrayList<>();
-
-                AttachmentTransformParameterSpec attachmentTransformParameterSpec =
-                    new AttachmentTransformParameterSpec(
-                        attachmentCallbackHandler, attachment
-                    );
-
-                String attachmentSignatureTransform = WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS;
-                if ("Element".equals(encPart.getEncModifier())) {
-                    attachmentSignatureTransform = WSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS;
-                }
-
-                transforms.add(
-                    signatureFactory.newTransform(
-                        attachmentSignatureTransform, attachmentTransformParameterSpec)
-                    );
-
-                javax.xml.crypto.dsig.Reference reference =
-                    signatureFactory.newReference(
-                        "cid:" + attachment.getId(), digestMethod, transforms, null, null
-                    );
-
-                attachmentReferenceList.add(reference);
-            } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-            }
-        }
-        
-        return attachmentReferenceList;
     }
     
     /**
@@ -284,7 +295,7 @@ public class WSSecSignatureBase extends WSSecBase {
      * Get the List of inclusive prefixes from the DOM Element argument 
      */
     public List<String> getInclusivePrefixes(Element target, boolean excludeVisible) {
-        List<String> result = new ArrayList<>();
+        List<String> result = new ArrayList<String>();
         Node parent = target;
         while (parent.getParentNode() != null &&
             !(Node.DOCUMENT_NODE == parent.getParentNode().getNodeType())) {

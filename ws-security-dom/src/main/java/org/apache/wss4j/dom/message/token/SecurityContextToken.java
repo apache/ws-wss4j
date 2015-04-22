@@ -22,10 +22,11 @@ package org.apache.wss4j.dom.message.token;
 import javax.xml.namespace.QName;
 
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -43,6 +44,8 @@ public class SecurityContextToken {
      * Identifier element
      */
     private Element elementIdentifier;
+    
+    private WSSConfig wssConfig;
     
     private String tokenType = WSConstants.WSC_SCT;
     
@@ -76,7 +79,7 @@ public class SecurityContextToken {
         element = 
             doc.createElementNS(ns, "wsc:" + ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
 
-        XMLUtils.setNamespace(element, ns, ConversationConstants.WSC_PREFIX);
+        WSSecurityUtil.setNamespace(element, ns, ConversationConstants.WSC_PREFIX);
 
         elementIdentifier = 
             doc.createElementNS(ns, "wsc:" + ConversationConstants.IDENTIFIER_LN);
@@ -86,6 +89,8 @@ public class SecurityContextToken {
         String uuid = IDGenerator.generateID("uuid:");
         
         elementIdentifier.appendChild(doc.createTextNode(uuid));
+        
+        setID(getWSSConfig().getIdAllocator().createSecureId("sctId-", element));
     }
 
     /**
@@ -100,7 +105,7 @@ public class SecurityContextToken {
         element = 
             doc.createElementNS(ns, "wsc:" + ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
 
-        XMLUtils.setNamespace(element, ns, ConversationConstants.WSC_PREFIX);
+        WSSecurityUtil.setNamespace(element, ns, ConversationConstants.WSC_PREFIX);
 
         elementIdentifier = 
             doc.createElementNS(ns, "wsc:" + ConversationConstants.IDENTIFIER_LN);
@@ -137,7 +142,7 @@ public class SecurityContextToken {
         }
 
         elementIdentifier = 
-            XMLUtils.getDirectChildElement(
+            WSSecurityUtil.getDirectChildElement(
                 element, 
                 ConversationConstants.IDENTIFIER_LN,
                 el.getNamespaceURI()
@@ -149,7 +154,7 @@ public class SecurityContextToken {
      * efficiency purposes.
      */
     public void addWSUNamespace() {
-        XMLUtils.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+        WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
     }
 
     /**
@@ -264,4 +269,10 @@ public class SecurityContextToken {
         return true;
     }
 
+    private WSSConfig getWSSConfig() {
+        if (wssConfig == null) {
+            wssConfig = WSSConfig.getNewInstance();
+        }
+        return wssConfig;
+    }
 }

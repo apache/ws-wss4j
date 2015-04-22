@@ -24,22 +24,22 @@ import java.security.KeyStore;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.crypto.Merlin;
-import org.apache.wss4j.common.saml.SAMLCallback;
-import org.apache.wss4j.common.saml.SAMLKeyInfo;
-import org.apache.wss4j.common.saml.SAMLUtil;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.crypto.Merlin;
+import org.apache.wss4j.common.saml.SAMLKeyInfo;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.SAMLUtil;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.common.util.DOM2Writer;
+import org.apache.wss4j.common.util.Loader;
 import org.junit.Assert;
-import org.opensaml.xmlsec.signature.Signature;
-import org.opensaml.xmlsec.signature.support.SignatureConstants;
+import org.opensaml.xml.signature.Signature;
+import org.opensaml.xml.signature.SignatureConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

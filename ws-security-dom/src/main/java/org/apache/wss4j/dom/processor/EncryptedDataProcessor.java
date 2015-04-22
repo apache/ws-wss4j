@@ -22,32 +22,30 @@ package org.apache.wss4j.dom.processor;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.crypto.SecretKey;
 import javax.xml.namespace.QName;
 
-import org.apache.wss4j.common.bsp.BSPEnforcer;
+import org.w3c.dom.Element;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.str.STRParser;
-import org.apache.wss4j.dom.str.STRParserParameters;
-import org.apache.wss4j.dom.str.STRParserResult;
 import org.apache.wss4j.dom.str.SecurityTokenRefSTRParser;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.w3c.dom.Element;
 
 /**
  * This will process incoming <code>xenc:EncryptedData</code> elements.
@@ -71,7 +69,7 @@ public class EncryptedDataProcessor implements Processor {
         final String encryptedDataId = elem.getAttributeNS(null, "Id");
 
         Element kiElem =
-            XMLUtils.getDirectChildElement(elem, "KeyInfo", WSConstants.SIG_NS);
+            WSSecurityUtil.getDirectChildElement(elem, "KeyInfo", WSConstants.SIG_NS);
         // KeyInfo cannot be null
         if (kiElem == null) {
             throw new WSSecurityException(
@@ -84,11 +82,11 @@ public class EncryptedDataProcessor implements Processor {
         
         // Get the Key either via a SecurityTokenReference or an EncryptedKey
         Element secRefToken = 
-            XMLUtils.getDirectChildElement(
+            WSSecurityUtil.getDirectChildElement(
                 kiElem, "SecurityTokenReference", WSConstants.WSSE_NS
             );
         Element encryptedKeyElement = 
-            XMLUtils.getDirectChildElement(
+            WSSecurityUtil.getDirectChildElement(
                 kiElem, WSConstants.ENC_KEY_LN, WSConstants.ENC_NS
             );
         
@@ -102,20 +100,17 @@ public class EncryptedDataProcessor implements Processor {
         List<WSSecurityEngineResult> encrKeyResults = null;
         Principal principal = null;
         if (secRefToken != null) {
-            STRParserParameters parameters = new STRParserParameters();
-            parameters.setData(request);
-            parameters.setWsDocInfo(wsDocInfo);
-            parameters.setStrElement(secRefToken);
-            if (symEncAlgo != null) {
-                parameters.setDerivationKeyLength(KeyUtils.getKeyLength(symEncAlgo));
-            }
-            
             STRParser strParser = new SecurityTokenRefSTRParser();
-            STRParserResult parserResult = strParser.parseSecurityTokenReference(parameters);
-            byte[] secretKey = parserResult.getSecretKey();
-            principal = parserResult.getPrincipal();
+            Map<String, Object> parameters = new HashMap<String, Object>();
+            parameters.put(SecurityTokenRefSTRParser.SIGNATURE_METHOD, symEncAlgo);
+            strParser.parseSecurityTokenReference(
+                secRefToken, request,
+                wsDocInfo, parameters
+            );
+            byte[] secretKey = strParser.getSecretKey();
+            principal = strParser.getPrincipal();
             key = KeyUtils.prepareSecretKey(symEncAlgo, secretKey);
-            encrKeyResults = new ArrayList<>();
+            encrKeyResults = new ArrayList<WSSecurityEngineResult>();
         } else if (encryptedKeyElement != null) {
             EncryptedKeyProcessor encrKeyProc = new EncryptedKeyProcessor();
             encrKeyResults = encrKeyProc.handleToken(encryptedKeyElement, request, wsDocInfo);
@@ -157,7 +152,8 @@ public class EncryptedDataProcessor implements Processor {
         wsDocInfo.addResult(result);
         wsDocInfo.addTokenElement(elem);
         
-        List<WSSecurityEngineResult> completeResults = new LinkedList<>();
+        List<WSSecurityEngineResult> completeResults = 
+            new ArrayList<WSSecurityEngineResult>();
         completeResults.addAll(encrKeyResults);
         completeResults.add(result);
         

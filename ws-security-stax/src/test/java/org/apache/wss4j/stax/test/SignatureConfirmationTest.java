@@ -47,7 +47,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 public class SignatureConfirmationTest extends AbstractTestBase {
 
@@ -55,7 +54,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
     @Test
     public void testDefaultConfigurationInbound() throws Exception {
 
-        Set<Integer> sigv;
+        List<byte[]> sigv;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -63,7 +62,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
             Map<String, Object> messageContext = doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties);
-            sigv = (Set<Integer>) messageContext.get(WSHandlerConstants.SEND_SIGV);
+            sigv = (List<byte[]>) messageContext.get(WSHandlerConstants.SEND_SIGV);
             Document securedDocument = (Document) messageContext.get(SECURED_DOCUMENT);
 
             //some test that we can really sure we get what we want from WSS4J
@@ -151,7 +150,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
     @Test
     public void testDefaultConfigurationInboundUnsignedConfirmation() throws Exception {
 
-        Set<Integer> sigv;
+        List<byte[]> sigv;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -159,7 +158,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
             Map<String, Object> messageContext = doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties);
-            sigv = (Set<Integer>) messageContext.get(WSHandlerConstants.SEND_SIGV);
+            sigv = (List<byte[]>) messageContext.get(WSHandlerConstants.SEND_SIGV);
             Document securedDocument = (Document) messageContext.get(SECURED_DOCUMENT);
 
             //some test that we can really sure we get what we want from WSS4J

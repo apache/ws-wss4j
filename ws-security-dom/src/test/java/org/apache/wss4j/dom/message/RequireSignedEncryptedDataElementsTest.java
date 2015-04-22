@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.message;
 
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.TreeMap;
@@ -28,6 +29,7 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
@@ -38,7 +40,6 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -273,7 +274,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
     
     private RequestData getRequestData(boolean reqSignedEncData) throws WSSecurityException {
         RequestData reqData = new RequestData();
-        Map<String, Object> messageContext = new TreeMap<>();
+        Map<String, Object> messageContext = new TreeMap<String, Object>();
         messageContext = new java.util.TreeMap<String, Object>();
         messageContext.put(WSHandlerConstants.REQUIRE_SIGNED_ENCRYPTED_DATA_ELEMENTS, Boolean.toString(reqSignedEncData));
         reqData.setMsgContext(messageContext);
@@ -349,9 +350,9 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
     }
 
     
-    private WSHandlerResult verify(Document doc, RequestData reqData) throws Exception {
+    private List<WSSecurityEngineResult> verify(Document doc, RequestData reqData) throws Exception {
         Element elem = WSSecurityUtil.getSecurityHeader(doc, null);
-        WSHandlerResult resultList = 
+        List<WSSecurityEngineResult> resultList = 
             secEngine.processSecurityHeader(elem, reqData);
         if (LOG.isDebugEnabled()) {
             String outputString = 

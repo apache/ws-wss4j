@@ -37,6 +37,7 @@ import org.apache.wss4j.common.crypto.JasyptPasswordEncryptor;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
+import org.apache.wss4j.stax.ext.WSSConfigurationException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSConstants.UsernameTokenPasswordType;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
@@ -296,6 +297,8 @@ public final class ConfigurationConverter {
                 crypto = properties.getEncryptionCrypto();
             }
             return crypto.getDefaultX509Identifier();
+        } catch (WSSConfigurationException e) {
+            LOG.debug(e.getMessage(), e);
         } catch (WSSecurityException e) {
             LOG.debug(e.getMessage(), e);
         }
@@ -505,7 +508,7 @@ public final class ConfigurationConverter {
         Object sigParts = config.get(ConfigurationConstants.SIGNATURE_PARTS);
         if (sigParts != null) {
             if (sigParts instanceof String) {
-                List<SecurePart> parts = new ArrayList<>();
+                List<SecurePart> parts = new ArrayList<SecurePart>();
                 splitEncParts((String)sigParts, parts, WSSConstants.NS_SOAP11);
                 for (SecurePart part : parts) {
                     part.setDigestMethod(sigDigestAlgo);
@@ -526,7 +529,7 @@ public final class ConfigurationConverter {
         sigParts = config.get(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS);
         if (sigParts != null) {
             if (sigParts instanceof String) {
-                List<SecurePart> parts = new ArrayList<>();
+                List<SecurePart> parts = new ArrayList<SecurePart>();
                 splitEncParts((String)sigParts, parts, WSSConstants.NS_SOAP11);
                 for (SecurePart part : parts) {
                     part.setRequired(false);
@@ -562,7 +565,7 @@ public final class ConfigurationConverter {
         Object encParts = config.get(ConfigurationConstants.ENCRYPTION_PARTS);
         if (encParts != null) {
             if (encParts instanceof String) {
-                List<SecurePart> parts = new ArrayList<>();
+                List<SecurePart> parts = new ArrayList<SecurePart>();
                 splitEncParts((String)encParts, parts, WSSConstants.NS_SOAP11);
                 for (SecurePart part : parts) {
                     properties.addEncryptionPart(part);
@@ -581,7 +584,7 @@ public final class ConfigurationConverter {
         encParts = config.get(ConfigurationConstants.OPTIONAL_ENCRYPTION_PARTS);
         if (encParts != null) {
             if (encParts instanceof String) {
-                List<SecurePart> parts = new ArrayList<>();
+                List<SecurePart> parts = new ArrayList<SecurePart>();
                 splitEncParts((String)encParts, parts, WSSConstants.NS_SOAP11);
                 for (SecurePart part : parts) {
                     part.setRequired(false);
@@ -618,7 +621,7 @@ public final class ConfigurationConverter {
             String[] certConstraintsList = certConstraints.split(",");
             if (certConstraintsList != null) {
                 Collection<Pattern> subjectCertConstraints = 
-                    new ArrayList<>(certConstraintsList.length);
+                    new ArrayList<Pattern>(certConstraintsList.length);
                 for (String certConstraint : certConstraintsList) {
                     try {
                         subjectCertConstraints.add(Pattern.compile(certConstraint.trim()));

@@ -49,22 +49,24 @@ import java.util.List;
  */
 public class SignatureProtectionAssertionState extends AssertionState implements Assertable {
 
-    private final List<EncryptedElementSecurityEvent> encryptedElementEvents = new ArrayList<>();
-    private final List<TokenSecurityEvent<? extends SecurityToken>> tokenSecurityEvents = new ArrayList<>();
-    private final List<List<QName>> elementPaths = new ArrayList<>();
+    private final List<EncryptedElementSecurityEvent> encryptedElementEvents = 
+        new ArrayList<EncryptedElementSecurityEvent>();
+    private final List<TokenSecurityEvent<? extends SecurityToken>> tokenSecurityEvents =
+            new ArrayList<TokenSecurityEvent<? extends SecurityToken>>();
+    private final List<List<QName>> elementPaths = new ArrayList<List<QName>>();
     private PolicyAsserter policyAsserter;
 
     public SignatureProtectionAssertionState(AbstractSecurityAssertion assertion, 
                                              PolicyAsserter policyAsserter,
                                              boolean asserted) {
         super(assertion, asserted);
-        List<QName> signature11Path = new LinkedList<>();
+        List<QName> signature11Path = new LinkedList<QName>();
         signature11Path.addAll(WSSConstants.SOAP_11_HEADER_PATH);
         signature11Path.add(WSSConstants.TAG_wsse_Security);
         signature11Path.add(WSSConstants.TAG_dsig_Signature);
         elementPaths.add(signature11Path);
 
-        List<QName> signatureConfirmation11Path = new LinkedList<>();
+        List<QName> signatureConfirmation11Path = new LinkedList<QName>();
         signatureConfirmation11Path.addAll(WSSConstants.SOAP_11_HEADER_PATH);
         signatureConfirmation11Path.add(WSSConstants.TAG_wsse_Security);
         signatureConfirmation11Path.add(WSSConstants.TAG_wsse11_SignatureConfirmation);

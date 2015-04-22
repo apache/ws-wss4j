@@ -50,7 +50,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 public class HeaderOrderingTest extends AbstractTestBase {
 
@@ -599,7 +598,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
     @Test
     public void testSignatureConfirmationUsernameTokenTimestampStrictHeaderOrdering() throws Exception {
 
-        Set<Integer> sigv;
+        List<byte[]> sigv;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -607,7 +606,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
             Properties properties = new Properties();
             properties.setProperty(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
             Map<String, Object> messageContext = doOutboundSecurityWithWSS4J_1(sourceDocument, action, properties);
-            sigv = (Set<Integer>) messageContext.get(WSHandlerConstants.SEND_SIGV);
+            sigv = (List<byte[]>) messageContext.get(WSHandlerConstants.SEND_SIGV);
             Document securedDocument = (Document) messageContext.get(SECURED_DOCUMENT);
 
             //some test that we can really sure we get what we want from WSS4J

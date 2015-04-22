@@ -57,18 +57,16 @@ import org.apache.directory.server.core.kerberos.KeyDerivationInterceptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.kerberos.KerberosContextAndServiceNameCallback;
 import org.apache.wss4j.common.spnego.SpnegoTokenContext;
-import org.apache.wss4j.common.token.BinarySecurity;
-import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
+import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.KerberosTokenValidator;
@@ -193,16 +191,16 @@ public class KerberosTest extends AbstractLdapTestUnit {
             
             // Read in krb5.conf and substitute in the correct port
             File f = new File(basedir + "/src/test/resources/kerberos/krb5.conf");
-            File f2 = new File(basedir + "/target/test-classes/kerberos/krb5.conf");
-
-            try (FileInputStream inputStream = new FileInputStream(f);
-                FileOutputStream outputStream = new FileOutputStream(f2)) {
-                String content = IOUtils.toString(inputStream, "UTF-8");
-                inputStream.close();
-                content = content.replaceAll("port", "" + super.getKdcServer().getTransports()[0].getPort());
             
-                IOUtils.write(content, outputStream, "UTF-8");
-            }
+            FileInputStream inputStream = new FileInputStream(f);
+            String content = IOUtils.toString(inputStream, "UTF-8");
+            inputStream.close();
+            content = content.replaceAll("port", "" + super.getKdcServer().getTransports()[0].getPort());
+            
+            File f2 = new File(basedir + "/target/test-classes/kerberos/krb5.conf");
+            FileOutputStream outputStream = new FileOutputStream(f2);
+            IOUtils.write(content, outputStream, "UTF-8");
+            outputStream.close();
             
             System.setProperty("java.security.krb5.conf", f2.getPath());
             
@@ -260,10 +258,10 @@ public class KerberosTest extends AbstractLdapTestUnit {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
 
-        WSHandlerResult results =
+        List<WSSecurityEngineResult> results =
             secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         WSSecurityEngineResult actionResult =
-            results.getActionResults().get(WSConstants.BST).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         Assert.assertTrue(token != null);
@@ -413,10 +411,10 @@ public class KerberosTest extends AbstractLdapTestUnit {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
         
-        WSHandlerResult results = 
+        List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         WSSecurityEngineResult actionResult =
-            results.getActionResults().get(WSConstants.BST).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         Assert.assertTrue(token != null);
@@ -469,7 +467,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         byte[] keyData = secretKey.getEncoded();
         sign.setSecretKey(keyData);
         
-        byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
+        byte[] digestBytes = WSSecurityUtil.generateDigest(bst.getToken());
         sign.setCustomTokenId(Base64.encode(digestBytes));
         
         Document signedDoc = sign.build(doc, null, secHeader);
@@ -491,10 +489,10 @@ public class KerberosTest extends AbstractLdapTestUnit {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
         
-        WSHandlerResult results = 
+        List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         WSSecurityEngineResult actionResult =
-            results.getActionResults().get(WSConstants.BST).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         Assert.assertTrue(token != null);
@@ -564,10 +562,10 @@ public class KerberosTest extends AbstractLdapTestUnit {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
         
-        WSHandlerResult results = 
+        List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(encryptedDoc, null, callbackHandler, null);
         WSSecurityEngineResult actionResult =
-            results.getActionResults().get(WSConstants.BST).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         Assert.assertTrue(token != null);
@@ -637,10 +635,10 @@ public class KerberosTest extends AbstractLdapTestUnit {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
         
-        WSHandlerResult results = 
+        List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(encryptedDoc, null, callbackHandler, null);
         WSSecurityEngineResult actionResult =
-            results.getActionResults().get(WSConstants.BST).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         Assert.assertTrue(token != null);
@@ -690,7 +688,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         builder.setEncryptSymmKey(false);
         builder.setCustomReferenceValue(WSConstants.WSS_KRB_KI_VALUE_TYPE);
 
-        byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
+        byte[] digestBytes = WSSecurityUtil.generateDigest(bst.getToken());
         builder.setEncKeyId(Base64.encode(digestBytes));
         
         Document encryptedDoc = builder.build(doc, null, secHeader);
@@ -712,10 +710,10 @@ public class KerberosTest extends AbstractLdapTestUnit {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
         
-        WSHandlerResult results = 
+        List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(encryptedDoc, null, callbackHandler, null);
         WSSecurityEngineResult actionResult =
-            results.getActionResults().get(WSConstants.BST).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         Assert.assertTrue(token != null);
@@ -794,10 +792,10 @@ public class KerberosTest extends AbstractLdapTestUnit {
                 }
             };
 
-            WSHandlerResult results =
+            List<WSSecurityEngineResult> results =
                     secEngine.processSecurityHeader(document, null, callbackHandler, null);
             WSSecurityEngineResult actionResult =
-                    results.getActionResults().get(WSConstants.BST).get(0);
+                    WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
             BinarySecurity token =
                     (BinarySecurity) actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
             Assert.assertTrue(token != null);
@@ -939,7 +937,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             byte[] keyData = secretKey.getEncoded();
             sign.setSecretKey(keyData);
 
-            byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
+            byte[] digestBytes = WSSecurityUtil.generateDigest(bst.getToken());
             sign.setCustomTokenId(Base64.encode(digestBytes));
 
             sign.build(doc, null, secHeader);
@@ -1060,10 +1058,10 @@ public class KerberosTest extends AbstractLdapTestUnit {
                 }
             };
 
-            WSHandlerResult results =
+            List<WSSecurityEngineResult> results =
                     secEngine.processSecurityHeader(document, null, callbackHandler, null);
             WSSecurityEngineResult actionResult =
-                    results.getActionResults().get(WSConstants.BST).get(0);
+                    WSSecurityUtil.fetchActionResult(results, WSConstants.BST);
             BinarySecurity token =
                     (BinarySecurity) actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
             Assert.assertTrue(token != null);
@@ -1201,7 +1199,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             builder.setEncryptSymmKey(false);
             builder.setCustomReferenceValue(WSConstants.WSS_KRB_KI_VALUE_TYPE);
 
-            byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
+            byte[] digestBytes = WSSecurityUtil.generateDigest(bst.getToken());
             builder.setEncKeyId(Base64.encode(digestBytes));
 
             builder.build(doc, null, secHeader);

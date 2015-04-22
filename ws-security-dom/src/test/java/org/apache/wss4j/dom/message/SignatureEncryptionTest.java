@@ -31,11 +31,11 @@ import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -140,12 +140,13 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
 
-        WSEncryptionPart part = 
-            new WSEncryptionPart(
-                    "add",
-                    "http://ws.apache.org/counter/counter_port_type",
-                    "Element");
-        encrypt.getParts().add(part);
+        List<WSEncryptionPart> encParts = new ArrayList<WSEncryptionPart>();
+        encParts.add(
+                new WSEncryptionPart(
+                        "add",
+                        "http://ws.apache.org/counter/counter_port_type",
+                        "Element"));
+        encrypt.setParts(encParts);
         
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
         
@@ -156,12 +157,13 @@ public class SignatureEncryptionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        WSEncryptionPart signPart = 
-            new WSEncryptionPart(
-                    WSConstants.ENC_DATA_LN,
-                    WSConstants.ENC_NS,
-                    "Element");
-        sign.getParts().add(signPart);
+        List<WSEncryptionPart> sigParts = new ArrayList<WSEncryptionPart>();
+        sigParts.add(
+                new WSEncryptionPart(
+                        WSConstants.ENC_DATA_LN,
+                        WSConstants.ENC_NS,
+                        "Element"));
+        sign.setParts(sigParts);
         
         Document encryptedSignedDoc = sign.build(encryptedDoc, crypto, secHeader);
         
@@ -172,13 +174,13 @@ public class SignatureEncryptionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        WSHandlerResult results = verify(encryptedSignedDoc);
+        List<WSSecurityEngineResult> results = verify(encryptedSignedDoc);
         
         List<WSSecurityEngineResult> sigSecEngResults = 
-            results.getActionResults().get(WSConstants.SIGN);
+            WSSecurityUtil.fetchAllActionResults(results, WSConstants.SIGN);
         
         List<WSSecurityEngineResult> encSecEngResults = 
-            results.getActionResults().get(WSConstants.ENCR);
+            WSSecurityUtil.fetchAllActionResults(results, WSConstants.ENCR);
         
         assertEquals(1, sigSecEngResults.size());
         assertEquals(1, encSecEngResults.size());
@@ -247,12 +249,14 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         LOG.info("Before Encryption....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "add",
                 "http://ws.apache.org/counter/counter_port_type",
                 "");
-        encrypt.getParts().add(encP);
+        parts.add(encP);
+        encrypt.setParts(parts);
 
         WSSecHeader secHeader = new WSSecHeader();
         secHeader.insertSecurityHeader(doc);
@@ -370,7 +374,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> handlerActions = new ArrayList<>();
+        List<HandlerAction> handlerActions = new ArrayList<HandlerAction>();
         HandlerAction action = new HandlerAction(WSConstants.ENCR);
         handlerActions.add(action);
         action = new HandlerAction(WSConstants.SIGN);
@@ -389,7 +393,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<Integer> receivingActions = new ArrayList<>();
+        List<Integer> receivingActions = new ArrayList<Integer>();
         receivingActions.add(WSConstants.ENCR);
         receivingActions.add(WSConstants.SIGN);
         messageContext.put(WSHandlerConstants.DEC_PROP_REF_ID, "" + crypto.hashCode());
@@ -397,7 +401,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         handler.receive(receivingActions, reqData);
         
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        newEngine.processSecurityHeader(doc, reqData);
+        newEngine.processSecurityHeader(doc, null, reqData);
     }
     
     @org.junit.Test
@@ -415,7 +419,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        List<HandlerAction> handlerActions = new ArrayList<>();
+        List<HandlerAction> handlerActions = new ArrayList<HandlerAction>();
         HandlerAction action = new HandlerAction(WSConstants.SIGN);
         handlerActions.add(action);
         action = new HandlerAction(WSConstants.ENCR);
@@ -434,7 +438,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        List<Integer> receivingActions = new ArrayList<>();
+        List<Integer> receivingActions = new ArrayList<Integer>();
         receivingActions.add(WSConstants.SIGN);
         receivingActions.add(WSConstants.ENCR);
         messageContext.put(WSHandlerConstants.DEC_PROP_REF_ID, "" + crypto.hashCode());
@@ -442,7 +446,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         handler.receive(receivingActions, reqData);
         
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        newEngine.processSecurityHeader(doc, reqData);
+        newEngine.processSecurityHeader(doc, null, reqData);
     }
 
     /**
@@ -455,8 +459,8 @@ public class SignatureEncryptionTest extends org.junit.Assert {
      * @throws Exception
      *             Thrown when there is a problem in verification
      */
-    private WSHandlerResult verify(Document doc) throws Exception {
-        WSHandlerResult resultList = 
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        List<WSSecurityEngineResult> resultList = 
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         if (LOG.isDebugEnabled()) {
             String outputString = 

@@ -226,7 +226,7 @@ public class CertificateStore extends CryptoBase {
             List<X509Certificate> certList = Arrays.asList(x509certs);
             CertPath path = getCertificateFactory().generateCertPath(certList);
 
-            Set<TrustAnchor> set = new HashSet<>();
+            Set<TrustAnchor> set = new HashSet<TrustAnchor>();
             if (trustedCerts != null) {
                 for (X509Certificate cert : trustedCerts) {
                     TrustAnchor anchor = 
@@ -247,10 +247,27 @@ public class CertificateStore extends CryptoBase {
                 validator = CertPathValidator.getInstance("PKIX", provider);
             }
             validator.validate(path, param);
-        } catch (java.security.NoSuchProviderException | NoSuchAlgorithmException 
-            | java.security.cert.CertificateException
-            | java.security.InvalidAlgorithmParameterException
-            | java.security.cert.CertPathValidatorException e) {
+        } catch (java.security.NoSuchProviderException e) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, "certpath", e,
+                    e.getMessage()
+                );
+        } catch (NoSuchAlgorithmException e) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, "certpath", e,
+                    e.getMessage()
+                );
+        } catch (java.security.cert.CertificateException e) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, "certpath", e,
+                    e.getMessage()
+                );
+        } catch (java.security.InvalidAlgorithmParameterException e) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, "certpath", e,
+                    e.getMessage()
+                );
+        } catch (java.security.cert.CertPathValidatorException e) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "certpath", e,
                     e.getMessage()

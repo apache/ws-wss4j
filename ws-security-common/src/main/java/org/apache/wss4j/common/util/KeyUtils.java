@@ -19,29 +19,16 @@
 
 package org.apache.wss4j.common.util;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.xml.security.algorithms.JCEMapper;
-import org.apache.xml.security.encryption.XMLCipher;
 
 public final class KeyUtils {
     private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(KeyUtils.class);
     private static final int MAX_SYMMETRIC_KEY_SIZE = 1024;
-    
-    /**
-     * A cached MessageDigest object
-     */
-    private static MessageDigest digest;
     
     private KeyUtils() {
         // complete
@@ -58,22 +45,22 @@ public final class KeyUtils {
     }
     
     /**
-     * Convert the raw key bytes into a SecretKey object of type algorithm.
+     * Convert the raw key bytes into a SecretKey object of type symEncAlgo.
      */
-    public static SecretKey prepareSecretKey(String algorithm, byte[] rawKey) {
+    public static SecretKey prepareSecretKey(String symEncAlgo, byte[] rawKey) {
         // Do an additional check on the keysize required by the encryption algorithm
         int size = 0;
         try {
-            size = getKeyLength(algorithm);
+            size = getKeyLength(symEncAlgo);
         } catch (Exception e) {
             // ignore - some unknown (to JCEMapper) encryption algorithm
             if (LOG.isDebugEnabled()) {
                 LOG.debug(e.getMessage());
             }
         }
-        String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(algorithm);
+        String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(symEncAlgo);
         SecretKeySpec keySpec;
-        if (size > 0 && !algorithm.endsWith("gcm") && !algorithm.contains("hmac-")) {
+        if (size > 0 && !symEncAlgo.endsWith("gcm") && !symEncAlgo.contains("hmac-")) {
             keySpec = 
                 new SecretKeySpec(
                     rawKey, 0, rawKey.length > size ? size : rawKey.length, keyAlgorithm
@@ -88,95 +75,5 @@ public final class KeyUtils {
             keySpec = new SecretKeySpec(rawKey, keyAlgorithm);
         }
         return keySpec;
-    }
-    
-    public static KeyGenerator getKeyGenerator(String algorithm) throws WSSecurityException {
-        try {
-            //
-            // Assume AES as default, so initialize it
-            //
-            String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(algorithm);
-            if (keyAlgorithm == null || "".equals(keyAlgorithm)) {
-                keyAlgorithm = JCEMapper.translateURItoJCEID(algorithm);
-            }
-            KeyGenerator keyGen = KeyGenerator.getInstance(keyAlgorithm);
-            if (algorithm.equalsIgnoreCase(XMLCipher.AES_128)
-                || algorithm.equalsIgnoreCase(XMLCipher.AES_128_GCM)) {
-                keyGen.init(128);
-            } else if (algorithm.equalsIgnoreCase(XMLCipher.AES_192)
-                || algorithm.equalsIgnoreCase(XMLCipher.AES_192_GCM)) {
-                keyGen.init(192);
-            } else if (algorithm.equalsIgnoreCase(XMLCipher.AES_256)
-                || algorithm.equalsIgnoreCase(XMLCipher.AES_256_GCM)) {
-                keyGen.init(256);
-            }
-            return keyGen;
-        } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, e
-            );
-        }
-    }
-    
-    
-    /**
-     * Translate the "cipherAlgo" URI to a JCE ID, and return a javax.crypto.Cipher instance
-     * of this type. 
-     */
-    public static Cipher getCipherInstance(String cipherAlgo)
-        throws WSSecurityException {
-        try {
-            String keyAlgorithm = JCEMapper.translateURItoJCEID(cipherAlgo);
-            String provider = JCEMapper.getProviderId();
-            
-            if (provider == null) {
-                return Cipher.getInstance(keyAlgorithm);
-            }
-            return Cipher.getInstance(keyAlgorithm, provider);
-        } catch (NoSuchPaddingException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp", 
-                ex, "No such padding: " + cipherAlgo);
-        } catch (NoSuchAlgorithmException ex) {
-            // Check to see if an RSA OAEP MGF-1 with SHA-1 algorithm was requested
-            // Some JDKs don't support RSA/ECB/OAEPPadding
-            if (XMLCipher.RSA_OAEP.equals(cipherAlgo)) {
-                try {
-                    return Cipher.getInstance("RSA/ECB/OAEPWithSHA1AndMGF1Padding");
-                } catch (Exception e) {
-                    throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
-                        e, "No such algorithm: " + cipherAlgo);
-                }
-            } else {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
-                    ex, "No such algorithm: " + cipherAlgo);
-            }
-        } catch (NoSuchProviderException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
-                ex, "No such provider " + JCEMapper.getProviderId() + " for: " + cipherAlgo);
-        }
-    }
-    
-    /**
-     * Generate a (SHA1) digest of the input bytes. The MessageDigest instance that backs this
-     * method is cached for efficiency.  
-     * @param inputBytes the bytes to digest
-     * @return the digest of the input bytes
-     * @throws WSSecurityException
-     */
-    public static synchronized byte[] generateDigest(byte[] inputBytes) throws WSSecurityException {
-        try {
-            if (digest == null) {
-                digest = MessageDigest.getInstance("SHA-1");
-            }
-            return digest.digest(inputBytes);
-        } catch (Exception e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", e,
-                    "Error in generating digest"
-            );
-        }
-    }
+    }    
 }

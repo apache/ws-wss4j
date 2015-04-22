@@ -19,6 +19,9 @@
 
 package org.apache.wss4j.dom.message;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.dom.WSConstants;
@@ -28,7 +31,6 @@ import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -71,27 +73,29 @@ public class EncryptedDataInHeaderTest extends org.junit.Assert {
         timestamp.setTimeToLive(300);
         timestamp.build(doc, secHeader);
         
-        WSSecEncrypt encrypt = new WSSecEncrypt();
-        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        
         // Encrypt the Timestamp and SOAP Body
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp", WSConstants.WSU_NS, "");
-        encrypt.getParts().add(encP);
+        parts.add(encP);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         encP = 
             new WSEncryptionPart(
                 WSConstants.ELEM_BODY, soapNamespace, "Content"
             );
-        encrypt.getParts().add(encP);
+        parts.add(encP);
+        
+        WSSecEncrypt encrypt = new WSSecEncrypt();
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        encrypt.setParts(parts);
         
         encrypt.prepare(doc, crypto);
         encrypt.prependToHeader(secHeader);
         
         // Append Reference List to security header
-        Element refs = encrypt.encrypt();
+        Element refs = encrypt.encryptForRef(null, parts);
         secHeader.getSecurityHeader().appendChild(refs);
 
         if (LOG.isDebugEnabled()) {
@@ -100,9 +104,9 @@ public class EncryptedDataInHeaderTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        WSHandlerResult results = verify(doc);
+        List<WSSecurityEngineResult> results = verify(doc);
         WSSecurityEngineResult actionResult = 
-            results.getActionResults().get(WSConstants.ENCR).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ENCR);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
     }
@@ -115,8 +119,8 @@ public class EncryptedDataInHeaderTest extends org.junit.Assert {
      * @param doc 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private WSHandlerResult verify(Document doc) throws Exception {
-        WSHandlerResult results = 
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(doc, null, callbackHandler, null, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verified and decrypted message:");

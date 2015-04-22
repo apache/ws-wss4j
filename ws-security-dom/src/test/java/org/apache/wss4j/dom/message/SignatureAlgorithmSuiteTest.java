@@ -26,26 +26,25 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.xml.crypto.dsig.SignatureMethod;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.apache.wss4j.common.SignatureActionToken;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecretKeyCallbackHandler;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * A set of test-cases for signing and verifying SOAP requests when specifying an 
@@ -158,7 +157,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         
-        byte[] encodedBytes = KeyUtils.generateDigest(keyData);
+        byte[] encodedBytes = WSSecurityUtil.generateDigest(keyData);
         String identifier = Base64.encode(encodedBytes);
         SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
@@ -278,7 +277,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         return algorithmSuite;
     }
 
-    private WSHandlerResult verify(
+    private List<WSSecurityEngineResult> verify(
         Element securityHeader, AlgorithmSuite algorithmSuite, Crypto sigVerCrypto
     ) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
@@ -287,7 +286,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         
         data.setAlgorithmSuite(algorithmSuite);
         
-        List<BSPRule> ignoredRules = new ArrayList<>();
+        List<BSPRule> ignoredRules = new ArrayList<BSPRule>();
         ignoredRules.add(BSPRule.R5404);
         ignoredRules.add(BSPRule.R5406);
         data.setIgnoredBSPRules(ignoredRules);

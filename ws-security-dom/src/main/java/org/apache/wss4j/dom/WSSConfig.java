@@ -73,7 +73,7 @@ public class WSSConfig {
      */
     private static final Map<Integer, Class<?>> DEFAULT_ACTIONS;
     static {
-        final Map<Integer, Class<?>> tmp = new HashMap<>();
+        final Map<Integer, Class<?>> tmp = new HashMap<Integer, Class<?>>();
         try {
             tmp.put(
                 WSConstants.UT,
@@ -132,7 +132,7 @@ public class WSSConfig {
      */
     private static final Map<QName, Class<?>> DEFAULT_PROCESSORS;
     static {
-        final Map<QName, Class<?>> tmp = new HashMap<>();
+        final Map<QName, Class<?>> tmp = new HashMap<QName, Class<?>>();
         try {
             tmp.put(
                 WSSecurityEngine.SAML_TOKEN,
@@ -207,7 +207,7 @@ public class WSSConfig {
      */
     private static final Map<QName, Class<?>> DEFAULT_VALIDATORS;
     static {
-        final Map<QName, Class<?>> tmp = new HashMap<>();
+        final Map<QName, Class<?>> tmp = new HashMap<QName, Class<?>>();
         try {
             tmp.put(
                 WSSecurityEngine.SAML_TOKEN,
@@ -254,6 +254,104 @@ public class WSSConfig {
     private static boolean staticallyInitialized = false;
 
     /**
+     * Whether to add an InclusiveNamespaces PrefixList as a CanonicalizationMethod
+     * child when generating Signatures using WSConstants.C14N_EXCL_OMIT_COMMENTS.
+     * The default is true.
+     */
+    private boolean addInclusivePrefixes = true;
+
+    /**
+     * Set the timestamp precision mode. If set to <code>true</code> then use
+     * timestamps with milliseconds, otherwise omit the milliseconds. As per XML
+     * Date/Time specification the default is to include the milliseconds.
+     */
+    private boolean precisionInMilliSeconds = true;
+
+    private boolean enableSignatureConfirmation;
+
+    /**
+     * If set to true then the timestamp handling will throw an exception if the
+     * timestamp contains an expires element and the semantics are expired.
+     * 
+     * If set to false, no exception will be thrown, even if the semantics are
+     * expired.
+     */
+    private boolean timeStampStrict = true;
+    
+    /**
+     * If this value is not null, then username token handling will throw an 
+     * exception if the password type of the Username Token does not match this value
+     */
+    private String requiredPasswordType;
+    
+    /**
+     * This variable controls whether a UsernameToken with no password element is allowed. 
+     * The default value is "false". Set it to "true" to allow deriving keys from UsernameTokens 
+     * or to support UsernameTokens for purposes other than authentication.
+     */
+    private boolean allowUsernameTokenNoPassword;
+    
+    /**
+     * The time in seconds between creation and expiry for a Timestamp. The default
+     * is 300 seconds (5 minutes).
+     */
+    private int timeStampTTL = 300;
+    
+    /**
+     * The time in seconds in the future within which the Created time of an incoming 
+     * Timestamp is valid. The default is 60 seconds.
+     */
+    private int timeStampFutureTTL = 60;
+    
+    /**
+     * The time in seconds between creation and expiry for a UsernameToken Created
+     * element. The default is 300 seconds (5 minutes).
+     */
+    private int utTTL = 300;
+    
+    /**
+     * The time in seconds in the future within which the Created time of an incoming 
+     * UsernameToken is valid. The default is 60 seconds.
+     */
+    private int utFutureTTL = 60;
+    
+    /**
+     * This variable controls whether types other than PasswordDigest or PasswordText
+     * are allowed when processing UsernameTokens. 
+     * 
+     * By default this is set to false so that the user doesn't have to explicitly
+     * reject custom token types in the callback handler.
+     */
+    private boolean handleCustomPasswordTypes;
+    
+    /**
+     * This variable controls whether (wsse) namespace qualified password types are
+     * accepted when processing UsernameTokens.
+     * 
+     * By default this is set to false.
+     */
+    private boolean allowNamespaceQualifiedPasswordTypes;
+    
+    /**
+     * Whether the password should be treated as a binary value.  This
+     * is needed to properly handle password equivalence for UsernameToken
+     * passwords.  Binary passwords are Base64 encoded so they can be
+     * treated as strings in most places, but when the password digest
+     * is calculated or a key is derived from the password, the password
+     * will be Base64 decoded before being used. This is most useful for
+     * hashed passwords as password equivalents.
+     *
+     * See https://issues.apache.org/jira/browse/WSS-239
+     */
+    private boolean passwordsAreEncoded;
+    
+    /**
+     * Whether to validate the SubjectConfirmation requirements of a received SAML Token
+     * (sender-vouches or holder-of-key). The default is true.
+     */
+    private boolean validateSamlSubjectConfirmation = true;
+    
+    /**
      * This allows the user to specify a different time than that of the current System time.
      */
     private WSTimeSource currentTime;
@@ -280,7 +378,8 @@ public class WSSConfig {
      * The known actions are initialized from a set of defaults,
      * but the list may be modified via the setAction operations.
      */
-    private final Map<Integer, Object> actionMap = new HashMap<Integer, Object>(DEFAULT_ACTIONS);
+    private final Map<Integer, Object> actionMap = 
+        new HashMap<Integer, Object>(DEFAULT_ACTIONS);
 
     /**
      * The known processors. This map is of the form <QName, Class<?>> or
@@ -288,7 +387,8 @@ public class WSSConfig {
      * The known processors are initialized from a set of defaults,
      * but the list may be modified via the setProcessor operations.
      */
-    private final Map<QName, Object> processorMap = new HashMap<QName, Object>(DEFAULT_PROCESSORS);
+    private final Map<QName, Object> processorMap = 
+        new HashMap<QName, Object>(DEFAULT_PROCESSORS);
     
     /**
      * The known validators. This map is of the form <QName, Class<?>> or
@@ -296,7 +396,8 @@ public class WSSConfig {
      * The known validators are initialized from a set of defaults,
      * but the list may be modified via the setValidator operations.
      */
-    private final Map<QName, Object> validatorMap = new HashMap<QName, Object>(DEFAULT_VALIDATORS);
+    private final Map<QName, Object> validatorMap = 
+        new HashMap<QName, Object>(DEFAULT_VALIDATORS);
     
     static {
         try {
@@ -355,6 +456,143 @@ public class WSSConfig {
         return new WSSConfig();
     }
 
+    /**
+     * Checks if we need to use milliseconds in timestamps
+     * 
+     * @return whether to use precision in milliseconds for timestamps
+     */
+    public boolean isPrecisionInMilliSeconds() {
+        return precisionInMilliSeconds;
+    }
+
+    /**
+     * Set the precision in milliseconds for timestamps
+     * 
+     * @param precisionInMilliSeconds whether to use precision in milliseconds for timestamps
+     */
+    public void setPrecisionInMilliSeconds(boolean precisionInMilliSeconds) {
+        this.precisionInMilliSeconds = precisionInMilliSeconds;
+    }
+
+    /**
+     * @return Returns the enableSignatureConfirmation.
+     */
+    public boolean isEnableSignatureConfirmation() {
+        return enableSignatureConfirmation;
+    }
+
+    /**
+     * @param enableSignatureConfirmation
+     *            The enableSignatureConfirmation to set.
+     */
+    public void setEnableSignatureConfirmation(boolean enableSignatureConfirmation) {
+        this.enableSignatureConfirmation = enableSignatureConfirmation;
+    }
+    
+    /**
+     * @param handleCustomTypes 
+     * whether to handle custom UsernameToken password types or not
+     */
+    public void setHandleCustomPasswordTypes(boolean handleCustomTypes) {
+        this.handleCustomPasswordTypes = handleCustomTypes;
+    }
+    
+    /**
+     * @return whether custom UsernameToken password types are allowed or not
+     */
+    public boolean getHandleCustomPasswordTypes() {
+        return handleCustomPasswordTypes;
+    }
+    
+    /**
+     * @param allowNamespaceQualifiedTypes
+     * whether (wsse) namespace qualified password types are accepted or not
+     */
+    public void setAllowNamespaceQualifiedPasswordTypes(boolean allowNamespaceQualifiedTypes) {
+        allowNamespaceQualifiedPasswordTypes = allowNamespaceQualifiedTypes;
+    }
+    
+    /**
+     * @return whether (wsse) namespace qualified password types are accepted or not
+     */
+    public boolean getAllowNamespaceQualifiedPasswordTypes() {
+        return allowNamespaceQualifiedPasswordTypes;
+    }
+    
+    /**
+     * @return Returns if we shall throw an exception on expired request
+     *         semantic
+     */
+    public boolean isTimeStampStrict() {
+        return timeStampStrict;
+    }
+
+    /**
+     * @param timeStampStrict
+     *            If true throw an exception on expired request semantic
+     */
+    public void setTimeStampStrict(boolean timeStampStrict) {
+        this.timeStampStrict = timeStampStrict;
+    }
+    
+    /**
+     * @return the required password type when processing a UsernameToken
+     */
+    public String getRequiredPasswordType() {
+        return requiredPasswordType;
+    }
+
+    /**
+     * @param requiredPasswordType The required password type when processing
+     * a Username Token.
+     */
+    public void setRequiredPasswordType(String requiredPasswordType) {
+        this.requiredPasswordType = requiredPasswordType;
+    }
+    
+    /**
+     * @return Returns the TTL of a Timestamp in seconds
+     */
+    public int getTimeStampTTL() {
+        return timeStampTTL;
+    }
+
+    /**
+     * @param timeStampTTL The new value for timeStampTTL
+     */
+    public void setTimeStampTTL(int timeStampTTL) {
+        this.timeStampTTL = timeStampTTL;
+    }
+    
+    /**
+     * @return Returns the Future TTL of a Timestamp in seconds
+     */
+    public int getTimeStampFutureTTL() {
+        return timeStampFutureTTL;
+    }
+
+    /**
+     * @param timeStampFutureTTL the new value for timeStampFutureTTL
+     */
+    public void setTimeStampFutureTTL(int timeStampFutureTTL) {
+        this.timeStampFutureTTL = timeStampFutureTTL;
+    }
+    
+    /**
+     * @param passwordsAreEncoded
+     * whether passwords are encoded
+     */
+    public void setPasswordsAreEncoded(boolean passwordsAreEncoded) {
+        this.passwordsAreEncoded = passwordsAreEncoded;
+    }
+    
+    /**
+     * @return whether passwords are encoded
+     */
+    public boolean getPasswordsAreEncoded() {
+        return passwordsAreEncoded;
+    }
+    
     /**
      * @return Returns the WsuIdAllocator used to generate wsu:Id attributes
      */
@@ -545,6 +783,56 @@ public class WSSConfig {
         return null;
     }
 
+    /**
+     * Whether to add an InclusiveNamespaces PrefixList as a CanonicalizationMethod
+     * child when generating Signatures using WSConstants.C14N_EXCL_OMIT_COMMENTS.
+     * The default is true.
+     */
+    public boolean isAddInclusivePrefixes() {
+        return addInclusivePrefixes;
+    }
+
+    /**
+     * Whether to add an InclusiveNamespaces PrefixList as a CanonicalizationMethod
+     * child when generating Signatures using WSConstants.C14N_EXCL_OMIT_COMMENTS.
+     * The default is true.
+     */
+    public void setAddInclusivePrefixes(boolean addInclusivePrefixes) {
+        this.addInclusivePrefixes = addInclusivePrefixes;
+    }
+
+    public boolean isAllowUsernameTokenNoPassword() {
+        return allowUsernameTokenNoPassword;
+    }
+
+    public void setAllowUsernameTokenNoPassword(boolean allowUsernameTokenNoPassword) {
+        this.allowUsernameTokenNoPassword = allowUsernameTokenNoPassword;
+    }
+
+    public int getUtTTL() {
+        return utTTL;
+    }
+
+    public void setUtTTL(int utTTL) {
+        this.utTTL = utTTL;
+    }
+
+    public int getUtFutureTTL() {
+        return utFutureTTL;
+    }
+
+    public void setUtFutureTTL(int utFutureTTL) {
+        this.utFutureTTL = utFutureTTL;
+    }
+
+    public boolean isValidateSamlSubjectConfirmation() {
+        return validateSamlSubjectConfirmation;
+    }
+
+    public void setValidateSamlSubjectConfirmation(boolean validateSamlSubjectConfirmation) {
+        this.validateSamlSubjectConfirmation = validateSamlSubjectConfirmation;
+    }
+    
     public WSTimeSource getCurrentTime() {
         if (currentTime != null) {
             return currentTime;

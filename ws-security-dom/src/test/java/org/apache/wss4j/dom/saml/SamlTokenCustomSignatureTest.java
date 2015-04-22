@@ -38,6 +38,7 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
@@ -46,7 +47,6 @@ import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
@@ -179,13 +179,16 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Assertion",
                 "urn:oasis:names:tc:SAML:1.0:assertion",
                 "Element");
         encP.setRequired(false);
-        sign.getParts().add(encP);
+        parts.add(encP);
+        
+        sign.setParts(parts);
         
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
@@ -223,7 +226,7 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         
-        List<HandlerAction> actions = new ArrayList<>();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
         HandlerAction action = new HandlerAction(WSConstants.ST_UNSIGNED);
         actions.add(action);
         action = new HandlerAction(WSConstants.SIGN);
@@ -276,20 +279,22 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
      * @param doc
      * @throws Exception Thrown when there is a problem in verification
      */
-    private WSHandlerResult verify(Document doc) throws Exception {
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
-        RequestData requestData = new RequestData();
-        requestData.setDecCrypto(crypto);
-        requestData.setSigVerCrypto(crypto);
-        requestData.setValidateSamlSubjectConfirmation(false);
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setValidateSamlSubjectConfirmation(false);
+        secEngine.setWssConfig(config);
         
-        WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
+        List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(
+                doc, null, null, crypto
+            );
         String outputString = XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         return results;
     }
 
-    private WSHandlerResult verifyWithoutProfile(Document doc) throws Exception {
+    private List<WSSecurityEngineResult> verifyWithoutProfile(Document doc) throws Exception {
         SamlAssertionValidator validator = new SamlAssertionValidator();
         validator.setValidateSignatureAgainstProfile(false);
         
@@ -298,7 +303,7 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
         config.setValidator(WSSecurityEngine.SAML_TOKEN, validator);
         config.setValidator(WSSecurityEngine.SAML2_TOKEN, validator);
         
-        WSHandlerResult results = 
+        List<WSSecurityEngineResult> results = 
             secEngine.processSecurityHeader(
                 doc, null, null, crypto
             );

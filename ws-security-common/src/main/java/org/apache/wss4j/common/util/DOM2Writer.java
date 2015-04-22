@@ -37,7 +37,7 @@ import java.io.Writer;
 public final class DOM2Writer {
     public static final char NL = '\n';
     public static final String LS = System.getProperty("line.separator",
-            Character.valueOf(NL).toString());
+            (Character.valueOf(NL)).toString());
     
     private DOM2Writer() {
         // Complete
@@ -122,7 +122,7 @@ public final class DOM2Writer {
                             if (elNamespaceURI.equals(namespaceURI)) {
                                 prefixIsDeclared = true;
                             }
-                        } catch (IllegalArgumentException e) { //NOPMD
+                        } catch (IllegalArgumentException e) {
                             //
                         }
                         if (!prefixIsDeclared) {
@@ -145,7 +145,7 @@ public final class DOM2Writer {
                                 if (attrNamespaceURI.equals(namespaceURI)) {
                                     prefixIsDeclared = true;
                                 }
-                            } catch (IllegalArgumentException e) { //NOPMD
+                            } catch (IllegalArgumentException e) {
                                 //
                             }
                             if (!prefixIsDeclared) {

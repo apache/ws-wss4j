@@ -65,7 +65,7 @@ public final class AttachmentUtils {
     public static final String PARAM_SIZE = "size";
     public static final String PARAM_TYPE = "type";
 
-    public static final Set<String> ALL_PARAMS = new HashSet<>();
+    public static final Set<String> ALL_PARAMS = new HashSet<String>();
 
     static {
         ALL_PARAMS.add(PARAM_CHARSET);
@@ -86,7 +86,7 @@ public final class AttachmentUtils {
         //5.4.1 MIME header canonicalization:
 
         //3. sorting
-        Map<String, String> sortedHeaders = new TreeMap<>();
+        Map<String, String> sortedHeaders = new TreeMap<String, String>();
         Iterator<Map.Entry<String, String>> iterator = headers.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, String> next = iterator.next();
@@ -240,7 +240,7 @@ public final class AttachmentUtils {
         //10. lower case
         stringBuilder.append(params[0].toLowerCase());
 
-        TreeMap<String, String> paramMap = new TreeMap<>();
+        TreeMap<String, String> paramMap = new TreeMap<String, String>();
 
         String parameterName = null;
         String parameterValue = null;
@@ -388,8 +388,8 @@ public final class AttachmentUtils {
     }
 
     /*
-     * Removes any comment outside quoted text. Comments are enclosed between ()
-     */
+         * Removes any comment outside quoted text. Comments are enclosed between ()
+         */
     public static String uncomment(String text) {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -432,7 +432,7 @@ public final class AttachmentUtils {
             Map<String, String> headers, InputStream attachmentInputStream) throws IOException, WSSecurityException {
 
         //read and replace headers
-        List<String> headerLines = new ArrayList<>();
+        List<String> headerLines = new ArrayList<String>();
         StringBuilder stringBuilder = new StringBuilder();
         boolean cr = false;
         int ch;
@@ -498,7 +498,9 @@ public final class AttachmentUtils {
 
                 try {
                     cipher.init(Cipher.DECRYPT_MODE, key, iv);
-                } catch (InvalidKeyException | InvalidAlgorithmParameterException e) {
+                } catch (InvalidKeyException e) {
+                    throw new IOException(e);
+                } catch (InvalidAlgorithmParameterException e) {
                     throw new IOException(e);
                 }
             }
@@ -559,7 +561,8 @@ public final class AttachmentUtils {
         final InputStream attachmentInputStream;
 
         if (complete) {
-            try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            try {
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(byteArrayOutputStream, "US-ASCII");
 
                 Iterator<Map.Entry<String, String>> iterator = headers.entrySet().iterator();
@@ -592,6 +595,8 @@ public final class AttachmentUtils {
                         new ByteArrayInputStream(byteArrayOutputStream.toByteArray()),
                         attachment.getSourceStream()
                 );
+            } catch (UnsupportedEncodingException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
             } catch (IOException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
             }

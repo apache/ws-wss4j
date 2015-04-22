@@ -35,13 +35,13 @@ import org.apache.wss4j.common.saml.bean.ProxyRestrictionBean;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
+import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.CustomSamlAssertionValidator;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
 import org.joda.time.DateTime;
@@ -64,6 +64,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         WSSConfig config = WSSConfig.getNewInstance();
         config.setValidator(WSSecurityEngine.SAML_TOKEN, new CustomSamlAssertionValidator());
         config.setValidator(WSSecurityEngine.SAML2_TOKEN, new CustomSamlAssertionValidator());
+        config.setValidateSamlSubjectConfirmation(false);
         secEngine.setWssConfig(config);
     }
     
@@ -373,7 +374,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
         ProxyRestrictionBean proxyRestriction = new ProxyRestrictionBean();
-        List<String> audiences = new ArrayList<>();
+        List<String> audiences = new ArrayList<String>();
         audiences.add("http://apache.org/one");
         audiences.add("http://apache.org/two");
         proxyRestriction.getAudienceURIs().addAll(audiences);
@@ -416,7 +417,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
-        List<String> audiences = new ArrayList<>();
+        List<String> audiences = new ArrayList<String>();
         audiences.add("http://apache.org/one");
         audiences.add("http://apache.org/two");
         AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
@@ -456,7 +457,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
-        List<String> audiences = new ArrayList<>();
+        List<String> audiences = new ArrayList<String>();
         audiences.add("http://apache.org/one");
         audiences.add("http://apache.org/two");
         AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
@@ -491,10 +492,13 @@ public class SamlConditionsTest extends org.junit.Assert {
         WSSecurityEngine newEngine = new WSSecurityEngine();
         RequestData data = new RequestData();
         data.setAudienceRestrictions(audiences);
-        data.setValidateSamlSubjectConfirmation(false);
+        
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setValidateSamlSubjectConfirmation(false);
+        newEngine.setWssConfig(config);
         
         try {
-            newEngine.processSecurityHeader(doc, data);
+            newEngine.processSecurityHeader(doc, "", data);
             fail("Failure expected on a bad audience restriction");
         } catch (WSSecurityException ex) {
             // expected
@@ -504,7 +508,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         audiences.add("http://apache.org/one");
         data.setAudienceRestrictions(audiences);
         
-        newEngine.processSecurityHeader(doc, data);
+        newEngine.processSecurityHeader(doc, "", data);
     }
     
     // Now test AudienceRestrictions with supplied restrictions
@@ -516,7 +520,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
-        List<String> audiences = new ArrayList<>();
+        List<String> audiences = new ArrayList<String>();
         audiences.add("http://apache.org/one");
         audiences.add("http://apache.org/two");
         AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
@@ -551,10 +555,13 @@ public class SamlConditionsTest extends org.junit.Assert {
         WSSecurityEngine newEngine = new WSSecurityEngine();
         RequestData data = new RequestData();
         data.setAudienceRestrictions(audiences);
-        data.setValidateSamlSubjectConfirmation(false);
+        
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setValidateSamlSubjectConfirmation(false);
+        newEngine.setWssConfig(config);
         
         try {
-            newEngine.processSecurityHeader(doc, data);
+            newEngine.processSecurityHeader(doc, "", data);
             fail("Failure expected on a bad audience restriction");
         } catch (WSSecurityException ex) {
             // expected
@@ -564,7 +571,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         audiences.add("http://apache.org/one");
         data.setAudienceRestrictions(audiences);
         
-        newEngine.processSecurityHeader(doc, data);
+        newEngine.processSecurityHeader(doc, "", data);
     }
     
     /**
@@ -580,7 +587,8 @@ public class SamlConditionsTest extends org.junit.Assert {
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
         
-        List<AudienceRestrictionBean> audiencesRestrictions = new ArrayList<>();
+        List<AudienceRestrictionBean> audiencesRestrictions = 
+            new ArrayList<AudienceRestrictionBean>();
         AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
         audienceRestrictionBean.setAudienceURIs(Collections.singletonList("http://apache.org/one"));
         audiencesRestrictions.add(audienceRestrictionBean);
@@ -625,7 +633,8 @@ public class SamlConditionsTest extends org.junit.Assert {
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
         
-        List<AudienceRestrictionBean> audiencesRestrictions = new ArrayList<>();
+        List<AudienceRestrictionBean> audiencesRestrictions = 
+            new ArrayList<AudienceRestrictionBean>();
         AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
         audienceRestrictionBean.setAudienceURIs(Collections.singletonList("http://apache.org/one"));
         audiencesRestrictions.add(audienceRestrictionBean);
@@ -658,16 +667,19 @@ public class SamlConditionsTest extends org.junit.Assert {
         }
         
         // This should fail as the expected audience isn't in the assertion
-        List<String> audiences = new ArrayList<>();
+        List<String> audiences = new ArrayList<String>();
         audiences.add("http://apache.org/three");
      
         WSSecurityEngine newEngine = new WSSecurityEngine();
         RequestData data = new RequestData();
         data.setAudienceRestrictions(audiences);
-        data.setValidateSamlSubjectConfirmation(false);
+        
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setValidateSamlSubjectConfirmation(false);
+        newEngine.setWssConfig(config);
         
         try {
-            newEngine.processSecurityHeader(doc, data);
+            newEngine.processSecurityHeader(doc, "", data);
             fail("Failure expected on a bad audience restriction");
         } catch (WSSecurityException ex) {
             // expected
@@ -677,7 +689,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         audiences.add("http://apache.org/one");
         data.setAudienceRestrictions(audiences);
         
-        newEngine.processSecurityHeader(doc, data);
+        newEngine.processSecurityHeader(doc, "", data);
     }
     
     private void createAndVerifyMessage(
@@ -719,11 +731,9 @@ public class SamlConditionsTest extends org.junit.Assert {
      * @param envelope 
      * @throws Exception Thrown when there is a problem in verification
      */
-    private WSHandlerResult verify(Document doc) throws Exception {
-        RequestData requestData = new RequestData();
-        requestData.setValidateSamlSubjectConfirmation(false);
-        
-        WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
+    private List<WSSecurityEngineResult> verify(Document doc) throws Exception {
+        List<WSSecurityEngineResult> results = 
+            secEngine.processSecurityHeader(doc, null, null, null);
         String outputString = 
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);

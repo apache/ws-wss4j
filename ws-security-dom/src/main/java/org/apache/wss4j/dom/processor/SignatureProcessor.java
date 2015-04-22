@@ -29,7 +29,9 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.crypto.Data;
 import javax.xml.crypto.MarshalException;
@@ -52,7 +54,6 @@ import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 import javax.xml.crypto.dsig.spec.HMACParameterSpec;
 
-import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
@@ -63,25 +64,25 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.PublicKeyPrincipalImpl;
 import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
-import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.CallbackLookup;
+import org.apache.wss4j.dom.message.DOMCallbackLookup;
+import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.message.token.Timestamp;
 import org.apache.wss4j.dom.str.STRParser;
 import org.apache.wss4j.dom.str.STRParser.REFERENCE_TYPE;
-import org.apache.wss4j.dom.str.STRParserParameters;
-import org.apache.wss4j.dom.str.STRParserResult;
 import org.apache.wss4j.dom.str.SignatureSTRParser;
 import org.apache.wss4j.dom.transform.AttachmentContentSignatureTransform;
 import org.apache.wss4j.dom.transform.STRTransform;
 import org.apache.wss4j.dom.transform.STRTransformUtil;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
@@ -114,7 +115,7 @@ public class SignatureProcessor implements Processor {
             LOG.debug("Found signature element");
         }
         Element keyInfoElement = 
-            XMLUtils.getDirectChildElement(
+            WSSecurityUtil.getDirectChildElement(
                 elem,
                 "KeyInfo",
                 WSConstants.SIG_NS
@@ -158,23 +159,19 @@ public class SignatureProcessor implements Processor {
                     credential = validator.validate(credential, data);
                 }
             } else {
-                STRParserParameters parameters = new STRParserParameters();
-                parameters.setData(data);
-                parameters.setWsDocInfo(wsDocInfo);
-                parameters.setStrElement(child);
-                if (signatureMethod != null) {
-                    parameters.setDerivationKeyLength(KeyUtils.getKeyLength(signatureMethod));
-                }
-                
                 STRParser strParser = new SignatureSTRParser();
-                STRParserResult parserResult = strParser.parseSecurityTokenReference(parameters);
-                principal = parserResult.getPrincipal();
-                certs = parserResult.getCertificates();
-                publicKey = parserResult.getPublicKey();
-                secretKey = parserResult.getSecretKey();
-                referenceType = parserResult.getCertificatesReferenceType();
+                Map<String, Object> parameters = new HashMap<String, Object>();
+                parameters.put(SignatureSTRParser.SIGNATURE_METHOD, signatureMethod);
+                strParser.parseSecurityTokenReference(
+                    child, data, wsDocInfo, parameters
+                );
+                principal = strParser.getPrincipal();
+                certs = strParser.getCertificates();
+                publicKey = strParser.getPublicKey();
+                secretKey = strParser.getSecretKey();
+                referenceType = strParser.getCertificatesReferenceType();
                 
-                boolean trusted = parserResult.isTrustedCredential();
+                boolean trusted = strParser.isTrustedCredential();
                 if (trusted && LOG.isDebugEnabled()) {
                     LOG.debug("Direct Trust for SAML/BST credential");
                 }
@@ -230,7 +227,7 @@ public class SignatureProcessor implements Processor {
             buildProtectedRefs(
                 elem.getOwnerDocument(), xmlSignature.getSignedInfo(), data, wsDocInfo
             );
-        if (dataRefs.isEmpty()) {
+        if (dataRefs.size() == 0) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
         }
         
@@ -414,7 +411,7 @@ public class SignatureProcessor implements Processor {
             // Test for replay attacks
             testMessageReplay(elem, xmlSignature.getSignatureValue().getValue(), key, data, wsDocInfo);
             
-            setElementsOnContext(xmlSignature, (DOMValidateContext)context, wsDocInfo);
+            setElementsOnContext(xmlSignature, (DOMValidateContext)context, wsDocInfo, elem.getOwnerDocument());
             boolean signatureOk = xmlSignature.validate(context);
             if (signatureOk) {
                 return xmlSignature;
@@ -460,17 +457,24 @@ public class SignatureProcessor implements Processor {
     private void setElementsOnContext(
         XMLSignature xmlSignature, 
         DOMValidateContext context,
-        WSDocInfo wsDocInfo
+        WSDocInfo wsDocInfo,
+        Document doc
     ) throws WSSecurityException {
         java.util.Iterator<?> referenceIterator = 
             xmlSignature.getSignedInfo().getReferences().iterator();
         CallbackLookup callbackLookup = wsDocInfo.getCallbackLookup();
+        if (callbackLookup == null) {
+            callbackLookup = new DOMCallbackLookup(doc);
+        }
         while (referenceIterator.hasNext()) {
             Reference reference = (Reference)referenceIterator.next();
             String uri = reference.getURI();
             Element element = callbackLookup.getAndRegisterElement(uri, null, true, context);
             if (element == null) {
-                wsDocInfo.setTokenOnContext(uri, context);
+                element = wsDocInfo.getTokenElement(uri);
+                if (element != null) {
+                    WSSecurityUtil.storeElementInContext(context, element);
+                }
             }
         }
     }
@@ -484,14 +488,14 @@ public class SignatureProcessor implements Processor {
         Element signatureElement
     ) {
         Element signedInfoElement = 
-            XMLUtils.getDirectChildElement(
+            WSSecurityUtil.getDirectChildElement(
                 signatureElement,
                 "SignedInfo",
                 WSConstants.SIG_NS
             );
         if (signedInfoElement != null) {
             Element signatureMethodElement = 
-                XMLUtils.getDirectChildElement(
+                WSSecurityUtil.getDirectChildElement(
                     signedInfoElement,
                     "SignatureMethod",
                     WSConstants.SIG_NS
@@ -520,9 +524,10 @@ public class SignatureProcessor implements Processor {
         RequestData requestData,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
-        List<WSDataRef> protectedRefs = new ArrayList<>(signedInfo.getReferences().size());
-        for (Object reference : signedInfo.getReferences()) {
-            Reference siRef = (Reference)reference;
+        List<WSDataRef> protectedRefs = new ArrayList<WSDataRef>();
+        List<?> referencesList = signedInfo.getReferences();
+        for (int i = 0; i < referencesList.size(); i++) {
+            Reference siRef = (Reference)referencesList.get(i);
             String uri = siRef.getURI();
             
             if (!"".equals(uri)) {
@@ -562,7 +567,7 @@ public class SignatureProcessor implements Processor {
                 // Set the Transform algorithms as well
                 @SuppressWarnings("unchecked")
                 List<Transform> transforms = (List<Transform>)siRef.getTransforms();
-                List<String> transformAlgorithms = new ArrayList<>(transforms.size());
+                List<String> transformAlgorithms = new ArrayList<String>(transforms.size());
                 for (Transform transform : transforms) {
                     transformAlgorithms.add(transform.getAlgorithm());
                 }
@@ -585,10 +590,11 @@ public class SignatureProcessor implements Processor {
         RequestData requestData,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
+        List<?> transformsList = siRef.getTransforms();
         
-        for (Object transformObject : siRef.getTransforms()) {
+        for (int j = 0; j < transformsList.size(); j++) {
             
-            Transform transform = (Transform)transformObject;
+            Transform transform = (Transform)transformsList.get(j);
             
             if (STRTransform.TRANSFORM_URI.equals(transform.getAlgorithm())) {
                 NodeSetData data = (NodeSetData)siRef.getDereferencedData();

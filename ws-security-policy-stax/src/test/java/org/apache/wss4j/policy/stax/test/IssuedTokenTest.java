@@ -103,9 +103,9 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         SubjectBean subjectBean = new SubjectBean();
         samlCallback.setSubject(subjectBean);
 
-        List<AttributeStatementBean> attributeStatementBeans = new ArrayList<>();
-        List<AttributeBean> attributeBeans = new ArrayList<>();
-        List<Object> attributeValues = new ArrayList<>();
+        List<AttributeStatementBean> attributeStatementBeans = new ArrayList<AttributeStatementBean>();
+        List<AttributeBean> attributeBeans = new ArrayList<AttributeBean>();
+        List<Object> attributeValues = new ArrayList<Object>();
         attributeValues.add("test@example.com");
         attributeBeans.add(new AttributeBean("email", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/email", attributeValues));
         attributeValues.clear();
@@ -137,7 +137,7 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         SignedPartSecurityEvent signedPartSecurityEvent =
@@ -170,9 +170,9 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         SubjectBean subjectBean = new SubjectBean();
         samlCallback.setSubject(subjectBean);
 
-        List<AttributeStatementBean> attributeStatementBeans = new ArrayList<>();
-        List<AttributeBean> attributeBeans = new ArrayList<>();
-        List<Object> attributeValues = new ArrayList<>();
+        List<AttributeStatementBean> attributeStatementBeans = new ArrayList<AttributeStatementBean>();
+        List<AttributeBean> attributeBeans = new ArrayList<AttributeBean>();
+        List<Object> attributeValues = new ArrayList<Object>();
         attributeValues.add("test@example.com");
         attributeBeans.add(new AttributeBean("email", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/email", attributeValues));
         attributeValues.clear();
@@ -201,7 +201,7 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         SignedPartSecurityEvent signedPartSecurityEvent =
@@ -239,9 +239,9 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         SubjectBean subjectBean = new SubjectBean();
         samlCallback.setSubject(subjectBean);
 
-        List<AttributeStatementBean> attributeStatementBeans = new ArrayList<>();
-        List<AttributeBean> attributeBeans = new ArrayList<>();
-        List<Object> attributeValues = new ArrayList<>();
+        List<AttributeStatementBean> attributeStatementBeans = new ArrayList<AttributeStatementBean>();
+        List<AttributeBean> attributeBeans = new ArrayList<AttributeBean>();
+        List<Object> attributeValues = new ArrayList<Object>();
         attributeValues.add("test@example.com");
         attributeBeans.add(new AttributeBean("email", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/email", attributeValues));
         attributeValues.clear();
@@ -273,7 +273,7 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         SignedPartSecurityEvent signedPartSecurityEvent =
@@ -311,9 +311,9 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         SubjectBean subjectBean = new SubjectBean();
         samlCallback.setSubject(subjectBean);
 
-        List<AttributeStatementBean> attributeStatementBeans = new ArrayList<>();
-        List<AttributeBean> attributeBeans = new ArrayList<>();
-        List<Object> attributeValues = new ArrayList<>();
+        List<AttributeStatementBean> attributeStatementBeans = new ArrayList<AttributeStatementBean>();
+        List<AttributeBean> attributeBeans = new ArrayList<AttributeBean>();
+        List<Object> attributeValues = new ArrayList<Object>();
         attributeValues.add("test@example.com");
         attributeBeans.add(new AttributeBean("email", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/email", attributeValues));
         attributeValues.clear();
@@ -345,7 +345,7 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         SignedPartSecurityEvent signedPartSecurityEvent =
@@ -383,9 +383,9 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         SubjectBean subjectBean = new SubjectBean();
         samlCallback.setSubject(subjectBean);
 
-        List<AttributeStatementBean> attributeStatementBeans = new ArrayList<>();
-        List<AttributeBean> attributeBeans = new ArrayList<>();
-        List<Object> attributeValues = new ArrayList<>();
+        List<AttributeStatementBean> attributeStatementBeans = new ArrayList<AttributeStatementBean>();
+        List<AttributeBean> attributeBeans = new ArrayList<AttributeBean>();
+        List<Object> attributeValues = new ArrayList<Object>();
         attributeValues.add("test@example.com");
         attributeBeans.add(new AttributeBean("email", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/email", attributeValues));
         attributeStatementBeans.add(new AttributeStatementBean(subjectBean, attributeBeans));
@@ -414,7 +414,7 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         SignedPartSecurityEvent signedPartSecurityEvent =
@@ -501,7 +501,7 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         SignedPartSecurityEvent signedPartSecurityEvent =
@@ -548,7 +548,7 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         SignedPartSecurityEvent signedPartSecurityEvent =

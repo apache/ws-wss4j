@@ -33,25 +33,24 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
-import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.DateUtil;
-import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.common.util.WSCurrentTimeSource;
 import org.apache.wss4j.common.util.WSTimeSource;
-import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.utils.Base64;
+import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -74,7 +73,7 @@ public class UsernameToken {
         org.slf4j.LoggerFactory.getLogger(UsernameToken.class);
     private static final boolean DO_DEBUG = LOG.isDebugEnabled();
 
-    private Element element;
+    private Element element ;
     private Element elementUsername;
     private Element elementPassword;
     private Element elementNonce;
@@ -114,27 +113,27 @@ public class UsernameToken {
             );
         }
         elementUsername = 
-            XMLUtils.getDirectChildElement(
+            WSSecurityUtil.getDirectChildElement(
                 element, WSConstants.USERNAME_LN, WSConstants.WSSE_NS
             );
         elementPassword = 
-            XMLUtils.getDirectChildElement(
+            WSSecurityUtil.getDirectChildElement(
                 element, WSConstants.PASSWORD_LN, WSConstants.WSSE_NS
             );
         elementNonce = 
-            XMLUtils.getDirectChildElement(
+            WSSecurityUtil.getDirectChildElement(
                 element, WSConstants.NONCE_LN, WSConstants.WSSE_NS
             );
         elementCreated = 
-            XMLUtils.getDirectChildElement(
+            WSSecurityUtil.getDirectChildElement(
                 element, WSConstants.CREATED_LN, WSConstants.WSU_NS
             );
         elementSalt = 
-            XMLUtils.getDirectChildElement(
+            WSSecurityUtil.getDirectChildElement(
                 element, WSConstants.SALT_LN, WSConstants.WSSE11_NS
             );
         elementIteration = 
-            XMLUtils.getDirectChildElement(
+            WSSecurityUtil.getDirectChildElement(
                 element, WSConstants.ITERATION_LN, WSConstants.WSSE11_NS
             );
         if (elementUsername == null) {
@@ -166,7 +165,7 @@ public class UsernameToken {
         
         // Guard against a malicious user sending a bogus iteration value
         if (elementIteration != null) {
-            String iter = XMLUtils.getElementText(elementIteration);
+            String iter = nodeString(elementIteration);
             if (iter != null) {
                 int iterInt = Integer.parseInt(iter);
                 if (iterInt < 0 || iterInt > 10000) {
@@ -286,7 +285,7 @@ public class UsernameToken {
      * efficiency purposes.
      */
     public void addWSSENamespace() {
-        XMLUtils.setNamespace(element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
+        WSSecurityUtil.setNamespace(element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
     }
     
     /**
@@ -294,7 +293,7 @@ public class UsernameToken {
      * efficiency purposes.
      */
     public void addWSUNamespace() {
-        XMLUtils.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+        WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
     }
 
     /**
@@ -367,7 +366,7 @@ public class UsernameToken {
             doc.createElementNS(
                 WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX + ":" + WSConstants.SALT_LN
             );
-        XMLUtils.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
+        WSSecurityUtil.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
         elementSalt.appendChild(doc.createTextNode(Base64.encode(saltValue)));
         element.appendChild(elementSalt);
         return saltValue;
@@ -382,7 +381,7 @@ public class UsernameToken {
             doc.createElementNS(
                 WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX + ":" + WSConstants.ITERATION_LN
             );
-        XMLUtils.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
+        WSSecurityUtil.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
         elementIteration.appendChild(doc.createTextNode(text));
         element.appendChild(elementIteration);
     }
@@ -393,7 +392,7 @@ public class UsernameToken {
      * @return the data from the user name element.
      */
     public String getName() {
-        return XMLUtils.getElementText(elementUsername);
+        return nodeString(elementUsername);
     }
 
     /**
@@ -413,7 +412,7 @@ public class UsernameToken {
      * @return the data from the nonce element.
      */
     public String getNonce() {
-        return XMLUtils.getElementText(elementNonce);
+        return nodeString(elementNonce);
     }
 
     /**
@@ -422,7 +421,7 @@ public class UsernameToken {
      * @return the data from the created time element.
      */
     public String getCreated() {
-        return XMLUtils.getElementText(elementCreated);
+        return nodeString(elementCreated);
     }
     
     /**
@@ -441,7 +440,7 @@ public class UsernameToken {
      * @return the password string or <code>null</code> if no such node exists.
      */
     public String getPassword() {
-        String password = XMLUtils.getElementText(elementPassword);
+        String password = nodeString(elementPassword);
         // See WSS-219
         if (password == null && elementPassword != null) {
             return "";
@@ -464,7 +463,7 @@ public class UsernameToken {
      * @throws WSSecurityException
      */
     public byte[] getSalt() throws WSSecurityException {
-        String salt = XMLUtils.getElementText(elementSalt);
+        String salt = nodeString(elementSalt);
         if (salt != null) {
             try {
                 return Base64.decode(salt);
@@ -485,7 +484,7 @@ public class UsernameToken {
      *         is returned.
      */
     public int getIteration() {
-        String iter = XMLUtils.getElementText(elementIteration);
+        String iter = nodeString(elementIteration);
         if (iter != null) {
             return Integer.parseInt(iter);
         }
@@ -565,7 +564,14 @@ public class UsernameToken {
         }
         try {
             data.getCallbackHandler().handle(new Callback[]{pwCb});
-        } catch (IOException | UnsupportedCallbackException e) {
+        } catch (IOException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(e.getMessage(), e);
+            }
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e
+            );
+        } catch (UnsupportedCallbackException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(e.getMessage(), e);
             }
@@ -606,7 +612,7 @@ public class UsernameToken {
 
             System.arraycopy(b3, 0, b4, offset, b3.length);
             
-            byte[] digestBytes = KeyUtils.generateDigest(b4);
+            byte[] digestBytes = WSSecurityUtil.generateDigest(b4);
             passwdDigest = Base64.encode(digestBytes);
         } catch (Exception e) {
             if (DO_DEBUG) {
@@ -638,6 +644,37 @@ public class UsernameToken {
     private Text getFirstNode(Element e) {
         Node node = e.getFirstChild();
         return node != null && Node.TEXT_NODE == node.getNodeType() ? (Text) node : null;
+    }
+
+    /**
+     * Returns the data of an element as String or null if either the the element
+     * does not contain a Text node or the node is empty.
+     * 
+     * @param e DOM element
+     * @return Element text node data as String
+     */
+    private String nodeString(Element e) {
+        if (e != null) {
+            Node node = e.getFirstChild();
+            StringBuilder builder = new StringBuilder();
+            boolean found = false;
+            while (node != null) {
+                if (Node.TEXT_NODE == node.getNodeType()) {
+                    found = true;
+                    builder.append(((Text)node).getData());
+                } else if (Node.CDATA_SECTION_NODE == node.getNodeType()) {
+                    found = true;
+                    builder.append(((CDATASection)node).getData());
+                }
+                node = node.getNextSibling();
+            }
+            
+            if (!found) {
+                return null;
+            }
+            return builder.toString();
+        }
+        return null;
     }
 
     /**
@@ -699,7 +736,7 @@ public class UsernameToken {
             // we must have an iteration element to use this token for a derived key
             bspEnforcer.handleBSPRule(BSPRule.R4218);
         } else {
-            String iter = XMLUtils.getElementText(elementIteration);
+            String iter = nodeString(elementIteration);
             if (iter == null || Integer.parseInt(iter) < 1000) {
                 bspEnforcer.handleBSPRule(BSPRule.R4218);
             }
@@ -911,7 +948,7 @@ public class UsernameToken {
             // Encoding Type must be equal to Base64Binary
             if (encodingType == null || "".equals(encodingType)) {
                 bspEnforcer.handleBSPRule(BSPRule.R4220);
-            } else if (!WSConstants.BASE64_ENCODING.equals(encodingType)) {
+            } else if (!BinarySecurity.BASE64_ENCODING.equals(encodingType)) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("The Username Token's nonce element has a bad encoding type");
                 }

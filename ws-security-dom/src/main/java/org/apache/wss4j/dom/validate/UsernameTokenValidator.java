@@ -25,6 +25,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
@@ -60,9 +61,15 @@ public class UsernameTokenValidator implements Validator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCredential");
         }
         
-        boolean handleCustomPasswordTypes = data.isHandleCustomPasswordTypes();
-        boolean passwordsAreEncoded = data.isEncodePasswords();
-        String requiredPasswordType = data.getRequiredPasswordType();
+        boolean handleCustomPasswordTypes = false;
+        boolean passwordsAreEncoded = false;
+        String requiredPasswordType = null;
+        WSSConfig wssConfig = data.getWssConfig();
+        if (wssConfig != null) {
+            handleCustomPasswordTypes = wssConfig.getHandleCustomPasswordTypes();
+            passwordsAreEncoded = wssConfig.getPasswordsAreEncoded();
+            requiredPasswordType = wssConfig.getRequiredPasswordType();
+        }
         
         UsernameToken usernameToken = credential.getUsernametoken();
         usernameToken.setPasswordsAreEncoded(passwordsAreEncoded);
@@ -160,7 +167,14 @@ public class UsernameTokenValidator implements Validator {
             new WSPasswordCallback(user, null, pwType, WSPasswordCallback.USERNAME_TOKEN);
         try {
             data.getCallbackHandler().handle(new Callback[]{pwCb});
-        } catch (IOException | UnsupportedCallbackException e) {
+        } catch (IOException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(e.getMessage(), e);
+            }
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e
+            );
+        } catch (UnsupportedCallbackException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(e.getMessage(), e);
             }
@@ -207,7 +221,12 @@ public class UsernameTokenValidator implements Validator {
     protected void verifyUnknownPassword(UsernameToken usernameToken,
                                          RequestData data) throws WSSecurityException {
         
-        boolean allowUsernameTokenDerivedKeys = data.isAllowUsernameTokenNoPassword();
+        boolean allowUsernameTokenDerivedKeys = false;
+        WSSConfig wssConfig = data.getWssConfig();
+        if (wssConfig != null) {
+            allowUsernameTokenDerivedKeys = wssConfig.isAllowUsernameTokenNoPassword();
+        }
+        
         if (!allowUsernameTokenDerivedKeys) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Authentication failed as the received UsernameToken does not "

@@ -19,6 +19,21 @@
 
 package org.apache.wss4j.dom.transform;
 
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDocInfo;
+import org.apache.wss4j.dom.bsp.BSPEnforcer;
+import org.apache.wss4j.dom.message.token.PKIPathSecurity;
+import org.apache.wss4j.dom.message.token.SecurityTokenReference;
+import org.apache.wss4j.dom.message.token.X509Security;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+
+import org.apache.xml.security.c14n.Canonicalizer;
+import org.apache.xml.security.signature.XMLSignatureInput;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
 import java.io.ByteArrayInputStream;
 import java.io.OutputStream;
 import java.security.InvalidAlgorithmParameterException;
@@ -35,19 +50,6 @@ import javax.xml.crypto.dom.DOMCryptoContext;
 import javax.xml.crypto.dsig.TransformException;
 import javax.xml.crypto.dsig.TransformService;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
-
-import org.apache.wss4j.common.bsp.BSPEnforcer;
-import org.apache.wss4j.common.token.PKIPathSecurity;
-import org.apache.wss4j.common.token.SecurityTokenReference;
-import org.apache.wss4j.common.token.X509Security;
-import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.xml.security.c14n.Canonicalizer;
-import org.apache.xml.security.signature.XMLSignatureInput;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 
 /**
@@ -133,12 +135,12 @@ public class STRTransform extends TransformService {
         // Canonicalizer
         //
         String canonAlgo = null;
-        Element transformParams = XMLUtils.getDirectChildElement(
+        Element transformParams = WSSecurityUtil.getDirectChildElement(
             transformElement, "TransformationParameters", WSConstants.WSSE_NS
         );
         if (transformParams != null) {
             Element canonElem = 
-                XMLUtils.getDirectChildElement(
+                WSSecurityUtil.getDirectChildElement(
                     transformParams, "CanonicalizationMethod", WSConstants.SIG_NS
                 );
             canonAlgo = canonElem.getAttributeNS(null, "Algorithm");
@@ -203,10 +205,10 @@ public class STRTransform extends TransformService {
                     //
                     // Add the WSSE/WSU namespaces to the element for C14n
                     //
-                    XMLUtils.setNamespace(
+                    WSSecurityUtil.setNamespace(
                         dereferencedToken, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX
                     );
-                    XMLUtils.setNamespace(
+                    WSSecurityUtil.setNamespace(
                         dereferencedToken, WSConstants.WSU_NS, WSConstants.WSU_PREFIX
                     );
                 }

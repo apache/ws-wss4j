@@ -74,8 +74,13 @@ public class WSSec {
             
             Schema schema = WSSUtils.loadWSSecuritySchemas();
             WSSConstants.setJaxbSchemas(schema);
-        } catch (XMLSecurityException | JAXBException
-            | SAXException | URISyntaxException e) {
+        } catch (XMLSecurityException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        } catch (JAXBException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        } catch (SAXException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        } catch (URISyntaxException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }

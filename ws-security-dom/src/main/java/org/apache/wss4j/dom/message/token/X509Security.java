@@ -17,10 +17,10 @@
  * under the License.
  */
 
-package org.apache.wss4j.common.token;
+package org.apache.wss4j.dom.message.token;
 
-import org.apache.wss4j.common.WSS4JConstants;
-import org.apache.wss4j.common.bsp.BSPEnforcer;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.Merlin;
@@ -28,7 +28,6 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateEncodingException;
@@ -39,7 +38,7 @@ import java.security.cert.X509Certificate;
  */
 public class X509Security extends BinarySecurity {
     
-    public static final String X509_V3_TYPE = WSS4JConstants.X509TOKEN_NS + "#X509v3";
+    public static final String X509_V3_TYPE = WSConstants.X509TOKEN_NS + "#X509v3";
     
     /*
      * Stores the associated X.509 Certificate. This saves numerous
@@ -92,15 +91,9 @@ public class X509Security extends BinarySecurity {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, "invalidCertData", 0);
         }
-        try (InputStream in = new ByteArrayInputStream(data)) {
-            cachedCert = certCrypto.loadCertificate(in);
-            return cachedCert;
-        } catch (IOException e) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "parseError", e
-            );
-        }
-
+        InputStream in = new ByteArrayInputStream(data);
+        cachedCert = certCrypto.loadCertificate(in);
+        return cachedCert;
     }
 
     /**

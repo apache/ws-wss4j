@@ -94,7 +94,7 @@ public class DerivedKeyTests extends AbstractPolicyTestBase {
 
         policyEnforcer.registerSecurityEvent(recipientX509TokenSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         SignedPartSecurityEvent signedPartSecurityEvent =
@@ -167,7 +167,7 @@ public class DerivedKeyTests extends AbstractPolicyTestBase {
 
         policyEnforcer.registerSecurityEvent(recipientX509TokenSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         SignedPartSecurityEvent signedPartSecurityEvent =
@@ -245,7 +245,7 @@ public class DerivedKeyTests extends AbstractPolicyTestBase {
         recipientX509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientX509TokenSecurityEvent);
 
-        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
+        List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<XMLSecurityConstants.ContentType>();
         protectionOrder.add(XMLSecurityConstants.ContentType.SIGNATURE);
         protectionOrder.add(XMLSecurityConstants.ContentType.ENCRYPTION);
         SignedPartSecurityEvent signedPartSecurityEvent =

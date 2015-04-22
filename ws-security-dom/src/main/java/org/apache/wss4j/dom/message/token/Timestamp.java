@@ -21,23 +21,25 @@ package org.apache.wss4j.dom.message.token;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.common.util.WSCurrentTimeSource;
 import org.apache.wss4j.common.util.WSTimeSource;
-import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.bsp.BSPEnforcer;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -51,6 +53,7 @@ import org.w3c.dom.Text;
 public class Timestamp {
     
     private Element element;
+    private List<Element> customElements;
     private Date createdDate;
     private Date expiresDate;
     
@@ -65,6 +68,7 @@ public class Timestamp {
     public Timestamp(Element timestampElement, BSPEnforcer bspEnforcer) throws WSSecurityException {
 
         element = timestampElement;
+        customElements = new ArrayList<Element>();
 
         String strCreated = null;
         String strExpires = null;
@@ -107,6 +111,7 @@ public class Timestamp {
                     }
                 } else {
                     bspEnforcer.handleBSPRule(BSPRule.R3222);
+                    customElements.add(currentChildElement);
                 }
             }
         }
@@ -183,6 +188,7 @@ public class Timestamp {
      */
     public Timestamp(boolean milliseconds, Document doc, WSTimeSource timeSource, int ttl) {
 
+        customElements = new ArrayList<Element>();
         element = 
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
@@ -220,7 +226,7 @@ public class Timestamp {
      * efficiency purposes.
      */
     public void addWSUNamespace() {
-        XMLUtils.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+        WSSecurityUtil.setNamespace(element, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
     }
 
     /**
@@ -259,6 +265,23 @@ public class Timestamp {
         return expiresDate;
     }
 
+    /**
+     * Creates and adds a custom element to this Timestamp
+     */
+    public void addCustomElement(Document doc, Element customElement) {
+        customElements.add(customElement);
+        element.appendChild(customElement);
+    }
+
+    /**
+     * Get the the custom elements from this Timestamp
+     *
+     * @return the list containing the custom elements.
+     */
+    public List<Element> getCustomElements() {
+        return customElements;
+    }
+    
     /**
      * Set wsu:Id attribute of this timestamp
      * @param id

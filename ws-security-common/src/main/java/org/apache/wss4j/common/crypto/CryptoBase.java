@@ -20,7 +20,6 @@
 package org.apache.wss4j.common.crypto;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.security.MessageDigest;
@@ -32,8 +31,10 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,31 +47,32 @@ import org.apache.wss4j.common.ext.WSSecurityException;
  * functionality of the Crypto interface.
  */
 public abstract class CryptoBase implements Crypto {
-    public static final String SKI_OID = "2.5.29.14";  //NOPMD - not an IP address
+    public static final String SKI_OID = "2.5.29.14";
     /**
      * OID For the NameConstraints Extension to X.509
      *
      * http://java.sun.com/j2se/1.4.2/docs/api/
      * http://www.ietf.org/rfc/rfc3280.txt (s. 4.2.1.11)
      */
-    public static final String NAME_CONSTRAINTS_OID = "2.5.29.30";  //NOPMD - not an IP address
+    public static final String NAME_CONSTRAINTS_OID = "2.5.29.30";
     
     private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(CryptoBase.class);
                     
     private static final Constructor<?> BC_509CLASS_CONS;
 
-    protected CertificateFactory certificateFactory;
-    private String defaultAlias;
-    private String cryptoProvider;
+    protected Map<String, CertificateFactory> certFactMap = 
+        new HashMap<String, CertificateFactory>();
+    protected String defaultAlias = null;
+    protected String cryptoProvider = null;
     
     static {
         Constructor<?> cons = null;
         try {
             Class<?> c = Class.forName("org.bouncycastle.asn1.x500.X500Name");
             cons = c.getConstructor(new Class[] {String.class});
-        } catch (Exception e) { //NOPMD
-          //ignore
+        } catch (Exception e) {
+            //ignore
         }
         BC_509CLASS_CONS = cons;
     }
@@ -125,10 +127,15 @@ public abstract class CryptoBase implements Crypto {
     /**
      * Sets the CertificateFactory instance on this Crypto instance
      *
+     * @param provider the CertificateFactory provider name
      * @param certFactory the CertificateFactory the CertificateFactory instance to set
      */
-    public void setCertificateFactory(CertificateFactory certFactory) {
-        this.certificateFactory = certFactory;
+    public void setCertificateFactory(String provider, CertificateFactory certFactory) {
+        if (provider == null || provider.length() == 0) {
+            certFactMap.put(certFactory.getProvider().getName(), certFactory);
+        } else {
+            certFactMap.put(provider, certFactory);
+        }
     }
     
     /**
@@ -139,28 +146,37 @@ public abstract class CryptoBase implements Crypto {
      * @throws WSSecurityException
      */
     public CertificateFactory getCertificateFactory() throws WSSecurityException {
-        if (certificateFactory != null) {
-            return certificateFactory;
+        String provider = getCryptoProvider();
+
+        //Try to find a CertificateFactory that generates certs that are fully
+        //compatible with the certs in the KeyStore  (Sun -> Sun, BC -> BC, etc...)
+        CertificateFactory factory = null;
+        if (provider != null && provider.length() != 0) {
+            factory = certFactMap.get(provider);
+        } else {
+            factory = certFactMap.get("DEFAULT");
         }
-        
-        try {
-            String provider = getCryptoProvider();
-            if (provider == null || provider.length() == 0) {
-                certificateFactory = CertificateFactory.getInstance("X.509");
-            } else {
-                certificateFactory = CertificateFactory.getInstance("X.509", provider);
+        if (factory == null) {
+            try {
+                if (provider == null || provider.length() == 0) {
+                    factory = CertificateFactory.getInstance("X.509");
+                    certFactMap.put("DEFAULT", factory);
+                } else {
+                    factory = CertificateFactory.getInstance("X.509", provider);
+                    certFactMap.put(provider, factory);
+                }
+                certFactMap.put(factory.getProvider().getName(), factory);
+            } catch (CertificateException e) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "unsupportedCertType", e
+                );
+            } catch (NoSuchProviderException e) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noSecProvider", e
+                );
             }
-        } catch (CertificateException e) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "unsupportedCertType", e
-            );
-        } catch (NoSuchProviderException e) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noSecProvider", e
-            );
         }
-        
-        return certificateFactory;
+        return factory;
     }
 
     /**
@@ -261,15 +277,15 @@ public abstract class CryptoBase implements Crypto {
      */
     public X509Certificate[] getCertificatesFromBytes(byte[] data)
         throws WSSecurityException {
+        InputStream in = new ByteArrayInputStream(data);
         CertPath path = null;
-        try (InputStream in = new ByteArrayInputStream(data)) {
+        try {
             path = getCertificateFactory().generateCertPath(in);
-        } catch (CertificateException | IOException e) {
+        } catch (CertificateException e) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "parseError", e
             );
         }
-        
         List<?> l = path.getCertificates();
         X509Certificate[] certs = new X509Certificate[l.size()];
         int i = 0;
@@ -288,7 +304,7 @@ public abstract class CryptoBase implements Crypto {
         if (BC_509CLASS_CONS != null) {
              try {
                  return BC_509CLASS_CONS.newInstance(s);
-             } catch (Exception e) { //NOPMD
+             } catch (Exception e) {
                  //ignore
              }
         }

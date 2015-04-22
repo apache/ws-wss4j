@@ -45,7 +45,7 @@ public abstract class SignatureEncryptionActionToken implements SecurityActionTo
     private String keyIdentifier;
     private int keyIdentifierId;
     private String digestAlgorithm;
-    private List<WSEncryptionPart> parts = new ArrayList<>();
+    private List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
     private String optionalParts;
     private String cryptoProperties;
     private String tokenType;
