@@ -49,6 +49,7 @@ import javax.xml.namespace.QName;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.NoSuchProviderException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -845,7 +846,12 @@ public final class WSSecurityUtil {
         throws WSSecurityException {
         try {
             String keyAlgorithm = JCEMapper.translateURItoJCEID(cipherAlgo);
-            return Cipher.getInstance(keyAlgorithm);
+            String provider = JCEMapper.getProviderId();
+            
+            if (provider == null) {
+                return Cipher.getInstance(keyAlgorithm);
+            }
+            return Cipher.getInstance(keyAlgorithm, provider);
         } catch (NoSuchPaddingException ex) {
             throw new WSSecurityException(
                 WSSecurityException.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp", 
@@ -869,6 +875,11 @@ public final class WSSecurityUtil {
                     new Object[] { "No such algorithm: " + cipherAlgo }, ex
                 );
             }
+        } catch (NoSuchProviderException ex) {
+            throw new WSSecurityException(
+                WSSecurityException.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                new Object[] { "No such provider " + JCEMapper.getProviderId() + " for: "  + cipherAlgo }, ex
+            );
         }
     }
     
