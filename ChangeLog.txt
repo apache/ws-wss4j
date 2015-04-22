@@ -5,6 +5,25 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.0.4
+=============
+
+Bug
+
+    [WSS-526] - MerlinDevice uses incorrect property names
+    [WSS-527] - When using WSS4JStaxInInterceptor giving NullPointer Exception in X509IssuerSerialTokenImpl.java:60
+    [WSS-535] - Add WSSE and WSU xmlns definitions to signature's SecurityTokenReference
+    [WSS-536] - WSSecurityUtil.getCipherInstance() does not use configured provider
+
+Improvement
+
+    [WSS-529] - Support Inclusive C14N via policy
+    [WSS-530] - Add a property to enforce that a received Timestamp has an "Expires" Element
+    [WSS-531] - Only create an EncryptedHeader if the parent node is the SOAP Header
+    [WSS-533] - Also use signing key when trying to detect message replay attacks
+    [WSS-534] - Allow SupportingToken policies to have more than one token
+
+
 Release 2.0.3
 =============
 
