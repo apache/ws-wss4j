@@ -180,6 +180,17 @@
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.2</version>
+                <configuration>
+                    <source>${targetJdk}</source>
+                    <target>${targetJdk}</target>
+                    <showWarnings>true</showWarnings>
+                    <compilerArgument>-Xlint:overrides</compilerArgument>
+                </configuration>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
