@@ -1058,14 +1058,15 @@ public class SamlTokenTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
 
-        RequestData requestData = new RequestData();
-        requestData.setValidateSamlSubjectConfirmation(false);
-        
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        WSHandlerResult results = newEngine.processSecurityHeader(doc, requestData);
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setValidateSamlSubjectConfirmation(false);
+        newEngine.setWssConfig(config);
+        List<WSSecurityEngineResult> results = 
+            newEngine.processSecurityHeader(doc, null, null, null);
         
         WSSecurityEngineResult actionResult =
-            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
         
         SamlAssertionWrapper receivedSamlAssertion =
             (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
