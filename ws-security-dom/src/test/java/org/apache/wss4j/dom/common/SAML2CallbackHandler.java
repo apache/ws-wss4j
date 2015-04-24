@@ -96,4 +96,8 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
         }
     }
     
+    public void setSubjectName(String newSubjectName) {
+        this.subjectName = newSubjectName;
+    }
+    
 }

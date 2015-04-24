@@ -1028,6 +1028,51 @@ public class SamlTokenTest extends org.junit.Assert {
         assertFalse(receivedSamlAssertion.isSigned());
     }
     
+    @org.junit.Test
+    public void testSAML2SpecialCharacter() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.ATTR);
+        callbackHandler.setIssuer("www.example.com");
+        // Test an "umlaut"
+        String newSubjectName = "uid=j\u00f6e,ou=people,ou=saml-demo,o=example.com";
+        callbackHandler.setSubjectName(newSubjectName);
+        List<Object> customAttributeValue = new ArrayList<>(1);
+        customAttributeValue.add("j\u00f6an");
+        callbackHandler.setCustomAttributeValues(customAttributeValue);
+
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+
+        String outputString = XMLUtils.PrettyDocumentToString(unsignedDoc);
+        assertTrue(outputString.contains("j\u00f6e") && outputString.contains("j\u00f6an"));
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+
+        RequestData requestData = new RequestData();
+        requestData.setValidateSamlSubjectConfirmation(false);
+        
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        WSHandlerResult results = newEngine.processSecurityHeader(doc, requestData);
+        
+        WSSecurityEngineResult actionResult =
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+        
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertFalse(receivedSamlAssertion.isSigned());
+    }
+    
     private void encryptElement(
         Document document,
         Element elementToEncrypt,
