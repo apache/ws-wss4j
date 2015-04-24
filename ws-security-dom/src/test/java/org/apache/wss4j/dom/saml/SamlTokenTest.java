@@ -1036,7 +1036,7 @@ public class SamlTokenTest extends org.junit.Assert {
         // Test an "umlaut"
         String newSubjectName = "uid=j\u00f6e,ou=people,ou=saml-demo,o=example.com";
         callbackHandler.setSubjectName(newSubjectName);
-        List<Object> customAttributeValue = new ArrayList<>(1);
+        List<Object> customAttributeValue = new ArrayList<Object>(1);
         customAttributeValue.add("j\u00f6an");
         callbackHandler.setCustomAttributeValues(customAttributeValue);
 
