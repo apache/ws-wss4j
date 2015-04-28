@@ -19,13 +19,24 @@ LICENSE.txt and NOTICE.txt files contained in each release artifact.
 <ul>
 <li>
 <p>
-The current stable release is Apache WSS4J 2.0.3:
+The current stable release is Apache WSS4J 2.1.0:
 </p>
 <p>
-<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/2.0.3/wss4j-2.0.3-source-release.zip">wss4j-2.0.3-source-release.zip</a>
-(<a href="http://www.apache.org/dist/ws/wss4j/2.0.3/wss4j-2.0.3-source-release.zip.asc">PGP</a>)
-(<a href="http://www.apache.org/dist/ws/wss4j/2.0.3/wss4j-2.0.3-source-release.zip.md5">MD5</a>)
-(<a href="http://www.apache.org/dist/ws/wss4j/2.0.3/wss4j-2.0.3-source-release.zip.sha1">SHA1</a>)
+<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/2.1.0/wss4j-2.1.0-source-release.zip">wss4j-2.1.0-source-release.zip</a>
+(<a href="http://www.apache.org/dist/ws/wss4j/2.1.0/wss4j-2.1.0-source-release.zip.asc">PGP</a>)
+(<a href="http://www.apache.org/dist/ws/wss4j/2.1.0/wss4j-2.1.0-source-release.zip.md5">MD5</a>)
+(<a href="http://www.apache.org/dist/ws/wss4j/2.1.0/wss4j-2.1.0-source-release.zip.sha1">SHA1</a>)
+</p>
+</li>
+<li>
+<p>
+The current stable release of the older 2.0.x branch is Apache WSS4J 2.0.4:
+</p>
+<p>
+<a href="http://www.apache.org/dyn/closer.cgi/ws/wss4j/2.0.4/wss4j-2.0.4-source-release.zip">wss4j-2.0.4-source-release.zip</a>
+(<a href="http://www.apache.org/dist/ws/wss4j/2.0.4/wss4j-2.0.4-source-release.zip.asc">PGP</a>)
+(<a href="http://www.apache.org/dist/ws/wss4j/2.0.4/wss4j-2.0.4-source-release.zip.md5">MD5</a>)
+(<a href="http://www.apache.org/dist/ws/wss4j/2.0.4/wss4j-2.0.4-source-release.zip.sha1">SHA1</a>)
 </p>
 </li>
 <li>

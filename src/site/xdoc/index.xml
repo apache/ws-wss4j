@@ -47,28 +47,20 @@ Software Foundation.
 <subsection name="News">
 <ul>
 <li>
-<p><b>February 2015</b> - 
-The Apache WSS4J team are pleased to announce the release of version 2.0.3.
+<p><b>April 2015</b> - 
+The Apache WSS4J team are pleased to announce the release of version 2.1.0.
 </p>
 <p>
-Please see the <a href="https://issues.apache.org/jira/browse/WSS/fixforversion/12328783">release notes</a> for more information.
+Please see the <a href="https://issues.apache.org/jira/browse/WSS/fixforversion/12331950">release notes</a> for more information.
 </p>
 </li>
 <li>
-<p><b>February 2015</b> - 
-The Apache WSS4J team are pleased to announce the release of version 1.6.18. 
+<p><b>April 2015</b> - 
+The Apache WSS4J team are pleased to announce the release of version 2.0.4.
 </p>
 <p>
-Please see the <a href="https://issues.apache.org/jira/browse/WSS/fixforversion/12328782">
+Please see the <a href="https://issues.apache.org/jira/browse/WSS/fixforversion/12329395">
 release notes</a> for more information.
-</p>
-<p><b>February 2015</b> - 
-Two new security advisories have been issued for Apache WSS4J, both of which
-are fixed in 1.6.17 and 2.0.2.
-</p>
-<p>
-Please see the <a href="security_advisories.html">the security advisories</a>
-page for more information.
 </p>
 </li>
 </ul>
