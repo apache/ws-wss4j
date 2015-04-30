@@ -199,7 +199,8 @@ public class CertificateStore extends CryptoBase {
                 );
             }
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "certpath", "No trusted certs found"
+                WSSecurityException.ErrorCode.FAILURE, "certpath", 
+                new Object[] {"No trusted certs found"}
             );
         }
         
@@ -252,8 +253,8 @@ public class CertificateStore extends CryptoBase {
             | java.security.InvalidAlgorithmParameterException
             | java.security.cert.CertPathValidatorException e) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "certpath", e,
-                    e.getMessage()
+                    WSSecurityException.ErrorCode.FAILURE, e, "certpath",
+                    new Object[] {e.getMessage()}
                 );
         }
         
@@ -347,7 +348,7 @@ public class CertificateStore extends CryptoBase {
             sha = MessageDigest.getInstance("SHA1");
         } catch (NoSuchAlgorithmException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
+                WSSecurityException.ErrorCode.FAILURE, e, "decoding.general"
             );
         }
         for (X509Certificate trustedCert : trustedCerts) {
@@ -355,7 +356,7 @@ public class CertificateStore extends CryptoBase {
                 sha.update(trustedCert.getEncoded());
             } catch (CertificateEncodingException ex) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", ex
+                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, ex, "encodeError"
                 );
             }
             byte[] data = sha.digest();

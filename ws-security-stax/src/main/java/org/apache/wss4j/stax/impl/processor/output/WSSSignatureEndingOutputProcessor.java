@@ -186,7 +186,8 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
             } else if (WSSecurityTokenConstants.KeyIdentifier_UsernameTokenReference.equals(keyIdentifier)) {
                 WSSUtils.createUsernameTokenReferenceStructure(this, outputProcessorChain, tokenId);
             } else {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "unsupportedSecurityToken", keyIdentifier);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "unsupportedSecurityToken", 
+                                              new Object[] {keyIdentifier});
             }
             createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference);
         }

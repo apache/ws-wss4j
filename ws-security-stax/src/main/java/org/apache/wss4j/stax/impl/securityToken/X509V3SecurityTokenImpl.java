@@ -48,7 +48,7 @@ public class X509V3SecurityTokenImpl extends X509SecurityTokenImpl {
             X509Certificate x509Certificate = getCrypto().loadCertificate(inputStream);
             setX509Certificates(new X509Certificate[]{x509Certificate});
         } catch (IOException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "parseError", e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e, "parseError");
         }
 
         // Check to see if the certificates actually correspond to the decryption crypto

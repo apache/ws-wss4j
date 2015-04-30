@@ -675,7 +675,7 @@ public class SignatureProcessor implements Processor {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.INVALID_SECURITY,
                 "invalidTimestamp",
-                "A replay attack has been detected");
+                new Object[] {"A replay attack has been detected"});
         }
 
         // Store the Timestamp/SignatureValue/Key combination in the cache

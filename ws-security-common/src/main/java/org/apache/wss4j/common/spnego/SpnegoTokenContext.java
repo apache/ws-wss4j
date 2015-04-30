@@ -125,10 +125,9 @@ public class SpnegoTokenContext {
                 LOG.debug(ex.getMessage(), ex);
             }
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE,
+                WSSecurityException.ErrorCode.FAILURE, ex,
                 "kerberosLoginError", 
-                ex,
-                ex.getMessage());
+                new Object[] {ex.getMessage()});
         }
         if (LOG.isDebugEnabled()) {
             LOG.debug("Successfully authenticated to the TGT");
@@ -140,7 +139,7 @@ public class SpnegoTokenContext {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, 
                 "kerberosLoginError",
-                "No Client principals found after login");
+                new Object[] {"No Client principals found after login"});
         }
         
         // Get the service ticket
@@ -182,7 +181,7 @@ public class SpnegoTokenContext {
                     throw (WSSecurityException) cause;
                 } else {
                     throw new WSSecurityException(
-                         ErrorCode.FAILURE, "kerberosServiceTicketError", cause
+                         ErrorCode.FAILURE, new Exception(cause), "kerberosServiceTicketError"
                     );
                 }
             }
@@ -239,10 +238,9 @@ public class SpnegoTokenContext {
                 LOG.debug(ex.getMessage(), ex);
             }
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE,
+                WSSecurityException.ErrorCode.FAILURE, ex,
                 "kerberosLoginError", 
-                ex,
-                ex.getMessage());
+                new Object[] {ex.getMessage()});
         }
         if (LOG.isDebugEnabled()) {
             LOG.debug("Successfully authenticated to the TGT");
@@ -257,7 +255,7 @@ public class SpnegoTokenContext {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, 
                     "kerberosLoginError",
-                    "No Client principals found after login");
+                    new Object[] {"No Client principals found after login"});
             }
             service = principals.iterator().next().getName();
         }
@@ -293,7 +291,7 @@ public class SpnegoTokenContext {
                     throw (WSSecurityException) cause;
                 } else {
                     throw new WSSecurityException(
-                         ErrorCode.FAILURE, "kerberosServiceTicketError", cause
+                         ErrorCode.FAILURE, new Exception(cause), "kerberosServiceTicketError"
                     );
                 }
             }
@@ -340,7 +338,7 @@ public class SpnegoTokenContext {
                 LOG.debug("Error in cleaning up a GSS context", e);
             }
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "spnegoKeyError", e
+                WSSecurityException.ErrorCode.FAILURE, e, "spnegoKeyError"
             );
         }
     }
@@ -357,7 +355,7 @@ public class SpnegoTokenContext {
                 LOG.debug("Error in cleaning up a GSS context", e);
             }
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "spnegoKeyError", e
+                WSSecurityException.ErrorCode.FAILURE, e, "spnegoKeyError"
             );
         }
     }

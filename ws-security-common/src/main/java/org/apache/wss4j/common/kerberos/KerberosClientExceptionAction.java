@@ -132,14 +132,9 @@ public class KerberosClientExceptionAction implements PrivilegedExceptionAction<
 
                 krbCtx.setSecretKey(key);
             }
-            catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException e) {
+            catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 throw new WSSecurityException(
-                    ErrorCode.FAILURE, "kerberosServiceTicketError", e
-                );
-            }
-            catch (InvocationTargetException e) {
-                throw new WSSecurityException(
-                    ErrorCode.FAILURE, "kerberosServiceTicketError", e.getCause()
+                    ErrorCode.FAILURE, e, "kerberosServiceTicketError"
                 );
             }
         }

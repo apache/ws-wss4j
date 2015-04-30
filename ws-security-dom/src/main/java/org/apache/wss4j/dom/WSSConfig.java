@@ -414,12 +414,12 @@ public class WSSConfig {
         if (actionObject instanceof Class<?>) {
             try {
                 return (Action)((Class<?>)actionObject).newInstance();
-            } catch (Throwable t) {
+            } catch (Exception ex) {
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug(t.getMessage(), t);
+                    LOG.debug(ex.getMessage(), ex);
                 }
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                        "unableToLoadClass", t, ((Class<?>)actionObject).getName());
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex,
+                        "unableToLoadClass", new Object[] {((Class<?>)actionObject).getName()});
             }
         } else if (actionObject instanceof Action) {
             return (Action)actionObject;
@@ -506,12 +506,12 @@ public class WSSConfig {
         if (validatorObject instanceof Class<?>) {
             try {
                 return (Validator)((Class<?>)validatorObject).newInstance();
-            } catch (Throwable t) {
+            } catch (Exception ex) {
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug(t.getMessage(), t);
+                    LOG.debug(ex.getMessage(), ex);
                 }
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                    "unableToLoadClass", t, ((Class<?>)validatorObject).getName());
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex,
+                    "unableToLoadClass", new Object[] {((Class<?>)validatorObject).getName()});
             }
         } else if (validatorObject instanceof Validator) {
             return (Validator)validatorObject;
@@ -532,12 +532,12 @@ public class WSSConfig {
         if (processorObject instanceof Class<?>) {
             try {
                 return (Processor)((Class<?>)processorObject).newInstance();
-            } catch (Throwable t) {
+            } catch (Exception ex) {
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug(t.getMessage(), t);
+                    LOG.debug(ex.getMessage(), ex);
                 }
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                        "unableToLoadClass", t, ((Class<?>)processorObject).getName());
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex,
+                        "unableToLoadClass", new Object[] {((Class<?>)processorObject).getName()});
             }
         } else if (processorObject instanceof Processor) {
             return (Processor)processorObject;

@@ -121,7 +121,7 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
             
         } catch (WSSecurityException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
-                                          "empty", e, "Error during Encryption: ");
+                                          "empty", new Object[] {"Error during Encryption: "});
         }
     }
     

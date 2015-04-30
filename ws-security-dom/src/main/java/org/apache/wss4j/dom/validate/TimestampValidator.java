@@ -42,7 +42,8 @@ public class TimestampValidator implements Validator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCredential");
         }
         if (data.getWssConfig() == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", "WSSConfig cannot be null");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", 
+                                          new Object[] {"WSSConfig cannot be null"});
         }
         boolean timeStampStrict = data.isTimeStampStrict();
         int timeStampTTL = data.getTimeStampTTL();
@@ -55,14 +56,14 @@ public class TimestampValidator implements Validator {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.MESSAGE_EXPIRED,
                 "invalidTimestamp",
-                "The security semantics of the message have expired");
+                new Object[] {"The security semantics of the message have expired"});
         }
         
         if (data.isRequireTimestampExpires() && timeStamp.getExpires() == null) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.SECURITY_ERROR,
                 "invalidTimestamp",
-                "The received Timestamp does not contain an expires Element");
+                new Object[] {"The received Timestamp does not contain an expires Element"});
         }
         return credential;
     }

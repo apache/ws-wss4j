@@ -77,7 +77,7 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
             try {
                 securityProperties.getCallbackHandler().handle(new Callback[]{pwcb});
             } catch (IOException | UnsupportedCallbackException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noPassword", e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "noPassword");
             }
             
             Element assertionElem = pwcb.getCustomToken();
@@ -102,12 +102,14 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
             
             if (this.samlAssertionWrapper == null && secret == null && key == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", id
+                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", 
+                    new Object[] {id}
                 );
             }
         } else {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", id
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", 
+                new Object[] {id}
             );
         }
     }

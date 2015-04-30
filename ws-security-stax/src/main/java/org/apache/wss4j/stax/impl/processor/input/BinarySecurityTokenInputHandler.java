@@ -42,6 +42,7 @@ import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
+
 import java.util.Deque;
 import java.util.List;
 
@@ -105,7 +106,7 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
         } else {
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "invalidValueType",
-                    binarySecurityTokenType.getValueType());
+                    new Object[] {binarySecurityTokenType.getValueType()});
         }
         tokenSecurityEvent.setCorrelationID(binarySecurityTokenType.getId());
         wsInboundSecurityContext.registerSecurityEvent(tokenSecurityEvent);

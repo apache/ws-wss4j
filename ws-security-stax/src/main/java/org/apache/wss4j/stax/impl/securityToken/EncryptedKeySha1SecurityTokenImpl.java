@@ -69,7 +69,8 @@ public class EncryptedKeySha1SecurityTokenImpl
                         WSSConstants.NS_ENCRYPTED_KEY_SHA1, WSPasswordCallback.SECRET_KEY);
         WSSUtils.doSecretKeyCallback(callbackHandler, secretKeyCallback, getSha1Identifier());
         if (secretKeyCallback.getKey() == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKey", getSha1Identifier());
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKey", 
+                                          new Object[] {getSha1Identifier()});
         }
 
         String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(algorithmURI);

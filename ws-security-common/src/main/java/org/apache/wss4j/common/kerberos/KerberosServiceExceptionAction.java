@@ -124,14 +124,9 @@ public class KerberosServiceExceptionAction implements PrivilegedExceptionAction
 
                     krbServiceCtx.setSessionKey(key);
                 }
-                catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException e) {
+                catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                     throw new WSSecurityException(
-                        ErrorCode.FAILURE, KERBEROS_TICKET_VALIDATION_ERROR_MSG_ID, e
-                    );
-                }
-                catch (InvocationTargetException e) {
-                    throw new WSSecurityException(
-                        ErrorCode.FAILURE, KERBEROS_TICKET_VALIDATION_ERROR_MSG_ID, e.getCause()
+                        ErrorCode.FAILURE, e, KERBEROS_TICKET_VALIDATION_ERROR_MSG_ID
                     );
                 }
             }            

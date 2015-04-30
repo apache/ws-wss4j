@@ -79,7 +79,8 @@ public abstract class CryptoFactory {
                 LOG.debug("Cannot load Crypto instance as properties object is null");
             }
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                    "empty", null, "Cannot load Crypto instance as properties object is null");
+                    "empty", 
+                    new Object[] {"Cannot load Crypto instance as properties object is null"});
         }
         return getInstance(properties, Loader.getClassLoader(CryptoFactory.class), null);
     }
@@ -111,7 +112,8 @@ public abstract class CryptoFactory {
                 LOG.debug("Cannot load Crypto instance as properties object is null");
             }
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                    "empty", null, "Cannot load Crypto instance as properties object is null");
+                    "empty", 
+                    new Object[] {"Cannot load Crypto instance as properties object is null"});
         }
 
         String cryptoClassName = properties.getProperty("org.apache.wss4j.crypto.provider");
@@ -129,9 +131,10 @@ public abstract class CryptoFactory {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Unable to instantiate Merlin", e);
                 }
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                                              "empty", e, "Cannot create Crypto class "
-                                              + cryptoClassName);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
+                                              "empty", 
+                                              new Object[] {"Cannot create Crypto class "
+                                              + cryptoClassName});
             }
         } else {
             try {
@@ -141,8 +144,8 @@ public abstract class CryptoFactory {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug(ex.getMessage(), ex);
                 }
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                        "empty", ex, cryptoClassName + " Not Found");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex,
+                        "empty", new Object[] {cryptoClassName + " Not Found"});
             }
         }
         return loadClass(cryptoClass, properties, classLoader);
@@ -231,8 +234,8 @@ public abstract class CryptoFactory {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Unable to instantiate: " + cryptoClass.getName(), e);
             }
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                    "empty", e, cryptoClass + " cannot create instance");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
+                    "empty", new Object[] {cryptoClass + " cannot create instance"});
         }
     }
     
@@ -267,8 +270,8 @@ public abstract class CryptoFactory {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Unable to instantiate: " + cryptoClass.getName(), e);
             }
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                    "empty", e, cryptoClass + " cannot create instance");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
+                    "empty", new Object[] {cryptoClass + " cannot create instance"});
         }
     }
     
@@ -290,7 +293,7 @@ public abstract class CryptoFactory {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, 
                     "resourceNotFound",
-                    propFilename
+                    new Object[] {propFilename}
                 );
             }
             properties.load(url.openStream());
@@ -299,8 +302,8 @@ public abstract class CryptoFactory {
                 LOG.debug("Cannot find resource: " + propFilename, e);
             }
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, 
-                "resourceNotFound", e, propFilename
+                WSSecurityException.ErrorCode.FAILURE, e,
+                "resourceNotFound", new Object[] {propFilename}
             );
         }
         return properties;

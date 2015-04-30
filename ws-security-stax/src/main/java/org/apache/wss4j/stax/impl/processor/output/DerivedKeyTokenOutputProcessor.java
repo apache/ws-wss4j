@@ -96,7 +96,8 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 String defaultLabel = WSSConstants.WS_SecureConversation_DEFAULT_LABEL + WSSConstants.WS_SecureConversation_DEFAULT_LABEL;
                 label = defaultLabel.getBytes("UTF-8");
             } catch (UnsupportedEncodingException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", e, "UTF-8 encoding is not supported");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "empty", 
+                                              new Object[] {"UTF-8 encoding is not supported"});
             }
 
             byte[] nonce = WSSConstants.generateBytes(16);
@@ -113,7 +114,8 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 WSPasswordCallback passwordCallback = new WSPasswordCallback(wsuIdDKT, WSPasswordCallback.SECRET_KEY);
                 WSSUtils.doSecretKeyCallback(((WSSSecurityProperties)securityProperties).getCallbackHandler(), passwordCallback, wsuIdDKT);
                 if (passwordCallback.getKey() == null) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKey", wsuIdDKT);
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKey", 
+                                                  new Object[] {wsuIdDKT});
                 }
                 secret = passwordCallback.getKey();
             } else {

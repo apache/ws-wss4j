@@ -165,7 +165,8 @@ public class EncryptedKeyProcessor implements Processor {
         if (certs == null || certs.length < 1 || certs[0] == null) {
             throw new WSSecurityException(
                                           WSSecurityException.ErrorCode.FAILURE,
-                                          "noCertsFound", "decryption (KeyId)");
+                                          "noCertsFound", 
+                                          new Object[] {"decryption (KeyId)"});
         }
 
         // Check for compliance against the defined AlgorithmSuite
@@ -329,7 +330,7 @@ public class EncryptedKeyProcessor implements Processor {
             return Base64.decode(text);
         } catch (Base64DecodingException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
+                WSSecurityException.ErrorCode.FAILURE, e, "decoding.general"
             );
         }
     }
@@ -432,7 +433,7 @@ public class EncryptedKeyProcessor implements Processor {
                 } else if (WSConstants.X509_CERT_LN.equals(x509Child.getLocalName())) {
                     byte[] token = getDecodedBase64EncodedData(x509Child);
                     if (token == null) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidCertData", 0);
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidCertData", new Object[] {"0"});
                     }
                     try (InputStream in = new ByteArrayInputStream(token)) {
                         X509Certificate cert = data.getDecCrypto().loadCertificate(in);
@@ -441,7 +442,7 @@ public class EncryptedKeyProcessor implements Processor {
                         }
                     } catch (IOException e) {
                         throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "parseError", e
+                            WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, e, "parseError"
                         );
                     }
                 }
@@ -540,8 +541,8 @@ public class EncryptedKeyProcessor implements Processor {
             symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, decryptedData);
         } catch (IllegalArgumentException ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "badEncAlgo", 
-                ex, symEncAlgo);
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex, "badEncAlgo", 
+                new Object[] {symEncAlgo});
         }
         
         // Check for compliance against the defined AlgorithmSuite
