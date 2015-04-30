@@ -205,7 +205,7 @@ public class KerberosTokenValidator implements Validator {
                 throw (WSSecurityException) cause;
             } else {
                 throw new WSSecurityException(
-                    ErrorCode.FAILURE, "kerberosTicketValidationError", new Object[] {}, cause
+                    ErrorCode.FAILURE, "kerberosTicketValidationError", cause
                 );
             }
         }

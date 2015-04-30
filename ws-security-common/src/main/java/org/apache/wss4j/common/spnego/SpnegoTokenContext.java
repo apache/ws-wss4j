@@ -182,7 +182,7 @@ public class SpnegoTokenContext {
                     throw (WSSecurityException) cause;
                 } else {
                     throw new WSSecurityException(
-                         ErrorCode.FAILURE, "kerberosServiceTicketError", new Object[] {}, cause
+                         ErrorCode.FAILURE, "kerberosServiceTicketError", cause
                     );
                 }
             }
@@ -293,7 +293,7 @@ public class SpnegoTokenContext {
                     throw (WSSecurityException) cause;
                 } else {
                     throw new WSSecurityException(
-                         ErrorCode.FAILURE, "kerberosServiceTicketError", new Object[] {}, cause
+                         ErrorCode.FAILURE, "kerberosServiceTicketError", cause
                     );
                 }
             }
