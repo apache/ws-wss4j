@@ -253,7 +253,7 @@ public class KerberosSecurity extends BinarySecurity {
                 throw (WSSecurityException) cause;
             } else {
                 throw new WSSecurityException(
-                     ErrorCode.FAILURE, "kerberosServiceTicketError", new Object[] {}, cause
+                     ErrorCode.FAILURE, "kerberosServiceTicketError", cause
                 );
             }
         } finally {

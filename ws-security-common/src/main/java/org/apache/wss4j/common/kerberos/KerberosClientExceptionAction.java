@@ -139,12 +139,12 @@ public class KerberosClientExceptionAction implements PrivilegedExceptionAction<
             }
             catch (NoSuchMethodException e) {
                 throw new WSSecurityException(
-                    ErrorCode.FAILURE, "kerberosServiceTicketError", new Object[] {}, e
+                    ErrorCode.FAILURE, "kerberosServiceTicketError", e
                 );
             }
             catch (InvocationTargetException e) {
                 throw new WSSecurityException(
-                    ErrorCode.FAILURE, "kerberosServiceTicketError", new Object[] {}, e.getCause()
+                    ErrorCode.FAILURE, "kerberosServiceTicketError", e.getCause()
                 );
             }
             catch (IllegalAccessException e) {
