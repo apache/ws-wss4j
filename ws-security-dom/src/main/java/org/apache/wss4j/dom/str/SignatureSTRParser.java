@@ -215,7 +215,7 @@ public class SignatureSTRParser implements STRParser {
         } else {
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY,
-                    "unsupportedKeyInfo", strElement.toString());
+                    "unsupportedKeyInfo", new Object[] {strElement.toString()});
         }
         
         if (certs != null && certs.length > 0 && principal == null) {
@@ -319,8 +319,8 @@ public class SignatureSTRParser implements STRParser {
             }
         } catch (Exception e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE,
-                "noPassword", e, id);
+                WSSecurityException.ErrorCode.FAILURE, e,
+                "noPassword", new Object[] {id});
         }
 
         return null;
@@ -425,12 +425,12 @@ public class SignatureSTRParser implements STRParser {
                                     }
                                 } catch (Base64DecodingException e) {
                                     throw new WSSecurityException(
-                                        WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
+                                        WSSecurityException.ErrorCode.FAILURE, e, "decoding.general"
                                     );
                                 }
                             } catch (CertificateEncodingException ex) {
                                 throw new WSSecurityException(
-                                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", ex
+                                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, ex, "encodeError"
                                 );
                             }
                         }

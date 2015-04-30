@@ -62,7 +62,7 @@ public class BinarySecurity {
         if (!(el.equals(TOKEN_BST) || el.equals(TOKEN_KI))) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
-                "unhandledToken", el);
+                "unhandledToken", new Object[] {el});
         }
         String encoding = getEncodingType();
         if (encoding == null || "".equals(encoding)) {

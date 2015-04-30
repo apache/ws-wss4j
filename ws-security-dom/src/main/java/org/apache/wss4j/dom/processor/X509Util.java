@@ -104,23 +104,21 @@ public final class X509Util {
             cb.handle(new Callback[]{pwCb});
         } catch (IOException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE,
+                WSSecurityException.ErrorCode.FAILURE, e,
                 "noPassword",
-                e,
-                keyName);
+                new Object[] {keyName});
         } catch (UnsupportedCallbackException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE,
+                WSSecurityException.ErrorCode.FAILURE, e,
                 "noPassword",
-                e,
-                keyName);
+                new Object[] {keyName});
         }
         byte[] decryptedData = pwCb.getKey();
         if (decryptedData == null) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,
                 "noPassword",
-                keyName);
+                new Object[] {keyName});
         }
         return KeyUtils.prepareSecretKey(algorithm, decryptedData);
     }

@@ -64,9 +64,9 @@ public class P_SHA1 implements DerivationAlgorithm {
 
             return key;
         } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "errorInKeyDerivation", e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "errorInKeyDerivation");
         } catch (InvalidKeyException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "errorInKeyDerivation", e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "errorInKeyDerivation");
         }
     }
 

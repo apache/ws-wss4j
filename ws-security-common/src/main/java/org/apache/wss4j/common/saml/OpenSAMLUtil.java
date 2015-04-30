@@ -85,17 +85,20 @@ public final class OpenSAMLUtil {
     public static XMLObject fromDom(Element root) throws WSSecurityException {
         if (root == null) {
             LOG.debug("Attempting to unmarshal a null element!");
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", "Error unmarshalling a SAML assertion");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", 
+                                          new Object[] {"Error unmarshalling a SAML assertion"});
         }
         Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(root);
         if (unmarshaller == null) {
             LOG.debug("Unable to find an unmarshaller for element: " + root.getLocalName());
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", "Error unmarshalling a SAML assertion");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", 
+                                          new Object[] {"Error unmarshalling a SAML assertion"});
         }
         try {
             return unmarshaller.unmarshall(root);
         } catch (UnmarshallingException ex) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", ex, "Error unmarshalling a SAML assertion");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex, "empty",
+                                          new Object[] {"Error unmarshalling a SAML assertion"});
         }
     }
 
@@ -146,7 +149,8 @@ public final class OpenSAMLUtil {
                     element = marshaller.marshall(xmlObject, doc);
                 } 
             } catch (MarshallingException ex) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", ex, "Error marshalling a SAML assertion");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex, "empty", 
+                                              new Object[] {"Error marshalling a SAML assertion"});
             }
     
             if (signObject) {
@@ -217,7 +221,8 @@ public final class OpenSAMLUtil {
             try {
                 Signer.signObject(signature);
             } catch (SignatureException ex) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", ex, "Error signing a SAML assertion");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex, "empty", 
+                                              new Object[] {"Error signing a SAML assertion"});
             }
         }
     }

@@ -98,7 +98,8 @@ public class SecurityTokenRefSTRParser implements STRParser {
             
             if (secretKey == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", uri);
+                    WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId",
+                    new Object[] {uri});
             }
         } else if (secRef.containsReference()) {
             Reference reference = secRef.getReference();
@@ -120,7 +121,8 @@ public class SecurityTokenRefSTRParser implements STRParser {
             }
             if (secretKey == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", uri);
+                    WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId",
+                    new Object[] {uri});
             }
         } else if (secRef.containsKeyIdentifier()) {
             String valueType = secRef.getKeyIdentifierValueType();
@@ -155,7 +157,8 @@ public class SecurityTokenRefSTRParser implements STRParser {
                 }
                 if (secretKey == null) {
                     throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", uri);
+                        WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", 
+                        new Object[] {uri});
                 }
             } else {
                 if (SecurityTokenReference.ENC_KEY_SHA1_URI.equals(valueType)) {
@@ -167,7 +170,8 @@ public class SecurityTokenRefSTRParser implements STRParser {
                     );
                 if (secretKey == null) {
                     throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", uri);
+                        WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", 
+                        new Object[] {uri});
                 }
             }
         } else {
@@ -252,8 +256,8 @@ public class SecurityTokenRefSTRParser implements STRParser {
             }
         } catch (Exception e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE,
-                "noPassword", e, id);
+                WSSecurityException.ErrorCode.FAILURE, e,
+                "noPassword", new Object[] {id});
         }
 
         return null;
@@ -275,7 +279,8 @@ public class SecurityTokenRefSTRParser implements STRParser {
                     data.getSigVerCrypto(), data.getCallbackHandler());
         if (samlKi == null) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_CHECK, "invalidSAMLToken", "No Secret Key");
+                WSSecurityException.ErrorCode.FAILED_CHECK, "invalidSAMLToken", 
+                new Object[] {"No Secret Key"});
         }
         return samlKi.getSecret();
     }

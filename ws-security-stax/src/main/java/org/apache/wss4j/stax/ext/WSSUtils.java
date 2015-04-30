@@ -105,9 +105,9 @@ public class WSSUtils extends XMLSecurityUtils {
             try {
                 callbackHandler.handle(new Callback[]{callback});
             } catch (IOException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noPassword", e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "noPassword");
             } catch (UnsupportedCallbackException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noPassword", e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "noPassword");
             }
         }
     }
@@ -132,7 +132,7 @@ public class WSSUtils extends XMLSecurityUtils {
             sha.update(b4);
             return new String(Base64.encodeBase64(sha.digest()));
         } catch (NoSuchAlgorithmException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "decoding.general", e);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "decoding.general");
         } catch (UnsupportedEncodingException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }

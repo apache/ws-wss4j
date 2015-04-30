@@ -288,7 +288,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
             if (attachmentCallbackHandler == null) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY,
-                    "empty", "no attachment callbackhandler supplied"
+                    "empty", new Object[] {"no attachment callbackhandler supplied"}
                 );
             }
 
@@ -303,7 +303,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
             if (attachments == null || attachments.isEmpty() || !attachmentId.equals(attachments.get(0).getId())) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY,
-                    "empty", "Attachment not found"
+                    "empty", new Object[] {"Attachment not found"}
                 );
             }
 

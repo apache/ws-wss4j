@@ -382,7 +382,8 @@ public abstract class AbstractTestBase extends org.junit.Assert {
              */
             String action = (String) mc.get(WSHandlerConstants.ACTION);
             if (action == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", "WSS4JHandler: No action defined");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
+                                              new Object[] {"WSS4JHandler: No action defined"});
             }
             List<HandlerAction> actions = WSSecurityUtil.decodeHandlerAction(action, null);
             if (actions.isEmpty()) {
@@ -418,7 +419,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
                  * there is a specific parameter to get a username.
                  */
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
-                        "WSS4JHandler: Empty username for specified action"
+                                              new Object[] {"WSS4JHandler: Empty username for specified action"}
                 );
             }
             if (doDebug) {
@@ -433,7 +434,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
             Document doc = (Document) mc.get(SECURED_DOCUMENT);
             if (doc == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
-                        "WSS4JHandler: cannot get SOAP envlope from message"
+                                              new Object[] {"WSS4JHandler: cannot get SOAP envlope from message"}
                 );
             }
             if (doDebug) {
@@ -452,7 +453,8 @@ public abstract class AbstractTestBase extends org.junit.Assert {
                 throws WSSecurityException {
             String action = (String) mc.get(WSHandlerConstants.ACTION);
             if (action == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", "WSS4JHandler: No action defined");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", 
+                                              new Object[] {"WSS4JHandler: No action defined"});
             }
             List<Integer> actions = WSSecurityUtil.decodeAction(action);
 
@@ -497,8 +499,8 @@ public abstract class AbstractTestBase extends org.junit.Assert {
                 if (doDebug) {
                     log.debug(ex.getMessage(), ex);
                 }
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
-                        "WSS4JHandler: security processing failed", ex
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex, "empty",
+                                              new Object[] {"WSS4JHandler: security processing failed"}
                 );
             }
             if (wsResult == null || wsResult.size() == 0) {
@@ -507,7 +509,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
                     return true;
                 } else {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "empty",
-                            "WSS4JHandler: Request does not contain required Security header"
+                                                  new Object[] {"WSS4JHandler: Request does not contain required Security header"}
                     );
                 }
             }
@@ -524,7 +526,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
              */
             if (!checkReceiverResults(wsResult, actions)) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
-                        "WSS4JHandler: security processing failed (actions mismatch)"
+                                              new Object[] {"WSS4JHandler: security processing failed (actions mismatch)"}
                 );
             }
 

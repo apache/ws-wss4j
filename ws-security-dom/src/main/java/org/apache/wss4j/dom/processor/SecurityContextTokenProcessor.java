@@ -111,16 +111,14 @@ public class SecurityContextTokenProcessor implements Processor {
             cb.handle(callbacks);
         } catch (IOException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, 
+                WSSecurityException.ErrorCode.FAILURE, e,
                 "noKey",
-                e,
-                identifier);
+                new Object[] {identifier});
         } catch (UnsupportedCallbackException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, 
+                WSSecurityException.ErrorCode.FAILURE, e,
                 "noKey",
-                e,
-                identifier);
+                new Object[] {identifier});
         }
 
         return callback.getKey();

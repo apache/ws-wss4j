@@ -33,6 +33,7 @@ import org.apache.xml.security.stax.impl.processor.output.FinalOutputProcessor;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
+
 import java.util.*;
 
 /**
@@ -154,9 +155,9 @@ public class SecurityHeaderReorderProcessor extends AbstractOutputProcessor {
                             !xmlSecStartElement.getName().equals(securityHeaderOrder.getSecurityHeaderElementName())) {
                         throw new WSSecurityException(
                                 WSSecurityException.ErrorCode.FAILURE, "empty",
-                                "Invalid security header order. Expected " +
+                                new Object[] {"Invalid security header order. Expected " +
                                         securityHeaderOrder.getSecurityHeaderElementName() +
-                                        " but got " + xmlSecStartElement.getName());
+                                        " but got " + xmlSecStartElement.getName()});
                     }
 
                     Map<SecurityHeaderOrder, Deque<XMLSecEvent>> map = actionEventMap.get(securityHeaderOrder.getAction());

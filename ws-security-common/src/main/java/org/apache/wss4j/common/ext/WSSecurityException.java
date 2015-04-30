@@ -127,61 +127,34 @@ public class WSSecurityException extends XMLSecurityException {
     }
 
     private ErrorCode errorCode;
-
-    /**
-     * Constructor.
-     * <p/>
-     *
-     * @param errorCode
-     * @param msgId
-     * @param exception
-     * @param arguments
-     */
-    public WSSecurityException(ErrorCode errorCode, String msgId, Exception exception, Object... arguments) {
-        super(msgId, arguments, exception);
+    
+    public WSSecurityException(ErrorCode errorCode) {
+        this(errorCode, errorCode.name());
+    }
+    
+    public WSSecurityException(ErrorCode errorCode, String msgId) {
+        super(msgId, new Object[]{});
         this.errorCode = errorCode;
     }
-
-    /**
-     * Constructor.
-     * <p/>
-     *
-     * @param errorCode
-     * @param msgId
-     * @param exception
-     */
-    public WSSecurityException(ErrorCode errorCode, String msgId, Exception exception) {
-        super(msgId, exception);
-        this.errorCode = errorCode;
-    }
-
+    
     public WSSecurityException(ErrorCode errorCode, Exception exception) {
         super(exception);
         this.errorCode = errorCode;
     }
-
-    /**
-     * Constructor.
-     * <p/>
-     *
-     * @param errorCode
-     * @param msgId
-     * @param arguments
-     */
-    public WSSecurityException(ErrorCode errorCode, String msgId, Object... arguments) {
-        super(msgId, arguments);
+    
+    public WSSecurityException(ErrorCode errorCode, Exception exception, String msgId) {
+        super(msgId, exception);
         this.errorCode = errorCode;
     }
 
+    public WSSecurityException(ErrorCode errorCode, Exception exception, String msgId, Object[] arguments) {
+        super(msgId, arguments, exception);
+        this.errorCode = errorCode;
+    }
 
-    /**
-     * Constructor.
-     * <p/>
-     *
-     * @param errorCode
-     */
-    public WSSecurityException(ErrorCode errorCode) {
-        this(errorCode, errorCode.name());
+    public WSSecurityException(ErrorCode errorCode, String msgId, Object[] arguments) {
+        super(msgId, arguments);
+        this.errorCode = errorCode;
     }
 
     /**

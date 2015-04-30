@@ -80,7 +80,8 @@ public class KerberosClientSecurityToken extends GenericOutboundSecurityToken {
             if (clientPrincipals.isEmpty()) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE,
-                    "kerberosLoginError", "No Client principals found after login"
+                    "kerberosLoginError", 
+                    new Object[] {"No Client principals found after login"}
                 );
             }
             // Store the TGT
@@ -113,7 +114,7 @@ public class KerberosClientSecurityToken extends GenericOutboundSecurityToken {
                     throw (WSSecurityException) cause;
                 } else {
                     throw new WSSecurityException(
-                         ErrorCode.FAILURE, "kerberosServiceTicketError", new Object[] {}, cause
+                         ErrorCode.FAILURE, new Exception(cause), "kerberosServiceTicketError"
                     );
                 }
             }

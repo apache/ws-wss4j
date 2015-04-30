@@ -358,17 +358,19 @@ public final class ConfigurationConverter {
                                  callbackHandlerClass,
                                  CallbackHandler.class);
         } catch (ClassNotFoundException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                    "empty", e,
-                    "WSHandler: cannot load callback handler class: " + callbackHandlerClass
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
+                    "empty",
+                    new Object[] {"WSHandler: cannot load callback handler class: " 
+                    + callbackHandlerClass}
             );
         }
         try {
             cbHandler = cbClass.newInstance();
         } catch (Exception e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                    "empty", e,
-                    "WSHandler: cannot create instance of callback handler: " + callbackHandlerClass
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
+                    "empty",
+                    new Object[] {"WSHandler: cannot create instance of callback handler: " 
+                    + callbackHandlerClass}
             );
         }
         return cbHandler;

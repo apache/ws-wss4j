@@ -25,7 +25,6 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
@@ -62,8 +61,8 @@ public class EncryptedAssertionProcessor implements Processor {
         String typeStr = encryptedDataElement.getAttributeNS(null, "Type");
         if (typeStr != null && !(WSConstants.ENC_NS + "Element").equals(typeStr)) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY, "badElement", "Element",
-                typeStr
+                WSSecurityException.ErrorCode.INVALID_SECURITY, "badElement", 
+                new Object[] {"Element", typeStr}
             );
         }
         

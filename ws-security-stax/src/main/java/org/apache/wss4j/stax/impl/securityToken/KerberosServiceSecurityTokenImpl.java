@@ -96,7 +96,7 @@ public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityTok
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILURE,
                         "kerberosLoginError",
-                        "No Client principals found after login"
+                        new Object[] {"No Client principals found after login"}
                     );
                 }
                 service = principals.iterator().next().getName();
@@ -116,7 +116,7 @@ public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityTok
                     throw (WSSecurityException) cause;
                 } else {
                     throw new WSSecurityException(
-                        ErrorCode.FAILURE, "kerberosTicketValidationError", new Object[] {}, cause
+                        ErrorCode.FAILURE, new Exception(cause), "kerberosTicketValidationError"
                     );
                 }
             }

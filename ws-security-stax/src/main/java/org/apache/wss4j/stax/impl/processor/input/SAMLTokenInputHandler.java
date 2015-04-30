@@ -80,6 +80,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Comment;
 import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.ProcessingInstruction;
+
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -122,7 +123,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             Signature signature = samlAssertionWrapper.getSignature();
             if (signature == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
-                        "empty", "no signature to validate");
+                        "empty", new Object[] {"no signature to validate"});
             }
 
             int sigKeyInfoIdx = getSignatureKeyInfoIndex(eventQueue);
@@ -145,15 +146,15 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             } else {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
-                        "cannot get certificate or key"
+                        new Object[] {"cannot get certificate or key"}
                 );
             }
             SignatureValidator sigValidator = new SignatureValidator(credential);
             try {
                 sigValidator.validate(signature);
             } catch (ValidationException ex) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                        "empty", ex, "SAML signature validation failed");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex,
+                        "empty", new Object[] {"SAML signature validation failed"});
             }
         }
 
@@ -557,7 +558,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
                         "empty",
-                        "Illegal XMLEvent received: " + xmlSecEvent.getEventType());
+                        new Object[] {"Illegal XMLEvent received: " + xmlSecEvent.getEventType()});
         }
         return currentNode;
     }
@@ -748,7 +749,8 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             }
             if (methodNotSatisfied) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION,
-                    "empty", "SAML proof-of-possession of the private/secret key failed");
+                    "empty", 
+                    new Object[] {"SAML proof-of-possession of the private/secret key failed"});
             }
         }
 

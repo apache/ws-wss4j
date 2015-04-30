@@ -163,7 +163,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILURE,
                         "noUserCertsFound",
-                        user, "encryption");
+                        new Object[] {user, "encryption"});
                 }
                 remoteCert = certs[0];
             }
@@ -397,7 +397,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE,
                     "noEncElement",
-                    "{" + encPart.getNamespace() + "}" + encPart.getName());
+                    new Object[] {"{" + encPart.getNamespace() + "}" + encPart.getName()});
             }
 
             for (Element elementToEncrypt : elementsToEncrypt) {
@@ -425,7 +425,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             if (attachmentCallbackHandler == null) {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILURE,
-                        "empty", "no attachment callbackhandler supplied"
+                        "empty", new Object[] {"no attachment callbackhandler supplied"}
                 );
             }
 

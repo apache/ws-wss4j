@@ -64,7 +64,7 @@ public class SignatureConfirmation {
                 signatureValue = Base64.decode(sv);
             } catch (Base64DecodingException e) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
+                    WSSecurityException.ErrorCode.FAILURE, e, "decoding.general"
                 );
             }
         }

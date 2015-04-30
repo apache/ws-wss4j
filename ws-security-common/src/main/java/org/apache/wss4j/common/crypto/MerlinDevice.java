@@ -222,7 +222,7 @@ public class MerlinDevice extends Merlin {
                 if (DO_DEBUG) {
                     LOG.debug(e.getMessage(), e);
                 }
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "ioError00", e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "ioError00");
             } finally {
                 if (is != null) {
                     is.close();

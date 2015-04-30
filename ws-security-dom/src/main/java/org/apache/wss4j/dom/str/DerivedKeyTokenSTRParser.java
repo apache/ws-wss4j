@@ -90,7 +90,8 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                 getSecretKeyFromToken(uri, null, WSPasswordCallback.SECURITY_CONTEXT_TOKEN, data);
             if (secretKey == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", uri);
+                    WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", 
+                    new Object[] {uri});
             }
         } else if (secRef.containsKeyIdentifier()) {
             String keyIdentifierValueType = secRef.getKeyIdentifierValueType();
@@ -116,7 +117,8 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                 }
                 if (secretKey == null) {
                     throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", uri);
+                        WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", 
+                        new Object[] {uri});
                 }
             } else {
                 if (keyIdentifierValueType.equals(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
@@ -131,7 +133,8 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                        ); 
                     if (secretKey == null) {
                         throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", uri);
+                            WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", 
+                            new Object[] {uri});
                     }
                 } else {
                     secretKey = crypto.getPrivateKey(certs[0], data.getCallbackHandler()).getEncoded();
@@ -222,8 +225,8 @@ public class DerivedKeyTokenSTRParser implements STRParser {
             }
         } catch (Exception e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE,
-                "noPassword", e, id);
+                WSSecurityException.ErrorCode.FAILURE, e,
+                "noPassword", new Object[] {id});
         }
 
         return null;

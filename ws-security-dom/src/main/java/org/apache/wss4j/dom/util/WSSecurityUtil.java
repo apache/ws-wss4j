@@ -830,8 +830,8 @@ public final class WSSecurityUtil {
             return Cipher.getInstance(keyAlgorithm, provider);
         } catch (NoSuchPaddingException ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp", 
-                ex, "No such padding: " + cipherAlgo);
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex, "unsupportedKeyTransp", 
+                new Object[] {"No such padding: " + cipherAlgo});
         } catch (NoSuchAlgorithmException ex) {
             // Check to see if an RSA OAEP MGF-1 with SHA-1 algorithm was requested
             // Some JDKs don't support RSA/ECB/OAEPPadding
@@ -840,18 +840,18 @@ public final class WSSecurityUtil {
                     return Cipher.getInstance("RSA/ECB/OAEPWithSHA1AndMGF1Padding");
                 } catch (Exception e) {
                     throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
-                        e, "No such algorithm: " + cipherAlgo);
+                        WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, e, "unsupportedKeyTransp",
+                        new Object[] {"No such algorithm: " + cipherAlgo});
                 }
             } else {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
-                    ex, "No such algorithm: " + cipherAlgo);
+                    WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex, "unsupportedKeyTransp",
+                    new Object[] {"No such algorithm: " + cipherAlgo});
             }
         } catch (NoSuchProviderException ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
-                ex, "No such provider " + JCEMapper.getProviderId() + " for: " + cipherAlgo);
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex, "unsupportedKeyTransp",
+                new Object[] {"No such provider " + JCEMapper.getProviderId() + " for: " + cipherAlgo});
         }
     }
     
@@ -971,7 +971,7 @@ public final class WSSecurityUtil {
                 actions.add(WSConstants.CUSTOM_TOKEN);
             } else {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
-                        "Unknown action defined: " + single[i]
+                                              new Object[] {"Unknown action defined: " + single[i]}
                 );
             }
         }
@@ -1024,13 +1024,13 @@ public final class WSSecurityUtil {
                     int parsedAction = Integer.parseInt(single[i]);
                     if (wssConfig.getAction(parsedAction) == null) {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
-                                "Unknown action defined: " + single[i]
+                                                      new Object[] {"Unknown action defined: " + single[i]}
                         );
                     }
                     actions.add(new HandlerAction(parsedAction));
                 } catch (NumberFormatException ex) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
-                            "Unknown action defined: " + single[i]
+                                                  new Object[] {"Unknown action defined: " + single[i]}
                     );
                 }
             }
@@ -1049,9 +1049,8 @@ public final class WSSecurityUtil {
         try {
             return XMLSecurityConstants.generateBytes(length);
         } catch (Exception ex) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                    "empty", ex,
-                    "Error in generating nonce of length " + length
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex,
+                    "empty", new Object[] {"Error in generating nonce of length " + length}
             );
         }
     }
@@ -1070,8 +1069,8 @@ public final class WSSecurityUtil {
             }
             return digest.digest(inputBytes);
         } catch (Exception e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", e,
-                    "Error in generating digest"
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "empty",
+                                          new Object[] {"Error in generating digest"}
             );
         }
     }
@@ -1188,7 +1187,8 @@ public final class WSSecurityUtil {
         }
         
         throw new WSSecurityException(
-            WSSecurityException.ErrorCode.FAILED_CHECK, "requiredElementNotSigned", elem);
+            WSSecurityException.ErrorCode.FAILED_CHECK, "requiredElementNotSigned", 
+            new Object[] {elem});
     }
     
     /**

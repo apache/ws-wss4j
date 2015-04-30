@@ -119,7 +119,7 @@ public class WSSecUsernameToken extends WSSecBase {
                 return UsernameTokenUtil.generateDerivedKey(Base64.decode(password), saltValue, iteration);
             } catch (Base64DecodingException e) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
+                    WSSecurityException.ErrorCode.FAILURE, e, "decoding.general"
                 );
             }
         } else {

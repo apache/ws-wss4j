@@ -52,7 +52,7 @@ public class X509SubjectPublicKeyInfo extends DERDecoder {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                 "noSKIHandling",
-                "Support for X.509-encoded public keys only"
+                new Object[] {"Support for X.509-encoded public keys only"}
             );
         }
     }
@@ -86,7 +86,7 @@ public class X509SubjectPublicKeyInfo extends DERDecoder {
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                     "noSKIHandling",
-                    "Unsupported X.509 public key format"
+                    new Object[] {"Unsupported X.509 public key format"}
             );
         }
         skip(algIDlen);           // AlgorithmIdentifier contents
@@ -97,7 +97,7 @@ public class X509SubjectPublicKeyInfo extends DERDecoder {
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                     "noSKIHandling",
-                    "Invalid X.509 public key format"
+                    new Object[] {"Invalid X.509 public key format"}
             );
         }
         skip(1);   // number unused bits

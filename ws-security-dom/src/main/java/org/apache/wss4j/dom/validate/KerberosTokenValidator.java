@@ -166,10 +166,9 @@ public class KerberosTokenValidator implements Validator {
                 LOG.debug(ex.getMessage(), ex);
             }
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE,
+                WSSecurityException.ErrorCode.FAILURE, ex,
                 "kerberosLoginError", 
-                ex,
-                ex.getMessage()
+                new Object[] {ex.getMessage()}
             );
         }
         if (LOG.isDebugEnabled()) {
@@ -187,7 +186,7 @@ public class KerberosTokenValidator implements Validator {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, 
                     "kerberosLoginError",
-                    "No Client principals found after login");
+                    new Object[] {"No Client principals found after login"});
             }
             service = principals.iterator().next().getName();
         }
@@ -205,7 +204,7 @@ public class KerberosTokenValidator implements Validator {
                 throw (WSSecurityException) cause;
             } else {
                 throw new WSSecurityException(
-                    ErrorCode.FAILURE, "kerberosTicketValidationError", cause
+                    ErrorCode.FAILURE, new Exception(cause), "kerberosTicketValidationError"
                 );
             }
         }
@@ -245,7 +244,7 @@ public class KerberosTokenValidator implements Validator {
                 }
             } catch (KerberosTokenDecoderException e) {
                 // TODO
-                throw new WSSecurityException(ErrorCode.FAILURE, "Error retrieving session key.", e);
+                throw new WSSecurityException(ErrorCode.FAILURE, e, "Error retrieving session key.");
             }            
         } else {
             LOG.debug("KerberosTokenDecoder is not set.");

@@ -126,22 +126,22 @@ public class KerberosServiceExceptionAction implements PrivilegedExceptionAction
                 }
                 catch (ClassNotFoundException e) {
                     throw new WSSecurityException(
-                        ErrorCode.FAILURE, KERBEROS_TICKET_VALIDATION_ERROR_MSG_ID, new Object[] {}, e
+                        ErrorCode.FAILURE, e, KERBEROS_TICKET_VALIDATION_ERROR_MSG_ID
                     );
                 }
                 catch (NoSuchMethodException e) {
                     throw new WSSecurityException(
-                        ErrorCode.FAILURE, KERBEROS_TICKET_VALIDATION_ERROR_MSG_ID, e
+                        ErrorCode.FAILURE, e, KERBEROS_TICKET_VALIDATION_ERROR_MSG_ID
                     );
                 }
                 catch (InvocationTargetException e) {
                     throw new WSSecurityException(
-                        ErrorCode.FAILURE, KERBEROS_TICKET_VALIDATION_ERROR_MSG_ID, e.getCause()
+                        ErrorCode.FAILURE, e, KERBEROS_TICKET_VALIDATION_ERROR_MSG_ID
                     );
                 }
                 catch (IllegalAccessException e) {
                     throw new WSSecurityException(
-                        ErrorCode.FAILURE, KERBEROS_TICKET_VALIDATION_ERROR_MSG_ID, new Object[] {}, e
+                        ErrorCode.FAILURE, e, KERBEROS_TICKET_VALIDATION_ERROR_MSG_ID
                     );
                 }      
             }            

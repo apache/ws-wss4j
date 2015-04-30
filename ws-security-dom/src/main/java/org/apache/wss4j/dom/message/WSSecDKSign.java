@@ -147,7 +147,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         } catch (Exception ex) {
             LOG.error("", ex);
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", ex
+                WSSecurityException.ErrorCode.FAILED_SIGNATURE, ex, "noXMLSig"
             );
         }
 

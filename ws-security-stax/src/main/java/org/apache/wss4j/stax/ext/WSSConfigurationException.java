@@ -27,15 +27,15 @@ public class WSSConfigurationException extends WSSecurityException {
 
     private static final long serialVersionUID = 689628294822027113L;
 
-    public WSSConfigurationException(ErrorCode errorCode, String msgId, Throwable exception, Object ... args) {
-        super(errorCode, msgId, exception, args);
+    public WSSConfigurationException(ErrorCode errorCode, Exception exception, String msgId, Object[] args) {
+        super(errorCode, exception, msgId, args);
     }
 
-    public WSSConfigurationException(ErrorCode errorCode, String msgId, Throwable exception) {
-        super(errorCode, msgId, exception);
+    public WSSConfigurationException(ErrorCode errorCode, Exception exception, String msgId) {
+        super(errorCode, exception, msgId);
     }
 
-    public WSSConfigurationException(ErrorCode errorCode, String msgId, Object ... args) {
+    public WSSConfigurationException(ErrorCode errorCode, String msgId, Object[] args) {
         super(errorCode, msgId, args);
     }
 

@@ -173,7 +173,7 @@ public class WSSecSignature extends WSSecSignatureBase {
         } catch (Exception ex) {
             LOG.error("", ex);
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", ex
+                WSSecurityException.ErrorCode.FAILED_SIGNATURE, ex, "noXMLSig"
             );
         }
 
@@ -326,7 +326,7 @@ public class WSSecSignature extends WSSecSignatureBase {
                 } catch (java.security.KeyException ex) {
                     LOG.error("", ex);
                     throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", ex
+                        WSSecurityException.ErrorCode.FAILED_SIGNATURE, ex, "noXMLSig"
                     );
                 }
                 break;
@@ -820,7 +820,7 @@ public class WSSecSignature extends WSSecSignatureBase {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILURE,
                         "noUserCertsFound",
-                        user, "signature");
+                        new Object[] {user, "signature"});
             }
             certUri = getWsConfig().getIdAllocator().createSecureId("X509-", certs[0]);  
             //
@@ -838,7 +838,7 @@ public class WSSecSignature extends WSSecSignatureBase {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILURE,
                         "unknownSignatureAlgorithm",
-                        pubKeyAlgo);
+                        new Object[] {pubKeyAlgo});
                 }
             }
         }

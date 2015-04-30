@@ -54,9 +54,9 @@ public class ExternalSecurityTokenImpl extends AbstractInboundSecurityToken {
             try {
                 securityProperties.getCallbackHandler().handle(new Callback[]{pwcb});
             } catch (IOException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noPassword", e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "noPassword");
             } catch (UnsupportedCallbackException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noPassword", e);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "noPassword");
             }
             this.tokenElement = pwcb.getCustomToken();
             this.key = pwcb.getKey();
@@ -64,7 +64,8 @@ public class ExternalSecurityTokenImpl extends AbstractInboundSecurityToken {
         
         if (this.tokenElement == null) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", id
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", 
+                new Object[] {id}
             );
         }
     }
