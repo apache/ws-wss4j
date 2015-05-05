@@ -19,12 +19,12 @@
 
 package org.apache.wss4j.common.kerberos;
 
+import org.apache.directory.shared.kerberos.codec.KerberosDecoder;
 import org.apache.directory.shared.kerberos.codec.types.EncryptionType;
 import org.apache.directory.shared.kerberos.components.EncTicketPart;
 import org.apache.directory.shared.kerberos.components.EncryptionKey;
 import org.apache.directory.shared.kerberos.exceptions.KerberosException;
 import org.apache.directory.shared.kerberos.messages.ApReq;
-import org.apache.directory.server.kerberos.protocol.codec.KerberosDecoder;
 import org.apache.directory.server.kerberos.shared.crypto.encryption.CipherTextHandler;
 import org.apache.directory.server.kerberos.shared.crypto.encryption.KeyUsage;
 
