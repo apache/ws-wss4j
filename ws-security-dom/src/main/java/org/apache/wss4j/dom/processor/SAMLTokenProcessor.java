@@ -174,7 +174,7 @@ public class SAMLTokenProcessor implements Processor {
             if (keyInfo == null) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
-                    new Object[] {"cannot get certificate or key"}
+                    "cannot get certificate or key"
                 );
             }
             SAMLKeyInfo samlKeyInfo = 
@@ -190,7 +190,7 @@ public class SAMLTokenProcessor implements Processor {
             } else {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
-                    new Object[] {"cannot get certificate or key"});
+                    "cannot get certificate or key");
             }
             
             // Not checking signature here, just marshalling into an XMLSignature
@@ -204,8 +204,8 @@ public class SAMLTokenProcessor implements Processor {
                 xmlSignature = signatureFactory.unmarshalXMLSignature(context);
             } catch (MarshalException ex) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILED_CHECK, ex, "invalidSAMLsecurity", 
-                    new Object[] {"cannot get certificate or key"}
+                    WSSecurityException.ErrorCode.FAILED_CHECK, "invalidSAMLsecurity", 
+                    ex, "cannot get certificate or key"
                 );
             }
             

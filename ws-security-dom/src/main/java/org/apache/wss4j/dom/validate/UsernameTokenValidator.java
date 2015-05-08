@@ -182,7 +182,7 @@ public class UsernameTokenValidator implements Validator {
                     passDigest = UsernameToken.doPasswordDigest(nonce, createdTime, Base64.decode(origPassword));
                 } catch (Base64DecodingException e) {
                     throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILURE, e, "decoding.general"
+                        WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
                     );
                 }
             } else {

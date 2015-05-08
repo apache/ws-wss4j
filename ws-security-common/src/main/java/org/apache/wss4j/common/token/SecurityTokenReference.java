@@ -26,6 +26,11 @@ import java.util.Arrays;
 
 import javax.xml.namespace.QName;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.Text;
+
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
@@ -38,10 +43,6 @@ import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.utils.Base64;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.Text;
 
 /**
  * Security Token Reference.
@@ -77,8 +78,7 @@ public class SecurityTokenReference {
         element = elem;
         QName el = new QName(element.getNamespaceURI(), element.getLocalName());
         if (!STR_QNAME.equals(el)) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "badElement", 
-                                          new Object[] {STR_QNAME, el});
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "badElement", STR_QNAME, el);
         }
         
         checkBSPCompliance(bspEnforcer);
@@ -189,7 +189,7 @@ public class SecurityTokenReference {
             data = cert.getEncoded();
         } catch (CertificateEncodingException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, e, "encodeError"
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", e
             );
         }
         Text text = doc.createTextNode(Base64.encode(data));
@@ -214,7 +214,7 @@ public class SecurityTokenReference {
         if (cert.getVersion() != 3) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
-                "invalidCertForSKI", new Object[] {cert.getVersion()});
+                "invalidCertForSKI", cert.getVersion());
         }
         
         Document doc = element.getOwnerDocument();
@@ -246,7 +246,7 @@ public class SecurityTokenReference {
             encodedCert = cert.getEncoded();
         } catch (CertificateEncodingException e1) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, e1, "encodeError"
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", e1
             );
         }
         try {
@@ -255,7 +255,7 @@ public class SecurityTokenReference {
             createKeyIdentifier(doc, THUMB_URI, text, true);
         } catch (WSSecurityException e1) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, e1, "decoding.general"
+                WSSecurityException.ErrorCode.FAILURE, "decoding.general", e1
             );
         }
     }
@@ -340,7 +340,7 @@ public class SecurityTokenReference {
                     thumb = Base64.decode(text);
                 } catch (Base64DecodingException e) {
                     throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILURE, e, "decoding.general"
+                        WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
                     );
                 }
                 CryptoType cryptoType = new CryptoType(CryptoType.TYPE.THUMBPRINT_SHA1);

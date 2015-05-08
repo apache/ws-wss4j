@@ -124,7 +124,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             Signature signature = samlAssertionWrapper.getSignature();
             if (signature == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
-                        "empty", new Object[] {"no signature to validate"});
+                        "empty", "no signature to validate");
             }
 
             int sigKeyInfoIdx = getSignatureKeyInfoIndex(eventQueue);
@@ -147,14 +147,14 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             } else {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
-                        new Object[] {"cannot get certificate or key"}
+                        "cannot get certificate or key"
                 );
             }
             try {
                 SignatureValidator.validate(signature, credential);
             } catch (SignatureException ex) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                        ex, "empty", new Object[] {"SAML signature validation failed"});
+                        "empty", ex, "SAML signature validation failed");
             }
         }
 
@@ -558,7 +558,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
                         "empty",
-                        new Object[] {"Illegal XMLEvent received: " + xmlSecEvent.getEventType()});
+                        "Illegal XMLEvent received: " + xmlSecEvent.getEventType());
         }
         return currentNode;
     }
@@ -749,8 +749,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             }
             if (methodNotSatisfied) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION,
-                    "empty", 
-                    new Object[] {"SAML proof-of-possession of the private/secret key failed"});
+                    "empty", "SAML proof-of-possession of the private/secret key failed");
             }
         }
 

@@ -135,8 +135,8 @@ public final class KeyUtils {
             return Cipher.getInstance(keyAlgorithm, provider);
         } catch (NoSuchPaddingException ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex, "unsupportedKeyTransp", 
-                new Object[] {"No such padding: " + cipherAlgo});
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp", 
+                ex, "No such padding: " + cipherAlgo);
         } catch (NoSuchAlgorithmException ex) {
             // Check to see if an RSA OAEP MGF-1 with SHA-1 algorithm was requested
             // Some JDKs don't support RSA/ECB/OAEPPadding
@@ -145,18 +145,18 @@ public final class KeyUtils {
                     return Cipher.getInstance("RSA/ECB/OAEPWithSHA1AndMGF1Padding");
                 } catch (Exception e) {
                     throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, e, "unsupportedKeyTransp",
-                        new Object[] {"No such algorithm: " + cipherAlgo});
+                        WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                        e, "No such algorithm: " + cipherAlgo);
                 }
             } else {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex, "unsupportedKeyTransp",
-                    new Object[] {"No such algorithm: " + cipherAlgo});
+                    WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                    ex, "No such algorithm: " + cipherAlgo);
             }
         } catch (NoSuchProviderException ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex, "unsupportedKeyTransp",
-                new Object[] {"No such provider " + JCEMapper.getProviderId() + " for: " + cipherAlgo});
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                ex, "No such provider " + JCEMapper.getProviderId() + " for: " + cipherAlgo);
         }
     }
     
@@ -174,8 +174,8 @@ public final class KeyUtils {
             }
             return digest.digest(inputBytes);
         } catch (Exception e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "empty",
-                                          new Object[] {"Error in generating digest"}
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", e,
+                    "Error in generating digest"
             );
         }
     }

@@ -60,7 +60,7 @@ public class DERDecoder {
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                     "noSKIHandling",
-                    new Object[] {"Invalid DER string"}
+                    "Invalid DER string"
             );
         }
         arr = derEncoded;
@@ -86,7 +86,7 @@ public class DERDecoder {
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                     "noSKIHandling",
-                    new Object[] {"Unsupported DER format"}
+                    "Unsupported DER format"
             );
         }
         pos += length;
@@ -118,7 +118,7 @@ public class DERDecoder {
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                     "noSKIHandling",
-                    new Object[] {"Invalid DER format"}
+                    "Invalid DER format"
             );
         }
         pos++;
@@ -137,7 +137,7 @@ public class DERDecoder {
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                     "noSKIHandling",
-                    new Object[] {"Invalid DER format"}
+                    "Invalid DER format"
             );
         }
         return arr[pos] == val;
@@ -165,7 +165,7 @@ public class DERDecoder {
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                     "noSKIHandling",
-                    new Object[] {"Invalid DER format"}
+                    "Invalid DER format"
             );
         }
         int len;
@@ -180,7 +180,7 @@ public class DERDecoder {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                         "noSKIHandling",
-                        new Object[] {"Invalid DER format"}
+                        "Invalid DER format"
                 );
             }
             byte[] lenBytes = new byte[nbytes];
@@ -206,13 +206,13 @@ public class DERDecoder {
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                     "noSKIHandling",
-                    new Object[] {"Invalid DER format"}
+                    "Invalid DER format"
              );
         } else if (length < 0) {
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                     "noSKIHandling",
-                    new Object[] {"Unsupported DER format"}
+                    "Unsupported DER format"
             );
         }
         byte[] value = new byte[length];

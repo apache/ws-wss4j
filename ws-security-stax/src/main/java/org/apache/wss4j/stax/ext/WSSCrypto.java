@@ -62,7 +62,7 @@ class WSSCrypto {
                                                   passwordEncryptor);
                 keyStore = crypto.getKeyStore();
             } catch (Exception e) {
-                throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, e, "signatureCryptoFailure");
+                throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureCryptoFailure", e);
             }
         } else {
             try {
@@ -73,7 +73,7 @@ class WSSCrypto {
                 crypto.setCRLCertStore(this.getCrlCertStore());
                 crypto.setPasswordEncryptor(passwordEncryptor);
             } catch (Exception e) {
-                throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, e, "signatureCryptoFailure");
+                throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureCryptoFailure", e);
             }
         }
         

@@ -53,7 +53,6 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -85,7 +84,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             if (attachmentCallbackHandler == null) {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.INVALID_SECURITY,
-                        "empty", new Object[] {"no attachment callbackhandler supplied"}
+                        "empty", "no attachment callbackhandler supplied"
                 );
             }
 
@@ -103,7 +102,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             if (attachments == null || attachments.isEmpty() || !attachmentId.equals(attachments.get(0).getId())) {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.INVALID_SECURITY,
-                        "empty", new Object[] {"Attachment not found"}
+                        "empty", "Attachment not found"
                 );
             }
 
@@ -128,8 +127,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                     if (!(transformer instanceof AttachmentContentSignatureTransform)) {
                         throw new WSSecurityException(
                                 WSSecurityException.ErrorCode.INVALID_SECURITY,
-                                "empty", 
-                                new Object[] {"First transform must be Attachment[Content|Complete]SignatureTransform"}
+                                "empty", "First transform must be Attachment[Content|Complete]SignatureTransform"
                         );
                     }
                     Map<String, Object> transformerProperties = new HashMap<>(2);
@@ -329,7 +327,8 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
         if (transformTypeList.size() > maximumAllowedTransformsPerReference) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY,
                     "secureProcessing.MaximumAllowedTransformsPerReference",
-                    new Object[] {transformTypeList.size(), maximumAllowedTransformsPerReference});
+                    transformTypeList.size(),
+                    maximumAllowedTransformsPerReference);
         }
 
         String algorithm = null;

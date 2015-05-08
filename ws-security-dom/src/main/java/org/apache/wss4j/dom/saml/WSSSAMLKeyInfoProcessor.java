@@ -93,8 +93,8 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
                     try {
                         return new SAMLKeyInfo(Base64.decode(txt.getData()));
                     } catch (Exception e) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
-                                "decoding.general");
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                                "decoding.general", e);
                     }
                 } else if (SecurityTokenReference.STR_QNAME.equals(el)) {
                     STRParserParameters parameters = new STRParserParameters();

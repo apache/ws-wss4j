@@ -314,7 +314,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                         throw new WSSecurityException(
                                 WSSecurityException.ErrorCode.FAILURE,
                                 "unsupportedKeyTransp",
-                                new Object[] {"public key algorithm too weak to encrypt symmetric key"}
+                                "public key algorithm too weak to encrypt symmetric key"
                         );
                     }
                     byte[] encryptedEphemeralKey = cipher.wrap(secretKey);

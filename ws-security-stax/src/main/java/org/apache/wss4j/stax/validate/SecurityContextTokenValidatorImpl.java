@@ -64,7 +64,7 @@ public class SecurityContextTokenValidatorImpl implements SecurityContextTokenVa
                         tokenContext.getWssSecurityProperties().getCallbackHandler(), passwordCallback, null);
                 if (passwordCallback.getKey() == null) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE,
-                            "noKey", new Object[] {securityContextTokenType.getId()});
+                            "noKey", securityContextTokenType.getId());
                 }
                 String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
                 key = new SecretKeySpec(passwordCallback.getKey(), keyAlgorithm);

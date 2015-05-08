@@ -201,14 +201,14 @@ public class WSSecEncryptedKey extends WSSecBase {
                 throw new WSSecurityException(
                                               WSSecurityException.ErrorCode.FAILURE,
                                               "noUserCertsFound",
-                                              new Object[] {user, "encryption"});
+                                              user, "encryption");
             }
             X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
             if (certs == null || certs.length <= 0) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE,
                     "noUserCertsFound",
-                    new Object[] {user, "encryption"});
+                    user, "encryption");
             }
             remoteCert = certs[0];
         }

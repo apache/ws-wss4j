@@ -282,8 +282,8 @@ public final class STRParserUtil {
             }
         } catch (Exception e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, e,
-                "noPassword", new Object[] {uri});
+                WSSecurityException.ErrorCode.FAILURE,
+                "noPassword", e, uri);
         }
 
         return null;
@@ -313,7 +313,7 @@ public final class STRParserUtil {
         if (tokElement == null) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE,
-                "noToken", new Object[] {uri});
+                "noToken", uri);
         }
         return tokElement;
     }

@@ -141,9 +141,8 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                     }
                     if (certificates == null) {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                                "empty", 
-                                new Object[] {"No issuer certs were found to sign the SAML Assertion using issuer name: "
-                                + samlCallback.getIssuerKeyName()}
+                                "empty", "No issuer certs were found to sign the SAML Assertion using issuer name: "
+                                + samlCallback.getIssuerKeyName()
                         );
                     }
     

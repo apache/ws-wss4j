@@ -41,7 +41,6 @@ import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
-
 import java.util.Deque;
 import java.util.List;
 
@@ -58,7 +57,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
         Boolean alreadyProcessed = wssecurityContextInbound.<Boolean>get(WSSConstants.TIMESTAMP_PROCESSED);
         if (Boolean.TRUE.equals(alreadyProcessed)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidTimestamp",
-                                          new Object[] {"Message contains two or more timestamps"});
+                    "Message contains two or more timestamps");
         }
         wssecurityContextInbound.put(WSSConstants.TIMESTAMP_PROCESSED, Boolean.TRUE);
 

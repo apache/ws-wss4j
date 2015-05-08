@@ -26,6 +26,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
 import org.w3c.dom.Element;
+
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
@@ -146,7 +147,7 @@ public class UsernameTokenProcessor implements Processor {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY,
                     "badUsernameToken",
-                    new Object[] {"A replay attack has been detected"}
+                    "A replay attack has been detected"
                 );
             }
             

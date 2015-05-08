@@ -227,12 +227,12 @@ public class SignatureSTRParser implements STRParser {
                                     }
                                 } catch (Base64DecodingException e) {
                                     throw new WSSecurityException(
-                                        WSSecurityException.ErrorCode.FAILURE, e, "decoding.general"
+                                        WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
                                     );
                                 }
                             } catch (CertificateEncodingException ex) {
                                 throw new WSSecurityException(
-                                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, ex, "encodeError"
+                                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", ex
                                 );
                             }
                         }
@@ -447,7 +447,7 @@ public class SignatureSTRParser implements STRParser {
         } else {
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY,
-                    "unsupportedKeyInfo", new Object[] {strElement.toString()});
+                    "unsupportedKeyInfo", strElement.toString());
         }
         
         REFERENCE_TYPE referenceType = getReferenceType(secRef);

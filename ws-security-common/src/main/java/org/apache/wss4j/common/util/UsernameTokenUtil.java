@@ -67,7 +67,7 @@ public final class UsernameTokenUtil {
                 LOG.debug(e.getMessage(), e);
             }
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, e, "decoding.general"
+                WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
             );
         }
         //
@@ -105,8 +105,8 @@ public final class UsernameTokenUtil {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(e.getMessage(), e);
             }
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
-                    "empty", new Object[] {"Unable to convert password to UTF-8"});
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                    "empty", e, "Unable to convert password to UTF-8");
         }
     }
     
@@ -144,8 +144,9 @@ public final class UsernameTokenUtil {
         try {
             return XMLSecurityConstants.generateBytes(length);
         } catch (Exception ex) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex,
-                    "empty", new Object[] {"Error in generating nonce of length " + length}
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                    "empty", ex,
+                    "Error in generating nonce of length " + length
             );
         }
     }

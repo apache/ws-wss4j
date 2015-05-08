@@ -580,7 +580,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY,
                     "empty",
-                    new Object[] {"BSP:" + bspRule.name() + ": " + bspRule.getMsg()});
+                    "BSP:" + bspRule.name() + ": " + bspRule.getMsg());
         } else {
             LOG.warn("BSP:" + bspRule.name() + ": " + bspRule.getMsg());
         }

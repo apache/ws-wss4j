@@ -428,16 +428,14 @@ public class OutboundWSSec {
                 cryptoType.setAlias(alias);
                 x509Certificates = securityProperties.getSignatureCrypto().getX509Certificates(cryptoType);
                 if (x509Certificates == null || x509Certificates.length == 0) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noUserCertsFound", 
-                                                  new Object[] {alias});
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noUserCertsFound", alias);
                 }
             } else if (secretKey != null) {
                 x509Certificates = null;
                 String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(signatureAlgorithm);
                 key = new SecretKeySpec(secretKey, algoFamily);
             } else {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noPassword", 
-                                              new Object[] {alias});
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noPassword", alias);
             }
         } catch (WSSecurityException ex) {
             if (signedSAML && securityProperties.getSamlCallbackHandler() != null) {
@@ -545,7 +543,7 @@ public class OutboundWSSec {
             x509Certificates = crypto.getX509Certificates(cryptoType);
             if (x509Certificates == null || x509Certificates.length == 0) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, "noUserCertsFound",
-                                              new Object[] {securityProperties.getEncryptionUser(), "encryption"});
+                                              securityProperties.getEncryptionUser(), "encryption");
             }
         }
         

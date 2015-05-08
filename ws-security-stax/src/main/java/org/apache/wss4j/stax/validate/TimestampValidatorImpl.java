@@ -66,7 +66,7 @@ public class TimestampValidatorImpl implements TimestampValidator {
                 expiresDate = expires.toGregorianCalendar().getTime();
             } else if (tokenContext.getWssSecurityProperties().isRequireTimestampExpires()) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidTimestamp",
-                                              new Object[] {"The received Timestamp does not contain an expires Element"});
+                    "The received Timestamp does not contain an expires Element");
             }
 
             Date rightNow = new Date();
@@ -77,13 +77,13 @@ public class TimestampValidatorImpl implements TimestampValidator {
                 && expiresDate.before(rightNow)) {
                 log.debug("Time now: " + WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED, "invalidTimestamp",
-                                              new Object[] {"The security semantics of the message have expired"});
+                        "The security semantics of the message have expired");
             }
 
             if (createdDate != null && !DateUtil.verifyCreated(createdDate, ttl, futureTTL)) {
                 log.debug("Time now: " + WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED, "invalidTimestamp",
-                                              new Object[] {"The security semantics of the message have expired"});
+                        "The security semantics of the message have expired");
             }
 
         } catch (IllegalArgumentException e) {

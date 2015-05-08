@@ -158,8 +158,7 @@ public class SignatureAction implements Action {
             }
             reqData.getSignatureValues().add(wsSign.getSignatureValue());
         } catch (WSSecurityException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
-                                          "empty", new Object[] {"Error during Signature: "});
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", e, "Error during Signature: ");
         }
     }
 

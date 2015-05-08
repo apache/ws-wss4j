@@ -203,8 +203,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
             String labelText = clientLabel + serviceLabel;
             label = labelText.getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "empty", 
-                                          new Object[] {"UTF-8 encoding is not supported"});
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", e, "UTF-8 encoding is not supported");
         }
         byte[] nonce = WSSecurityUtil.generateNonce(16);
         
@@ -368,7 +367,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILURE,
                         "noUserCertsFound",
-                        new Object[] {user, "signature"});
+                        user, "signature");
             }
         }
         return certs;

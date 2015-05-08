@@ -138,8 +138,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                 STRParserUtil.getSecretKeyFromToken(uri, null, WSPasswordCallback.SECURITY_CONTEXT_TOKEN, data);
             if (secretKey == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", 
-                    new Object[] {uri});
+                    WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", uri);
             }
             parserResult.setSecretKey(secretKey);
         } else if (secRef.containsKeyIdentifier()) {
@@ -166,8 +165,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                 }
                 if (secretKey == null) {
                     throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", 
-                        new Object[] {uri});
+                        WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", uri);
                 }
                 parserResult.setSecretKey(secretKey);
             } else {
@@ -184,8 +182,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                        ); 
                     if (secretKey == null) {
                         throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", 
-                            new Object[] {uri});
+                            WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", uri);
                     }
                     parserResult.setSecretKey(secretKey);
                 } else {

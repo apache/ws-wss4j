@@ -102,8 +102,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
                     data.getSigVerCrypto(), data.getCallbackHandler());
         if (samlKi == null) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_CHECK, "invalidSAMLToken", 
-                new Object[] {"No Secret Key"});
+                WSSecurityException.ErrorCode.FAILED_CHECK, "invalidSAMLToken", "No Secret Key");
         }
         return samlKi.getSecret();
     }
@@ -154,8 +153,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
         
         if (parserResult.getSecretKey() == null) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", 
-                new Object[] {uri});
+                WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", uri);
         }
         
         return parserResult;
@@ -194,8 +192,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
             }
             if (secretKey == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId",
-                    new Object[] {uri});
+                    WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", uri);
             }
             parserResult.setSecretKey(secretKey);
         } else if (secRef.containsKeyIdentifier()) {
@@ -234,8 +231,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
                 }
                 if (secretKey == null) {
                     throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", 
-                        new Object[] {uri});
+                        WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", uri);
                 }
                 parserResult.setSecretKey(secretKey);
             } else {
@@ -249,8 +245,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
                     );
                 if (secretKey == null) {
                     throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", 
-                        new Object[] {uri});
+                        WSSecurityException.ErrorCode.FAILED_CHECK, "unsupportedKeyId", uri);
                 }
                 parserResult.setSecretKey(secretKey);
             }

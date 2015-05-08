@@ -283,8 +283,7 @@ public class ReferenceListProcessor implements Processor {
             callbackLookup.getElement(dataRefURI, null, true);
         if (encryptedDataElement == null) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY, "dataRef", 
-                new Object[] {dataRefURI});
+                WSSecurityException.ErrorCode.INVALID_SECURITY, "dataRef", dataRefURI);
         }
         if (encryptedDataElement.getLocalName().equals(WSConstants.ENCRYPTED_HEADER)
             && encryptedDataElement.getNamespaceURI().equals(WSConstants.WSSE11_NS)) {
@@ -434,7 +433,7 @@ public class ReferenceListProcessor implements Processor {
             if (attachments == null || attachments.isEmpty() || !attachmentId.equals(attachments.get(0).getId())) {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.INVALID_SECURITY,
-                        "empty", new Object[] {"Attachment not found"}
+                        "empty", "Attachment not found"
                 );
             }
             Attachment attachment = attachments.get(0);

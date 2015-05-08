@@ -76,8 +76,7 @@ public class DerivedKeyTokenProcessor implements Processor {
         
         String tempNonce = dkt.getNonce();
         if (tempNonce == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", 
-                                          new Object[] {"Missing wsc:Nonce value"});
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", "Missing wsc:Nonce value");
         }
         int length = dkt.getLength();
         byte[] keyBytes = dkt.deriveKey(length, secret);

@@ -61,7 +61,7 @@ public class X509PKIPathv1SecurityTokenImpl extends X509SecurityTokenImpl {
                 setX509Certificates(certs);
             }
         } catch (CertificateException | IOException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e, "parseError");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "parseError", e);
         }
     }
 

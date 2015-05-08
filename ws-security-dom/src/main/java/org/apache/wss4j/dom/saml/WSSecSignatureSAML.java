@@ -242,7 +242,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE,
                     "invalidSAMLsecurity",
-                    new Object[] {"for SAML Signature (Key Holder)"});
+                    "for SAML Signature (Key Holder)");
             }
             if (secretKey == null) {
                 RequestData data = new RequestData();
@@ -266,7 +266,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,
                 "noCertsFound",
-                new Object[] {"SAML signature"});
+                "SAML signature");
         }
         
         if (getSignatureAlgorithm() == null) {
@@ -291,7 +291,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE,
                     "unknownSignatureAlgorithm",
-                    new Object[] {pubKeyAlgo});
+                    pubKeyAlgo);
             }
         }
         sig = null;
@@ -309,7 +309,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         } catch (Exception ex) {
             LOG.error("", ex);
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_SIGNATURE, ex, "noXMLSig"
+                WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", ex
             );
         }
 
@@ -368,7 +368,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
             }
         } catch (Exception ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_SIGNATURE, ex, "noXMLSig"
+                WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", ex
             );
         }
         

@@ -44,7 +44,6 @@ import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-
 import java.security.Key;
 import java.util.Deque;
 import java.util.List;
@@ -123,8 +122,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                         }
                         byte[] nonce = derivedKeyTokenType.getNonce();
                         if (nonce == null || nonce.length == 0) {
-                            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "empty", 
-                                                          new Object[] {"Missing wsc:Nonce value"});
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "empty", "Missing wsc:Nonce value");
                         }
                         String derivedKeyAlgorithm = derivedKeyTokenType.getAlgorithm();
                         if (derivedKeyAlgorithm == null) {

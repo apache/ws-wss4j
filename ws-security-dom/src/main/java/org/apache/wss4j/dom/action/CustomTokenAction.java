@@ -53,14 +53,14 @@ public class CustomTokenAction implements Action {
         try {
             callbackHandler.handle(new Callback[]{wsPasswordCallback});
         } catch (Exception e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
-                    "empty", new Object[] {"WSHandler: password callback failed"});
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                    "empty", e, "WSHandler: password callback failed");
         }
         
         Element customToken = wsPasswordCallback.getCustomToken();
         if (customToken == null) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "resourceNotFound", new Object[] {"CustomToken"}
+                WSSecurityException.ErrorCode.FAILURE, "resourceNotFound", "CustomToken"
             );
         }
         

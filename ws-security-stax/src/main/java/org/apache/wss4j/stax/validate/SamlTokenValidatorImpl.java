@@ -254,7 +254,7 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY,
                     "badSamlToken",
-                    new Object[] {"A replay attack has been detected"});
+                    "A replay attack has been detected");
             }
             
             DateTime expires = samlAssertion.getSaml2().getConditions().getNotOnOrAfter();

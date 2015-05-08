@@ -49,7 +49,7 @@ public class Reference {
         QName el = new QName(element.getNamespaceURI(), element.getLocalName());
         if (!el.equals(TOKEN)) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "badElement", new Object[] {TOKEN, el}
+                WSSecurityException.ErrorCode.FAILURE, "badElement", TOKEN, el
             );
         }
 

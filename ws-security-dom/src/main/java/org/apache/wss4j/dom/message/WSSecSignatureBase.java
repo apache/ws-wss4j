@@ -88,7 +88,7 @@ public class WSSecSignatureBase extends WSSecBase {
         } catch (Exception ex) {
             LOG.error("", ex);
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILED_SIGNATURE, ex, "noXMLSig"
+                WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", ex
             );
         }
 
@@ -174,7 +174,7 @@ public class WSSecSignatureBase extends WSSecBase {
                         throw new WSSecurityException(
                             WSSecurityException.ErrorCode.FAILURE, 
                             "noEncElement",
-                            new Object[] {nmSpace + ", " + elemName});
+                            nmSpace + ", " + elemName);
                     }
                     for (Element elementToSign : elementsToSign) {
                         TransformParameterSpec transformSpec = null;
@@ -202,7 +202,7 @@ public class WSSecSignatureBase extends WSSecBase {
             } catch (Exception ex) {
                 LOG.error("", ex);
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILED_SIGNATURE, ex, "noXMLSig"
+                    WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noXMLSig", ex
                 );
             }
         }
@@ -223,7 +223,7 @@ public class WSSecSignatureBase extends WSSecBase {
         if (attachmentCallbackHandler == null) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,
-                "empty", new Object[] {"no attachment callbackhandler supplied"}
+                "empty", "no attachment callbackhandler supplied"
             );
         }
 
