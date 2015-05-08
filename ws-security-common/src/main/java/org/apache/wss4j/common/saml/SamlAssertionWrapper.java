@@ -63,6 +63,7 @@ import org.opensaml.xmlsec.signature.Signature;
 import org.opensaml.xmlsec.signature.support.SignatureConstants;
 import org.opensaml.xmlsec.signature.support.SignatureException;
 import org.opensaml.xmlsec.signature.support.SignatureValidator;
+import org.opensaml.xmlsec.signature.support.SignerProvider;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -568,8 +569,7 @@ public class SamlAssertionWrapper {
             kiFactory.setEmitEntityCertificate(true);
         }
         try {
-            KeyInfo keyInfo = kiFactory.newInstance().generate(
-                    signingCredential);
+            KeyInfo keyInfo = kiFactory.newInstance().generate(signingCredential);
             signature.setKeyInfo(keyInfo);
         } catch (org.opensaml.security.SecurityException ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", ex,
@@ -632,11 +632,15 @@ public class SamlAssertionWrapper {
                     "cannot get certificate or key"
                 );
             }
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
             try {
+                Thread.currentThread().setContextClassLoader(SignerProvider.class.getClassLoader());
                 SignatureValidator.validate(sig, credential);
             } catch (SignatureException ex) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                         "empty", ex, "SAML signature validation failed");
+            } finally {
+                Thread.currentThread().setContextClassLoader(loader);
             }
             signatureKeyInfo = samlKeyInfo;
         } else {

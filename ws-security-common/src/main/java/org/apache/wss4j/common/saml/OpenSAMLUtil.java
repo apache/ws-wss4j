@@ -42,6 +42,7 @@ import org.opensaml.saml.config.SAMLConfiguration;
 import org.opensaml.xmlsec.signature.Signature;
 import org.opensaml.xmlsec.signature.support.SignatureException;
 import org.opensaml.xmlsec.signature.support.Signer;
+import org.opensaml.xmlsec.signature.support.SignerProvider;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
@@ -82,8 +83,9 @@ public final class OpenSAMLUtil {
                 OpenSAMLBootstrap.bootstrap();
                 
                 SAMLConfiguration samlConfiguration = new SAMLConfiguration();
-                configuration.register(SAMLConfiguration.class, samlConfiguration, ConfigurationService.DEFAULT_PARTITION_NAME);
 
+                configuration.register(SAMLConfiguration.class, samlConfiguration, ConfigurationService.DEFAULT_PARTITION_NAME);
+                
                 builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
                 marshallerFactory = XMLObjectProviderRegistrySupport.getMarshallerFactory();
                 unmarshallerFactory = XMLObjectProviderRegistrySupport.getUnmarshallerFactory();
@@ -235,10 +237,14 @@ public final class OpenSAMLUtil {
     
     private static void signObject(Signature signature) throws WSSecurityException {
         if (signature != null) {
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
             try {
+                Thread.currentThread().setContextClassLoader(SignerProvider.class.getClassLoader());
                 Signer.signObject(signature);
             } catch (SignatureException ex) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", ex, "Error signing a SAML assertion");
+            } finally {
+                Thread.currentThread().setContextClassLoader(loader);
             }
         }
     }
