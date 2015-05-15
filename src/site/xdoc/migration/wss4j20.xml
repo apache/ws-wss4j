@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <document>
 <body>
-<section name="WSS4J 2.0.0 Migration Guide">
+<section name="Apache WSS4J 2.0.0 Migration Guide">
 <p>
-This page is a migration guide for helping Apache WSS4J 1.6.X users to migrate
-to the 2.0.X releases. Also see the <a href="newfeatures20.html">new
+This page is a migration guide for helping Apache WSS4J 1.6.x users to migrate
+to the 2.0.x releases. Also see the <a href="newfeatures20.html">new
 features</a> page for more information about the new functionality available in
-WSS4J 2.0.X.
+WSS4J 2.0.x.
 </p>
 <subsection name="Migrating to using the streaming (StAX) code">
 <p>
@@ -44,7 +44,7 @@ please see the <a href="streaming.html">streaming documentation</a> page.
 <subsection name="Crypto/CallbackHandler changes">
 <p>
 Typically, a user configures Signature and Encryption keys via a Crypto
-properties file. In WSS4J 1.6.X, the property names all start with 
+properties file. In WSS4J 1.6.x, the property names all start with 
 "org.apache.ws.security.crypto.*". In WSS4J 2.0.0, the new prefix is 
 "org.apache.wss4j.crypto.*". However, WSS4J 2.0.0 will accept the older
 prefix value. No other changes are necessary for migrating Crypto properties.
@@ -85,7 +85,7 @@ signing of a SAML Assertion. In Apache WSS4J 2.0.0, the SAMLIssuer
 functionality has been moved to the SAMLCallback, so that the CallbackHandler
 used to create a SAML Assertion is responsible for all of the signing
 configuration as well. Therefore, the properties file that is used in
-WSS4J 1.6.X to sign a SAML Assertion is no longer used in WSS4J 2.0.0, and
+WSS4J 1.6.x to sign a SAML Assertion is no longer used in WSS4J 2.0.0, and
 the "samlPropFile" and "samlPropRefId" configuration tags have been removed. 
 </p>
 <p>
@@ -107,7 +107,7 @@ can be set to sign the Assertion:
 </subsection>
 <subsection name="Configuration tag changes">
 <p>
-In WSS4J 1.6.X, configuration tags were configured in the WSHandlerConstants
+In WSS4J 1.6.x, configuration tags were configured in the WSHandlerConstants
 class. In WSS4J 2.0.0, both the DOM and StAX-based code largely share the 
 same configuration options, and so the configuration tags are defined in
 <a href="http://svn.apache.org/viewvc/webservices/wss4j/trunk/ws-security-common/src/main/java/org/apache/wss4j/common/ConfigurationConstants.java?view=markup">ConfigurationConstants</a>. Note that the WSS4J 1.6.x configuration class
@@ -117,7 +117,7 @@ change any configuration code when upgrading.
 <p>
 The configuration tags that have been removed and added are detailed below. 
 The non-standard key derivation and UsernameToken Signature functionality that
-was optional in WSS4J 1.6.X has been removed. Some new actions are added for
+was optional in WSS4J 1.6.x has been removed. Some new actions are added for
 the streaming code, as well as some options surrounding caching. An important
 migration point is that there is now a separate configuration tag used for
 verifying signatures. In WSS4J 1.6.x, there was only one tag used for both
@@ -391,7 +391,7 @@ properties files. The default is the JasyptPasswordEncryptor.</td>
 
 <subsection name="Derived Key and Secure Conversation namespace change">
 <p>
-In WSS4J 1.6.X, the default namespace used for Derived Key and Secure
+In WSS4J 1.6.x, the default namespace used for Derived Key and Secure
 Conversation was the older "http://schemas.xmlsoap.org/ws/2005/02/sc"
 namespace. In WSS4J 2.0.0, the default namespace is now
 "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512". To switch

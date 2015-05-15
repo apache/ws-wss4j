@@ -9,12 +9,10 @@ by WSS4J and how to configure it.
 <ul>
 <li><a href="what.html">What is Apache WSS4J?</a></li>
 <li><a href="using.html">Using Apache WSS4J</a></li>
+<li><a href="migration/migration.html">Migration Guides</a></li>
 <li><a href="config.html">WSS4J Configuration</a></li>
-<li><a href="newfeatures20.html">WSS4J 2.0.0 New Features</a></li>
 <li><a href="streaming.html">Streaming WS-Security support</a></li>
 <li><a href="attachments.html">Securing message attachments</a></li>
-<li><a href="migration.html">WSS4J 2.0.0 Migration Guide</a></li>
-<li><a href="wss4j16.html">WSS4J 1.6.0 Migration Guide</a></li>
 <li><a href="topics.html">Special Topics</a></li>
 <li><a href="best_practice.html">Security Best Practices</a></li>
 <li><a href="resources.html">Further Resources</a></li>

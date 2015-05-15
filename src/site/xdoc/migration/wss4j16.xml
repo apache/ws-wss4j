@@ -5,7 +5,7 @@
 <p>
 This page describes the new features of WSS4J 1.6.0, and the things to be
 aware of when upgrading from WSS4J 1.5.x. Note that WSS4J 1.6.x has now been
-replaced by WSS4J 2.0.x, please see the WSS4J 2.0.0 <a href="migration.html">migration guide</a> for more information.
+replaced by WSS4J 2.0.x, please see the WSS4J 2.0.0 <a href="wss4j20.html">migration guide</a> for more information.
 </p>
 <subsection name="New features">
 <p>
