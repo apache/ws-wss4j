@@ -133,7 +133,6 @@ public class Loader {
      * algorithm used to find the resource is given in getResource()
      * 
      * @param resourceName The name of the resource to load
-     * @param callingClass The Class object of the calling object
      */
     public static InputStream getResourceAsStream(String resourceName) {
         URL url = getResource(resourceName);

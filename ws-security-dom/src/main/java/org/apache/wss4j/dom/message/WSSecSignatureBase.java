@@ -69,7 +69,7 @@ public class WSSecSignatureBase extends WSSecBase {
      * @param wsDocInfo The WSDocInfo object to store protection elements in
      * @param signatureFactory The XMLSignature object
      * @param secHeader The Security Header
-     * @param wssConfig The WSSConfig
+     * @param addInclusivePrefixes Whether to add inclusive prefixes or not
      * @param digestAlgo The digest algorithm to use
      * @throws WSSecurityException
      */

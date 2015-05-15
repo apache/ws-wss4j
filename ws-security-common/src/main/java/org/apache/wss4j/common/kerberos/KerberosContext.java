@@ -120,7 +120,6 @@ public class KerberosContext {
 
     /**
      * Checks if this context instance is already destroyed.
-     * @return
      */
     public boolean isDisposed() {
         return disposed;

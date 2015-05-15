@@ -261,7 +261,8 @@ public final class STRParserUtil {
      * Get the Secret Key from a CallbackHandler
      * @param id The id of the element
      * @param type The type of the element (may be null)
-     * @param cb The CallbackHandler object
+     * @param identifier The WSPasswordCallback usage identifier
+     * @poaram data The RequestData Object
      * @return A Secret Key
      * @throws WSSecurityException
      */

@@ -150,13 +150,6 @@ public class StAX2DOM {
         return recordLoc;
     }
 
-    /**
-     * @param parent
-     * @param reader
-     * @return
-     * @throws javax.xml.stream.XMLStreamException
-     *
-     */
     static Element startElement(Document doc,
                                 Node parent,
                                 XMLStreamReader reader,

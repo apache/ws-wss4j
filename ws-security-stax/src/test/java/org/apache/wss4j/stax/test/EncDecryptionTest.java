@@ -1225,7 +1225,6 @@ public class EncDecryptionTest extends AbstractTestBase {
      */
 
 /*  Not spec conform and therefore not supported!:
-    @Test
     public void testEncDecryptionKeyIdentifierBinarySecurityTokenEmbedded() throws Exception {
 
         ByteArrayOutputStream baos;
