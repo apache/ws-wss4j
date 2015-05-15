@@ -59,7 +59,7 @@ public class AudienceRestrictionBean {
     /**
      * Set the audienceURI instance
      *
-     * @param audienceURI the audienceURI instance to set
+     * @param audienceURIs the audienceURI instances to set
      */
     public void setAudienceURIs(List<String> audienceURIs) {
         this.audienceURIs.clear();

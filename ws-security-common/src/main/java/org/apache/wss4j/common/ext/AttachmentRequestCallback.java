@@ -28,8 +28,6 @@ public class AttachmentRequestCallback implements Callback {
 
     /**
      * The requested attachment which will be secured. If null all attachments are requested
-     *
-     * @return
      */
     public String getAttachmentId() {
         return attachmentId;

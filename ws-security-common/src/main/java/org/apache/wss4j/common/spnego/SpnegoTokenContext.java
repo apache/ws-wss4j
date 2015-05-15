@@ -78,7 +78,7 @@ public class SpnegoTokenContext {
      * @param jaasLoginModuleName the JAAS Login Module name to use
      * @param callbackHandler a CallbackHandler instance to retrieve a password (optional)
      * @param serviceName the desired Kerberized service
-     * @param serviceNameForm 
+     * @param isUsernameServiceNameForm 
      * @throws WSSecurityException
      */
     public void retrieveServiceTicket(
@@ -97,7 +97,7 @@ public class SpnegoTokenContext {
      * @param jaasLoginModuleName the JAAS Login Module name to use
      * @param callbackHandler a CallbackHandler instance to retrieve a password (optional)
      * @param serviceName the desired Kerberized service
-     * @param serviceNameForm 
+     * @param isUsernameServiceNameForm 
      * @param requestCredDeleg Whether to request credential delegation or not
      * @param delegationCredential The delegation credential to use
      * @throws WSSecurityException

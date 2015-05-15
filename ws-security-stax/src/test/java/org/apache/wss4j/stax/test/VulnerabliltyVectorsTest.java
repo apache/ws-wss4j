@@ -118,7 +118,6 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
     /*
     Todo correct this test.
-    @Test
     public void testRecursiveKeyReferencesDOS2() throws Exception {
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
