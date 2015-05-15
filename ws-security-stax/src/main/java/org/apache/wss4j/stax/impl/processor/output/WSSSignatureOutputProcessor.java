@@ -155,7 +155,8 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
             if (attachmentCallbackHandler == null) {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILED_SIGNATURE,
-                        "empty", "no attachment callbackhandler supplied"
+                        "empty", 
+                        new Object[] {"no attachment callbackhandler supplied"}
                 );
             }
 

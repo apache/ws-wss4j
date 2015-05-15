@@ -179,7 +179,8 @@ public class UsernameTokenTest extends AbstractTestBase {
                     if (securityEvent instanceof UsernameTokenSecurityEvent) {
                         UsernameTokenSecurityEvent usernameTokenSecurityEvent = (UsernameTokenSecurityEvent) securityEvent;
                         if (!"username".equals(usernameTokenSecurityEvent.getSecurityToken().getPrincipal().getName())) {
-                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", "Wrong username");
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", 
+                                                          new Object[] {"Wrong username"});
                         }
                     }
                 }

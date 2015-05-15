@@ -109,8 +109,7 @@ public class UsernameToken {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
                 "badElement",
-                TOKEN,
-                el
+                new Object[] {TOKEN, el}
             );
         }
         elementUsername = 
@@ -141,7 +140,7 @@ public class UsernameToken {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
                 "badUsernameToken",
-                "Username is missing"
+                new Object[] {"Username is missing"}
             );
         }
         
@@ -158,7 +157,7 @@ public class UsernameToken {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
                     "badUsernameToken",
-                    "Password is missing"
+                    new Object[] {"Password is missing"}
                 );
             }
             return;
@@ -173,7 +172,7 @@ public class UsernameToken {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
                         "badUsernameToken",
-                        "Iteration is missing"
+                        new Object[] {"Iteration is missing"}
                     );
                 }
             }
@@ -194,7 +193,7 @@ public class UsernameToken {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
                         "badUsernameToken",
-                        "The Password Type is not allowed to be namespace qualified"
+                        new Object[] {"The Password Type is not allowed to be namespace qualified"}
                     );
                 }
             }
@@ -206,7 +205,7 @@ public class UsernameToken {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
                     "badUsernameToken",
-                    "Nonce or Created is missing"
+                    new Object[] {"Nonce or Created is missing"}
                 );
             }
         }
@@ -220,9 +219,9 @@ public class UsernameToken {
                         WSSConfig.datatypeFactory.newXMLGregorianCalendar(createdString);
                 } catch (IllegalArgumentException e) {
                     throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
-                        "badUsernameToken", e,
-                        "Error parsing UsernameToken Created value"
+                        WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e,
+                        "badUsernameToken",
+                        new Object[] {"Error parsing UsernameToken Created value"}
                     );
                 }
                 createdDate = createdCalendar.toGregorianCalendar().getTime();
@@ -470,7 +469,7 @@ public class UsernameToken {
                 return Base64.decode(salt);
             } catch (Base64DecodingException e) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
+                    WSSecurityException.ErrorCode.FAILURE, e, "decoding.general"
                 );
             }
         }
@@ -712,7 +711,7 @@ public class UsernameToken {
                 return UsernameTokenUtil.generateDerivedKey(Base64.decode(rawPassword), salt, iteration);
             } catch (Base64DecodingException e) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
+                    WSSecurityException.ErrorCode.FAILURE, e, "decoding.general"
                 );
             }
         } else {
@@ -747,7 +746,7 @@ public class UsernameToken {
             return principal;
         } catch (Base64DecodingException e) {
             throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "decoding.general", e
+                    WSSecurityException.ErrorCode.FAILURE, e, "decoding.general"
             );
         }
     }

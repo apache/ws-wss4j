@@ -152,11 +152,11 @@ public abstract class CryptoBase implements Crypto {
             }
         } catch (CertificateException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "unsupportedCertType", e
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, e, "unsupportedCertType"
             );
         } catch (NoSuchProviderException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noSecProvider", e
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, e, "noSecProvider"
             );
         }
         
@@ -176,7 +176,7 @@ public abstract class CryptoBase implements Crypto {
             return (X509Certificate) certFactory.generateCertificate(in);
         } catch (CertificateException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "parseError", e
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, e, "parseError"
             );
         }
     }
@@ -209,8 +209,8 @@ public abstract class CryptoBase implements Crypto {
                 return digest.digest(value);
             } catch (Exception ex) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN, "noSKIHandling", ex,
-                    "No SKI certificate extension and no SHA1 message digest available"
+                    WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN, ex, "noSKIHandling",
+                    new Object[] {"No SKI certificate extension and no SHA1 message digest available"}
                 );
             }
         }
@@ -242,11 +242,11 @@ public abstract class CryptoBase implements Crypto {
             return path.getEncoded();
         } catch (CertificateEncodingException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", e
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, e, "encodeError"
             );
         } catch (CertificateException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "parseError", e
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, e, "parseError"
             );
         }
     }
@@ -266,7 +266,7 @@ public abstract class CryptoBase implements Crypto {
             path = getCertificateFactory().generateCertPath(in);
         } catch (CertificateException | IOException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "parseError", e
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, e, "parseError"
             );
         }
         

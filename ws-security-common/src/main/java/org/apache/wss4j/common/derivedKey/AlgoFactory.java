@@ -41,7 +41,7 @@ public final class AlgoFactory {
             return new P_SHA1();
         } else {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
-                                          "unknownAlgorithm", algorithm);
+                                          "unknownAlgorithm", new Object[] {algorithm});
         }
     }
 

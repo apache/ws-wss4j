@@ -443,8 +443,8 @@ public abstract class WSHandler {
                         //
                         if (sigVal.length != 0) {
                             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "empty",
-                                    "Received a SignatureConfirmation element, but there are no stored"
-                                 + " signature values"
+                                 new Object[] {"Received a SignatureConfirmation element, but there are no stored"
+                                 + " signature values"}
                             );
                         }
                     } else {
@@ -453,8 +453,8 @@ public abstract class WSHandler {
                             savedSignatures.remove(hash);
                         } else {
                             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
-                                    "Received a SignatureConfirmation element, but there are no matching"
-                                + " stored signature values"
+                                new Object[] {"Received a SignatureConfirmation element, but there are no matching"
+                                + " stored signature values"}
                             );
                         } 
                     }
@@ -467,7 +467,8 @@ public abstract class WSHandler {
         //
         if (savedSignatures != null && !savedSignatures.isEmpty()) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
-                                          "Check Signature confirmation: the stored signature values list is not empty"
+                                          new Object[] {"Check Signature confirmation: the stored signature values"
+                                                        + " list is not empty"}
             );
         }
     }
@@ -486,7 +487,7 @@ public abstract class WSHandler {
                 reqData.setPwType(null);
             } else {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                        "empty", "Unknown password type encoding: " + type);
+                        "empty", new Object[] {"Unknown password type encoding: " + type});
             }
         }
         
@@ -536,7 +537,7 @@ public abstract class WSHandler {
             if (id == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                         "empty",
-                        "WSHandler: Signature: unknown key identification"
+                        new Object[] {"WSHandler: Signature: unknown key identification"}
                 );
             }
             int tmp = id;
@@ -549,7 +550,7 @@ public abstract class WSHandler {
                     || tmp == WSConstants.KEY_VALUE)) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                         "empty",
-                        "WSHandler: Signature: illegal key identification"
+                        new Object[] {"WSHandler: Signature: illegal key identification"}
                 );
             }
             actionToken.setKeyIdentifierId(tmp);
@@ -656,7 +657,7 @@ public abstract class WSHandler {
             if (id == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                         "empty",
-                        "WSHandler: Encryption: unknown key identification"
+                        new Object[] {"WSHandler: Encryption: unknown key identification"}
                 );
             }
             int tmp = id;
@@ -669,7 +670,7 @@ public abstract class WSHandler {
                     || tmp == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER)) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                         "empty",
-                        "WSHandler: Encryption: illegal key identification"
+                        new Object[] {"WSHandler: Encryption: illegal key identification"}
                 );
             }
         }
@@ -725,7 +726,8 @@ public abstract class WSHandler {
         }
         if (actionToken.isEncSymmetricEncryptionKey() && actionToken.getUser() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                    "empty", "WSHandler: Encryption: no username");
+                    "empty", 
+                    new Object[] {"WSHandler: Encryption: no username"});
         }
 
         handleSpecialUser(reqData);
@@ -824,7 +826,7 @@ public abstract class WSHandler {
 
         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                 "empty",
-                "WSHandler: illegal " + configTag + " parameter"
+                new Object[] {"WSHandler: illegal " + configTag + " parameter"}
         );
     }
     
@@ -1042,17 +1044,20 @@ public abstract class WSHandler {
                                  callbackHandlerClass,
                                  CallbackHandler.class);
         } catch (ClassNotFoundException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                    "empty", e,
-                    "WSHandler: cannot load callback handler class: " + callbackHandlerClass
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
+                    "empty",
+                    new Object[] {"WSHandler: cannot load callback handler class: " 
+                    + callbackHandlerClass}
             );
         }
         try {
             cbHandler = cbClass.newInstance();
         } catch (Exception e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                    "empty", e,
-                    "WSHandler: cannot create instance of callback handler: " + callbackHandlerClass
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
+                    "empty",
+                    new Object[] {"WSHandler: cannot create instance of callback handler: " 
+                    + callbackHandlerClass
+                    }
             );
         }
         return cbHandler;
@@ -1098,7 +1103,8 @@ public abstract class WSHandler {
             if (password == null) {
                 String err = "provided null or empty password";
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                        "empty", "WSHandler: application " + err);
+                        "empty", 
+                        new Object[] {"WSHandler: application " + err});
             }
             WSPasswordCallback pwCb = constructPasswordCallback(username, doAction);
             pwCb.setPassword(password);
@@ -1129,8 +1135,8 @@ public abstract class WSHandler {
         try {
             cbHandler.handle(callbacks);
         } catch (Exception e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                    "empty", e, "WSHandler: password callback failed");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
+                    "empty", new Object[] {"WSHandler: password callback failed"});
         }
         return pwCb;
     }
@@ -1216,7 +1222,8 @@ public abstract class WSHandler {
                 encPart = new WSEncryptionPart(element, nmSpace, mode);
             } else {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                        "empty", "WSHandler: wrong part definition: " + tmpS);
+                        "empty", 
+                        new Object[] {"WSHandler: wrong part definition: " + tmpS});
             }
             encPart.setRequired(required);
             parts.add(encPart);

@@ -24,7 +24,6 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -53,14 +52,14 @@ public class CustomTokenAction implements Action {
         try {
             callbackHandler.handle(new Callback[]{wsPasswordCallback});
         } catch (Exception e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                    "empty", e, "WSHandler: password callback failed");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
+                    "empty", new Object[] {"WSHandler: password callback failed"});
         }
         
         Element customToken = wsPasswordCallback.getCustomToken();
         if (customToken == null) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "resourceNotFound", "CustomToken"
+                WSSecurityException.ErrorCode.FAILURE, "resourceNotFound", new Object[] {"CustomToken"}
             );
         }
         

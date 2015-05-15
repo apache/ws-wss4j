@@ -130,8 +130,8 @@ public class SAMLTokenSignedAction implements Action {
                     reqData.getSecHeader());
             reqData.getSignatureValues().add(wsSign.getSignatureValue());
         } catch (WSSecurityException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", e, 
-                                          "Error when signing the SAML token: ");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "empty", 
+                                          new Object[] {"Error when signing the SAML token: "});
         }
     }
 

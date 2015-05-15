@@ -90,14 +90,14 @@ public class X509Security extends BinarySecurity {
         byte[] data = getToken();
         if (data == null) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "invalidCertData", 0);
+                WSSecurityException.ErrorCode.FAILURE, "invalidCertData", new Object[] {"0"});
         }
         try (InputStream in = new ByteArrayInputStream(data)) {
             cachedCert = certCrypto.loadCertificate(in);
             return cachedCert;
         } catch (IOException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "parseError", e
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, e, "parseError"
             );
         }
 
@@ -121,7 +121,7 @@ public class X509Security extends BinarySecurity {
             setToken(cert.getEncoded());
         } catch (CertificateEncodingException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", e
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, e, "encodeError"
             );
         }
     }

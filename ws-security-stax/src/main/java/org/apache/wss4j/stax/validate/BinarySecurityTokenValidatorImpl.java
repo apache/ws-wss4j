@@ -46,7 +46,7 @@ public class BinarySecurityTokenValidatorImpl implements BinarySecurityTokenVali
         if (!WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(binarySecurityTokenType.getEncodingType())) {
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "badEncoding",
-                    binarySecurityTokenType.getEncodingType());
+                    new Object[] {binarySecurityTokenType.getEncodingType()});
         }
 
         byte[] securityTokenData = Base64.decodeBase64(binarySecurityTokenType.getValue());
@@ -91,7 +91,7 @@ public class BinarySecurityTokenValidatorImpl implements BinarySecurityTokenVali
             } else {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "invalidValueType",
-                        binarySecurityTokenType.getValueType());
+                        new Object[] {binarySecurityTokenType.getValueType()});
             }
         } catch (XMLSecurityException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);

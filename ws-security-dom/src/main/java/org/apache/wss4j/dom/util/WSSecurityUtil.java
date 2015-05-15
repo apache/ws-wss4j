@@ -386,7 +386,7 @@ public final class WSSecurityUtil {
     public static String getSOAPNamespace(Element startElement) {
         return getSOAPConstants(startElement).getEnvelopeURI();
     }
-
+    
     public static List<Integer> decodeAction(String action) throws WSSecurityException {
         String actionToParse = action;
         if (actionToParse == null) {
@@ -428,7 +428,7 @@ public final class WSSecurityUtil {
                 actions.add(WSConstants.CUSTOM_TOKEN);
             } else {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
-                        "Unknown action defined: " + single[i]
+                                              new Object[] {"Unknown action defined: " + single[i]}
                 );
             }
         }
@@ -481,13 +481,13 @@ public final class WSSecurityUtil {
                     int parsedAction = Integer.parseInt(single[i]);
                     if (wssConfig.getAction(parsedAction) == null) {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
-                                "Unknown action defined: " + single[i]
+                                                      new Object[] {"Unknown action defined: " + single[i]}
                         );
                     }
                     actions.add(new HandlerAction(parsedAction));
                 } catch (NumberFormatException ex) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
-                            "Unknown action defined: " + single[i]
+                                                  new Object[] {"Unknown action defined: " + single[i]}
                     );
                 }
             }
@@ -506,9 +506,8 @@ public final class WSSecurityUtil {
         try {
             return XMLSecurityConstants.generateBytes(length);
         } catch (Exception ex) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                    "empty", ex,
-                    "Error in generating nonce of length " + length
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex,
+                    "empty", new Object[] {"Error in generating nonce of length " + length}
             );
         }
     }
@@ -536,7 +535,8 @@ public final class WSSecurityUtil {
         }
         
         throw new WSSecurityException(
-            WSSecurityException.ErrorCode.FAILED_CHECK, "requiredElementNotSigned", elem);
+            WSSecurityException.ErrorCode.FAILED_CHECK, "requiredElementNotSigned", 
+            new Object[] {elem});
     }
     
     /**

@@ -209,7 +209,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
         if (attachmentCallbackHandler == null) {
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE,
-                    "empty", "no attachment callbackhandler supplied"
+                    "empty", new Object[] {"no attachment callbackhandler supplied"}
             );
         }
 

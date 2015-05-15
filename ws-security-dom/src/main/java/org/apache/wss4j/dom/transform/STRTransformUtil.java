@@ -124,7 +124,7 @@ public final class STRTransformUtil {
             data = cert.getEncoded();
         } catch (CertificateEncodingException e) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "encodeError", e
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, e, "encodeError"
             );
         }
         String prefix = XMLUtils.getPrefixNS(WSConstants.WSSE_NS, secRefE);

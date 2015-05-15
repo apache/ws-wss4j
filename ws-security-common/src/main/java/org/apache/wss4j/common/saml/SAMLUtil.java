@@ -274,7 +274,7 @@ public final class SAMLUtil {
                             if (certs == null || certs.length < 1) {
                                 throw new WSSecurityException(
                                     WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
-                                    "cannot get certificate or key"
+                                    new Object[] {"cannot get certificate or key"}
                                 );
                             }
                             return new SAMLKeyInfo(certs);
@@ -284,8 +284,8 @@ public final class SAMLUtil {
             }
         } catch (Exception ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity", ex,
-                "cannot get certificate or key"
+                WSSecurityException.ErrorCode.FAILURE, ex, "invalidSAMLsecurity",
+                new Object[] {"cannot get certificate or key"}
             );
         }
         return null;
