@@ -22,6 +22,7 @@ package org.apache.wss4j.dom.message.token;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
@@ -90,7 +91,8 @@ public class DerivedKeyToken {
         
         ns = ConversationConstants.getWSCNs(version);
         element = 
-            doc.createElementNS(ns, "wsc:" + ConversationConstants.DERIVED_KEY_TOKEN_LN);
+            doc.createElementNS(ns, ConversationConstants.WSC_PREFIX + ":" 
+                + ConversationConstants.DERIVED_KEY_TOKEN_LN);
         WSSecurityUtil.setNamespace(element, ns, ConversationConstants.WSC_PREFIX);
         bspEnforcer = new BSPEnforcer();
     }
@@ -206,12 +208,13 @@ public class DerivedKeyToken {
         if (elementProperties == null) { //Create the properties element if it is not there
             elementProperties = 
                 element.getOwnerDocument().createElementNS(
-                    ns, "wsc:" + ConversationConstants.PROPERTIES_LN
+                    ns, ConversationConstants.WSC_PREFIX + ":" + ConversationConstants.PROPERTIES_LN
                 );
             element.appendChild(elementProperties);
         }
         Element tempElement = 
-            element.getOwnerDocument().createElementNS(ns, "wsc:" + propName);
+            element.getOwnerDocument().createElementNS(ns, ConversationConstants.WSC_PREFIX + ":" 
+                + propName);
         tempElement.appendChild(element.getOwnerDocument().createTextNode(propValue));
 
         elementProperties.appendChild(tempElement);
@@ -243,17 +246,19 @@ public class DerivedKeyToken {
      * @param properties The properties and values in a Map
      */
     public void setProperties(Map<String, String> properties) {
-        for (String key : properties.keySet()) {
-            String propertyName = properties.get(key); //Get the property name
-            //Check whether this property is already there
-            //If so change the value
-            Element node = 
-                WSSecurityUtil.findElement(elementProperties, propertyName, ns);
-            if (node != null) { //If the node is not null
-                Text node1 = getFirstNode(node);
-                node1.setData(properties.get(propertyName));
-            } else {
-                addProperty(propertyName, properties.get(propertyName));
+        if (properties != null && !properties.isEmpty()) {
+            for (Entry<String, String> entry : properties.entrySet()) {
+                String propertyName = entry.getValue();
+                //Check whether this property is already there
+                //If so change the value
+                Element node = 
+                    WSSecurityUtil.findElement(elementProperties, propertyName, ns);
+                if (node != null) { //If the node is not null
+                    Text node1 = getFirstNode(node);
+                    node1.setData(properties.get(propertyName));
+                } else {
+                    addProperty(propertyName, properties.get(propertyName));
+                }
             }
         }
     }
@@ -282,7 +287,7 @@ public class DerivedKeyToken {
     public void setLength(int length) {
         elementLength = 
             element.getOwnerDocument().createElementNS(
-                ns, "wsc:" + ConversationConstants.LENGTH_LN
+                ns, ConversationConstants.WSC_PREFIX + ":" + ConversationConstants.LENGTH_LN
             );
         elementLength.appendChild(
             element.getOwnerDocument().createTextNode(Long.toString(length))
@@ -307,7 +312,7 @@ public class DerivedKeyToken {
         if (elementGeneration == null) {
             elementOffset = 
                 element.getOwnerDocument().createElementNS(
-                    ns, "wsc:" + ConversationConstants.OFFSET_LN
+                    ns, ConversationConstants.WSC_PREFIX + ":" + ConversationConstants.OFFSET_LN
                 );
             elementOffset.appendChild(
                 element.getOwnerDocument().createTextNode(Integer.toString(offset))
@@ -336,7 +341,7 @@ public class DerivedKeyToken {
         if (elementOffset == null) {
             elementGeneration = 
                 element.getOwnerDocument().createElementNS(
-                    ns, "wsc:" + ConversationConstants.GENERATION_LN
+                    ns, ConversationConstants.WSC_PREFIX + ":" + ConversationConstants.GENERATION_LN
                 );
             elementGeneration.appendChild(
                 element.getOwnerDocument().createTextNode(Integer.toString(generation))
@@ -362,7 +367,7 @@ public class DerivedKeyToken {
     public void setLabel(String label) {
         elementLabel = 
             element.getOwnerDocument().createElementNS(
-                ns, "wsc:" + ConversationConstants.LABEL_LN
+                ns, ConversationConstants.WSC_PREFIX + ":" + ConversationConstants.LABEL_LN
             );
         elementLabel.appendChild(element.getOwnerDocument().createTextNode(label));
         element.appendChild(elementLabel);
@@ -376,7 +381,7 @@ public class DerivedKeyToken {
     public void setNonce(String nonce) {
         elementNonce = 
             element.getOwnerDocument().createElementNS(
-                ns, "wsc:" + ConversationConstants.NONCE_LN
+                ns, ConversationConstants.WSC_PREFIX + ":" + ConversationConstants.NONCE_LN
             );
         elementNonce.appendChild(element.getOwnerDocument().createTextNode(nonce));
         element.appendChild(elementNonce);
@@ -534,10 +539,11 @@ public class DerivedKeyToken {
             System.arraycopy(labelBytes, 0, seed, 0, labelBytes.length);
             System.arraycopy(nonce, 0, seed, labelBytes.length, nonce.length);
             
-            if (length <= 0) {
-                length = getLength();
+            int keyLength = length;
+            if (keyLength <= 0) {
+                keyLength = getLength();
             }
-            return algo.createKey(secret, seed, getOffset(), length);
+            return algo.createKey(secret, seed, getOffset(), keyLength);
             
         } catch (Exception e) {
             throw new WSSecurityException(
