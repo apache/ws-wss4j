@@ -161,7 +161,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
             }
 
             AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
-            String id = securePart.getExternalReference().substring(4);
+            String id = securePart.getExternalReference().substring("cid:".length());
             attachmentRequestCallback.setAttachmentId(id);
             try {
                 attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});

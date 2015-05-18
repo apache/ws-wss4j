@@ -599,7 +599,7 @@ public class SecurityTokenReference {
 
             if (!WSS4JConstants.WSS_SAML_KI_VALUE_TYPE.equals(valueType) 
                 && !WSS4JConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)
-                && (encodingType == null || "".equals(encodingType))) {
+                && "".equals(encodingType)) {
                 bspEnforcer.handleBSPRule(BSPRule.R3070);
             }
         } else if ("Embedded".equals(child.getLocalName())) {

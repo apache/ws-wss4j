@@ -641,8 +641,8 @@ public final class ConfigurationConverter {
         final Map<QName, Validator> validatorMap = 
             (Map<QName, Validator>)config.get(ConfigurationConstants.VALIDATOR_MAP);
         if (validatorMap != null) {
-            for (QName key : validatorMap.keySet()) {
-                properties.addValidator(key, validatorMap.get(key));
+            for (Map.Entry<QName, Validator> entry : validatorMap.entrySet()) {
+                properties.addValidator(entry.getKey(), entry.getValue());
             }
         }
         

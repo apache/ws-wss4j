@@ -119,7 +119,7 @@ public class PolicyEnforcer implements SecurityEventListener {
     // HttpsToken Algorithms
     //unused tokens must be checked (algorithms etc)
 
-    protected static final transient org.slf4j.Logger log = 
+    private static final transient org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(PolicyEnforcer.class);
     
     private static final QName SOAP11_FAULT = new QName(WSSConstants.NS_SOAP11, "Fault");
@@ -659,7 +659,7 @@ public class PolicyEnforcer implements SecurityEventListener {
                     while (assertableIterator.hasNext()) {
                         Assertable assertable = assertableIterator.next();
                         if (!assertable.isAsserted() && !assertable.isLogged()) {
-                            log.error(entry.getKey().getName() + " not satisfied: " + assertable.getErrorMessage());
+                            LOG.error(entry.getKey().getName() + " not satisfied: " + assertable.getErrorMessage());
                             assertable.setLogged(true);
                         }
                     }
@@ -672,7 +672,7 @@ public class PolicyEnforcer implements SecurityEventListener {
     @Override
     public synchronized void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
 
-        if (securityEvent instanceof NoSecuritySecurityEvent) {
+        if (!noSecurityHeader && securityEvent instanceof NoSecuritySecurityEvent) {
             noSecurityHeader = true;
         }
         
@@ -687,8 +687,8 @@ public class PolicyEnforcer implements SecurityEventListener {
         if (WSSecurityEventConstants.Operation.equals(securityEvent.getSecurityEventType())) {
             operationSecurityEventOccured = true;
             final OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
-            if (SOAP11_FAULT.equals(operationSecurityEvent.getOperation())
-                || SOAP12_FAULT.equals(operationSecurityEvent.getOperation())) {
+            if (!faultOccurred && (SOAP11_FAULT.equals(operationSecurityEvent.getOperation())
+                || SOAP12_FAULT.equals(operationSecurityEvent.getOperation()))) {
                 faultOccurred = true;
             }
             

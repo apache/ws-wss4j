@@ -196,7 +196,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
             final String externalReference = securePart.getExternalReference();
             if (externalReference != null && externalReference.startsWith("cid:")) {
                 attachmentSecurePart = securePart;
-                externalId = externalReference.substring(4);
+                externalId = externalReference.substring("cid:".length());
                 break;
             }
         }
@@ -454,7 +454,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                         if (use200512Namespace) {
                             attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_WSC_05_12 + "/sct"));
                         } else {
-                            attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_WSC_05_12 + "/sct"));
+                            attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_WSC_05_02 + "/sct"));
                         }
                     } else if (WSSecurityTokenConstants.EncryptedKeyToken.equals(securityToken.getTokenType())) {
                         attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
