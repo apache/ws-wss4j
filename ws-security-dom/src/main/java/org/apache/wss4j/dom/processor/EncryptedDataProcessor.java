@@ -46,7 +46,9 @@ import org.apache.wss4j.dom.str.STRParser;
 import org.apache.wss4j.dom.str.STRParserParameters;
 import org.apache.wss4j.dom.str.STRParserResult;
 import org.apache.wss4j.dom.str.SecurityTokenRefSTRParser;
+import org.apache.wss4j.dom.util.EncryptionUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.dom.util.X509Util;
 import org.w3c.dom.Element;
 
 /**
@@ -146,7 +148,7 @@ public class EncryptedDataProcessor implements Processor {
             algorithmSuiteValidator.checkSymmetricEncryptionAlgorithm(symEncAlgo);
         }
 
-        WSDataRef dataRef = ReferenceListProcessor.decryptEncryptedData(
+        WSDataRef dataRef = EncryptionUtils.decryptEncryptedData(
                 elem.getOwnerDocument(), encryptedDataId, elem, key, symEncAlgo, request);
 
         WSSecurityEngineResult result =

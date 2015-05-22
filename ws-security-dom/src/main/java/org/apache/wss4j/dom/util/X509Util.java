@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.processor;
+package org.apache.wss4j.dom.util;
 
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
@@ -72,7 +72,7 @@ public final class X509Util {
         return symEncAlgo;
     }
 
-    protected static SecretKey getSharedKey(
+    public static SecretKey getSharedKey(
         Element keyInfoElem,
         String algorithm,
         CallbackHandler cb
