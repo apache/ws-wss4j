@@ -17,13 +17,12 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.processor;
+package org.apache.wss4j.dom.util;
 
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
@@ -73,7 +72,7 @@ public final class X509Util {
         return symEncAlgo;
     }
 
-    protected static SecretKey getSharedKey(
+    public static SecretKey getSharedKey(
         Element keyInfoElem,
         String algorithm,
         CallbackHandler cb

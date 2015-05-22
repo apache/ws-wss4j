@@ -48,6 +48,7 @@ import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
+import org.apache.wss4j.dom.util.EncryptionUtils;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
 import org.opensaml.xml.signature.KeyInfo;
@@ -265,7 +266,7 @@ public class SAMLTokenProcessor implements Processor {
                 }
                 ref.setTransformAlgorithms(transformAlgorithms);
     
-                ref.setXpath(ReferenceListProcessor.getXPath(token));
+                ref.setXpath(EncryptionUtils.getXPath(token));
                 protectedRefs.add(ref);
             }
         }

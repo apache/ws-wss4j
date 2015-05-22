@@ -45,7 +45,9 @@ import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.str.STRParser;
 import org.apache.wss4j.dom.str.SecurityTokenRefSTRParser;
+import org.apache.wss4j.dom.util.EncryptionUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.dom.util.X509Util;
 
 /**
  * This will process incoming <code>xenc:EncryptedData</code> elements.
@@ -141,7 +143,7 @@ public class EncryptedDataProcessor implements Processor {
             algorithmSuiteValidator.checkSymmetricEncryptionAlgorithm(symEncAlgo);
         }
 
-        WSDataRef dataRef = ReferenceListProcessor.decryptEncryptedData(
+        WSDataRef dataRef = EncryptionUtils.decryptEncryptedData(
                 elem.getOwnerDocument(), encryptedDataId, elem, key, symEncAlgo, request);
 
         WSSecurityEngineResult result =

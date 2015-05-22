@@ -102,6 +102,7 @@ public final class WSConstants {
         "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Content-Only";
     public static final String SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE =
         "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Complete";
+    public static final String XOP_NS = "http://www.w3.org/2004/08/xop/include";
     
     public static final String KEYTRANSPORT_RSA15 = 
         "http://www.w3.org/2001/04/xmlenc#rsa-1_5";

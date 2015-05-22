@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.processor;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -34,6 +35,9 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -43,6 +47,8 @@ import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.ext.Attachment;
+import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
@@ -55,10 +61,13 @@ import org.apache.wss4j.dom.message.token.DOMX509IssuerSerial;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.str.EncryptedKeySTRParser;
 import org.apache.wss4j.dom.str.STRParser;
+import org.apache.wss4j.dom.util.EncryptionUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.dom.util.X509Util;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.utils.Base64;
+import org.apache.xml.security.utils.JavaUtils;
 
 public class EncryptedKeyProcessor implements Processor {
     private static final org.slf4j.Logger LOG = 
@@ -204,8 +213,16 @@ public class EncryptedKeyProcessor implements Processor {
         
         byte[] encryptedEphemeralKey = null;
         byte[] decryptedBytes = null;
+        
         try {
-            encryptedEphemeralKey = getDecodedBase64EncodedData(xencCipherValue);
+            // Get the key bytes from CipherValue directly or via an attachment
+            String xopUri = EncryptionUtils.getXOPURIFromCipherValue(xencCipherValue);
+            if (xopUri != null && xopUri.startsWith("cid:")) {
+                encryptedEphemeralKey = getDecryptedKeyBytesFromAttachment(xopUri, data);
+            } else {
+                encryptedEphemeralKey = getDecodedBase64EncodedData(xencCipherValue);
+            }
+            
             String keyAlgorithm = JCEMapper.translateURItoJCEID(encryptedKeyTransportMethod);
             decryptedBytes = cipher.unwrap(encryptedEphemeralKey, keyAlgorithm, Cipher.SECRET_KEY).getEncoded();
         } catch (IllegalStateException ex) {
@@ -238,6 +255,40 @@ public class EncryptedKeyProcessor implements Processor {
         return java.util.Collections.singletonList(result);
     }
     
+    private byte[] getDecryptedKeyBytesFromAttachment(
+        String xopUri, RequestData data
+    ) throws WSSecurityException {
+        CallbackHandler attachmentCallbackHandler = data.getAttachmentCallbackHandler();
+        if (attachmentCallbackHandler == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+        }
+
+        final String attachmentId = xopUri.substring(4);
+
+        AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
+        attachmentRequestCallback.setAttachmentId(attachmentId);
+
+        try {
+            attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
+            
+            List<Attachment> attachments = attachmentRequestCallback.getAttachments();
+            if (attachments == null || attachments.isEmpty() || !attachmentId.equals(attachments.get(0).getId())) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.INVALID_SECURITY,
+                    "empty", new Object[] {"Attachment not found"}
+                );
+            }
+            Attachment attachment = attachments.get(0);
+            InputStream inputStream = attachment.getSourceStream();
+            
+            return JavaUtils.getBytesFromStream(inputStream);
+        } catch (UnsupportedCallbackException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
+        } catch (IOException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
+        }
+    }
+    
     /**
      * Generates a random secret key using the algorithm specified in the
      * first DataReference URI
@@ -253,7 +304,7 @@ public class EncryptedKeyProcessor implements Processor {
             int size = 16;
             if (!dataRefURIs.isEmpty()) {
                 String uri = dataRefURIs.iterator().next();
-                Element ee = ReferenceListProcessor.findEncryptedDataElement(doc, wsDocInfo, uri);
+                Element ee = EncryptionUtils.findEncryptedDataElement(doc, wsDocInfo, uri);
                 String algorithmURI = X509Util.getEncAlgo(ee);
                 alg = JCEMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
                 size = KeyUtils.getKeyLength(algorithmURI);
@@ -524,7 +575,7 @@ public class EncryptedKeyProcessor implements Processor {
         // Find the encrypted data element referenced by dataRefURI
         //
         Element encryptedDataElement = 
-            ReferenceListProcessor.findEncryptedDataElement(doc, docInfo, dataRefURI);
+            EncryptionUtils.findEncryptedDataElement(doc, docInfo, dataRefURI);
         if (encryptedDataElement != null && data.isRequireSignedEncryptedDataElements()) {
             List<WSSecurityEngineResult> signedResults = 
                 docInfo.getResultsByTag(WSConstants.SIGN);
@@ -567,7 +618,7 @@ public class EncryptedKeyProcessor implements Processor {
             algorithmSuiteValidator.checkSymmetricEncryptionAlgorithm(symEncAlgo);
         }
 
-        return ReferenceListProcessor.decryptEncryptedData(
+        return EncryptionUtils.decryptEncryptedData(
             doc, dataRefURI, encryptedDataElement, symmetricKey, symEncAlgo, data
         );
     }
