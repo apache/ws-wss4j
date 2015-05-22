@@ -300,7 +300,7 @@ public class EncryptedKeyProcessor implements Processor {
             if (attachments == null || attachments.isEmpty() || !attachmentId.equals(attachments.get(0).getId())) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY,
-                    "empty", "Attachment not found"
+                    "empty", new Object[] {"Attachment not found"}
                 );
             }
             Attachment attachment = attachments.get(0);

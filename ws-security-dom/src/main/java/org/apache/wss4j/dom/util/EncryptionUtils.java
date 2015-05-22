@@ -81,7 +81,8 @@ public final class EncryptionUtils {
             callbackLookup.getElement(dataRefURI, null, true);
         if (encryptedDataElement == null) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY, "dataRef", dataRefURI);
+                WSSecurityException.ErrorCode.INVALID_SECURITY, "dataRef", 
+                new Object[] {dataRefURI});
         }
         if (encryptedDataElement.getLocalName().equals(WSConstants.ENCRYPTED_HEADER)
             && encryptedDataElement.getNamespaceURI().equals(WSConstants.WSSE11_NS)) {
@@ -259,7 +260,7 @@ public final class EncryptionUtils {
             if (attachments == null || attachments.isEmpty() || !attachmentId.equals(attachments.get(0).getId())) {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.INVALID_SECURITY,
-                        "empty", "Attachment not found"
+                        "empty", new Object[] {"Attachment not found"}
                 );
             }
             Attachment attachment = attachments.get(0);
