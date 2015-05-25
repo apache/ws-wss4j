@@ -35,17 +35,16 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.ext.Attachment;
-import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.DOMX509IssuerSerial;
 import org.apache.wss4j.common.token.SecurityTokenReference;
@@ -66,10 +65,6 @@ import org.apache.wss4j.dom.util.X509Util;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.utils.Base64;
-import org.apache.xml.security.utils.JavaUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 public class EncryptedKeyProcessor implements Processor {
     private static final org.slf4j.Logger LOG = 
@@ -244,7 +239,7 @@ public class EncryptedKeyProcessor implements Processor {
             // Get the key bytes from CipherValue directly or via an attachment
             String xopUri = EncryptionUtils.getXOPURIFromCipherValue(xencCipherValue);
             if (xopUri != null && xopUri.startsWith("cid:")) {
-                encryptedEphemeralKey = getDecryptedKeyBytesFromAttachment(xopUri, data);
+                encryptedEphemeralKey = WSSecurityUtil.getBytesFromAttachment(xopUri, data);
             } else {
                 encryptedEphemeralKey = getDecodedBase64EncodedData(xencCipherValue);
             }
@@ -278,39 +273,6 @@ public class EncryptedKeyProcessor implements Processor {
         wsDocInfo.addResult(result);
         wsDocInfo.addTokenElement(elem);
         return Collections.singletonList(result);
-    }
-    
-    private byte[] getDecryptedKeyBytesFromAttachment(
-        String xopUri, RequestData data
-    ) throws WSSecurityException {
-        CallbackHandler attachmentCallbackHandler = data.getAttachmentCallbackHandler();
-        if (attachmentCallbackHandler == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
-        }
-
-        final String attachmentId = xopUri.substring(4);
-
-        AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
-        attachmentRequestCallback.setAttachmentId(attachmentId);
-
-        try {
-            attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
-            
-            List<Attachment> attachments = attachmentRequestCallback.getAttachments();
-            if (attachments == null || attachments.isEmpty() || !attachmentId.equals(attachments.get(0).getId())) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.INVALID_SECURITY,
-                    "empty", new Object[] {"Attachment not found"}
-                );
-            }
-            Attachment attachment = attachments.get(0);
-            InputStream inputStream = attachment.getSourceStream();
-            
-            return JavaUtils.getBytesFromStream(inputStream);
-        } catch (UnsupportedCallbackException | IOException e) {
-            throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILED_CHECK, e);
-        }
     }
     
     /**
