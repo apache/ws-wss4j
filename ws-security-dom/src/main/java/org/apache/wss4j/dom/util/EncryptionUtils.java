@@ -215,8 +215,7 @@ public final class EncryptionUtils {
     }
     
     public static String getXOPURIFromCipherValue(Element cipherValue) {
-        if (cipherValue != null && cipherValue.hasAttributeNS(WSConstants.XMLNS_NS, "xop")
-            && WSConstants.XOP_NS.equals(cipherValue.getAttributeNS(WSConstants.XMLNS_NS, "xop"))) {
+        if (cipherValue != null) {
             Element cipherValueChild =
                 XMLUtils.getDirectChildElement(cipherValue, "Include", WSConstants.XOP_NS);
             if (cipherValueChild != null && cipherValueChild.hasAttributeNS(null, "href")) {
@@ -254,7 +253,7 @@ public final class EncryptionUtils {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
             }
 
-            final String attachmentId = uri.substring(4);
+            final String attachmentId = uri.substring("cid:".length());
 
             AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
             attachmentRequestCallback.setAttachmentId(attachmentId);

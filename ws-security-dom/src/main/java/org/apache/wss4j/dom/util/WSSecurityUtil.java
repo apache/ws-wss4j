@@ -28,14 +28,18 @@ import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.common.ext.Attachment;
+import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.HandlerAction;
+import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.CallbackLookup;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.utils.Base64;
+import org.apache.xml.security.utils.JavaUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -51,10 +55,16 @@ import javax.xml.namespace.QName;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 
 /**
  * WS-Security Utility methods. <p/>
@@ -1208,4 +1218,39 @@ public final class WSSecurityUtil {
         return false;
     }
     
+    public static byte[] getBytesFromAttachment(
+        String xopUri, RequestData data
+    ) throws WSSecurityException {
+        CallbackHandler attachmentCallbackHandler = data.getAttachmentCallbackHandler();
+        if (attachmentCallbackHandler == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+        }
+
+        final String attachmentId = xopUri.substring("cid:".length());
+
+        AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
+        attachmentRequestCallback.setAttachmentId(attachmentId);
+
+        try {
+            attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
+
+            List<Attachment> attachments = attachmentRequestCallback.getAttachments();
+            if (attachments == null || attachments.isEmpty() 
+                || !attachmentId.equals(attachments.get(0).getId())) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.INVALID_SECURITY,
+                    "empty", new Object[] {"Attachment not found"}
+                );
+            }
+            Attachment attachment = attachments.get(0);
+            InputStream inputStream = attachment.getSourceStream();
+
+            return JavaUtils.getBytesFromStream(inputStream);
+        } catch (UnsupportedCallbackException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
+        } catch (IOException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
+        }
+    }
+
 }

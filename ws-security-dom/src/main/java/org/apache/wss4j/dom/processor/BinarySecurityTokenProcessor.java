@@ -36,6 +36,7 @@ import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.dom.message.token.PKIPathSecurity;
 import org.apache.wss4j.dom.message.token.X509Security;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
 
@@ -166,6 +167,18 @@ public class BinarySecurityTokenProcessor implements Processor {
         } else {
             token = new BinarySecurity(element, data.getBSPEnforcer());
         }
+        
+        // Now see if the Element content is actually referenced via xop:Include
+        Element elementChild =
+            WSSecurityUtil.getDirectChildElement(element, "Include", WSConstants.XOP_NS);
+        if (elementChild != null && elementChild.hasAttributeNS(null, "href")) {
+            String xopUri = elementChild.getAttributeNS(null, "href");
+            if (xopUri != null && xopUri.startsWith("cid:")) {
+                byte[] content = WSSecurityUtil.getBytesFromAttachment(xopUri, data);
+                token.setToken(content);
+            }
+        }
+        
         return token;
     }
     
