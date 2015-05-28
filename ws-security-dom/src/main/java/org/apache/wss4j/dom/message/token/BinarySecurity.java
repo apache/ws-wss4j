@@ -219,9 +219,25 @@ public class BinarySecurity {
      * 
      * @return the first text node.
      */
-    protected Text getFirstNode() {
+    private Text getFirstNode() {
         Node node = element.getFirstChild();
-        return node != null && Node.TEXT_NODE == node.getNodeType() ? (Text) node : null;
+        while (node != null && Node.TEXT_NODE != node.getNodeType()) {
+            node = node.getNextSibling();
+        }
+        if (node instanceof Text) {
+            return (Text)node;
+        }
+        
+        // Otherwise we have no Text child. Just remove the child nodes + add a new text node
+        node = element.getFirstChild();
+        while (node != null) {
+            Node nextNode = node.getNextSibling();
+            element.removeChild(node);
+            node = nextNode;
+        }
+        
+        Node textNode = element.getOwnerDocument().createTextNode("");
+        return (Text)element.appendChild(textNode);
     }
 
     /**
