@@ -47,11 +47,10 @@ Software Foundation.
 <subsection name="News">
 <ul>
 <li>
-<p><b>April 2015</b> - 
-The Apache WSS4J team are pleased to announce the release of version 2.1.0.
-</p>
-<p>
-Please see the <a href="https://issues.apache.org/jira/browse/WSS/fixforversion/12331950">release notes</a> for more information.
+<p><b>June 2015</b> - 
+The Apache WSS4J team are pleased to announce the release of version 2.1.1.
+This release fixes an important bug in 2.1.0, which prevents signing or
+validating a signed SAML token in an OSGi container.
 </p>
 </li>
 <li>
