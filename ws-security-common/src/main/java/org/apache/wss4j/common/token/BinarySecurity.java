@@ -48,6 +48,7 @@ public class BinarySecurity {
         org.slf4j.LoggerFactory.getLogger(BinarySecurity.class);
     
     private Element element;
+    private byte[] data;
 
     /**
      * Constructor.
@@ -177,11 +178,15 @@ public class BinarySecurity {
      * @return the byte array containing token information
      */
     public byte[] getToken() {
+        if (data != null) {
+            return data;
+        }
         try {
             String text = XMLUtils.getElementText(element);
             if (text == null) {
                 return null;
             }
+            
             return Base64.decode(text);
         } catch (Exception ex) {
             if (LOG.isDebugEnabled()) {
@@ -202,6 +207,14 @@ public class BinarySecurity {
         }
         Text node = getFirstNode();
         node.setData(Base64.encode(data));
+        setRawToken(data);
+    }
+    
+    /**
+     * Set the raw token data, without Base-64 encoding it into the Element.
+     */
+    public void setRawToken(byte[] data) {
+        this.data = Arrays.copyOf(data, data.length);
     }
 
     /**
