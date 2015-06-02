@@ -19,20 +19,6 @@
 
 package org.apache.wss4j.dom.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
-
-import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.AttachmentResultCallback;
@@ -53,6 +39,19 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 public final class EncryptionUtils {
     
@@ -119,11 +118,6 @@ public final class EncryptionUtils {
         RequestData requestData
     ) throws WSSecurityException {
 
-        WSDataRef dataRef = new WSDataRef();
-        dataRef.setEncryptedElement(encData);
-        dataRef.setWsuId(dataRefURI);
-        dataRef.setAlgorithm(symEncAlgo);
-
         // See if it is an attachment, and handle that differently
         String typeStr = encData.getAttributeNS(null, "Type");
         String xopURI = getXOPURIFromEncryptedData(encData);
@@ -141,14 +135,18 @@ public final class EncryptionUtils {
             }
             String uri = cipherReference.getAttributeNS(null, "URI");
             
-            return decryptAttachment(dataRefURI, uri, false, encData, symmetricKey, symEncAlgo, requestData);
-        } else if (xopURI != null) {
-            return decryptAttachment(dataRefURI, xopURI, true, encData, symmetricKey, symEncAlgo, requestData);
+            return decryptAttachment(dataRefURI, uri, encData, symmetricKey, symEncAlgo, requestData);
         }
+        
+        WSDataRef dataRef = new WSDataRef();
+        dataRef.setEncryptedElement(encData);
+        dataRef.setWsuId(dataRefURI);
+        dataRef.setAlgorithm(symEncAlgo);
 
         boolean content = X509Util.isContent(encData);
         dataRef.setContent(content);
         
+        Element encDataOrig = encData;
         Node parent = encData.getParentNode();
         Node previousSibling = encData.getPreviousSibling();
         if (content) {
@@ -166,13 +164,29 @@ public final class EncryptionUtils {
                     WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex
             );
         }
-        
+
+        Node decryptedNode = null;
         try {
-            xmlCipher.doFinal(doc, encData, content);
+            if (xopURI != null) {
+                Element tempEncData;
+
+                //if content == true, use encDataOrig (i.e., actual EncryptedData element instead of parent)
+                //We will replace the EncryptedData element itself with the decrypted data found in attachment
+                if (content) {
+                    tempEncData = encDataOrig;
+                } else {
+                    tempEncData = encData;
+                }
+                decryptedNode = decryptXopAttachment(symmetricKey, symEncAlgo, requestData, xopURI, tempEncData);
+            } else {
+                //in this case, the XMLCipher knows how to handle encData when it's the parent node
+                // (i.e., when content == true)
+                xmlCipher.doFinal(doc, encData, content);
+            }
         } catch (Exception ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
         }
-        
+
         if (parent.getLocalName().equals(WSConstants.ENCRYPTED_HEADER)
             && parent.getNamespaceURI().equals(WSConstants.WSSE11_NS)
             || parent.getLocalName().equals(WSConstants.ENCRYPED_ASSERTION_LN)
@@ -188,11 +202,12 @@ public final class EncryptionUtils {
             dataRef.setProtectedElement(encData);
             dataRef.setXpath(getXPath(encData));
         } else {
-            Node decryptedNode;
-            if (previousSibling == null) {
-                decryptedNode = parent.getFirstChild();
-            } else {
-                decryptedNode = previousSibling.getNextSibling();
+            if (decryptedNode == null) {
+                if (previousSibling == null) {
+                    decryptedNode = parent.getFirstChild();
+                } else {
+                    decryptedNode = previousSibling.getNextSibling();
+                }
             }
             if (decryptedNode != null && Node.ELEMENT_NODE == decryptedNode.getNodeType()) {
                 dataRef.setProtectedElement((Element)decryptedNode);
@@ -202,7 +217,7 @@ public final class EncryptionUtils {
         
         return dataRef;
     }
-    
+
     private static String getXOPURIFromEncryptedData(Element encData) {
         Element cipherData = XMLUtils.getDirectChildElement(encData, "CipherData", WSConstants.ENC_NS);
         if (cipherData != null) {
@@ -231,7 +246,6 @@ public final class EncryptionUtils {
     decryptAttachment(
         String dataRefURI,
         String uri,
-        boolean xop,
         Element encData,
         SecretKey symmetricKey,
         String symEncAlgo,
@@ -277,17 +291,6 @@ public final class EncryptionUtils {
                     AttachmentUtils.setupAttachmentDecryptionStream(
                             encAlgo, cipher, symmetricKey, attachment.getSourceStream());
             
-            // For the xop:Include case, we need to replace the xop:Include Element with the
-            // decrypted Element
-            if (xop) {
-                DocumentBuilder db = 
-                    org.apache.xml.security.utils.XMLUtils.createDocumentBuilder(false);
-                Document doc = db.parse(attachmentInputStream);
-                Node importedNode = encData.getOwnerDocument().importNode(doc.getDocumentElement(), true);
-                encData.getParentNode().appendChild(importedNode);
-                org.apache.xml.security.utils.XMLUtils.repoolDocumentBuilder(db);
-            }
-            
             Attachment resultAttachment = new Attachment();
             resultAttachment.setId(attachment.getId());
             resultAttachment.setMimeType(encData.getAttributeNS(null, "MimeType"));
@@ -313,10 +316,6 @@ public final class EncryptionUtils {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
         } catch (NoSuchPaddingException e) { 
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
-        } catch (ParserConfigurationException e) { 
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
-        } catch (SAXException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
         }
 
         dataRef.setContent(true);
@@ -325,6 +324,52 @@ public final class EncryptionUtils {
         
         return dataRef;
     }
+    
+
+    private static Node decryptXopAttachment(SecretKey symmetricKey, String symEncAlgo, RequestData requestData,
+                                             String xopURI, Element encData) throws WSSecurityException, IOException,
+            UnsupportedCallbackException, NoSuchAlgorithmException, NoSuchPaddingException, ParserConfigurationException, SAXException {
+
+        CallbackHandler attachmentCallbackHandler = requestData.getAttachmentCallbackHandler();
+        if (attachmentCallbackHandler == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
+        }
+        final String attachmentId = xopURI.substring("cid:".length());
+
+        AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
+        attachmentRequestCallback.setAttachmentId(attachmentId);
+
+        attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
+        List<Attachment> attachments = attachmentRequestCallback.getAttachments();
+        if (attachments == null || attachments.isEmpty() || !attachmentId.equals(attachments.get(0).getId())) {
+            throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.INVALID_SECURITY,
+                    "empty", new Object[] {"Attachment not found"}
+            );
+        }
+        Attachment attachment = attachments.get(0);
+
+        final String jceAlgorithm =
+                JCEMapper.translateURItoJCEID(symEncAlgo);
+        final Cipher cipher = Cipher.getInstance(jceAlgorithm);
+
+        InputStream attachmentInputStream =
+                AttachmentUtils.setupAttachmentDecryptionStream(
+                        symEncAlgo, cipher, symmetricKey, attachment.getSourceStream());
+
+        // For the xop:Include case, we need to replace the xop:Include Element with the
+        // decrypted Element
+        DocumentBuilder db =
+                org.apache.xml.security.utils.XMLUtils.createDocumentBuilder(false);
+        Document document = db.parse(attachmentInputStream);
+        Node decryptedNode = 
+            encData.getOwnerDocument().importNode(document.getDocumentElement(), true);
+        encData.getParentNode().appendChild(decryptedNode);
+        org.apache.xml.security.utils.XMLUtils.repoolDocumentBuilder(db);
+        encData.getParentNode().removeChild(encData);
+        return decryptedNode;
+    }
+
     
     /**
      * @param decryptedNode the decrypted node
