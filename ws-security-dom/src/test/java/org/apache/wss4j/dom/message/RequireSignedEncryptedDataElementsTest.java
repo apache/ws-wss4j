@@ -248,7 +248,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
             verify(encryptedSignedDoc, reqData);
             fail("WSSecurityException expected");
         } catch (WSSecurityException e) {
-            assertTrue(e.getMessage().contains("is not included in the signature"));
+            assertTrue(e.getMessage().contains("is not signed"));
         }
     }
     
@@ -262,12 +262,12 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
             verify(encryptedSignedDoc, reqData);
             fail("WSSecurityException expected");
         } catch (WSSecurityException e) {
-            assertTrue(e.getMessage().contains("is not included in the signature"));
+            assertTrue(e.getMessage().contains("is not signed"));
         }
     }
     
     private static void checkFailure(Element attackElement, WSSecurityException e) {
-        final String mex = MessageFormat.format(resources.getString("requiredElementNotSigned"), attackElement);
+        final String mex = MessageFormat.format(resources.getString("elementNotSigned"), attackElement);
         assertTrue(e.getMessage().contains(mex));
         assertEquals(WSSecurityException.ErrorCode.FAILED_CHECK, e.getErrorCode());
     }

@@ -1197,7 +1197,7 @@ public final class WSSecurityUtil {
         }
         
         throw new WSSecurityException(
-            WSSecurityException.ErrorCode.FAILED_CHECK, "requiredElementNotSigned", 
+            WSSecurityException.ErrorCode.FAILED_CHECK, "elementNotSigned", 
             new Object[] {elem});
     }
     
