@@ -175,7 +175,7 @@ public class BinarySecurityTokenProcessor implements Processor {
             String xopUri = elementChild.getAttributeNS(null, "href");
             if (xopUri != null && xopUri.startsWith("cid:")) {
                 byte[] content = WSSecurityUtil.getBytesFromAttachment(xopUri, data);
-                token.setToken(content);
+                token.setRawToken(content);
             }
         }
         
