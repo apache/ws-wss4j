@@ -226,6 +226,17 @@ public class BinarySecurity {
     public void setRawToken(byte[] data) {
         this.data = Arrays.copyOf(data, data.length);
     }
+    
+    /**
+     * BASE64-Encode the raw token bytes + store them in a text child node.
+     */
+    public void encodeRawToken() {
+        if (data == null) {
+            throw new IllegalArgumentException("data == null");
+        }
+        Text node = getFirstNode();
+        node.setData(Base64.encode(data));
+    }
 
     /**
      * return the first text node.
