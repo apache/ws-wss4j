@@ -1160,7 +1160,7 @@ public class SamlTokenTest extends org.junit.Assert {
             }
             return results;
         } catch (WSSecurityException ex) {
-            assertTrue(!success);
+            assertFalse(success);
             assertTrue(ex.getMessage().contains("SAML token security failure"));
             return null;
         }

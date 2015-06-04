@@ -647,7 +647,7 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
             LOG.debug(outputString);
         }
-        assertTrue(!outputString.contains("counter_port_type") ? true : false);
+        assertFalse(outputString.contains("counter_port_type"));
         
         WSSecurityEngine newEngine = new WSSecurityEngine();
         List<WSSecurityEngineResult> results = 

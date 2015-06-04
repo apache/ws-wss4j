@@ -719,7 +719,7 @@ public class SamlConditionsTest extends org.junit.Assert {
                 fail("Failure expected in processing the SAML assertion");
             }
         } catch (WSSecurityException ex) {
-            assertTrue(!success);
+            assertFalse(success);
             assertTrue(ex.getMessage().contains("SAML token security failure"));
         }
     }

@@ -198,7 +198,7 @@ public class SamlAuthnTest extends AbstractTestBase {
                 }
                 Assert.assertNotNull(document);
             } catch (XMLStreamException e) {
-                Assert.assertTrue(!success);
+                Assert.assertFalse(success);
                 Assert.assertNotNull(e.getCause());
             }
         }

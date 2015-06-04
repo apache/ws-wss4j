@@ -80,7 +80,7 @@ public class TimestampTest extends AbstractTestBase {
 
             Assert.assertTrue(gregorianCalendarCreated.before(gregorianCalendarExpires));
             GregorianCalendar now = new GregorianCalendar();
-            Assert.assertTrue(!now.before(gregorianCalendarCreated));
+            Assert.assertFalse(now.before(gregorianCalendarCreated));
             Assert.assertTrue(now.before(gregorianCalendarExpires));
 
             gregorianCalendarCreated.add(Calendar.SECOND, 301);
@@ -157,7 +157,7 @@ public class TimestampTest extends AbstractTestBase {
 
             Assert.assertTrue(gregorianCalendarCreated.before(gregorianCalendarExpires));
             GregorianCalendar now = new GregorianCalendar();
-            Assert.assertTrue(!now.before(gregorianCalendarCreated));
+            Assert.assertFalse(now.before(gregorianCalendarCreated));
             Assert.assertTrue(now.before(gregorianCalendarExpires));
 
             gregorianCalendarCreated.add(Calendar.SECOND, 3601);
@@ -680,7 +680,7 @@ public class TimestampTest extends AbstractTestBase {
 
             Assert.assertTrue(gregorianCalendarCreated.before(gregorianCalendarExpires));
             GregorianCalendar now = new GregorianCalendar();
-            Assert.assertTrue(!now.before(gregorianCalendarCreated));
+            Assert.assertFalse(now.before(gregorianCalendarCreated));
             Assert.assertTrue(now.before(gregorianCalendarExpires));
 
             gregorianCalendarCreated.add(Calendar.SECOND, 301);
