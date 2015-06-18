@@ -64,7 +64,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
             new SecurityTokenReference(parameters.getStrElement(), parameters.getData().getBSPEnforcer());
         
         String uri = null;
-        if (secRef.containsReference()) {
+        if (secRef.getReference() != null) {
             uri = secRef.getReference().getURI();
             uri = XMLUtils.getIDFromReference(uri);
         } else if (secRef.containsKeyIdentifier()) {
@@ -90,19 +90,21 @@ public class DerivedKeyTokenSTRParser implements STRParser {
         STRParserResult parserResult = new STRParserResult();
         RequestData data = parameters.getData();
         
-        int action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION));
-        if (WSConstants.UT_NOPASSWORD == action || WSConstants.UT == action) {
+        Integer action = ((Integer)result.get(WSSecurityEngineResult.TAG_ACTION));
+        if (action != null 
+            && (WSConstants.UT_NOPASSWORD == action.intValue() || WSConstants.UT == action.intValue())) {
             STRParserUtil.checkUsernameTokenBSPCompliance(secRef, data.getBSPEnforcer());
             byte[] secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
             parserResult.setSecretKey(secretKey);
-        } else if (WSConstants.ENCR == action) {
+        } else if (action != null && WSConstants.ENCR == action.intValue()) {
             STRParserUtil.checkEncryptedKeyBSPCompliance(secRef, data.getBSPEnforcer());
             byte[] secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
             parserResult.setSecretKey(secretKey);
-        } else if (WSConstants.SCT == action || WSConstants.BST == action) {
+        } else if (action != null && (WSConstants.SCT == action.intValue() || WSConstants.BST == action.intValue())) {
             byte[] secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
             parserResult.setSecretKey(secretKey);
-        } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
+        } else if (action != null 
+            && (WSConstants.ST_UNSIGNED == action.intValue() || WSConstants.ST_SIGNED == action.intValue())) {
             SamlAssertionWrapper samlAssertion =
                 (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
             STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion, data.getBSPEnforcer());
@@ -171,7 +173,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                 }
                 parserResult.setSecretKey(secretKey);
             } else {
-                if (keyIdentifierValueType.equals(SecurityTokenReference.ENC_KEY_SHA1_URI)) {
+                if (SecurityTokenReference.ENC_KEY_SHA1_URI.equals(keyIdentifierValueType)) {
                     STRParserUtil.checkEncryptedKeyBSPCompliance(secRef, data.getBSPEnforcer());
                 }
                 Crypto crypto = data.getDecCrypto();

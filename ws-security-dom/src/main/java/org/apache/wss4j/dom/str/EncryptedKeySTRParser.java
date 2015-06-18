@@ -66,7 +66,7 @@ public class EncryptedKeySTRParser implements STRParser {
             new SecurityTokenReference(parameters.getStrElement(), parameters.getData().getBSPEnforcer());
         
         String uri = null;
-        if (secRef.containsReference()) {
+        if (secRef.getReference() != null) {
             uri = secRef.getReference().getURI();
             uri = XMLUtils.getIDFromReference(uri);
         } else if (secRef.containsKeyIdentifier()) {
@@ -92,8 +92,8 @@ public class EncryptedKeySTRParser implements STRParser {
         STRParserResult parserResult = new STRParserResult();
         RequestData data = parameters.getData();
         
-        int action = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
-        if (WSConstants.BST == action) {
+        Integer action = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
+        if (action != null && WSConstants.BST == action.intValue()) {
             BinarySecurity token = 
                 (BinarySecurity)result.get(
                     WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN
@@ -104,7 +104,8 @@ public class EncryptedKeySTRParser implements STRParser {
                     WSSecurityEngineResult.TAG_X509_CERTIFICATES
                 );
             parserResult.setCerts(certs);
-        } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
+        } else if (action != null 
+            && (WSConstants.ST_UNSIGNED == action.intValue() || WSConstants.ST_SIGNED == action.intValue())) {
             SamlAssertionWrapper samlAssertion =
                 (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
             STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion, data.getBSPEnforcer());

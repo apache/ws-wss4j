@@ -572,12 +572,16 @@ public abstract class AbstractTestBase extends org.junit.Assert {
             int ai = 0;
             for (WSSecurityEngineResult result : wsSecurityEngineResults) {
                 final Integer act = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
-                if (act == WSConstants.SC || act == WSConstants.BST || act == WSConstants.DKT || act == WSConstants.SCT || act == WSConstants.UT_NOPASSWORD) {
-                    continue;
-                }
-
-                if (ai >= size || actions.get(ai++).intValue() != act) {
-                    return false;
+                if (act != null) {
+                    if (act.intValue() == WSConstants.SC || act.intValue() == WSConstants.BST 
+                        || act.intValue() == WSConstants.DKT || act.intValue() == WSConstants.SCT 
+                        || act.intValue() == WSConstants.UT_NOPASSWORD) {
+                        continue;
+                    }
+    
+                    if (ai >= size || actions.get(ai++).intValue() != act) {
+                        return false;
+                    }
                 }
             }
             /*

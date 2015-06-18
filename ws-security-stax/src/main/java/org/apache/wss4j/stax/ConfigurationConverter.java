@@ -295,7 +295,9 @@ public final class ConfigurationConverter {
             } else {
                 crypto = properties.getEncryptionCrypto();
             }
-            return crypto.getDefaultX509Identifier();
+            if (crypto != null) {
+                return crypto.getDefaultX509Identifier();
+            }
         } catch (WSSecurityException e) {
             LOG.debug(e.getMessage(), e);
         }

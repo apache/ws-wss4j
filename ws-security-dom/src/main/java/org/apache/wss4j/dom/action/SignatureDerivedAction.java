@@ -162,7 +162,7 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
                 key = passwordCallback.getKey();
             } else if (signatureToken.getKey() != null) {
                 key = signatureToken.getKey();
-            } else {
+            } else if (signatureToken.getCrypto() != null) {
                 Crypto crypto = signatureToken.getCrypto();
                 key = crypto.getPrivateKey(signatureToken.getUser(), passwordCallback.getPassword()).getEncoded();
             }

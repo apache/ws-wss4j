@@ -224,67 +224,69 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
         }
         
         List<Attachment> attachments = attachmentRequestCallback.getAttachments();
-        for (int i = 0; i < attachments.size(); i++) {
-            final Attachment attachment = attachments.get(i);
-            final String attachmentId = attachment.getId();
-
-            String tokenId = outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION);
-            SecurityTokenProvider<OutboundSecurityToken> securityTokenProvider =
-                    outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
-            OutboundSecurityToken securityToken = securityTokenProvider.getSecurityToken();
-            EncryptionPartDef encryptionPartDef = new EncryptionPartDef();
-            encryptionPartDef.setSecurePart(attachmentSecurePart);
-            encryptionPartDef.setModifier(attachmentSecurePart.getModifier());
-            encryptionPartDef.setCipherReferenceId(attachment.getId());
-            encryptionPartDef.setMimeType(attachment.getMimeType());
-            encryptionPartDef.setEncRefId(IDGenerator.generateID(null));
-            encryptionPartDef.setKeyId(securityTokenProvider.getId());
-            encryptionPartDef.setSymmetricKey(securityToken.getSecretKey(getSecurityProperties().getEncryptionSymAlgorithm()));
-            outputProcessorChain.getSecurityContext().putAsList(EncryptionPartDef.class, encryptionPartDef);
-
-            final Attachment resultAttachment = new Attachment();
-            resultAttachment.setId(attachmentId);
-            resultAttachment.setMimeType("application/octet-stream");
-
-            String encryptionSymAlgorithm = getSecurityProperties().getEncryptionSymAlgorithm();
-            String jceAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(encryptionSymAlgorithm);
-            if (jceAlgorithm == null) {
-                throw new XMLSecurityException("algorithms.NoSuchMap", encryptionSymAlgorithm);
-            }
-            //initialize the cipher
-            Cipher cipher = null;
-            try {
-                cipher = Cipher.getInstance(jceAlgorithm);
-
-                // The Spec mandates a 96-bit IV for GCM algorithms
-                if ("AES/GCM/NoPadding".equals(cipher.getAlgorithm())) {
-                    byte[] temp = XMLSecurityConstants.generateBytes(12);
-                    IvParameterSpec ivParameterSpec = new IvParameterSpec(temp);
-                    cipher.init(Cipher.ENCRYPT_MODE, encryptionPartDef.getSymmetricKey(), ivParameterSpec);
-                } else {
-                    cipher.init(Cipher.ENCRYPT_MODE, encryptionPartDef.getSymmetricKey());
+        if (attachments != null) {
+            for (int i = 0; i < attachments.size(); i++) {
+                final Attachment attachment = attachments.get(i);
+                final String attachmentId = attachment.getId();
+    
+                String tokenId = outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION);
+                SecurityTokenProvider<OutboundSecurityToken> securityTokenProvider =
+                        outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
+                OutboundSecurityToken securityToken = securityTokenProvider.getSecurityToken();
+                EncryptionPartDef encryptionPartDef = new EncryptionPartDef();
+                encryptionPartDef.setSecurePart(attachmentSecurePart);
+                encryptionPartDef.setModifier(attachmentSecurePart.getModifier());
+                encryptionPartDef.setCipherReferenceId(attachment.getId());
+                encryptionPartDef.setMimeType(attachment.getMimeType());
+                encryptionPartDef.setEncRefId(IDGenerator.generateID(null));
+                encryptionPartDef.setKeyId(securityTokenProvider.getId());
+                encryptionPartDef.setSymmetricKey(securityToken.getSecretKey(getSecurityProperties().getEncryptionSymAlgorithm()));
+                outputProcessorChain.getSecurityContext().putAsList(EncryptionPartDef.class, encryptionPartDef);
+    
+                final Attachment resultAttachment = new Attachment();
+                resultAttachment.setId(attachmentId);
+                resultAttachment.setMimeType("application/octet-stream");
+    
+                String encryptionSymAlgorithm = getSecurityProperties().getEncryptionSymAlgorithm();
+                String jceAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(encryptionSymAlgorithm);
+                if (jceAlgorithm == null) {
+                    throw new XMLSecurityException("algorithms.NoSuchMap", encryptionSymAlgorithm);
                 }
-            } catch (Exception e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
-            }
-
-            final Map<String, String> headers = new HashMap<>();
-            headers.putAll(attachment.getHeaders());
-            resultAttachment.setSourceStream(
-                    AttachmentUtils.setupAttachmentEncryptionStream(
-                            cipher,
-                            SecurePart.Modifier.Element == encryptionPartDef.getModifier(),
-                            attachment, headers
-                    ));
-            resultAttachment.addHeaders(headers);
-
-            final AttachmentResultCallback attachmentResultCallback = new AttachmentResultCallback();
-            attachmentResultCallback.setAttachmentId(attachmentId);
-            attachmentResultCallback.setAttachment(resultAttachment);
-            try {
-                attachmentCallbackHandler.handle(new Callback[]{attachmentResultCallback});
-            } catch (Exception e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
+                //initialize the cipher
+                Cipher cipher = null;
+                try {
+                    cipher = Cipher.getInstance(jceAlgorithm);
+    
+                    // The Spec mandates a 96-bit IV for GCM algorithms
+                    if ("AES/GCM/NoPadding".equals(cipher.getAlgorithm())) {
+                        byte[] temp = XMLSecurityConstants.generateBytes(12);
+                        IvParameterSpec ivParameterSpec = new IvParameterSpec(temp);
+                        cipher.init(Cipher.ENCRYPT_MODE, encryptionPartDef.getSymmetricKey(), ivParameterSpec);
+                    } else {
+                        cipher.init(Cipher.ENCRYPT_MODE, encryptionPartDef.getSymmetricKey());
+                    }
+                } catch (Exception e) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
+                }
+    
+                final Map<String, String> headers = new HashMap<>();
+                headers.putAll(attachment.getHeaders());
+                resultAttachment.setSourceStream(
+                        AttachmentUtils.setupAttachmentEncryptionStream(
+                                cipher,
+                                SecurePart.Modifier.Element == encryptionPartDef.getModifier(),
+                                attachment, headers
+                        ));
+                resultAttachment.addHeaders(headers);
+    
+                final AttachmentResultCallback attachmentResultCallback = new AttachmentResultCallback();
+                attachmentResultCallback.setAttachmentId(attachmentId);
+                attachmentResultCallback.setAttachment(resultAttachment);
+                try {
+                    attachmentCallbackHandler.handle(new Callback[]{attachmentResultCallback});
+                } catch (Exception e) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
+                }
             }
         }
     }

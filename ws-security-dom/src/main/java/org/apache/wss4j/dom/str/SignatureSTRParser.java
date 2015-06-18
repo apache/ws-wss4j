@@ -86,7 +86,7 @@ public class SignatureSTRParser implements STRParser {
         // detected BST that may be used later during dereferencing.
         //
         String uri = null;
-        if (secRef.containsReference()) {
+        if (secRef.getReference() != null) {
             uri = secRef.getReference().getURI();
             uri = XMLUtils.getIDFromReference(uri);
         } else if (secRef.containsKeyIdentifier()) {
@@ -257,8 +257,9 @@ public class SignatureSTRParser implements STRParser {
         STRParserResult parserResult = new STRParserResult();
         RequestData data = parameters.getData();
         
-        int action = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
-        if (WSConstants.UT_NOPASSWORD == action || WSConstants.UT == action) {
+        Integer action = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
+        if (action != null
+            && (WSConstants.UT_NOPASSWORD == action.intValue() || WSConstants.UT == action.intValue())) {
             STRParserUtil.checkUsernameTokenBSPCompliance(secRef, data.getBSPEnforcer());
             
             UsernameToken usernameToken = 
@@ -268,7 +269,7 @@ public class SignatureSTRParser implements STRParser {
             parserResult.setSecretKey((byte[])result.get(WSSecurityEngineResult.TAG_SECRET));
            
             parserResult.setPrincipal(usernameToken.createPrincipal());
-        } else if (WSConstants.BST == action) {
+        } else if (action != null && WSConstants.BST == action.intValue()) {
             BinarySecurity token = 
                 (BinarySecurity)result.get(
                     WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN
@@ -283,20 +284,20 @@ public class SignatureSTRParser implements STRParser {
             if (validatedToken) {
                 parserResult.setTrustedCredential(true);
             }
-        } else if (WSConstants.ENCR == action) {
+        } else if (action != null && WSConstants.ENCR == action.intValue()) {
             STRParserUtil.checkEncryptedKeyBSPCompliance(secRef, data.getBSPEnforcer());
             
             parserResult.setSecretKey((byte[])result.get(WSSecurityEngineResult.TAG_SECRET));
             String id = (String)result.get(WSSecurityEngineResult.TAG_ID);
             parserResult.setPrincipal(new CustomTokenPrincipal(id));
-        } else if (WSConstants.SCT == action) {
+        } else if (action != null && WSConstants.SCT == action.intValue()) {
             parserResult.setSecretKey((byte[])result.get(WSSecurityEngineResult.TAG_SECRET));
             SecurityContextToken sct = 
                 (SecurityContextToken)result.get(
                         WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN
                 );
             parserResult.setPrincipal(new CustomTokenPrincipal(sct.getIdentifier()));
-        } else if (WSConstants.DKT == action) {
+        } else if (action != null && WSConstants.DKT == action.intValue()) {
             DerivedKeyToken dkt = 
                 (DerivedKeyToken)result.get(WSSecurityEngineResult.TAG_DERIVED_KEY_TOKEN);
             int keyLength = dkt.getLength();
@@ -308,7 +309,8 @@ public class SignatureSTRParser implements STRParser {
             ((WSDerivedKeyTokenPrincipal)principal).setSecret(secret);
             parserResult.setPrincipal(principal);
             parserResult.setSecretKey(dkt.deriveKey(keyLength, secret)); 
-        } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
+        } else if (action != null 
+            && (WSConstants.ST_UNSIGNED == action.intValue() || WSConstants.ST_SIGNED == action.intValue())) {
             SamlAssertionWrapper samlAssertion =
                 (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
             STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion, data.getBSPEnforcer());

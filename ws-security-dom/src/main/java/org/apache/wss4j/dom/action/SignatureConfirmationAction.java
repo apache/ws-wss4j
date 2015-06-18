@@ -73,11 +73,13 @@ public class SignatureConfirmationAction implements Action {
             List<WSSecurityEngineResult> resultList = wshResult.getResults();
 
             for (WSSecurityEngineResult result : resultList) {
-                int resultAction = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
+                Integer resultAction = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
                 
                 // See if it's a signature action
-                if (WSConstants.SIGN == resultAction || WSConstants.ST_SIGNED == resultAction
-                    || WSConstants.UT_SIGN == resultAction) {
+                if (resultAction != null
+                    && (WSConstants.SIGN == resultAction.intValue() 
+                        || WSConstants.ST_SIGNED == resultAction.intValue()
+                        || WSConstants.UT_SIGN == resultAction.intValue())) {
                     byte[] sigVal = (byte[]) result.get(WSSecurityEngineResult.TAG_SIGNATURE_VALUE);
                     wsc.build(doc, sigVal, reqData.getSecHeader());
                     signatureParts.add(new WSEncryptionPart(wsc.getId()));

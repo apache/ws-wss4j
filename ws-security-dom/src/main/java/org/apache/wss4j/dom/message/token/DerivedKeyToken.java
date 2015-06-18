@@ -257,7 +257,9 @@ public class DerivedKeyToken {
                     XMLUtils.findElement(elementProperties, propertyName, ns);
                 if (node != null) { //If the node is not null
                     Text node1 = getFirstNode(node);
-                    node1.setData(properties.get(propertyName));
+                    if (node1 != null) {
+                        node1.setData(properties.get(propertyName));
+                    }
                 } else {
                     addProperty(propertyName, properties.get(propertyName));
                 }
@@ -272,7 +274,9 @@ public class DerivedKeyToken {
             while (node != null) {
                 if (Node.ELEMENT_NODE == node.getNodeType()) {
                     Text text = getFirstNode((Element) node);
-                    table.put(node.getNodeName(), text.getData());
+                    if (text != null) {
+                        table.put(node.getNodeName(), text.getData());
+                    }
                 }
                 node = node.getNextSibling();
             }
@@ -299,7 +303,10 @@ public class DerivedKeyToken {
 
     public int getLength() {
         if (elementLength != null) {
-            return Integer.parseInt(getFirstNode(elementLength).getData());
+            Text text = getFirstNode(elementLength);
+            if (text != null) {
+                return Integer.parseInt(text.getData());
+            }
         }
         return 32;
     }
@@ -328,7 +335,10 @@ public class DerivedKeyToken {
 
     public int getOffset() {
         if (elementOffset != null) {
-            return Integer.parseInt(getFirstNode(elementOffset).getData());
+            Text text = getFirstNode(elementOffset);
+            if (text != null) {
+                return Integer.parseInt(text.getData());
+            }
         }
         return 0;
     }
@@ -356,7 +366,10 @@ public class DerivedKeyToken {
 
     public int getGeneration() {
         if (elementGeneration != null) {
-            return Integer.parseInt(getFirstNode(elementGeneration).getData());
+            Text text = getFirstNode(elementGeneration);
+            if (text != null) {
+                return Integer.parseInt(text.getData());
+            }
         }
         return -1;
     }
@@ -396,7 +409,10 @@ public class DerivedKeyToken {
      */
     public String getLabel() {
         if (elementLabel != null) {
-            return getFirstNode(elementLabel).getData();
+            Text text = getFirstNode(elementLabel);
+            if (text != null) {
+                return text.getData();
+            }
         }
         return null;
     }
@@ -408,7 +424,10 @@ public class DerivedKeyToken {
      */
     public String getNonce() {
         if (elementNonce != null) {
-            return getFirstNode(elementNonce).getData();
+            Text text = getFirstNode(elementNonce);
+            if (text != null) {
+                return text.getData();
+            }
         }
         return null;
     }
@@ -471,7 +490,7 @@ public class DerivedKeyToken {
      */
     public String getAlgorithm() {
         String algo = element.getAttributeNS(ns, "Algorithm");
-        if (algo == null || algo.equals("")) {
+        if ("".equals(algo)) {
             return ConversationConstants.DerivationAlgorithm.P_SHA_1;
         } else {
             return algo;
@@ -491,10 +510,10 @@ public class DerivedKeyToken {
         
         String basetokenId = null;
         SecurityTokenReference securityTokenReference = getSecurityTokenReference();
-        if (securityTokenReference.containsReference()) {
+        if (securityTokenReference != null && securityTokenReference.getReference() != null) {
             basetokenId = securityTokenReference.getReference().getURI();
             basetokenId = XMLUtils.getIDFromReference(basetokenId);
-        } else {
+        } else if (securityTokenReference != null) {
             // KeyIdentifier
             basetokenId = securityTokenReference.getKeyIdentifierValue();
         }
@@ -606,7 +625,9 @@ public class DerivedKeyToken {
             return false;
         }
         try {
-            if (!getSecurityTokenReference().equals(token.getSecurityTokenReference())) {
+            if (getSecurityTokenReference() != null 
+                && !getSecurityTokenReference().equals(token.getSecurityTokenReference())
+                || getSecurityTokenReference() == null && token.getSecurityTokenReference() != null) {
                 return false;
             }
         } catch (WSSecurityException e) {

@@ -239,33 +239,35 @@ public class WSSecSignatureBase extends WSSecBase {
         }
         
         List<javax.xml.crypto.dsig.Reference> attachmentReferenceList = new ArrayList<>();
-        for (Attachment attachment : attachmentRequestCallback.getAttachments()) {
-            try {
-                List<Transform> transforms = new ArrayList<>();
-
-                AttachmentTransformParameterSpec attachmentTransformParameterSpec =
-                    new AttachmentTransformParameterSpec(
-                        attachmentCallbackHandler, attachment
-                    );
-
-                String attachmentSignatureTransform = WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS;
-                if ("Element".equals(encPart.getEncModifier())) {
-                    attachmentSignatureTransform = WSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS;
+        if (attachmentRequestCallback.getAttachments() != null) {
+            for (Attachment attachment : attachmentRequestCallback.getAttachments()) {
+                try {
+                    List<Transform> transforms = new ArrayList<>();
+    
+                    AttachmentTransformParameterSpec attachmentTransformParameterSpec =
+                        new AttachmentTransformParameterSpec(
+                            attachmentCallbackHandler, attachment
+                        );
+    
+                    String attachmentSignatureTransform = WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS;
+                    if ("Element".equals(encPart.getEncModifier())) {
+                        attachmentSignatureTransform = WSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS;
+                    }
+    
+                    transforms.add(
+                        signatureFactory.newTransform(
+                            attachmentSignatureTransform, attachmentTransformParameterSpec)
+                        );
+    
+                    javax.xml.crypto.dsig.Reference reference =
+                        signatureFactory.newReference(
+                            "cid:" + attachment.getId(), digestMethod, transforms, null, null
+                        );
+    
+                    attachmentReferenceList.add(reference);
+                } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException e) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
                 }
-
-                transforms.add(
-                    signatureFactory.newTransform(
-                        attachmentSignatureTransform, attachmentTransformParameterSpec)
-                    );
-
-                javax.xml.crypto.dsig.Reference reference =
-                    signatureFactory.newReference(
-                        "cid:" + attachment.getId(), digestMethod, transforms, null, null
-                    );
-
-                attachmentReferenceList.add(reference);
-            } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
             }
         }
         

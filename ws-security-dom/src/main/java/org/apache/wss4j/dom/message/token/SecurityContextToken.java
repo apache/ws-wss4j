@@ -167,7 +167,10 @@ public class SecurityContextToken {
      */
     public String getIdentifier() {
         if (elementIdentifier != null) {
-            return getFirstNode(elementIdentifier).getData();
+            Text text = getFirstNode(elementIdentifier);
+            if (text != null) {
+                return text.getData();
+            }
         }
         return null;
     }

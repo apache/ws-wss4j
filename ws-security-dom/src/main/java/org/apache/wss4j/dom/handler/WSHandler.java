@@ -351,13 +351,15 @@ public abstract class WSHandler {
         int ai = 0;
         for (WSSecurityEngineResult result : wsResult) {
             final Integer actInt = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
-            int act = actInt;
-            if (act == WSConstants.SC || act == WSConstants.BST) {
-                continue;
-            }
-            
-            if (ai >= size || actions.get(ai++) != act) {
-                return false;
+            if (actInt != null) {
+                int act = actInt;
+                if (act == WSConstants.SC || act == WSConstants.BST) {
+                    continue;
+                }
+                
+                if (ai >= size || actions.get(ai++) != act) {
+                    return false;
+                }
             }
         }
 
@@ -378,18 +380,20 @@ public abstract class WSHandler {
         
         for (WSSecurityEngineResult result : wsResult) {
             final Integer actInt = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
-            int act = actInt;
-            if (act == WSConstants.SC || act == WSConstants.BST) {
-                continue;
-            } else if (act == WSConstants.ENCR
-                && (result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS) == null
-                    || ((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS)).isEmpty())) {
-                continue;
-            }
+            if (actInt != null) {
+                int act = actInt;
+                if (act == WSConstants.SC || act == WSConstants.BST) {
+                    continue;
+                } else if (act == WSConstants.ENCR
+                    && (result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS) == null
+                        || ((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS)).isEmpty())) {
+                    continue;
+                }
+                    
                 
-            
-            if (!recordedActions.remove(actInt)) {
-                return false;
+                if (!recordedActions.remove(actInt)) {
+                    return false;
+                }
             }
         }
 
@@ -434,21 +438,20 @@ public abstract class WSHandler {
                         WSSecurityEngineResult.TAG_SIGNATURE_CONFIRMATION
                     );
     
-                byte[] sigVal = sc.getSignatureValue();
-                if (sigVal != null) {
+                if (sc != null && sc.getSignatureValue() != null) {
                     if (savedSignatures == null || savedSignatures.size() == 0) {
                         //
                         // If there are no stored signature values, and we've received a 
                         // SignatureConfirmation element then throw an Exception
                         //
-                        if (sigVal.length != 0) {
+                        if (sc.getSignatureValue().length != 0) {
                             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "empty",
                                  new Object[] {"Received a SignatureConfirmation element, but there are no stored"
                                  + " signature values"}
                             );
                         }
                     } else {
-                        Integer hash = Arrays.hashCode(sigVal);
+                        Integer hash = Arrays.hashCode(sc.getSignatureValue());
                         if (savedSignatures.contains(hash)) {
                             savedSignatures.remove(hash);
                         } else {
@@ -1260,9 +1263,8 @@ public abstract class WSHandler {
              * encryption action :-).
              */
             for (WSSecurityEngineResult wser : wsSecEngineResults) {
-                int wserAction =
-                        (Integer) wser.get(WSSecurityEngineResult.TAG_ACTION);
-                if (wserAction == WSConstants.SIGN) {
+                Integer wserAction = (Integer) wser.get(WSSecurityEngineResult.TAG_ACTION);
+                if (wserAction != null && wserAction.intValue() == WSConstants.SIGN) {
                     X509Certificate cert = 
                         (X509Certificate)wser.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
                     actionToken.setCertificate(cert);

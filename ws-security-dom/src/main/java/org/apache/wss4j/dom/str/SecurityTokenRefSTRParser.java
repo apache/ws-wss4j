@@ -71,7 +71,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
             new SecurityTokenReference(parameters.getStrElement(), parameters.getData().getBSPEnforcer());
         
         String uri = null;
-        if (secRef.containsReference()) {
+        if (secRef.getReference() != null) {
             uri = secRef.getReference().getURI();
             uri = XMLUtils.getIDFromReference(uri);
         } else if (secRef.containsKeyIdentifier()) {
@@ -120,12 +120,12 @@ public class SecurityTokenRefSTRParser implements STRParser {
         STRParserResult parserResult = new STRParserResult();
         RequestData data = parameters.getData();
         
-        int action = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
-        if (WSConstants.ENCR == action) {
+        Integer action = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
+        if (action != null && WSConstants.ENCR == action.intValue()) {
             STRParserUtil.checkEncryptedKeyBSPCompliance(secRef, data.getBSPEnforcer());
             byte[] secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
             parserResult.setSecretKey(secretKey);
-        } else if (WSConstants.DKT == action) {
+        } else if (action != null && WSConstants.DKT == action.intValue()) {
             DerivedKeyToken dkt = 
                 (DerivedKeyToken)result.get(WSSecurityEngineResult.TAG_DERIVED_KEY_TOKEN);
             byte[] secret = 
@@ -133,16 +133,19 @@ public class SecurityTokenRefSTRParser implements STRParser {
             byte[] secretKey = dkt.deriveKey(parameters.getDerivationKeyLength(), secret);
             parserResult.setSecretKey(secretKey);
             parserResult.setPrincipal(dkt.createPrincipal());
-        } else if (WSConstants.ST_UNSIGNED == action || WSConstants.ST_SIGNED == action) {
+        } else if (action != null 
+            && (WSConstants.ST_UNSIGNED == action.intValue() || WSConstants.ST_SIGNED == action.intValue())) {
             SamlAssertionWrapper samlAssertion =
                 (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
             byte[] secretKey = 
                 getSecretKeyFromAssertion(samlAssertion, secRef, data, parameters.getWsDocInfo());
             parserResult.setSecretKey(secretKey);
-        } else if (WSConstants.SCT == action || WSConstants.BST == action) {
+        } else if (action != null 
+            && (WSConstants.SCT == action.intValue() || WSConstants.BST == action.intValue())) {
             byte[] secretKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
             parserResult.setSecretKey(secretKey);
-        } else if (WSConstants.UT_NOPASSWORD == action || WSConstants.UT == action) {
+        } else if (action != null
+            && (WSConstants.UT_NOPASSWORD == action.intValue() || WSConstants.UT == action.intValue())) {
             STRParserUtil.checkUsernameTokenBSPCompliance(secRef, data.getBSPEnforcer());
             UsernameToken usernameToken = 
                 (UsernameToken)result.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
