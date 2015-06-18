@@ -872,6 +872,31 @@ public class SamlTokenTest extends org.junit.Assert {
     }
     
     @org.junit.Test
+    public void testAssertionWrapperNoDocument() throws Exception {
+        SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
+        callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+        
+        String assertionString = DOM2Writer.nodeToString(samlAssertion.toDOM(null));
+        
+        // Convert String to DOM + into an assertionWrapper
+        InputStream in = new ByteArrayInputStream(assertionString.getBytes());
+        
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        Document newDoc = dbf.newDocumentBuilder().parse(in);
+        
+        SamlAssertionWrapper newAssertion = 
+            new SamlAssertionWrapper(newDoc.getDocumentElement());
+        String secondAssertionString = newAssertion.assertionToString();
+        assertEquals(assertionString, secondAssertionString);
+    }
+    
+    @org.junit.Test
     public void testRequiredSubjectConfirmationMethod() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);

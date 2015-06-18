@@ -21,6 +21,9 @@ package org.apache.wss4j.common.saml;
 
 import javax.xml.namespace.QName;
 
+import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
+import net.shibboleth.utilities.java.support.xml.BasicParserPool;
+
 import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.opensaml.core.config.Configuration;
@@ -90,11 +93,16 @@ public final class OpenSAMLUtil {
                 marshallerFactory = XMLObjectProviderRegistrySupport.getMarshallerFactory();
                 unmarshallerFactory = XMLObjectProviderRegistrySupport.getUnmarshallerFactory();
                 
+                BasicParserPool pp = new BasicParserPool();
+                pp.setMaxPoolSize(50);
+                pp.initialize();
+                providerRegistry.setParserPool(pp);
+                
                 samlEngineInitialized = true;
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("opensaml3 library bootstrap complete");
                 }
-            } catch (XMLConfigurationException ex) {
+            } catch (XMLConfigurationException | ComponentInitializationException ex) {
                 LOG.error("Unable to bootstrap the opensaml3 library - all SAML operations will fail", ex);
             }
         }
