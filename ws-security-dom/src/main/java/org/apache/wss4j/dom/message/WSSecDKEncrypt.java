@@ -88,6 +88,14 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         }
         Element externRefList = encryptForExternalRef(null, parts);
 
+        addAttachmentEncryptedDataElements(secHeader);
+
+        addExternalRefElement(externRefList, secHeader);
+
+        return doc;
+    }
+    
+    public void addAttachmentEncryptedDataElements(WSSecHeader secHeader) {
         if (attachmentEncryptedDataElements != null) {
             for (int i = 0; i < attachmentEncryptedDataElements.size(); i++) {
                 Element encryptedData = attachmentEncryptedDataElements.get(i);
@@ -96,10 +104,6 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
                 );
             }
         }
-
-        addExternalRefElement(externRefList, secHeader);
-
-        return doc;
     }
 
     /**
