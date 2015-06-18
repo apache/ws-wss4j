@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.dom.message;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.crypto.SecretKey;
@@ -44,11 +45,20 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
     private String symEncAlgo = WSConstants.AES_128;
     private int derivedKeyLength = -1;
+
+    private List<Element> attachmentEncryptedDataElements;
     
     public WSSecDKEncrypt() {
         super();
     }
-    
+
+    @Override
+    public void prepare(Document doc) throws WSSecurityException {
+        super.prepare(doc);
+
+        attachmentEncryptedDataElements = new ArrayList<>();
+    }
+
     public Document build(Document doc, WSSecHeader secHeader) throws WSSecurityException {
         
         //
@@ -61,6 +71,16 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         prependDKElementToHeader(secHeader);
                 
         Element externRefList = encrypt();
+
+        if (attachmentEncryptedDataElements != null) {
+            for (int i = 0; i < attachmentEncryptedDataElements.size(); i++) {
+                Element encryptedData = attachmentEncryptedDataElements.get(i);
+                WSSecurityUtil.prependChildElement(
+                        secHeader.getSecurityHeader(), encryptedData
+                );
+            }
+        }
+
         addExternalRefElement(externRefList, secHeader);
 
         return doc;
@@ -104,7 +124,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
         List<String> encDataRefs = 
             WSSecEncrypt.doEncryption(
-                document, getIdAllocator(), keyInfo, key, symEncAlgo, references, callbackLookup
+                document, getIdAllocator(), keyInfo, key, symEncAlgo, references, callbackLookup, attachmentCallbackHandler, attachmentEncryptedDataElements
             );
         if (dataRef == null) {
             dataRef = 
@@ -178,5 +198,8 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     public void setDerivedKeyLength(int keyLength) {
         derivedKeyLength = keyLength;
     }
-    
+
+    public List<Element> getAttachmentEncryptedDataElements() {
+        return attachmentEncryptedDataElements;
+    }
 }
