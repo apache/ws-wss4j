@@ -768,6 +768,10 @@ public class SamlAssertionWrapper {
         return null;
     }
     
+    public SAMLObject getSamlObject() {
+        return samlObject;
+    }
+    
     /**
      * Check the Conditions of the Assertion.
      */
