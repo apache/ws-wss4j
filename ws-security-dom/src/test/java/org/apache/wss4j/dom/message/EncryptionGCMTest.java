@@ -92,8 +92,8 @@ public class EncryptionGCMTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128_GCM);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
 
         String outputString = 
@@ -121,8 +121,8 @@ public class EncryptionGCMTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_256_GCM);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
 
         String outputString = 
@@ -154,8 +154,8 @@ public class EncryptionGCMTest extends org.junit.Assert {
         builder.setDigestAlgorithm(WSConstants.SHA256);
         builder.setMGFAlgorithm(WSConstants.MGF_SHA256);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
 
         String outputString =

@@ -1160,8 +1160,8 @@ public class SignatureTest extends AbstractTestBase {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
             Document doc = documentBuilderFactory.newDocumentBuilder().parse(sourceDocument);
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
 
             WSSecSignature sign = new WSSecSignature();
             sign.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);

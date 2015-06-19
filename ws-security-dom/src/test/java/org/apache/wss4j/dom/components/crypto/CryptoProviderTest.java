@@ -81,8 +81,8 @@ public class CryptoProviderTest extends org.junit.Assert {
         sign.setUserInfo("wss86", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
         if (LOG.isDebugEnabled()) {
@@ -104,8 +104,8 @@ public class CryptoProviderTest extends org.junit.Assert {
         sign.setUserInfo("wss86", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
         String outputString = XMLUtils.PrettyDocumentToString(signedDoc);
@@ -131,8 +131,8 @@ public class CryptoProviderTest extends org.junit.Assert {
         sign.setUserInfo("wss86", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
         String outputString = XMLUtils.PrettyDocumentToString(signedDoc);
@@ -183,8 +183,8 @@ public class CryptoProviderTest extends org.junit.Assert {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUseThisCert(cert);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
         
         if (LOG.isDebugEnabled()) {
@@ -232,8 +232,8 @@ public class CryptoProviderTest extends org.junit.Assert {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUseThisCert(cert);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
         
         if (LOG.isDebugEnabled()) {

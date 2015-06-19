@@ -64,8 +64,8 @@ public class EncryptedDataInHeaderTest extends org.junit.Assert {
     @org.junit.Test
     public void testEncryptedDataInHeader() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);

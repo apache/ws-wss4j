@@ -388,8 +388,8 @@ public class SignatureEncryptionTest extends AbstractTestBase {
 
             Document doc = documentBuilderFactory.newDocumentBuilder().parse(sourceDocument);
 
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
 
             WSSecSignature sign = new WSSecSignature();
             sign.setUserInfo("transmitter", "default");

@@ -88,8 +88,8 @@ public class SamlTokenSVTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Document signedDoc = 
             wsSign.build(
@@ -148,8 +148,8 @@ public class SamlTokenSVTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Document signedDoc = 
             wsSign.build(
@@ -208,8 +208,8 @@ public class SamlTokenSVTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Document signedDoc = 
             wsSign.build(
@@ -268,8 +268,8 @@ public class SamlTokenSVTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Document signedDoc = 
             wsSign.build(
@@ -331,8 +331,8 @@ public class SamlTokenSVTest extends org.junit.Assert {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Document signedDoc = 
             wsSign.build(

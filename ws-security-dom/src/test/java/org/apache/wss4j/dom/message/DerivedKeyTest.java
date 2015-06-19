@@ -66,8 +66,8 @@ public class DerivedKeyTest extends org.junit.Assert {
     @org.junit.Test
     public void testEncryptionDecryptionTRIPLEDES() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         //EncryptedKey
         WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
@@ -104,8 +104,8 @@ public class DerivedKeyTest extends org.junit.Assert {
     @org.junit.Test
     public void testEncryptionDecryptionAES128() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         //EncryptedKey
         WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
@@ -138,8 +138,8 @@ public class DerivedKeyTest extends org.junit.Assert {
     @org.junit.Test
     public void testSignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         //EncryptedKey
         WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
@@ -185,8 +185,8 @@ public class DerivedKeyTest extends org.junit.Assert {
     @org.junit.Test
     public void testSignatureThumbprintSHA1() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         SecurityTokenReference secToken = new SecurityTokenReference(doc);
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
@@ -226,8 +226,8 @@ public class DerivedKeyTest extends org.junit.Assert {
     @org.junit.Test
     public void testSignatureSKI() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         SecurityTokenReference secToken = new SecurityTokenReference(doc);
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
@@ -261,8 +261,8 @@ public class DerivedKeyTest extends org.junit.Assert {
     @org.junit.Test
     public void testSignatureEncrypt() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         //EncryptedKey
         WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
@@ -302,8 +302,8 @@ public class DerivedKeyTest extends org.junit.Assert {
     @org.junit.Test
     public void testEncryptSignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         //EncryptedKey
         WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();

@@ -224,8 +224,8 @@ public class KerberosTest extends AbstractLdapTestUnit {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         KerberosSecurity bst = new KerberosSecurity(doc);
         CallbackHandler callbackHandler = new CallbackHandler() {
@@ -282,8 +282,8 @@ public class KerberosTest extends AbstractLdapTestUnit {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         SpnegoTokenContext spnegoToken = new SpnegoTokenContext();
         CallbackHandler callbackHandler = new CallbackHandler() {
@@ -363,8 +363,8 @@ public class KerberosTest extends AbstractLdapTestUnit {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         KerberosSecurity bst = new KerberosSecurity(doc);
         CallbackHandler callbackHandler = new CallbackHandler() {
@@ -437,8 +437,8 @@ public class KerberosTest extends AbstractLdapTestUnit {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         KerberosSecurity bst = new KerberosSecurity(doc);
         CallbackHandler callbackHandler = new CallbackHandler() {
@@ -515,8 +515,8 @@ public class KerberosTest extends AbstractLdapTestUnit {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         KerberosSecurity bst = new KerberosSecurity(doc);
         CallbackHandler callbackHandler = new CallbackHandler() {
@@ -587,8 +587,8 @@ public class KerberosTest extends AbstractLdapTestUnit {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         KerberosSecurity bst = new KerberosSecurity(doc);
         CallbackHandler callbackHandler = new CallbackHandler() {
@@ -660,8 +660,8 @@ public class KerberosTest extends AbstractLdapTestUnit {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         KerberosSecurity bst = new KerberosSecurity(doc);
         CallbackHandler callbackHandler = new CallbackHandler() {
@@ -816,8 +816,8 @@ public class KerberosTest extends AbstractLdapTestUnit {
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
 
             KerberosSecurity bst = new KerberosSecurity(doc);
             CallbackHandler callbackHandler = new CallbackHandler() {
@@ -909,8 +909,8 @@ public class KerberosTest extends AbstractLdapTestUnit {
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
 
             KerberosSecurity bst = new KerberosSecurity(doc);
             CallbackHandler callbackHandler = new CallbackHandler() {
@@ -1082,8 +1082,8 @@ public class KerberosTest extends AbstractLdapTestUnit {
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
 
             KerberosSecurity bst = new KerberosSecurity(doc);
             CallbackHandler callbackHandler = new CallbackHandler() {
@@ -1173,8 +1173,8 @@ public class KerberosTest extends AbstractLdapTestUnit {
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
 
             KerberosSecurity bst = new KerberosSecurity(doc);
             CallbackHandler callbackHandler = new CallbackHandler() {

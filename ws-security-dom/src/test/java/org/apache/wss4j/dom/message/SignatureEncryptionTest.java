@@ -95,8 +95,8 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         LOG.info("Before Encryption....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
         
@@ -137,8 +137,8 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         LOG.info("Before Encryption....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         WSEncryptionPart part = 
             new WSEncryptionPart(
@@ -223,8 +223,8 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         LOG.info("Before Encryption....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         Document signedDoc = sign.build(doc, crypto, secHeader);
         Document encryptedSignedDoc = encrypt.build(signedDoc, crypto, secHeader);
@@ -254,8 +254,8 @@ public class SignatureEncryptionTest extends org.junit.Assert {
                 "");
         encrypt.getParts().add(encP);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         Document signedDoc = sign.build(doc, crypto, secHeader);
         Document encryptedSignedDoc = encrypt.build(signedDoc, crypto, secHeader);
@@ -291,8 +291,8 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         LOG.info("Before Sign/Encryption....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Document signedDoc = sign.build(doc, crypto, secHeader);
         Document encryptedSignedDoc = encrypt.build(signedDoc, crypto, secHeader);
@@ -318,8 +318,8 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         LOG.info("Before Sign/Encryption....");
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
         encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);

@@ -70,8 +70,8 @@ public class UTSignatureTest extends org.junit.Assert {
     @org.junit.Test
     public void testSignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("bob", "security");
@@ -121,8 +121,8 @@ public class UTSignatureTest extends org.junit.Assert {
     @org.junit.Test
     public void testBadUserSignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("colm", "security");

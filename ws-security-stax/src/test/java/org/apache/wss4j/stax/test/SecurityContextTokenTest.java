@@ -138,8 +138,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
             sctBuilder.setWscVersion(version);
@@ -348,8 +348,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
             sctBuilder.setWscVersion(version);
@@ -531,8 +531,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
             sctBuilder.setWscVersion(version);
@@ -578,8 +578,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
             sctBuilder.setWscVersion(version);
@@ -801,8 +801,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
             sctBuilder.setWscVersion(version);
@@ -1025,8 +1025,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
             sctBuilder.setWscVersion(version);

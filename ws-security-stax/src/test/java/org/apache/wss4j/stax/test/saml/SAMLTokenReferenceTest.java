@@ -361,9 +361,9 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             samlAssertion.signAssertion("samlissuer", "default", issuerCrypto, false);
 
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-            WSSecHeader secHeader = new WSSecHeader();
+            WSSecHeader secHeader = new WSSecHeader(doc);
             Node assertionNode = samlAssertion.toDOM(doc);
-            secHeader.insertSecurityHeader(doc);
+            secHeader.insertSecurityHeader();
             secHeader.getSecurityHeader().appendChild(assertionNode);
 
             // Encrypt the SOAP body
@@ -446,9 +446,9 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
              samlAssertion.signAssertion("samlissuer", "default", issuerCrypto, false);
 
              Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-             WSSecHeader secHeader = new WSSecHeader();
+             WSSecHeader secHeader = new WSSecHeader(doc);
              Node assertionNode = samlAssertion.toDOM(doc);
-             secHeader.insertSecurityHeader(doc);
+             secHeader.insertSecurityHeader();
              secHeader.getSecurityHeader().appendChild(assertionNode);
 
              // Encrypt the SOAP body
@@ -809,8 +809,8 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
 
             Crypto userCrypto = CryptoFactory.getInstance("transmitter-crypto.properties");
             Document securedDocument = wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);

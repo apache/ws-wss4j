@@ -79,8 +79,8 @@ public class PrincipalTest extends org.junit.Assert {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecret");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
@@ -111,8 +111,8 @@ public class PrincipalTest extends org.junit.Assert {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecret");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
@@ -146,8 +146,8 @@ public class PrincipalTest extends org.junit.Assert {
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
@@ -189,8 +189,8 @@ public class PrincipalTest extends org.junit.Assert {
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
@@ -233,8 +233,8 @@ public class PrincipalTest extends org.junit.Assert {
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
@@ -269,8 +269,8 @@ public class PrincipalTest extends org.junit.Assert {
     public void testBinarySecurityToken() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         X509Security bst = new X509Security(doc);
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);

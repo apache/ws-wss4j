@@ -109,8 +109,8 @@ public abstract class WSHandler {
         reqData.setActor(actor);
 
         boolean mu = decodeBooleanConfigValue(mc, WSHandlerConstants.MUST_UNDERSTAND, true);
-        WSSecHeader secHeader = new WSSecHeader(actor, mu);
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(actor, mu, doc);
+        secHeader.insertSecurityHeader();
         reqData.setSecHeader(secHeader);
         reqData.setSoapConstants(WSSecurityUtil.getSOAPConstants(doc.getDocumentElement()));
 

@@ -112,8 +112,8 @@ public class AttachmentTest extends org.junit.Assert {
 
         LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
@@ -157,8 +157,8 @@ public class AttachmentTest extends org.junit.Assert {
 
         LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
@@ -213,8 +213,8 @@ public class AttachmentTest extends org.junit.Assert {
 
         LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
@@ -258,8 +258,8 @@ public class AttachmentTest extends org.junit.Assert {
 
         LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
@@ -321,8 +321,8 @@ public class AttachmentTest extends org.junit.Assert {
         
         LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
@@ -356,8 +356,8 @@ public class AttachmentTest extends org.junit.Assert {
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
         encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Content"));
@@ -415,8 +415,8 @@ public class AttachmentTest extends org.junit.Assert {
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
         encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Content"));
@@ -470,8 +470,8 @@ public class AttachmentTest extends org.junit.Assert {
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
         encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Content"));
@@ -535,8 +535,8 @@ public class AttachmentTest extends org.junit.Assert {
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
         encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Content"));
@@ -599,8 +599,8 @@ public class AttachmentTest extends org.junit.Assert {
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
         encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Element"));
@@ -647,8 +647,8 @@ public class AttachmentTest extends org.junit.Assert {
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
         encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Element"));
@@ -699,8 +699,8 @@ public class AttachmentTest extends org.junit.Assert {
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
         encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Element"));
@@ -757,8 +757,8 @@ public class AttachmentTest extends org.junit.Assert {
     public void testXMLAttachmentCmplSignCmplEnc() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         WSSecSignature signature = new WSSecSignature();
         signature.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -822,8 +822,8 @@ public class AttachmentTest extends org.junit.Assert {
     public void testInvalidXMLAttachmentCmplSignCmplEnc() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         WSSecSignature signature = new WSSecSignature();
         signature.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -921,8 +921,8 @@ public class AttachmentTest extends org.junit.Assert {
     public void testXMLAttachmentCmplEncCmplSign() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -986,8 +986,8 @@ public class AttachmentTest extends org.junit.Assert {
     public void testInvalidXMLAttachmentCmplEncCmplSign() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");

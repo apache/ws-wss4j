@@ -72,8 +72,8 @@ public class ReplayTest extends org.junit.Assert {
     public void testReplayedTimestamp() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);
@@ -123,8 +123,8 @@ public class ReplayTest extends org.junit.Assert {
     public void testEhCacheReplayedTimestamp() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);
@@ -173,8 +173,8 @@ public class ReplayTest extends org.junit.Assert {
     public void testReplayedTimestampBelowSignature() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);
@@ -219,8 +219,8 @@ public class ReplayTest extends org.junit.Assert {
     public void testEhCacheReplayedTimestampBelowSignature() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);
@@ -264,8 +264,8 @@ public class ReplayTest extends org.junit.Assert {
     public void testReplayedTimestampNoExpires() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(0);
@@ -315,8 +315,8 @@ public class ReplayTest extends org.junit.Assert {
     public void testEhCacheReplayedTimestampNoExpires() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(0);
@@ -367,8 +367,8 @@ public class ReplayTest extends org.junit.Assert {
         builder.setUserInfo("wernerd", "verySecret");
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
@@ -401,8 +401,8 @@ public class ReplayTest extends org.junit.Assert {
         builder.setUserInfo("wernerd", "verySecret");
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
@@ -453,8 +453,8 @@ public class ReplayTest extends org.junit.Assert {
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
@@ -504,8 +504,8 @@ public class ReplayTest extends org.junit.Assert {
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 

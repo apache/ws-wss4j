@@ -485,8 +485,8 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
 
             Document securedDocument = wsSign.build(doc, samlAssertion, secHeader);
             
@@ -985,8 +985,8 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
 
             Document securedDocument = wsSign.build(doc, samlAssertion, secHeader);
 

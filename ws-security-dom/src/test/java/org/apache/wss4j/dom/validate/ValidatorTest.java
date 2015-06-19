@@ -74,8 +74,8 @@ public class ValidatorTest extends org.junit.Assert {
     public void testExpiredTimestamp() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(-1);
@@ -112,8 +112,8 @@ public class ValidatorTest extends org.junit.Assert {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Crypto crypto = CryptoFactory.getInstance("wss40.properties");
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
@@ -155,8 +155,8 @@ public class ValidatorTest extends org.junit.Assert {
         builder.setUserInfo("wernerd", "verySecre");
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
         
         if (LOG.isDebugEnabled()) {
@@ -188,8 +188,8 @@ public class ValidatorTest extends org.junit.Assert {
     public void testTransformedBST() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         X509Security bst = new X509Security(doc);
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
@@ -239,8 +239,8 @@ public class ValidatorTest extends org.junit.Assert {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, CryptoFactory.getInstance(), secHeader);
 
         if (LOG.isDebugEnabled()) {

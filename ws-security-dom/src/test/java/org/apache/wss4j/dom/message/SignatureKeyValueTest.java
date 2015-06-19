@@ -65,8 +65,8 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         builder.setUserInfo("wss40", "security");
         builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         String outputString = 
@@ -107,8 +107,8 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         builder.setUserInfo("wss86", "security");
         builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = 
             builder.build(doc, CryptoFactory.getInstance("wss86.properties"), secHeader);
 
@@ -142,8 +142,8 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         builder.setUserInfo("wss40DSA", "security");
         builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         String outputString = 

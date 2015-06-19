@@ -82,8 +82,8 @@ public class BSTKerberosTest extends org.junit.Assert {
     public void testCreateBinarySecurityToken() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         BinarySecurity bst = new BinarySecurity(doc);
         bst.setValueType(AP_REQ);
@@ -110,8 +110,8 @@ public class BSTKerberosTest extends org.junit.Assert {
     public void testSignBST() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         BinarySecurity bst = new BinarySecurity(doc);
         bst.setValueType(AP_REQ);
@@ -146,8 +146,8 @@ public class BSTKerberosTest extends org.junit.Assert {
     public void testSignBSTTimestamp() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         BinarySecurity bst = new BinarySecurity(doc);
         bst.setValueType(AP_REQ);
@@ -185,8 +185,8 @@ public class BSTKerberosTest extends org.junit.Assert {
     public void testProcessToken() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         BinarySecurity bst = new BinarySecurity(doc);
         bst.setValueType(AP_REQ);
@@ -219,8 +219,8 @@ public class BSTKerberosTest extends org.junit.Assert {
     public void testProcessTokenCustomValidator() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         BinarySecurity bst = new BinarySecurity(doc);
         bst.setValueType(AP_REQ);
@@ -256,8 +256,8 @@ public class BSTKerberosTest extends org.junit.Assert {
     public void testKerberosSignatureDRCreation() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         BinarySecurity bst = new BinarySecurity(doc);
         bst.setValueType(AP_REQ);
@@ -295,8 +295,8 @@ public class BSTKerberosTest extends org.junit.Assert {
     public void testKerberosSignatureKICreation() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         BinarySecurity bst = new BinarySecurity(doc);
         bst.setValueType(AP_REQ);
@@ -336,8 +336,8 @@ public class BSTKerberosTest extends org.junit.Assert {
     public void testKerberosEncryptionDRCreation() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         BinarySecurity bst = new BinarySecurity(doc);
         bst.setValueType(AP_REQ);
@@ -374,8 +374,8 @@ public class BSTKerberosTest extends org.junit.Assert {
     public void testKerberosEncryptionKICreation() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         BinarySecurity bst = new BinarySecurity(doc);
         bst.setValueType(AP_REQ);

@@ -50,8 +50,8 @@ public class CertErrorTest extends org.junit.Assert {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("bob", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         try {
             builder.build(doc, CryptoFactory.getInstance(), secHeader);
             fail("Expected failure on a bad username");
@@ -69,8 +69,8 @@ public class CertErrorTest extends org.junit.Assert {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("alice");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         try {
             builder.build(doc, CryptoFactory.getInstance(), secHeader);
             fail("Expected failure on a bad username");

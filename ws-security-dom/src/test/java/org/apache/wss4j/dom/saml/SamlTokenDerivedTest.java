@@ -93,8 +93,8 @@ public class SamlTokenDerivedTest extends org.junit.Assert {
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         SecurityTokenReference secRefSaml = 
             createSamlSTR(doc, samlAssertion, WSSConfig.getNewInstance());

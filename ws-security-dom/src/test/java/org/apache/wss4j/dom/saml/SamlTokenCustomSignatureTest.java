@@ -92,8 +92,8 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         Element assertionElement = samlAssertion.toDOM(doc);
         
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         secHeader.getSecurityHeader().appendChild(assertionElement);
         
         // Sign
@@ -133,8 +133,8 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         Element assertionElement = samlAssertion.toDOM(doc);
         
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         secHeader.getSecurityHeader().appendChild(assertionElement);
         
         // Sign
@@ -171,8 +171,8 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         Element assertionElement = samlAssertion.toDOM(doc);
         
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         secHeader.getSecurityHeader().appendChild(assertionElement);
         
         WSSecSignature sign = new WSSecSignature();

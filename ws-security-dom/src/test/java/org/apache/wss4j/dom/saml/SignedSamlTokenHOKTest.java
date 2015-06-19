@@ -114,8 +114,8 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         Document signedDoc = 
             wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
@@ -186,8 +186,8 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         wsSign.setSecretKey(ephemeralKey);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = 
             wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
 
@@ -247,8 +247,8 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         Document signedDoc = 
             wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
@@ -310,8 +310,8 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         wsSign.setSecretKey(ephemeralKey);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         Document signedDoc = 
             wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
@@ -374,8 +374,8 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         Document signedDoc = 
             wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
@@ -435,8 +435,8 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         Document signedDoc = 
             wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
@@ -496,8 +496,8 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         Document signedDoc = 
             wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
@@ -562,8 +562,8 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         Document signedDoc = 
             wsSign.build(doc, crypto, samlAssertion, null, null, null, secHeader);
@@ -638,8 +638,8 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
         wsSign.setSecretKey(ephemeralKey);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         Document signedDoc = 
             wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);

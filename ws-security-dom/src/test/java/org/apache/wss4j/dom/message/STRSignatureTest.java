@@ -89,8 +89,8 @@ public class STRSignatureTest extends org.junit.Assert {
 
         LOG.info("Before Signing STR DirectReference....");
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
@@ -116,8 +116,8 @@ public class STRSignatureTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
         
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         //
         // Set up to sign body and use STRTransform to sign
@@ -195,8 +195,8 @@ public class STRSignatureTest extends org.junit.Assert {
 
         LOG.info("Before Signing STR IS....");
         
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
@@ -247,8 +247,8 @@ public class STRSignatureTest extends org.junit.Assert {
 
         LOG.info("Before Signing STR SKI....");
         
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         Document signedDoc = builder.build(doc, crypto, secHeader);
 

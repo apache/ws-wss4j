@@ -115,8 +115,8 @@ public class XOPAttachmentTest extends AbstractTestBase {
         encrypt.setUserInfo("receiver", "default");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
         encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Content"));

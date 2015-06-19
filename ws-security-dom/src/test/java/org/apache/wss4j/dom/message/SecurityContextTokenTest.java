@@ -59,8 +59,8 @@ public class SecurityContextTokenTest extends org.junit.Assert {
     public void testBuild() {
         try {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
             sctBuilder.prepare(doc, crypto);
@@ -97,8 +97,8 @@ public class SecurityContextTokenTest extends org.junit.Assert {
     public void testSCTDKTEncrypt() {
         try {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
             sctBuilder.prepare(doc, crypto);
@@ -146,8 +146,8 @@ public class SecurityContextTokenTest extends org.junit.Assert {
     public void testSCTKDKTSign() {
         try {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
             sctBuilder.setWscVersion(ConversationConstants.VERSION_05_12);
@@ -196,8 +196,8 @@ public class SecurityContextTokenTest extends org.junit.Assert {
     public void testSCTKDKTSignAbsolute() {
         try {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
             sctBuilder.prepare(doc, crypto);
@@ -234,8 +234,8 @@ public class SecurityContextTokenTest extends org.junit.Assert {
     public void testSCTKDKTSignEncrypt() {
         try {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
             sctBuilder.prepare(doc, crypto);
@@ -277,8 +277,8 @@ public class SecurityContextTokenTest extends org.junit.Assert {
     public void testSCTKDKTEncryptSign() {
         try {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
             sctBuilder.prepare(doc, crypto);
@@ -325,8 +325,8 @@ public class SecurityContextTokenTest extends org.junit.Assert {
     public void testSCTSign() {
         try {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
             sctBuilder.prepare(doc, crypto);

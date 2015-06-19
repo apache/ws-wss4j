@@ -97,8 +97,8 @@ public class ModifiedRequestTest extends org.junit.Assert {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -152,8 +152,8 @@ public class ModifiedRequestTest extends org.junit.Assert {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -232,8 +232,8 @@ public class ModifiedRequestTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Document signedDoc = 
             wsSign.build(
@@ -267,8 +267,8 @@ public class ModifiedRequestTest extends org.junit.Assert {
     @org.junit.Test
     public void testDuplicatedSignedUsernameToken() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecUsernameToken usernameToken = new WSSecUsernameToken();
         usernameToken.setUserInfo("wss86", "security");
@@ -322,8 +322,8 @@ public class ModifiedRequestTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
         Document encryptedDoc = builder.build(doc, wssCrypto, secHeader);
 
@@ -357,8 +357,8 @@ public class ModifiedRequestTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
         Document encryptedDoc = builder.build(doc, wssCrypto, secHeader);
 
@@ -405,8 +405,8 @@ public class ModifiedRequestTest extends org.junit.Assert {
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
         
         WSSecTimestamp timestamp = new WSSecTimestamp();
@@ -466,8 +466,8 @@ public class ModifiedRequestTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
         Document encryptedDoc = builder.build(doc, wssCrypto, secHeader);
 
@@ -513,8 +513,8 @@ public class ModifiedRequestTest extends org.junit.Assert {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);
@@ -565,8 +565,8 @@ public class ModifiedRequestTest extends org.junit.Assert {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Crypto wss40Crypto = CryptoFactory.getInstance("wss40.properties");
         Document signedDoc = builder.build(doc, wss40Crypto, secHeader);
@@ -593,8 +593,8 @@ public class ModifiedRequestTest extends org.junit.Assert {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Document signedDoc = builder.build(doc, crypto, secHeader);
         

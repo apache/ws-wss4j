@@ -1560,8 +1560,8 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             Document doc = documentBuilderFactory.newDocumentBuilder().parse(sourceDocument);
 
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
 
             WSSecEncrypt builder = new WSSecEncrypt();
             builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
@@ -2532,8 +2532,8 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             Document doc = documentBuilderFactory.newDocumentBuilder().parse(sourceDocument);
 
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
             Element securityHeaderElement = secHeader.getSecurityHeader();
             securityHeaderElement.appendChild(doc.getElementsByTagNameNS("http://schemas.xmlsoap.org/wsdl/", "definitions").item(0));
 
@@ -2576,8 +2576,8 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             Document doc = documentBuilderFactory.newDocumentBuilder().parse(sourceDocument);
 
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
             Element securityHeaderElement = secHeader.getSecurityHeader();
             securityHeaderElement.appendChild(doc.getElementsByTagNameNS("http://schemas.xmlsoap.org/wsdl/", "definitions").item(0));
 
@@ -2619,8 +2619,8 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             Document doc = documentBuilderFactory.newDocumentBuilder().parse(sourceDocument);
 
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
             Element securityHeaderElement = secHeader.getSecurityHeader();
             securityHeaderElement.appendChild(doc.getElementsByTagNameNS("http://schemas.xmlsoap.org/wsdl/", "definitions").item(0));
 

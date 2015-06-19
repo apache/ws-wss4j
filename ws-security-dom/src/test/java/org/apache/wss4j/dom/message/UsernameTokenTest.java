@@ -126,8 +126,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setUserInfo("wernerd", "verySecret");
         LOG.info("Before adding UsernameToken PW Digest....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
@@ -177,8 +177,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setUserInfo("wernerd", Base64.encode(MessageDigest.getInstance("SHA-1").digest("verySecret".getBytes("UTF-8"))));
         LOG.info("Before adding UsernameToken PW Digest....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
@@ -206,8 +206,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setUserInfo("badusername", "verySecret");
         LOG.info("Before adding UsernameToken PW Digest....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
@@ -237,8 +237,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setUserInfo("wernerd", "verySecre");
         LOG.info("Before adding UsernameToken PW Digest....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
@@ -266,8 +266,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecret");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
@@ -297,8 +297,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     @org.junit.Test
     public void testNearFutureCreated() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Element usernameTokenElement = 
             doc.createElementNS(
@@ -362,8 +362,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     @org.junit.Test
     public void testFutureCreated() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Element usernameTokenElement = 
             doc.createElementNS(
@@ -422,8 +422,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setUserInfo("wernerd", "verySecret");
         LOG.info("Before adding UsernameToken PW Text....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Text:");
@@ -463,8 +463,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setUserInfo("wernerd", passwdDigest);
         LOG.info("Before adding UsernameToken PW Text....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Text:");
@@ -484,8 +484,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setUserInfo("wernerd", "verySecre");
         LOG.info("Before adding UsernameToken PW Text....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Text:");
@@ -565,8 +565,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setUserInfo("nopassuser", null);
         LOG.info("Before adding UsernameToken with no password....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
         if (LOG.isDebugEnabled()) {
             String outputString = 
@@ -592,8 +592,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setUserInfo("emptyuser", "");
         LOG.info("Before adding UsernameToken with an empty password....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
         if (LOG.isDebugEnabled()) {
             String outputString = 
@@ -632,8 +632,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setUserInfo("wernerd", "verySecret");
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
         
         if (LOG.isDebugEnabled()) {
@@ -663,8 +663,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setUserInfo("wernerd", "verySecret");
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
         
         if (LOG.isDebugEnabled()) {
@@ -699,8 +699,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setUserInfo("wernerd", "BAD_PASSWORD");
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document utDoc = builder.build(doc, secHeader);
         
         //
@@ -742,8 +742,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setUserInfo("wernerd", "BAD_PASSWORD");
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document utDoc = builder.build(doc, secHeader);
         
         //
@@ -782,8 +782,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setUserInfo("wernerd", "verySecret");
         LOG.info("Before adding UsernameToken PW Digest....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
         String outputString = 
             XMLUtils.PrettyDocumentToString(signedDoc);
@@ -892,8 +892,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setUserInfo("wernerd", "verySecret");
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document utDoc = builder.build(doc, secHeader);
         
         //
@@ -935,8 +935,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setUserInfo("wernerd", "verySecret");
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document utDoc = builder.build(doc, secHeader);
         
         //
@@ -978,8 +978,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setUserInfo("wernerd", "verySecret");
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document utDoc = builder.build(doc, secHeader);
         
         //
@@ -1021,8 +1021,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setUserInfo("wernerd", "verySecret");
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document utDoc = builder.build(doc, secHeader);
         
         //
@@ -1093,8 +1093,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecret");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSTimeSource spoofedTimeSource = new WSTimeSource() {
 

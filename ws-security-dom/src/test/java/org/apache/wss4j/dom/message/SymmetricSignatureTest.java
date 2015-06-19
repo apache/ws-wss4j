@@ -94,8 +94,8 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
     public void testSymmetricSignatureSHA1() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecSignature sign = new WSSecSignature();
         sign.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
@@ -127,8 +127,8 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
     public void testSymmetricSignatureDR() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
         encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
@@ -168,8 +168,8 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         LOG.info("Before Sign/Encryption....");
         
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
         encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);

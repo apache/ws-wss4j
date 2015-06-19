@@ -279,8 +279,8 @@ public class SignatureConfirmationTest extends org.junit.Assert {
     @org.junit.Test
     public void testWsuId() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         byte[] randomBytes = WSSecurityUtil.generateNonce(20);
         SignatureConfirmation sigConf = new SignatureConfirmation(doc, randomBytes);

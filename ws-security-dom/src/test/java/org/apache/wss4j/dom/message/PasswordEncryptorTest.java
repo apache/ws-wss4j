@@ -88,8 +88,8 @@ public class PasswordEncryptorTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
@@ -138,8 +138,8 @@ public class PasswordEncryptorTest extends org.junit.Assert {
         builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOEP);
       
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);        
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();        
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
 
         String outputString = 

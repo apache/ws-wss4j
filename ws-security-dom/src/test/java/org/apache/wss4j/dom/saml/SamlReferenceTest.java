@@ -110,8 +110,8 @@ public class SamlReferenceTest extends org.junit.Assert {
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -173,8 +173,8 @@ public class SamlReferenceTest extends org.junit.Assert {
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -244,8 +244,8 @@ public class SamlReferenceTest extends org.junit.Assert {
         wsSign.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         Document signedDoc = 
             wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
@@ -309,8 +309,8 @@ public class SamlReferenceTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         Document signedDoc = 
             wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
@@ -357,8 +357,8 @@ public class SamlReferenceTest extends org.junit.Assert {
     @org.junit.Test
     public void testAssertionBelowSTR() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.ATTR);
@@ -426,9 +426,9 @@ public class SamlReferenceTest extends org.junit.Assert {
         samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
+        WSSecHeader secHeader = new WSSecHeader(doc);
         Node assertionNode = samlAssertion.toDOM(doc);
-        secHeader.insertSecurityHeader(doc);
+        secHeader.insertSecurityHeader();
         secHeader.getSecurityHeader().appendChild(assertionNode);
         
         // Encrypt the SOAP body
@@ -502,9 +502,9 @@ public class SamlReferenceTest extends org.junit.Assert {
         
         samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
+        WSSecHeader secHeader = new WSSecHeader(doc);
         Node assertionNode = samlAssertion.toDOM(doc);
-        secHeader.insertSecurityHeader(doc);
+        secHeader.insertSecurityHeader();
         secHeader.getSecurityHeader().appendChild(assertionNode);
         
         // Encrypt the SOAP body
@@ -573,8 +573,8 @@ public class SamlReferenceTest extends org.junit.Assert {
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -635,8 +635,8 @@ public class SamlReferenceTest extends org.junit.Assert {
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -706,8 +706,8 @@ public class SamlReferenceTest extends org.junit.Assert {
         wsSign.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         Document signedDoc = 
             wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
@@ -771,8 +771,8 @@ public class SamlReferenceTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         Document signedDoc = 
             wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
@@ -829,9 +829,9 @@ public class SamlReferenceTest extends org.junit.Assert {
         samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
+        WSSecHeader secHeader = new WSSecHeader(doc);
         Node assertionNode = samlAssertion.toDOM(doc);
-        secHeader.insertSecurityHeader(doc);
+        secHeader.insertSecurityHeader();
         secHeader.getSecurityHeader().appendChild(assertionNode);
         
         // Encrypt the SOAP body
@@ -905,9 +905,9 @@ public class SamlReferenceTest extends org.junit.Assert {
         samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
+        WSSecHeader secHeader = new WSSecHeader(doc);
         Node assertionNode = samlAssertion.toDOM(doc);
-        secHeader.insertSecurityHeader(doc);
+        secHeader.insertSecurityHeader();
         secHeader.getSecurityHeader().appendChild(assertionNode);
         
         // Encrypt the SOAP body

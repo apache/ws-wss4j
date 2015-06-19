@@ -73,8 +73,8 @@ public class UTDerivedKeyTest extends org.junit.Assert {
     @org.junit.Test
     public void testUsernameTokenUnit() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         UsernameToken usernameToken = new UsernameToken(true, doc, null);
         usernameToken.setName("bob");
@@ -132,8 +132,8 @@ public class UTDerivedKeyTest extends org.junit.Assert {
     @org.junit.Test
     public void testDerivedKeyEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("bob", "security");
@@ -183,8 +183,8 @@ public class UTDerivedKeyTest extends org.junit.Assert {
     @org.junit.Test
     public void testDerivedKeyEncryptionWithEncodedPassword() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordsAreEncoded(true);
@@ -234,8 +234,8 @@ public class UTDerivedKeyTest extends org.junit.Assert {
     @org.junit.Test
     public void testDerivedKeyChangedEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("bob", "security");
@@ -287,8 +287,8 @@ public class UTDerivedKeyTest extends org.junit.Assert {
     @org.junit.Test
     public void testDerivedKeyBadUserEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("colm", "security");
@@ -337,8 +337,8 @@ public class UTDerivedKeyTest extends org.junit.Assert {
     @org.junit.Test
     public void testDerivedKeySignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("bob", "security");
@@ -386,8 +386,8 @@ public class UTDerivedKeyTest extends org.junit.Assert {
     @org.junit.Test
     public void testDerivedKeySignatureWithEncodedPassword() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordsAreEncoded(true);
@@ -445,8 +445,8 @@ public class UTDerivedKeyTest extends org.junit.Assert {
     @org.junit.Test
     public void testDerivedKeyChangedSignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("bob", "security");
@@ -496,8 +496,8 @@ public class UTDerivedKeyTest extends org.junit.Assert {
     @org.junit.Test
     public void testDerivedKeyBadUserSignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("colm", "security");
@@ -542,8 +542,8 @@ public class UTDerivedKeyTest extends org.junit.Assert {
     @org.junit.Test
     public void testNoSaltEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         UsernameToken usernameToken = new UsernameToken(true, doc, null);
         usernameToken.setName("bob");
@@ -593,8 +593,8 @@ public class UTDerivedKeyTest extends org.junit.Assert {
     @org.junit.Test
     public void testNoIterationEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         UsernameToken usernameToken = new UsernameToken(true, doc, null);
         usernameToken.setName("bob");
@@ -642,8 +642,8 @@ public class UTDerivedKeyTest extends org.junit.Assert {
     @org.junit.Test
     public void testLowIterationEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         UsernameToken usernameToken = new UsernameToken(true, doc, null);
         usernameToken.setName("bob");
@@ -704,8 +704,8 @@ public class UTDerivedKeyTest extends org.junit.Assert {
     @org.junit.Test
     public void testBadValueType() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("bob", "security");
@@ -767,8 +767,8 @@ public class UTDerivedKeyTest extends org.junit.Assert {
     @org.junit.Test
     public void testKeyIdentifier() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("bob", "security");

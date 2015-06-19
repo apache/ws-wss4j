@@ -69,8 +69,8 @@ public class SKISignatureTest extends org.junit.Assert {
         LOG.info("Before SigningDSA_SKIDirect....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
@@ -112,8 +112,8 @@ public class SKISignatureTest extends org.junit.Assert {
         LOG.info("Before SigningDSA_Autodetect....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
@@ -146,8 +146,8 @@ public class SKISignatureTest extends org.junit.Assert {
         LOG.info("Before SigningRSA_Autodetect....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         Document signedDoc = builder.build(doc, crypto, secHeader);
 

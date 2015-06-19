@@ -40,20 +40,25 @@ public class WSSecHeader {
     private boolean mustunderstand = true;
 
     private Element securityHeader;
+    
+    private final Document doc;
 
     /**
      * Constructor.
+     * @param doc The Document to use when creating the security header
      */
-    public WSSecHeader() {
+    public WSSecHeader(Document doc) {
+        this(null, doc);
     }
 
     /**
      * Constructor.
      * 
      * @param actor The actor name of the <code>wsse:Security</code> header
+     * @param doc The Document to use when creating the security header
      */
-    public WSSecHeader(String actor) {
-        this(actor, true);
+    public WSSecHeader(String actor, Document doc) {
+        this(actor, true, doc);
     }
 
     /**
@@ -61,10 +66,12 @@ public class WSSecHeader {
      * 
      * @param act The actor name of the <code>wsse:Security</code> header
      * @param mu Set <code>mustUnderstand</code> to true or false
+     * @param doc The Document to use when creating the security header
      */
-    public WSSecHeader(String act, boolean mu) {
+    public WSSecHeader(String act, boolean mu, Document doc) {
         actor = act;
         mustunderstand = mu;
+        this.doc = doc;
     }
 
     /**
@@ -101,7 +108,11 @@ public class WSSecHeader {
      * @return true if empty or if there is no security header
      *         false if non empty security header
      */
-    public boolean isEmpty(Document doc) throws WSSecurityException {
+    public boolean isEmpty() throws WSSecurityException {
+        if (doc == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
+                                          new Object[] {"The Document of WSSecHeader is null"});
+        }
         if (securityHeader == null) {            
             securityHeader = 
                 WSSecurityUtil.findWsseSecurityHeaderBlock(
@@ -122,16 +133,21 @@ public class WSSecHeader {
      * the document. If a header block is found return it, otherwise a new
      * wsse:Security header block is created and the attributes set
      * 
-     * @param doc A SOAP envelope as <code>Document</code>
      * @return A <code>wsse:Security</code> element
      */
-    public Element insertSecurityHeader(Document doc) throws WSSecurityException {
+    public Element insertSecurityHeader() throws WSSecurityException {
         //
         // If there is already a security header in this instance just return it
         //
         if (securityHeader != null) {
             return securityHeader;
         }
+        
+        if (doc == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
+                                          new Object[] {"The Document of WSSecHeader is null"});
+        }
+        
         securityHeader = 
             WSSecurityUtil.findWsseSecurityHeaderBlock(
                 doc, doc.getDocumentElement(), actor, true
@@ -170,8 +186,13 @@ public class WSSecHeader {
         return securityHeader;
     }
     
-    public void removeSecurityHeader(Document doc) throws WSSecurityException {
-        if (securityHeader == null) {            
+    public void removeSecurityHeader() throws WSSecurityException {
+        if (securityHeader == null) {    
+            if (doc == null) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
+                                              new Object[] {"The Document of WSSecHeader is null"});
+            }
+            
             securityHeader = 
                 WSSecurityUtil.findWsseSecurityHeaderBlock(
                     doc, doc.getDocumentElement(), actor, false

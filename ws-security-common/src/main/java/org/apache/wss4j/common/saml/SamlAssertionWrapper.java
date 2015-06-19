@@ -40,6 +40,7 @@ import org.apache.xml.security.utils.Base64;
 import org.apache.xml.security.utils.XMLUtils;
 import org.joda.time.DateTime;
 import org.opensaml.core.xml.XMLObject;
+import org.opensaml.saml.common.SAMLObject;
 import org.opensaml.saml.common.SAMLObjectContentReference;
 import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.common.SignableSAMLObject;
@@ -79,19 +80,9 @@ public class SamlAssertionWrapper {
         org.slf4j.LoggerFactory.getLogger(SamlAssertionWrapper.class);
 
     /**
-     * Raw SAML assertion data
+     * Raw SAML Object
      */
-    private XMLObject xmlObject = null;
-
-    /**
-     * Typed SAML v1.1 assertion
-     */
-    private org.opensaml.saml.saml1.core.Assertion saml1 = null;
-
-    /**
-     * Typed SAML v2.0 assertion
-     */
-    private org.opensaml.saml.saml2.core.Assertion saml2 = null;
+    private SAMLObject samlObject = null;
 
     /**
      * Which SAML specification to use (currently, only v1.1 and v2.0 are supported)
@@ -153,45 +144,28 @@ public class SamlAssertionWrapper {
 
     /**
      * Constructor SamlAssertionWrapper creates a new SamlAssertionWrapper instance.
-     *
-     * @param saml2 of type Assertion
-     */
-    public SamlAssertionWrapper(org.opensaml.saml.saml2.core.Assertion saml2) {
-        this((XMLObject)saml2);
-    }
-
-    /**
-     * Constructor SamlAssertionWrapper creates a new SamlAssertionWrapper instance.
-     *
-     * @param saml1 of type Assertion
-     */
-    public SamlAssertionWrapper(org.opensaml.saml.saml1.core.Assertion saml1) {
-        this((XMLObject)saml1);
-    }
-
-    /**
-     * Constructor SamlAssertionWrapper creates a new SamlAssertionWrapper instance.
      * This is the primary constructor.  All other constructor calls should
      * be routed to this method to ensure that the wrapper is initialized
      * correctly.
      *
-     * @param xmlObject of type XMLObject
+     * @param samlObject of type SAMLObject
      */
-    public SamlAssertionWrapper(XMLObject xmlObject) {
+    public SamlAssertionWrapper(SAMLObject samlObject) throws WSSecurityException {
         OpenSAMLUtil.initSamlEngine();
         
-        this.xmlObject = xmlObject;
-        if (xmlObject instanceof org.opensaml.saml.saml1.core.Assertion) {
-            this.saml1 = (org.opensaml.saml.saml1.core.Assertion) xmlObject;
+        this.samlObject = samlObject;
+        if (samlObject instanceof org.opensaml.saml.saml1.core.Assertion) {
             samlVersion = SAMLVersion.VERSION_11;
-        } else if (xmlObject instanceof org.opensaml.saml.saml2.core.Assertion) {
-            this.saml2 = (org.opensaml.saml.saml2.core.Assertion) xmlObject;
+        } else if (samlObject instanceof org.opensaml.saml.saml2.core.Assertion) {
             samlVersion = SAMLVersion.VERSION_20;
         } else {
             LOG.error(
                 "SamlAssertionWrapper: found unexpected type "
-                + (xmlObject != null ? xmlObject.getClass().getName() : null)
+                + (samlObject != null ? samlObject.getClass().getName() : null)
             );
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
+                                          new Object[] {"A SAML 2.0 or 1.1 Assertion can only be used with "
+                                                        + "SamlAssertionWrapper"});
         }
         fromDOM = false;
     }
@@ -222,7 +196,10 @@ public class SamlAssertionWrapper {
      * @return the saml1 (type Assertion) of this SamlAssertionWrapper object.
      */
     public org.opensaml.saml.saml1.core.Assertion getSaml1() {
-        return saml1;
+        if (samlVersion == SAMLVersion.VERSION_11) {
+            return (org.opensaml.saml.saml1.core.Assertion)samlObject;
+        }
+        return null;
     }
 
     /**
@@ -231,16 +208,10 @@ public class SamlAssertionWrapper {
      * @return the saml2 (type Assertion) of this SamlAssertionWrapper object.
      */
     public org.opensaml.saml.saml2.core.Assertion getSaml2() {
-        return saml2;
-    }
-
-    /**
-     * Method getXmlObject returns the xmlObject of this SamlAssertionWrapper object.
-     *
-     * @return the xmlObject (type XMLObject) of this SamlAssertionWrapper object.
-     */
-    public XMLObject getXmlObject() {
-        return xmlObject;
+        if (samlVersion == SAMLVersion.VERSION_20) {
+            return (org.opensaml.saml.saml2.core.Assertion)samlObject;
+        }
+        return null;
     }
 
     /**
@@ -249,7 +220,7 @@ public class SamlAssertionWrapper {
      * @return the created (type boolean) of this SamlAssertionWrapper object.
      */
     public boolean isCreated() {
-        return saml1 != null || saml2 != null;
+        return samlObject != null;
     }
 
 
@@ -268,7 +239,7 @@ public class SamlAssertionWrapper {
             }
             return assertionElement;
         }
-        assertionElement = OpenSAMLUtil.toDom(xmlObject, doc);
+        assertionElement = OpenSAMLUtil.toDom(samlObject, doc);
         return assertionElement;
     }
 
@@ -292,21 +263,22 @@ public class SamlAssertionWrapper {
      */
     public String getId() {
         String id = null;
-        if (saml2 != null) {
-            id = saml2.getID();
-        } else if (saml1 != null) {
-            id = saml1.getID();
+        if (samlVersion == SAMLVersion.VERSION_20) {
+            id = ((org.opensaml.saml.saml2.core.Assertion)samlObject).getID();
+            if (id == null || id.length() == 0) {
+                LOG.error("SamlAssertionWrapper: ID was null, seeting a new ID value");
+                id = IDGenerator.generateID("_");
+                ((org.opensaml.saml.saml2.core.Assertion)samlObject).setID(id);
+            }
+        } else if (samlVersion == SAMLVersion.VERSION_11) {
+            id = ((org.opensaml.saml.saml1.core.Assertion)samlObject).getID();
+            if (id == null || id.length() == 0) {
+                LOG.error("SamlAssertionWrapper: ID was null, seeting a new ID value");
+                id = IDGenerator.generateID("_");
+                ((org.opensaml.saml.saml1.core.Assertion)samlObject).setID(id);
+            }
         } else {
             LOG.error("SamlAssertionWrapper: unable to return ID - no saml assertion object");
-        }
-        if (id == null || id.length() == 0) {
-            LOG.error("SamlAssertionWrapper: ID was null, seeting a new ID value");
-            id = IDGenerator.generateID("_");
-            if (saml2 != null) {
-                saml2.setID(id);
-            } else if (saml1 != null) {
-                saml1.setID(id);
-            }
         }
         return id;
     }
@@ -317,11 +289,13 @@ public class SamlAssertionWrapper {
      * @return the issuerString (type String) of this SamlAssertionWrapper object.
      */
     public String getIssuerString() {
-        if (saml2 != null && saml2.getIssuer() != null) {
-            return saml2.getIssuer().getValue();
-        } else if (saml1 != null) {
-            return saml1.getIssuer();
-        }
+        if (samlVersion == SAMLVersion.VERSION_20
+            && ((org.opensaml.saml.saml2.core.Assertion)samlObject).getIssuer() != null) {
+            return ((org.opensaml.saml.saml2.core.Assertion)samlObject).getIssuer().getValue();
+        } else if (samlVersion == SAMLVersion.VERSION_11
+            && ((org.opensaml.saml.saml1.core.Assertion)samlObject).getIssuer() != null) {
+            return ((org.opensaml.saml.saml1.core.Assertion)samlObject).getIssuer();
+        } 
         LOG.error(
             "SamlAssertionWrapper: unable to return Issuer string - no saml assertion "
             + "object or issuer is null"
@@ -334,14 +308,15 @@ public class SamlAssertionWrapper {
      * @return the subjectName of this SamlAssertionWrapper object
      */
     public String getSubjectName() {
-        if (saml2 != null) {
-            org.opensaml.saml.saml2.core.Subject subject = saml2.getSubject();
+        if (samlVersion == SAMLVersion.VERSION_20) {
+            org.opensaml.saml.saml2.core.Subject subject = 
+                ((org.opensaml.saml.saml2.core.Assertion)samlObject).getSubject();
             if (subject != null && subject.getNameID() != null) {
                 return subject.getNameID().getValue();
             }
-        } else if (saml1 != null) {
+        } else if (samlVersion == SAMLVersion.VERSION_11) {
             Subject samlSubject = null;
-            for (Statement stmt : saml1.getStatements()) {
+            for (Statement stmt : ((org.opensaml.saml.saml1.core.Assertion)samlObject).getStatements()) {
                 if (stmt instanceof AttributeStatement) {
                     AttributeStatement attrStmt = (AttributeStatement) stmt;
                     samlSubject = attrStmt.getSubject();
@@ -376,15 +351,18 @@ public class SamlAssertionWrapper {
      */
     public List<String> getConfirmationMethods() {
         List<String> methods = new ArrayList<>();
-        if (saml2 != null) {
-            org.opensaml.saml.saml2.core.Subject subject = saml2.getSubject();
+        if (samlVersion == SAMLVersion.VERSION_20) {
+            org.opensaml.saml.saml2.core.Subject subject =  
+                ((org.opensaml.saml.saml2.core.Assertion)samlObject).getSubject();
             List<org.opensaml.saml.saml2.core.SubjectConfirmation> confirmations = 
                 subject.getSubjectConfirmations();
             for (org.opensaml.saml.saml2.core.SubjectConfirmation confirmation : confirmations) {
                 methods.add(confirmation.getMethod());
             }
-        } else if (saml1 != null) {
+        } else if (samlVersion == SAMLVersion.VERSION_11) {
             List<SubjectStatement> subjectStatements = new ArrayList<>();
+            org.opensaml.saml.saml1.core.Assertion saml1 = 
+                ((org.opensaml.saml.saml1.core.Assertion)samlObject);
             subjectStatements.addAll(saml1.getSubjectStatements());
             subjectStatements.addAll(saml1.getAuthenticationStatements());
             subjectStatements.addAll(saml1.getAttributeStatements());
@@ -417,10 +395,10 @@ public class SamlAssertionWrapper {
      * @return the signed (type boolean) of this SamlAssertionWrapper object.
      */
     public boolean isSigned() {
-        if (saml2 != null) {
-            return saml2.isSigned() || saml2.getSignature() != null;
-        } else if (saml1 != null) {
-            return saml1.isSigned() || saml1.getSignature() != null;
+        if (samlObject instanceof SignableSAMLObject 
+            && (((SignableSAMLObject)samlObject).isSigned() 
+                || ((SignableSAMLObject)samlObject).getSignature() != null)) {
+            return true;
         }
         return false;
     }
@@ -441,8 +419,8 @@ public class SamlAssertionWrapper {
      * @param signatureDigestAlgorithm the signature digest algorithm to use
      */
     public void setSignature(Signature signature, String signatureDigestAlgorithm) {
-        if (xmlObject instanceof SignableSAMLObject) {
-            SignableSAMLObject signableObject = (SignableSAMLObject) xmlObject;
+        if (samlObject instanceof SignableSAMLObject) {
+            SignableSAMLObject signableObject = (SignableSAMLObject) samlObject;
             signableObject.setSignature(signature);
             String digestAlg = signatureDigestAlgorithm;
             if (digestAlg == null) {
@@ -454,7 +432,7 @@ public class SamlAssertionWrapper {
             signableObject.releaseDOM();
             signableObject.releaseChildrenDOM(true);
         } else {
-            LOG.error("Attempt to sign an unsignable object " + xmlObject.getClass().getName());
+            LOG.error("Attempt to sign an unsignable object " + samlObject.getClass().getName());
         }
     }
     
@@ -676,15 +654,17 @@ public class SamlAssertionWrapper {
         Crypto sigCrypto,
         CallbackHandler callbackHandler
     ) throws WSSecurityException {
-        if (saml1 != null) {
+        if (samlVersion == SAMLVersion.VERSION_11) {
             subjectKeyInfo = 
                 SAMLUtil.getCredentialFromSubject(
-                    saml1, keyInfoProcessor, sigCrypto, callbackHandler
+                    (org.opensaml.saml.saml1.core.Assertion)samlObject, keyInfoProcessor, 
+                    sigCrypto, callbackHandler
                 );
-        } else if (saml2 != null) {
+        } else if (samlVersion == SAMLVersion.VERSION_20) {
             subjectKeyInfo = 
                 SAMLUtil.getCredentialFromSubject(
-                    saml2, keyInfoProcessor, sigCrypto, callbackHandler
+                    (org.opensaml.saml.saml2.core.Assertion)samlObject, keyInfoProcessor, 
+                    sigCrypto, callbackHandler
                 );
         }
     }
@@ -703,9 +683,9 @@ public class SamlAssertionWrapper {
                     "The SAML version was null in getSamlVersion(). Recomputing SAML version..."
                 );
             }
-            if (saml1 != null && saml2 == null) {
+            if (samlObject != null && samlObject instanceof org.opensaml.saml.saml1.core.Assertion) {
                 samlVersion = SAMLVersion.VERSION_11;
-            } else if (saml1 == null && saml2 != null) {
+            } else if (samlObject != null && samlObject instanceof org.opensaml.saml.saml2.core.Assertion) {
                 samlVersion = SAMLVersion.VERSION_20;
             } else {
                 // We are only supporting SAML v1.1 or SAML v2.0 at this time.
@@ -749,10 +729,8 @@ public class SamlAssertionWrapper {
      */
     public byte[] getSignatureValue() throws WSSecurityException {
         Signature sig = null;
-        if (saml2 != null && saml2.getSignature() != null) {
-            sig = saml2.getSignature();
-        } else if (saml1 != null && saml1.getSignature() != null) {
-            sig = saml1.getSignature();
+        if (samlObject instanceof SignableSAMLObject) {
+            sig = ((SignableSAMLObject)samlObject).getSignature();
         }
         if (sig != null) {
             return getSignatureValue(sig);
@@ -784,13 +762,10 @@ public class SamlAssertionWrapper {
     }
 
     public Signature getSignature() throws WSSecurityException {
-        Signature sig = null;
-        if (saml2 != null && saml2.getSignature() != null) {
-            sig = saml2.getSignature();
-        } else if (saml1 != null && saml1.getSignature() != null) {
-            sig = saml1.getSignature();
+        if (samlObject instanceof SignableSAMLObject) {
+            return ((SignableSAMLObject)samlObject).getSignature();
         }
-        return sig;
+        return null;
     }
     
     /**
@@ -997,12 +972,12 @@ public class SamlAssertionWrapper {
      * Parse the DOM Element into Opensaml objects.
      */
     private void parseElement(Element element) throws WSSecurityException {
-        this.xmlObject = OpenSAMLUtil.fromDom(element);
+        XMLObject xmlObject = OpenSAMLUtil.fromDom(element);
         if (xmlObject instanceof org.opensaml.saml.saml1.core.Assertion) {
-            this.saml1 = (org.opensaml.saml.saml1.core.Assertion) xmlObject;
+            this.samlObject = (SAMLObject)xmlObject;
             samlVersion = SAMLVersion.VERSION_11;
         } else if (xmlObject instanceof org.opensaml.saml.saml2.core.Assertion) {
-            this.saml2 = (org.opensaml.saml.saml2.core.Assertion) xmlObject;
+            this.samlObject = (SAMLObject)xmlObject;
             samlVersion = SAMLVersion.VERSION_20;
         } else {
             LOG.error(
@@ -1028,7 +1003,8 @@ public class SamlAssertionWrapper {
         
         if (samlVersion.equals(SAMLVersion.VERSION_11)) {
             // Build a SAML v1.1 assertion
-            saml1 = SAML1ComponentBuilder.createSamlv1Assertion(issuer);
+            org.opensaml.saml.saml1.core.Assertion saml1 = 
+                SAML1ComponentBuilder.createSamlv1Assertion(issuer);
 
             try {
                 // Process the SAML authentication statement(s)
@@ -1069,11 +1045,11 @@ public class SamlAssertionWrapper {
             }
 
             // Set the OpenSaml2 XMLObject instance
-            xmlObject = saml1;
+            samlObject = saml1;
 
         } else if (samlVersion.equals(SAMLVersion.VERSION_20)) {
             // Build a SAML v2.0 assertion
-            saml2 = SAML2ComponentBuilder.createAssertion();
+            org.opensaml.saml.saml2.core.Assertion saml2 = SAML2ComponentBuilder.createAssertion();
             Issuer samlIssuer = SAML2ComponentBuilder.createIssuer(issuer);
 
             // Authn Statement(s)
@@ -1121,7 +1097,7 @@ public class SamlAssertionWrapper {
             }
 
             // Set the OpenSaml2 XMLObject instance
-            xmlObject = saml2;
+            samlObject = saml2;
         }
     }
 

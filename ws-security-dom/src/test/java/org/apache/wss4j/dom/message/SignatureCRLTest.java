@@ -92,8 +92,8 @@ public class SignatureCRLTest extends org.junit.Assert {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
         if (LOG.isDebugEnabled()) {
@@ -124,8 +124,8 @@ public class SignatureCRLTest extends org.junit.Assert {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
         if (LOG.isDebugEnabled()) {
@@ -159,8 +159,8 @@ public class SignatureCRLTest extends org.junit.Assert {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
         if (LOG.isDebugEnabled()) {

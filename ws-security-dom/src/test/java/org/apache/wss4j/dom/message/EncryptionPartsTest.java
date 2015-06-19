@@ -97,8 +97,8 @@ public class EncryptionPartsTest extends org.junit.Assert {
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -146,8 +146,8 @@ public class EncryptionPartsTest extends org.junit.Assert {
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -183,8 +183,8 @@ public class EncryptionPartsTest extends org.junit.Assert {
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -220,8 +220,8 @@ public class EncryptionPartsTest extends org.junit.Assert {
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -258,8 +258,8 @@ public class EncryptionPartsTest extends org.junit.Assert {
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -306,8 +306,8 @@ public class EncryptionPartsTest extends org.junit.Assert {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -336,8 +336,8 @@ public class EncryptionPartsTest extends org.junit.Assert {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -367,8 +367,8 @@ public class EncryptionPartsTest extends org.junit.Assert {
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -436,8 +436,8 @@ public class EncryptionPartsTest extends org.junit.Assert {
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         // Give wrong names to make sure it's picking up the element
         WSEncryptionPart encP =
@@ -483,8 +483,8 @@ public class EncryptionPartsTest extends org.junit.Assert {
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSEncryptionPart encP =
             new WSEncryptionPart(

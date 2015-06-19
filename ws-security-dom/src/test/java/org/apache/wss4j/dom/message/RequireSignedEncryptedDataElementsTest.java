@@ -293,8 +293,8 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         LOG.info("Before Encryption....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
         
@@ -324,8 +324,8 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         LOG.info("Before Encryption....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
         Document signedDoc = sign.build(doc, crypto, secHeader);
         

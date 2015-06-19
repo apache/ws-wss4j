@@ -70,8 +70,8 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
 
@@ -108,8 +108,8 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
         builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSA15);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Document encryptedDoc = builder.build(doc, wssCrypto, secHeader);
 
@@ -145,8 +145,8 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
         builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSA15);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Document encryptedDoc = builder.build(doc, wssCrypto, secHeader);
 
@@ -187,8 +187,8 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Document encryptedDoc = builder.build(doc, wssCrypto, secHeader);
 
@@ -226,8 +226,8 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
         builder.setEncryptSymmKey(false);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
 

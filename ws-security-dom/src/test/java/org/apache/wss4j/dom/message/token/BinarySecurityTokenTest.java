@@ -65,8 +65,8 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
     public void testX509() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         X509Security bst = new X509Security(doc);
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
@@ -106,8 +106,8 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
     public void testPKIPath() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         PKIPathSecurity bst = new PKIPathSecurity(doc);
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
@@ -143,8 +143,8 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
     public void testCustomToken() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         BinarySecurity bst = new BinarySecurity(doc);
         bst.setToken("12435677".getBytes());
@@ -172,8 +172,8 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
         bst = new BinarySecurity(doc);
         bst.setToken("12435677".getBytes());
         bst.setValueType("http://custom_value_Type");
-        secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
         
         WSHandlerResult results = 

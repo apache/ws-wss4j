@@ -65,8 +65,8 @@ public class TimestampTest extends org.junit.Assert {
     public void testValidTimestamp() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);
@@ -103,8 +103,8 @@ public class TimestampTest extends org.junit.Assert {
     public void testValidTimestampNoExpires() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(0);
@@ -133,8 +133,8 @@ public class TimestampTest extends org.junit.Assert {
     public void testInvalidTimestampNoExpires() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(0);
@@ -180,8 +180,8 @@ public class TimestampTest extends org.junit.Assert {
     public void testExpiredTimestamp() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(-1);
@@ -210,8 +210,8 @@ public class TimestampTest extends org.junit.Assert {
     public void testOldTimestamp() throws Exception {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecTimestamp timestamp = new WSSecTimestamp();
         Document createdDoc = timestamp.build(doc, secHeader);
@@ -246,8 +246,8 @@ public class TimestampTest extends org.junit.Assert {
     public void testNearFutureCreated() throws Exception {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Element timestampElement = 
             doc.createElementNS(
@@ -294,8 +294,8 @@ public class TimestampTest extends org.junit.Assert {
     public void testFutureCreated() throws Exception {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Element timestampElement = 
             doc.createElementNS(
@@ -340,8 +340,8 @@ public class TimestampTest extends org.junit.Assert {
     public void testExpiresBeforeCreated() throws Exception {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Element timestampElement = 
             doc.createElementNS(
@@ -394,8 +394,8 @@ public class TimestampTest extends org.junit.Assert {
     public void testMultipleTimestamps() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);
@@ -432,8 +432,8 @@ public class TimestampTest extends org.junit.Assert {
     public void testMultipleCreated() throws Exception {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Element timestampElement = 
             doc.createElementNS(
@@ -478,8 +478,8 @@ public class TimestampTest extends org.junit.Assert {
     public void testNoCreated() throws Exception {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Element timestampElement = 
             doc.createElementNS(
@@ -528,8 +528,8 @@ public class TimestampTest extends org.junit.Assert {
     public void testMultipleExpires() throws Exception {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Element timestampElement = 
             doc.createElementNS(
@@ -585,8 +585,8 @@ public class TimestampTest extends org.junit.Assert {
     public void testExpiresInFrontOfCreated() throws Exception {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Element timestampElement = 
             doc.createElementNS(
@@ -640,8 +640,8 @@ public class TimestampTest extends org.junit.Assert {
     public void testCreatedSeconds() throws Exception {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Element timestampElement = 
             doc.createElementNS(
@@ -685,8 +685,8 @@ public class TimestampTest extends org.junit.Assert {
     public void testCreatedValueType() throws Exception {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Element timestampElement = 
             doc.createElementNS(
@@ -738,8 +738,8 @@ public class TimestampTest extends org.junit.Assert {
     public void testCustomElement() throws Exception {
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         Element timestampElement = 
             doc.createElementNS(
@@ -797,8 +797,8 @@ public class TimestampTest extends org.junit.Assert {
     public void testSpoofedTimestamp() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);
@@ -837,8 +837,8 @@ public class TimestampTest extends org.junit.Assert {
     public void testTimestampNoMilliseconds() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setPrecisionInMilliSeconds(false);
@@ -868,8 +868,8 @@ public class TimestampTest extends org.junit.Assert {
             Locale.setDefault(new Locale("th", "TH"));
         
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-            WSSecHeader secHeader = new WSSecHeader();
-            secHeader.insertSecurityHeader(doc);
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
             
             WSSecTimestamp timestamp = new WSSecTimestamp();
             timestamp.setTimeToLive(300);

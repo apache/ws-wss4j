@@ -73,8 +73,8 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
         builder.setUserInfo("wss40", "security");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);        
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();        
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
         
         try {
@@ -116,8 +116,8 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
         builder.setTimeToLive(-1);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);        
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();        
         Document timestampedDoc = builder.build(doc, secHeader);
         
         try {
@@ -143,8 +143,8 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);        
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();        
         Document timestampedDoc = builder.build(doc, secHeader);
         
         try {
@@ -170,8 +170,8 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
         builder.setUserInfo(null, "security");
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);        
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();        
         builder.build(doc, secHeader);
         
         try {

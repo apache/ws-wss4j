@@ -67,8 +67,8 @@ public class SignedBSTTest extends org.junit.Assert {
     @org.junit.Test
     public void testSignedBST() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         
         // Get a certificate, convert it into a BinarySecurityToken and add it to the security header
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);

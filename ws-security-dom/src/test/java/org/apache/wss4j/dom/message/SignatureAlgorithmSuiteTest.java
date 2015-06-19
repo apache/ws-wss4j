@@ -75,8 +75,8 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         builder.setSignatureAlgorithm(WSConstants.RSA_SHA1);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
@@ -110,8 +110,8 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         builder.setSignatureAlgorithm(WSConstants.DSA);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, dsaCrypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
@@ -148,8 +148,8 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         builder.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
@@ -211,8 +211,8 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         builder.setSigCanonicalization(WSConstants.C14N_EXCL_WITH_COMMENTS);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
@@ -244,8 +244,8 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         builder.setDigestAlgo(WSConstants.SHA256);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {

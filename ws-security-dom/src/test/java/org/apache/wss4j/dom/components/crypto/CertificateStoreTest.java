@@ -81,8 +81,8 @@ public class CertificateStoreTest extends org.junit.Assert {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, senderCrypto, secHeader);
         
         if (LOG.isDebugEnabled()) {
@@ -113,8 +113,8 @@ public class CertificateStoreTest extends org.junit.Assert {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, senderCrypto, secHeader);
         
         if (LOG.isDebugEnabled()) {
@@ -151,8 +151,8 @@ public class CertificateStoreTest extends org.junit.Assert {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, senderCrypto, secHeader);
         
         if (LOG.isDebugEnabled()) {
@@ -185,8 +185,8 @@ public class CertificateStoreTest extends org.junit.Assert {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, senderCrypto, secHeader);
         
         if (LOG.isDebugEnabled()) {
@@ -219,8 +219,8 @@ public class CertificateStoreTest extends org.junit.Assert {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, senderCrypto, secHeader);
         
         if (LOG.isDebugEnabled()) {
@@ -254,8 +254,8 @@ public class CertificateStoreTest extends org.junit.Assert {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, CryptoFactory.getInstance(), secHeader);
         
         if (LOG.isDebugEnabled()) {

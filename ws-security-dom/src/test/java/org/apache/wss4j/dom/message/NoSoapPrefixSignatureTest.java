@@ -60,9 +60,9 @@ public class NoSoapPrefixSignatureTest extends org.junit.Assert {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader();
+        WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.setActor("bob");
-        secHeader.insertSecurityHeader(doc);
+        secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, crypto, secHeader);
         
         if (LOG.isDebugEnabled()) {
