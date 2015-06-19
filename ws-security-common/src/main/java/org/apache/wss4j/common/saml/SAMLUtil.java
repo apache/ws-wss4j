@@ -76,11 +76,14 @@ public final class SAMLUtil {
             return getCredentialFromSubject(
                 samlAssertion.getSaml1(), keyInfoProcessor, sigCrypto, callbackHandler
             );
-        } else {
+        } else if (samlAssertion.getSaml2() != null) {
             return getCredentialFromSubject(
                 samlAssertion.getSaml2(), keyInfoProcessor, sigCrypto, callbackHandler
             );
         }
+        
+        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
+                                      new Object[] {"Cannot get credentials from an unknown SAML Assertion"});
     }
     
     /**
