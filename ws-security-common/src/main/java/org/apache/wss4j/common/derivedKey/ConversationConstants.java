@@ -68,6 +68,11 @@ public final class ConversationConstants {
      * Field IDENTIFIER_LN
      */
     public static final String IDENTIFIER_LN = "Identifier";
+    
+    /**
+     * Field INSTANCE_LN
+     */
+    public static final String INSTANCE_LN = "Instance";
 
     /**
      * Field EXPIRES_LN
