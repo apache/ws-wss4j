@@ -44,6 +44,11 @@ public class SecurityContextToken {
      */
     private Element elementIdentifier;
     
+    /**
+     * Instance element
+     */
+    private Element elementInstance;
+    
     private String tokenType = WSConstants.WSC_SCT;
     
     /**
@@ -115,7 +120,23 @@ public class SecurityContextToken {
             tokenType = WSConstants.WSC_SCT_05_12;
         }
     }
-
+    
+    /**
+     * Constructor to create the SCT with a given uuid and instance
+     *
+     * @param doc
+     */
+    public SecurityContextToken(int version, Document doc, String uuid, String instance)
+        throws WSSecurityException {
+        this(version, doc, uuid);
+        
+        if (instance != null) {
+            String ns = ConversationConstants.getWSCNs(version);
+            elementInstance = doc.createElementNS(ns, ConversationConstants.INSTANCE_LN);
+            element.appendChild(elementInstance);
+            elementInstance.appendChild(doc.createTextNode(instance));
+        }
+    }
     
     /**
      * This is used to create a SecurityContextToken using a DOM Element
@@ -140,6 +161,13 @@ public class SecurityContextToken {
             XMLUtils.getDirectChildElement(
                 element, 
                 ConversationConstants.IDENTIFIER_LN,
+                el.getNamespaceURI()
+            );
+        
+        elementInstance = 
+            XMLUtils.getDirectChildElement(
+                element, 
+                ConversationConstants.INSTANCE_LN,
                 el.getNamespaceURI()
             );
     }
@@ -174,7 +202,22 @@ public class SecurityContextToken {
         }
         return null;
     }
-    
+
+    /**
+     * Get the instance.
+     *
+     * @return the data from the instance element.
+     */
+    public String getInstance() {
+        if (elementInstance != null) {
+            Text text = getFirstNode(elementInstance);
+            if (text != null) {
+                return text.getData();
+            }
+        }
+        return null;
+    }
+
     /**
      * Get the WS-Trust tokenType String associated with this token
      */
