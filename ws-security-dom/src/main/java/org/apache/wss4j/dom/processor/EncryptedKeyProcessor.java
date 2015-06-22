@@ -63,8 +63,6 @@ import org.apache.wss4j.dom.util.EncryptionUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.X509Util;
 import org.apache.xml.security.algorithms.JCEMapper;
-import org.apache.xml.security.exceptions.Base64DecodingException;
-import org.apache.xml.security.utils.Base64;
 
 public class EncryptedKeyProcessor implements Processor {
     private static final org.slf4j.Logger LOG = 
@@ -189,13 +187,13 @@ public class EncryptedKeyProcessor implements Processor {
             if (WSConstants.KEYTRANSPORT_RSAOEP.equals(encryptedKeyTransportMethod)
                     || WSConstants.KEYTRANSPORT_RSAOEP_XENC11.equals(encryptedKeyTransportMethod)) {
                 // Get the DigestMethod if it exists
-                String digestAlgorithm = getDigestAlgorithm(elem);
+                String digestAlgorithm = EncryptionUtils.getDigestAlgorithm(elem);
                 String jceDigestAlgorithm = "SHA-1";
                 if (digestAlgorithm != null && !"".equals(digestAlgorithm)) {
                     jceDigestAlgorithm = JCEMapper.translateURItoJCEID(digestAlgorithm);
                 }
 
-                String mgfAlgorithm = getMGFAlgorithm(elem);
+                String mgfAlgorithm = EncryptionUtils.getMGFAlgorithm(elem);
                 MGF1ParameterSpec mgfParameterSpec = new MGF1ParameterSpec("SHA-1");
                 if (mgfAlgorithm != null) {
                     if (WSConstants.MGF_SHA224.equals(mgfAlgorithm)) {
@@ -210,7 +208,7 @@ public class EncryptedKeyProcessor implements Processor {
                 }
 
                 PSource.PSpecified pSource = PSource.PSpecified.DEFAULT;
-                byte[] pSourceBytes = getPSource(elem);
+                byte[] pSourceBytes = EncryptionUtils.getPSource(elem);
                 if (pSourceBytes != null) {
                     pSource = new PSource.PSpecified(pSourceBytes);
                 }
@@ -241,7 +239,7 @@ public class EncryptedKeyProcessor implements Processor {
             if (xopUri != null && xopUri.startsWith("cid:")) {
                 encryptedEphemeralKey = WSSecurityUtil.getBytesFromAttachment(xopUri, data);
             } else {
-                encryptedEphemeralKey = getDecodedBase64EncodedData(xencCipherValue);
+                encryptedEphemeralKey = EncryptionUtils.getDecodedBase64EncodedData(xencCipherValue);
             }
             
             String keyAlgorithm = JCEMapper.translateURItoJCEID(encryptedKeyTransportMethod);
@@ -265,6 +263,7 @@ public class EncryptedKeyProcessor implements Processor {
             WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD, 
             encryptedKeyTransportMethod
         );
+        result.put(WSSecurityEngineResult.TAG_TOKEN_ELEMENT, elem);
         String tokenId = elem.getAttributeNS(null, "Id");
         if (!"".equals(tokenId)) {
             result.put(WSSecurityEngineResult.TAG_ID, tokenId);
@@ -325,72 +324,6 @@ public class EncryptedKeyProcessor implements Processor {
         return null;
     }
     
-    /**
-     * Method getDecodedBase64EncodedData
-     *
-     * @param element
-     * @return a byte array containing the decoded data
-     * @throws WSSecurityException
-     */
-    private static byte[] getDecodedBase64EncodedData(Element element) throws WSSecurityException {
-        try {
-            String text = XMLUtils.getElementText(element);
-            if (text == null) {
-                return null;
-            }
-            return Base64.decode(text);
-        } catch (Base64DecodingException e) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, e, "decoding.general"
-            );
-        }
-    }
-    
-    private static String getDigestAlgorithm(Node encBodyData) throws WSSecurityException {
-        Element tmpE = 
-            XMLUtils.getDirectChildElement(
-                encBodyData, "EncryptionMethod", WSConstants.ENC_NS
-            );
-        if (tmpE != null) {
-            Element digestElement = 
-                XMLUtils.getDirectChildElement(tmpE, "DigestMethod", WSConstants.SIG_NS);
-            if (digestElement != null) {
-                return digestElement.getAttributeNS(null, "Algorithm");
-            }
-        }
-        return null;
-    }
-
-    private static String getMGFAlgorithm(Node encBodyData) throws WSSecurityException {
-        Element tmpE =
-            XMLUtils.getDirectChildElement(
-                        encBodyData, "EncryptionMethod", WSConstants.ENC_NS
-                );
-        if (tmpE != null) {
-            Element mgfElement =
-                XMLUtils.getDirectChildElement(tmpE, "MGF", WSConstants.ENC11_NS);
-            if (mgfElement != null) {
-                return mgfElement.getAttributeNS(null, "Algorithm");
-            }
-        }
-        return null;
-    }
-
-    private static byte[] getPSource(Node encBodyData) throws WSSecurityException {
-        Element tmpE =
-            XMLUtils.getDirectChildElement(
-                        encBodyData, "EncryptionMethod", WSConstants.ENC_NS
-                );
-        if (tmpE != null) {
-            Element pSourceElement =
-                XMLUtils.getDirectChildElement(tmpE, "OAEPparams", WSConstants.ENC_NS);
-            if (pSourceElement != null) {
-                return getDecodedBase64EncodedData(pSourceElement);
-            }
-        }
-        return null;
-    }
-    
     private Element getKeyInfoChildElement(
         Element xencEncryptedKey, RequestData data
     ) throws WSSecurityException {
@@ -442,7 +375,7 @@ public class EncryptedKeyProcessor implements Processor {
                     cryptoType.setIssuerSerial(issuerSerial.getIssuer(), issuerSerial.getSerialNumber());
                     return data.getDecCrypto().getX509Certificates(cryptoType);
                 } else if (WSConstants.X509_CERT_LN.equals(x509Child.getLocalName())) {
-                    byte[] token = getDecodedBase64EncodedData(x509Child);
+                    byte[] token = EncryptionUtils.getDecodedBase64EncodedData(x509Child);
                     if (token == null) {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidCertData", new Object[] {"0"});
                     }

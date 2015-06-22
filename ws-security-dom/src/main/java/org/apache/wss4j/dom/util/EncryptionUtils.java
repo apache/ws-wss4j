@@ -33,6 +33,8 @@ import org.apache.wss4j.dom.message.CallbackLookup;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
+import org.apache.xml.security.exceptions.Base64DecodingException;
+import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -47,6 +49,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
@@ -411,4 +414,69 @@ public final class EncryptionUtils {
         }
     }
 
+    public static String getDigestAlgorithm(Node encBodyData) throws WSSecurityException {
+        Element tmpE = 
+            XMLUtils.getDirectChildElement(
+                encBodyData, "EncryptionMethod", WSConstants.ENC_NS
+            );
+        if (tmpE != null) {
+            Element digestElement = 
+                XMLUtils.getDirectChildElement(tmpE, "DigestMethod", WSConstants.SIG_NS);
+            if (digestElement != null) {
+                return digestElement.getAttributeNS(null, "Algorithm");
+            }
+        }
+        return null;
+    }
+
+    public static String getMGFAlgorithm(Node encBodyData) throws WSSecurityException {
+        Element tmpE =
+            XMLUtils.getDirectChildElement(
+                        encBodyData, "EncryptionMethod", WSConstants.ENC_NS
+                );
+        if (tmpE != null) {
+            Element mgfElement =
+                XMLUtils.getDirectChildElement(tmpE, "MGF", WSConstants.ENC11_NS);
+            if (mgfElement != null) {
+                return mgfElement.getAttributeNS(null, "Algorithm");
+            }
+        }
+        return null;
+    }
+
+    public static byte[] getPSource(Node encBodyData) throws WSSecurityException {
+        Element tmpE =
+            XMLUtils.getDirectChildElement(
+                        encBodyData, "EncryptionMethod", WSConstants.ENC_NS
+                );
+        if (tmpE != null) {
+            Element pSourceElement =
+                XMLUtils.getDirectChildElement(tmpE, "OAEPparams", WSConstants.ENC_NS);
+            if (pSourceElement != null) {
+                return getDecodedBase64EncodedData(pSourceElement);
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Method getDecodedBase64EncodedData
+     *
+     * @param element
+     * @return a byte array containing the decoded data
+     * @throws WSSecurityException
+     */
+    public static byte[] getDecodedBase64EncodedData(Element element) throws WSSecurityException {
+        try {
+            String text = XMLUtils.getElementText(element);
+            if (text == null) {
+                return null;
+            }
+            return Base64.decode(text);
+        } catch (Base64DecodingException e) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILURE, e, "decoding.general"
+            );
+        }
+    }
 }
