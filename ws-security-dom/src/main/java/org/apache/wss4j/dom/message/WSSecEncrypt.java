@@ -675,7 +675,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             if (customReferenceValue != null) {
                 secToken.setKeyIdentifierEncKeySHA1(customReferenceValue);
             } else {
-                byte[] encodedBytes = KeyUtils.generateDigest(encryptedEphemeralKey);
+                byte[] encodedBytes = WSSecurityUtil.generateDigest(encryptedEphemeralKey);
                 secToken.setKeyIdentifierEncKeySHA1(Base64.encode(encodedBytes));
             }
             secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
