@@ -669,7 +669,19 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
             }
             keyInfo.addUnknownElement(secToken.getElement());
+        } else if (!encryptSymmKey && keyIdentifierType == WSConstants.ISSUER_SERIAL) {
+            SecurityTokenReference secToken = new SecurityTokenReference(document);
+            secToken.addWSSENamespace();
+            if (customReferenceValue != null) {
+                secToken.setKeyIdentifierEncKeySHA1(customReferenceValue);
+            } else {
+                byte[] encodedBytes = KeyUtils.generateDigest(encryptedEphemeralKey);
+                secToken.setKeyIdentifierEncKeySHA1(Base64.encode(encodedBytes));
+            }
+            secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+            keyInfo.addUnknownElement(secToken.getElement());
         }
+        
         Element keyInfoElement = keyInfo.getElement();
         keyInfoElement.setAttributeNS(
             WSConstants.XMLNS_NS, "xmlns:" + WSConstants.SIG_PREFIX, WSConstants.SIG_NS
