@@ -34,7 +34,6 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
-import javax.security.auth.callback.Callback;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -44,7 +43,6 @@ import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
@@ -171,110 +169,13 @@ public class EncryptedKeyProcessor implements Processor {
             encryptedEphemeralKey = EncryptionUtils.getDecodedBase64EncodedData(xencCipherValue);
         }
         
-        Cipher cipher = null;
         if (symmetricKeyWrap) {
-            // See if we have a KeyName
-            String keyName = "";
-            Element keyInfo = 
-                WSSecurityUtil.getDirectChildElement(
-                    elem, "KeyInfo", WSConstants.SIG_NS
-                );
-            if (keyInfo != null) {
-                Element keyNmElem = 
-                    WSSecurityUtil.getDirectChildElement(
-                        keyInfo, "KeyName", WSConstants.SIG_NS
-                    );
-                if (keyNmElem != null) {
-                    Node node = keyNmElem.getFirstChild();
-                    StringBuilder builder = new StringBuilder();
-                    while (node != null) {
-                        if (Node.TEXT_NODE == node.getNodeType()) {
-                            builder.append(((Text)node).getData());
-                        }
-                        node = node.getNextSibling();
-                    }
-                    keyName = builder.toString();
-                }
-            }
-            
-            // Get secret key for decryption from a CallbackHandler
-            WSPasswordCallback pwcb = new WSPasswordCallback(keyName, WSPasswordCallback.SECRET_KEY);
-            pwcb.setEncryptedSecret(encryptedEphemeralKey);
-            
-            // Get the (first) encryption algorithm
-            if (!dataRefURIs.isEmpty()) {
-                String uri = dataRefURIs.iterator().next();
-                Element ee = 
-                    EncryptionUtils.findEncryptedDataElement(elem.getOwnerDocument(), wsDocInfo, uri);
-                String algorithmURI = X509Util.getEncAlgo(ee);
-                pwcb.setAlgorithm(algorithmURI);
-            }
-            try {
-                data.getCallbackHandler().handle(new Callback[] {pwcb});
-            } catch (Exception e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
-                        "empty", new Object[] {"WSHandler: password callback failed"});
-            }
-            decryptedBytes = pwcb.getKey();
+            decryptedBytes = getSymmetricDecryptedBytes(data, wsDocInfo, elem,
+                                                        dataRefURIs, encryptedEphemeralKey);
         } else {
-            if (data.getDecCrypto() == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noDecCryptoFile");
-            }
-            cipher = WSSecurityUtil.getCipherInstance(encryptedKeyTransportMethod);
-            try {
-                PrivateKey privateKey = data.getDecCrypto().getPrivateKey(certs[0], data.getCallbackHandler());
-                OAEPParameterSpec oaepParameterSpec = null;
-                if (WSConstants.KEYTRANSPORT_RSAOEP.equals(encryptedKeyTransportMethod)
-                        || WSConstants.KEYTRANSPORT_RSAOEP_XENC11.equals(encryptedKeyTransportMethod)) {
-                    // Get the DigestMethod if it exists
-                    String digestAlgorithm = EncryptionUtils.getDigestAlgorithm(elem);
-                    String jceDigestAlgorithm = "SHA-1";
-                    if (digestAlgorithm != null && !"".equals(digestAlgorithm)) {
-                        jceDigestAlgorithm = JCEMapper.translateURItoJCEID(digestAlgorithm);
-                    }
-    
-                    String mgfAlgorithm = EncryptionUtils.getMGFAlgorithm(elem);
-                    MGF1ParameterSpec mgfParameterSpec = new MGF1ParameterSpec("SHA-1");
-                    if (mgfAlgorithm != null) {
-                        if (WSConstants.MGF_SHA224.equals(mgfAlgorithm)) {
-                            mgfParameterSpec = new MGF1ParameterSpec("SHA-224");
-                        } else if (WSConstants.MGF_SHA256.equals(mgfAlgorithm)) {
-                            mgfParameterSpec = new MGF1ParameterSpec("SHA-256");
-                        } else if (WSConstants.MGF_SHA384.equals(mgfAlgorithm)) {
-                            mgfParameterSpec = new MGF1ParameterSpec("SHA-384");
-                        } else if (WSConstants.MGF_SHA512.equals(mgfAlgorithm)) {
-                            mgfParameterSpec = new MGF1ParameterSpec("SHA-512");
-                        }
-                    }
-    
-                    PSource.PSpecified pSource = PSource.PSpecified.DEFAULT;
-                    byte[] pSourceBytes = EncryptionUtils.getPSource(elem);
-                    if (pSourceBytes != null) {
-                        pSource = new PSource.PSpecified(pSourceBytes);
-                    }
-                    
-                    oaepParameterSpec = 
-                        new OAEPParameterSpec(
-                            jceDigestAlgorithm, "MGF1", mgfParameterSpec, pSource
-                        );
-                }
-                if (oaepParameterSpec == null) {
-                    cipher.init(Cipher.UNWRAP_MODE, privateKey);
-                } else {
-                    cipher.init(Cipher.UNWRAP_MODE, privateKey, oaepParameterSpec);
-                }
-            } catch (Exception ex) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
-            }
-            
-            try {
-                String keyAlgorithm = JCEMapper.translateURItoJCEID(encryptedKeyTransportMethod);
-                decryptedBytes = cipher.unwrap(encryptedEphemeralKey, keyAlgorithm, Cipher.SECRET_KEY).getEncoded();
-            } catch (IllegalStateException ex) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
-            } catch (Exception ex) {
-                decryptedBytes = getRandomKey(dataRefURIs, elem.getOwnerDocument(), wsDocInfo);
-            }
+            decryptedBytes = getAsymmetricDecryptedBytes(data, wsDocInfo, encryptedKeyTransportMethod,
+                                                         encryptedEphemeralKey, dataRefURIs,
+                                                         elem, certs[0]);
         }
 
         List<WSDataRef> dataRefs = decryptDataRefs(dataRefURIs, elem.getOwnerDocument(), wsDocInfo,
@@ -302,6 +203,100 @@ public class EncryptedKeyProcessor implements Processor {
         wsDocInfo.addResult(result);
         wsDocInfo.addTokenElement(elem);
         return java.util.Collections.singletonList(result);
+    }
+    
+    private static byte[] getSymmetricDecryptedBytes(
+        RequestData data,
+        WSDocInfo wsDocInfo,
+        Element encryptedKeyElement,
+        List<String> dataRefURIs,
+        byte[] encryptedEphemeralKey
+    ) throws WSSecurityException {
+        // Get the (first) encryption algorithm
+        String algorithmURI = null;
+        
+        Element keyInfoChildElement = 
+            WSSecurityUtil.getDirectChildElement(
+                encryptedKeyElement, "KeyInfo", WSConstants.SIG_NS
+            );
+        if (!dataRefURIs.isEmpty()) {
+            String uri = dataRefURIs.iterator().next();
+            Element ee = 
+                EncryptionUtils.findEncryptedDataElement(keyInfoChildElement.getOwnerDocument(), 
+                                                         wsDocInfo, uri);
+            algorithmURI = X509Util.getEncAlgo(ee);
+        }
+        return X509Util.getSecretKey(keyInfoChildElement, algorithmURI, 
+                                     data.getCallbackHandler(), encryptedEphemeralKey);
+    }
+    
+    private static byte[] getAsymmetricDecryptedBytes(
+        RequestData data,
+        WSDocInfo wsDocInfo,
+        String encryptedKeyTransportMethod,
+        byte[] encryptedEphemeralKey,
+        List<String> dataRefURIs,
+        Element encryptedKeyElement,
+        X509Certificate cert
+    ) throws WSSecurityException {
+        if (data.getDecCrypto() == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noDecCryptoFile");
+        }
+        Cipher cipher = WSSecurityUtil.getCipherInstance(encryptedKeyTransportMethod);
+        try {
+            PrivateKey privateKey = data.getDecCrypto().getPrivateKey(cert, data.getCallbackHandler());
+            OAEPParameterSpec oaepParameterSpec = null;
+            if (WSConstants.KEYTRANSPORT_RSAOEP.equals(encryptedKeyTransportMethod)
+                || WSConstants.KEYTRANSPORT_RSAOEP_XENC11.equals(encryptedKeyTransportMethod)) {
+                // Get the DigestMethod if it exists
+                String digestAlgorithm = EncryptionUtils.getDigestAlgorithm(encryptedKeyElement);
+                String jceDigestAlgorithm = "SHA-1";
+                if (digestAlgorithm != null && !"".equals(digestAlgorithm)) {
+                    jceDigestAlgorithm = JCEMapper.translateURItoJCEID(digestAlgorithm);
+                }
+
+                String mgfAlgorithm = EncryptionUtils.getMGFAlgorithm(encryptedKeyElement);
+                MGF1ParameterSpec mgfParameterSpec = new MGF1ParameterSpec("SHA-1");
+                if (mgfAlgorithm != null) {
+                    if (WSConstants.MGF_SHA224.equals(mgfAlgorithm)) {
+                        mgfParameterSpec = new MGF1ParameterSpec("SHA-224");
+                    } else if (WSConstants.MGF_SHA256.equals(mgfAlgorithm)) {
+                        mgfParameterSpec = new MGF1ParameterSpec("SHA-256");
+                    } else if (WSConstants.MGF_SHA384.equals(mgfAlgorithm)) {
+                        mgfParameterSpec = new MGF1ParameterSpec("SHA-384");
+                    } else if (WSConstants.MGF_SHA512.equals(mgfAlgorithm)) {
+                        mgfParameterSpec = new MGF1ParameterSpec("SHA-512");
+                    }
+                }
+
+                PSource.PSpecified pSource = PSource.PSpecified.DEFAULT;
+                byte[] pSourceBytes = EncryptionUtils.getPSource(encryptedKeyElement);
+                if (pSourceBytes != null) {
+                    pSource = new PSource.PSpecified(pSourceBytes);
+                }
+
+                oaepParameterSpec = 
+                    new OAEPParameterSpec(
+                        jceDigestAlgorithm, "MGF1", mgfParameterSpec, pSource
+                    );
+            }
+            if (oaepParameterSpec == null) {
+                cipher.init(Cipher.UNWRAP_MODE, privateKey);
+            } else {
+                cipher.init(Cipher.UNWRAP_MODE, privateKey, oaepParameterSpec);
+            }
+        } catch (Exception ex) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
+        }
+
+        try {
+            String keyAlgorithm = JCEMapper.translateURItoJCEID(encryptedKeyTransportMethod);
+            return cipher.unwrap(encryptedEphemeralKey, keyAlgorithm, Cipher.SECRET_KEY).getEncoded();
+        } catch (IllegalStateException ex) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
+        } catch (Exception ex) {
+            return getRandomKey(dataRefURIs, encryptedKeyElement.getOwnerDocument(), wsDocInfo);
+        }
     }
     
     private static boolean isSymmetricKeyWrap(String transportAlgorithm) {
