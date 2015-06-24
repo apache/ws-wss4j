@@ -147,7 +147,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         // Get the certificate that contains the public key for the public key
         // algorithm that will encrypt the generated symmetric (session) key.
         //
-        if (encryptSymmKey) {
+        if (encryptSymmKey && encryptedEphemeralKey == null) {
             X509Certificate remoteCert = useThisCert;
             if (remoteCert == null) {
                 CryptoType cryptoType = null;
@@ -168,6 +168,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 remoteCert = certs[0];
             }
             prepareInternal(symmetricKey, remoteCert, crypto);
+        } else if (encryptedEphemeralKey != null) {
+            prepareInternal(symmetricKey);
         } else {
             encryptedEphemeralKey = ephemeralKey;
         }
@@ -229,6 +231,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             prependBSTElementToHeader(secHeader);
         }
 
+        clean();
         LOG.debug("Encryption complete.");
         return doc;
     }

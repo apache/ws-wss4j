@@ -87,13 +87,17 @@ public class EncryptionAction implements Action {
         }
         
         wsEncrypt.setEncryptSymmKey(encryptionToken.isEncSymmetricEncryptionKey());
+        
         byte[] ephemeralKey = encryptionToken.getKey();
-        if (!encryptionToken.isEncSymmetricEncryptionKey() && ephemeralKey == null) {
+        if (encryptionToken.isGetSymmetricKeyFromCallbackHandler()
+            || !encryptionToken.isEncSymmetricEncryptionKey() && ephemeralKey == null) {
             CallbackHandler callbackHandler = 
                 handler.getPasswordCallbackHandler(reqData);
             WSPasswordCallback passwordCallback = 
                 handler.getPasswordCB(encryptionToken.getUser(), WSConstants.ENCR, callbackHandler, reqData);
             ephemeralKey = passwordCallback.getKey();
+            byte[] encryptedKey = passwordCallback.getEncryptedSecret();
+            wsEncrypt.setEncryptedEphemeralKey(encryptedKey);
         }
         wsEncrypt.setEphemeralKey(ephemeralKey);
         

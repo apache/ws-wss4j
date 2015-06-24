@@ -28,6 +28,7 @@ public class EncryptionActionToken extends SignatureEncryptionActionToken {
     private String mgfAlgorithm;
     private String symmetricAlgorithm;
     private String keyTransportAlgorithm;
+    private boolean getSymmetricKeyFromCallbackHandler;
     
     public boolean isEncSymmetricEncryptionKey() {
         return encSymmetricEncryptionKey;
@@ -52,6 +53,12 @@ public class EncryptionActionToken extends SignatureEncryptionActionToken {
     }
     public void setKeyTransportAlgorithm(String keyTransportAlgorithm) {
         this.keyTransportAlgorithm = keyTransportAlgorithm;
+    }
+    public boolean isGetSymmetricKeyFromCallbackHandler() {
+        return getSymmetricKeyFromCallbackHandler;
+    }
+    public void setGetSymmetricKeyFromCallbackHandler(boolean getSymmetricKeyFromCallbackHandler) {
+        this.getSymmetricKeyFromCallbackHandler = getSymmetricKeyFromCallbackHandler;
     }
  
 }

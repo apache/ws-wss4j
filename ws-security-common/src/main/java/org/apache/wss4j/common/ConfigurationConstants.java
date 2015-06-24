@@ -532,6 +532,14 @@ public class ConfigurationConstants {
      */
     public static final String USE_2005_12_NAMESPACE = "use200512Namespace";
     
+    /**
+     * Whether to get a secret key from a CallbackHandler or not for encryption only. The default is
+     * false. If set to true WSS4J attempts to get the secret key from the CallbackHandler instead of
+     * generating a random key internally. This allows the user more control over the symmetric key
+     * if required.
+     */
+    public static final String GET_SECRET_KEY_FROM_CALLBACK_HANDLER = "getSecretKeyFromCallbackHandler";
+    
     //
     // (Non-boolean) Configuration parameters for the actions/processors
     //

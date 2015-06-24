@@ -716,6 +716,12 @@ public abstract class WSHandler {
         boolean use200512Namespace = decodeUse200512Namespace(reqData);
         reqData.setUse200512Namespace(use200512Namespace);
         
+        String getSecretKeyFromCallbackHandler = getString(WSHandlerConstants.GET_SECRET_KEY_FROM_CALLBACK_HANDLER, mc);
+        if (getSecretKeyFromCallbackHandler != null) {
+            boolean getSecretKeyBoolean = Boolean.parseBoolean(getSecretKeyFromCallbackHandler);
+            actionToken.setGetSymmetricKeyFromCallbackHandler(getSecretKeyBoolean);
+        }
+        
         String digestAlgo = getString(WSHandlerConstants.ENC_DIGEST_ALGO, mc);
         actionToken.setDigestAlgorithm(digestAlgo);
 
