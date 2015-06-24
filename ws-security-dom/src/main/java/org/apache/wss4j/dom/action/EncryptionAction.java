@@ -21,9 +21,9 @@ package org.apache.wss4j.dom.action;
 
 import java.security.cert.X509Certificate;
 
+import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.EncryptionActionToken;
 import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -93,10 +93,19 @@ public class EncryptionAction implements Action {
             || !encryptionToken.isEncSymmetricEncryptionKey() && ephemeralKey == null) {
             CallbackHandler callbackHandler = 
                 handler.getPasswordCallbackHandler(reqData);
-            WSPasswordCallback passwordCallback = 
-                handler.getPasswordCB(encryptionToken.getUser(), WSConstants.ENCR, callbackHandler, reqData);
-            ephemeralKey = passwordCallback.getKey();
-            byte[] encryptedKey = passwordCallback.getEncryptedSecret();
+            // Get secret key for encryption from a CallbackHandler
+            WSPasswordCallback pwcb = 
+                new WSPasswordCallback(encryptionToken.getUser(), WSPasswordCallback.SECRET_KEY);
+            pwcb.setAlgorithm(wsEncrypt.getSymmetricEncAlgorithm());
+            try {
+                callbackHandler.handle(new Callback[] {pwcb});
+            } catch (Exception e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
+                        "empty", new Object[] {"WSHandler: password callback failed"});
+            }
+            
+            ephemeralKey = pwcb.getKey();
+            byte[] encryptedKey = pwcb.getEncryptedSecret();
             wsEncrypt.setEncryptedEphemeralKey(encryptedKey);
         }
         wsEncrypt.setEphemeralKey(ephemeralKey);

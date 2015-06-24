@@ -173,9 +173,42 @@ public class EncryptedKeyProcessor implements Processor {
         
         Cipher cipher = null;
         if (symmetricKeyWrap) {
+            // See if we have a KeyName
+            String keyName = "";
+            Element keyInfo = 
+                WSSecurityUtil.getDirectChildElement(
+                    elem, "KeyInfo", WSConstants.SIG_NS
+                );
+            if (keyInfo != null) {
+                Element keyNmElem = 
+                    WSSecurityUtil.getDirectChildElement(
+                        keyInfo, "KeyName", WSConstants.SIG_NS
+                    );
+                if (keyNmElem != null) {
+                    Node node = keyNmElem.getFirstChild();
+                    StringBuilder builder = new StringBuilder();
+                    while (node != null) {
+                        if (Node.TEXT_NODE == node.getNodeType()) {
+                            builder.append(((Text)node).getData());
+                        }
+                        node = node.getNextSibling();
+                    }
+                    keyName = builder.toString();
+                }
+            }
+            
             // Get secret key for decryption from a CallbackHandler
-            WSPasswordCallback pwcb = new WSPasswordCallback("", WSPasswordCallback.SECRET_KEY);
+            WSPasswordCallback pwcb = new WSPasswordCallback(keyName, WSPasswordCallback.SECRET_KEY);
             pwcb.setEncryptedSecret(encryptedEphemeralKey);
+            
+            // Get the (first) encryption algorithm
+            if (!dataRefURIs.isEmpty()) {
+                String uri = dataRefURIs.iterator().next();
+                Element ee = 
+                    EncryptionUtils.findEncryptedDataElement(elem.getOwnerDocument(), wsDocInfo, uri);
+                String algorithmURI = X509Util.getEncAlgo(ee);
+                pwcb.setAlgorithm(algorithmURI);
+            }
             try {
                 data.getCallbackHandler().handle(new Callback[] {pwcb});
             } catch (Exception e) {
