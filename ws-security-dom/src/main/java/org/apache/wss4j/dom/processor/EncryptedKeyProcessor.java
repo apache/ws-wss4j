@@ -222,7 +222,7 @@ public class EncryptedKeyProcessor implements Processor {
         if (!dataRefURIs.isEmpty()) {
             String uri = dataRefURIs.iterator().next();
             Element ee = 
-                EncryptionUtils.findEncryptedDataElement(keyInfoChildElement.getOwnerDocument(), 
+                EncryptionUtils.findEncryptedDataElement(encryptedKeyElement.getOwnerDocument(), 
                                                          wsDocInfo, uri);
             algorithmURI = X509Util.getEncAlgo(ee);
         }
