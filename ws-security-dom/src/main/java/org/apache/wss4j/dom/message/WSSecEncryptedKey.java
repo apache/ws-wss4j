@@ -164,6 +164,13 @@ public class WSSecEncryptedKey extends WSSecBase {
         return encKeyId;
     }
 
+    public void clean() {
+        ephemeralKey = null;
+        symmetricKey = null;
+        encryptedEphemeralKey = null;
+    }
+    
+
     /**
      * Prepare the ephemeralKey and the tokens required to be added to the
      * security header
@@ -189,31 +196,35 @@ public class WSSecEncryptedKey extends WSSecBase {
             }
         }
         
-        //
-        // Get the certificate that contains the public key for the public key
-        // algorithm that will encrypt the generated symmetric (session) key.
-        //
-        X509Certificate remoteCert = useThisCert;
-        if (remoteCert == null) {
-            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-            cryptoType.setAlias(user);
-            if (crypto == null) {
-                throw new WSSecurityException(
-                                              WSSecurityException.ErrorCode.FAILURE,
-                                              "noUserCertsFound",
-                                              new Object[] {user, "encryption"});
+        if (encryptedEphemeralKey == null) {
+            //
+            // Get the certificate that contains the public key for the public key
+            // algorithm that will encrypt the generated symmetric (session) key.
+            //
+            X509Certificate remoteCert = useThisCert;
+            if (remoteCert == null) {
+                CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+                cryptoType.setAlias(user);
+                if (crypto == null) {
+                    throw new WSSecurityException(
+                                                  WSSecurityException.ErrorCode.FAILURE,
+                                                  "noUserCertsFound",
+                                                  new Object[] {user, "encryption"});
+                }
+                X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+                if (certs == null || certs.length <= 0) {
+                    throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILURE,
+                        "noUserCertsFound",
+                        new Object[] {user, "encryption"});
+                }
+                remoteCert = certs[0];
             }
-            X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
-            if (certs == null || certs.length <= 0) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE,
-                    "noUserCertsFound",
-                    new Object[] {user, "encryption"});
-            }
-            remoteCert = certs[0];
+            
+            prepareInternal(symmetricKey, remoteCert, crypto);
+        } else {
+            prepareInternal(symmetricKey);
         }
-        
-        prepareInternal(symmetricKey, remoteCert, crypto);
     }
 
     /**
@@ -420,6 +431,88 @@ public class WSSecEncryptedKey extends WSSecBase {
         xencCipherValue.appendChild(keyText);
     }
     
+    protected void prepareInternal(SecretKey secretKey) throws WSSecurityException {
+        Text keyText = 
+            WSSecurityUtil.createBase64EncodedTextNode(document, encryptedEphemeralKey);
+
+        encryptedKeyElement = createEncryptedKey(document, keyEncAlgo);
+        if (encKeyId == null || "".equals(encKeyId)) {
+            encKeyId = IDGenerator.generateID("EK-");
+        }
+        encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);
+
+        if (keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING
+            || keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING_DIRECT
+            || keyIdentifierType == WSConstants.CUSTOM_KEY_IDENTIFIER) {
+            SecurityTokenReference secToken = new SecurityTokenReference(document);
+
+            switch (keyIdentifierType) {
+    
+                case WSConstants.CUSTOM_SYMM_SIGNING :
+                    Reference refCust = new Reference(document);
+                    if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                        secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+                        refCust.setValueType(customEKTokenValueType);
+                    } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                        secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+                    } else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customEKTokenValueType)) {
+                        secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+                        refCust.setValueType(customEKTokenValueType);
+                    } else {
+                        refCust.setValueType(customEKTokenValueType);
+                    }
+                    refCust.setURI("#" + customEKTokenId);
+                    secToken.setReference(refCust);
+                    break;
+    
+                case WSConstants.CUSTOM_SYMM_SIGNING_DIRECT :
+                    Reference refCustd = new Reference(document);
+                    if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                        secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+                        refCustd.setValueType(customEKTokenValueType);
+                    } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                        secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+                    }  else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customEKTokenValueType)) {
+                        secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+                        refCustd.setValueType(customEKTokenValueType);
+                    } else {
+                        refCustd.setValueType(customEKTokenValueType);
+                    }
+                    refCustd.setURI(customEKTokenId);
+                    secToken.setReference(refCustd);
+                    break;
+    
+                case WSConstants.CUSTOM_KEY_IDENTIFIER:
+                    secToken.setKeyIdentifier(customEKTokenValueType, customEKTokenId);
+                    if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                        secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+                    } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                        secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+                    } else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customEKTokenValueType)) {
+                        secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+                    } else if (SecurityTokenReference.ENC_KEY_SHA1_URI.equals(customEKTokenValueType)) {
+                        secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+                    }
+                    break;           
+    
+                default:
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unsupportedKeyId");
+            }
+            Element keyInfoElement = 
+                document.createElementNS(
+                    WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
+                );
+            keyInfoElement.setAttributeNS(
+                WSConstants.XMLNS_NS, "xmlns:" + WSConstants.SIG_PREFIX, WSConstants.SIG_NS
+            );
+            keyInfoElement.appendChild(secToken.getElement());
+            encryptedKeyElement.appendChild(keyInfoElement);
+        }
+
+        Element xencCipherValue = createCipherValue(document, encryptedKeyElement);
+        xencCipherValue.appendChild(keyText);
+    }
+
     /**
      * Add a BinarySecurityToken
      */
@@ -639,6 +732,10 @@ public class WSSecEncryptedKey extends WSSecBase {
 
     public byte[] getEncryptedEphemeralKey() {
         return encryptedEphemeralKey;
+    }
+    
+    public void setEncryptedEphemeralKey(byte[] encryptedKey) {
+        encryptedEphemeralKey = encryptedKey;
     }
     
     public void setCustomEKTokenValueType(String customEKTokenValueType) {

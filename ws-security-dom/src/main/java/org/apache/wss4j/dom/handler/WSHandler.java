@@ -709,6 +709,10 @@ public abstract class WSHandler {
             decodeBooleanConfigValue(mc, WSHandlerConstants.USE_2005_12_NAMESPACE, true);
         reqData.setUse200512Namespace(use200512Namespace);
         
+        boolean getSecretKeyFromCallbackHandler = 
+            decodeBooleanConfigValue(mc, WSHandlerConstants.GET_SECRET_KEY_FROM_CALLBACK_HANDLER, false);
+        actionToken.setGetSymmetricKeyFromCallbackHandler(getSecretKeyFromCallbackHandler);
+        
         String digestAlgo = getString(WSHandlerConstants.ENC_DIGEST_ALGO, mc);
         actionToken.setDigestAlgorithm(digestAlgo);
 

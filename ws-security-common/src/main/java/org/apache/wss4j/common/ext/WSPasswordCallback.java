@@ -138,10 +138,12 @@ public class WSPasswordCallback implements Callback {
     private String identifier;
     private String password;
     private byte[] secret;
+    private byte[] encryptedSecret;
     private Key key;
     private int usage;
     private String type;
     private Element customToken;
+    private String algorithm;
     
     /**
      * Constructor.
@@ -264,5 +266,43 @@ public class WSPasswordCallback implements Callback {
     public void setCustomToken(Element customToken) {
         this.customToken = customToken;
     }
+
+    /**
+     * Get the Encrypted Secret. The CallbackHandler may return an encrypted version of the secret key
+     * to be used, instead of having WSS4J explicitly encrypt the key. Alternatively, the recipient can
+     * call this with the cipher content of the EncryptedKey, if a symmetric key wrap algorithm is used.
+     *
+     */
+    public byte[] getEncryptedSecret() {
+        return encryptedSecret;
+    }
+
+    /**
+     * Set the Encrypted Secret. The CallbackHandler may return an encrypted version of the secret key
+     * to be used, instead of having WSS4J explicitly encrypt the key. Alternatively, the recipient can
+     * call this with the cipher content of the EncryptedKey, if a symmetric key wrap algorithm is used.
+     *  
+     * @param encryptedSecret
+     */
+    public void setEncryptedSecret(byte[] encryptedSecret) {
+        this.encryptedSecret = encryptedSecret;
+    }
+    
+    /**
+     * Get the algorithm to be used. For example, a different secret key might be returned depending
+     * on the algorithm.
+     */
+    public String getAlgorithm() {
+        return algorithm;
+    }
+
+    /**
+     * Specify an algorithm to be used. For example, a different secret key might be returned depending
+     * on the algorithm.
+     */
+    public void setAlgorithm(String algorithm) {
+        this.algorithm = algorithm;
+    }
+
     
 }
