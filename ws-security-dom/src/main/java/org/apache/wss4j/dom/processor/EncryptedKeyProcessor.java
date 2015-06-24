@@ -145,28 +145,30 @@ public class EncryptedKeyProcessor implements Processor {
         
         X509Certificate[] certs = null;
         STRParser.REFERENCE_TYPE referenceType = null;
-        if (SecurityTokenReference.SECURITY_TOKEN_REFERENCE.equals(keyInfoChildElement.getLocalName()) 
-            && WSConstants.WSSE_NS.equals(keyInfoChildElement.getNamespaceURI())) {
-            STRParserParameters parameters = new STRParserParameters();
-            parameters.setData(data);
-            parameters.setWsDocInfo(wsDocInfo);
-            parameters.setStrElement(keyInfoChildElement);
-            
-            STRParser strParser = new EncryptedKeySTRParser();
-            STRParserResult parserResult = strParser.parseSecurityTokenReference(parameters);
-
-            certs = parserResult.getCertificates();
-            referenceType = parserResult.getCertificatesReferenceType();
-        } else {
-            certs = getCertificatesFromX509Data(keyInfoChildElement, data);
-        }
-        
         boolean symmetricKeyWrap = isSymmetricKeyWrap(encryptedKeyTransportMethod);
-        if (!symmetricKeyWrap && (certs == null || certs.length < 1 || certs[0] == null)) {
-            throw new WSSecurityException(
+        if (!symmetricKeyWrap) {
+            if (SecurityTokenReference.SECURITY_TOKEN_REFERENCE.equals(keyInfoChildElement.getLocalName()) 
+                && WSConstants.WSSE_NS.equals(keyInfoChildElement.getNamespaceURI())) {
+                STRParserParameters parameters = new STRParserParameters();
+                parameters.setData(data);
+                parameters.setWsDocInfo(wsDocInfo);
+                parameters.setStrElement(keyInfoChildElement);
+                
+                STRParser strParser = new EncryptedKeySTRParser();
+                STRParserResult parserResult = strParser.parseSecurityTokenReference(parameters);
+
+                certs = parserResult.getCertificates();
+                referenceType = parserResult.getCertificatesReferenceType();
+            } else {
+                certs = getCertificatesFromX509Data(keyInfoChildElement, data);
+            }
+            
+            if (certs == null || certs.length < 1 || certs[0] == null) {
+                throw new WSSecurityException(
                                           WSSecurityException.ErrorCode.FAILURE,
                                           "noCertsFound", 
                                           new Object[] {"decryption (KeyId)"});
+            }
         }
 
         // Check for compliance against the defined AlgorithmSuite
@@ -197,9 +199,31 @@ public class EncryptedKeyProcessor implements Processor {
         
         Cipher cipher = null;
         if (symmetricKeyWrap) {
+            // See if we have a KeyName
+            String keyName = "";
+            if (keyInfoChildElement != null) {
+                Element keyNmElem = 
+                    XMLUtils.getDirectChildElement(
+                        keyInfoChildElement, "KeyName", WSConstants.SIG_NS
+                    );
+                if (keyNmElem != null) {
+                    keyName = XMLUtils.getElementText(keyNmElem);
+                }
+            }
+            
             // Get secret key for decryption from a CallbackHandler
-            WSPasswordCallback pwcb = new WSPasswordCallback("", WSPasswordCallback.SECRET_KEY);
+            WSPasswordCallback pwcb = new WSPasswordCallback(keyName, WSPasswordCallback.SECRET_KEY);
             pwcb.setEncryptedSecret(encryptedEphemeralKey);
+            
+            // Get the (first) encryption algorithm
+            String uri = getFirstDataRefURI(refList);
+            if (uri != null) {
+                Element ee = 
+                    EncryptionUtils.findEncryptedDataElement(refList.getOwnerDocument(), 
+                                                                    wsDocInfo, uri);
+                String algorithmURI = X509Util.getEncAlgo(ee);
+                pwcb.setAlgorithm(algorithmURI);
+            }
             try {
                 data.getCallbackHandler().handle(new Callback[] {pwcb});
             } catch (Exception e) {
