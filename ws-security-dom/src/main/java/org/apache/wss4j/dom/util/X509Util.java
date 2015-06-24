@@ -22,12 +22,10 @@ package org.apache.wss4j.dom.util;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -72,10 +70,11 @@ public final class X509Util {
         return symEncAlgo;
     }
 
-    public static SecretKey getSharedKey(
+    public static byte[] getSecretKey(
         Element keyInfoElem,
         String algorithm,
-        CallbackHandler cb
+        CallbackHandler cb,
+        byte[] encryptedKey
     ) throws WSSecurityException {
         String keyName = null;
         Element keyNmElem = 
@@ -88,8 +87,9 @@ public final class X509Util {
         if (keyName == null || keyName.length() <= 0) {
             LOG.debug("No Key Name available");
         }
-        WSPasswordCallback pwCb = 
-                new WSPasswordCallback(keyName, WSPasswordCallback.SECRET_KEY);
+        WSPasswordCallback pwCb = new WSPasswordCallback(keyName, WSPasswordCallback.SECRET_KEY);
+        pwCb.setEncryptedSecret(encryptedKey);
+        pwCb.setAlgorithm(algorithm);
         try {
             cb.handle(new Callback[]{pwCb});
         } catch (IOException | UnsupportedCallbackException e) {
@@ -105,7 +105,7 @@ public final class X509Util {
                 "noPassword",
                 new Object[] {keyName});
         }
-        return KeyUtils.prepareSecretKey(algorithm, decryptedData);
+        return decryptedData;
     }
 
 }
