@@ -439,7 +439,7 @@ parameter (i.e. "true" or "false") are as follows:
 <tr>
 <td><b>WSS4J 2.0.0</b> ADD_INCLUSIVE_PREFIXES</td>
 <td>addInclusivePrefixes</td>
-<td> Whether to add an InclusiveNamespaces PrefixList as a
+<td>Whether to add an InclusiveNamespaces PrefixList as a
 CanonicalizationMethod child when generating Signatures using
 WSConstants.C14N_EXCL_OMIT_COMMENTS. Default is "true".</td>
 </tr>
@@ -586,6 +586,14 @@ conjunction with a message Signature). Default is "true"</td>
 <td>use200512Namespace</td>
 <td>Whether to use the 2005/12 namespace for SecureConveration + DerivedKeys,
 or the older namespace. The default is "true"</td>
+</tr>
+<tr>
+<td><b>WSS4J 2.1.2/2.0.5</b> GET_SECRET_KEY_FROM_CALLBACK_HANDLER</td>
+<td>getSecretKeyFromCallbackHandler</td>
+<td>Whether to get a secret key from a CallbackHandler or not for encryption
+only. The default is false. If set to true WSS4J attempts to get the secret
+key from the CallbackHandler instead of generating a random key internally.
+</td>
 </tr>
 </table>
 <p>
