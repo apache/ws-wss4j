@@ -142,6 +142,7 @@ public class WSSecEncryptedKey extends WSSecBase {
     
     private boolean bstAddedToSecurityHeader;
     private boolean includeEncryptionToken;
+    private Element customEKKeyInfoElement;
     
     public WSSecEncryptedKey() {
         super();
@@ -338,119 +339,123 @@ public class WSSecEncryptedKey extends WSSecBase {
         }
         encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);
 
-        SecurityTokenReference secToken = new SecurityTokenReference(document);
-
-        switch (keyIdentifierType) {
-        case WSConstants.X509_KEY_IDENTIFIER:
-            secToken.setKeyIdentifier(remoteCert);
-            break;
-
-        case WSConstants.SKI_KEY_IDENTIFIER:
-            secToken.setKeyIdentifierSKI(remoteCert, crypto);
-            
-            if (includeEncryptionToken) {
-                addBST(remoteCert);
+        if (customEKKeyInfoElement != null) {
+            encryptedKeyElement.appendChild(customEKKeyInfoElement);
+        } else {
+            SecurityTokenReference secToken = new SecurityTokenReference(document);
+    
+            switch (keyIdentifierType) {
+            case WSConstants.X509_KEY_IDENTIFIER:
+                secToken.setKeyIdentifier(remoteCert);
+                break;
+    
+            case WSConstants.SKI_KEY_IDENTIFIER:
+                secToken.setKeyIdentifierSKI(remoteCert, crypto);
+                
+                if (includeEncryptionToken) {
+                    addBST(remoteCert);
+                }
+                break;
+    
+            case WSConstants.THUMBPRINT_IDENTIFIER:
+            case WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER:
+                //
+                // This identifier is not applicable for this case, so fall back to
+                // ThumbprintRSA.
+                //
+                secToken.setKeyIdentifierThumb(remoteCert);
+                
+                if (includeEncryptionToken) {
+                    addBST(remoteCert);
+                }
+                break;
+    
+            case WSConstants.ISSUER_SERIAL:
+                String issuer = remoteCert.getIssuerX500Principal().getName();
+                java.math.BigInteger serialNumber = remoteCert.getSerialNumber();
+                DOMX509IssuerSerial domIssuerSerial = 
+                    new DOMX509IssuerSerial(
+                        document, issuer, serialNumber
+                    );
+                DOMX509Data domX509Data = new DOMX509Data(document, domIssuerSerial);
+                secToken.setX509Data(domX509Data);
+                
+                if (includeEncryptionToken) {
+                    addBST(remoteCert);
+                }
+                break;
+    
+            case WSConstants.BST_DIRECT_REFERENCE:
+                Reference ref = new Reference(document);
+                String certUri = IDGenerator.generateID(null);
+                ref.setURI("#" + certUri);
+                bstToken = new X509Security(document);
+                ((X509Security) bstToken).setX509Certificate(remoteCert);
+                bstToken.setID(certUri);
+                ref.setValueType(bstToken.getValueType());
+                secToken.setReference(ref);
+                break;
+                
+            case WSConstants.CUSTOM_SYMM_SIGNING :
+                Reference refCust = new Reference(document);
+                if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                    secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+                    refCust.setValueType(customEKTokenValueType);
+                } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                    secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+                } else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customEKTokenValueType)) {
+                    secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+                    refCust.setValueType(customEKTokenValueType);
+                } else {
+                    refCust.setValueType(customEKTokenValueType);
+                }
+                refCust.setURI("#" + customEKTokenId);
+                secToken.setReference(refCust);
+                break;
+                
+            case WSConstants.CUSTOM_SYMM_SIGNING_DIRECT :
+                Reference refCustd = new Reference(document);
+                if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                    secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+                    refCustd.setValueType(customEKTokenValueType);
+                } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                    secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+                }  else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customEKTokenValueType)) {
+                    secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+                    refCustd.setValueType(customEKTokenValueType);
+                } else {
+                    refCustd.setValueType(customEKTokenValueType);
+                }
+                refCustd.setURI(customEKTokenId);
+                secToken.setReference(refCustd);
+                break;
+                
+            case WSConstants.CUSTOM_KEY_IDENTIFIER:
+                secToken.setKeyIdentifier(customEKTokenValueType, customEKTokenId);
+                if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                    secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+                } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                    secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+                } else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customEKTokenValueType)) {
+                    secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+                } else if (SecurityTokenReference.ENC_KEY_SHA1_URI.equals(customEKTokenValueType)) {
+                    secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+                }
+                break;           
+    
+            default:
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unsupportedKeyId");
             }
-            break;
-
-        case WSConstants.THUMBPRINT_IDENTIFIER:
-        case WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER:
-            //
-            // This identifier is not applicable for this case, so fall back to
-            // ThumbprintRSA.
-            //
-            secToken.setKeyIdentifierThumb(remoteCert);
-            
-            if (includeEncryptionToken) {
-                addBST(remoteCert);
-            }
-            break;
-
-        case WSConstants.ISSUER_SERIAL:
-            String issuer = remoteCert.getIssuerX500Principal().getName();
-            java.math.BigInteger serialNumber = remoteCert.getSerialNumber();
-            DOMX509IssuerSerial domIssuerSerial = 
-                new DOMX509IssuerSerial(
-                    document, issuer, serialNumber
+            Element keyInfoElement = 
+                document.createElementNS(
+                    WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
                 );
-            DOMX509Data domX509Data = new DOMX509Data(document, domIssuerSerial);
-            secToken.setX509Data(domX509Data);
-            
-            if (includeEncryptionToken) {
-                addBST(remoteCert);
-            }
-            break;
-
-        case WSConstants.BST_DIRECT_REFERENCE:
-            Reference ref = new Reference(document);
-            String certUri = IDGenerator.generateID(null);
-            ref.setURI("#" + certUri);
-            bstToken = new X509Security(document);
-            ((X509Security) bstToken).setX509Certificate(remoteCert);
-            bstToken.setID(certUri);
-            ref.setValueType(bstToken.getValueType());
-            secToken.setReference(ref);
-            break;
-            
-        case WSConstants.CUSTOM_SYMM_SIGNING :
-            Reference refCust = new Reference(document);
-            if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
-                secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
-                refCust.setValueType(customEKTokenValueType);
-            } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
-                secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
-            } else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customEKTokenValueType)) {
-                secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
-                refCust.setValueType(customEKTokenValueType);
-            } else {
-                refCust.setValueType(customEKTokenValueType);
-            }
-            refCust.setURI("#" + customEKTokenId);
-            secToken.setReference(refCust);
-            break;
-            
-        case WSConstants.CUSTOM_SYMM_SIGNING_DIRECT :
-            Reference refCustd = new Reference(document);
-            if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
-                secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
-                refCustd.setValueType(customEKTokenValueType);
-            } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
-                secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
-            }  else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customEKTokenValueType)) {
-                secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
-                refCustd.setValueType(customEKTokenValueType);
-            } else {
-                refCustd.setValueType(customEKTokenValueType);
-            }
-            refCustd.setURI(customEKTokenId);
-            secToken.setReference(refCustd);
-            break;
-            
-        case WSConstants.CUSTOM_KEY_IDENTIFIER:
-            secToken.setKeyIdentifier(customEKTokenValueType, customEKTokenId);
-            if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
-                secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
-            } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
-                secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
-            } else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customEKTokenValueType)) {
-                secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
-            } else if (SecurityTokenReference.ENC_KEY_SHA1_URI.equals(customEKTokenValueType)) {
-                secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
-            }
-            break;           
-
-        default:
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unsupportedKeyId");
-        }
-        Element keyInfoElement = 
-            document.createElementNS(
-                WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
+            keyInfoElement.setAttributeNS(
+                WSConstants.XMLNS_NS, "xmlns:" + WSConstants.SIG_PREFIX, WSConstants.SIG_NS
             );
-        keyInfoElement.setAttributeNS(
-            WSConstants.XMLNS_NS, "xmlns:" + WSConstants.SIG_PREFIX, WSConstants.SIG_NS
-        );
-        keyInfoElement.appendChild(secToken.getElement());
-        encryptedKeyElement.appendChild(keyInfoElement);
+            keyInfoElement.appendChild(secToken.getElement());
+            encryptedKeyElement.appendChild(keyInfoElement);
+        }
 
         Element xencCipherValue = createCipherValue(document, encryptedKeyElement);
         xencCipherValue.appendChild(keyText);
@@ -468,7 +473,9 @@ public class WSSecEncryptedKey extends WSSecBase {
         }
         encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);
 
-        if (keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING
+        if (customEKKeyInfoElement != null) {
+            encryptedKeyElement.appendChild(customEKKeyInfoElement);
+        } else if (keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING
             || keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING_DIRECT
             || keyIdentifierType == WSConstants.CUSTOM_KEY_IDENTIFIER) {
             SecurityTokenReference secToken = new SecurityTokenReference(document);
@@ -887,5 +894,12 @@ public class WSSecEncryptedKey extends WSSecBase {
         this.includeEncryptionToken = includeEncryptionToken;
     }
 
+    public Element getCustomEKKeyInfoElement() {
+        return customEKKeyInfoElement;
+    }
+
+    public void setCustomEKKeyInfoElement(Element customEKKeyInfoElement) {
+        this.customEKKeyInfoElement = customEKKeyInfoElement;
+    }
 
 }

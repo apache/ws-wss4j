@@ -144,6 +144,7 @@ public class WSPasswordCallback implements Callback {
     private String type;
     private Element customToken;
     private String algorithm;
+    private Element keyInfoReference;
     
     /**
      * Constructor.
@@ -302,6 +303,19 @@ public class WSPasswordCallback implements Callback {
      */
     public void setAlgorithm(String algorithm) {
         this.algorithm = algorithm;
+    }
+
+    public Element getKeyInfoReference() {
+        return keyInfoReference;
+    }
+
+    /**
+     * This allows the CallbackHandler to specify a custom Element used to reference the 
+     * key (if for example SECRET_KEY is the usage of the callback)
+     * @param keyInfoReference
+     */
+    public void setKeyInfoReference(Element keyInfoReference) {
+        this.keyInfoReference = keyInfoReference;
     }
 
     
