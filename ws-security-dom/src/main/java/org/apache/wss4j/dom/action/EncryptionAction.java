@@ -108,6 +108,7 @@ public class EncryptionAction implements Action {
             ephemeralKey = pwcb.getKey();
             byte[] encryptedKey = pwcb.getEncryptedSecret();
             wsEncrypt.setEncryptedEphemeralKey(encryptedKey);
+            wsEncrypt.setCustomEKKeyInfoElement(pwcb.getKeyInfoReference());
         }
         wsEncrypt.setEphemeralKey(ephemeralKey);
         
