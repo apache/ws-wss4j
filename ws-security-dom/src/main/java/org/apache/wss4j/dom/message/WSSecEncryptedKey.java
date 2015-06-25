@@ -315,7 +315,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);
 
         if (customEKKeyInfoElement != null) {
-            encryptedKeyElement.appendChild(customEKKeyInfoElement);
+            encryptedKeyElement.appendChild(document.adoptNode(customEKKeyInfoElement));
         } else {
             SecurityTokenReference secToken = new SecurityTokenReference(document);
     
@@ -447,7 +447,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);
 
         if (customEKKeyInfoElement != null) {
-            encryptedKeyElement.appendChild(customEKKeyInfoElement);
+            encryptedKeyElement.appendChild(document.adoptNode(customEKKeyInfoElement));
         } else if (keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING
             || keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING_DIRECT
             || keyIdentifierType == WSConstants.CUSTOM_KEY_IDENTIFIER) {
