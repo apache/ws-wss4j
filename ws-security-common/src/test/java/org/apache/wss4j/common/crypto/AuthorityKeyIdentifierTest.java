@@ -25,15 +25,16 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
 import org.apache.wss4j.common.util.Loader;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
-import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 
 /**
  * This is a test for extracting AuthorityKeyIdentifier/SubjectKeyIdentifier information from
  * the certs using BouncyCastle.
  */
 public class AuthorityKeyIdentifierTest extends org.junit.Assert {
+    
+    public AuthorityKeyIdentifierTest() {
+        WSProviderConfig.init();
+    }
     
     @org.junit.Test
     public void testExtractKeyIdentifiers() throws Exception {
@@ -45,10 +46,7 @@ public class AuthorityKeyIdentifierTest extends org.junit.Assert {
         assertNotNull(cert);
         
         // Get AuthorityKeyIdentifier from the cert
-        byte[] octets = (ASN1OctetString.getInstance(cert.getExtensionValue("2.5.29.35")).getOctets());     
-        AuthorityKeyIdentifier authorityKeyIdentifier = 
-            AuthorityKeyIdentifier.getInstance(octets);
-        byte[] keyIdentifierBytes = authorityKeyIdentifier.getKeyIdentifier();
+        byte[] keyIdentifierBytes = BouncyCastleUtils.getAuthorityKeyIdentifierBytes(cert);
         assertNotNull(keyIdentifierBytes);
         
         // Now load the CA cert
@@ -59,15 +57,42 @@ public class AuthorityKeyIdentifierTest extends org.junit.Assert {
         assertNotNull(caCert);
         
         // Get SubjectKeyIdentifier from the CA cert
-        byte[] subjectOctets = 
-            (ASN1OctetString.getInstance(caCert.getExtensionValue("2.5.29.14")).getOctets());     
-        SubjectKeyIdentifier subjectKeyIdentifier =
-            SubjectKeyIdentifier.getInstance(subjectOctets);
-        assertNotNull(subjectKeyIdentifier);
-        byte[] subjectKeyIdentifierBytes = subjectKeyIdentifier.getKeyIdentifier();
+        byte[] subjectKeyIdentifierBytes = 
+            BouncyCastleUtils.getSubjectKeyIdentifierBytes(caCert);
         assertNotNull(subjectKeyIdentifierBytes);
 
         assertTrue(Arrays.equals(keyIdentifierBytes, subjectKeyIdentifierBytes));
+    }
+    
+    @org.junit.Test
+    public void testMerlinAKI() throws Exception {
+        // Load the keystore
+        KeyStore keyStore = loadKeyStore("keys/wss40.jks", "security");
+        assertNotNull(keyStore);
+        X509Certificate cert = (X509Certificate)keyStore.getCertificate("wss40");
+        assertNotNull(cert);
+        
+        // Now load the CA keystore + instantiate MerlinAKI
+        KeyStore caKeyStore = loadKeyStore("keys/wss40CA.jks", "security");
+        assertNotNull(caKeyStore);
+        MerlinAKI crypto = new MerlinAKI();
+        crypto.setTrustStore(caKeyStore);
+        
+        // Verify trust...
+        crypto.verifyTrust(new X509Certificate[]{cert}, false, null);
+        
+        // Now test with a non-trusted cert
+        KeyStore badKeyStore = loadKeyStore("keys/wss86.keystore", "security");
+        assertNotNull(badKeyStore);
+        X509Certificate badCert = (X509Certificate)badKeyStore.getCertificate("wss86");
+        assertNotNull(badCert);
+        
+        try {
+            crypto.verifyTrust(new X509Certificate[]{badCert}, false, null);
+            fail("Failure expected on trying to validate an untrusted cert");
+        } catch (Exception ex) {
+            // expected
+        }
     }
     
     private KeyStore loadKeyStore(String path, String password) throws Exception {
