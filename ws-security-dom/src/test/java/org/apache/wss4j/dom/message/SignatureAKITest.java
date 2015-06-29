@@ -19,8 +19,14 @@
 
 package org.apache.wss4j.dom.message;
 
+import java.io.InputStream;
+import java.security.KeyStore;
+
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.Merlin;
+import org.apache.wss4j.common.crypto.MerlinAKI;
+import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
@@ -40,7 +46,6 @@ public class SignatureAKITest extends org.junit.Assert {
         org.slf4j.LoggerFactory.getLogger(SignatureAKITest.class);
     
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = null;
     
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
@@ -49,7 +54,6 @@ public class SignatureAKITest extends org.junit.Assert {
     
     public SignatureAKITest() throws Exception {
         WSSConfig.init();
-        crypto = CryptoFactory.getInstance("wss40CAAKI.properties");
     }
 
     @org.junit.Test
@@ -68,7 +72,40 @@ public class SignatureAKITest extends org.junit.Assert {
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        WSHandlerResult results = verify(signedDoc);
+        Crypto caCrypto = CryptoFactory.getInstance("wss40CAAKI.properties");
+        WSHandlerResult results = verify(signedDoc, caCrypto);
+        
+        WSSecurityEngineResult actionResult =
+            results.getActionResults().get(WSConstants.SIGN).get(0);
+        assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
+        assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
+    }
+    
+    // Here, the CA keystore contains two keys with the same Distinguished Name
+    @org.junit.Test
+    public void testSignatureAKIDuplicate() throws Exception {
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("wss40", "security");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        Crypto signingCrypto = CryptoFactory.getInstance("wss40.properties");
+        Document signedDoc = builder.build(doc, signingCrypto, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        MerlinAKI caCrypto = new MerlinAKI();
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        ClassLoader loader = Loader.getClassLoader(SignatureAKITest.class);
+        InputStream input = Merlin.loadInputStream(loader, "keys/wss40CADupl.jks");
+        keyStore.load(input, "security".toCharArray());
+        caCrypto.setKeyStore(keyStore);
+        
+        WSHandlerResult results = verify(signedDoc, caCrypto);
         
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
@@ -83,7 +120,7 @@ public class SignatureAKITest extends org.junit.Assert {
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
-    private WSHandlerResult verify(Document doc) throws Exception {
+    private WSHandlerResult verify(Document doc, Crypto crypto) throws Exception {
         return secEngine.processSecurityHeader(doc, null, null, crypto);
     }
 
