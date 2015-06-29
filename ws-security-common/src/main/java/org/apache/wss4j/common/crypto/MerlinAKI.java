@@ -104,7 +104,11 @@ public class MerlinAKI extends Merlin {
             if (foundCerts != null && foundCerts[0] != null && foundCerts[0].equals(certs[0])) {
                 try {
                     certs[0].checkValidity();
-                } catch (CertificateExpiredException | CertificateNotYetValidException e) {
+                } catch (CertificateExpiredException e) {
+                    throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILED_CHECK, e, "invalidCert"
+                    );
+                } catch (CertificateNotYetValidException e) {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILED_CHECK, e, "invalidCert"
                     );
@@ -153,7 +157,9 @@ public class MerlinAKI extends Merlin {
                 x509certs[0] = certs[0];
                 System.arraycopy(foundCerts, 0, x509certs, 1, foundCerts.length);
             }
-        } catch (NoSuchAlgorithmException | CertificateException ex) {
+        } catch (NoSuchAlgorithmException ex) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex, "certpath");
+        } catch (CertificateException ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex, "certpath");
         }
         
@@ -172,7 +178,7 @@ public class MerlinAKI extends Merlin {
             List<X509Certificate> certList = Arrays.asList(x509certs);
             CertPath path = getCertificateFactory().generateCertPath(certList);
 
-            Set<TrustAnchor> set = new HashSet<>();
+            Set<TrustAnchor> set = new HashSet<TrustAnchor>();
             if (truststore != null) {
                 Enumeration<String> truststoreAliases = truststore.aliases();
                 while (truststoreAliases.hasMoreElements()) {
@@ -217,13 +223,36 @@ public class MerlinAKI extends Merlin {
             
             PKIXParameters param = createPKIXParameters(set, enableRevocation);
             validator.validate(path, param);
-        } catch (NoSuchProviderException | NoSuchAlgorithmException 
-            | CertificateException | InvalidAlgorithmParameterException
-            | java.security.cert.CertPathValidatorException 
-            | KeyStoreException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, e, "certpath"
-                );
+        } catch (NoSuchProviderException e) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILURE, e, "certpath"
+            );
+        } catch (NoSuchAlgorithmException e) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILURE, e,
+                "certpath", new Object[] {e.getMessage()}
+            );
+        } catch (CertificateException e) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILURE, e, "certpath"
+            );
+        } catch (InvalidAlgorithmParameterException e) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILURE, e, "certpath"
+            );
+        } catch (java.security.cert.CertPathValidatorException e) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, e, "certpath"
+            );
+        } catch (KeyStoreException e) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILURE, e, "certpath"
+            );
+        } catch (NullPointerException e) {
+            // NPE thrown by JDK 1.7 for one of the test cases
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILURE, e, "certpath"
+            );
         }
         
         // Finally check Cert Constraints
