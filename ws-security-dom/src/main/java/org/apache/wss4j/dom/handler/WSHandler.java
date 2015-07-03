@@ -120,6 +120,10 @@ public abstract class WSHandler {
             reqData.setCallbackHandler(passwordCallbackHandler);
         }
         
+        boolean storeBytesInAttachment = 
+            decodeBooleanConfigValue(mc, WSHandlerConstants.STORE_BYTES_IN_ATTACHMENT, false);
+        reqData.setStoreBytesInAttachment(storeBytesInAttachment);
+        
         // Perform configuration
         for (HandlerAction actionToDo : actions) {
             if (actionToDo.getAction() == WSConstants.SC) {

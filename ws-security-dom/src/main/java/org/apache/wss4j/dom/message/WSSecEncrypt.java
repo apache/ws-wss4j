@@ -25,7 +25,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
@@ -50,16 +52,21 @@ import org.apache.wss4j.dom.WsuIdAllocator;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.algorithms.JCEMapper;
+import org.apache.xml.security.c14n.Canonicalizer;
+import org.apache.xml.security.encryption.AbstractSerializer;
 import org.apache.xml.security.encryption.EncryptedData;
+import org.apache.xml.security.encryption.TransformSerializer;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.utils.Base64;
+import org.apache.xml.security.utils.EncryptionConstants;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Encrypts a parts of a message according to WS Specification, X509 profile,
@@ -245,7 +252,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         List<String> encDataRefs = 
             doEncryption(
                 document, getIdAllocator(), keyInfo, secretKeySpec, getSymmetricEncAlgorithm(), references, 
-                    callbackLookup, attachmentCallbackHandler, attachmentEncryptedDataElements
+                    callbackLookup, attachmentCallbackHandler, attachmentEncryptedDataElements,
+                    storeBytesInAttachment
             );
         if (dataRef == null) {
             dataRef = 
@@ -326,7 +334,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     ) throws WSSecurityException {
         return doEncryption(
                 doc, idAllocator, keyInfo, secretKey, encryptionAlgorithm,
-                references, callbackLookup, null, null);
+                references, callbackLookup, null, null, false);
     }
 
     public static List<String> doEncryption(
@@ -338,7 +346,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             List<WSEncryptionPart> references,
             CallbackLookup callbackLookup,
             CallbackHandler attachmentCallbackHandler,
-            List<Element> attachmentEncryptedDataElements
+            List<Element> attachmentEncryptedDataElements,
+            boolean storeBytesInAttachment
     ) throws WSSecurityException {
 
         XMLCipher xmlCipher = null;
@@ -378,130 +387,245 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                     new Object[] {"{" + encPart.getNamespace() + "}" + encPart.getName()});
             }
 
-            for (Element elementToEncrypt : elementsToEncrypt) {
-                String id = 
-                    encryptElement(doc, elementToEncrypt, encPart.getEncModifier(), idAllocator, xmlCipher,
-                                   secretKey, keyInfo);
-                encPart.setEncId(id);
-                encDataRef.add("#" + id);
-            }
-                
-            if (part != references.size() - 1) {
-                try {
-                    keyInfo = new KeyInfo((Element) keyInfo.getElement().cloneNode(true), null);
-                } catch (Exception ex) {
-                    throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
-                    );
+            if (storeBytesInAttachment) {
+                for (Element elementToEncrypt : elementsToEncrypt) {
+                    try {
+                        String id = 
+                            encryptElementInAttachment(doc, idAllocator, keyInfo, secretKey, encryptionAlgorithm,
+                                          attachmentCallbackHandler, encPart, elementToEncrypt);
+                        encPart.setEncId(id);
+                        encDataRef.add("#" + id);
+                    } catch (Exception ex) {
+                        throw new WSSecurityException(
+                            WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
+                        );
+                    }
+                }
+            } else {
+                for (Element elementToEncrypt : elementsToEncrypt) {
+                    String id = 
+                        encryptElement(doc, elementToEncrypt, encPart.getEncModifier(), idAllocator, xmlCipher,
+                                       secretKey, keyInfo);
+                    encPart.setEncId(id);
+                    encDataRef.add("#" + id);
                 }
             }
         }
 
         if (attachmentEncryptionPart != null) {
-            // We have an attachment to encrypt
-
-            if (attachmentCallbackHandler == null) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE,
-                    "empty", new Object[] {"no attachment callbackhandler supplied"}
-                );
-            }
-
-            AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
-            String id = attachmentEncryptionPart.getId().substring(4);
-            attachmentRequestCallback.setAttachmentId(id);
-            try {
-                attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
-            } catch (Exception e) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e
-                );
-            }
-            String attachmentEncryptedDataType = WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY;
-            if ("Element".equals(attachmentEncryptionPart.getEncModifier())) {
-                attachmentEncryptedDataType = WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE;
-            }
-
-            for (Attachment attachment : attachmentRequestCallback.getAttachments()) {
-
-                final String attachmentId = attachment.getId();
-                String encEncryptedDataId = idAllocator.createId("ED-", attachmentId);
-                encDataRef.add("#" + encEncryptedDataId);
-
-                Element encryptedData =
-                    doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptedData");
-                encryptedData.setAttributeNS(null, "Id", encEncryptedDataId);
-                encryptedData.setAttributeNS(null, "MimeType", attachment.getMimeType());
-                encryptedData.setAttributeNS(null, "Type", attachmentEncryptedDataType);
-
-                Element encryptionMethod =
-                    doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptionMethod");
-                encryptionMethod.setAttributeNS(null, "Algorithm", encryptionAlgorithm);
-
-                encryptedData.appendChild(encryptionMethod);
-                encryptedData.appendChild(keyInfo.getElement());
-
-                Element cipherData =
-                    doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":CipherData");
-                Element cipherReference =
-                    doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":CipherReference");
-                cipherReference.setAttributeNS(null, "URI", "cid:" + attachmentId);
-
-                Element transforms = doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":Transforms");
-                Element transform = doc.createElementNS(WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":Transform");
-                transform.setAttributeNS(null, "Algorithm", WSConstants.SWA_ATTACHMENT_CIPHERTEXT_TRANS);
-                transforms.appendChild(transform);
-
-                cipherReference.appendChild(transforms);
-                cipherData.appendChild(cipherReference);
-                encryptedData.appendChild(cipherData);
-
-                attachmentEncryptedDataElements.add(encryptedData);
-
-                Attachment resultAttachment = new Attachment();
-                resultAttachment.setId(attachmentId);
-                resultAttachment.setMimeType("application/octet-stream");
-
-                String jceAlgorithm = JCEMapper.translateURItoJCEID(encryptionAlgorithm);
-                Cipher cipher = null;
-                try {
-                    cipher = Cipher.getInstance(jceAlgorithm);
-
-                    // The Spec mandates a 96-bit IV for GCM algorithms
-                    if (XMLCipher.AES_128_GCM.equals(encryptionAlgorithm)
-                        || XMLCipher.AES_192_GCM.equals(encryptionAlgorithm)
-                        || XMLCipher.AES_256_GCM.equals(encryptionAlgorithm)) {
-                        byte[] temp = WSSecurityUtil.generateNonce(12);
-                        IvParameterSpec paramSpec = new IvParameterSpec(temp);
-                        cipher.init(Cipher.ENCRYPT_MODE, secretKey, paramSpec);
-                    } else {
-                        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-                    }
-                } catch (Exception e) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
-                }
-
-                Map<String, String> headers = new HashMap<>(attachment.getHeaders());
-                resultAttachment.setSourceStream(
-                    AttachmentUtils.setupAttachmentEncryptionStream(
-                        cipher, "Element".equals(attachmentEncryptionPart.getEncModifier()),
-                        attachment, headers
-                    )
-                );
-                resultAttachment.addHeaders(headers);
-
-                AttachmentResultCallback attachmentResultCallback = new AttachmentResultCallback();
-                attachmentResultCallback.setAttachmentId(attachmentId);
-                attachmentResultCallback.setAttachment(resultAttachment);
-                try {
-                    attachmentCallbackHandler.handle(new Callback[]{attachmentResultCallback});
-                } catch (Exception e) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
-                }
-            }
+            encryptAttachment(doc, idAllocator, keyInfo, secretKey, encryptionAlgorithm,
+                              attachmentCallbackHandler, attachmentEncryptionPart, encDataRef,
+                              attachmentEncryptedDataElements);
         }
 
         return encDataRef;
+    }
+    
+    private static String encryptElementInAttachment(
+        Document doc,
+        WsuIdAllocator idAllocator,
+        KeyInfo keyInfo,
+        SecretKey secretKey,
+        String encryptionAlgorithm,
+        CallbackHandler attachmentCallbackHandler,
+        WSEncryptionPart encryptionPart,
+        Element elementToEncrypt
+   ) throws Exception {
+        
+        String type = EncryptionConstants.TYPE_ELEMENT;
+        if ("Content".equals(encryptionPart.getEncModifier())) {
+            type = EncryptionConstants.TYPE_CONTENT;
+        }
+        
+        final String attachmentId = idAllocator.createId("", doc);
+        String encEncryptedDataId = idAllocator.createId("ED-", attachmentId);
+
+        Element encryptedData =
+            doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptedData");
+        encryptedData.setAttributeNS(null, "Id", encEncryptedDataId);
+        encryptedData.setAttributeNS(null, "Type", type);
+
+        Element encryptionMethod =
+            doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptionMethod");
+        encryptionMethod.setAttributeNS(null, "Algorithm", encryptionAlgorithm);
+
+        encryptedData.appendChild(encryptionMethod);
+        encryptedData.appendChild(keyInfo.getElement());
+
+        Element cipherData =
+            doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":CipherData");
+        Element cipherValue =
+            doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":CipherValue");
+        cipherData.appendChild(cipherValue);
+        encryptedData.appendChild(cipherData);
+
+        Cipher cipher = createCipher(encryptionAlgorithm, secretKey);
+
+        // Serialize and encrypt the element
+        AbstractSerializer serializer = new TransformSerializer();
+        serializer.setCanonicalizer(Canonicalizer.getInstance(Canonicalizer.ALGO_ID_C14N_PHYSICAL));
+        serializer.setSecureValidation(true);
+        
+        byte[] serializedOctets = null;
+        if (type.equals(EncryptionConstants.TYPE_CONTENT)) {
+            NodeList children = elementToEncrypt.getChildNodes();
+            if (null != children) {
+                serializedOctets = serializer.serializeToByteArray(children);
+            } else {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, "Element has no content.");
+            }
+        } else {
+            serializedOctets = serializer.serializeToByteArray(elementToEncrypt);
+        }
+        
+        byte[] encryptedBytes = null;
+        try {
+            encryptedBytes = cipher.doFinal(serializedOctets);
+        } catch (IllegalBlockSizeException ibse) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ibse);
+        } catch (BadPaddingException bpe) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, bpe);
+        }
+
+        // Now build up to a properly XML Encryption encoded octet stream
+        byte[] iv = cipher.getIV();
+        byte[] finalEncryptedBytes = new byte[iv.length + encryptedBytes.length];
+        System.arraycopy(iv, 0, finalEncryptedBytes, 0, iv.length);
+        System.arraycopy(encryptedBytes, 0, finalEncryptedBytes, iv.length, encryptedBytes.length);
+        
+        if ("Content".equals(encryptionPart.getEncModifier())) {
+            Node child = elementToEncrypt.getFirstChild();
+            while (child != null) {
+                Node sibling = child.getNextSibling();
+                elementToEncrypt.removeChild(child);
+                child = sibling;
+            }
+            elementToEncrypt.appendChild(encryptedData);
+        } else {
+            elementToEncrypt.getParentNode().replaceChild(encryptedData, elementToEncrypt);
+        }
+        
+        WSSecurityUtil.storeBytesInAttachment(cipherValue, doc, attachmentId, 
+                                              finalEncryptedBytes, attachmentCallbackHandler);
+
+        return encEncryptedDataId;
+    }
+    
+    private static void encryptAttachment(
+        Document doc,
+        WsuIdAllocator idAllocator,
+        KeyInfo keyInfo,
+        SecretKey secretKey,
+        String encryptionAlgorithm,
+        CallbackHandler attachmentCallbackHandler,
+        WSEncryptionPart attachmentEncryptionPart,
+        List<String> encDataRef,
+        List<Element> attachmentEncryptedDataElements
+    ) throws WSSecurityException {
+        if (attachmentCallbackHandler == null) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILURE,
+                "empty", new Object[] {"no attachment callbackhandler supplied"}
+            );
+        }
+
+        AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
+        String id = attachmentEncryptionPart.getId().substring(4);
+        attachmentRequestCallback.setAttachmentId(id);
+        try {
+            attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
+        } catch (Exception e) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e
+            );
+        }
+        String attachmentEncryptedDataType = WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY;
+        if ("Element".equals(attachmentEncryptionPart.getEncModifier())) {
+            attachmentEncryptedDataType = WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE;
+        }
+
+        for (Attachment attachment : attachmentRequestCallback.getAttachments()) {
+
+            final String attachmentId = attachment.getId();
+            String encEncryptedDataId = idAllocator.createId("ED-", attachmentId);
+            encDataRef.add("#" + encEncryptedDataId);
+
+            Element encryptedData =
+                doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptedData");
+            encryptedData.setAttributeNS(null, "Id", encEncryptedDataId);
+            encryptedData.setAttributeNS(null, "MimeType", attachment.getMimeType());
+            encryptedData.setAttributeNS(null, "Type", attachmentEncryptedDataType);
+
+            Element encryptionMethod =
+                doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptionMethod");
+            encryptionMethod.setAttributeNS(null, "Algorithm", encryptionAlgorithm);
+
+            encryptedData.appendChild(encryptionMethod);
+            encryptedData.appendChild(keyInfo.getElement());
+
+            Element cipherData =
+                doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":CipherData");
+            Element cipherReference =
+                doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":CipherReference");
+            cipherReference.setAttributeNS(null, "URI", "cid:" + attachmentId);
+
+            Element transforms = doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":Transforms");
+            Element transform = doc.createElementNS(WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":Transform");
+            transform.setAttributeNS(null, "Algorithm", WSConstants.SWA_ATTACHMENT_CIPHERTEXT_TRANS);
+            transforms.appendChild(transform);
+
+            cipherReference.appendChild(transforms);
+            cipherData.appendChild(cipherReference);
+            encryptedData.appendChild(cipherData);
+
+            attachmentEncryptedDataElements.add(encryptedData);
+
+            Attachment resultAttachment = new Attachment();
+            resultAttachment.setId(attachmentId);
+            resultAttachment.setMimeType("application/octet-stream");
+
+            Cipher cipher = createCipher(encryptionAlgorithm, secretKey);
+
+            Map<String, String> headers = new HashMap<>(attachment.getHeaders());
+            resultAttachment.setSourceStream(
+                AttachmentUtils.setupAttachmentEncryptionStream(
+                    cipher, "Element".equals(attachmentEncryptionPart.getEncModifier()),
+                    attachment, headers
+                )
+            );
+            resultAttachment.addHeaders(headers);
+
+            AttachmentResultCallback attachmentResultCallback = new AttachmentResultCallback();
+            attachmentResultCallback.setAttachmentId(attachmentId);
+            attachmentResultCallback.setAttachment(resultAttachment);
+            try {
+                attachmentCallbackHandler.handle(new Callback[]{attachmentResultCallback});
+            } catch (Exception e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
+            }
+        }
+    }
+    
+    private static Cipher createCipher(String encryptionAlgorithm, SecretKey secretKey) 
+        throws WSSecurityException {
+        String jceAlgorithm = JCEMapper.translateURItoJCEID(encryptionAlgorithm);
+        try {
+            Cipher cipher = Cipher.getInstance(jceAlgorithm);
+
+            // The Spec mandates a 96-bit IV for GCM algorithms
+            if (XMLCipher.AES_128_GCM.equals(encryptionAlgorithm)
+                || XMLCipher.AES_192_GCM.equals(encryptionAlgorithm)
+                || XMLCipher.AES_256_GCM.equals(encryptionAlgorithm)) {
+                byte[] iv = WSSecurityUtil.generateNonce(12);
+                IvParameterSpec paramSpec = new IvParameterSpec(iv);
+                cipher.init(Cipher.ENCRYPT_MODE, secretKey, paramSpec);
+            } else {
+                cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+            }
+            return cipher;
+        } catch (Exception e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
+        }
     }
 
     /**

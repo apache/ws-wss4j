@@ -87,6 +87,7 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
         Element tokenElement = 
             setupTokenReference(reqData, signatureToken, wsSign, passwordCallback, doc);
         wsSign.setAttachmentCallbackHandler(reqData.getAttachmentCallbackHandler());
+        wsSign.setStoreBytesInAttachment(reqData.isStoreBytesInAttachment());
 
         try {
             List<WSEncryptionPart> parts = signatureToken.getParts();

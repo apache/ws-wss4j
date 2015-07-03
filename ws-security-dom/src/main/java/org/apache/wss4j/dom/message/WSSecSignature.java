@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.message;
 
 import java.security.NoSuchProviderException;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
@@ -39,6 +40,7 @@ import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 
 import org.apache.wss4j.common.WSEncryptionPart;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -85,7 +87,7 @@ public class WSSecSignature extends WSSecSignatureBase {
     protected Document document;
     protected WSDocInfo wsDocInfo;
     protected String strUri;
-    protected BinarySecurity bstToken;
+    protected Element bstToken;
     protected String keyInfoUri;
     protected String certUri;
     protected byte[] signatureValue;
@@ -189,19 +191,15 @@ public class WSSecSignature extends WSSecSignatureBase {
             case WSConstants.BST_DIRECT_REFERENCE:
                 Reference ref = new Reference(document);
                 ref.setURI("#" + certUri);
+                
+                addBST(certs);
                 if (!useSingleCert) {
-                    bstToken = new PKIPathSecurity(document);
-                    ((PKIPathSecurity) bstToken).setX509Certificates(certs, crypto);
                     secRef.addTokenType(PKIPathSecurity.PKI_TYPE);
+                    ref.setValueType(PKIPathSecurity.PKI_TYPE);
                 } else {
-                    bstToken = new X509Security(document);
-                    ((X509Security) bstToken).setX509Certificate(certs[0]);
+                    ref.setValueType(X509Security.X509_V3_TYPE);
                 }
-                bstAddedToSecurityHeader = false;
-                ref.setValueType(bstToken.getValueType());
                 secRef.setReference(ref);
-                bstToken.setID(certUri);
-                wsDocInfo.addTokenElement(bstToken.getElement(), false);
                 break;
     
             case WSConstants.ISSUER_SERIAL:
@@ -430,16 +428,46 @@ public class WSSecSignature extends WSSecSignatureBase {
      * Add a BinarySecurityToken
      */
     private void addBST(X509Certificate[] certs) throws WSSecurityException {
-        if (!useSingleCert) {
-            bstToken = new PKIPathSecurity(document);
-            ((PKIPathSecurity) bstToken).setX509Certificates(certs, crypto);
+        if (storeBytesInAttachment) {
+            bstToken = 
+                document.createElementNS(WSS4JConstants.WSSE_NS, "wsse:BinarySecurityToken");
+            bstToken.setAttributeNS(null, "EncodingType", WSS4JConstants.BASE64_ENCODING);
+            bstToken.setAttributeNS(WSS4JConstants.WSU_NS, WSS4JConstants.WSU_PREFIX + ":Id", certUri);
+            
+            byte[] certBytes = null;
+            if (!useSingleCert) {
+                bstToken.setAttributeNS(null, "ValueType", PKIPathSecurity.PKI_TYPE);
+                certBytes = crypto.getBytesFromCertificates(certs);
+            } else {
+                bstToken.setAttributeNS(null, "ValueType", X509Security.X509_V3_TYPE);
+                try {
+                    certBytes = certs[0].getEncoded();
+                } catch (CertificateEncodingException e) {
+                    throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, e, "encodeError"
+                    );
+                }
+            }
+            
+            final String attachmentId = getIdAllocator().createId("", document);
+            WSSecurityUtil.storeBytesInAttachment(bstToken, document, attachmentId, 
+                                                  certBytes, attachmentCallbackHandler);
+            wsDocInfo.addTokenElement(bstToken, false);
         } else {
-            bstToken = new X509Security(document);
-            ((X509Security) bstToken).setX509Certificate(certs[0]);
+            BinarySecurity binarySecurity = null;
+            if (!useSingleCert) {
+                binarySecurity = new PKIPathSecurity(document);
+                ((PKIPathSecurity) binarySecurity).setX509Certificates(certs, crypto);
+            } else {
+                binarySecurity = new X509Security(document);
+                ((X509Security) binarySecurity).setX509Certificate(certs[0]);
+            }
+            binarySecurity.setID(certUri);
+            bstToken = binarySecurity.getElement();
+            wsDocInfo.addTokenElement(bstToken, false);
         }
+        
         bstAddedToSecurityHeader = false;
-        bstToken.setID(certUri);
-        wsDocInfo.addTokenElement(bstToken.getElement(), false);
     }
     
     /**
@@ -454,7 +482,7 @@ public class WSSecSignature extends WSSecSignatureBase {
      */
     public void prependBSTElementToHeader(WSSecHeader secHeader) {
         if (bstToken != null && !bstAddedToSecurityHeader) {
-            WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bstToken.getElement());
+            WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bstToken);
             bstAddedToSecurityHeader = true;
         }
     }
@@ -466,7 +494,7 @@ public class WSSecSignature extends WSSecSignatureBase {
     public void appendBSTElementToHeader(WSSecHeader secHeader) {
         if (bstToken != null && !bstAddedToSecurityHeader) {
             Element secHeaderElement = secHeader.getSecurityHeader();
-            secHeaderElement.appendChild(bstToken.getElement());
+            secHeaderElement.appendChild(bstToken);
             bstAddedToSecurityHeader = true;
         }
     }
@@ -698,7 +726,7 @@ public class WSSecSignature extends WSSecSignatureBase {
         if (bstToken == null) {
             return null;
         }
-        return bstToken.getID();
+        return bstToken.getAttributeNS(WSS4JConstants.WSU_NS, "Id");
     }
     
     /**
@@ -747,10 +775,7 @@ public class WSSecSignature extends WSSecSignatureBase {
      * @return the BST Token element
      */
     public Element getBinarySecurityTokenElement() {
-        if (bstToken != null) {
-            return bstToken.getElement();
-        }
-        return null;
+        return bstToken;
     }
     
     /**

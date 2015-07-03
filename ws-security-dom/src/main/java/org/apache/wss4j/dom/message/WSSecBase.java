@@ -44,6 +44,7 @@ public class WSSecBase {
     protected boolean doDebug;
     protected CallbackLookup callbackLookup;
     protected CallbackHandler attachmentCallbackHandler;
+    protected boolean storeBytesInAttachment;
 
     private WsuIdAllocator idAllocator;
     private final List<WSEncryptionPart> parts = new ArrayList<>();
@@ -103,6 +104,10 @@ public class WSSecBase {
 
     public void setAttachmentCallbackHandler(CallbackHandler attachmentCallbackHandler) {
         this.attachmentCallbackHandler = attachmentCallbackHandler;
+    }
+    
+    public void setStoreBytesInAttachment(boolean storeBytesInAttachment) {
+        this.storeBytesInAttachment = storeBytesInAttachment;
     }
 
     /**

@@ -120,6 +120,7 @@ public class EncryptionAction implements Action {
         }
         
         wsEncrypt.setAttachmentCallbackHandler(reqData.getAttachmentCallbackHandler());
+        wsEncrypt.setStoreBytesInAttachment(reqData.isStoreBytesInAttachment());
         
         try {
             wsEncrypt.build(doc, encryptionToken.getCrypto(), reqData.getSecHeader());

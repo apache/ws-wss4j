@@ -98,6 +98,7 @@ public class SignatureAction implements Action {
         }
 
         wsSign.setAttachmentCallbackHandler(reqData.getAttachmentCallbackHandler());
+        wsSign.setStoreBytesInAttachment(reqData.isStoreBytesInAttachment());
 
         try {
             wsSign.prepare(doc, signatureToken.getCrypto(), reqData.getSecHeader());

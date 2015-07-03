@@ -540,6 +540,14 @@ public class ConfigurationConstants {
      */
     public static final String GET_SECRET_KEY_FROM_CALLBACK_HANDLER = "getSecretKeyFromCallbackHandler";
     
+    /**
+     * Whether to store bytes (CipherData or BinarySecurityToken) in an attachment. The default is false,
+     * meaning that bytes are BASE-64 encoded and "inlined" in the message. Setting this to true is more
+     * efficient, as it means that the BASE-64 encoding step can be skipped. For this to work, a 
+     * CallbackHandler must be set on RequestData that can handle attachments.
+     */
+    public static final String STORE_BYTES_IN_ATTACHMENT = "storeBytesInAttachment";
+    
     //
     // (Non-boolean) Configuration parameters for the actions/processors
     //

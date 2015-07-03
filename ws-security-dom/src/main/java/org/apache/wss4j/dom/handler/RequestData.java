@@ -94,6 +94,7 @@ public class RequestData {
     private boolean use200512Namespace = true;
     private final List<String> audienceRestrictions = new ArrayList<>();
     private boolean requireTimestampExpires;
+    private boolean storeBytesInAttachment;
     
     /**
      * Whether to add an InclusiveNamespaces PrefixList as a CanonicalizationMethod
@@ -753,5 +754,13 @@ public class RequestData {
 
     public void setEncodePasswords(boolean encodePasswords) {
         this.encodePasswords = encodePasswords;
+    }
+
+    public boolean isStoreBytesInAttachment() {
+        return storeBytesInAttachment;
+    }
+
+    public void setStoreBytesInAttachment(boolean storeBytesInAttachment) {
+        this.storeBytesInAttachment = storeBytesInAttachment;
     }
 }

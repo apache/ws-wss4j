@@ -42,6 +42,7 @@ import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.token.DOMX509Data;
 import org.apache.wss4j.common.token.DOMX509IssuerSerial;
 import org.apache.wss4j.common.token.Reference;
@@ -377,11 +378,12 @@ public class WSSecSignatureSAML extends WSSecSignature {
             case WSConstants.BST_DIRECT_REFERENCE:
                 Reference ref = new Reference(doc);
                 ref.setURI("#" + certUri);
-                bstToken = new X509Security(doc);
-                ((X509Security) bstToken).setX509Certificate(certs[0]);
-                bstToken.setID(certUri);
-                wsDocInfo.addTokenElement(bstToken.getElement(), false);
-                ref.setValueType(bstToken.getValueType());
+                BinarySecurity binarySecurity = new X509Security(doc);
+                ((X509Security) binarySecurity).setX509Certificate(certs[0]);
+                binarySecurity.setID(certUri);
+                bstToken = binarySecurity.getElement();
+                wsDocInfo.addTokenElement(bstToken, false);
+                ref.setValueType(binarySecurity.getValueType());
                 secRef.setReference(ref);
                 break;
                 
