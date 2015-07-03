@@ -322,8 +322,6 @@ public class WSSecEncryptedKey extends WSSecBase {
                 WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
             );
         }
-        Text keyText = 
-            WSSecurityUtil.createBase64EncodedTextNode(document, encryptedEphemeralKey);
 
         //
         // Now we need to setup the EncryptedKey header block 1) create a
@@ -458,15 +456,19 @@ public class WSSecEncryptedKey extends WSSecBase {
         }
 
         Element xencCipherValue = createCipherValue(document, encryptedKeyElement);
-        xencCipherValue.appendChild(keyText);
-
         envelope = document.getDocumentElement();
+        if (storeBytesInAttachment) {
+            final String attachmentId = IDGenerator.generateID("");
+            WSSecurityUtil.storeBytesInAttachment(xencCipherValue, document, attachmentId, 
+                                                  encryptedEphemeralKey, attachmentCallbackHandler);
+        } else {
+            Text keyText = 
+                WSSecurityUtil.createBase64EncodedTextNode(document, encryptedEphemeralKey);
+            xencCipherValue.appendChild(keyText);
+        }
     }
     
     protected void prepareInternal(SecretKey secretKey) throws WSSecurityException {
-        Text keyText = 
-            WSSecurityUtil.createBase64EncodedTextNode(document, encryptedEphemeralKey);
-
         encryptedKeyElement = createEncryptedKey(document, keyEncAlgo);
         if (encKeyId == null || "".equals(encKeyId)) {
             encKeyId = IDGenerator.generateID("EK-");
@@ -544,7 +546,15 @@ public class WSSecEncryptedKey extends WSSecBase {
         }
 
         Element xencCipherValue = createCipherValue(document, encryptedKeyElement);
-        xencCipherValue.appendChild(keyText);
+        if (storeBytesInAttachment) {
+            final String attachmentId = IDGenerator.generateID("");
+            WSSecurityUtil.storeBytesInAttachment(xencCipherValue, document, attachmentId, 
+                                                  encryptedEphemeralKey, attachmentCallbackHandler);
+        } else {
+            Text keyText = 
+                WSSecurityUtil.createBase64EncodedTextNode(document, encryptedEphemeralKey);
+            xencCipherValue.appendChild(keyText);
+        }
     }
 
     /**

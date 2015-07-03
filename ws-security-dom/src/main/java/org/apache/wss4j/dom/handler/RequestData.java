@@ -95,6 +95,7 @@ public class RequestData {
     private boolean use200512Namespace = true;
     private final List<String> audienceRestrictions = new ArrayList<String>();
     private boolean requireTimestampExpires;
+    private boolean storeBytesInAttachment;
 
     public void clear() {
         soapConstants = null;
@@ -131,6 +132,7 @@ public class RequestData {
         setUse200512Namespace(true);
         audienceRestrictions.clear();
         requireTimestampExpires = false;
+        storeBytesInAttachment = false;
     }
 
     public boolean isEnableTimestampReplayCache() {
@@ -590,5 +592,12 @@ public class RequestData {
     public void setRequireTimestampExpires(boolean requireTimestampExpires) {
         this.requireTimestampExpires = requireTimestampExpires;
     }
-        
+
+    public boolean isStoreBytesInAttachment() {
+        return storeBytesInAttachment;
+    }
+
+    public void setStoreBytesInAttachment(boolean storeBytesInAttachment) {
+        this.storeBytesInAttachment = storeBytesInAttachment;
+    } 
 }

@@ -114,6 +114,10 @@ public abstract class WSHandler {
         boolean enableSigConf = decodeEnableSignatureConfirmation(reqData);
         wssConfig.setEnableSignatureConfirmation(enableSigConf);
 
+        String storeBytes = getString(WSHandlerConstants.STORE_BYTES_IN_ATTACHMENT, mc);
+        boolean storeBytesInAttachment = Boolean.parseBoolean(storeBytes);
+        reqData.setStoreBytesInAttachment(storeBytesInAttachment);
+        
         // Perform configuration
         for (HandlerAction actionToDo : actions) {
             if (actionToDo.getAction() == WSConstants.SC) {

@@ -47,6 +47,8 @@ public class WSSecBase {
     
     protected CallbackLookup callbackLookup;
 
+    protected boolean storeBytesInAttachment;
+
     private WSSConfig wssConfig;
 
     protected CallbackHandler attachmentCallbackHandler;
@@ -126,6 +128,10 @@ public class WSSecBase {
 
     public void setAttachmentCallbackHandler(CallbackHandler attachmentCallbackHandler) {
         this.attachmentCallbackHandler = attachmentCallbackHandler;
+    }
+    
+    public void setStoreBytesInAttachment(boolean storeBytesInAttachment) {
+        this.storeBytesInAttachment = storeBytesInAttachment;
     }
 
     /**

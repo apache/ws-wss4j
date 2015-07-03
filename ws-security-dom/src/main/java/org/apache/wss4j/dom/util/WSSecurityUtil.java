@@ -30,6 +30,7 @@ import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
+import org.apache.wss4j.common.ext.AttachmentResultCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.HandlerAction;
@@ -55,6 +56,7 @@ import javax.xml.namespace.QName;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -1253,4 +1255,32 @@ public final class WSSecurityUtil {
         }
     }
 
+    public static void storeBytesInAttachment(
+        Element parentElement,
+        Document doc,
+        String attachmentId,
+        byte[] bytes,
+        CallbackHandler attachmentCallbackHandler
+    ) throws WSSecurityException {
+        parentElement.setAttributeNS(XMLUtils.XMLNS_NS, "xmlns:xop", WSConstants.XOP_NS);
+        Element xopInclude =
+            doc.createElementNS(WSConstants.XOP_NS, "xop:Include");
+        xopInclude.setAttributeNS(null, "href", "cid:" + attachmentId);
+        parentElement.appendChild(xopInclude);
+        
+        Attachment resultAttachment = new Attachment();
+        resultAttachment.setId(attachmentId);
+        resultAttachment.setMimeType("application/ciphervalue");
+        resultAttachment.setSourceStream(new ByteArrayInputStream(bytes));
+        
+        AttachmentResultCallback attachmentResultCallback = new AttachmentResultCallback();
+        attachmentResultCallback.setAttachmentId(attachmentId);
+        attachmentResultCallback.setAttachment(resultAttachment);
+        try {
+            attachmentCallbackHandler.handle(new Callback[]{attachmentResultCallback});
+        } catch (Exception e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        }
+        
+    }
 }

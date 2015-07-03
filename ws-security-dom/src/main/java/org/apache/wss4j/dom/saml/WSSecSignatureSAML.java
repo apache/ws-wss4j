@@ -50,6 +50,7 @@ import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
+import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.message.token.DOMX509Data;
 import org.apache.wss4j.dom.message.token.DOMX509IssuerSerial;
 import org.apache.wss4j.dom.message.token.Reference;
@@ -388,11 +389,12 @@ public class WSSecSignatureSAML extends WSSecSignature {
             case WSConstants.BST_DIRECT_REFERENCE:
                 Reference ref = new Reference(doc);
                 ref.setURI("#" + certUri);
-                bstToken = new X509Security(doc);
-                ((X509Security) bstToken).setX509Certificate(certs[0]);
-                bstToken.setID(certUri);
-                wsDocInfo.addTokenElement(bstToken.getElement(), false);
-                ref.setValueType(bstToken.getValueType());
+                BinarySecurity binarySecurity = new X509Security(doc);
+                ((X509Security) binarySecurity).setX509Certificate(certs[0]);
+                binarySecurity.setID(certUri);
+                bstToken = binarySecurity.getElement();
+                wsDocInfo.addTokenElement(bstToken, false);
+                ref.setValueType(binarySecurity.getValueType());
                 secRef.setReference(ref);
                 break;
                 

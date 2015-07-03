@@ -86,6 +86,7 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
         Element tokenElement = 
             setupTokenReference(reqData, encryptionToken, wsEncrypt, passwordCallback, doc);
         wsEncrypt.setAttachmentCallbackHandler(reqData.getAttachmentCallbackHandler());
+        wsEncrypt.setStoreBytesInAttachment(reqData.isStoreBytesInAttachment());
 
         try {
             List<WSEncryptionPart> parts = encryptionToken.getParts();
