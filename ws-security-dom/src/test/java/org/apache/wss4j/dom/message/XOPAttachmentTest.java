@@ -438,8 +438,8 @@ public class XOPAttachmentTest extends org.junit.Assert {
     @org.junit.Test
     public void testSignedEncryptedSOAPBody() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
         
         AttachmentCallbackHandler outboundAttachmentCallback = new AttachmentCallbackHandler();
         
@@ -449,7 +449,6 @@ public class XOPAttachmentTest extends org.junit.Assert {
         
         builder.setAttachmentCallbackHandler(outboundAttachmentCallback);
         builder.setStoreBytesInAttachment(true);
-        builder.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
         builder.build(doc, crypto, secHeader);
         
         WSSecEncrypt encrypt = new WSSecEncrypt();
@@ -458,7 +457,6 @@ public class XOPAttachmentTest extends org.junit.Assert {
 
         encrypt.setAttachmentCallbackHandler(outboundAttachmentCallback);
         encrypt.setStoreBytesInAttachment(true);
-        encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
 
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
         
@@ -498,8 +496,8 @@ public class XOPAttachmentTest extends org.junit.Assert {
     @org.junit.Test
     public void testEncryptedSignedSOAPBody() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
         
         AttachmentCallbackHandler outboundAttachmentCallback = new AttachmentCallbackHandler();
         
@@ -509,7 +507,6 @@ public class XOPAttachmentTest extends org.junit.Assert {
 
         encrypt.setAttachmentCallbackHandler(outboundAttachmentCallback);
         encrypt.setStoreBytesInAttachment(true);
-        encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
 
         encrypt.build(doc, crypto, secHeader);
         
@@ -519,7 +516,6 @@ public class XOPAttachmentTest extends org.junit.Assert {
         
         builder.setAttachmentCallbackHandler(outboundAttachmentCallback);
         builder.setStoreBytesInAttachment(true);
-        builder.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
         Document signedDoc = builder.build(doc, crypto, secHeader);
         
         List<Attachment> signedAttachments = outboundAttachmentCallback.getResponseAttachments();
