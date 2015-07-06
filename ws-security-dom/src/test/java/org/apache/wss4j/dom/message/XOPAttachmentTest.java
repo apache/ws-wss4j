@@ -337,6 +337,104 @@ public class XOPAttachmentTest extends org.junit.Assert {
         verify(encryptedDoc, inboundAttachmentCallback);
     }
     
+    @org.junit.Test
+    public void testDerivedEncryptedSOAPBody() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        AttachmentCallbackHandler outboundAttachmentCallback = new AttachmentCallbackHandler();
+        
+        //EncryptedKey
+        WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
+        encrKeyBuilder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
+        encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
+        encrKeyBuilder.setAttachmentCallbackHandler(outboundAttachmentCallback);
+        encrKeyBuilder.setStoreBytesInAttachment(true);
+        encrKeyBuilder.prepare(doc, crypto);
+
+        //Key information from the EncryptedKey
+        byte[] ek = encrKeyBuilder.getEphemeralKey();
+        String tokenIdentifier = encrKeyBuilder.getId();  
+
+        //Derived key encryption
+        WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+        encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
+        encrBuilder.setExternalKey(ek, tokenIdentifier);
+        encrBuilder.setAttachmentCallbackHandler(outboundAttachmentCallback);
+        encrBuilder.setStoreBytesInAttachment(true);
+        Document encryptedDoc = encrBuilder.build(doc, secHeader);
+
+        encrKeyBuilder.prependToHeader(secHeader);
+        encrKeyBuilder.prependBSTElementToHeader(secHeader);
+        
+        List<Attachment> encryptedAttachments = outboundAttachmentCallback.getResponseAttachments();
+        assertNotNull(encryptedAttachments);
+        // Should have EncryptedKey + EncryptedData stored in attachments...
+        assertTrue(encryptedAttachments.size() == 2);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = XMLUtils.PrettyDocumentToString(encryptedDoc);
+            LOG.debug(outputString);
+            // System.out.println(outputString);
+        }
+
+        AttachmentCallbackHandler inboundAttachmentCallback = 
+            new AttachmentCallbackHandler(encryptedAttachments);
+        verify(encryptedDoc, inboundAttachmentCallback);
+        
+        String processedDoc = XMLUtils.PrettyDocumentToString(encryptedDoc);
+        assertTrue(processedDoc.contains(SOAP_BODY));
+    }
+    
+    @org.junit.Test
+    public void testDerivedSignedSOAPBody() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        AttachmentCallbackHandler outboundAttachmentCallback = new AttachmentCallbackHandler();
+        
+        //EncryptedKey
+        WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
+        encrKeyBuilder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
+        encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
+        encrKeyBuilder.setAttachmentCallbackHandler(outboundAttachmentCallback);
+        encrKeyBuilder.setStoreBytesInAttachment(true);
+        encrKeyBuilder.prepare(doc, crypto);
+
+        //Key information from the EncryptedKey
+        byte[] ek = encrKeyBuilder.getEphemeralKey();
+        String tokenIdentifier = encrKeyBuilder.getId();  
+
+        //Derived key encryption
+        WSSecDKSign sigBuilder = new WSSecDKSign();
+        sigBuilder.setExternalKey(ek, tokenIdentifier);
+        sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
+        sigBuilder.setAttachmentCallbackHandler(outboundAttachmentCallback);
+        sigBuilder.setStoreBytesInAttachment(true);
+        Document signedDoc = sigBuilder.build(doc, secHeader);
+
+        encrKeyBuilder.prependToHeader(secHeader);
+        encrKeyBuilder.prependBSTElementToHeader(secHeader);
+        
+        List<Attachment> signedAttachments = outboundAttachmentCallback.getResponseAttachments();
+        assertNotNull(signedAttachments);
+        assertTrue(signedAttachments.size() == 1);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+
+        AttachmentCallbackHandler inboundAttachmentCallback = 
+            new AttachmentCallbackHandler(signedAttachments);
+        verify(signedDoc, inboundAttachmentCallback);
+        
+        String processedDoc = XMLUtils.PrettyDocumentToString(signedDoc);
+        assertTrue(processedDoc.contains(SOAP_BODY));
+    }
+    
     /**
      * Verifies the soap envelope.
      * This method verifies all the signature generated.
