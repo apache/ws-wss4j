@@ -211,6 +211,39 @@ public class XOPAttachmentTest extends org.junit.Assert {
         assertTrue(processedDoc.contains(SOAP_BODY));
     }
 
+    // Here we are storing the BinarySecurityToken bytes in an attachment
+    @org.junit.Test
+    public void testSignedSOAPBody() throws Exception {
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        AttachmentCallbackHandler outboundAttachmentCallback = new AttachmentCallbackHandler();
+        builder.setAttachmentCallbackHandler(outboundAttachmentCallback);
+        builder.setStoreBytesInAttachment(true);
+        
+        Document signedDoc = builder.build(doc, crypto, secHeader);
+        
+        List<Attachment> signedAttachments = outboundAttachmentCallback.getResponseAttachments();
+        assertNotNull(signedAttachments);
+        assertTrue(signedAttachments.size() == 1);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("After Signing....");
+            String outputString = 
+                XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+        }
+        
+        AttachmentCallbackHandler inboundAttachmentCallback = 
+            new AttachmentCallbackHandler(signedAttachments);
+        verify(signedDoc, inboundAttachmentCallback);
+    }
+    
     /**
      * Verifies the soap envelope.
      * This method verifies all the signature generated.
