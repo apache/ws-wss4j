@@ -47,7 +47,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- * Test for processing an xop:Include inside a CipherValue Element
+ * Test for creating / processing an xop:Include inside a CipherValue Element
  */
 public class XOPAttachmentTest extends org.junit.Assert {
 
@@ -81,8 +81,9 @@ public class XOPAttachmentTest extends org.junit.Assert {
     // Set up a test to encrypt the SOAP Body + an attachment, which is the same content as 
     // the SOAP Body. Then replace the encrypted SOAP Body with a xop:Include to the attachment,
     // and modify the request to remove the encryption stuff pointing to the attachment.
+    // (NOTE: This test was before we supported creating requests with xop:Include)
     @org.junit.Test
-    public void testEncryptedSOAPBody() throws Exception {
+    public void testManualEncryptedSOAPBody() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -163,6 +164,43 @@ public class XOPAttachmentTest extends org.junit.Assert {
 
         attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
         verify(encryptedDoc, attachmentCallbackHandler);
+        
+        String processedDoc = XMLUtils.PrettyDocumentToString(encryptedDoc);
+        assertTrue(processedDoc.contains(SOAP_BODY));
+    }
+    
+    @org.junit.Test
+    public void testEncryptedSOAPBody() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecEncrypt encrypt = new WSSecEncrypt();
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        AttachmentCallbackHandler outboundAttachmentCallback = new AttachmentCallbackHandler();
+        encrypt.setAttachmentCallbackHandler(outboundAttachmentCallback);
+        encrypt.setStoreBytesInAttachment(true);
+
+        encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+
+        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        
+        List<Attachment> encryptedAttachments = outboundAttachmentCallback.getResponseAttachments();
+        assertNotNull(encryptedAttachments);
+        // Should have EncryptedKey + EncryptedData stored in attachments...
+        assertTrue(encryptedAttachments.size() == 2);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = XMLUtils.PrettyDocumentToString(encryptedDoc);
+            LOG.debug(outputString);
+            // System.out.println(outputString);
+        }
+
+        AttachmentCallbackHandler inboundAttachmentCallback = 
+            new AttachmentCallbackHandler(encryptedAttachments);
+        verify(encryptedDoc, inboundAttachmentCallback);
         
         String processedDoc = XMLUtils.PrettyDocumentToString(encryptedDoc);
         assertTrue(processedDoc.contains(SOAP_BODY));

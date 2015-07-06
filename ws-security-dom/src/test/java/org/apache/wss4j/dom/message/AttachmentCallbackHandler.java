@@ -29,19 +29,24 @@ import org.apache.wss4j.common.ext.AttachmentResultCallback;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  * A Callback Handler implementation for the case of signing/encrypting Attachments via the SwA 
- * (SOAP with Attachments) specification.
+ * (SOAP with Attachments) specification or when using xop:Include in the case of MTOM.
  */
 public class AttachmentCallbackHandler implements CallbackHandler {
     
     private final List<Attachment> originalRequestAttachments;
     private Map<String, Attachment> attachmentMap = new HashMap<>();
     private List<Attachment> responseAttachments = new ArrayList<>();
+    
+    public AttachmentCallbackHandler() {
+        originalRequestAttachments = Collections.emptyList();
+    }
     
     public AttachmentCallbackHandler(List<Attachment> attachments) {
         originalRequestAttachments = attachments;
