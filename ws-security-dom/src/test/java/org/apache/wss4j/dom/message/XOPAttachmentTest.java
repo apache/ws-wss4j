@@ -435,6 +435,126 @@ public class XOPAttachmentTest extends org.junit.Assert {
         assertTrue(processedDoc.contains(SOAP_BODY));
     }
     
+    @org.junit.Test
+    public void testSignedEncryptedSOAPBody() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        AttachmentCallbackHandler outboundAttachmentCallback = new AttachmentCallbackHandler();
+        
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        
+        builder.setAttachmentCallbackHandler(outboundAttachmentCallback);
+        builder.setStoreBytesInAttachment(true);
+        builder.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        builder.build(doc, crypto, secHeader);
+        
+        WSSecEncrypt encrypt = new WSSecEncrypt();
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        encrypt.setAttachmentCallbackHandler(outboundAttachmentCallback);
+        encrypt.setStoreBytesInAttachment(true);
+        encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+
+        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        
+        List<Attachment> encryptedAttachments = outboundAttachmentCallback.getResponseAttachments();
+        assertNotNull(encryptedAttachments);
+        assertTrue(encryptedAttachments.size() == 3);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = XMLUtils.PrettyDocumentToString(encryptedDoc);
+            LOG.debug(outputString);
+            // System.out.println(outputString);
+        }
+
+        AttachmentCallbackHandler inboundAttachmentCallback = 
+            new AttachmentCallbackHandler(encryptedAttachments);
+        //WSHandlerResult results = verify(encryptedDoc, inboundAttachmentCallback);
+        verify(encryptedDoc, inboundAttachmentCallback);
+        
+        String processedDoc = XMLUtils.PrettyDocumentToString(encryptedDoc);
+        assertTrue(processedDoc.contains(SOAP_BODY));
+        /*
+        // Check Signature Element
+        WSSecurityEngineResult actionResult =
+            results.getActionResults().get(WSConstants.SIGN).get(0);
+        @SuppressWarnings("unchecked")
+        final List<WSDataRef> refs =
+            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        assertNotNull(refs);
+        assertTrue(refs.size() == 1);
+        WSDataRef wsDataRef = refs.get(0);
+        Element protectedElement = wsDataRef.getProtectedElement();
+        String outputString = DOM2Writer.nodeToString(protectedElement);
+        System.out.println("ONE1: " + outputString);
+        */
+    }
+    
+    @org.junit.Test
+    public void testEncryptedSignedSOAPBody() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        AttachmentCallbackHandler outboundAttachmentCallback = new AttachmentCallbackHandler();
+        
+        WSSecEncrypt encrypt = new WSSecEncrypt();
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        encrypt.setAttachmentCallbackHandler(outboundAttachmentCallback);
+        encrypt.setStoreBytesInAttachment(true);
+        encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+
+        encrypt.build(doc, crypto, secHeader);
+        
+        WSSecSignature builder = new WSSecSignature();
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        
+        builder.setAttachmentCallbackHandler(outboundAttachmentCallback);
+        builder.setStoreBytesInAttachment(true);
+        builder.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        Document signedDoc = builder.build(doc, crypto, secHeader);
+        
+        List<Attachment> signedAttachments = outboundAttachmentCallback.getResponseAttachments();
+        assertNotNull(signedAttachments);
+        assertTrue(signedAttachments.size() == 3);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug(outputString);
+            // System.out.println(outputString);
+        }
+
+        AttachmentCallbackHandler inboundAttachmentCallback = 
+            new AttachmentCallbackHandler(signedAttachments);
+        // WSHandlerResult results = verify(signedDoc, inboundAttachmentCallback);
+        verify(signedDoc, inboundAttachmentCallback);
+        
+        String processedDoc = XMLUtils.PrettyDocumentToString(signedDoc);
+        assertTrue(processedDoc.contains(SOAP_BODY));
+        /*
+        // Check Signature Element
+        WSSecurityEngineResult actionResult =
+            results.getActionResults().get(WSConstants.SIGN).get(0);
+        @SuppressWarnings("unchecked")
+        final List<WSDataRef> refs =
+            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        assertNotNull(refs);
+        assertTrue(refs.size() == 1);
+        WSDataRef wsDataRef = refs.get(0);
+        Element protectedElement = wsDataRef.getProtectedElement();
+        String outputString = DOM2Writer.nodeToString(protectedElement);
+        System.out.println("TWO1: " + outputString);
+        */
+    }
+    
     /**
      * Verifies the soap envelope.
      * This method verifies all the signature generated.
