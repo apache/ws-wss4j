@@ -469,6 +469,11 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
         final String attachmentId = config.getIdAllocator().createId("", doc);
         String encEncryptedDataId = config.getIdAllocator().createId("ED-", attachmentId);
+        
+        if ("Header".equals(encryptionPart.getEncModifier()) 
+            && elementToEncrypt.getParentNode().equals(WSSecurityUtil.getSOAPHeader(doc))) {
+            createEncryptedHeaderElement(doc, elementToEncrypt, config);
+        }
 
         Element encryptedData =
             doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":EncryptedData");
@@ -678,45 +683,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         String xencEncryptedDataId = 
             config.getIdAllocator().createId("ED-", elementToEncrypt);
         try {
-            String headerId = "";
             if ("Header".equals(modifier) 
                 && elementToEncrypt.getParentNode().equals(WSSecurityUtil.getSOAPHeader(doc))) {
-                Element elem = 
-                    doc.createElementNS(
-                        WSConstants.WSSE11_NS, "wsse11:" + WSConstants.ENCRYPTED_HEADER
-                    );
-                WSSecurityUtil.setNamespace(elem, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
-                String wsuPrefix = 
-                    WSSecurityUtil.setNamespace(elem, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
-                headerId = config.getIdAllocator().createId("EH-", elementToEncrypt);
-                elem.setAttributeNS(
-                    WSConstants.WSU_NS, wsuPrefix + ":Id", headerId
-                );
-                //
-                // Add the EncryptedHeader node to the element to be encrypted's parent
-                // (i.e. the SOAP header). Add the element to be encrypted to the Encrypted
-                // Header node as well
-                //
-                Node parent = elementToEncrypt.getParentNode();
-                elementToEncrypt = (Element)parent.replaceChild(elem, elementToEncrypt);
-                elem.appendChild(elementToEncrypt);
-                
-                NamedNodeMap map = elementToEncrypt.getAttributes();
-                for (int i = 0; i < map.getLength(); i++) {
-                    Attr attr = (Attr)map.item(i);
-                    if (attr.getNamespaceURI().equals(WSConstants.URI_SOAP11_ENV)
-                        || attr.getNamespaceURI().equals(WSConstants.URI_SOAP12_ENV)) {                         
-                        String soapEnvPrefix = 
-                            WSSecurityUtil.setNamespace(
-                                elem, attr.getNamespaceURI(), WSConstants.DEFAULT_SOAP_PREFIX
-                            );
-                        elem.setAttributeNS(
-                            attr.getNamespaceURI(), 
-                            soapEnvPrefix + ":" + attr.getLocalName(), 
-                            attr.getValue()
-                        );
-                    }
-                }
+                createEncryptedHeaderElement(doc, elementToEncrypt, config);
             }
             
             xmlCipher.init(XMLCipher.ENCRYPT_MODE, secretKey);
@@ -729,6 +698,49 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
             );
+        }
+    }
+    
+    private static void createEncryptedHeaderElement(
+        Document doc,
+        Element elementToEncrypt,
+        WSSConfig config
+    ) {
+        Element elem = 
+            doc.createElementNS(
+                WSConstants.WSSE11_NS, "wsse11:" + WSConstants.ENCRYPTED_HEADER
+            );
+        WSSecurityUtil.setNamespace(elem, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
+        String wsuPrefix = 
+            WSSecurityUtil.setNamespace(elem, WSConstants.WSU_NS, WSConstants.WSU_PREFIX);
+        String headerId = config.getIdAllocator().createId("EH-", elementToEncrypt);
+        elem.setAttributeNS(
+            WSConstants.WSU_NS, wsuPrefix + ":Id", headerId
+        );
+        //
+        // Add the EncryptedHeader node to the element to be encrypted's parent
+        // (i.e. the SOAP header). Add the element to be encrypted to the Encrypted
+        // Header node as well
+        //
+        Node parent = elementToEncrypt.getParentNode();
+        elementToEncrypt = (Element)parent.replaceChild(elem, elementToEncrypt);
+        elem.appendChild(elementToEncrypt);
+        
+        NamedNodeMap map = elementToEncrypt.getAttributes();
+        for (int i = 0; i < map.getLength(); i++) {
+            Attr attr = (Attr)map.item(i);
+            if (attr.getNamespaceURI().equals(WSConstants.URI_SOAP11_ENV)
+                || attr.getNamespaceURI().equals(WSConstants.URI_SOAP12_ENV)) {                         
+                String soapEnvPrefix = 
+                    WSSecurityUtil.setNamespace(
+                        elem, attr.getNamespaceURI(), WSConstants.DEFAULT_SOAP_PREFIX
+                    );
+                elem.setAttributeNS(
+                    attr.getNamespaceURI(), 
+                    soapEnvPrefix + ":" + attr.getLocalName(), 
+                    attr.getValue()
+                );
+            }
         }
     }
     
