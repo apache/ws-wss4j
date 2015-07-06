@@ -56,6 +56,18 @@ public class XOPAttachmentTest extends org.junit.Assert {
         + "<value xmlns=\"\">15</value>" 
         + "</add>";
     
+    private static final String SOAP_HEADER_MSG = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+        "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
+        "   <soapenv:Header>" + 
+        "       <foo:bar1 xmlns:foo=\"urn:foo.bar\" >baz1</foo:bar1>" + 
+        "       <foo:foobar xmlns:foo=\"urn:foo.bar\" >baz</foo:foobar>" + 
+        "       <foo:bar2 xmlns:foo=\"urn:foo.bar\" >baz2</foo:bar2>" +
+        "   </soapenv:Header>" +
+        "   <soapenv:Body>" +
+        "      <ns1:testMethod xmlns:ns1=\"http://axis/service/security/test6/LogTestService8\"></ns1:testMethod>" +
+        "   </soapenv:Body>" +
+        "</soapenv:Envelope>";
+    
     private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(XOPAttachmentTest.class);
 
@@ -237,6 +249,81 @@ public class XOPAttachmentTest extends org.junit.Assert {
         AttachmentCallbackHandler inboundAttachmentCallback = 
             new AttachmentCallbackHandler(signedAttachments);
         verify(signedDoc, inboundAttachmentCallback);
+    }
+    
+    @org.junit.Test
+    public void testEncryptedHeaderAsEncryptedData() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAP_HEADER_MSG);
+        WSSecEncrypt encrypt = new WSSecEncrypt();
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        AttachmentCallbackHandler outboundAttachmentCallback = new AttachmentCallbackHandler();
+        encrypt.setAttachmentCallbackHandler(outboundAttachmentCallback);
+        encrypt.setStoreBytesInAttachment(true);
+
+        WSEncryptionPart encP =
+            new WSEncryptionPart(
+                "foobar", "urn:foo.bar", "");
+        encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        encrypt.getParts().add(encP);
+
+        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        
+        List<Attachment> encryptedAttachments = outboundAttachmentCallback.getResponseAttachments();
+        assertNotNull(encryptedAttachments);
+        // Should have EncryptedKey + EncryptedData + the header stored in attachments...
+        assertTrue(encryptedAttachments.size() == 3);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = XMLUtils.PrettyDocumentToString(encryptedDoc);
+            LOG.debug(outputString);
+            // System.out.println(outputString);
+        }
+
+        AttachmentCallbackHandler inboundAttachmentCallback = 
+            new AttachmentCallbackHandler(encryptedAttachments);
+        verify(encryptedDoc, inboundAttachmentCallback);
+    }
+    
+    @org.junit.Test
+    public void testEncryptedHeaderasEncryptedHeader() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAP_HEADER_MSG);
+        WSSecEncrypt encrypt = new WSSecEncrypt();
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        AttachmentCallbackHandler outboundAttachmentCallback = new AttachmentCallbackHandler();
+        encrypt.setAttachmentCallbackHandler(outboundAttachmentCallback);
+        encrypt.setStoreBytesInAttachment(true);
+
+        WSEncryptionPart encP =
+            new WSEncryptionPart(
+                "foobar", "urn:foo.bar", "Header");
+        encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        encrypt.getParts().add(encP);
+
+        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        
+        List<Attachment> encryptedAttachments = outboundAttachmentCallback.getResponseAttachments();
+        assertNotNull(encryptedAttachments);
+        // Should have EncryptedKey + EncryptedData + the header stored in attachments...
+        assertTrue(encryptedAttachments.size() == 3);
+        
+        if (LOG.isDebugEnabled()) {
+            String outputString = XMLUtils.PrettyDocumentToString(encryptedDoc);
+            LOG.debug(outputString);
+        }
+
+        AttachmentCallbackHandler inboundAttachmentCallback = 
+            new AttachmentCallbackHandler(encryptedAttachments);
+        verify(encryptedDoc, inboundAttachmentCallback);
     }
     
     /**
