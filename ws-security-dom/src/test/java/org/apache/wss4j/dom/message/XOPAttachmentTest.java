@@ -340,8 +340,8 @@ public class XOPAttachmentTest extends org.junit.Assert {
     @org.junit.Test
     public void testDerivedEncryptedSOAPBody() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
         
         AttachmentCallbackHandler outboundAttachmentCallback = new AttachmentCallbackHandler();
         
@@ -390,8 +390,8 @@ public class XOPAttachmentTest extends org.junit.Assert {
     @org.junit.Test
     public void testDerivedSignedSOAPBody() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
         
         AttachmentCallbackHandler outboundAttachmentCallback = new AttachmentCallbackHandler();
         
