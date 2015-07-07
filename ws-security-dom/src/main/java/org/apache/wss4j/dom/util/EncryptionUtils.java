@@ -223,11 +223,18 @@ public final class EncryptionUtils {
     }
 
     private static String getXOPURIFromEncryptedData(Element encData) {
+        Element cipherValue = getCipherValueFromEncryptedData(encData);
+        if (cipherValue != null) {
+            return getXOPURIFromCipherValue(cipherValue);
+        }
+        
+        return null;
+    }
+    
+    public static Element getCipherValueFromEncryptedData(Element encData) {
         Element cipherData = XMLUtils.getDirectChildElement(encData, "CipherData", WSConstants.ENC_NS);
         if (cipherData != null) {
-            Element cipherValue = 
-                XMLUtils.getDirectChildElement(cipherData, "CipherValue", WSConstants.ENC_NS);
-            return getXOPURIFromCipherValue(cipherValue);
+            return XMLUtils.getDirectChildElement(cipherData, "CipherValue", WSConstants.ENC_NS);
         }
         
         return null;

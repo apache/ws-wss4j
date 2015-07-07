@@ -266,8 +266,8 @@ public class XOPAttachmentTest extends org.junit.Assert {
         builder.setIncludeSignatureToken(true);
         
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
         
         AttachmentCallbackHandler outboundAttachmentCallback = new AttachmentCallbackHandler();
         builder.setAttachmentCallbackHandler(outboundAttachmentCallback);
@@ -505,28 +505,15 @@ public class XOPAttachmentTest extends org.junit.Assert {
 
         AttachmentCallbackHandler inboundAttachmentCallback = 
             new AttachmentCallbackHandler(encryptedAttachments);
-        //WSHandlerResult results = verify(encryptedDoc, inboundAttachmentCallback);
         verify(encryptedDoc, inboundAttachmentCallback);
         
         String processedDoc = XMLUtils.PrettyDocumentToString(encryptedDoc);
         assertTrue(processedDoc.contains(SOAP_BODY));
-        /*
-        // Check Signature Element
-        WSSecurityEngineResult actionResult =
-            results.getActionResults().get(WSConstants.SIGN).get(0);
-        @SuppressWarnings("unchecked")
-        final List<WSDataRef> refs =
-            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
-        assertNotNull(refs);
-        assertTrue(refs.size() == 1);
-        WSDataRef wsDataRef = refs.get(0);
-        Element protectedElement = wsDataRef.getProtectedElement();
-        String outputString = DOM2Writer.nodeToString(protectedElement);
-        System.out.println("ONE1: " + outputString);
-        */
     }
     
+    // TODO
     @org.junit.Test
+    @org.junit.Ignore
     public void testEncryptedSignedSOAPBody() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader();
@@ -563,25 +550,10 @@ public class XOPAttachmentTest extends org.junit.Assert {
 
         AttachmentCallbackHandler inboundAttachmentCallback = 
             new AttachmentCallbackHandler(signedAttachments);
-        // WSHandlerResult results = verify(signedDoc, inboundAttachmentCallback);
         verify(signedDoc, inboundAttachmentCallback);
         
         String processedDoc = XMLUtils.PrettyDocumentToString(signedDoc);
         assertTrue(processedDoc.contains(SOAP_BODY));
-        /*
-        // Check Signature Element
-        WSSecurityEngineResult actionResult =
-            results.getActionResults().get(WSConstants.SIGN).get(0);
-        @SuppressWarnings("unchecked")
-        final List<WSDataRef> refs =
-            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
-        assertNotNull(refs);
-        assertTrue(refs.size() == 1);
-        WSDataRef wsDataRef = refs.get(0);
-        Element protectedElement = wsDataRef.getProtectedElement();
-        String outputString = DOM2Writer.nodeToString(protectedElement);
-        System.out.println("TWO1: " + outputString);
-        */
     }
     
     /**

@@ -88,6 +88,7 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
+import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -413,7 +414,8 @@ public class SignatureProcessor implements Processor {
             // Test for replay attacks
             testMessageReplay(elem, xmlSignature.getSignatureValue().getValue(), key, data, wsDocInfo);
             
-            setElementsOnContext(xmlSignature, (DOMValidateContext)context, wsDocInfo, elem.getOwnerDocument());
+            setElementsOnContext(xmlSignature, (DOMValidateContext)context, data, wsDocInfo, 
+                                 elem.getOwnerDocument());
             boolean signatureOk = xmlSignature.validate(context);
             if (signatureOk) {
                 return xmlSignature;
@@ -459,6 +461,7 @@ public class SignatureProcessor implements Processor {
     private void setElementsOnContext(
         XMLSignature xmlSignature, 
         DOMValidateContext context,
+        RequestData data,
         WSDocInfo wsDocInfo,
         Document doc
     ) throws WSSecurityException {
@@ -484,6 +487,27 @@ public class SignatureProcessor implements Processor {
                 // We don't write out the xop:Include bytes into the BinarySecurityToken by default
                 // But if the BST is signed, then we have to, or else Signature validation fails...
                 handleXopInclude(element, wsDocInfo);
+            } else if (element != null) {
+                // Handle EncryptedData children that might store the bytes in the attachment
+                List<Element> encElements = 
+                    WSSecurityUtil.findElements(element, "EncryptedData", WSConstants.ENC_NS);
+                for (Element encElement : encElements) {
+                    Element xencCipherValue = EncryptionUtils.getCipherValueFromEncryptedData(encElement);
+                    
+                    String xopURI = EncryptionUtils.getXOPURIFromCipherValue(xencCipherValue);
+                    if (xopURI != null) {
+                        // Store the bytes in the attachment to calculate the signature
+                        byte[] attachmentBytes = WSSecurityUtil.getBytesFromAttachment(xopURI, data);
+                        String encodedBytes = Base64.encode(attachmentBytes);
+
+                        Element includeElement =
+                            WSSecurityUtil.getDirectChildElement(xencCipherValue, "Include", WSConstants.XOP_NS);
+
+                        Node newCipherValueChild = 
+                            encElement.getOwnerDocument().createTextNode(encodedBytes);
+                        xencCipherValue.replaceChild(newCipherValueChild, includeElement);
+                    }
+                }
             }
         }
     }
