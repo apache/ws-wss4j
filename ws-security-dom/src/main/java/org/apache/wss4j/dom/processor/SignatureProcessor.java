@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.crypto.Data;
 import javax.xml.crypto.MarshalException;
@@ -64,7 +63,6 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.PublicKeyPrincipalImpl;
 import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
-import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
@@ -477,59 +475,21 @@ public class SignatureProcessor implements Processor {
             Element element = callbackLookup.getAndRegisterElement(uri, null, true, context);
             if (element == null) {
                 wsDocInfo.setTokenOnContext(uri, context);
-            } else if ("BinarySecurityToken".equals(element.getLocalName())
-                && WSConstants.WSSE_NS.equals(element.getNamespaceURI())
-                && isXopInclude(element)) {
-                // We don't write out the xop:Include bytes into the BinarySecurityToken by default
-                // But if the BST is signed, then we have to, or else Signature validation fails...
-                handleXopInclude(element, wsDocInfo);
             } else {
-                // Handle EncryptedData children that might store the bytes in the attachment
-                List<Element> encElements = 
-                    XMLUtils.findElements(element, "EncryptedData", WSConstants.ENC_NS);
-                for (Element encElement : encElements) {
-                    Element xencCipherValue = EncryptionUtils.getCipherValueFromEncryptedData(encElement);
-                    
-                    String xopURI = EncryptionUtils.getXOPURIFromCipherValue(xencCipherValue);
+                // Look for xop:Include Nodes
+                List<Element> includeElements = 
+                    XMLUtils.findElements(element, "Include", WSConstants.XOP_NS);
+                for (Element includeElement : includeElements) {
+                    String xopURI = includeElement.getAttributeNS(null, "href");
                     if (xopURI != null) {
                         // Store the bytes in the attachment to calculate the signature
                         byte[] attachmentBytes = WSSecurityUtil.getBytesFromAttachment(xopURI, data);
                         String encodedBytes = Base64.encode(attachmentBytes);
 
-                        Element includeElement =
-                            XMLUtils.getDirectChildElement(xencCipherValue, "Include", WSConstants.XOP_NS);
-
                         Node newCipherValueChild = 
-                            encElement.getOwnerDocument().createTextNode(encodedBytes);
-                        xencCipherValue.replaceChild(newCipherValueChild, includeElement);
+                            includeElement.getOwnerDocument().createTextNode(encodedBytes);
+                        includeElement.getParentNode().replaceChild(newCipherValueChild, includeElement);
                     }
-                }
-            }
-        }
-    }
-    
-    private boolean isXopInclude(Element element) {
-        Element elementChild =
-            XMLUtils.getDirectChildElement(element, "Include", WSConstants.XOP_NS);
-        if (elementChild != null && elementChild.hasAttributeNS(null, "href")) {
-            String xopUri = elementChild.getAttributeNS(null, "href");
-            if (xopUri != null && xopUri.startsWith("cid:")) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    private void handleXopInclude(Element element, WSDocInfo wsDocInfo) {
-        Map<Integer, List<WSSecurityEngineResult>> actionResults = wsDocInfo.getActionResults();
-        if (actionResults != null && actionResults.containsKey(WSConstants.BST)) {
-            for (WSSecurityEngineResult result : actionResults.get(WSConstants.BST)) {
-                Element token = (Element)result.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
-                if (element.equals(token)) {
-                    BinarySecurity binarySecurity = 
-                        (BinarySecurity)result.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-                    binarySecurity.encodeRawToken();
-                    return;
                 }
             }
         }
