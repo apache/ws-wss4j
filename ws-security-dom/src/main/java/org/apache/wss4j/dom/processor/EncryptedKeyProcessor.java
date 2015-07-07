@@ -126,15 +126,7 @@ public class EncryptedKeyProcessor implements Processor {
         //
         // Now lookup CipherValue.
         //
-        Element tmpE = 
-            XMLUtils.getDirectChildElement(
-                elem, "CipherData", WSConstants.ENC_NS
-            );
-        Element xencCipherValue = null;
-        if (tmpE != null) {
-            xencCipherValue = 
-                XMLUtils.getDirectChildElement(tmpE, "CipherValue", WSConstants.ENC_NS);
-        }
+        Element xencCipherValue = EncryptionUtils.getCipherValueFromEncryptedData(elem);
         if (xencCipherValue == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noCipher");
         }
