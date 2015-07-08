@@ -30,7 +30,8 @@
     
     <properties>
         <wss4j.osgi.import>
-            org.joda.time*;version="[1.6,3)"
+            org.joda.time*;version="[1.6,3)",
+            net.shibboleth*;resolution:=optional
         </wss4j.osgi.import>
         <!--
                         <DynamicImport-Package>
