@@ -31,7 +31,10 @@ import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
+import org.apache.wss4j.common.saml.bean.DelegateBean;
+import org.apache.wss4j.common.saml.bean.NameIDBean;
 import org.apache.wss4j.common.saml.bean.ProxyRestrictionBean;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
@@ -678,6 +681,33 @@ public class SamlConditionsTest extends org.junit.Assert {
         data.setAudienceRestrictions(audiences);
         
         newEngine.processSecurityHeader(doc, data);
+    }
+    
+    @org.junit.Test
+    public void testSAML2Delegate() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        
+        ConditionsBean conditions = new ConditionsBean();
+        DateTime notBefore = new DateTime();
+        conditions.setNotBefore(notBefore);
+        conditions.setNotAfter(notBefore.plusMinutes(20));
+        
+        DelegateBean delegate = new DelegateBean();
+        delegate.setDelegationInstant(DateTime.now());
+        delegate.setConfirmationMethod(SAML2Constants.CONF_BEARER);
+        
+        NameIDBean nameID = new NameIDBean();
+        nameID.setNameValue("bob");
+        nameID.setNameQualifier("www.example.com");
+        delegate.setNameIDBean(nameID);
+        
+        conditions.setDelegates(Collections.singletonList(delegate));
+        
+        callbackHandler.setConditions(conditions);
+        
+        createAndVerifyMessage(callbackHandler, true);
     }
     
     private void createAndVerifyMessage(

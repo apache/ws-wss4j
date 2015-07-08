@@ -19,16 +19,12 @@
 
 package org.apache.wss4j.common.saml.bean;
 
-import org.apache.wss4j.common.saml.builder.SAML1Constants;
-
 /**
  * Class SubjectBean represents a SAML subject (can be used to create
  * both SAML v1.1 and v2.0 statements)
  */
 public class SubjectBean {
-    private String subjectName;
-    private String subjectNameIDFormat = SAML1Constants.NAMEID_FORMAT_UNSPECIFIED;
-    private String subjectNameQualifier;
+    private final NameIDBean nameID = new NameIDBean();
     private String subjectConfirmationMethod;
     private KeyInfoBean keyInfo;
     private SubjectConfirmationDataBean subjectConfirmationData;
@@ -51,8 +47,8 @@ public class SubjectBean {
         String subjectNameQualifier, 
         String subjectConfirmationMethod
     ) {
-        this.subjectName = subjectName;
-        this.subjectNameQualifier = subjectNameQualifier;
+        nameID.setNameValue(subjectName);
+        nameID.setNameQualifier(subjectNameQualifier);
         this.subjectConfirmationMethod = subjectConfirmationMethod;
     }
     
@@ -71,7 +67,7 @@ public class SubjectBean {
         String subjectNameIDFormat
     ) {
         this(subjectName, subjectNameQualifier, subjectConfirmationMethod);
-        this.subjectNameIDFormat = subjectNameIDFormat;
+        nameID.setNameIDFormat(subjectNameIDFormat);
     }
 
     /**
@@ -80,7 +76,7 @@ public class SubjectBean {
      * @return the subjectName (type String) of this SubjectBean object.
      */
     public String getSubjectName() {
-        return subjectName;
+        return nameID.getNameValue();
     }
 
     /**
@@ -89,7 +85,7 @@ public class SubjectBean {
      * @param subjectName the subjectName of this SubjectBean object.
      */
     public void setSubjectName(String subjectName) {
-        this.subjectName = subjectName;
+        nameID.setNameValue(subjectName);
     }
     
     /**
@@ -98,7 +94,7 @@ public class SubjectBean {
      * @return the subjectNameQualifier (type String) of this SubjectBean object.
      */
     public String getSubjectNameQualifier() {
-        return subjectNameQualifier;
+        return nameID.getNameQualifier();
     }
 
     /**
@@ -107,7 +103,7 @@ public class SubjectBean {
      * @param subjectNameQualifier the subjectNameQualifier of this SubjectBean object.
      */
     public void setSubjectNameQualifier(String subjectNameQualifier) {
-        this.subjectNameQualifier = subjectNameQualifier;
+        nameID.setNameQualifier(subjectNameQualifier);
     }
     
     /**
@@ -138,7 +134,7 @@ public class SubjectBean {
      * @return the subjectNameIDFormat (type String) of this SubjectBean object.
      */
     public String getSubjectNameIDFormat() {
-        return subjectNameIDFormat;
+        return nameID.getNameIDFormat();
     }
 
     /**
@@ -148,7 +144,7 @@ public class SubjectBean {
      * @param subjectNameIDFormat the subjectNameIDFormat of this SubjectBean object.
      */
     public void setSubjectNameIDFormat(String subjectNameIDFormat) {
-        this.subjectNameIDFormat = subjectNameIDFormat;
+        nameID.setNameIDFormat(subjectNameIDFormat);
     }
     
     /**
@@ -200,16 +196,7 @@ public class SubjectBean {
 
         SubjectBean that = (SubjectBean) o;
 
-        if (subjectName == null && that.subjectName != null) {
-            return false;
-        } else if (subjectName != null && !subjectName.equals(that.subjectName)) {
-            return false;
-        }
-        
-        if (subjectNameQualifier == null && that.subjectNameQualifier != null) {
-            return false;
-        } else if (subjectNameQualifier != null && 
-            !subjectNameQualifier.equals(that.subjectNameQualifier)) {
+        if (!nameID.equals(that.nameID)) {
             return false;
         }
         
@@ -217,13 +204,6 @@ public class SubjectBean {
             return false;
         } else if (subjectConfirmationMethod != null && 
             !subjectConfirmationMethod.equals(that.subjectConfirmationMethod)) {
-            return false;
-        }
-        
-        if (subjectNameIDFormat == null && that.subjectNameIDFormat != null) {
-            return false;
-        } else if (subjectNameIDFormat != null 
-            && !subjectNameIDFormat.equals(that.subjectNameIDFormat)) {
             return false;
         }
         
@@ -248,18 +228,9 @@ public class SubjectBean {
      */
     @Override
     public int hashCode() {
-        int result = 0;
-        if (subjectName != null) {
-            result = subjectName.hashCode();
-        }
-        if (subjectNameQualifier != null) {
-            result = 31 * result + subjectNameQualifier.hashCode();
-        }
+        int result = nameID.hashCode();
         if (subjectConfirmationMethod != null) {
             result = 31 * result + subjectConfirmationMethod.hashCode();
-        }
-        if (subjectNameIDFormat != null) {
-            result = 31 * result + subjectNameIDFormat.hashCode();
         }
         if (keyInfo != null) {
             result = 31 * result + keyInfo.hashCode();
