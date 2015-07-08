@@ -19,12 +19,16 @@
 
 package org.apache.wss4j.common.token;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.UUID;
 
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.bsp.BSPRule;
+import org.apache.wss4j.common.ext.Attachment;
+import org.apache.wss4j.common.ext.AttachmentResultCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.XMLUtils;
@@ -34,6 +38,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
+import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
@@ -49,6 +54,16 @@ public class BinarySecurity {
     
     private Element element;
     private byte[] data;
+    private boolean storeBytesInAttachment;
+    private CallbackHandler attachmentCallbackHandler;
+
+    public CallbackHandler getAttachmentCallbackHandler() {
+        return attachmentCallbackHandler;
+    }
+
+    public void setAttachmentCallbackHandler(CallbackHandler attachmentCallbackHandler) {
+        this.attachmentCallbackHandler = attachmentCallbackHandler;
+    }
 
     /**
      * Constructor.
@@ -87,7 +102,6 @@ public class BinarySecurity {
     public BinarySecurity(Document doc) {
         element = doc.createElementNS(WSS4JConstants.WSSE_NS, "wsse:BinarySecurityToken");
         setEncodingType(WSS4JConstants.BASE64_ENCODING);
-        element.appendChild(doc.createTextNode(""));
     }
     
     /**
@@ -201,13 +215,38 @@ public class BinarySecurity {
      * 
      * @param data 
      */
-    public void setToken(byte[] data) {
+    public void setToken(byte[] data) throws WSSecurityException {
         if (data == null) {
             throw new IllegalArgumentException("data == null");
         }
-        Text node = getFirstNode();
-        node.setData(Base64.encode(data));
-        setRawToken(data);
+        if (storeBytesInAttachment && attachmentCallbackHandler != null) {
+            Document document = element.getOwnerDocument();
+            final String attachmentId = "_" + UUID.randomUUID().toString();
+            
+            element.setAttributeNS(XMLUtils.XMLNS_NS, "xmlns:xop", WSS4JConstants.XOP_NS);
+            Element xopInclude =
+                document.createElementNS(WSS4JConstants.XOP_NS, "xop:Include");
+            xopInclude.setAttributeNS(null, "href", "cid:" + attachmentId);
+            element.appendChild(xopInclude);
+            
+            Attachment resultAttachment = new Attachment();
+            resultAttachment.setId(attachmentId);
+            resultAttachment.setMimeType("application/ciphervalue");
+            resultAttachment.setSourceStream(new ByteArrayInputStream(data));
+            
+            AttachmentResultCallback attachmentResultCallback = new AttachmentResultCallback();
+            attachmentResultCallback.setAttachmentId(attachmentId);
+            attachmentResultCallback.setAttachment(resultAttachment);
+            try {
+                attachmentCallbackHandler.handle(new Callback[]{attachmentResultCallback});
+            } catch (Exception e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+            }
+        } else {
+            Text node = getFirstNode();
+            node.setData(Base64.encode(data));
+            setRawToken(data);
+        }
     }
     
     /**
@@ -323,5 +362,13 @@ public class BinarySecurity {
             return false;
         }
         return true;
+    }
+
+    public boolean isStoreBytesInAttachment() {
+        return storeBytesInAttachment;
+    }
+
+    public void setStoreBytesInAttachment(boolean storeBytesInAttachment) {
+        this.storeBytesInAttachment = storeBytesInAttachment;
     }
 }
