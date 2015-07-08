@@ -96,6 +96,7 @@ public class RequestData {
     private final List<String> audienceRestrictions = new ArrayList<String>();
     private boolean requireTimestampExpires;
     private boolean storeBytesInAttachment;
+    private boolean expandXopIncludeForSignature = true;
 
     public void clear() {
         soapConstants = null;
@@ -133,6 +134,7 @@ public class RequestData {
         audienceRestrictions.clear();
         requireTimestampExpires = false;
         storeBytesInAttachment = false;
+        expandXopIncludeForSignature = true;
     }
 
     public boolean isEnableTimestampReplayCache() {
@@ -600,4 +602,12 @@ public class RequestData {
     public void setStoreBytesInAttachment(boolean storeBytesInAttachment) {
         this.storeBytesInAttachment = storeBytesInAttachment;
     } 
+
+    public boolean isExpandXopIncludeForSignature() {
+        return expandXopIncludeForSignature;
+    }
+
+    public void setExpandXopIncludeForSignature(boolean expandXopIncludeForSignature) {
+        this.expandXopIncludeForSignature = expandXopIncludeForSignature;
+    }
 }

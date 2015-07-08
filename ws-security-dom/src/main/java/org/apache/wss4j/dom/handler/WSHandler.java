@@ -1453,6 +1453,12 @@ public abstract class WSHandler {
                 reqData.setSubjectCertConstraints(subjectCertConstraints);
             }
         }
+        
+        boolean expandXOP = 
+            decodeBooleanConfigValue(
+                reqData, WSHandlerConstants.EXPAND_XOP_INCLUDE_FOR_SIGNATURE, true
+            );
+        reqData.setExpandXopIncludeForSignature(expandXOP);
     }
 
     /*
