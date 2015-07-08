@@ -35,6 +35,7 @@ public class ConditionsBean {
     private List<AudienceRestrictionBean> audienceRestrictions;
     private boolean oneTimeUse;
     private ProxyRestrictionBean proxyRestriction;
+    private List<DelegateBean> delegates;
 
     /**
      * Constructor ConditionsBean creates a new ConditionsBean instance.
@@ -181,6 +182,14 @@ public class ConditionsBean {
         this.proxyRestriction = proxyRestriction;
     }
     
+    public List<DelegateBean> getDelegates() {
+        return delegates;
+    }
+
+    public void setDelegates(List<DelegateBean> delegates) {
+        this.delegates = delegates;
+    }
+    
     /**
      * Method equals ...
      *
@@ -223,6 +232,12 @@ public class ConditionsBean {
             && !proxyRestriction.equals(that.proxyRestriction)) {
             return false; 
         }
+        
+        if (delegates == null && that.delegates != null) {
+            return false;
+        } else if (delegates != null && !delegates.equals(that.delegates)) {
+            return false; 
+        }
 
         return true;
     }
@@ -245,6 +260,9 @@ public class ConditionsBean {
         result = 31 * result + (oneTimeUse ? 1 : 0);
         if (proxyRestriction != null) {
             result = 31 * result + proxyRestriction.hashCode();
+        }
+        if (delegates != null) {
+            result = 31 * result + delegates.hashCode();
         }
         return result;
     }

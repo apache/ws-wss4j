@@ -32,16 +32,21 @@ import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
 import org.apache.wss4j.common.saml.bean.AuthDecisionStatementBean;
 import org.apache.wss4j.common.saml.bean.AuthenticationStatementBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
+import org.apache.wss4j.common.saml.bean.DelegateBean;
 import org.apache.wss4j.common.saml.bean.KeyInfoBean;
+import org.apache.wss4j.common.saml.bean.NameIDBean;
 import org.apache.wss4j.common.saml.bean.ProxyRestrictionBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
 import org.apache.wss4j.common.saml.bean.SubjectLocalityBean;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.joda.time.DateTime;
+
 import org.opensaml.Configuration;
 import org.opensaml.common.SAMLObjectBuilder;
 import org.opensaml.common.SAMLVersion;
+import org.opensaml.samlext.saml2delrestrict.Delegate;
+import org.opensaml.samlext.saml2delrestrict.DelegationRestrictionType;
 import org.opensaml.saml2.core.Action;
 import org.opensaml.saml2.core.Advice;
 import org.opensaml.saml2.core.Assertion;
@@ -120,7 +125,11 @@ public final class SAML2ComponentBuilder {
     
     private static volatile SAMLObjectBuilder<AudienceRestriction> audienceRestrictionBuilder;
     
+    private static volatile SAMLObjectBuilder<DelegationRestrictionType> delegationRestrictionBuilder;
+    
     private static volatile SAMLObjectBuilder<Audience> audienceBuilder;
+    
+    private static volatile SAMLObjectBuilder<Delegate> delegateBuilder;
     
     private static volatile SAMLObjectBuilder<AuthzDecisionStatement> authorizationDecisionStatementBuilder;
     
@@ -243,6 +252,13 @@ public final class SAML2ComponentBuilder {
         if (conditionsBean.getProxyRestriction() != null) {
             conditions.getConditions().add(createProxyRestriction(conditionsBean.getProxyRestriction()));
         }
+        
+        if (conditionsBean.getDelegates() != null && !conditionsBean.getDelegates().isEmpty()) {
+            DelegationRestrictionType delegationRestriction = 
+                createDelegationRestriction(conditionsBean.getDelegates());
+            conditions.getConditions().add(delegationRestriction);
+        }
+        
         return conditions;
     }
     
@@ -328,6 +344,45 @@ public final class SAML2ComponentBuilder {
             audienceRestriction.getAudiences().add(audience);
         }
         return audienceRestriction;
+    }
+    
+    /**
+     * Create an DelegationRestrictionType object
+     *
+     * @param delegates of type List<DelegateBean>
+     * @return a DelegationRestrictionType object
+     */
+    @SuppressWarnings("unchecked")
+    public static DelegationRestrictionType createDelegationRestriction(
+        List<DelegateBean> delegates
+    ) {
+        if (delegationRestrictionBuilder == null) {
+            delegationRestrictionBuilder = (SAMLObjectBuilder<DelegationRestrictionType>)
+                builderFactory.getBuilder(DelegationRestrictionType.TYPE_NAME);
+        }
+        DelegationRestrictionType delegationRestriction = delegationRestrictionBuilder.buildObject();
+        
+        if (delegateBuilder == null) {
+            delegateBuilder = (SAMLObjectBuilder<Delegate>)
+                builderFactory.getBuilder(Delegate.DEFAULT_ELEMENT_NAME);
+        }
+        
+        for (DelegateBean delegateBean : delegates) {
+            Delegate delegate = delegateBuilder.buildObject();
+            delegate.setConfirmationMethod(delegateBean.getConfirmationMethod());
+            delegate.setDelegationInstant(delegateBean.getDelegationInstant());
+            
+            if (delegateBean.getNameIDBean() == null) {
+                throw new IllegalStateException(
+                   "The value of NameIDBean in DelegateBean may not be null"
+                );
+            }
+            NameID nameID = createNameID(delegateBean.getNameIDBean());
+            delegate.setNameID(nameID);
+            delegationRestriction.getDelegates().add(delegate);
+        }
+        
+        return delegationRestriction;
     }
     
     /**
@@ -631,19 +686,26 @@ public final class SAML2ComponentBuilder {
      * @param subject A SubjectBean instance
      * @return NameID
      */
-    @SuppressWarnings("unchecked")
     public static NameID createNameID(SubjectBean subject) {
+        NameIDBean nameIDBean = new NameIDBean();
+        nameIDBean.setNameIDFormat(subject.getSubjectNameIDFormat());
+        nameIDBean.setNameQualifier(subject.getSubjectNameQualifier());
+        nameIDBean.setNameValue(subject.getSubjectName());
+        return createNameID(nameIDBean);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static NameID createNameID(NameIDBean nameIDBean) {
         if (nameIdBuilder == null) {
             nameIdBuilder = (SAMLObjectBuilder<NameID>) 
                 builderFactory.getBuilder(NameID.DEFAULT_ELEMENT_NAME);
         }
         NameID nameID = nameIdBuilder.buildObject();
-        nameID.setNameQualifier(subject.getSubjectNameQualifier());
-        nameID.setFormat(subject.getSubjectNameIDFormat());
-        nameID.setValue(subject.getSubjectName());
+        nameID.setNameQualifier(nameIDBean.getNameQualifier());
+        nameID.setFormat(nameIDBean.getNameIDFormat());
+        nameID.setValue(nameIDBean.getNameValue());
         return nameID;
     }
-
 
     /**
      * Create SAML2 Attribute Statement(s)
