@@ -38,9 +38,12 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
+import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -511,48 +514,103 @@ public class XOPAttachmentTest extends org.junit.Assert {
         assertTrue(processedDoc.contains(SOAP_BODY));
     }
     
-    // TODO
     @org.junit.Test
-    @org.junit.Ignore
-    public void testEncryptedSignedSOAPBody() throws Exception {
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader();
-        secHeader.insertSecurityHeader(doc);
+    public void testSignedEncryptedSOAPBodyViaHandler() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
         
         AttachmentCallbackHandler outboundAttachmentCallback = new AttachmentCallbackHandler();
+        reqData.setAttachmentCallbackHandler(outboundAttachmentCallback);
         
-        WSSecEncrypt encrypt = new WSSecEncrypt();
-        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-
-        encrypt.setAttachmentCallbackHandler(outboundAttachmentCallback);
-        encrypt.setStoreBytesInAttachment(true);
-
-        encrypt.build(doc, crypto, secHeader);
         
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
+        config.put(WSHandlerConstants.ENC_PROP_FILE, "crypto.properties");
+        config.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference"); 
+        config.put("password", "security");
+        config.put(WSHandlerConstants.STORE_BYTES_IN_ATTACHMENT, "true");
+        reqData.setMsgContext(config);
         
-        builder.setAttachmentCallbackHandler(outboundAttachmentCallback);
-        builder.setStoreBytesInAttachment(true);
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        actions.add(new HandlerAction(WSConstants.SIGN));
+        actions.add(new HandlerAction(WSConstants.ENCR));
         
-        List<Attachment> signedAttachments = outboundAttachmentCallback.getResponseAttachments();
-        assertNotNull(signedAttachments);
-        assertTrue(signedAttachments.size() == 3);
-        
+        handler.send(
+            doc, 
+            reqData, 
+            actions,
+            true
+        );
+        String outputString = 
+            XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(signedDoc);
+            LOG.debug("Signed message:");
             LOG.debug(outputString);
-            // System.out.println(outputString);
         }
-
-        AttachmentCallbackHandler inboundAttachmentCallback = 
-            new AttachmentCallbackHandler(signedAttachments);
-        verify(signedDoc, inboundAttachmentCallback);
         
-        String processedDoc = XMLUtils.PrettyDocumentToString(signedDoc);
+        List<Attachment> encryptedAttachments = outboundAttachmentCallback.getResponseAttachments();
+        assertNotNull(encryptedAttachments);
+        assertTrue(encryptedAttachments.size() == 3);
+        
+        AttachmentCallbackHandler inboundAttachmentCallback = 
+            new AttachmentCallbackHandler(encryptedAttachments);
+        verify(doc, inboundAttachmentCallback);
+        
+        String processedDoc = XMLUtils.PrettyDocumentToString(doc);
+        assertTrue(processedDoc.contains(SOAP_BODY));
+    }
+    
+    @org.junit.Test
+    public void testEncryptedSignedSOAPBodyViaHandler() throws Exception {
+        final WSSConfig cfg = WSSConfig.getNewInstance();
+        final RequestData reqData = new RequestData();
+        reqData.setWssConfig(cfg);
+        reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
+        
+        AttachmentCallbackHandler outboundAttachmentCallback = new AttachmentCallbackHandler();
+        reqData.setAttachmentCallbackHandler(outboundAttachmentCallback);
+        
+        
+        java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
+        config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
+        config.put(WSHandlerConstants.ENC_PROP_FILE, "crypto.properties");
+        config.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference"); 
+        config.put("password", "security");
+        config.put(WSHandlerConstants.STORE_BYTES_IN_ATTACHMENT, "true");
+        reqData.setMsgContext(config);
+        
+        final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        CustomHandler handler = new CustomHandler();
+        List<HandlerAction> actions = new ArrayList<HandlerAction>();
+        actions.add(new HandlerAction(WSConstants.ENCR));
+        actions.add(new HandlerAction(WSConstants.SIGN));
+        
+        handler.send(
+            doc, 
+            reqData, 
+            actions,
+            true
+        );
+        String outputString = 
+            XMLUtils.PrettyDocumentToString(doc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Signed message:");
+            LOG.debug(outputString);
+        }
+        
+        List<Attachment> encryptedAttachments = outboundAttachmentCallback.getResponseAttachments();
+        assertNotNull(encryptedAttachments);
+        assertTrue(encryptedAttachments.size() == 0);
+        
+        AttachmentCallbackHandler inboundAttachmentCallback = 
+            new AttachmentCallbackHandler(encryptedAttachments);
+        verify(doc, inboundAttachmentCallback);
+        
+        String processedDoc = XMLUtils.PrettyDocumentToString(doc);
         assertTrue(processedDoc.contains(SOAP_BODY));
     }
     

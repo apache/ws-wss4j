@@ -119,6 +119,7 @@ public abstract class WSHandler {
         reqData.setStoreBytesInAttachment(storeBytesInAttachment);
         
         // Perform configuration
+        boolean encryptionFound = false;
         for (HandlerAction actionToDo : actions) {
             if (actionToDo.getAction() == WSConstants.SC) {
                 wssConfig.setEnableSignatureConfirmation(true);
@@ -141,12 +142,18 @@ public abstract class WSHandler {
                     actionToken.setCrypto(loadSignatureCrypto(reqData));
                 }
                 decodeSignatureParameter(reqData);
+                if (encryptionFound && storeBytesInAttachment) {
+                    LOG.warn("Turning off storeBytesInAttachment as we have encryption before signature."
+                             + " The danger here is that the actual encryption bytes will not be signed");
+                    reqData.setStoreBytesInAttachment(false);
+                }
             } else if (actionToDo.getAction() == WSConstants.ST_SIGNED 
                 && actionToDo.getActionToken() == null) {
                 decodeSignatureParameter(reqData);
             } else if ((actionToDo.getAction() == WSConstants.ENCR
                 || actionToDo.getAction() == WSConstants.DKT_ENCR)
                 && actionToDo.getActionToken() == null) {
+                encryptionFound = true;
                 EncryptionActionToken actionToken = reqData.getEncryptionToken();
                 if (actionToken == null) {
                     actionToken = new EncryptionActionToken();
