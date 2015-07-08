@@ -548,6 +548,13 @@ public class ConfigurationConstants {
      */
     public static final String STORE_BYTES_IN_ATTACHMENT = "storeBytesInAttachment";
     
+    /**
+     * Whether to expand xop:Include Elements encountered when verifying a Signature. The default is true,
+     * meaning that the relevant attachment bytes are BASE-64 encoded and inserted into the Element. This
+     * ensures that the actual bytes are signed, and not just the reference.
+     */
+    public static final String EXPAND_XOP_INCLUDE_FOR_SIGNATURE = "expandXOPIncludeForSignature";
+    
     //
     // (Non-boolean) Configuration parameters for the actions/processors
     //

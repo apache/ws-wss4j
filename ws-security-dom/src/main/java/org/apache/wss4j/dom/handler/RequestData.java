@@ -193,6 +193,8 @@ public class RequestData {
      * (sender-vouches or holder-of-key). The default is true.
      */
     private boolean validateSamlSubjectConfirmation = true;
+    
+    private boolean expandXopIncludeForSignature = true;
 
     public boolean isEnableTimestampReplayCache() {
         return enableTimestampReplayCache;
@@ -762,5 +764,13 @@ public class RequestData {
 
     public void setStoreBytesInAttachment(boolean storeBytesInAttachment) {
         this.storeBytesInAttachment = storeBytesInAttachment;
+    }
+
+    public boolean isExpandXopIncludeForSignature() {
+        return expandXopIncludeForSignature;
+    }
+
+    public void setExpandXopIncludeForSignature(boolean expandXopIncludeForSignature) {
+        this.expandXopIncludeForSignature = expandXopIncludeForSignature;
     }
 }

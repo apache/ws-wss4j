@@ -475,7 +475,7 @@ public class SignatureProcessor implements Processor {
             Element element = callbackLookup.getAndRegisterElement(uri, null, true, context);
             if (element == null) {
                 wsDocInfo.setTokenOnContext(uri, context);
-            } else {
+            } else if (data.isExpandXopIncludeForSignature()) {
                 // Look for xop:Include Nodes
                 List<Element> includeElements = 
                     XMLUtils.findElements(element, "Include", WSConstants.XOP_NS);
