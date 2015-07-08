@@ -605,6 +605,15 @@ that the BASE-64 encoding step can be skipped. For this to work, a
 CallbackHandler must be set on RequestData that can handle attachments.
 </td>
 </tr>
+<tr>
+<td><b>WSS4J 2.1.2/2.0.5</b> EXPAND_XOP_INCLUDE_FOR_SIGNATURE</td>
+<td>expandXOPIncludeForSignature</td>
+<td>Whether to expand xop:Include Elements encountered when verifying a
+Signature. The default is true, meaning that the relevant attachment bytes are
+BASE-64 encoded and inserted into the Element. This ensures that the actual
+bytes are signed, and not just the reference.
+</td>
+</tr>
 </table>
 <p>
 The configuration tags for properties that are configured via a non-boolean
