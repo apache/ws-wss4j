@@ -74,6 +74,7 @@ import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.CallbackLookup;
 import org.apache.wss4j.dom.message.DOMCallbackLookup;
+import org.apache.wss4j.dom.message.token.BinarySecurity;
 import org.apache.wss4j.dom.message.token.SecurityTokenReference;
 import org.apache.wss4j.dom.message.token.Timestamp;
 import org.apache.wss4j.dom.str.STRParser;
@@ -480,7 +481,13 @@ public class SignatureProcessor implements Processor {
                     WSSecurityUtil.storeElementInContext(context, element);
                 }
             }
-            if (element != null && data.isExpandXopIncludeForSignature() && element.getFirstChild() != null) {
+            if (element != null && "BinarySecurityToken".equals(element.getLocalName())
+                && WSConstants.WSSE_NS.equals(element.getNamespaceURI())
+                && isXopInclude(element)) {
+                // We don't write out the xop:Include bytes into the BinarySecurityToken by default
+                // But if the BST is signed, then we have to, or else Signature validation fails...
+                handleXopInclude(element, wsDocInfo);
+            } else if (element != null && data.isExpandXopIncludeForSignature() && element.getFirstChild() != null) {
                 // Look for xop:Include Nodes
                 List<Element> includeElements = 
                     WSSecurityUtil.findElements(element.getFirstChild(), "Include", WSConstants.XOP_NS);
@@ -500,6 +507,33 @@ public class SignatureProcessor implements Processor {
         }
     }
     
+    private boolean isXopInclude(Element element) {
+        Element elementChild =
+            WSSecurityUtil.getDirectChildElement(element, "Include", WSConstants.XOP_NS);
+        if (elementChild != null && elementChild.hasAttributeNS(null, "href")) {
+            String xopUri = elementChild.getAttributeNS(null, "href");
+            if (xopUri != null && xopUri.startsWith("cid:")) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private void handleXopInclude(Element element, WSDocInfo wsDocInfo) {
+        List<WSSecurityEngineResult> actionResults = wsDocInfo.getResultsByTag(WSConstants.BST);
+        if (actionResults != null) {
+            for (WSSecurityEngineResult result : actionResults) {
+                Element token = (Element)result.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
+                if (element.equals(token)) {
+                    BinarySecurity binarySecurity = 
+                        (BinarySecurity)result.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+                    binarySecurity.encodeRawToken();
+                    return;
+                }
+            }
+        }
+    }
+
     /**
      * Get the signature method algorithm URI from the associated signature element.
      * @param signatureElement The signature element
