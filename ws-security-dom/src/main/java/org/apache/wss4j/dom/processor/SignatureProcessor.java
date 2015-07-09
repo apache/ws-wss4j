@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.crypto.Data;
 import javax.xml.crypto.MarshalException;
@@ -63,6 +64,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.PublicKeyPrincipalImpl;
 import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
+import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
@@ -475,6 +477,12 @@ public class SignatureProcessor implements Processor {
             Element element = callbackLookup.getAndRegisterElement(uri, null, true, context);
             if (element == null) {
                 wsDocInfo.setTokenOnContext(uri, context);
+            } else if ("BinarySecurityToken".equals(element.getLocalName())
+                && WSConstants.WSSE_NS.equals(element.getNamespaceURI())
+                && isXopInclude(element)) {
+                // We don't write out the xop:Include bytes into the BinarySecurityToken by default
+                // But if the BST is signed, then we have to, or else Signature validation fails...
+                handleXopInclude(element, wsDocInfo);
             } else if (data.isExpandXopIncludeForSignature() && element.getFirstChild() != null) {
                 // Look for xop:Include Nodes
                 List<Element> includeElements = 
@@ -490,6 +498,33 @@ public class SignatureProcessor implements Processor {
                             includeElement.getOwnerDocument().createTextNode(encodedBytes);
                         includeElement.getParentNode().replaceChild(newCipherValueChild, includeElement);
                     }
+                }
+            }
+        }
+    }
+    
+    private boolean isXopInclude(Element element) {
+        Element elementChild =
+            XMLUtils.getDirectChildElement(element, "Include", WSConstants.XOP_NS);
+        if (elementChild != null && elementChild.hasAttributeNS(null, "href")) {
+            String xopUri = elementChild.getAttributeNS(null, "href");
+            if (xopUri != null && xopUri.startsWith("cid:")) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private void handleXopInclude(Element element, WSDocInfo wsDocInfo) {
+        Map<Integer, List<WSSecurityEngineResult>> actionResults = wsDocInfo.getActionResults();
+        if (actionResults != null && actionResults.containsKey(WSConstants.BST)) {
+            for (WSSecurityEngineResult result : actionResults.get(WSConstants.BST)) {
+                Element token = (Element)result.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
+                if (element.equals(token)) {
+                    BinarySecurity binarySecurity = 
+                        (BinarySecurity)result.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+                    binarySecurity.encodeRawToken();
+                    return;
                 }
             }
         }
