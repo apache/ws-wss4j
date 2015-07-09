@@ -729,7 +729,7 @@ public class InboundWSSecurityContextImplTest {
         try {
             certificates = keyStore.getCertificateChain("transmitter");
         } catch (Exception e) {
-            throw new XMLSecurityException(e.getMessage(), e);
+            throw new XMLSecurityException(e);
         }
 
         X509Certificate[] x509Certificates = new X509Certificate[certificates.length];
