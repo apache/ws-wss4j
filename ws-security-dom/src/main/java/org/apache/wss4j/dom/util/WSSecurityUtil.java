@@ -1241,7 +1241,7 @@ public final class WSSecurityUtil {
                 || !attachmentId.equals(attachments.get(0).getId())) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY,
-                    "empty", new Object[] {"Attachment not found"}
+                    "empty", new Object[] {"Attachment not found: " + xopUri}
                 );
             }
             Attachment attachment = attachments.get(0);

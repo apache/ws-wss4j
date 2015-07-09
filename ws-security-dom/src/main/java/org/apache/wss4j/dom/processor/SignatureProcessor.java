@@ -480,10 +480,10 @@ public class SignatureProcessor implements Processor {
                     WSSecurityUtil.storeElementInContext(context, element);
                 }
             }
-            if (element != null && data.isExpandXopIncludeForSignature()) {
+            if (element != null && data.isExpandXopIncludeForSignature() && element.getFirstChild() != null) {
                 // Look for xop:Include Nodes
                 List<Element> includeElements = 
-                    WSSecurityUtil.findElements(element, "Include", WSConstants.XOP_NS);
+                    WSSecurityUtil.findElements(element.getFirstChild(), "Include", WSConstants.XOP_NS);
                 for (Element includeElement : includeElements) {
                     String xopURI = includeElement.getAttributeNS(null, "href");
                     if (xopURI != null) {
