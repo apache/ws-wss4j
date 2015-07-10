@@ -21,14 +21,17 @@ package org.apache.wss4j.policy.model;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.SPConstants.SPVersion;
 import org.w3c.dom.Element;
 
 import javax.xml.namespace.QName;
+
 import java.util.*;
 
 public class X509Token extends AbstractToken {
 
     public enum TokenType {
+        WssX509V1Token10,
         WssX509V3Token10,
         WssX509Pkcs7Token10,
         WssX509PkiPathV1Token10,
@@ -36,7 +39,7 @@ public class X509Token extends AbstractToken {
         WssX509V3Token11,
         WssX509Pkcs7Token11,
         WssX509PkiPathV1Token11;
-
+        
         private static final Map<String, TokenType> lookup = new HashMap<String, TokenType>();
 
         static {
@@ -95,6 +98,9 @@ public class X509Token extends AbstractToken {
                 TokenType tokenType = TokenType.lookUp(assertionName);
                 if (tokenType != null) {
                     if (x509Token.getTokenType() != null) {
+                        throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
+                    }
+                    if (TokenType.WssX509V1Token10 == tokenType && SPVersion.SP11 != getVersion()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     x509Token.setTokenType(tokenType);
