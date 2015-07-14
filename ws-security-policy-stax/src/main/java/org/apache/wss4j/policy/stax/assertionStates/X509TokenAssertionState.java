@@ -158,6 +158,7 @@ public class X509TokenAssertionState extends TokenAssertionState {
                         }
                         getPolicyAsserter().assertPolicy(new QName(namespace, x509Token.getTokenType().name()));
                         break;
+                    case WssX509V1Token10:
                     case WssX509V1Token11:
                         if (!WSSecurityTokenConstants.X509V1Token.equals(securityToken.getTokenType()) ||
                                 x509Certificate.getVersion() != 1) {
