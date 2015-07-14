@@ -250,7 +250,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                 String encryptionSymAlgorithm = getSecurityProperties().getEncryptionSymAlgorithm();
                 String jceAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(encryptionSymAlgorithm);
                 if (jceAlgorithm == null) {
-                    throw new XMLSecurityException("algorithms.NoSuchMap", encryptionSymAlgorithm);
+                    throw new XMLSecurityException("algorithms.NoSuchMap", new Object[] { encryptionSymAlgorithm });
                 }
                 //initialize the cipher
                 Cipher cipher = null;

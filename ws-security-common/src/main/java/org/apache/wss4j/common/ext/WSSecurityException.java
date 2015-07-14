@@ -143,12 +143,12 @@ public class WSSecurityException extends XMLSecurityException {
     }
 
     public WSSecurityException(ErrorCode errorCode, Exception exception, String msgId) {
-        super(msgId, exception);
+        super(exception, msgId);
         this.errorCode = errorCode;
     }
     
     public WSSecurityException(ErrorCode errorCode, Exception exception, String msgId, Object[] arguments) {
-        super(msgId, arguments, exception);
+        super(exception, msgId, arguments);
         this.errorCode = errorCode;
     }
     
