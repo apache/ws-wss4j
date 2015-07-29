@@ -267,9 +267,7 @@ public class WSSecEncryptedKey extends WSSecBase {
         }
         int blockSize = cipher.getBlockSize();
         if (doDebug) {
-            log.debug(
-                "cipher blksize: " + blockSize + ", symm key: " + secretKey.toString()
-            );
+            log.debug("cipher blksize: " + blockSize);
         }
         
         try {
