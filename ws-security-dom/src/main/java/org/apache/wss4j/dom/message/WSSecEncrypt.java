@@ -285,6 +285,10 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 document, getWsConfig(), keyInfo, secretKeySpec, symEncAlgo, references, callbackLookup,
                     attachmentCallbackHandler, attachmentEncryptedDataElements, storeBytesInAttachment
             );
+        if (encDataRefs.isEmpty()) {
+            return null;
+        }
+        
         if (dataRef == null) {
             dataRef = 
                 document.createElementNS(
@@ -314,7 +318,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * @param dataRef The internal <code>enc:Reference</code> element
      */
     public void addInternalRefElement(Element dataRef) {
-        encryptedKeyElement.appendChild(dataRef);
+        if (dataRef != null) {
+            encryptedKeyElement.appendChild(dataRef);
+        }
     }
 
     /**
@@ -328,7 +334,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * @param secHeader The security header.
      */
     public void addExternalRefElement(Element dataRef, WSSecHeader secHeader) {
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), dataRef);
+        if (dataRef != null) {
+            WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), dataRef);
+        }
     }
 
     public void addAttachmentEncryptedDataElements(WSSecHeader secHeader) {

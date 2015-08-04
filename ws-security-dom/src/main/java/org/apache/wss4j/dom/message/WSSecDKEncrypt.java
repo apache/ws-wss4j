@@ -183,13 +183,15 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
      * @param secHeader The security header.
      */
     public void addExternalRefElement(Element referenceList, WSSecHeader secHeader) {
-        Node node = dkt.getElement().getNextSibling();
-        if (node != null && Node.ELEMENT_NODE == node.getNodeType()) {
-            secHeader.getSecurityHeader().insertBefore(referenceList, node);
-        } else {
-            // If (at this moment) DerivedKeyToken is the LAST element of 
-            // the security header 
-            secHeader.getSecurityHeader().appendChild(referenceList);
+        if (referenceList != null) {
+            Node node = dkt.getElement().getNextSibling();
+            if (node != null && Node.ELEMENT_NODE == node.getNodeType()) {
+                secHeader.getSecurityHeader().insertBefore(referenceList, node);
+            } else {
+                // If (at this moment) DerivedKeyToken is the LAST element of 
+                // the security header 
+                secHeader.getSecurityHeader().appendChild(referenceList);
+            }
         }
     }
 
