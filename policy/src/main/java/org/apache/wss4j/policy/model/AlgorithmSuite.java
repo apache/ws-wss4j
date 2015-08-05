@@ -195,6 +195,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         private int maximumSymmetricKeyLength;
         private int minimumAsymmetricKeyLength;
         private int maximumAsymmetricKeyLength;
+        private String mgfAlgo;
         private String ns;
 
         public AlgorithmSuiteType(String name, String digest, String encryption, String symmetricKeyWrap, String asymmetricKeyWrap,
@@ -230,6 +231,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
             this.maximumSymmetricKeyLength = algorithmSuiteType.maximumSymmetricKeyLength;
             this.minimumAsymmetricKeyLength = algorithmSuiteType.minimumAsymmetricKeyLength;
             this.maximumAsymmetricKeyLength = algorithmSuiteType.maximumAsymmetricKeyLength;
+            this.mgfAlgo = algorithmSuiteType.mgfAlgo;
         }
         
         public String getName() {
@@ -290,6 +292,14 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         
         public String getNamespace() {
             return ns;
+        }
+        
+        public void setMGFAlgo(String mgfAlgo) {
+            this.mgfAlgo = mgfAlgo;
+        }
+        
+        public String getMGFAlgo() {
+            return mgfAlgo;
         }
     }
 
