@@ -202,7 +202,7 @@ public class AttachmentTest extends org.junit.Assert {
 
         List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
         parts.add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
-        parts.add(new WSEncryptionPart("cid:Attachments", "Content"));
+        parts.add(new WSEncryptionPart("cid:Attachments", "Element"));
         builder.setParts(parts);
 
         final String attachmentId = UUID.randomUUID().toString();
