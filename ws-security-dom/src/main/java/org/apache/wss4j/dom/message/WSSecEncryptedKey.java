@@ -269,7 +269,7 @@ public class WSSecEncryptedKey extends WSSecBase {
                 }
 
                 MGF1ParameterSpec mgf1ParameterSpec = new MGF1ParameterSpec("SHA-1");
-                if (mgfAlgo != null) {
+                if (WSConstants.KEYTRANSPORT_RSAOEP_XENC11.equals(keyEncAlgo)) {
                     if (WSConstants.MGF_SHA224.equals(mgfAlgo)) {
                         mgf1ParameterSpec = new MGF1ParameterSpec("SHA-224");
                     } if (WSConstants.MGF_SHA256.equals(mgfAlgo)) {
@@ -616,7 +616,7 @@ public class WSSecEncryptedKey extends WSSecBase {
             digestElement.setAttributeNS(null, "Algorithm", digestAlgo);
             encryptionMethod.appendChild(digestElement);
         }
-        if (mgfAlgo != null) {
+        if (WSConstants.KEYTRANSPORT_RSAOEP_XENC11.equals(keyEncAlgo) && mgfAlgo != null) {
             Element mgfElement =
                 doc.createElementNS(WSConstants.ENC11_NS, WSConstants.ENC11_PREFIX + ":MGF");
             mgfElement.setAttributeNS(null, "Algorithm", mgfAlgo);

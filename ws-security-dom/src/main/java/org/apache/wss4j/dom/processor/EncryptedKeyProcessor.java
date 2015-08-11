@@ -247,9 +247,9 @@ public class EncryptedKeyProcessor implements Processor {
                     jceDigestAlgorithm = JCEMapper.translateURItoJCEID(digestAlgorithm);
                 }
 
-                String mgfAlgorithm = EncryptionUtils.getMGFAlgorithm(encryptedKeyElement);
                 MGF1ParameterSpec mgfParameterSpec = new MGF1ParameterSpec("SHA-1");
-                if (mgfAlgorithm != null) {
+                if (WSConstants.KEYTRANSPORT_RSAOEP_XENC11.equals(encryptedKeyTransportMethod)) {
+                    String mgfAlgorithm = EncryptionUtils.getMGFAlgorithm(encryptedKeyElement);
                     if (WSConstants.MGF_SHA224.equals(mgfAlgorithm)) {
                         mgfParameterSpec = new MGF1ParameterSpec("SHA-224");
                     } else if (WSConstants.MGF_SHA256.equals(mgfAlgorithm)) {
@@ -590,8 +590,9 @@ public class EncryptedKeyProcessor implements Processor {
         }
         
         // EncryptionAlgorithm must be RSA15, or RSAOEP.
-        if (!WSConstants.KEYTRANSPORT_RSA15.equals(encAlgo)
-            && !WSConstants.KEYTRANSPORT_RSAOEP.equals(encAlgo)) {
+        if (!(WSConstants.KEYTRANSPORT_RSA15.equals(encAlgo)
+            || WSConstants.KEYTRANSPORT_RSAOEP.equals(encAlgo)
+            || WSConstants.KEYTRANSPORT_RSAOEP_XENC11.equals(encAlgo))) {
             bspEnforcer.handleBSPRule(BSPRule.R5621);
         }
     }

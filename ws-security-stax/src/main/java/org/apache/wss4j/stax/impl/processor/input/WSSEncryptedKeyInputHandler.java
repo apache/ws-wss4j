@@ -103,8 +103,9 @@ public class WSSEncryptedKeyInputHandler extends XMLEncryptedKeyInputHandler {
             securityContext.handleBSPRule(BSPRule.R5603);
         } else {
             String encryptionMethod = encryptionMethodType.getAlgorithm();
-            if (!WSSConstants.NS_XENC_RSA15.equals(encryptionMethod)
-                && !WSSConstants.NS_XENC_RSAOAEPMGF1P.equals(encryptionMethod)) {
+            if (!(WSSConstants.NS_XENC_RSA15.equals(encryptionMethod)
+                || WSSConstants.NS_XENC_RSAOAEPMGF1P.equals(encryptionMethod)
+                || WSSConstants.NS_XENC11_RSAOAEP.equals(encryptionMethod))) {
                 securityContext.handleBSPRule(BSPRule.R5621);
             }
         }
