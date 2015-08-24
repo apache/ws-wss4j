@@ -134,8 +134,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
             assertTrue(ex.getMessage().startsWith("javax.xml.crypto.URIReferenceException: " +
-                    "org.apache.xml.security.utils.resolver.ResourceResolverException: " +
-                    "Cannot resolve element with ID "));
+                    "org.apache.xml.security.utils.resolver.ResourceResolverException: "));
         }
     }
     
