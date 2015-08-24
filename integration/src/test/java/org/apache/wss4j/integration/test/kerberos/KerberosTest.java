@@ -335,7 +335,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             bst.retrieveServiceTicket("alice2", callbackHandler, "bob@service");
             Assert.fail("Failure expected on an unknown user");
         } catch (WSSecurityException ex) {
-            Assert.assertEquals(ex.getMessage(), "An error occurred in trying to obtain a TGT: No LoginModules configured for alice2");
+            Assert.assertTrue(ex.getMessage().startsWith("An error occurred in trying to obtain a TGT:"));
         }
         
         
