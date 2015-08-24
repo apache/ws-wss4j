@@ -1082,16 +1082,28 @@ public abstract class WSHandler {
     }
     
     protected PasswordEncryptor getPasswordEncryptor(RequestData requestData) {
-        if (requestData.getPasswordEncryptor() != null) {
-            return requestData.getPasswordEncryptor();
+        PasswordEncryptor passwordEncryptor = requestData.getPasswordEncryptor();
+        if (passwordEncryptor == null) {
+            Object o = getOption(WSHandlerConstants.PASSWORD_ENCRYPTOR_INSTANCE);
+            if (o instanceof PasswordEncryptor) {
+                passwordEncryptor = (PasswordEncryptor) o;
+            }
+        }
+        if (passwordEncryptor == null) {
+            Object mc = requestData.getMsgContext();
+            Object o = getProperty(mc, WSHandlerConstants.PASSWORD_ENCRYPTOR_INSTANCE);
+            if (o instanceof PasswordEncryptor) {
+                passwordEncryptor = (PasswordEncryptor) o;
+            }
+        }
+        if (passwordEncryptor == null) {
+            CallbackHandler callbackHandler = requestData.getCallbackHandler();
+            if (callbackHandler != null) {
+                passwordEncryptor = new JasyptPasswordEncryptor(callbackHandler);
+            }
         }
         
-        CallbackHandler callbackHandler = requestData.getCallbackHandler();
-        if (callbackHandler != null) {
-            return new JasyptPasswordEncryptor(callbackHandler);
-        }
-        
-        return null;
+        return passwordEncryptor;
     }
     
     /**
