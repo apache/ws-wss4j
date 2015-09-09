@@ -61,8 +61,7 @@ import java.util.Properties;
  * keytool -genkey -validity 3650 -alias wss40 -keyalg RSA -keystore wss40.jks 
  * -dname "CN=Colm,OU=WSS4J,O=Apache,L=Dublin,ST=Leinster,C=IE"
  * keytool -certreq -alias wss40 -keystore wss40.jks -file wss40.cer
- * openssl ca -config ca.config -policy policy_anything -days 3650 -out wss40.pem 
- * -infiles wss40.cer
+ * openssl ca -config ca.config -policy policy_anything -days 3650 -out wss40.pem -infiles wss40.cer
  * openssl x509 -outform DER -in wss40.pem -out wss40.crt
  * 
  * Import the CA cert into wss40.jks and import the new signed certificate

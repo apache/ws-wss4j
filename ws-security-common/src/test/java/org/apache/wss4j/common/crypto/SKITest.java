@@ -54,7 +54,7 @@ public class SKITest extends org.junit.Assert {
         assertTrue(certs != null && certs.length > 0);
         
         byte[] skiBytes = crypto.getSKIBytesFromCert(certs[0]);
-        String knownBase64Encoding = "TFM0+4PSEUvWgzeLu28btvYR4BQ=";
+        String knownBase64Encoding = "VPWiTCLlm0OwNWTwrnRTUF3qcIk=";
         assertTrue(knownBase64Encoding.equals(Base64.encode(skiBytes)));
     }
     
