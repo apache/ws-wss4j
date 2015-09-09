@@ -160,18 +160,23 @@ public class CryptoProviderTest extends org.junit.Assert {
         //
         byte[] certBytes = 
             Base64.decode(
-                "MIICfDCCAeUCBEnHoGMwDQYJKoZIhvcNAQEEBQAwgYQxCzAJBgNVBAYTAkRFMQ8wDQYDVQQIEwZC"
-                + "YXllcm4xDzANBgNVBAcTBk11bmljaDEPMA0GA1UEChMGQXBhY2hlMQ4wDAYDVQQLEwVXU1M0SjEP"
-                + "MA0GA1UEAxMGV2VybmVyMSEwHwYJKoZIhvcNAQkBFhJXZXJuZXJAZXhhbXBsZS5jb20wHhcNMDkw"
-                + "MzIzMTQ0NDUxWhcNMTkwMzIxMTQ0NDUxWjCBhDELMAkGA1UEBhMCREUxDzANBgNVBAgTBkJheWVy"
-                + "bjEPMA0GA1UEBxMGTXVuaWNoMQ8wDQYDVQQKEwZBcGFjaGUxDjAMBgNVBAsTBVdTUzRKMQ8wDQYD"
-                + "VQQDEwZXZXJuZXIxITAfBgkqhkiG9w0BCQEWEldlcm5lckBleGFtcGxlLmNvbTCBnzANBgkqhkiG"
-                + "9w0BAQEFAAOBjQAwgYkCgYEA3uRplw7q8y/sIR541uCrlbIMzJHXCRU3nQreGNr6dM49/LxHYffQ"
-                + "Ex99chQh+wR6fwArFlziDRNnqslOy8zKMfGbaBaR41ZZrxvkSsIwzOhD6yAPgKVQL2vTmJAbdZ35"
-                + "GwcOW8oe7l+NV9qmv7yrr5OhqDhFh36WhgjVLiwmP/cCAwEAATANBgkqhkiG9w0BAQQFAAOBgQBP"
-                + "PnR2BYn7DKn/SkU8XTgf9g2NoYcMyvQOB+Uo25/QzDdMk6HKmHl0+7mh7RAtXcBz2YqC3WbQW5U3"
-                + "KmOH6fVxB8hw6xalBjs2YpnBx4gaHAws35KlAfkGVVe5wqnrI7ER7RBYO/7Gr7uCUq11QrGyEG8/"
-                + "yIXktaFLxgD2R4hpfA=="
+                "MIIDqTCCApGgAwIBAgIEePiYTTANBgkqhkiG9w0BAQsFADCBhDELMAkGA1UEBhMCREUxDzANBgNV"
+                + "BAgTBkJheWVybjEPMA0GA1UEBxMGTXVuaWNoMQ8wDQYDVQQKEwZBcGFjaGUxDjAMBgNVBAsTBVdT"
+                + "UzRKMQ8wDQYDVQQDEwZXZXJuZXIxITAfBgkqhkiG9w0BCQEWEldlcm5lckBleGFtcGxlLmNvbTAe"
+                + "Fw0xNTA5MDkxNTA3MzFaFw0yNTA5MDYxNTA3MzFaMIGEMQswCQYDVQQGEwJERTEPMA0GA1UECBMG"
+                + "QmF5ZXJuMQ8wDQYDVQQHEwZNdW5pY2gxDzANBgNVBAoTBkFwYWNoZTEOMAwGA1UECxMFV1NTNEox"
+                + "DzANBgNVBAMTBldlcm5lcjEhMB8GCSqGSIb3DQEJARYSV2VybmVyQGV4YW1wbGUuY29tMIIBIjAN"
+                + "BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoUlwwKbNU0vNPwEc32E85k36n7cWAmuuhpX+CoTk"
+                + "XOfvpyoVcwBI8LwMmT1CR9KPxa+zmcE7RmX5qzVaW7Ukzra/pfD7YC3WGGAU9Awsq5OFLsMc4tZ/"
+                + "7FM5azGdZA/wSI2384Ytnu88Z8O1qnBblLdNluNWVADq5tvgAdPQMoks9Xg+9SBiwj2p3C0RD0uM"
+                + "x0bwscNEDWeHUJeGqNbWzEeYCvFLDGdl1Or3uha+drq4fNoVGstybM0VeGvFjP3NEX8dfl9WTxAl"
+                + "3dB0TXzb70RuQghLqHJtDEXMC/ckaNHht6F/VcOxjZCtpLlMUptyPjrMDFOIaZ5q/6NSiMIjqwID"
+                + "AQABoyEwHzAdBgNVHQ4EFgQUviIg1rtoiwto4gYIAWFHCsCDISkwDQYJKoZIhvcNAQELBQADggEB"
+                + "AJEaMtEBpI7X1lx2+Wcjn2a3xugfTGZcy3s4fxGpbCxcdbDS7gWR/N+acwp4GXEbDrObwxIO/Kt5"
+                + "eMzfD5EPCuMdLfLjK+G27RXc/89bR3aphm6ZyLnTLBJ5h24Of9+uDKY2bVIcF62uyXCnVAoq6dY/"
+                + "rBj7btSjAOWFshMDJGNN7k/78s33sTdJfD2NQDvAvRZb1hYiUGcUij0ka+bhS/EtazH411w2NOQY"
+                + "UyZ50HRroKJx1PPCE+OTO5JYPNQB2rauK63RHGGC94mY2ySCE2KP/yaWhkDJ60X2JKgnTLKUZxLP"
+                + "9IioeHVeUzGIccIicoiZR5kqaiqoEk82V81R+VA="
             );
         CertificateFactory factory = 
             CertificateFactory.getInstance("X.509", "BC");
