@@ -42,6 +42,7 @@ import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 
 public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
 
@@ -97,7 +98,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
             String createdStr = "";
             if (usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
                 || ((WSSSecurityProperties) getSecurityProperties()).isAddUsernameTokenCreated()) {
-                created = WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar());
+                created = WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar(TimeZone.getTimeZone("UTC")));
                 createdStr = created.toXMLFormat();
             }
 
