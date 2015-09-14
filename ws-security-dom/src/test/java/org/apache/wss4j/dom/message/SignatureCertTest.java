@@ -305,9 +305,7 @@ public class SignatureCertTest extends org.junit.Assert {
         assertTrue (certs != null && certs.length == 2);
     }
     
-    // TODO - Re-enable from Fri 11th
     @org.junit.Test
-    @org.junit.Ignore
     public void testExpiredCert() throws Exception {
         Properties clientProperties = new Properties();
         clientProperties.put("org.apache.wss4j.crypto.provider", 
@@ -346,9 +344,7 @@ public class SignatureCertTest extends org.junit.Assert {
         }
     }
     
-    // TODO - Re-enable from Fri 11th
     @org.junit.Test
-    @org.junit.Ignore
     public void testExpiredCertInKeystore() throws Exception {
         Properties clientProperties = new Properties();
         clientProperties.put("org.apache.wss4j.crypto.provider", 
