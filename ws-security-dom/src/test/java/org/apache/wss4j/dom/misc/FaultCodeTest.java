@@ -125,7 +125,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
             fail("Failure expected on an expired message");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
-            assertEquals("Invalid timestamp: The security semantics of the message have expired", ex.getMessage());
+            assertEquals("Invalid timestamp: The message timestamp has expired", ex.getMessage());
             QName faultCode = new QName(WSConstants.WSSE_NS, "MessageExpired");
             assertTrue(ex.getFaultCode().equals(faultCode));
         }
