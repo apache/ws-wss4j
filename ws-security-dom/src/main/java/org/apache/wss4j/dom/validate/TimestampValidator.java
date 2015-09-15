@@ -50,13 +50,21 @@ public class TimestampValidator implements Validator {
         int futureTimeToLive = data.getTimeStampFutureTTL();
         
         Timestamp timeStamp = credential.getTimestamp();
-        // Validate whether the security semantics have expired
-        if (timeStampStrict && timeStamp.isExpired()
-            || !timeStamp.verifyCreated(timeStampTTL, futureTimeToLive)) {
+        
+        // See if the Timestamp has expired
+        if (timeStampStrict && timeStamp.isExpired()) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.MESSAGE_EXPIRED,
                 "invalidTimestamp",
-                new Object[] {"The security semantics of the message have expired"});
+                new Object[] {"The message timestamp has expired"});
+        }
+        
+        // Validate the Created date
+        if (!timeStamp.verifyCreated(timeStampTTL, futureTimeToLive)) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.MESSAGE_EXPIRED,
+                "invalidTimestamp",
+                new Object[] {"The message timestamp is out of range"});
         }
         
         if (data.isRequireTimestampExpires() && timeStamp.getExpires() == null) {
