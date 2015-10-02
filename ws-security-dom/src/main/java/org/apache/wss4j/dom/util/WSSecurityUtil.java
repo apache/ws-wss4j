@@ -59,6 +59,8 @@ import java.security.NoSuchProviderException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -1228,7 +1230,15 @@ public final class WSSecurityUtil {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
         }
 
-        final String attachmentId = xopUri.substring("cid:".length());
+        String attachmentId = null;
+        try {
+            attachmentId = URLDecoder.decode(xopUri.substring("cid:".length()), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.INVALID_SECURITY,
+                "empty", new Object[] {"Attachment ID cannot be decoded: " + xopUri}
+            );
+        }
 
         AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
         attachmentRequestCallback.setAttachmentId(attachmentId);
