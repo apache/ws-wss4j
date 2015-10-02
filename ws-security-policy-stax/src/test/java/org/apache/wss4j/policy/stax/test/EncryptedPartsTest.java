@@ -18,21 +18,21 @@
  */
 package org.apache.wss4j.policy.stax.test;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.policy.stax.PolicyEnforcer;
 import org.apache.wss4j.policy.stax.PolicyViolationException;
+import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcer;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityEvent.EncryptedPartSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.junit.Assert;
 import org.junit.Test;
-
-import javax.xml.namespace.QName;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 public class EncryptedPartsTest extends AbstractPolicyTestBase {
 

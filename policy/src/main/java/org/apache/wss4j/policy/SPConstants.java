@@ -18,8 +18,6 @@
  */
 package org.apache.wss4j.policy;
 
-import org.apache.wss4j.policy.model.SupportingTokenType;
-
 import javax.xml.namespace.QName;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -646,8 +644,6 @@ public abstract class SPConstants {
     public abstract QName getRecipientSignatureToken();
 
     public abstract QName getRecipientEncryptionToken();
-
-    public abstract SupportingTokenType getSupportingTokenType(QName name);
 
     public abstract QName getTrust10();
 

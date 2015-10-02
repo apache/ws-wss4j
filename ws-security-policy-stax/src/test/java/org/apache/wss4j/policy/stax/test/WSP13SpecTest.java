@@ -19,10 +19,10 @@
 package org.apache.wss4j.policy.stax.test;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcer;
 import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
-import org.apache.wss4j.policy.stax.PolicyEnforcer;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.wss4j.stax.test.InboundWSSecurityContextImplTest;
 import org.junit.Assert;

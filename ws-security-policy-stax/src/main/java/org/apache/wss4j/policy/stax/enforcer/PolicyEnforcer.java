@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.policy.stax;
+package org.apache.wss4j.policy.stax.enforcer;
 
 import java.util.Deque;
 import java.util.HashMap;
@@ -68,6 +68,11 @@ import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.Wss10;
 import org.apache.wss4j.policy.model.X509Token;
 import org.apache.wss4j.policy.model.Wss11;
+import org.apache.wss4j.policy.stax.Assertable;
+import org.apache.wss4j.policy.stax.DummyPolicyAsserter;
+import org.apache.wss4j.policy.stax.OperationPolicy;
+import org.apache.wss4j.policy.stax.PolicyAsserter;
+import org.apache.wss4j.policy.stax.PolicyViolationException;
 import org.apache.wss4j.policy.stax.assertionStates.AlgorithmSuiteAssertionState;
 import org.apache.wss4j.policy.stax.assertionStates.ContentEncryptedElementsAssertionState;
 import org.apache.wss4j.policy.stax.assertionStates.EncryptedElementsAssertionState;

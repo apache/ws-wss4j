@@ -18,26 +18,14 @@
  */
 package org.apache.wss4j.policy.stax.test;
 
-import org.apache.wss4j.stax.WSSec;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
-import org.apache.xml.security.stax.config.Init;
-import org.junit.Assert;
-import org.junit.Test;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.bean.Version;
-import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.common.bsp.BSPRule;
-import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.crypto.Merlin;
-import org.apache.wss4j.policy.stax.PolicyEnforcer;
-import org.apache.wss4j.policy.stax.PolicyInputProcessor;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSConstants.UsernameTokenPasswordType;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.test.CallbackHandlerImpl;
-import org.apache.wss4j.stax.test.saml.SAMLCallbackHandlerImpl;
-import org.apache.xml.security.stax.ext.SecurePart;
-import org.w3c.dom.Document;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.KeyStore;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -46,10 +34,26 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import java.io.*;
-import java.security.KeyStore;
-import java.util.ArrayList;
-import java.util.List;
+import org.apache.wss4j.common.bsp.BSPRule;
+import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.crypto.Merlin;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.bean.Version;
+import org.apache.wss4j.common.saml.builder.SAML2Constants;
+import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcer;
+import org.apache.wss4j.policy.stax.enforcer.PolicyInputProcessor;
+import org.apache.wss4j.stax.WSSec;
+import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSConstants.UsernameTokenPasswordType;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.test.CallbackHandlerImpl;
+import org.apache.wss4j.stax.test.saml.SAMLCallbackHandlerImpl;
+import org.apache.xml.security.stax.config.Init;
+import org.apache.xml.security.stax.ext.SecurePart;
+import org.junit.Assert;
+import org.junit.Test;
+import org.w3c.dom.Document;
 
 public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
 

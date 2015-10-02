@@ -18,23 +18,13 @@
  */
 package org.apache.wss4j.policy.stax.test;
 
-import org.apache.wss4j.common.bsp.BSPRule;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.policy.stax.PolicyEnforcer;
-import org.apache.wss4j.policy.stax.PolicyInputProcessor;
-import org.apache.wss4j.stax.WSSec;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
-import org.apache.wss4j.stax.impl.securityToken.HttpsSecurityTokenImpl;
-import org.apache.wss4j.stax.securityEvent.HttpsTokenSecurityEvent;
-import org.apache.wss4j.stax.test.CallbackHandlerImpl;
-import org.apache.xml.security.stax.config.Init;
-import org.apache.xml.security.stax.ext.SecurePart;
-import org.apache.xml.security.stax.securityEvent.SecurityEvent;
-import org.junit.Assert;
-import org.junit.Test;
-import org.w3c.dom.Document;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -43,9 +33,23 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import org.apache.wss4j.common.bsp.BSPRule;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcer;
+import org.apache.wss4j.policy.stax.enforcer.PolicyInputProcessor;
+import org.apache.wss4j.stax.WSSec;
+import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.impl.securityToken.HttpsSecurityTokenImpl;
+import org.apache.wss4j.stax.securityEvent.HttpsTokenSecurityEvent;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.test.CallbackHandlerImpl;
+import org.apache.xml.security.stax.config.Init;
+import org.apache.xml.security.stax.ext.SecurePart;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.junit.Assert;
+import org.junit.Test;
+import org.w3c.dom.Document;
 
 public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
 

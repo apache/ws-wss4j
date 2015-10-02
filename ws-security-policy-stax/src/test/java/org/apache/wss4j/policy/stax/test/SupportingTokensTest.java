@@ -18,24 +18,36 @@
  */
 package org.apache.wss4j.policy.stax.test;
 
+import java.util.Date;
+
+import javax.xml.namespace.QName;
+
+import org.apache.wss4j.common.WSSPolicyException;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.bean.Version;
-import org.apache.wss4j.common.WSSPolicyException;
+import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcer;
+import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.impl.securityToken.DsaKeyValueSecurityTokenImpl;
+import org.apache.wss4j.stax.impl.securityToken.KerberosServiceSecurityTokenImpl;
+import org.apache.wss4j.stax.impl.securityToken.RsaKeyValueSecurityTokenImpl;
+import org.apache.wss4j.stax.impl.securityToken.SamlSecurityTokenImpl;
+import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityTokenImpl;
+import org.apache.wss4j.stax.impl.securityToken.X509SecurityTokenImpl;
+import org.apache.wss4j.stax.securityEvent.KerberosTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.KeyValueTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.RelTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.SamlTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.SecurityContextTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.UsernameTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.X509TokenSecurityEvent;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
-import org.apache.wss4j.stax.impl.securityToken.*;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.junit.Assert;
 import org.junit.Test;
-import org.apache.wss4j.policy.stax.PolicyEnforcer;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.securityEvent.*;
-
-import javax.xml.namespace.QName;
-
-import java.util.Date;
 
 public class SupportingTokensTest extends AbstractPolicyTestBase {
 

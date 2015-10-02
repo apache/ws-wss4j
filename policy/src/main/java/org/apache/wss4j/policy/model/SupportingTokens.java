@@ -34,7 +34,7 @@ import java.util.List;
 
 public class SupportingTokens extends AbstractSecurityAssertion implements PolicyContainingAssertion {
 
-    private SupportingTokenType supportingTokenType;
+    private QName supportingTokenType;
     private final List<AbstractToken> tokens = new ArrayList<>();
     private AlgorithmSuite algorithmSuite;
     private SignedParts signedParts;
@@ -43,7 +43,7 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
     private EncryptedElements encryptedElements;
     private Policy nestedPolicy;
 
-    public SupportingTokens(SPConstants.SPVersion version, SupportingTokenType supportingTokenType, Policy nestedPolicy) {
+    public SupportingTokens(SPConstants.SPVersion version, QName supportingTokenType, Policy nestedPolicy) {
         super(version);
         this.supportingTokenType = supportingTokenType;
         this.nestedPolicy = nestedPolicy;
@@ -53,7 +53,7 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
 
     @Override
     public QName getName() {
-        return getSupportingTokenType().getName();
+        return supportingTokenType;
     }
 
     @Override
@@ -68,7 +68,7 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
 
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
-        return new SupportingTokens(getVersion(), getSupportingTokenType(), nestedPolicy);
+        return new SupportingTokens(getVersion(), getName(), nestedPolicy);
     }
     
     @Override
@@ -135,14 +135,6 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
                 }
             }
         }
-    }
-
-    public SupportingTokenType getSupportingTokenType() {
-        return supportingTokenType;
-    }
-
-    protected void setSupportingTokenType(SupportingTokenType supportingTokenType) {
-        this.supportingTokenType = supportingTokenType;
     }
 
     public List<AbstractToken> getTokens() {

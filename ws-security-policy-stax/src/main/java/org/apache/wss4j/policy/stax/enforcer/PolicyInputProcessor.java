@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.policy.stax;
+package org.apache.wss4j.policy.stax.enforcer;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.WSSPolicyException;

@@ -18,12 +18,7 @@
  */
 package org.apache.wss4j.policy;
 
-import org.apache.wss4j.policy.model.SupportingTokenType;
-
 import javax.xml.namespace.QName;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 
 public class SP12Constants extends SPConstants {
 
@@ -742,44 +737,6 @@ public class SP12Constants extends SPConstants {
     @Override
     public QName getRecipientEncryptionToken() {
         return RECIPIENT_ENCRYPTION_TOKEN;
-    }
-
-    public enum SupportingTokenTypes implements SupportingTokenType {
-        SupportingTokens(SUPPORTING_TOKENS),
-        SignedSupportingTokens(SIGNED_SUPPORTING_TOKENS),
-        EndorsingSupportingTokens(ENDORSING_SUPPORTING_TOKENS),
-        SignedEndorsingSupportingTokens(SIGNED_ENDORSING_SUPPORTING_TOKENS),
-        SignedEncryptedSupportingTokens(SIGNED_ENCRYPTED_SUPPORTING_TOKENS),
-        EncryptedSupportingTokens(ENCRYPTED_SUPPORTING_TOKENS),
-        EndorsingEncryptedSupportingTokens(ENDORSING_ENCRYPTED_SUPPORTING_TOKENS),
-        SignedEndorsingEncryptedSupportingTokens(SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
-
-        private static final Map<QName, SupportingTokenTypes> lookup = new HashMap<>();
-
-        static {
-            for (SupportingTokenTypes u : EnumSet.allOf(SupportingTokenTypes.class))
-                lookup.put(u.getName(), u);
-        }
-
-        public static SupportingTokenTypes lookUp(QName name) {
-            return lookup.get(name);
-        }
-
-        private final QName name;
-
-        SupportingTokenTypes(QName name) {
-            this.name = name;
-        }
-
-        @Override
-        public QName getName() {
-            return name;
-        }
-    }
-
-    @Override
-    public SupportingTokenType getSupportingTokenType(QName name) {
-        return SupportingTokenTypes.lookUp(name);
     }
 
     @Override

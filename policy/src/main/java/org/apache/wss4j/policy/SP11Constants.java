@@ -18,12 +18,7 @@
  */
 package org.apache.wss4j.policy;
 
-import org.apache.wss4j.policy.model.SupportingTokenType;
-
 import javax.xml.namespace.QName;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 
 public class SP11Constants extends SPConstants {
 
@@ -686,40 +681,6 @@ public class SP11Constants extends SPConstants {
     @Override
     public QName getRecipientEncryptionToken() {
         return RECIPIENT_ENCRYPTION_TOKEN;
-    }
-
-    public enum SupportingTokenTypes implements SupportingTokenType {
-        SupportingTokens(SUPPORTING_TOKENS),
-        SignedSupportingTokens(SIGNED_SUPPORTING_TOKENS),
-        EndorsingSupportingTokens(ENDORSING_SUPPORTING_TOKENS),
-        SignedEndorsingSupportingTokens(SIGNED_ENDORSING_SUPPORTING_TOKENS);
-
-        private static final Map<QName, SupportingTokenTypes> lookup = new HashMap<>();
-
-        static {
-            for (SupportingTokenTypes u : EnumSet.allOf(SupportingTokenTypes.class))
-                lookup.put(u.getName(), u);
-        }
-
-        public static SupportingTokenTypes lookUp(QName name) {
-            return lookup.get(name);
-        }
-
-        private final QName name;
-
-        SupportingTokenTypes(QName name) {
-            this.name = name;
-        }
-
-        @Override
-        public QName getName() {
-            return name;
-        }
-    }
-
-    @Override
-    public SupportingTokenType getSupportingTokenType(QName name) {
-        return SupportingTokenTypes.lookUp(name);
     }
 
     @Override

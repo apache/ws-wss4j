@@ -18,11 +18,24 @@
  */
 package org.apache.wss4j.policy.stax.test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
-import org.apache.wss4j.policy.stax.PolicyEnforcer;
-import org.apache.wss4j.policy.stax.PolicyEnforcerFactory;
-import org.apache.wss4j.policy.stax.PolicyInputProcessor;
+import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcer;
+import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcerFactory;
+import org.apache.wss4j.policy.stax.enforcer.PolicyInputProcessor;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.test.AbstractTestBase;
@@ -32,19 +45,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 
 public class VulnerabliltyVectorsTest extends AbstractTestBase {
 

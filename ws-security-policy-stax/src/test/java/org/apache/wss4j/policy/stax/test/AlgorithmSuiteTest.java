@@ -18,6 +18,11 @@
  */
 package org.apache.wss4j.policy.stax.test;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 import org.apache.neethi.builders.AssertionBuilder;
@@ -26,20 +31,14 @@ import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.builders.AlgorithmSuiteBuilder;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
-import org.apache.wss4j.policy.stax.PolicyEnforcer;
 import org.apache.wss4j.policy.stax.PolicyViolationException;
+import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcer;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.junit.Assert;
 import org.junit.Test;
-
-import javax.xml.namespace.QName;
-
 import org.w3c.dom.Element;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class AlgorithmSuiteTest extends AbstractPolicyTestBase {
 

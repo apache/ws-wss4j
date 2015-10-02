@@ -19,6 +19,12 @@
 
 package org.apache.wss4j.policy.stax.test;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
@@ -27,26 +33,20 @@ import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.policy.stax.PolicyViolationException;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.policy.stax.enforcer.PolicyEnforcer;
+import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.impl.securityToken.KerberosServiceSecurityTokenImpl;
 import org.apache.wss4j.stax.impl.securityToken.SamlSecurityTokenImpl;
 import org.apache.wss4j.stax.securityEvent.KerberosTokenSecurityEvent;
-import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
-import org.junit.Assert;
-import org.junit.Test;
-import org.apache.wss4j.policy.stax.PolicyEnforcer;
-import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.SamlTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.ContentEncryptedElementSecurityEvent;
-
-import javax.xml.namespace.QName;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class IssuedTokenTest extends AbstractPolicyTestBase {
 

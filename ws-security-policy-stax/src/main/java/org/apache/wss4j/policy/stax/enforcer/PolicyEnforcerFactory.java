@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.policy.stax;
+package org.apache.wss4j.policy.stax.enforcer;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -86,6 +86,7 @@ import org.apache.wss4j.policy.builders.UsernameTokenBuilder;
 import org.apache.wss4j.policy.builders.WSS10Builder;
 import org.apache.wss4j.policy.builders.WSS11Builder;
 import org.apache.wss4j.policy.builders.X509TokenBuilder;
+import org.apache.wss4j.policy.stax.OperationPolicy;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

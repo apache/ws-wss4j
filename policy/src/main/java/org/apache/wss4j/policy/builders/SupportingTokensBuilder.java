@@ -26,7 +26,6 @@ import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.SPUtils;
-import org.apache.wss4j.policy.model.SupportingTokenType;
 import org.apache.wss4j.policy.model.SupportingTokens;
 import org.w3c.dom.Element;
 
@@ -38,7 +37,7 @@ public class SupportingTokensBuilder implements AssertionBuilder<Element> {
     public Assertion build(Element element, AssertionBuilderFactory factory) throws IllegalArgumentException {
 
         final SPConstants.SPVersion spVersion = SPConstants.SPVersion.getSPVersion(element.getNamespaceURI());
-        final SupportingTokenType supportingTokenType = spVersion.getSPConstants().getSupportingTokenType(SPUtils.getElementQName(element));
+        final QName supportingTokenType = SPUtils.getElementQName(element);
         final Element nestedPolicyElement = SPUtils.getFirstPolicyChildElement(element);
         final Policy nestedPolicy = nestedPolicyElement != null ? factory.getPolicyEngine().getPolicy(nestedPolicyElement) : new Policy();
         SupportingTokens supportingTokens = new SupportingTokens(
