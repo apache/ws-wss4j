@@ -79,14 +79,6 @@ public class EncryptionGCMTest extends org.junit.Assert {
     
     @org.junit.Test
     public void testAES128GCM() throws Exception {
-        //
-        // This test fails with the IBM JDK 7
-        //
-        if ("IBM Corporation".equals(System.getProperty("java.vendor"))
-            && System.getProperty("java.version") != null
-            &&  System.getProperty("java.version").startsWith("1.7")) {
-            return;
-        }
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -108,14 +100,6 @@ public class EncryptionGCMTest extends org.junit.Assert {
     
     @org.junit.Test
     public void testAES256GCM() throws Exception {
-        //
-        // This test fails with the IBM JDK 7
-        //
-        if ("IBM Corporation".equals(System.getProperty("java.vendor"))
-            && System.getProperty("java.version") != null
-            &&  System.getProperty("java.version").startsWith("1.7")) {
-            return;
-        }
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
@@ -137,15 +121,6 @@ public class EncryptionGCMTest extends org.junit.Assert {
 
     @org.junit.Test
     public void testAES192GCM_RSAOAEP_SHA256_MGFSHA256() throws Exception {
-        //
-        // This test fails with the IBM JDK 7
-        //
-        if ("IBM Corporation".equals(System.getProperty("java.vendor"))
-            && System.getProperty("java.version") != null
-            &&  System.getProperty("java.version").startsWith("1.7")) {
-            return;
-        }
-
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
