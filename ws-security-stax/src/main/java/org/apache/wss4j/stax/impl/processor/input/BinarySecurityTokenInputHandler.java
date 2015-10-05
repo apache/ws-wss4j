@@ -18,33 +18,35 @@
  */
 package org.apache.wss4j.stax.impl.processor.input;
 
+import java.util.Deque;
+import java.util.List;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
+
 import org.apache.wss4j.binding.wss10.BinarySecurityTokenType;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.securityToken.KerberosServiceSecurityToken;
-import org.apache.wss4j.stax.securityToken.X509SecurityToken;
 import org.apache.wss4j.stax.securityEvent.KerberosTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.X509TokenSecurityEvent;
+import org.apache.wss4j.stax.securityToken.KerberosServiceSecurityToken;
+import org.apache.wss4j.stax.securityToken.X509SecurityToken;
 import org.apache.wss4j.stax.validate.BinarySecurityTokenValidator;
 import org.apache.wss4j.stax.validate.BinarySecurityTokenValidatorImpl;
 import org.apache.wss4j.stax.validate.TokenContext;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.ext.*;
+import org.apache.xml.security.stax.ext.AbstractInputSecurityHeaderHandler;
+import org.apache.xml.security.stax.ext.InputProcessorChain;
+import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
-
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-
-import java.util.Deque;
-import java.util.List;
 
 /**
  * Processor for the BinarySecurityToken XML Structure

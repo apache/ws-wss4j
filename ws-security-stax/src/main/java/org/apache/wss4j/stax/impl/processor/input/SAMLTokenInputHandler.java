@@ -18,6 +18,28 @@
  */
 package org.apache.wss4j.stax.impl.processor.input;
 
+import java.security.Key;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.crypto.spec.SecretKeySpec;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Comment;
+import javax.xml.stream.events.Namespace;
+import javax.xml.stream.events.ProcessingInstruction;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.wss4j.binding.wss10.ObjectFactory;
 import org.apache.wss4j.binding.wss10.SecurityTokenReferenceType;
@@ -28,13 +50,13 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSUtils;
+import org.apache.wss4j.stax.impl.securityToken.SamlSecurityTokenImpl;
+import org.apache.wss4j.stax.securityEvent.SamlTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.wss4j.stax.securityToken.SamlSecurityToken;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
-import org.apache.wss4j.stax.impl.securityToken.SamlSecurityTokenImpl;
-import org.apache.wss4j.stax.securityEvent.SamlTokenSecurityEvent;
+import org.apache.wss4j.stax.utils.WSSUtils;
 import org.apache.wss4j.stax.validate.SamlTokenValidator;
 import org.apache.wss4j.stax.validate.SamlTokenValidatorImpl;
 import org.apache.wss4j.stax.validate.TokenContext;
@@ -44,7 +66,11 @@ import org.apache.xml.security.binding.xmldsig.X509DataType;
 import org.apache.xml.security.binding.xmlenc.EncryptedKeyType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
-import org.apache.xml.security.stax.ext.*;
+import org.apache.xml.security.stax.ext.AbstractInputProcessor;
+import org.apache.xml.security.stax.ext.AbstractInputSecurityHeaderHandler;
+import org.apache.xml.security.stax.ext.InputProcessorChain;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecNamespace;
@@ -68,24 +94,6 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
-import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Comment;
-import javax.xml.stream.events.Namespace;
-import javax.xml.stream.events.ProcessingInstruction;
-
-import java.security.Key;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.*;
 
 /**
  * Processor for the SAML Assertion XML Structure

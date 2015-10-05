@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.stax;
+package org.apache.wss4j.stax.setup;
 
 import java.util.ArrayList;
 import java.util.Collection;

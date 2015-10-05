@@ -18,6 +18,12 @@
  */
 package org.apache.wss4j.stax.impl.securityToken;
 
+import java.security.Key;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.Deque;
+import java.util.Map;
+
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.securityToken.SecurityTokenReference;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
@@ -26,12 +32,6 @@ import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
-
-import java.security.Key;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.Deque;
-import java.util.Map;
 
 public class SecurityTokenReferenceImpl extends AbstractInboundSecurityToken implements SecurityTokenReference {
 

@@ -18,16 +18,16 @@
  */
 package org.apache.wss4j.stax.impl.processor.output;
 
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSUtils;
+import org.apache.wss4j.stax.utils.WSSUtils;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.AbstractOutputProcessor;
 import org.apache.xml.security.stax.ext.OutputProcessorChain;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 
 public class ReferenceListOutputProcessor extends AbstractOutputProcessor {
 
@@ -43,7 +43,7 @@ public class ReferenceListOutputProcessor extends AbstractOutputProcessor {
         if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
 
             final QName headerElementName = WSSConstants.TAG_xenc_ReferenceList;
-            WSSUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
+            OutputProcessorUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
 
             OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
             WSSUtils.createReferenceListStructureForEncryption(this, subOutputProcessorChain);

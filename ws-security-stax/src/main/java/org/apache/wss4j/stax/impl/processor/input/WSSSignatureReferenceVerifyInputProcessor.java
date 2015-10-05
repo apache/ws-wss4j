@@ -18,6 +18,23 @@
  */
 package org.apache.wss4j.stax.impl.processor.input;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+
 import org.apache.wss4j.binding.wss10.TransformationParametersType;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.cache.ReplayCache;
@@ -25,15 +42,26 @@ import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.AttachmentResultCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
+import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.impl.transformer.AttachmentContentSignatureTransform;
+import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.TimestampSecurityEvent;
 import org.apache.wss4j.stax.securityToken.SecurityTokenReference;
+import org.apache.wss4j.stax.utils.WSSUtils;
 import org.apache.xml.security.binding.excc14n.InclusiveNamespaces;
 import org.apache.xml.security.binding.xmldsig.CanonicalizationMethodType;
 import org.apache.xml.security.binding.xmldsig.ReferenceType;
 import org.apache.xml.security.binding.xmldsig.SignatureType;
 import org.apache.xml.security.binding.xmldsig.TransformType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.ext.*;
+import org.apache.xml.security.stax.ext.DocumentContext;
+import org.apache.xml.security.stax.ext.InputProcessorChain;
+import org.apache.xml.security.stax.ext.Transformer;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.XMLSecurityProperties;
+import org.apache.xml.security.stax.ext.XMLSecurityUtils;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.xml.security.stax.impl.processor.input.AbstractSignatureReferenceVerifyInputProcessor;
@@ -42,23 +70,9 @@ import org.apache.xml.security.stax.impl.util.DigestOutputStream;
 import org.apache.xml.security.stax.impl.util.UnsynchronizedBufferedOutputStream;
 import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
-import org.apache.wss4j.stax.ext.*;
-import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.TimestampSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
-
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.*;
 
 public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignatureReferenceVerifyInputProcessor {
 

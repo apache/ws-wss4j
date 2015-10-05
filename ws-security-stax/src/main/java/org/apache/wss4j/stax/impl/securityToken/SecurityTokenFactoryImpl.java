@@ -18,29 +18,6 @@
  */
 package org.apache.wss4j.stax.impl.securityToken;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.wss4j.binding.wss10.KeyIdentifierType;
-import org.apache.wss4j.binding.wss10.SecurityTokenReferenceType;
-import org.apache.wss4j.common.bsp.BSPRule;
-import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSUtils;
-import org.apache.wss4j.stax.securityToken.*;
-import org.apache.xml.security.binding.xmldsig.*;
-import org.apache.xml.security.binding.xmldsig11.ECKeyValueType;
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.ext.*;
-import org.apache.xml.security.stax.impl.util.IDGenerator;
-import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
-import org.apache.xml.security.stax.securityToken.SecurityTokenFactory;
-import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
-
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.x500.X500Principal;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -52,6 +29,43 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.x500.X500Principal;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.wss4j.binding.wss10.KeyIdentifierType;
+import org.apache.wss4j.binding.wss10.SecurityTokenReferenceType;
+import org.apache.wss4j.common.bsp.BSPRule;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
+import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.securityToken.KerberosServiceSecurityToken;
+import org.apache.wss4j.stax.securityToken.SamlSecurityToken;
+import org.apache.wss4j.stax.securityToken.SecurityTokenReference;
+import org.apache.wss4j.stax.securityToken.UsernameSecurityToken;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.securityToken.X509SecurityToken;
+import org.apache.wss4j.stax.utils.WSSUtils;
+import org.apache.xml.security.binding.xmldsig.DSAKeyValueType;
+import org.apache.xml.security.binding.xmldsig.KeyInfoType;
+import org.apache.xml.security.binding.xmldsig.KeyValueType;
+import org.apache.xml.security.binding.xmldsig.RSAKeyValueType;
+import org.apache.xml.security.binding.xmldsig.X509DataType;
+import org.apache.xml.security.binding.xmldsig.X509IssuerSerialType;
+import org.apache.xml.security.binding.xmldsig11.ECKeyValueType;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.ext.InboundSecurityContext;
+import org.apache.xml.security.stax.ext.SecurityContext;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.XMLSecurityProperties;
+import org.apache.xml.security.stax.ext.XMLSecurityUtils;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenFactory;
+import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 /**
  * Factory to create InboundSecurityToken Objects from keys in XML

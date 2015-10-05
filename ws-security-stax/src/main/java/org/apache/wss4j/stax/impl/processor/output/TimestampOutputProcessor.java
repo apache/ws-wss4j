@@ -18,18 +18,21 @@
  */
 package org.apache.wss4j.stax.impl.processor.output;
 
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSUtils;
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.ext.AbstractOutputProcessor;
-import org.apache.xml.security.stax.ext.OutputProcessorChain;
-import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
-import java.util.*;
+
+import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.utils.WSSUtils;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.ext.AbstractOutputProcessor;
+import org.apache.xml.security.stax.ext.OutputProcessorChain;
+import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 
 public class TimestampOutputProcessor extends AbstractOutputProcessor {
 
@@ -61,7 +64,7 @@ public class TimestampOutputProcessor extends AbstractOutputProcessor {
         if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
             
             final QName headerElementName = WSSConstants.TAG_wsu_Timestamp;
-            WSSUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
+            OutputProcessorUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
 
             XMLGregorianCalendar created = WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar(TimeZone.getTimeZone("UTC")));
 

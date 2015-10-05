@@ -18,7 +18,6 @@
  */
 package org.apache.wss4j.stax.securityEvent;
 
-
 import org.apache.xml.security.stax.securityToken.SecurityToken;
 
 public class SecurityContextTokenSecurityEvent extends IssuedTokenSecurityEvent<SecurityToken> {

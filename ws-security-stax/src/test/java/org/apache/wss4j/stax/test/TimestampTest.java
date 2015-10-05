@@ -18,22 +18,16 @@
  */
 package org.apache.wss4j.stax.test;
 
-import org.apache.wss4j.common.ConfigurationConstants;
-import org.apache.wss4j.common.bsp.BSPRule;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
-import org.apache.xml.security.stax.securityEvent.SecurityEvent;
-import org.apache.wss4j.stax.ConfigurationConverter;
-import org.apache.wss4j.stax.WSSec;
-import org.apache.wss4j.stax.ext.*;
-import org.apache.wss4j.stax.test.utils.StAX2DOM;
-import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
-import org.junit.Assert;
-import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -43,10 +37,25 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.util.*;
+import org.apache.wss4j.common.ConfigurationConstants;
+import org.apache.wss4j.common.bsp.BSPRule;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.setup.ConfigurationConverter;
+import org.apache.wss4j.stax.setup.InboundWSSec;
+import org.apache.wss4j.stax.setup.OutboundWSSec;
+import org.apache.wss4j.stax.setup.WSSec;
+import org.apache.wss4j.stax.test.utils.StAX2DOM;
+import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.junit.Assert;
+import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class TimestampTest extends AbstractTestBase {
 

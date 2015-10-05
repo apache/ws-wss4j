@@ -29,9 +29,9 @@ import org.apache.wss4j.policy.stax.Assertable;
 import org.apache.wss4j.policy.stax.DummyPolicyAsserter;
 import org.apache.wss4j.policy.stax.PolicyAsserter;
 import org.apache.wss4j.policy.stax.PolicyUtils;
-import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.securityEvent.RequiredElementSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.wss4j.stax.utils.WSSUtils;
 
 import javax.xml.namespace.QName;
 

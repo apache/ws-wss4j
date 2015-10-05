@@ -18,16 +18,17 @@
  */
 package org.apache.wss4j.stax.impl.securityToken;
 
+import java.security.Principal;
+import java.security.cert.X509Certificate;
+
+import javax.security.auth.Subject;
+
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.securityToken.HttpsSecurityToken;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
-
-import javax.security.auth.Subject;
-import java.security.Principal;
-import java.security.cert.X509Certificate;
 
 public class HttpsSecurityTokenImpl extends AbstractInboundSecurityToken implements HttpsSecurityToken {
 

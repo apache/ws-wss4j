@@ -18,16 +18,6 @@
  */
 package org.apache.wss4j.stax.impl.securityToken;
 
-import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.impl.util.UnsynchronizedByteArrayInputStream;
-
-import javax.security.auth.callback.CallbackHandler;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.cert.CertPath;
@@ -36,6 +26,16 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.security.auth.callback.CallbackHandler;
+
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.impl.util.UnsynchronizedByteArrayInputStream;
 
 public class X509PKIPathv1SecurityTokenImpl extends X509SecurityTokenImpl {
 

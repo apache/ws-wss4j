@@ -16,41 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.stax.ext;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.wss4j.stax.WSSec;
-import org.apache.wss4j.stax.impl.SecurityHeaderOrder;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
-import org.apache.wss4j.stax.securityEvent.*;
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.ext.*;
-import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
-import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
-import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
-import org.apache.xml.security.stax.impl.EncryptionPartDef;
-import org.apache.xml.security.stax.impl.util.ConcreteLSInput;
-import org.apache.wss4j.common.crypto.Merlin;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
-import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
-import org.apache.xml.security.stax.securityToken.SecurityToken;
-import org.apache.xml.security.utils.ClassLoaderUtils;
-import org.w3c.dom.ls.LSInput;
-import org.w3c.dom.ls.LSResourceResolver;
-import org.xml.sax.SAXException;
-
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.xml.XMLConstants;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
+package org.apache.wss4j.stax.utils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -62,7 +28,47 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.wss4j.common.crypto.Merlin;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.securityEvent.DerivedKeyTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.EncryptedKeyTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.HttpsTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.KerberosTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.KeyValueTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.RelTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.SamlTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.SecurityContextTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.UsernameTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.X509TokenSecurityEvent;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.ext.AbstractOutputProcessor;
+import org.apache.xml.security.stax.ext.OutputProcessorChain;
+import org.apache.xml.security.stax.ext.SecurePart;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.XMLSecurityUtils;
+import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
+import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
+import org.apache.xml.security.stax.impl.EncryptionPartDef;
+import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
+import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityToken;
 
 public class WSSUtils extends XMLSecurityUtils {
 
@@ -204,30 +210,6 @@ public class WSSUtils extends XMLSecurityUtils {
                     && elementPath.get(0).getNamespaceURI().equals(secondLevelElementName.getNamespaceURI());
         }
         return false;
-    }
-
-    public static void updateSecurityHeaderOrder(
-            OutputProcessorChain outputProcessorChain, QName headerElementName,
-            XMLSecurityConstants.Action action, boolean onTop) {
-
-        final OutboundSecurityContext securityContext = outputProcessorChain.getSecurityContext();
-
-        Map<Object, SecurePart> dynamicSecureParts = securityContext.getAsMap(WSSConstants.ENCRYPTION_PARTS);
-        boolean encrypted = false;
-        if (dynamicSecureParts != null) {
-            encrypted = dynamicSecureParts.containsKey(headerElementName);
-        }
-
-        List<SecurityHeaderOrder> securityHeaderOrderList = securityContext.getAsList(SecurityHeaderOrder.class);
-        if (securityHeaderOrderList == null) {
-            securityContext.putList(SecurityHeaderOrder.class, Collections.<SecurityHeaderOrder>emptyList());
-            securityHeaderOrderList = securityContext.getAsList(SecurityHeaderOrder.class);
-        }
-        if (onTop) {
-            securityHeaderOrderList.add(0, new SecurityHeaderOrder(headerElementName, action, encrypted));
-        } else {
-            securityHeaderOrderList.add(new SecurityHeaderOrder(headerElementName, action, encrypted));
-        }
     }
 
     public static boolean isResponsibleActorOrRole(XMLSecStartElement xmlSecStartElement, String responsibleActor) {
@@ -658,53 +640,4 @@ public class WSSUtils extends XMLSecurityUtils {
         return tmp;
     }
     
-    public static Schema loadWSSecuritySchemas() throws SAXException {
-        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        schemaFactory.setResourceResolver(new LSResourceResolver() {
-            @Override
-            public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseURI) {
-                if ("http://www.w3.org/2001/XMLSchema.dtd".equals(systemId)) {
-                    ConcreteLSInput concreteLSInput = new ConcreteLSInput();
-                    concreteLSInput.setByteStream(ClassLoaderUtils.getResourceAsStream("schemas/XMLSchema.dtd", WSSec.class));
-                    return concreteLSInput;
-                } else if ("XMLSchema.dtd".equals(systemId)) {
-                    ConcreteLSInput concreteLSInput = new ConcreteLSInput();
-                    concreteLSInput.setByteStream(ClassLoaderUtils.getResourceAsStream("schemas/XMLSchema.dtd", WSSec.class));
-                    return concreteLSInput;
-                } else if ("datatypes.dtd".equals(systemId)) {
-                    ConcreteLSInput concreteLSInput = new ConcreteLSInput();
-                    concreteLSInput.setByteStream(ClassLoaderUtils.getResourceAsStream("schemas/datatypes.dtd", WSSec.class));
-                    return concreteLSInput;
-                } else if ("http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd".equals(systemId)) {
-                    ConcreteLSInput concreteLSInput = new ConcreteLSInput();
-                    concreteLSInput.setByteStream(ClassLoaderUtils.getResourceAsStream("schemas/xmldsig-core-schema.xsd", WSSec.class));
-                    return concreteLSInput;
-                } else if ("http://www.w3.org/2001/xml.xsd".equals(systemId)) {
-                    ConcreteLSInput concreteLSInput = new ConcreteLSInput();
-                    concreteLSInput.setByteStream(ClassLoaderUtils.getResourceAsStream("schemas/xml.xsd", WSSec.class));
-                    return concreteLSInput;
-                }
-                return null;
-            }
-        });
-        
-        Schema schema = schemaFactory.newSchema(
-                new Source[] {
-                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/xml.xsd", WSSec.class)),
-                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/soap-1.1.xsd", WSSec.class)),
-                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/soap-1.2.xsd", WSSec.class)),
-                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/exc-c14n.xsd", WSSec.class)),
-                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/xmldsig-core-schema.xsd", WSSec.class)),
-                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/xenc-schema.xsd", WSSec.class)),
-                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/xenc-schema-11.xsd", WSSec.class)),
-                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/xmldsig11-schema.xsd", WSSec.class)),
-                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/oasis-200401-wss-wssecurity-utility-1.0.xsd", WSSec.class)),
-                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/oasis-200401-wss-wssecurity-secext-1.0.xsd", WSSec.class)),
-                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/oasis-wss-wssecurity-secext-1.1.xsd", WSSec.class)),
-                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/ws-secureconversation-200502.xsd", WSSec.class)),
-                        new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/ws-secureconversation-1.3.xsd", WSSec.class)),
-                }
-        );
-        return schema;
-    }
 }

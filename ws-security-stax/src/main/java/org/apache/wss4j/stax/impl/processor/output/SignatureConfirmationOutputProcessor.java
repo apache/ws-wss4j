@@ -18,10 +18,16 @@
  */
 package org.apache.wss4j.stax.impl.processor.output;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSUtils;
+import org.apache.wss4j.stax.utils.WSSUtils;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.AbstractOutputProcessor;
 import org.apache.xml.security.stax.ext.OutputProcessorChain;
@@ -31,11 +37,6 @@ import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class SignatureConfirmationOutputProcessor extends AbstractOutputProcessor {
 
@@ -66,7 +67,7 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
                     aSignatureFound = true;
                     SignatureValueSecurityEvent signatureValueSecurityEvent = (SignatureValueSecurityEvent) securityEvent;
 
-                    WSSUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
+                    OutputProcessorUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
 
                     List<XMLSecAttribute> attributes = new ArrayList<>(2);
                     attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
@@ -77,7 +78,7 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
             }
 
             if (!aSignatureFound) {
-                WSSUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
+                OutputProcessorUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
                 List<XMLSecAttribute> attributes = new ArrayList<>(1);
                 attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, true, attributes);

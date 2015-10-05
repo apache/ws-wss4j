@@ -22,12 +22,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.wss4j.common.ConfigurationConstants;
-import org.apache.wss4j.stax.ConfigurationConverter;
-import org.apache.wss4j.stax.WSSec;
 import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.ext.WSSConstants.UsernameTokenPasswordType;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.setup.ConfigurationConverter;
+import org.apache.wss4j.stax.setup.WSSec;
 import org.apache.wss4j.stax.test.saml.SAMLCallbackHandlerImpl;
 import org.junit.Assert;
 import org.junit.Test;

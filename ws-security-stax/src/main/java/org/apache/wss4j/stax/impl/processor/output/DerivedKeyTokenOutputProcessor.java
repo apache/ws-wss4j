@@ -18,6 +18,16 @@
  */
 package org.apache.wss4j.stax.impl.processor.output;
 
+import java.io.UnsupportedEncodingException;
+import java.security.Key;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.crypto.spec.SecretKeySpec;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.wss4j.common.derivedKey.AlgoFactory;
 import org.apache.wss4j.common.derivedKey.DerivationAlgorithm;
@@ -25,11 +35,13 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.utils.WSSUtils;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
-import org.apache.xml.security.stax.ext.*;
+import org.apache.xml.security.stax.ext.AbstractOutputProcessor;
+import org.apache.xml.security.stax.ext.OutputProcessorChain;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.stax.XMLSecAttribute;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
@@ -37,16 +49,6 @@ import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
-
-import javax.crypto.spec.SecretKeySpec;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-
-import java.io.UnsupportedEncodingException;
-import java.security.Key;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
@@ -219,7 +221,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
 
                 final QName headerElementName = getHeaderElementName();
-                WSSUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
+                OutputProcessorUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
 
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 

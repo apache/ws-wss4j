@@ -18,14 +18,18 @@
  */
 package org.apache.wss4j.stax.impl.processor.input;
 
+import java.math.BigInteger;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.wss4j.binding.wss10.SecurityTokenReferenceType;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.utils.WSSUtils;
 import org.apache.wss4j.stax.validate.SignatureTokenValidator;
 import org.apache.wss4j.stax.validate.SignatureTokenValidatorImpl;
 import org.apache.xml.security.binding.excc14n.InclusiveNamespaces;
@@ -34,7 +38,10 @@ import org.apache.xml.security.binding.xmldsig.ManifestType;
 import org.apache.xml.security.binding.xmldsig.ObjectType;
 import org.apache.xml.security.binding.xmldsig.SignatureType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.ext.*;
+import org.apache.xml.security.stax.ext.InboundSecurityContext;
+import org.apache.xml.security.stax.ext.InputProcessorChain;
+import org.apache.xml.security.stax.ext.XMLSecurityProperties;
+import org.apache.xml.security.stax.ext.XMLSecurityUtils;
 import org.apache.xml.security.stax.impl.processor.input.AbstractSignatureInputHandler;
 import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
@@ -42,10 +49,6 @@ import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenFactory;
-
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.List;
 
 public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
     

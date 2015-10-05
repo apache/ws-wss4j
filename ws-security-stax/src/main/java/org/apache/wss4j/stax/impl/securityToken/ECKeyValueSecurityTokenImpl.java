@@ -18,6 +18,10 @@
  */
 package org.apache.wss4j.stax.impl.securityToken;
 
+import java.security.Principal;
+
+import javax.security.auth.Subject;
+
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.PublicKeyPrincipalImpl;
@@ -25,9 +29,6 @@ import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.securityToken.ECKeyValueSecurityToken;
 import org.apache.xml.security.binding.xmldsig11.ECKeyValueType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-
-import javax.security.auth.Subject;
-import java.security.Principal;
 
 public class ECKeyValueSecurityTokenImpl
         extends org.apache.xml.security.stax.impl.securityToken.ECKeyValueSecurityToken

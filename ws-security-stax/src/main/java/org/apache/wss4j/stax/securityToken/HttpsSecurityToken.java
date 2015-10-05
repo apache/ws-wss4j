@@ -18,7 +18,6 @@
  */
 package org.apache.wss4j.stax.securityToken;
 
-
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 public interface HttpsSecurityToken extends SubjectAndPrincipalSecurityToken, InboundSecurityToken {

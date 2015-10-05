@@ -16,15 +16,42 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.stax.ext;
+package org.apache.wss4j.stax.setup;
+
+import java.io.OutputStream;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
+import java.util.List;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.spec.SecretKeySpec;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.stax.impl.processor.output.*;
+import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.impl.processor.output.BinarySecurityTokenOutputProcessor;
+import org.apache.wss4j.stax.impl.processor.output.CustomTokenOutputProcessor;
+import org.apache.wss4j.stax.impl.processor.output.DerivedKeyTokenOutputProcessor;
+import org.apache.wss4j.stax.impl.processor.output.EncryptEndingOutputProcessor;
+import org.apache.wss4j.stax.impl.processor.output.EncryptOutputProcessor;
+import org.apache.wss4j.stax.impl.processor.output.EncryptedKeyOutputProcessor;
+import org.apache.wss4j.stax.impl.processor.output.ReferenceListOutputProcessor;
+import org.apache.wss4j.stax.impl.processor.output.SAMLTokenOutputProcessor;
+import org.apache.wss4j.stax.impl.processor.output.SecurityContextTokenOutputProcessor;
+import org.apache.wss4j.stax.impl.processor.output.SecurityHeaderOutputProcessor;
+import org.apache.wss4j.stax.impl.processor.output.SecurityHeaderReorderProcessor;
+import org.apache.wss4j.stax.impl.processor.output.SignatureConfirmationOutputProcessor;
+import org.apache.wss4j.stax.impl.processor.output.TimestampOutputProcessor;
+import org.apache.wss4j.stax.impl.processor.output.UsernameTokenOutputProcessor;
+import org.apache.wss4j.stax.impl.processor.output.WSSSignatureOutputProcessor;
 import org.apache.wss4j.stax.impl.securityToken.KerberosClientSecurityToken;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.utils.WSSUtils;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.OutboundSecurityContext;
@@ -44,16 +71,6 @@ import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.spec.SecretKeySpec;
-import javax.xml.stream.XMLStreamWriter;
-
-import java.io.OutputStream;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
-import java.util.List;
 
 /**
  * Outbound Streaming-WebService-Security

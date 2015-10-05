@@ -19,25 +19,25 @@
 package org.apache.wss4j.stax.test;
 
 
-import org.apache.xml.security.stax.securityEvent.SecurityEvent;
-import org.apache.wss4j.stax.WSSec;
-import org.apache.wss4j.stax.ext.OutboundWSSec;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.setup.OutboundWSSec;
+import org.apache.wss4j.stax.setup.WSSec;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 public class OutputChainTest extends AbstractTestBase {
 

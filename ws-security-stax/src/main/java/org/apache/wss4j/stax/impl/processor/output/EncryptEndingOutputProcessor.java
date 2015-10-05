@@ -18,19 +18,23 @@
  */
 package org.apache.wss4j.stax.impl.processor.output;
 
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+
+import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.impl.SecurityHeaderOrder;
+import org.apache.wss4j.stax.utils.WSSUtils;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.OutputProcessorChain;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.impl.EncryptionPartDef;
 import org.apache.xml.security.stax.impl.processor.output.AbstractEncryptEndingOutputProcessor;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSUtils;
-
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import java.util.*;
 
 /**
  * Processor buffers encrypted XMLEvents and forwards them when final is called
@@ -68,7 +72,7 @@ public class EncryptEndingOutputProcessor extends AbstractEncryptEndingOutputPro
 
                         int attachmentCount = attachmentCount(outputProcessorChain);
                         for (int i = 0; i < attachmentCount; i++) {
-                            WSSUtils.updateSecurityHeaderOrder(
+                            OutputProcessorUtils.updateSecurityHeaderOrder(
                                     outputProcessorChain, WSSConstants.TAG_xenc_EncryptedData, getAction(), true);
                         }
                         List<SecurityHeaderOrder> securityHeaderOrderList = 

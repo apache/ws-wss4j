@@ -18,16 +18,11 @@
  */
 package org.apache.wss4j.stax.impl.securityToken;
 
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.ext.WSSecurityException.ErrorCode;
-import org.apache.wss4j.common.kerberos.*;
-import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
-import org.apache.wss4j.stax.securityToken.KerberosServiceSecurityToken;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
+import java.io.IOException;
+import java.security.Key;
+import java.security.Principal;
+import java.security.PrivilegedActionException;
+import java.util.Set;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -36,11 +31,21 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
-import java.io.IOException;
-import java.security.Key;
-import java.security.Principal;
-import java.security.PrivilegedActionException;
-import java.util.Set;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.ext.WSSecurityException.ErrorCode;
+import org.apache.wss4j.common.kerberos.KerberosContextAndServiceNameCallback;
+import org.apache.wss4j.common.kerberos.KerberosServiceContext;
+import org.apache.wss4j.common.kerberos.KerberosServiceExceptionAction;
+import org.apache.wss4j.common.kerberos.KerberosTokenDecoder;
+import org.apache.wss4j.common.kerberos.KerberosTokenDecoderException;
+import org.apache.wss4j.common.kerberos.KerberosTokenDecoderImpl;
+import org.apache.wss4j.common.util.KeyUtils;
+import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
+import org.apache.wss4j.stax.securityToken.KerberosServiceSecurityToken;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
 
 public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityToken implements KerberosServiceSecurityToken {
 

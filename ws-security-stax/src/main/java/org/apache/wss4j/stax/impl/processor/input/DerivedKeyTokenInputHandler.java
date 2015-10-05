@@ -18,16 +18,24 @@
  */
 package org.apache.wss4j.stax.impl.processor.input;
 
+import java.security.Key;
+import java.util.Deque;
+import java.util.List;
+
+import javax.crypto.spec.SecretKeySpec;
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
+
 import org.apache.wss4j.binding.wssc.AbstractDerivedKeyTokenType;
 import org.apache.wss4j.common.derivedKey.DerivedKeyUtils;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.securityToken.UsernameSecurityToken;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.impl.securityToken.SecurityTokenFactoryImpl;
 import org.apache.wss4j.stax.securityEvent.DerivedKeyTokenSecurityEvent;
+import org.apache.wss4j.stax.securityToken.UsernameSecurityToken;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.AbstractInputSecurityHeaderHandler;
@@ -40,14 +48,6 @@ import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
-
-import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-
-import java.security.Key;
-import java.util.Deque;
-import java.util.List;
 
 /**
  * Processor for the SecurityContextToken XML Structure

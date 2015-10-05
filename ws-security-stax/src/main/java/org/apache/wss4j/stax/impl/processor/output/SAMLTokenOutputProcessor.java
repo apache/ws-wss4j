@@ -44,9 +44,9 @@ import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.utils.WSSUtils;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.AbstractOutputProcessor;
@@ -392,7 +392,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                 if (includeBST()) {
 
-                    WSSUtils.updateSecurityHeaderOrder(
+                    OutputProcessorUtils.updateSecurityHeaderOrder(
                             outputProcessorChain, WSSConstants.TAG_wsse_BinarySecurityToken, getAction(), false);
 
                     WSSUtils.createBinarySecurityTokenStructure(this, outputProcessorChain, securityToken.getId(),
@@ -405,7 +405,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 } else {
                     headerElementName = WSSConstants.TAG_saml2_Assertion;
                 }
-                WSSUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
+                OutputProcessorUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
 
                 try {
                     DocumentBuilder db = XMLUtils.createDocumentBuilder(false);
@@ -415,7 +415,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                     throw new XMLSecurityException(ex);
                 }
                 if (includeSTR) {
-                    WSSUtils.updateSecurityHeaderOrder(
+                    OutputProcessorUtils.updateSecurityHeaderOrder(
                             outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, getAction(), false);                    
                     outputSecurityTokenReference(subOutputProcessorChain, samlAssertionWrapper,
                             securityTokenReferenceId, samlAssertionWrapper.getId());

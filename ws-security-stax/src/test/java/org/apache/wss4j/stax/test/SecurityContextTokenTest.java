@@ -18,44 +18,6 @@
  */
 package org.apache.wss4j.stax.test;
 
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.common.bsp.BSPRule;
-import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoFactory;
-import org.apache.wss4j.common.derivedKey.ConversationConstants;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
-import org.apache.wss4j.dom.message.*;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.wss4j.stax.securityEvent.EncryptedPartSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
-import org.apache.xml.security.stax.securityEvent.SecurityEvent;
-import org.apache.wss4j.stax.WSSec;
-import org.apache.wss4j.stax.ext.InboundWSSec;
-import org.apache.wss4j.stax.ext.OutboundWSSec;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
-import org.apache.wss4j.stax.test.utils.SOAPUtil;
-import org.apache.wss4j.stax.test.utils.SecretKeyCallbackHandler;
-import org.apache.wss4j.stax.test.utils.StAX2DOM;
-import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
-import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized.Parameters;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-
-import javax.xml.crypto.dsig.SignatureMethod;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -64,6 +26,48 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
+
+import javax.xml.crypto.dsig.SignatureMethod;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.apache.wss4j.common.bsp.BSPRule;
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.derivedKey.ConversationConstants;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.message.WSSecDKEncrypt;
+import org.apache.wss4j.dom.message.WSSecDKSign;
+import org.apache.wss4j.dom.message.WSSecHeader;
+import org.apache.wss4j.dom.message.WSSecSecurityContextToken;
+import org.apache.wss4j.dom.message.WSSecSignature;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.securityEvent.EncryptedPartSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.wss4j.stax.setup.InboundWSSec;
+import org.apache.wss4j.stax.setup.OutboundWSSec;
+import org.apache.wss4j.stax.setup.WSSec;
+import org.apache.wss4j.stax.test.utils.SOAPUtil;
+import org.apache.wss4j.stax.test.utils.SecretKeyCallbackHandler;
+import org.apache.wss4j.stax.test.utils.StAX2DOM;
+import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class SecurityContextTokenTest extends AbstractTestBase {

@@ -18,6 +18,10 @@
  */
 package org.apache.wss4j.stax.impl.securityToken;
 
+import java.security.cert.X509Certificate;
+
+import javax.security.auth.callback.CallbackHandler;
+
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -26,9 +30,6 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.binding.xmldsig.X509IssuerSerialType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-
-import javax.security.auth.callback.CallbackHandler;
-import java.security.cert.X509Certificate;
 
 public class X509IssuerSerialTokenImpl extends X509SecurityTokenImpl {
 

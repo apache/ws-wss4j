@@ -27,9 +27,9 @@ import javax.xml.stream.XMLStreamException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.impl.securityToken.KerberosClientSecurityToken;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.utils.WSSUtils;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.AbstractOutputProcessor;
 import org.apache.xml.security.stax.ext.OutputProcessorChain;
@@ -148,7 +148,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
             if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
 
                 final QName headerElementName = WSSConstants.TAG_wsse_BinarySecurityToken;
-                WSSUtils.updateSecurityHeaderOrder(
+                OutputProcessorUtils.updateSecurityHeaderOrder(
                         outputProcessorChain, headerElementName, getAction(), false);
 
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
@@ -167,7 +167,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     );
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);
                     if (WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN.equals(getAction())) {                    
-                        WSSUtils.updateSecurityHeaderOrder(outputProcessorChain, WSSConstants.TAG_xenc_ReferenceList, getAction(), false);                    
+                        OutputProcessorUtils.updateSecurityHeaderOrder(outputProcessorChain, WSSConstants.TAG_xenc_ReferenceList, getAction(), false);                    
                         WSSUtils.createReferenceListStructureForEncryption(this, subOutputProcessorChain);
                     }
                 } else {

@@ -18,27 +18,29 @@
  */
 package org.apache.wss4j.stax.impl.securityToken;
 
-import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.ext.WSPasswordCallback;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.principal.PublicKeyPrincipalImpl;
-import org.apache.wss4j.stax.ext.*;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
-import org.apache.wss4j.stax.securityToken.X509SecurityToken;
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.stax.securityToken.SecurityTokenConstants.TokenType;
-
-import javax.security.auth.Subject;
-import javax.security.auth.callback.CallbackHandler;
-
 import java.security.Key;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.security.auth.Subject;
+import javax.security.auth.callback.CallbackHandler;
+
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.principal.PublicKeyPrincipalImpl;
+import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.securityToken.X509SecurityToken;
+import org.apache.wss4j.stax.utils.WSSUtils;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.securityToken.SecurityTokenConstants.TokenType;
 
 public abstract class X509SecurityTokenImpl
         extends org.apache.xml.security.stax.impl.securityToken.X509SecurityToken implements X509SecurityToken {

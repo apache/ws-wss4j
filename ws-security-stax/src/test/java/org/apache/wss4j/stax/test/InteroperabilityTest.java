@@ -18,22 +18,19 @@
  */
 package org.apache.wss4j.stax.test;
 
-import org.apache.wss4j.common.bsp.BSPRule;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
-import org.apache.wss4j.stax.WSSec;
-import org.apache.wss4j.stax.ext.*;
-import org.apache.wss4j.stax.securityEvent.EncryptedPartSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
-import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
-import org.apache.wss4j.stax.test.utils.StAX2DOM;
-import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
-import org.apache.xml.security.stax.ext.SecurePart;
-import org.apache.xml.security.stax.securityEvent.*;
-import org.junit.Assert;
-import org.junit.Test;
-import org.w3c.dom.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -44,8 +41,34 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 
-import java.io.*;
-import java.util.*;
+import org.apache.wss4j.common.bsp.BSPRule;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
+import org.apache.wss4j.stax.securityEvent.EncryptedPartSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
+import org.apache.wss4j.stax.setup.InboundWSSec;
+import org.apache.wss4j.stax.setup.OutboundWSSec;
+import org.apache.wss4j.stax.setup.WSSec;
+import org.apache.wss4j.stax.test.utils.StAX2DOM;
+import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
+import org.apache.xml.security.stax.ext.SecurePart;
+import org.apache.xml.security.stax.securityEvent.EncryptedElementSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
+import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
+import org.junit.Assert;
+import org.junit.Test;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class InteroperabilityTest extends AbstractTestBase {
 

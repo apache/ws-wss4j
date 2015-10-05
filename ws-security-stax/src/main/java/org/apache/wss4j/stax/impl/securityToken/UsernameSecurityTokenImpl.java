@@ -18,6 +18,12 @@
  */
 package org.apache.wss4j.stax.impl.securityToken;
 
+import java.security.Key;
+import java.security.Principal;
+
+import javax.crypto.spec.SecretKeySpec;
+import javax.security.auth.Subject;
+
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
@@ -30,11 +36,6 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.impl.securityToken.AbstractInboundSecurityToken;
-
-import javax.crypto.spec.SecretKeySpec;
-import javax.security.auth.Subject;
-import java.security.Key;
-import java.security.Principal;
 
 public class UsernameSecurityTokenImpl extends AbstractInboundSecurityToken implements UsernameSecurityToken {
 

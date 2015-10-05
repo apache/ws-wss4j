@@ -18,6 +18,11 @@
  */
 package org.apache.wss4j.stax.impl.processor.input;
 
+import java.util.Deque;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
+
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
@@ -25,13 +30,14 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.xml.security.binding.xmlenc.ReferenceList;
 import org.apache.xml.security.binding.xmlenc.ReferenceType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.ext.*;
+import org.apache.xml.security.stax.ext.AbstractInputProcessor;
+import org.apache.xml.security.stax.ext.AbstractInputSecurityHeaderHandler;
+import org.apache.xml.security.stax.ext.InputProcessor;
+import org.apache.xml.security.stax.ext.InputProcessorChain;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.XMLSecurityProperties;
 import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
-import java.util.Deque;
 
 /**
  * Processor for the EncryptedData XML Structure in the security header.

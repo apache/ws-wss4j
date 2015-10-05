@@ -16,9 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.wss4j.stax.ext;
+package org.apache.wss4j.stax.setup;
+
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.impl.InboundWSSecurityContextImpl;
 import org.apache.wss4j.stax.impl.WSSecurityStreamReader;
 import org.apache.wss4j.stax.impl.processor.input.OperationInputProcessor;
@@ -37,13 +47,6 @@ import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
-
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Inbound Streaming-WebService-Security

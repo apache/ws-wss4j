@@ -18,41 +18,53 @@
  */
 package org.apache.wss4j.stax.test;
 
-import org.apache.wss4j.common.crypto.WSProviderConfig;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.SAMLCallback;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.common.saml.bean.SubjectBean;
-import org.apache.wss4j.common.saml.bean.Version;
-import org.apache.wss4j.stax.WSSec;
-import org.apache.wss4j.stax.ext.WSSConstants;
-import org.apache.wss4j.stax.impl.InboundWSSecurityContextImpl;
-import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
-import org.apache.wss4j.stax.impl.securityToken.HttpsSecurityTokenImpl;
-import org.apache.wss4j.stax.impl.securityToken.SamlSecurityTokenImpl;
-import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityTokenImpl;
-import org.apache.wss4j.stax.impl.securityToken.X509SecurityTokenImpl;
-import org.apache.wss4j.stax.securityEvent.*;
-import org.apache.wss4j.stax.securityEvent.X509TokenSecurityEvent;
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.config.Init;
-import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
-import org.apache.xml.security.stax.ext.stax.XMLSecEventFactory;
-import org.apache.xml.security.stax.impl.util.IDGenerator;
-import org.apache.xml.security.stax.securityEvent.*;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import javax.xml.namespace.QName;
-
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.xml.namespace.QName;
+
+import org.apache.wss4j.common.crypto.WSProviderConfig;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.saml.SAMLCallback;
+import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.saml.bean.SubjectBean;
+import org.apache.wss4j.common.saml.bean.Version;
+import org.apache.wss4j.stax.ext.WSSConstants;
+import org.apache.wss4j.stax.impl.InboundWSSecurityContextImpl;
+import org.apache.wss4j.stax.impl.securityToken.HttpsSecurityTokenImpl;
+import org.apache.wss4j.stax.impl.securityToken.SamlSecurityTokenImpl;
+import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityTokenImpl;
+import org.apache.wss4j.stax.impl.securityToken.X509SecurityTokenImpl;
+import org.apache.wss4j.stax.securityEvent.EncryptedPartSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.HttpsTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.OperationSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.RequiredElementSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.SamlTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.SignatureConfirmationSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.TimestampSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.UsernameTokenSecurityEvent;
+import org.apache.wss4j.stax.securityEvent.X509TokenSecurityEvent;
+import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.setup.WSSec;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.config.Init;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
+import org.apache.xml.security.stax.ext.stax.XMLSecEvent;
+import org.apache.xml.security.stax.ext.stax.XMLSecEventFactory;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
+import org.apache.xml.security.stax.securityEvent.EncryptedElementSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
+import org.apache.xml.security.stax.securityEvent.SignatureValueSecurityEvent;
+import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class InboundWSSecurityContextImplTest {
 

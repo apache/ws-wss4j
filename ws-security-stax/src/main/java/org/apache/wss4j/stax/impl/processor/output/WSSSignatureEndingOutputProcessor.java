@@ -21,9 +21,9 @@ package org.apache.wss4j.stax.impl.processor.output;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.ext.WSSUtils;
 import org.apache.wss4j.stax.impl.SecurityHeaderOrder;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
+import org.apache.wss4j.stax.utils.WSSUtils;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.OutputProcessorChain;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
@@ -252,7 +252,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                 case XMLStreamConstants.START_ELEMENT:
                     if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, actor)) {
                         
-                        WSSUtils.updateSecurityHeaderOrder(
+                        OutputProcessorUtils.updateSecurityHeaderOrder(
                                 outputProcessorChain, WSSConstants.TAG_dsig_Signature, getAction(), true);
                         
                         List<SecurityHeaderOrder> securityHeaderOrderList = 
