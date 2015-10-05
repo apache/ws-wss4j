@@ -19,14 +19,12 @@
 
 package org.apache.wss4j.common.saml.bean;
 
-import org.apache.wss4j.common.saml.builder.SAML1Constants;
-
 /**
  * Class NameIDBean represents a SAML NameID (can be used to create both SAML v1.1 and v2.0 statements)
  */
 public class NameIDBean {
     private String nameValue;
-    private String nameIDFormat = SAML1Constants.NAMEID_FORMAT_UNSPECIFIED;
+    private String nameIDFormat = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified";
     private String nameQualifier;
 
     /**
