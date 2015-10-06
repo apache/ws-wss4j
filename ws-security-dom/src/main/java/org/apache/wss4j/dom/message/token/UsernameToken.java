@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
@@ -46,8 +47,7 @@ import org.apache.wss4j.common.util.WSCurrentTimeSource;
 import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.xml.security.exceptions.Base64DecodingException;
@@ -551,19 +551,19 @@ public class UsernameToken {
     /**
      * Set the raw (plain text) password used to compute secret key.
      */
-    public void setRawPassword(RequestData data) throws WSSecurityException {
+    public void setRawPassword(CallbackHandler callbackHandler) throws WSSecurityException {
+        if (callbackHandler == null) {
+            LOG.debug("CallbackHandler is null");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+        }
+        
         WSPasswordCallback pwCb = 
             new WSPasswordCallback(
                 getName(), getPassword(), getPasswordType(), 
                 WSPasswordCallback.USERNAME_TOKEN
             );
-        
-        if (data.getCallbackHandler() == null) {
-            LOG.debug("CallbackHandler is null");
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
-        }
         try {
-            data.getCallbackHandler().handle(new Callback[]{pwCb});
+            callbackHandler.handle(new Callback[]{pwCb});
         } catch (IOException | UnsupportedCallbackException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(e.getMessage(), e);

@@ -22,11 +22,11 @@ package org.apache.wss4j.dom.message;
 import javax.xml.crypto.dsig.SignatureMethod;
 
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SecretKeyCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.engine.WSSecurityEngine;
+import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;

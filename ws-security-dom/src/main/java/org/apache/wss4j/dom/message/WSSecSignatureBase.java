@@ -40,6 +40,7 @@ import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
+import org.apache.wss4j.dom.callback.DOMCallbackLookup;
 import org.apache.wss4j.dom.transform.AttachmentTransformParameterSpec;
 import org.apache.wss4j.dom.transform.STRTransform;
 import org.apache.wss4j.dom.util.WSSecurityUtil;

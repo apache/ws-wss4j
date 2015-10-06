@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom;
+package org.apache.wss4j.dom.engine;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -29,6 +29,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.namespace.QName;
 
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WsuIdAllocator;
 import org.apache.wss4j.dom.action.Action;
 import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;

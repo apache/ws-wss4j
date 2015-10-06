@@ -37,7 +37,7 @@ import org.apache.wss4j.common.util.WSCurrentTimeSource;
 import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

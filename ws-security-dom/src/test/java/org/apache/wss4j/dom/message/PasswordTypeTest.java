@@ -21,12 +21,12 @@ package org.apache.wss4j.dom.message;
 
 import java.util.Collections;
 
-import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
+import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.HandlerAction;

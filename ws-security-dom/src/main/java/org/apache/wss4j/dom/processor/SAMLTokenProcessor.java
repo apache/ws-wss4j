@@ -44,7 +44,7 @@ import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
 import org.apache.wss4j.dom.util.EncryptionUtils;

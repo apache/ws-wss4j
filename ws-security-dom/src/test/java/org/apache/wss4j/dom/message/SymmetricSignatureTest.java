@@ -30,13 +30,13 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.crypto.dsig.SignatureMethod;
 
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecretKeyCallbackHandler;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSPasswordCallback;

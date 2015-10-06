@@ -24,13 +24,13 @@ import java.util.List;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
+import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.cache.MemoryReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;

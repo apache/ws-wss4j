@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom;
+package org.apache.wss4j.dom.engine;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -29,12 +29,13 @@ import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDocInfo;
+import org.apache.wss4j.dom.callback.CallbackLookup;
+import org.apache.wss4j.dom.callback.DOMCallbackLookup;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.message.CallbackLookup;
-import org.apache.wss4j.dom.message.DOMCallbackLookup;
 import org.apache.wss4j.dom.processor.Processor;
 import org.apache.wss4j.dom.saml.DOMSAMLUtil;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
@@ -49,92 +50,6 @@ public class WSSecurityEngine {
     private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(WSSecurityEngine.class);
 
-    /**
-     * <code>wsse:BinarySecurityToken</code> as defined by WS Security specification
-     */
-    public static final QName BINARY_TOKEN = 
-        new QName(WSConstants.WSSE_NS, WSConstants.BINARY_TOKEN_LN);
-    /**
-     * <code>wsse:UsernameToken</code> as defined by WS Security specification
-     */
-    public static final QName USERNAME_TOKEN = 
-        new QName(WSConstants.WSSE_NS, WSConstants.USERNAME_TOKEN_LN);
-    /**
-     * <code>wsu:Timestamp</code> as defined by OASIS WS Security specification,
-     */
-    public static final QName TIMESTAMP = 
-        new QName(WSConstants.WSU_NS, WSConstants.TIMESTAMP_TOKEN_LN);
-    /**
-     * <code>wsse11:signatureConfirmation</code> as defined by OASIS WS Security specification,
-     */
-    public static final QName SIGNATURE_CONFIRMATION = 
-        new QName(WSConstants.WSSE11_NS, WSConstants.SIGNATURE_CONFIRMATION_LN);
-    /**
-     * <code>ds:Signature</code> as defined by XML Signature specification,
-     * enhanced by WS Security specification
-     */
-    public static final QName SIGNATURE = 
-        new QName(WSConstants.SIG_NS, WSConstants.SIG_LN);
-    /**
-     * <code>xenc:EncryptedKey</code> as defined by XML Encryption specification,
-     * enhanced by WS Security specification
-     */
-    public static final QName ENCRYPTED_KEY = 
-        new QName(WSConstants.ENC_NS, WSConstants.ENC_KEY_LN);
-    /**
-     * <code>xenc:EncryptedData</code> as defined by XML Encryption specification,
-     * enhanced by WS Security specification
-     */
-    public static final QName ENCRYPTED_DATA = 
-        new QName(WSConstants.ENC_NS, WSConstants.ENC_DATA_LN);
-    /**
-     * <code>xenc:ReferenceList</code> as defined by XML Encryption specification,
-     */
-    public static final QName REFERENCE_LIST = 
-        new QName(WSConstants.ENC_NS, WSConstants.REF_LIST_LN);
-    /**
-     * <code>saml:Assertion</code> as defined by SAML v1.1 specification
-     */
-    public static final QName SAML_TOKEN = 
-        new QName(WSConstants.SAML_NS, WSConstants.ASSERTION_LN);
-    
-    /**
-     * <code>saml:Assertion</code> as defined by SAML v2.0 specification
-     */
-    public static final QName SAML2_TOKEN = 
-        new QName(WSConstants.SAML2_NS, WSConstants.ASSERTION_LN);
-    
-    /**
-     * <code>saml:EncryptedAssertion</code> as defined by SAML v2.0 specification
-     */
-    public static final QName ENCRYPTED_ASSERTION = 
-        new QName(WSConstants.SAML2_NS, WSConstants.ENCRYPED_ASSERTION_LN);
-
-    /**
-     * <code>wsc:DerivedKeyToken</code> as defined by WS-SecureConversation specification
-     */
-    public static final QName DERIVED_KEY_TOKEN_05_02 = 
-        new QName(ConversationConstants.WSC_NS_05_02, ConversationConstants.DERIVED_KEY_TOKEN_LN);
-
-    /**
-     * <code>wsc:SecurityContextToken</code> as defined by WS-SecureConversation specification
-     */
-    public static final QName SECURITY_CONTEXT_TOKEN_05_02 = 
-        new QName(ConversationConstants.WSC_NS_05_02, ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
-
-    /**
-     * <code>wsc:DerivedKeyToken</code> as defined by WS-SecureConversation specification in WS-SX
-     */
-    public static final QName DERIVED_KEY_TOKEN_05_12 = 
-        new QName(ConversationConstants.WSC_NS_05_12, ConversationConstants.DERIVED_KEY_TOKEN_LN);
-
-    /**
-     * <code>wsc:SecurityContextToken</code> as defined by WS-SecureConversation specification in 
-     * WS-SX
-     */
-    public static final QName SECURITY_CONTEXT_TOKEN_05_12 = 
-        new QName(ConversationConstants.WSC_NS_05_12, ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
-    
     /**
      * The WSSConfig instance used by this SecurityEngine to
      * find Processors for processing security headers
@@ -414,9 +329,9 @@ public class WSSecurityEngine {
                 QName el = new QName(node.getNamespaceURI(), node.getLocalName());
                 
                 // Check for multiple timestamps
-                if (foundTimestamp && el.equals(TIMESTAMP)) {
+                if (foundTimestamp && el.equals(WSConstants.TIMESTAMP)) {
                     requestData.getBSPEnforcer().handleBSPRule(BSPRule.R3227);
-                } else if (el.equals(TIMESTAMP)) {
+                } else if (el.equals(WSConstants.TIMESTAMP)) {
                     foundTimestamp = true;
                 }
                 //

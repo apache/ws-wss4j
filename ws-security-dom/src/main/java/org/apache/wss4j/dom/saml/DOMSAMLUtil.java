@@ -34,7 +34,7 @@ import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.w3c.dom.Element;
 

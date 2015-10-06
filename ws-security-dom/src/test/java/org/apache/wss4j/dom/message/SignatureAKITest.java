@@ -29,11 +29,11 @@ import org.apache.wss4j.common.crypto.MerlinAKI;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.dom.engine.WSSecurityEngine;
+import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.w3c.dom.Document;
 

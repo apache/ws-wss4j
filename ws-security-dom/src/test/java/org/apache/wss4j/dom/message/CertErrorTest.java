@@ -19,9 +19,9 @@
 
 package org.apache.wss4j.dom.message;
 
-import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.w3c.dom.Document;

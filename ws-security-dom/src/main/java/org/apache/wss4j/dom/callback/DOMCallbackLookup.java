@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.wss4j.dom.message;
+package org.apache.wss4j.dom.callback;
 
 import java.util.Collections;
 import java.util.List;

@@ -20,9 +20,9 @@
 package org.apache.wss4j.dom.handler;
 
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 
 
 /**

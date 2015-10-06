@@ -39,8 +39,8 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.str.STRParser;
 import org.apache.wss4j.dom.str.STRParserParameters;
@@ -149,7 +149,8 @@ public class EncryptedDataProcessor implements Processor {
         }
 
         WSDataRef dataRef = EncryptionUtils.decryptEncryptedData(
-                elem.getOwnerDocument(), encryptedDataId, elem, key, symEncAlgo, request);
+                elem.getOwnerDocument(), encryptedDataId, elem, key, symEncAlgo, 
+                request.getAttachmentCallbackHandler());
 
         WSSecurityEngineResult result =
                 new WSSecurityEngineResult(WSConstants.ENCR, Collections.singletonList(dataRef));

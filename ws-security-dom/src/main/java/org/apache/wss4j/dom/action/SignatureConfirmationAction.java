@@ -20,7 +20,7 @@
 package org.apache.wss4j.dom.action;
 
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.SecurityActionToken;
 import org.apache.wss4j.common.SignatureActionToken;
 import org.apache.wss4j.common.WSEncryptionPart;

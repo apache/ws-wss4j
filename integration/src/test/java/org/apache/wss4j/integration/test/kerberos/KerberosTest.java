@@ -61,10 +61,10 @@ import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.dom.engine.WSSecurityEngine;
+import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.dom.message.WSSecHeader;
@@ -253,7 +253,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         KerberosTokenValidator validator = new KerberosTokenValidator();
         validator.setContextName("bob");
         validator.setServiceName("bob@service.ws.apache.org");
-        wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
+        wssConfig.setValidator(WSConstants.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
 

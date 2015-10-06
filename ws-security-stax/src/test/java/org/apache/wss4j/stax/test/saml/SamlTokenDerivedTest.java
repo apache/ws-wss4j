@@ -37,7 +37,7 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.message.WSSecDKSign;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.util.WSSecurityUtil;

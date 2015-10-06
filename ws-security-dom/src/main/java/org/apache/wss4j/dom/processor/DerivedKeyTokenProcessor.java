@@ -25,7 +25,7 @@ import java.util.List;
 import org.w3c.dom.Element;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.ext.WSSecurityException;

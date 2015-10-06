@@ -52,7 +52,7 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.str.EncryptedKeySTRParser;
 import org.apache.wss4j.dom.str.STRParser;
@@ -548,7 +548,7 @@ public class EncryptedKeyProcessor implements Processor {
         }
 
         return EncryptionUtils.decryptEncryptedData(
-            doc, dataRefURI, encryptedDataElement, symmetricKey, symEncAlgo, data
+            doc, dataRefURI, encryptedDataElement, symmetricKey, symEncAlgo, data.getAttachmentCallbackHandler()
         );
     }
     

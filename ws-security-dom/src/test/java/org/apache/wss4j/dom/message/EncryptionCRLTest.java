@@ -25,12 +25,12 @@ import javax.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Document;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
-import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.KeystoreCallbackHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.common.EncryptionActionToken;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;

@@ -30,8 +30,8 @@ import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.engine.WSSecurityEngine;
+import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.validate.Credential;
@@ -72,7 +72,7 @@ public class UsernameTokenProcessor implements Processor {
         if (token.getPassword() == null) { 
             action = WSConstants.UT_NOPASSWORD;
             if (token.isDerivedKey()) {
-                token.setRawPassword(data);
+                token.setRawPassword(data.getCallbackHandler());
                 secretKey = token.getDerivedKey(data.getBSPEnforcer());
             } 
         }

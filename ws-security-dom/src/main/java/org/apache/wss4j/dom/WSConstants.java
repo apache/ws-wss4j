@@ -22,11 +22,102 @@ package org.apache.wss4j.dom;
 import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.WSS4JConstants;
+import org.apache.wss4j.common.derivedKey.ConversationConstants;
 
 /**
  * Constants in WS-Security spec.
  */
 public final class WSConstants extends WSS4JConstants {
+    
+    //
+    // QNames for the security header elements
+    //
+    
+    /**
+     * <code>wsse:BinarySecurityToken</code> as defined by WS Security specification
+     */
+    public static final QName BINARY_TOKEN = 
+        new QName(WSConstants.WSSE_NS, WSConstants.BINARY_TOKEN_LN);
+    /**
+     * <code>wsse:UsernameToken</code> as defined by WS Security specification
+     */
+    public static final QName USERNAME_TOKEN = 
+        new QName(WSConstants.WSSE_NS, WSConstants.USERNAME_TOKEN_LN);
+    /**
+     * <code>wsu:Timestamp</code> as defined by OASIS WS Security specification,
+     */
+    public static final QName TIMESTAMP = 
+        new QName(WSConstants.WSU_NS, WSConstants.TIMESTAMP_TOKEN_LN);
+    /**
+     * <code>wsse11:signatureConfirmation</code> as defined by OASIS WS Security specification,
+     */
+    public static final QName SIGNATURE_CONFIRMATION = 
+        new QName(WSConstants.WSSE11_NS, WSConstants.SIGNATURE_CONFIRMATION_LN);
+    /**
+     * <code>ds:Signature</code> as defined by XML Signature specification,
+     * enhanced by WS Security specification
+     */
+    public static final QName SIGNATURE = 
+        new QName(WSConstants.SIG_NS, WSConstants.SIG_LN);
+    /**
+     * <code>xenc:EncryptedKey</code> as defined by XML Encryption specification,
+     * enhanced by WS Security specification
+     */
+    public static final QName ENCRYPTED_KEY = 
+        new QName(WSConstants.ENC_NS, WSConstants.ENC_KEY_LN);
+    /**
+     * <code>xenc:EncryptedData</code> as defined by XML Encryption specification,
+     * enhanced by WS Security specification
+     */
+    public static final QName ENCRYPTED_DATA = 
+        new QName(WSConstants.ENC_NS, WSConstants.ENC_DATA_LN);
+    /**
+     * <code>xenc:ReferenceList</code> as defined by XML Encryption specification,
+     */
+    public static final QName REFERENCE_LIST = 
+        new QName(WSConstants.ENC_NS, WSConstants.REF_LIST_LN);
+    /**
+     * <code>saml:Assertion</code> as defined by SAML v1.1 specification
+     */
+    public static final QName SAML_TOKEN = 
+        new QName(WSConstants.SAML_NS, WSConstants.ASSERTION_LN);
+    
+    /**
+     * <code>saml:Assertion</code> as defined by SAML v2.0 specification
+     */
+    public static final QName SAML2_TOKEN = 
+        new QName(WSConstants.SAML2_NS, WSConstants.ASSERTION_LN);
+    
+    /**
+     * <code>saml:EncryptedAssertion</code> as defined by SAML v2.0 specification
+     */
+    public static final QName ENCRYPTED_ASSERTION = 
+        new QName(WSConstants.SAML2_NS, WSConstants.ENCRYPED_ASSERTION_LN);
+
+    /**
+     * <code>wsc:DerivedKeyToken</code> as defined by WS-SecureConversation specification
+     */
+    public static final QName DERIVED_KEY_TOKEN_05_02 = 
+        new QName(ConversationConstants.WSC_NS_05_02, ConversationConstants.DERIVED_KEY_TOKEN_LN);
+
+    /**
+     * <code>wsc:SecurityContextToken</code> as defined by WS-SecureConversation specification
+     */
+    public static final QName SECURITY_CONTEXT_TOKEN_05_02 = 
+        new QName(ConversationConstants.WSC_NS_05_02, ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
+
+    /**
+     * <code>wsc:DerivedKeyToken</code> as defined by WS-SecureConversation specification in WS-SX
+     */
+    public static final QName DERIVED_KEY_TOKEN_05_12 = 
+        new QName(ConversationConstants.WSC_NS_05_12, ConversationConstants.DERIVED_KEY_TOKEN_LN);
+
+    /**
+     * <code>wsc:SecurityContextToken</code> as defined by WS-SecureConversation specification in 
+     * WS-SX
+     */
+    public static final QName SECURITY_CONTEXT_TOKEN_05_12 = 
+        new QName(ConversationConstants.WSC_NS_05_12, ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
     
     //
     // Fault codes defined in the WSS 1.1 spec under section 12, Error handling

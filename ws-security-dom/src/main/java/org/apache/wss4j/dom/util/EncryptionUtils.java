@@ -28,8 +28,7 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.handler.RequestData;
-import org.apache.wss4j.dom.message.CallbackLookup;
+import org.apache.wss4j.dom.callback.CallbackLookup;
 import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
@@ -105,6 +104,7 @@ public final class EncryptionUtils {
      * @param encData The EncryptedData element
      * @param symmetricKey The SecretKey with which to decrypt EncryptedData
      * @param symEncAlgo The symmetric encryption algorithm to use
+     * @param attachmentCallbackHandler The CallbackHandler from which to get attachments
      * @throws WSSecurityException
      */
     public static WSDataRef
@@ -114,7 +114,7 @@ public final class EncryptionUtils {
         Element encData,
         SecretKey symmetricKey,
         String symEncAlgo,
-        RequestData requestData
+        CallbackHandler attachmentCallbackHandler
     ) throws WSSecurityException {
 
         // See if it is an attachment, and handle that differently
@@ -134,7 +134,7 @@ public final class EncryptionUtils {
             }
             String uri = cipherReference.getAttributeNS(null, "URI");
             
-            return decryptAttachment(dataRefURI, uri, encData, symmetricKey, symEncAlgo, requestData);
+            return decryptAttachment(dataRefURI, uri, encData, symmetricKey, symEncAlgo, attachmentCallbackHandler);
         }
         
         WSDataRef dataRef = new WSDataRef();
@@ -176,7 +176,8 @@ public final class EncryptionUtils {
                 } else {
                     tempEncData = encData;
                 }
-                decryptedNode = decryptXopAttachment(symmetricKey, symEncAlgo, requestData, xopURI, tempEncData);
+                decryptedNode = decryptXopAttachment(symmetricKey, symEncAlgo, attachmentCallbackHandler, 
+                                                     xopURI, tempEncData);
             } else {
                 //in this case, the XMLCipher knows how to handle encData when it's the parent node
                 // (i.e., when content == true)
@@ -255,7 +256,7 @@ public final class EncryptionUtils {
         Element encData,
         SecretKey symmetricKey,
         String symEncAlgo,
-        RequestData requestData
+        CallbackHandler attachmentCallbackHandler
     ) throws WSSecurityException {
         WSDataRef dataRef = new WSDataRef();
         dataRef.setWsuId(dataRefURI);
@@ -268,7 +269,6 @@ public final class EncryptionUtils {
             dataRef.setWsuId(uri);
             dataRef.setAttachment(true);
 
-            CallbackHandler attachmentCallbackHandler = requestData.getAttachmentCallbackHandler();
             if (attachmentCallbackHandler == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
             }
@@ -328,11 +328,10 @@ public final class EncryptionUtils {
     }
     
 
-    private static Node decryptXopAttachment(SecretKey symmetricKey, String symEncAlgo, RequestData requestData,
+    private static Node decryptXopAttachment(SecretKey symmetricKey, String symEncAlgo, CallbackHandler attachmentCallbackHandler,
                                              String xopURI, Element encData) throws WSSecurityException, IOException,
             UnsupportedCallbackException, NoSuchAlgorithmException, NoSuchPaddingException, ParserConfigurationException, SAXException {
 
-        CallbackHandler attachmentCallbackHandler = requestData.getAttachmentCallbackHandler();
         if (attachmentCallbackHandler == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
         }

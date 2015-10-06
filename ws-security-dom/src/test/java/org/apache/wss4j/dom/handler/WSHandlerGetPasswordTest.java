@@ -22,11 +22,11 @@ package org.apache.wss4j.dom.handler;
 import java.util.Collections;
 
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
+import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.w3c.dom.Document;

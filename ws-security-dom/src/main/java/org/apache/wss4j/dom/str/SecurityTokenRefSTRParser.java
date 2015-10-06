@@ -36,8 +36,8 @@ import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.WSSecurityEngine;
-import org.apache.wss4j.dom.WSSecurityEngineResult;
+import org.apache.wss4j.dom.engine.WSSecurityEngine;
+import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.DerivedKeyToken;
 import org.apache.wss4j.dom.message.token.UsernameToken;
@@ -150,7 +150,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
             UsernameToken usernameToken = 
                 (UsernameToken)result.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
 
-            usernameToken.setRawPassword(data);
+            usernameToken.setRawPassword(data.getCallbackHandler());
             byte[] secretKey = usernameToken.getDerivedKey(data.getBSPEnforcer());
             parserResult.setSecretKey(secretKey);
         }

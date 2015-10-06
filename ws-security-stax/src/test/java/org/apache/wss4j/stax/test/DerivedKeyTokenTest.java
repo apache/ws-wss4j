@@ -39,7 +39,7 @@ import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.WSSecDKEncrypt;
 import org.apache.wss4j.dom.message.WSSecDKSign;

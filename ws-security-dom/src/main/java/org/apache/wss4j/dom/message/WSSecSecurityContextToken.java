@@ -22,7 +22,7 @@ package org.apache.wss4j.dom.message;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
-import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
