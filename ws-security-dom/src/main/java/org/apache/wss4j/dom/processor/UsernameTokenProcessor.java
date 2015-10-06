@@ -30,7 +30,6 @@ import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.UsernameToken;
@@ -63,7 +62,7 @@ public class UsernameTokenProcessor implements Processor {
             }
         }
         
-        Validator validator = data.getValidator(WSSecurityEngine.USERNAME_TOKEN);
+        Validator validator = data.getValidator(WSConstants.USERNAME_TOKEN);
         Credential credential = handleUsernameToken(elem, validator, data);
         UsernameToken token = credential.getUsernametoken();
         

@@ -667,7 +667,7 @@ public class TimestampTest extends org.junit.Assert {
         // is rejecting the Timestamp
         //
         WSSConfig wssConfig = WSSConfig.getNewInstance();
-        wssConfig.setValidator(WSSecurityEngine.TIMESTAMP, new NoOpValidator());
+        wssConfig.setValidator(WSConstants.TIMESTAMP, new NoOpValidator());
         try {
             verify(doc, wssConfig, new ArrayList<BSPRule>());
             fail("The timestamp validation should have failed");
@@ -724,7 +724,7 @@ public class TimestampTest extends org.junit.Assert {
         
         // Now it should pass...
         WSSConfig wssConfig = WSSConfig.getNewInstance();
-        wssConfig.setValidator(WSSecurityEngine.TIMESTAMP, new NoOpValidator());
+        wssConfig.setValidator(WSConstants.TIMESTAMP, new NoOpValidator());
         verify(doc, wssConfig, Collections.singletonList(BSPRule.R3225));
     }
     

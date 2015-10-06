@@ -88,7 +88,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         WSSConfig cfg = WSSConfig.getNewInstance();
         String p = "org.apache.wss4j.dom.common.CustomProcessor";
         cfg.setProcessor(
-            WSSecurityEngine.SIGNATURE,
+            WSConstants.SIGNATURE,
             org.apache.wss4j.dom.common.CustomProcessor.class
         );
         final WSSecurityEngine engine = new WSSecurityEngine();
@@ -134,10 +134,8 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         // Check to make sure we can install/replace and use our own processor
         //
         WSSConfig cfg = WSSConfig.getNewInstance();
-        cfg.setProcessor(
-            WSSecurityEngine.SIGNATURE,
-            CustomProcessor.class
-        );
+        cfg.setProcessor(WSConstants.SIGNATURE, CustomProcessor.class);
+        
         final WSSecurityEngine engine = new WSSecurityEngine();
         engine.setWssConfig(cfg);
         final WSHandlerResult results = 

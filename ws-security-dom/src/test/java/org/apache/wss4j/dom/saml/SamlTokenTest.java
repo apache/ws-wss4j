@@ -97,8 +97,8 @@ public class SamlTokenTest extends org.junit.Assert {
 
     public SamlTokenTest() {
         WSSConfig config = WSSConfig.getNewInstance();
-        config.setValidator(WSSecurityEngine.SAML_TOKEN, new CustomSamlAssertionValidator());
-        config.setValidator(WSSecurityEngine.SAML2_TOKEN, new CustomSamlAssertionValidator());
+        config.setValidator(WSConstants.SAML_TOKEN, new CustomSamlAssertionValidator());
+        config.setValidator(WSConstants.SAML2_TOKEN, new CustomSamlAssertionValidator());
         secEngine.setWssConfig(config);
     }
     
@@ -827,8 +827,8 @@ public class SamlTokenTest extends org.junit.Assert {
         WSSecurityEngine newEngine = new WSSecurityEngine();
         
         WSSConfig config = WSSConfig.getNewInstance();
-        config.setValidator(WSSecurityEngine.SAML_TOKEN, new CustomSamlAssertionValidator());
-        config.setValidator(WSSecurityEngine.SAML2_TOKEN, new CustomSamlAssertionValidator());
+        config.setValidator(WSConstants.SAML_TOKEN, new CustomSamlAssertionValidator());
+        config.setValidator(WSConstants.SAML2_TOKEN, new CustomSamlAssertionValidator());
         newEngine.setWssConfig(config);
         
         WSHandlerResult results = newEngine.processSecurityHeader(doc, data);
@@ -917,8 +917,8 @@ public class SamlTokenTest extends org.junit.Assert {
         WSSConfig config = WSSConfig.getNewInstance();
         SamlAssertionValidator assertionValidator = new SamlAssertionValidator();
         assertionValidator.setRequiredSubjectConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
-        config.setValidator(WSSecurityEngine.SAML_TOKEN, assertionValidator);
-        config.setValidator(WSSecurityEngine.SAML2_TOKEN, assertionValidator);
+        config.setValidator(WSConstants.SAML_TOKEN, assertionValidator);
+        config.setValidator(WSConstants.SAML2_TOKEN, assertionValidator);
         
         WSSecurityEngine newEngine = new WSSecurityEngine();
         newEngine.setWssConfig(config);
@@ -980,8 +980,8 @@ public class SamlTokenTest extends org.junit.Assert {
         WSSConfig config = WSSConfig.getNewInstance();
         SamlAssertionValidator assertionValidator = new SamlAssertionValidator();
         assertionValidator.setRequireStandardSubjectConfirmationMethod(false);
-        config.setValidator(WSSecurityEngine.SAML_TOKEN, assertionValidator);
-        config.setValidator(WSSecurityEngine.SAML2_TOKEN, assertionValidator);
+        config.setValidator(WSConstants.SAML_TOKEN, assertionValidator);
+        config.setValidator(WSConstants.SAML2_TOKEN, assertionValidator);
         
         newEngine.setWssConfig(config);
         
@@ -1022,8 +1022,8 @@ public class SamlTokenTest extends org.junit.Assert {
         WSSConfig config = WSSConfig.getNewInstance();
         SamlAssertionValidator assertionValidator = new SamlAssertionValidator();
         assertionValidator.setRequireBearerSignature(false);
-        config.setValidator(WSSecurityEngine.SAML_TOKEN, assertionValidator);
-        config.setValidator(WSSecurityEngine.SAML2_TOKEN, assertionValidator);
+        config.setValidator(WSConstants.SAML_TOKEN, assertionValidator);
+        config.setValidator(WSConstants.SAML2_TOKEN, assertionValidator);
         
         newEngine.setWssConfig(config);
         

@@ -121,7 +121,7 @@ public class PrincipalTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
         WSHandlerResult results = 
-            verify(signedDoc, new DummyValidator(), WSSecurityEngine.USERNAME_TOKEN, null);
+            verify(signedDoc, new DummyValidator(), WSConstants.USERNAME_TOKEN, null);
         
         Principal principal = 
             (Principal)results.getResults().get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
@@ -245,7 +245,7 @@ public class PrincipalTest extends org.junit.Assert {
         }
         
         WSHandlerResult results = 
-            verify(unsignedDoc, new DummyValidator(), WSSecurityEngine.SAML_TOKEN, null);
+            verify(unsignedDoc, new DummyValidator(), WSConstants.SAML_TOKEN, null);
         
         List<WSSecurityEngineResult> samlResults = 
             results.getActionResults().get(WSConstants.ST_UNSIGNED);
@@ -288,7 +288,7 @@ public class PrincipalTest extends org.junit.Assert {
         }
         
         WSHandlerResult results = 
-            verify(doc, new DummyValidator(), WSSecurityEngine.BINARY_TOKEN, crypto);
+            verify(doc, new DummyValidator(), WSConstants.BINARY_TOKEN, crypto);
         
         List<WSSecurityEngineResult> bstResults = 
             results.getActionResults().get(WSConstants.BST);

@@ -72,7 +72,6 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.callback.CallbackLookup;
-import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.Timestamp;
@@ -132,7 +131,7 @@ public class SignatureProcessor implements Processor {
         REFERENCE_TYPE referenceType = null;
 
         Credential credential = new Credential();
-        Validator validator = data.getValidator(WSSecurityEngine.SIGNATURE);
+        Validator validator = data.getValidator(WSConstants.SIGNATURE);
         if (keyInfoElement == null) {
             certs = getDefaultCerts(data.getSigVerCrypto());
             principal = certs[0].getSubjectX500Principal();

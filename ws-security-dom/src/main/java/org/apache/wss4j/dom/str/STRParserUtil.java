@@ -38,7 +38,6 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.callback.CallbackLookup;
 import org.apache.wss4j.dom.callback.DOMCallbackLookup;
-import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
@@ -110,7 +109,7 @@ public final class STRParserUtil {
                     WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity"
                 );
             }
-            Processor proc = request.getWssConfig().getProcessor(WSSecurityEngine.SAML_TOKEN);
+            Processor proc = request.getWssConfig().getProcessor(WSConstants.SAML_TOKEN);
             List<WSSecurityEngineResult> samlResult =
                 proc.handleToken(token, request, wsDocInfo);
             return 

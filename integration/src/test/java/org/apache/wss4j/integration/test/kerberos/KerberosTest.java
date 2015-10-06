@@ -406,7 +406,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         KerberosTokenValidator validator = new KerberosTokenValidator();
         validator.setContextName("bob");
         validator.setServiceName("bob@service.ws.apache.org");
-        wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
+        wssConfig.setValidator(WSConstants.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
         
@@ -484,7 +484,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         KerberosTokenValidator validator = new KerberosTokenValidator();
         validator.setContextName("bob");
         validator.setServiceName("bob@service.ws.apache.org");
-        wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
+        wssConfig.setValidator(WSConstants.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
         
@@ -557,7 +557,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         KerberosTokenValidator validator = new KerberosTokenValidator();
         validator.setContextName("bob");
         validator.setServiceName("bob@service.ws.apache.org");
-        wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
+        wssConfig.setValidator(WSConstants.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
         
@@ -630,7 +630,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         KerberosTokenValidator validator = new KerberosTokenValidator();
         validator.setContextName("bob");
         validator.setServiceName("bob@service.ws.apache.org");
-        wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
+        wssConfig.setValidator(WSConstants.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
         
@@ -705,7 +705,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         KerberosTokenValidator validator = new KerberosTokenValidator();
         validator.setContextName("bob");
         validator.setServiceName("bob@service.ws.apache.org");
-        wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
+        wssConfig.setValidator(WSConstants.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
         
@@ -775,7 +775,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             KerberosTokenValidator validator = new KerberosTokenValidator();
             validator.setContextName("bob");
             validator.setServiceName("bob@service.ws.apache.org");
-            wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
+            wssConfig.setValidator(WSConstants.BINARY_TOKEN, validator);
             WSSecurityEngine secEngine = new WSSecurityEngine();
             secEngine.setWssConfig(wssConfig);
 
@@ -1041,7 +1041,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             KerberosTokenValidator validator = new KerberosTokenValidator();
             validator.setContextName("bob");
             validator.setServiceName("bob@service.ws.apache.org");
-            wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, validator);
+            wssConfig.setValidator(WSConstants.BINARY_TOKEN, validator);
             WSSecurityEngine secEngine = new WSSecurityEngine();
             secEngine.setWssConfig(wssConfig);
 

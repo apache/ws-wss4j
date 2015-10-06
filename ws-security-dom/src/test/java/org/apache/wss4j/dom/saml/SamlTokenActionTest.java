@@ -61,8 +61,8 @@ public class SamlTokenActionTest extends org.junit.Assert {
     public SamlTokenActionTest() throws WSSecurityException {
         WSSConfig config = WSSConfig.getNewInstance();
         crypto = CryptoFactory.getInstance("wss40.properties");
-        config.setValidator(WSSecurityEngine.SAML_TOKEN, new CustomSamlAssertionValidator());
-        config.setValidator(WSSecurityEngine.SAML2_TOKEN, new CustomSamlAssertionValidator());
+        config.setValidator(WSConstants.SAML_TOKEN, new CustomSamlAssertionValidator());
+        config.setValidator(WSConstants.SAML2_TOKEN, new CustomSamlAssertionValidator());
         secEngine.setWssConfig(config);
     }
     

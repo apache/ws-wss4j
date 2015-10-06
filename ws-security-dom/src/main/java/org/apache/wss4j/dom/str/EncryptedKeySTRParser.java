@@ -35,7 +35,6 @@ import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
@@ -167,7 +166,7 @@ public class EncryptedKeySTRParser implements STRParser {
 
             // at this point ... check token type: Binary
             QName el = new QName(bstElement.getNamespaceURI(), bstElement.getLocalName());
-            if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
+            if (el.equals(WSConstants.BINARY_TOKEN)) {
                 X509Security token = new X509Security(bstElement, data.getBSPEnforcer());
                 STRParserUtil.checkBinarySecurityBSPCompliance(secRef, token, data.getBSPEnforcer());
                 parserResult.setCerts(new X509Certificate[]{token.getX509Certificate(crypto)});

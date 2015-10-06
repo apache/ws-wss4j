@@ -36,6 +36,7 @@ import org.apache.wss4j.common.saml.bean.NameIDBean;
 import org.apache.wss4j.common.saml.bean.ProxyRestrictionBean;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomSamlAssertionValidator;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
@@ -65,8 +66,8 @@ public class SamlConditionsTest extends org.junit.Assert {
 
     public SamlConditionsTest() {
         WSSConfig config = WSSConfig.getNewInstance();
-        config.setValidator(WSSecurityEngine.SAML_TOKEN, new CustomSamlAssertionValidator());
-        config.setValidator(WSSecurityEngine.SAML2_TOKEN, new CustomSamlAssertionValidator());
+        config.setValidator(WSConstants.SAML_TOKEN, new CustomSamlAssertionValidator());
+        config.setValidator(WSConstants.SAML2_TOKEN, new CustomSamlAssertionValidator());
         secEngine.setWssConfig(config);
     }
     

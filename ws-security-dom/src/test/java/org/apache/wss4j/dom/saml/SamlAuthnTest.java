@@ -26,6 +26,7 @@ import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomSamlAssertionValidator;
 import org.apache.wss4j.dom.common.SAML1CallbackHandler;
 import org.apache.wss4j.dom.common.SAML2CallbackHandler;
@@ -55,8 +56,8 @@ public class SamlAuthnTest extends org.junit.Assert {
 
     public SamlAuthnTest() {
         WSSConfig config = WSSConfig.getNewInstance();
-        config.setValidator(WSSecurityEngine.SAML_TOKEN, new CustomSamlAssertionValidator());
-        config.setValidator(WSSecurityEngine.SAML2_TOKEN, new CustomSamlAssertionValidator());
+        config.setValidator(WSConstants.SAML_TOKEN, new CustomSamlAssertionValidator());
+        config.setValidator(WSConstants.SAML2_TOKEN, new CustomSamlAssertionValidator());
         secEngine.setWssConfig(config);
     }
     

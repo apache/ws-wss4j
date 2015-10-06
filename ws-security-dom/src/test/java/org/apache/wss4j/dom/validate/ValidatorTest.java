@@ -97,7 +97,7 @@ public class ValidatorTest extends org.junit.Assert {
         }
 
         // Now switch out the default Timestamp validator
-        wssConfig.setValidator(WSSecurityEngine.TIMESTAMP, NoOpValidator.class);
+        wssConfig.setValidator(WSConstants.TIMESTAMP, NoOpValidator.class);
         verify(createdDoc, wssConfig, null, null);
     }
     
@@ -139,7 +139,7 @@ public class ValidatorTest extends org.junit.Assert {
         
         // Now switch out the default signature validator
         WSSConfig config = WSSConfig.getNewInstance();
-        config.setValidator(WSSecurityEngine.SIGNATURE, NoOpValidator.class);
+        config.setValidator(WSConstants.SIGNATURE, NoOpValidator.class);
         newEngine.setWssConfig(config);
         data.setWssConfig(config);
         newEngine.processSecurityHeader(signedDoc, data);
@@ -176,7 +176,7 @@ public class ValidatorTest extends org.junit.Assert {
         }
         
         // Now switch out the default UsernameToken validator
-        wssConfig.setValidator(WSSecurityEngine.USERNAME_TOKEN, NoOpValidator.class);
+        wssConfig.setValidator(WSConstants.USERNAME_TOKEN, NoOpValidator.class);
         verify(signedDoc, wssConfig, new UsernamePasswordCallbackHandler(), null);
     }
     
@@ -208,7 +208,7 @@ public class ValidatorTest extends org.junit.Assert {
         }
         
         WSSConfig config = WSSConfig.getNewInstance();
-        config.setValidator(WSSecurityEngine.BINARY_TOKEN, new BSTValidator());
+        config.setValidator(WSConstants.BINARY_TOKEN, new BSTValidator());
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(config);
         WSHandlerResult results = 
@@ -260,7 +260,7 @@ public class ValidatorTest extends org.junit.Assert {
             // expected
         }
         
-        config.setValidator(WSSecurityEngine.BINARY_TOKEN, new BSTValidator());
+        config.setValidator(WSConstants.BINARY_TOKEN, new BSTValidator());
         WSHandlerResult results = 
             secEngine.processSecurityHeader(doc, null, null, crypto);
         

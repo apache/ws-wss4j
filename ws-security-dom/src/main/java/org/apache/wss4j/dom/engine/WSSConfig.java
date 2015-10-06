@@ -137,63 +137,63 @@ public class WSSConfig {
         final Map<QName, Class<?>> tmp = new HashMap<>();
         try {
             tmp.put(
-                WSSecurityEngine.SAML_TOKEN,
+                WSConstants.SAML_TOKEN,
                 org.apache.wss4j.dom.processor.SAMLTokenProcessor.class
             );
             tmp.put(
-                WSSecurityEngine.SAML2_TOKEN,
+                WSConstants.SAML2_TOKEN,
                 org.apache.wss4j.dom.processor.SAMLTokenProcessor.class
             );
             tmp.put(
-                WSSecurityEngine.ENCRYPTED_ASSERTION,
+                WSConstants.ENCRYPTED_ASSERTION,
                 org.apache.wss4j.dom.processor.EncryptedAssertionProcessor.class
             );
             tmp.put(
-                WSSecurityEngine.ENCRYPTED_KEY,
+                WSConstants.ENCRYPTED_KEY,
                 org.apache.wss4j.dom.processor.EncryptedKeyProcessor.class
             );
             tmp.put(
-                WSSecurityEngine.SIGNATURE,
+                WSConstants.SIGNATURE,
                 org.apache.wss4j.dom.processor.SignatureProcessor.class
             );
             tmp.put(
-                WSSecurityEngine.TIMESTAMP,
+                WSConstants.TIMESTAMP,
                 org.apache.wss4j.dom.processor.TimestampProcessor.class
             );
             tmp.put(
-                WSSecurityEngine.USERNAME_TOKEN,
+                WSConstants.USERNAME_TOKEN,
                 org.apache.wss4j.dom.processor.UsernameTokenProcessor.class
             );
             tmp.put(
-                WSSecurityEngine.REFERENCE_LIST,
+                WSConstants.REFERENCE_LIST,
                 org.apache.wss4j.dom.processor.ReferenceListProcessor.class
             );
             tmp.put(
-                WSSecurityEngine.SIGNATURE_CONFIRMATION,
+                WSConstants.SIGNATURE_CONFIRMATION,
                 org.apache.wss4j.dom.processor.SignatureConfirmationProcessor.class
             );
             tmp.put(
-                WSSecurityEngine.DERIVED_KEY_TOKEN_05_02,
+                WSConstants.DERIVED_KEY_TOKEN_05_02,
                 org.apache.wss4j.dom.processor.DerivedKeyTokenProcessor.class
             );
             tmp.put(
-                WSSecurityEngine.DERIVED_KEY_TOKEN_05_12,
-                tmp.get(WSSecurityEngine.DERIVED_KEY_TOKEN_05_02)
+                WSConstants.DERIVED_KEY_TOKEN_05_12,
+                tmp.get(WSConstants.DERIVED_KEY_TOKEN_05_02)
             );
             tmp.put(
-                WSSecurityEngine.SECURITY_CONTEXT_TOKEN_05_02,
+                WSConstants.SECURITY_CONTEXT_TOKEN_05_02,
                 org.apache.wss4j.dom.processor.SecurityContextTokenProcessor.class
             );
             tmp.put(
-                WSSecurityEngine.SECURITY_CONTEXT_TOKEN_05_12,
-                tmp.get(WSSecurityEngine.SECURITY_CONTEXT_TOKEN_05_02)
+                WSConstants.SECURITY_CONTEXT_TOKEN_05_12,
+                tmp.get(WSConstants.SECURITY_CONTEXT_TOKEN_05_02)
             );
             tmp.put(
-                WSSecurityEngine.BINARY_TOKEN,
+                WSConstants.BINARY_TOKEN,
                 org.apache.wss4j.dom.processor.BinarySecurityTokenProcessor.class
             );
             tmp.put(
-                WSSecurityEngine.ENCRYPTED_DATA,
+                WSConstants.ENCRYPTED_DATA,
                 org.apache.wss4j.dom.processor.EncryptedDataProcessor.class
             );
         } catch (final Exception ex) {
@@ -212,23 +212,23 @@ public class WSSConfig {
         final Map<QName, Class<?>> tmp = new HashMap<>();
         try {
             tmp.put(
-                WSSecurityEngine.SAML_TOKEN,
+                WSConstants.SAML_TOKEN,
                 org.apache.wss4j.dom.validate.SamlAssertionValidator.class
             );
             tmp.put(
-                WSSecurityEngine.SAML2_TOKEN,
+                WSConstants.SAML2_TOKEN,
                 org.apache.wss4j.dom.validate.SamlAssertionValidator.class
             );
             tmp.put(
-                WSSecurityEngine.SIGNATURE,
+                WSConstants.SIGNATURE,
                 org.apache.wss4j.dom.validate.SignatureTrustValidator.class
             );
             tmp.put(
-                WSSecurityEngine.TIMESTAMP,
+                WSConstants.TIMESTAMP,
                 org.apache.wss4j.dom.validate.TimestampValidator.class
             );
             tmp.put(
-                WSSecurityEngine.USERNAME_TOKEN,
+                WSConstants.USERNAME_TOKEN,
                 org.apache.wss4j.dom.validate.UsernameTokenValidator.class
             );
         } catch (final Exception ex) {

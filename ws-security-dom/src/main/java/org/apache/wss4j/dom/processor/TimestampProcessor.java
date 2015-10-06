@@ -24,7 +24,6 @@ import java.util.List;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.Timestamp;
@@ -58,7 +57,7 @@ public class TimestampProcessor implements Processor {
             result.put(WSSecurityEngineResult.TAG_ID, tokenId);
         }
         
-        Validator validator = data.getValidator(WSSecurityEngine.TIMESTAMP);
+        Validator validator = data.getValidator(WSConstants.TIMESTAMP);
         if (validator != null) {
             validator.validate(credential, data);
             

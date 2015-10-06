@@ -295,8 +295,8 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
         
         WSSecurityEngine secEngine = new WSSecurityEngine();
         WSSConfig config = secEngine.getWssConfig();
-        config.setValidator(WSSecurityEngine.SAML_TOKEN, validator);
-        config.setValidator(WSSecurityEngine.SAML2_TOKEN, validator);
+        config.setValidator(WSConstants.SAML_TOKEN, validator);
+        config.setValidator(WSConstants.SAML2_TOKEN, validator);
         
         WSHandlerResult results = 
             secEngine.processSecurityHeader(

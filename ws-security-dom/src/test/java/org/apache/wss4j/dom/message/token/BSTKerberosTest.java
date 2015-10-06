@@ -236,7 +236,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         
         WSSecurityEngine customEngine = new WSSecurityEngine();
         WSSConfig wssConfig = WSSConfig.getNewInstance();
-        wssConfig.setValidator(WSSecurityEngine.BINARY_TOKEN, new KerberosValidator());
+        wssConfig.setValidator(WSConstants.BINARY_TOKEN, new KerberosValidator());
         customEngine.setWssConfig(wssConfig);
         customEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         

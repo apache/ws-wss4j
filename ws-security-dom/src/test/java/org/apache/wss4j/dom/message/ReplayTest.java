@@ -466,8 +466,8 @@ public class ReplayTest extends org.junit.Assert {
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         SamlAssertionValidator assertionValidator = new SamlAssertionValidator();
         assertionValidator.setRequireBearerSignature(false);
-        wssConfig.setValidator(WSSecurityEngine.SAML_TOKEN, assertionValidator);
-        wssConfig.setValidator(WSSecurityEngine.SAML2_TOKEN, assertionValidator);
+        wssConfig.setValidator(WSConstants.SAML_TOKEN, assertionValidator);
+        wssConfig.setValidator(WSConstants.SAML2_TOKEN, assertionValidator);
         
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);
@@ -519,8 +519,8 @@ public class ReplayTest extends org.junit.Assert {
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         SamlAssertionValidator assertionValidator = new SamlAssertionValidator();
         assertionValidator.setRequireBearerSignature(false);
-        wssConfig.setValidator(WSSecurityEngine.SAML_TOKEN, assertionValidator);
-        wssConfig.setValidator(WSSecurityEngine.SAML2_TOKEN, assertionValidator);
+        wssConfig.setValidator(WSConstants.SAML_TOKEN, assertionValidator);
+        wssConfig.setValidator(WSConstants.SAML2_TOKEN, assertionValidator);
         
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);

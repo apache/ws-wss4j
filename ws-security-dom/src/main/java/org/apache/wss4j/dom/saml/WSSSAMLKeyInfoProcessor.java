@@ -34,8 +34,8 @@ import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLKeyInfoProcessor;
 import org.apache.wss4j.common.token.SecurityTokenReference;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.processor.EncryptedKeyProcessor;
@@ -79,7 +79,7 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
         while (node != null) {
             if (Node.ELEMENT_NODE == node.getNodeType()) {
                 QName el = new QName(node.getNamespaceURI(), node.getLocalName());
-                if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)) {
+                if (el.equals(WSConstants.ENCRYPTED_KEY)) {
                     EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
                     List<WSSecurityEngineResult> result =
                         proc.handleToken((Element)node, data, docInfo, data.getSamlAlgorithmSuite());

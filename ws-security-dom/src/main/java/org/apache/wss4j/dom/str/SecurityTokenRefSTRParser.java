@@ -36,7 +36,6 @@ import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.DerivedKeyToken;
@@ -185,8 +184,8 @@ public class SecurityTokenRefSTRParser implements STRParser {
                     STRParserUtil.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, data.getCallbackHandler(),
                                                   uri, reference.getValueType());
                 QName el = new QName(token.getNamespaceURI(), token.getLocalName());
-                if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
-                    Processor proc = data.getWssConfig().getProcessor(WSSecurityEngine.BINARY_TOKEN);
+                if (el.equals(WSConstants.BINARY_TOKEN)) {
+                    Processor proc = data.getWssConfig().getProcessor(WSConstants.BINARY_TOKEN);
                     List<WSSecurityEngineResult> bstResult =
                             proc.handleToken(token, data, wsDocInfo);
                     BinarySecurity bstToken = 

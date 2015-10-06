@@ -44,7 +44,6 @@ import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
-import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.DerivedKeyToken;
@@ -361,8 +360,8 @@ public class SignatureSTRParser implements STRParser {
                     STRParserUtil.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, data.getCallbackHandler(),
                                                   uri, reference.getValueType());
                 QName el = new QName(token.getNamespaceURI(), token.getLocalName());
-                if (el.equals(WSSecurityEngine.BINARY_TOKEN)) {
-                    Processor proc = data.getWssConfig().getProcessor(WSSecurityEngine.BINARY_TOKEN);
+                if (el.equals(WSConstants.BINARY_TOKEN)) {
+                    Processor proc = data.getWssConfig().getProcessor(WSConstants.BINARY_TOKEN);
                     List<WSSecurityEngineResult> bstResult =
                         proc.handleToken(token, parameters.getData(), parameters.getWsDocInfo());
                     BinarySecurity bstToken = 
@@ -375,9 +374,8 @@ public class SignatureSTRParser implements STRParser {
                         (X509Certificate[])bstResult.get(0).get(WSSecurityEngineResult.TAG_X509_CERTIFICATES));
                     secretKey = (byte[])bstResult.get(0).get(WSSecurityEngineResult.TAG_SECRET);
                     principal = (Principal)bstResult.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
-                } else if (el.equals(WSSecurityEngine.SAML_TOKEN) 
-                    || el.equals(WSSecurityEngine.SAML2_TOKEN)) {
-                    Processor proc = data.getWssConfig().getProcessor(WSSecurityEngine.SAML_TOKEN);
+                } else if (el.equals(WSConstants.SAML_TOKEN) || el.equals(WSConstants.SAML2_TOKEN)) {
+                    Processor proc = data.getWssConfig().getProcessor(WSConstants.SAML_TOKEN);
                     //
                     // Just check to see whether the token was processed or not
                     //
@@ -410,9 +408,9 @@ public class SignatureSTRParser implements STRParser {
                     }
                     secretKey = keyInfo.getSecret();
                     principal = createPrincipalFromSAML(samlAssertion, parserResult);
-                } else if (el.equals(WSSecurityEngine.ENCRYPTED_KEY)) {
+                } else if (el.equals(WSConstants.ENCRYPTED_KEY)) {
                     STRParserUtil.checkEncryptedKeyBSPCompliance(secRef, data.getBSPEnforcer());
-                    Processor proc = data.getWssConfig().getProcessor(WSSecurityEngine.ENCRYPTED_KEY);
+                    Processor proc = data.getWssConfig().getProcessor(WSConstants.ENCRYPTED_KEY);
                     List<WSSecurityEngineResult> encrResult =
                         proc.handleToken(token, data, wsDocInfo);
                     secretKey = 
