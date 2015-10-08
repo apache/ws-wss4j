@@ -55,7 +55,9 @@ public class Loader {
         try {
             ClassLoader classLoader = getTCL();
             if (classLoader != null) {
-                LOG.debug("Trying to find [" + resource + "] using " + classLoader + " class loader.");
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Trying to find [" + resource + "] using " + classLoader + " class loader.");
+                }
                 url = classLoader.getResource(resource);
                 if (url == null && resource.startsWith("/")) {
                     //certain classloaders need it without the leading /
@@ -86,7 +88,9 @@ public class Loader {
         // may be the case that clazz was loaded by the Extension class
         // loader which the parent of the system class loader. Hence the
         // code below.
-        LOG.debug("Trying to find [" + resource + "] using ClassLoader.getSystemResource().");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Trying to find [" + resource + "] using ClassLoader.getSystemResource().");
+        }
         return ClassLoader.getSystemResource(resource);
     }
 
@@ -112,7 +116,9 @@ public class Loader {
         URL url = null;
         try {
             if (loader != null) {
-                LOG.debug("Trying to find [" + resource + "] using " + loader + " class loader.");
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Trying to find [" + resource + "] using " + loader + " class loader.");
+                }
                 url = loader.getResource(resource);
                 if (url == null && resource.startsWith("/")) {
                     //certain classloaders need it without the leading /

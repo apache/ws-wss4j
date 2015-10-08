@@ -56,7 +56,7 @@ public class BSPEnforcer {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "empty",
                                           new Object[] {"BSP:" + bspRule.name() + ": " + bspRule.getMsg()}
             );
-        } else {
+        } else if (LOG.isDebugEnabled()) {
             LOG.debug("BSP:" + bspRule.name() + ": " + bspRule.getMsg());
         }
     }

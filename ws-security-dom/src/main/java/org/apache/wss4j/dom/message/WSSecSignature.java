@@ -834,7 +834,9 @@ public class WSSecSignature extends WSSecSignatureBase {
             //
             if (sigAlgo == null) {
                 String pubKeyAlgo = certs[0].getPublicKey().getAlgorithm();
-                LOG.debug("Automatic signature algorithm detection: " + pubKeyAlgo);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Automatic signature algorithm detection: " + pubKeyAlgo);
+                }
                 if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
                     sigAlgo = WSConstants.DSA;
                 } else if (pubKeyAlgo.equalsIgnoreCase("RSA")) {

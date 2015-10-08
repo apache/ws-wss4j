@@ -283,7 +283,9 @@ public class WSSecSignatureSAML extends WSSecSignature {
             }
             
             String pubKeyAlgo = key.getAlgorithm();
-            LOG.debug("automatic sig algo detection: " + pubKeyAlgo);
+            if (doDebug) {
+                LOG.debug("automatic sig algo detection: " + pubKeyAlgo);
+            }
             if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
                 setSignatureAlgorithm(WSConstants.DSA);
             } else if (pubKeyAlgo.equalsIgnoreCase("RSA")) {
