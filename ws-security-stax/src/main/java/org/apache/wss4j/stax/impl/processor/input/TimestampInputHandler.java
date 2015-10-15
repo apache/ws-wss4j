@@ -149,7 +149,8 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
             } catch (IllegalArgumentException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
-            if (createdCalendar.getFractionalSecond().scale() > 3) {
+            if (createdCalendar.getFractionalSecond() != null 
+                && createdCalendar.getFractionalSecond().scale() > 3) {
                 securityContext.handleBSPRule(BSPRule.R3220);
             }
             if (createdCalendar.getSecond() > 59) {
@@ -173,7 +174,8 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
             } catch (IllegalArgumentException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
-            if (expiresCalendar.getFractionalSecond().scale() > 3) {
+            if (expiresCalendar.getFractionalSecond() != null
+                && expiresCalendar.getFractionalSecond().scale() > 3) {
                 securityContext.handleBSPRule(BSPRule.R3229);
             }
             if (expiresCalendar.getSecond() > 59) {
