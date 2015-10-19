@@ -100,7 +100,7 @@ public abstract class SignatureEncryptionActionToken implements SecurityActionTo
         return crypto;
     }
     
-    public void setCrypto(Crypto crypto) {
+    public synchronized void setCrypto(Crypto crypto) {
         this.crypto = crypto;
     }
     public String getKeyIdentifier() {
@@ -133,12 +133,15 @@ public abstract class SignatureEncryptionActionToken implements SecurityActionTo
     public void setParts(List<WSEncryptionPart> parts) {
         this.parts = parts;
     }
-    public String getCryptoProperties() {
-        return cryptoProperties;
-    }
-    public void setCryptoProperties(String cryptoProperties) {
+
+    public synchronized void setCryptoProperties(String cryptoProperties) {
         this.cryptoProperties = cryptoProperties;
     }
+    
+    public synchronized String getCryptoProperties() {
+        return cryptoProperties;
+    }
+    
     public String getTokenType() {
         return tokenType;
     }

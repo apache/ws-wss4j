@@ -263,6 +263,9 @@ public final class XMLUtils {
         //
         // Replace the formerly recursive implementation with a depth-first-loop lookup
         //
+        if (startNode == null) {
+            return null;
+        }
         Node startParent = startNode.getParentNode();
         Node processedNode = null;
         Element foundElement = null;
