@@ -530,7 +530,10 @@ public class EncryptedKeyProcessor implements Processor {
         
         // EncryptionAlgorithm cannot be null
         if (symEncAlgo == null) {
-            data.getBSPEnforcer().handleBSPRule(BSPRule.R5601);
+            LOG.debug("No encryption algorithm was specified in the request");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "badEncAlgo", 
+                                          new Object[] {null});
+            
         }
         // EncryptionAlgorithm must be 3DES, or AES128, or AES256
         if (!WSConstants.TRIPLE_DES.equals(symEncAlgo)

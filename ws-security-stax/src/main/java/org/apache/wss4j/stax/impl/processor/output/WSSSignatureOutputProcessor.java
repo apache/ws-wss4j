@@ -252,7 +252,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
     @Override
     protected SecurePart securePartMatches(XMLSecStartElement xmlSecStartElement, Map<Object, SecurePart> secureParts) {
     
-        if (xmlSecStartElement.getOnElementDeclaredAttributes().size() >= 0) {
+        if (!xmlSecStartElement.getOnElementDeclaredAttributes().isEmpty()) {
             Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_wsu_Id);
             if (attribute != null) {
                 SecurePart securePart = secureParts.get(attribute.getValue());

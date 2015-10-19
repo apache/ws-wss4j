@@ -207,7 +207,7 @@ public abstract class WSHandler {
             actionsToPerform = new ArrayList<HandlerAction>(actions);
             Collections.copy(actionsToPerform, actions);
 
-            int signatureIndex = actions.indexOf(WSConstants.SIGN);
+            int signatureIndex = actions.indexOf(signingAction);
             actionsToPerform.remove(signingAction);
             actionsToPerform.add(signingAction);
             reqData.setAppendSignatureAfterTimestamp(true);
