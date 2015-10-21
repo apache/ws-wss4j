@@ -68,7 +68,7 @@ import org.w3c.dom.Element;
 public class TransformationParametersType {
 
     @XmlAnyElement(lax = true)
-    protected List<Object> any;
+    private List<Object> any;
     @XmlAnyAttribute
     private Map<QName, String> otherAttributes = new HashMap<QName, String>();
 

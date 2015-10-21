@@ -61,7 +61,7 @@ public class KeyIdentifierType
 
     @XmlAttribute(name = "ValueType")
     @XmlSchemaType(name = "anyURI")
-    protected String valueType;
+    private String valueType;
 
     /**
      * Gets the value of the valueType property.
