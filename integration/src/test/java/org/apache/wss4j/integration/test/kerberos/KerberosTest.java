@@ -21,9 +21,10 @@ package org.apache.wss4j.integration.test.kerberos;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.directory.server.annotations.CreateKdcServer;
 import org.apache.directory.server.annotations.CreateLdapServer;
 import org.apache.directory.server.annotations.CreateTransport;
@@ -189,19 +189,14 @@ public class KerberosTest extends AbstractLdapTestUnit {
             }
             
             // Read in krb5.conf and substitute in the correct port
-            File f = new File(basedir + "/src/test/resources/kerberos/krb5.conf");
-            File f2 = new File(basedir + "/target/test-classes/kerberos/krb5.conf");
-
-            try (FileInputStream inputStream = new FileInputStream(f);
-                FileOutputStream outputStream = new FileOutputStream(f2)) {
-                String content = IOUtils.toString(inputStream, "UTF-8");
-                inputStream.close();
-                content = content.replaceAll("port", "" + super.getKdcServer().getTransports()[0].getPort());
+            Path path = FileSystems.getDefault().getPath(basedir, "/src/test/resources/kerberos/krb5.conf");
+            String content = new String(Files.readAllBytes(path), "UTF-8");
+            content = content.replaceAll("port", "" + super.getKdcServer().getTransports()[0].getPort());
             
-                IOUtils.write(content, outputStream, "UTF-8");
-            }
+            Path path2 = FileSystems.getDefault().getPath(basedir, "/target/test-classes/kerberos/krb5.conf");
+            Files.write(path2, content.getBytes());
             
-            System.setProperty("java.security.krb5.conf", f2.getPath());
+            System.setProperty("java.security.krb5.conf", path2.toString());
             
             portUpdated = true;
         }
