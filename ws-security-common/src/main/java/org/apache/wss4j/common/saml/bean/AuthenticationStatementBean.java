@@ -162,8 +162,12 @@ public class AuthenticationStatementBean {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof AuthenticationStatementBean)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof AuthenticationStatementBean)) {
+            return false;
+        }
 
         AuthenticationStatementBean that = (AuthenticationStatementBean) o;
 

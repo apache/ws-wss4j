@@ -91,16 +91,17 @@ public class P_SHA1 implements DerivationAlgorithm {
         SecretKeySpec key = new SecretKeySpec(secret, "HMACSHA1");
         mac.init(key);
 
-        while (required > 0) {
+        int bytesRequired = required;
+        while (bytesRequired > 0) {
             mac.update(a);
             a = mac.doFinal();
             mac.update(a);
             mac.update(seed);
             tmp = mac.doFinal();
-            tocpy = Math.min(required, tmp.length);
+            tocpy = Math.min(bytesRequired, tmp.length);
             System.arraycopy(tmp, 0, out, offset, tocpy);
             offset += tocpy;
-            required -= tocpy;
+            bytesRequired -= tocpy;
         }
         return out;
     }

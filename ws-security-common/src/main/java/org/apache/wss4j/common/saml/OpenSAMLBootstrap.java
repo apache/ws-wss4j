@@ -75,6 +75,10 @@ public class OpenSAMLBootstrap extends DefaultBootstrap {
         "/wssecurity-config.xml",
     };
     
+    private OpenSAMLBootstrap() {
+        // complete
+    }
+    
     /**
      * Initializes the OpenSAML library, loading default configurations.
      * 

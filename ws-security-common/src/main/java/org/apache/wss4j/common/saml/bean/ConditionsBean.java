@@ -198,8 +198,12 @@ public class ConditionsBean {
      */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ConditionsBean)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ConditionsBean)) {
+            return false;
+        }
 
         ConditionsBean that = (ConditionsBean) o;
 

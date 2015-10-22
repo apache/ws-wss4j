@@ -74,8 +74,12 @@ public class AudienceRestrictionBean {
      */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof AudienceRestrictionBean)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof AudienceRestrictionBean)) {
+            return false;
+        }
 
         AudienceRestrictionBean that = (AudienceRestrictionBean) o;
 

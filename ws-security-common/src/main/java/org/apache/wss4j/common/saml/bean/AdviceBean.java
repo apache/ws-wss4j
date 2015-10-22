@@ -48,8 +48,12 @@ public class AdviceBean {
     
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof AdviceBean)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof AdviceBean)) {
+            return false;
+        }
 
         AdviceBean that = (AdviceBean) o;
 

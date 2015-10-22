@@ -49,16 +49,17 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _Nonce_QNAME = new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Nonce");
-    private final static QName _Reference_QNAME = new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Reference");
-    private final static QName _BinarySecurityToken_QNAME = new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "BinarySecurityToken");
-    private final static QName _UsernameToken_QNAME = new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "UsernameToken");
-    private final static QName _KeyIdentifier_QNAME = new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "KeyIdentifier");
-    private final static QName _Embedded_QNAME = new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Embedded");
-    private final static QName _Security_QNAME = new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
-    private final static QName _SecurityTokenReference_QNAME = new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "SecurityTokenReference");
-    private final static QName _Password_QNAME = new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Password");
-    private final static QName _TransformationParameters_QNAME = new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "TransformationParameters");
+    private static final String WSSE_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+    private static final QName _Nonce_QNAME = new QName(WSSE_NS, "Nonce");
+    private static final QName _Reference_QNAME = new QName(WSSE_NS, "Reference");
+    private static final QName _BinarySecurityToken_QNAME = new QName(WSSE_NS, "BinarySecurityToken");
+    private static final QName _UsernameToken_QNAME = new QName(WSSE_NS, "UsernameToken");
+    private static final QName _KeyIdentifier_QNAME = new QName(WSSE_NS, "KeyIdentifier");
+    private static final QName _Embedded_QNAME = new QName(WSSE_NS, "Embedded");
+    private static final QName _Security_QNAME = new QName(WSSE_NS, "Security");
+    private static final QName _SecurityTokenReference_QNAME = new QName(WSSE_NS, "SecurityTokenReference");
+    private static final QName _Password_QNAME = new QName(WSSE_NS, "Password");
+    private static final QName _TransformationParameters_QNAME = new QName(WSSE_NS, "TransformationParameters");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: org.apache.wss4j.binding.wss10
@@ -159,7 +160,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link EncodedString }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", name = "Nonce")
+    @XmlElementDecl(namespace = WSSE_NS, name = "Nonce")
     public JAXBElement<EncodedString> createNonce(EncodedString value) {
         return new JAXBElement<EncodedString>(_Nonce_QNAME, EncodedString.class, null, value);
     }
@@ -168,7 +169,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link ReferenceType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", name = "Reference")
+    @XmlElementDecl(namespace = WSSE_NS, name = "Reference")
     public JAXBElement<ReferenceType> createReference(ReferenceType value) {
         return new JAXBElement<ReferenceType>(_Reference_QNAME, ReferenceType.class, null, value);
     }
@@ -177,7 +178,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link BinarySecurityTokenType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", name = "BinarySecurityToken")
+    @XmlElementDecl(namespace = WSSE_NS, name = "BinarySecurityToken")
     public JAXBElement<BinarySecurityTokenType> createBinarySecurityToken(BinarySecurityTokenType value) {
         return new JAXBElement<BinarySecurityTokenType>(_BinarySecurityToken_QNAME, BinarySecurityTokenType.class, null, value);
     }
@@ -186,7 +187,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link UsernameTokenType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", name = "UsernameToken")
+    @XmlElementDecl(namespace = WSSE_NS, name = "UsernameToken")
     public JAXBElement<UsernameTokenType> createUsernameToken(UsernameTokenType value) {
         return new JAXBElement<UsernameTokenType>(_UsernameToken_QNAME, UsernameTokenType.class, null, value);
     }
@@ -195,7 +196,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link KeyIdentifierType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", name = "KeyIdentifier")
+    @XmlElementDecl(namespace = WSSE_NS, name = "KeyIdentifier")
     public JAXBElement<KeyIdentifierType> createKeyIdentifier(KeyIdentifierType value) {
         return new JAXBElement<KeyIdentifierType>(_KeyIdentifier_QNAME, KeyIdentifierType.class, null, value);
     }
@@ -204,7 +205,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link EmbeddedType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", name = "Embedded")
+    @XmlElementDecl(namespace = WSSE_NS, name = "Embedded")
     public JAXBElement<EmbeddedType> createEmbedded(EmbeddedType value) {
         return new JAXBElement<EmbeddedType>(_Embedded_QNAME, EmbeddedType.class, null, value);
     }
@@ -213,7 +214,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link SecurityHeaderType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", name = "Security")
+    @XmlElementDecl(namespace = WSSE_NS, name = "Security")
     public JAXBElement<SecurityHeaderType> createSecurity(SecurityHeaderType value) {
         return new JAXBElement<SecurityHeaderType>(_Security_QNAME, SecurityHeaderType.class, null, value);
     }
@@ -222,7 +223,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link SecurityTokenReferenceType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", name = "SecurityTokenReference")
+    @XmlElementDecl(namespace = WSSE_NS, name = "SecurityTokenReference")
     public JAXBElement<SecurityTokenReferenceType> createSecurityTokenReference(SecurityTokenReferenceType value) {
         return new JAXBElement<SecurityTokenReferenceType>(_SecurityTokenReference_QNAME, SecurityTokenReferenceType.class, null, value);
     }
@@ -231,7 +232,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link PasswordString }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", name = "Password")
+    @XmlElementDecl(namespace = WSSE_NS, name = "Password")
     public JAXBElement<PasswordString> createPassword(PasswordString value) {
         return new JAXBElement<PasswordString>(_Password_QNAME, PasswordString.class, null, value);
     }
@@ -240,7 +241,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link TransformationParametersType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", name = "TransformationParameters")
+    @XmlElementDecl(namespace = WSSE_NS, name = "TransformationParameters")
     public JAXBElement<TransformationParametersType> createTransformationParameters(TransformationParametersType value) {
         return new JAXBElement<TransformationParametersType>(_TransformationParameters_QNAME, TransformationParametersType.class, null, value);
     }

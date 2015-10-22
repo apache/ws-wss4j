@@ -191,8 +191,12 @@ public class SubjectBean {
      */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SubjectBean)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof SubjectBean)) {
+            return false;
+        }
 
         SubjectBean that = (SubjectBean) o;
 
