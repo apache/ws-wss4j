@@ -5,6 +5,20 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 1.6.19
+=============
+
+Bug
+
+    [WSS-535] - Add WSSE and WSU xmlns definitions to signature's SecurityTokenReference
+    [WSS-536] - WSSecurityUtil.getCipherInstance() does not use configured provider
+    [WSS-548] - logging secretKey
+    [WSS-552] - The KerberosServiceExceptionAction and KerberosClientExceptionAction do not support HP JDK
+
+Improvement
+
+    [WSS-533] - Also use signing key when trying to detect message replay attacks
+
 Release 1.6.16
 =============
 
