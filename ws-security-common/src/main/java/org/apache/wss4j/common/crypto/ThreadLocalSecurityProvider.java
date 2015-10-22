@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 public final class ThreadLocalSecurityProvider extends Provider {
@@ -34,6 +35,7 @@ public final class ThreadLocalSecurityProvider extends Provider {
     private static final String NAME = "TLSP";
     private static final ThreadLocal<Provider> provider = new ThreadLocal<Provider>();
     private static boolean installed = false;
+    private static final EmptyEnumeration<Object> emptyEnumeration = new EmptyEnumeration<Object>();
 
     public static synchronized void install() {
         Security.insertProviderAt(new ThreadLocalSecurityProvider(),
@@ -146,7 +148,7 @@ public final class ThreadLocalSecurityProvider extends Provider {
         if (p != null) {
             return p.keys();
         } else {
-            return Collections.emptyEnumeration();
+            return emptyEnumeration;
         }
     }
 
@@ -155,7 +157,7 @@ public final class ThreadLocalSecurityProvider extends Provider {
         if (p != null) {
             return p.elements();
         } else {
-            return Collections.emptyEnumeration();
+            return emptyEnumeration;
         }
     }
 
@@ -185,5 +187,18 @@ public final class ThreadLocalSecurityProvider extends Provider {
             return null;
         }
     }
-    
+
+    private static class EmptyEnumeration<T> implements Enumeration<T> {
+
+        @Override
+        public boolean hasMoreElements() {
+            return false;
+        }
+
+        @Override
+        public T nextElement() {
+            throw new NoSuchElementException();
+        }
+
+    }
 }
