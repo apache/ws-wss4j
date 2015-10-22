@@ -55,9 +55,10 @@ public final class DerivedKeyUtils {
         System.arraycopy(labelBytes, 0, seed, 0, labelBytes.length);
         System.arraycopy(nonce, 0, seed, labelBytes.length, nonce.length);
 
-        if (length <= 0) {
-            length = 32;
+        long keyLength = length;
+        if (keyLength <= 0) {
+            keyLength = 32L;
         }
-        return algo.createKey(secret, seed, offset, length);
+        return algo.createKey(secret, seed, offset, keyLength);
     }
 }

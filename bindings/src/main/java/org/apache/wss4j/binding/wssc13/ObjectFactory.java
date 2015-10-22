@@ -49,13 +49,14 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _Identifier_QNAME = new QName("http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512", "Identifier");
-    private final static QName _SecurityContextToken_QNAME = new QName("http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512", "SecurityContextToken");
-    private final static QName _Instance_QNAME = new QName("http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512", "Instance");
-    private final static QName _DerivedKeyToken_QNAME = new QName("http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512", "DerivedKeyToken");
-    private final static QName _Name_QNAME = new QName("http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512", "Name");
-    private final static QName _Label_QNAME = new QName("http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512", "Label");
-    private final static QName _Nonce_QNAME = new QName("http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512", "Nonce");
+    private static final String WSSC13_NS = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512";
+    private static final QName _Identifier_QNAME = new QName(WSSC13_NS, "Identifier");
+    private static final QName _SecurityContextToken_QNAME = new QName(WSSC13_NS, "SecurityContextToken");
+    private static final QName _Instance_QNAME = new QName(WSSC13_NS, "Instance");
+    private static final QName _DerivedKeyToken_QNAME = new QName(WSSC13_NS, "DerivedKeyToken");
+    private static final QName _Name_QNAME = new QName(WSSC13_NS, "Name");
+    private static final QName _Label_QNAME = new QName(WSSC13_NS, "Label");
+    private static final QName _Nonce_QNAME = new QName(WSSC13_NS, "Nonce");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: org.apache.wss4j.binding.wssc13
@@ -92,7 +93,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512", name = "Identifier")
+    @XmlElementDecl(namespace = WSSC13_NS, name = "Identifier")
     public JAXBElement<String> createIdentifier(String value) {
         return new JAXBElement<String>(_Identifier_QNAME, String.class, null, value);
     }
@@ -101,7 +102,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link SecurityContextTokenType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512", name = "SecurityContextToken")
+    @XmlElementDecl(namespace = WSSC13_NS, name = "SecurityContextToken")
     public JAXBElement<SecurityContextTokenType> createSecurityContextToken(SecurityContextTokenType value) {
         return new JAXBElement<SecurityContextTokenType>(_SecurityContextToken_QNAME, SecurityContextTokenType.class, null, value);
     }
@@ -110,7 +111,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512", name = "Instance")
+    @XmlElementDecl(namespace = WSSC13_NS, name = "Instance")
     public JAXBElement<String> createInstance(String value) {
         return new JAXBElement<String>(_Instance_QNAME, String.class, null, value);
     }
@@ -119,7 +120,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link DerivedKeyTokenType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512", name = "DerivedKeyToken")
+    @XmlElementDecl(namespace = WSSC13_NS, name = "DerivedKeyToken")
     public JAXBElement<DerivedKeyTokenType> createDerivedKeyToken(DerivedKeyTokenType value) {
         return new JAXBElement<DerivedKeyTokenType>(_DerivedKeyToken_QNAME, DerivedKeyTokenType.class, null, value);
     }
@@ -128,7 +129,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512", name = "Name")
+    @XmlElementDecl(namespace = WSSC13_NS, name = "Name")
     public JAXBElement<String> createName(String value) {
         return new JAXBElement<String>(_Name_QNAME, String.class, null, value);
     }
@@ -137,7 +138,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512", name = "Label")
+    @XmlElementDecl(namespace = WSSC13_NS, name = "Label")
     public JAXBElement<String> createLabel(String value) {
         return new JAXBElement<String>(_Label_QNAME, String.class, null, value);
     }
@@ -146,7 +147,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512", name = "Nonce")
+    @XmlElementDecl(namespace = WSSC13_NS, name = "Nonce")
     public JAXBElement<byte[]> createNonce(byte[] value) {
         return new JAXBElement<byte[]>(_Nonce_QNAME, byte[].class, null, ((byte[]) value));
     }

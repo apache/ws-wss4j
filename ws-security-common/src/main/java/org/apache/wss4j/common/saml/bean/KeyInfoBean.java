@@ -134,8 +134,12 @@ public class KeyInfoBean {
      */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof KeyInfoBean)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof KeyInfoBean)) {
+            return false;
+        }
 
         KeyInfoBean that = (KeyInfoBean) o;
 

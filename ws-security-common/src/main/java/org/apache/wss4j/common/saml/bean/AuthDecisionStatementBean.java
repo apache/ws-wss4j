@@ -179,8 +179,12 @@ public class AuthDecisionStatementBean {
     
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof AuthDecisionStatementBean)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof AuthDecisionStatementBean)) {
+            return false;
+        }
 
         AuthDecisionStatementBean that = (AuthDecisionStatementBean) o;
 

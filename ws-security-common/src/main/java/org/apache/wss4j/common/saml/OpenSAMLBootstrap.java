@@ -67,6 +67,10 @@ public class OpenSAMLBootstrap {
         "/saml2-xacml2-profile.xml",
     };
     
+    private OpenSAMLBootstrap() {
+        // complete
+    }
+    
     /**
      * Initializes the OpenSAML library, loading default configurations.
      * 

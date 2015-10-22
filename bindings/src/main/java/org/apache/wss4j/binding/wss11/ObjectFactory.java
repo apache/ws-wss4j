@@ -49,10 +49,11 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _EncryptedHeader_QNAME = new QName("http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd", "EncryptedHeader");
-    private final static QName _SignatureConfirmation_QNAME = new QName("http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd", "SignatureConfirmation");
-    private final static QName _Salt_QNAME = new QName("http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd", "Salt");
-    private final static QName _Iteration_QNAME = new QName("http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd", "Iteration");
+    private static final String WSSE11_NS = "http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd"; 
+    private static final QName _EncryptedHeader_QNAME = new QName(WSSE11_NS, "EncryptedHeader");
+    private static final QName _SignatureConfirmation_QNAME = new QName(WSSE11_NS, "SignatureConfirmation");
+    private static final QName _Salt_QNAME = new QName(WSSE11_NS, "Salt");
+    private static final QName _Iteration_QNAME = new QName(WSSE11_NS, "Iteration");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: org.apache.wss4j.binding.wss11
@@ -81,7 +82,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link EncryptedHeaderType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd", name = "EncryptedHeader")
+    @XmlElementDecl(namespace = WSSE11_NS, name = "EncryptedHeader")
     public JAXBElement<EncryptedHeaderType> createEncryptedHeader(EncryptedHeaderType value) {
         return new JAXBElement<EncryptedHeaderType>(_EncryptedHeader_QNAME, EncryptedHeaderType.class, null, value);
     }
@@ -90,7 +91,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link SignatureConfirmationType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd", name = "SignatureConfirmation")
+    @XmlElementDecl(namespace = WSSE11_NS, name = "SignatureConfirmation")
     public JAXBElement<SignatureConfirmationType> createSignatureConfirmation(SignatureConfirmationType value) {
         return new JAXBElement<SignatureConfirmationType>(_SignatureConfirmation_QNAME, SignatureConfirmationType.class, null, value);
     }
@@ -99,7 +100,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd", name = "Salt")
+    @XmlElementDecl(namespace = WSSE11_NS, name = "Salt")
     public JAXBElement<byte[]> createSalt(byte[] value) {
         return new JAXBElement<byte[]>(_Salt_QNAME, byte[].class, null, ((byte[]) value));
     }
@@ -108,7 +109,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link Long }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd", name = "Iteration")
+    @XmlElementDecl(namespace = WSSE11_NS, name = "Iteration")
     public JAXBElement<Long> createIteration(Long value) {
         return new JAXBElement<Long>(_Iteration_QNAME, Long.class, null, value);
     }

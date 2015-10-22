@@ -126,8 +126,12 @@ public class SubjectConfirmationDataBean {
      */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SubjectConfirmationDataBean)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof SubjectConfirmationDataBean)) {
+            return false;
+        }
 
         SubjectConfirmationDataBean that = (SubjectConfirmationDataBean) o;
 

@@ -49,9 +49,10 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _Expires_QNAME = new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd", "Expires");
-    private final static QName _Created_QNAME = new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd", "Created");
-    private final static QName _Timestamp_QNAME = new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd", "Timestamp");
+    private static final String WSU_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
+    private static final QName _Expires_QNAME = new QName(WSU_NS, "Expires");
+    private static final QName _Created_QNAME = new QName(WSU_NS, "Created");
+    private static final QName _Timestamp_QNAME = new QName(WSU_NS, "Timestamp");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: org.apache.wss4j.binding.wsu10
@@ -88,7 +89,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link AttributedDateTime }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd", name = "Expires")
+    @XmlElementDecl(namespace = WSU_NS, name = "Expires")
     public JAXBElement<AttributedDateTime> createExpires(AttributedDateTime value) {
         return new JAXBElement<AttributedDateTime>(_Expires_QNAME, AttributedDateTime.class, null, value);
     }
@@ -97,7 +98,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link AttributedDateTime }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd", name = "Created")
+    @XmlElementDecl(namespace = WSU_NS, name = "Created")
     public JAXBElement<AttributedDateTime> createCreated(AttributedDateTime value) {
         return new JAXBElement<AttributedDateTime>(_Created_QNAME, AttributedDateTime.class, null, value);
     }
@@ -106,7 +107,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link TimestampType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd", name = "Timestamp")
+    @XmlElementDecl(namespace = WSU_NS, name = "Timestamp")
     public JAXBElement<TimestampType> createTimestamp(TimestampType value) {
         return new JAXBElement<TimestampType>(_Timestamp_QNAME, TimestampType.class, null, value);
     }

@@ -81,8 +81,12 @@ public class NameIDBean {
      */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof NameIDBean)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof NameIDBean)) {
+            return false;
+        }
 
         NameIDBean that = (NameIDBean) o;
 

@@ -87,8 +87,12 @@ public class AttributeStatementBean {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof AttributeStatementBean)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof AttributeStatementBean)) {
+            return false;
+        }
 
         AttributeStatementBean that = (AttributeStatementBean) o;
 
