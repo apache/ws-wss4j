@@ -143,7 +143,9 @@ public class KeyInfoBean {
 
         KeyInfoBean that = (KeyInfoBean) o;
 
-        if (certIdentifier != that.certIdentifier) return false;
+        if (certIdentifier != that.certIdentifier) {
+            return false;
+        }
         if (cert == null && that.cert != null) {
             return false;
         } else if (cert != null && !cert.equals(that.cert)) {

@@ -687,9 +687,9 @@ public class SamlAssertionWrapper {
                     "The SAML version was null in getSamlVersion(). Recomputing SAML version..."
                 );
             }
-            if (samlObject != null && samlObject instanceof org.opensaml.saml.saml1.core.Assertion) {
+            if (samlObject instanceof org.opensaml.saml.saml1.core.Assertion) {
                 samlVersion = SAMLVersion.VERSION_11;
-            } else if (samlObject != null && samlObject instanceof org.opensaml.saml.saml2.core.Assertion) {
+            } else if (samlObject instanceof org.opensaml.saml.saml2.core.Assertion) {
                 samlVersion = SAMLVersion.VERSION_20;
             } else {
                 // We are only supporting SAML v1.1 or SAML v2.0 at this time.

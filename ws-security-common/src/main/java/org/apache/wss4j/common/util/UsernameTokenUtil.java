@@ -51,10 +51,6 @@ public final class UsernameTokenUtil {
         byte[] salt, 
         int iteration
     ) throws WSSecurityException {
-        if (iteration == 0) {
-            iteration = DEFAULT_ITERATION;
-        }
-
         byte[] pwSalt = new byte[salt.length + password.length];
         System.arraycopy(password, 0, pwSalt, 0, password.length);
         System.arraycopy(salt, 0, pwSalt, password.length, salt.length);
@@ -77,7 +73,11 @@ public final class UsernameTokenUtil {
         //
         // Perform the 1st up to iteration-1 hash rounds
         //
-        for (int i = 1; i < iteration; i++) {
+        int iter = iteration;
+        if (iter <= 0) {
+            iter = DEFAULT_ITERATION;
+        }
+        for (int i = 1; i < iter; i++) {
             k = sha.digest(k);
         }
         return k;

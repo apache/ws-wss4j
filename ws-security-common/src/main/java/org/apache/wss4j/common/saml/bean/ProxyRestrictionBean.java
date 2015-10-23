@@ -85,7 +85,9 @@ public class ProxyRestrictionBean {
 
         ProxyRestrictionBean that = (ProxyRestrictionBean) o;
 
-        if (count != that.count) return false;
+        if (count != that.count) {
+            return false;
+        }
         
         if (!audienceURIs.equals(that.audienceURIs)) {
             return false; 

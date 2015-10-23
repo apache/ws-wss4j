@@ -254,16 +254,17 @@ public class NSStack {
      * Given a prefix, return the associated namespace (if any).
      */
     public String getNamespaceURI(String prefix) {
-        if (prefix == null) {
-            prefix = "";
+        String pfix = prefix;
+        if (pfix == null) {
+            pfix = "";
         }
-        int hash = prefix.hashCode();
+        int hash = pfix.hashCode();
         for (int cursor = top; cursor > 0; cursor--) {
             Mapping map = stack[cursor];
             if (map == null) {
                 continue;
             }
-            if (map.getPrefixHash() == hash && map.getPrefix().equals(prefix)) {
+            if (map.getPrefixHash() == hash && map.getPrefix().equals(pfix)) {
                 return map.getNamespaceURI();
             }
         }

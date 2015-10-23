@@ -138,7 +138,7 @@ public class Merlin extends CryptoBase {
                 
                 truststore = KeyStore.getInstance(KeyStore.getDefaultType());
                 truststore.load(cacertsIs, cacertsPasswd.toCharArray());
-                loadCACerts = true;
+                this.loadCACerts = true;
             } catch (Exception e) {
                 LOG.warn("CA certs could not be loaded: " + e.getMessage());
             }
@@ -683,17 +683,18 @@ public class Merlin extends CryptoBase {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", 
                                               new Object[] {msg});
             }
-            if (password == null && privatePasswordSet) {
-                password = properties.getProperty(PREFIX + KEYSTORE_PRIVATE_PASSWORD);
-                if (password == null) {
-                    password = properties.getProperty(OLD_PREFIX + KEYSTORE_PRIVATE_PASSWORD);
+            String pwd = password;
+            if (pwd == null && privatePasswordSet) {
+                pwd = properties.getProperty(PREFIX + KEYSTORE_PRIVATE_PASSWORD);
+                if (pwd == null) {
+                    pwd = properties.getProperty(OLD_PREFIX + KEYSTORE_PRIVATE_PASSWORD);
                 }
-                if (password != null) {
-                    password = password.trim();
+                if (pwd != null) {
+                    pwd = pwd.trim();
                 }
             }
-            Key keyTmp = keystore.getKey(identifier, password == null 
-                                         ? new char[]{} : password.toCharArray());
+            Key keyTmp = keystore.getKey(identifier, pwd == null 
+                                         ? new char[]{} : pwd.toCharArray());
             if (!(keyTmp instanceof PrivateKey)) {
                 String msg = "Key is not a private key, alias: [" + identifier + "]";
                 String logMsg = createKeyStoreErrorMessage(keystore);
