@@ -39,7 +39,7 @@ public class EHCacheReplayCache implements ReplayCache {
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
     protected Ehcache cache;
     protected CacheManager cacheManager;
-    protected long ttl = DEFAULT_TTL;
+    private long ttl = DEFAULT_TTL;
     
     public EHCacheReplayCache(String key, URL configFileURL) {
         this(key, EHCacheManagerHolder.getCacheManager("", configFileURL));
@@ -66,7 +66,7 @@ public class EHCacheReplayCache implements ReplayCache {
     }
 
     private static class RefCountCache extends Cache {
-        AtomicInteger count = new AtomicInteger();
+        private AtomicInteger count = new AtomicInteger();
         public RefCountCache(CacheConfiguration cc) {
             super(cc);
         }

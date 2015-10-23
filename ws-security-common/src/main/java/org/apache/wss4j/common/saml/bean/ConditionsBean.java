@@ -207,7 +207,9 @@ public class ConditionsBean {
 
         ConditionsBean that = (ConditionsBean) o;
 
-        if (tokenPeriodSeconds != that.tokenPeriodSeconds) return false;
+        if (tokenPeriodSeconds != that.tokenPeriodSeconds) {
+            return false;
+        }
         
         if (notBefore == null && that.notBefore != null) {
             return false;
@@ -228,7 +230,9 @@ public class ConditionsBean {
             return false; 
         }
         
-        if (oneTimeUse != that.oneTimeUse) return false;
+        if (oneTimeUse != that.oneTimeUse) {
+            return false;
+        }
         
         if (proxyRestriction == null && that.proxyRestriction != null) {
             return false;
