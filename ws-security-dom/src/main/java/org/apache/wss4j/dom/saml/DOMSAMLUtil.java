@@ -106,15 +106,21 @@ public final class DOMSAMLUtil  {
         Certificate[] tlsCerts
     ) {
         List<String> confirmationMethods = assertionWrapper.getConfirmationMethods();
+        boolean isHolderOfKey = false;
         for (String confirmationMethod : confirmationMethods) {
             if (OpenSAMLUtil.isMethodHolderOfKey(confirmationMethod)) {
-                if (tlsCerts == null && (signedResults == null || signedResults.isEmpty())) {
-                    return false;
-                }
-                SAMLKeyInfo subjectKeyInfo = assertionWrapper.getSubjectKeyInfo();
-                if (!compareCredentials(subjectKeyInfo, signedResults, tlsCerts)) {
-                    return false;
-                }
+                isHolderOfKey = true;
+                break;
+            }
+        }
+        
+        if (isHolderOfKey) {
+            if (tlsCerts == null && (signedResults == null || signedResults.isEmpty())) {
+                return false;
+            }
+            SAMLKeyInfo subjectKeyInfo = assertionWrapper.getSubjectKeyInfo();
+            if (!compareCredentials(subjectKeyInfo, signedResults, tlsCerts)) {
+                return false;
             }
         }
         return true;
@@ -215,15 +221,22 @@ public final class DOMSAMLUtil  {
         if (tlsCerts != null && tlsCerts.length > 0) {
             return true;
         }
+        
         List<String> confirmationMethods = assertionWrapper.getConfirmationMethods();
+        boolean isSenderVouches = false;
         for (String confirmationMethod : confirmationMethods) {
             if (OpenSAMLUtil.isMethodSenderVouches(confirmationMethod)) {
-                if (signed == null || signed.isEmpty()) {
-                    return false;
-                }
-                if (!checkAssertionAndBodyAreSigned(assertionWrapper, body, signed)) {
-                    return false;
-                }
+                isSenderVouches = true;
+                break;
+            }
+        }
+        
+        if (isSenderVouches) {
+            if (signed == null || signed.isEmpty()) {
+                return false;
+            }
+            if (!checkAssertionAndBodyAreSigned(assertionWrapper, body, signed)) {
+                return false;
             }
         }
         return true;
