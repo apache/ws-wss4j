@@ -944,11 +944,7 @@ public class Merlin extends CryptoBase {
             return null;
         }
         
-        X509Certificate[] x509certs = new X509Certificate[certs.length];
-        for (int i = 0; i < certs.length; i++) {
-            x509certs[i] = (X509Certificate) certs[i];
-        }
-        return x509certs;
+        return Arrays.copyOf(certs, certs.length, X509Certificate[].class);
     }
     
     /**
@@ -1025,11 +1021,7 @@ public class Merlin extends CryptoBase {
             return null;
         }
         
-        X509Certificate[] x509certs = new X509Certificate[certs.length];
-        for (int i = 0; i < certs.length; i++) {
-            x509certs[i] = (X509Certificate) certs[i];
-        }
-        return x509certs;
+        return Arrays.copyOf(certs, certs.length, X509Certificate[].class);
     }
 
     /**
@@ -1101,11 +1093,7 @@ public class Merlin extends CryptoBase {
             return null;
         }
         
-        X509Certificate[] x509certs = new X509Certificate[certs.length];
-        for (int i = 0; i < certs.length; i++) {
-            x509certs[i] = (X509Certificate) certs[i];
-        }
-        return x509certs;
+        return Arrays.copyOf(certs, certs.length, X509Certificate[].class);
     }
     
     /**
@@ -1185,11 +1173,7 @@ public class Merlin extends CryptoBase {
             return null;
         }
         
-        X509Certificate[] x509certs = new X509Certificate[certs.length];
-        for (int i = 0; i < certs.length; i++) {
-            x509certs[i] = (X509Certificate) certs[i];
-        }
-        return x509certs;
+        return Arrays.copyOf(certs, certs.length, X509Certificate[].class);
     }
     
     /**
@@ -1232,11 +1216,7 @@ public class Merlin extends CryptoBase {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "keystore");
         }
 
-        X509Certificate[] x509certs = new X509Certificate[certs.length];
-        for (int i = 0; i < certs.length; i++) {
-            x509certs[i] = (X509Certificate) certs[i];
-        }
-        return x509certs;
+        return Arrays.copyOf(certs, certs.length, X509Certificate[].class);
     }
     
     /**
