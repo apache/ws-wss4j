@@ -282,11 +282,7 @@ public class MerlinAKI extends Merlin {
             return null;
         }
         
-        X509Certificate[] x509certs = new X509Certificate[certs.length];
-        for (int i = 0; i < certs.length; i++) {
-            x509certs[i] = (X509Certificate) certs[i];
-        }
-        return x509certs;
+        return Arrays.copyOf(certs, certs.length, X509Certificate[].class);
     }
 
     private Certificate[] getCertificates(
