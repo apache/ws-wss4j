@@ -5,6 +5,44 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.0.6
+=============
+
+Bug
+
+    [WSS-548] - logging secretKey
+    [WSS-549] - Don't write out a ReferenceList if there are no elements to encrypt
+    [WSS-551] - Property passwordEncryptorInstance is not honored
+    [WSS-552] - The KerberosServiceExceptionAction and KerberosClientExceptionAction do not support HP JDK
+    [WSS-553] - <wsu:Expires> and <wsu:Created> elements not use UTC time format
+    [WSS-556] - Basic256Sha256 policy uses wrong minimum symmetric key length for signature
+    [WSS-557] - Using MTOM and WS-Security leads to "Attachment not found"
+    [WSS-559] - NullPointerException in TimestampInputHandler.checkBSPCompliance
+
+Improvement
+
+    [WSS-550] - Add the ability to specify a MGF-SHA algorithm in the policy AlgorithmSuiteType
+    [WSS-554] - Improved error message for timestamp in the future
+
+Release 2.0.5
+=============
+
+Bug
+
+    [WSS-541] - No support for signing and encrypting attachments while using derived keys
+    [WSS-542] - Secure Conversation Renew is missing Instance creation
+    [WSS-546] - Support sp11:WssX509V1Token10 in the policy model
+
+Improvement
+
+    [WSS-539] - Support MTOM/XOP-optimized content within a CipherValue element
+    [WSS-544] - Support the ability to store message bytes in attachments (when using MTOM)
+    [WSS-545] - Add the ability to create DelegateRestrictionType Conditions when creating SAML Assertions
+
+New Feature
+
+    [WSS-543] - Create a Merlin implementation that retrieves CA certs via their SubjectKeyIdentifier
+
 Release 2.0.4
 =============
 
