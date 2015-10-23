@@ -57,7 +57,3 @@ you get errors about invalid key lengths, the Unlimited Strength files are not
 installed.
 
 [1] http://www.oracle.com/technetwork/java/javase/downloads/index.html
-
-Note that for JDK 1.5 the tests require that xml-apis and xercesImpl be 
-available in an "endorsed" subdirectory.
-
