@@ -56,6 +56,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
             "       <foo:bar1>baz1</foo:bar1>" + 
             "       <foo:foobar>baz</foo:foobar>" + 
             "       <foo:bar2>baz2</foo:bar2>" +
+            "       <foo:with-attributes some-attribute=\"3\">baz</foo:with-attributes>" +
             "   </soapenv:Header>" +
             "   <soapenv:Body>" +
             "      <ns1:testMethod xmlns:ns1=\"http://axis/service/security/test6/LogTestService8\"></ns1:testMethod>" +
@@ -295,6 +296,54 @@ public class EncryptionPartsTest extends org.junit.Assert {
         assertEquals("/soapenv:Envelope/soapenv:Header/foo:foobar", xpath);
     }
     
+    /**
+     * Test encrypting a custom SOAP header using wsse11:EncryptedHeader
+     */
+    @SuppressWarnings("unchecked")
+    @org.junit.Test
+    public void testSOAPEncryptedHeaderWithAttributes() throws Exception {
+        WSSecEncrypt encrypt = new WSSecEncrypt();
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        WSEncryptionPart encP =
+            new WSEncryptionPart(
+                "with-attributes",
+                "urn:foo.bar",
+                "Header");
+        encrypt.getParts().add(encP);
+
+        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+
+        String outputString =
+            XMLUtils.PrettyDocumentToString(encryptedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        assertTrue(outputString.contains("wsse11:EncryptedHeader"));
+        assertFalse(outputString.contains("foo:with-attributes"));
+
+        WSHandlerResult results = verify(encryptedDoc);
+
+        WSSecurityEngineResult actionResult =
+            results.getActionResults().get(WSConstants.ENCR).get(0);
+        assertTrue(actionResult != null);
+        assertFalse(actionResult.isEmpty());
+        final java.util.List<WSDataRef> refs =
+            (java.util.List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+
+        assertEquals(WSConstants.KEYTRANSPORT_RSAOEP,
+            actionResult.get(WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD));
+
+        WSDataRef wsDataRef = refs.get(0);
+        String xpath = wsDataRef.getXpath();
+        assertEquals("/soapenv:Envelope/soapenv:Header/foo:with-attributes", xpath);
+    }
+
     /**
      * Test encrypting a custom SOAP header with a bad localname
      */
