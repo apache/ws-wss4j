@@ -38,7 +38,6 @@ import org.apache.wss4j.common.kerberos.KerberosServiceContext;
 import org.apache.wss4j.common.kerberos.KerberosServiceExceptionAction;
 import org.apache.wss4j.common.kerberos.KerberosTokenDecoder;
 import org.apache.wss4j.common.kerberos.KerberosTokenDecoderException;
-import org.apache.wss4j.common.kerberos.KerberosTokenDecoderImpl;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.securityToken.KerberosServiceSecurityToken;
@@ -76,7 +75,7 @@ public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityTok
         return WSSecurityTokenConstants.KerberosToken;
     }
 
-    protected KerberosTokenDecoder getTGT() throws WSSecurityException {
+    protected byte[] getTGTSessionKey() throws WSSecurityException {
         try {
             KerberosContextAndServiceNameCallback contextAndServiceNameCallback = new KerberosContextAndServiceNameCallback();
             callbackHandler.handle(new Callback[]{contextAndServiceNameCallback});
@@ -112,7 +111,7 @@ public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityTok
                                                    service, 
                                                    contextAndServiceNameCallback.isUsernameServiceNameForm(),
                                                    false);
-            KerberosServiceContext krbServiceCtx= null;
+            KerberosServiceContext krbServiceCtx = null;
             try {
                 krbServiceCtx = Subject.doAs(subject, action);
             } catch (PrivilegedActionException e) {
@@ -128,25 +127,23 @@ public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityTok
 
             this.principal = krbServiceCtx.getPrincipal();
 
-            final Key sessionKey = krbServiceCtx.getSessionKey();
-
-            if (null != sessionKey) {
-                return new KerberosTokenDecoder() {
-                    public void setToken(byte[] token) {}
-                    public void setSubject(Subject subject) {}
-                    public byte[] getSessionKey() throws KerberosTokenDecoderException {
-                        return sessionKey.getEncoded();
-                    }
-                    public void clear() {}
-                };
-            } else {
-                KerberosTokenDecoder kerberosTokenDecoder = new KerberosTokenDecoderImpl();
+            Key key = krbServiceCtx.getSessionKey();
+            if (key != null) {
+                return key.getEncoded();
+            }
+            
+            if (kerberosTokenDecoder != null) {
+                kerberosTokenDecoder.clear();
                 kerberosTokenDecoder.setToken(binaryContent);
                 kerberosTokenDecoder.setSubject(subject);
-                return kerberosTokenDecoder;            	
+                return kerberosTokenDecoder.getSessionKey();
             }
+
+            return null;
         } catch (LoginException | UnsupportedCallbackException | IOException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        } catch (KerberosTokenDecoderException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
         }
     }
 
@@ -159,16 +156,7 @@ public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityTok
             return key;
         }
 
-        if (this.kerberosTokenDecoder == null) {
-            this.kerberosTokenDecoder = getTGT();
-        }
-
-        byte[] sk;
-        try {
-            sk = this.kerberosTokenDecoder.getSessionKey();
-        } catch (KerberosTokenDecoderException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
-        }
+        byte[] sk = getTGTSessionKey();
 
         key = KeyUtils.prepareSecretKey(algorithmURI, sk);
         setSecretKey(algorithmURI, key);

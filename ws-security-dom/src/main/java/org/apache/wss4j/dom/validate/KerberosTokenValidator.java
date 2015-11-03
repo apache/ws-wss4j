@@ -35,7 +35,6 @@ import org.apache.wss4j.common.kerberos.KerberosServiceContext;
 import org.apache.wss4j.common.kerberos.KerberosServiceExceptionAction;
 import org.apache.wss4j.common.kerberos.KerberosTokenDecoder;
 import org.apache.wss4j.common.kerberos.KerberosTokenDecoderException;
-import org.apache.wss4j.common.kerberos.KerberosTokenDecoderImpl;
 import org.apache.wss4j.common.token.BinarySecurity;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
@@ -224,12 +223,7 @@ public class KerberosTokenValidator implements Validator {
         
         // Otherwise, try to extract the session key from the token if a KerberosTokenDecoder implementation is
         // available
-        if (null == credential.getSecretKey()) {    
-            KerberosTokenDecoder kerberosTokenDecoder = this.kerberosTokenDecoder;
-            if (kerberosTokenDecoder == null) {
-                kerberosTokenDecoder = new KerberosTokenDecoderImpl();
-            }
-            
+        if (null == credential.getSecretKey() && kerberosTokenDecoder != null) {    
             LOG.debug("KerberosTokenDecoder is set.Trying to obtain the session key from it.");            
             kerberosTokenDecoder.clear();
             kerberosTokenDecoder.setToken(token);
