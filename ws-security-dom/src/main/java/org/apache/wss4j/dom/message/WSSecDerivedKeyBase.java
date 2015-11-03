@@ -19,27 +19,27 @@
 
 package org.apache.wss4j.dom.message;
 
-import org.apache.wss4j.dom.WSConstants;
+import java.nio.charset.StandardCharsets;
+import java.security.cert.X509Certificate;
+
+import javax.crypto.SecretKey;
+
+import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.derivedKey.AlgoFactory;
+import org.apache.wss4j.common.derivedKey.ConversationConstants;
+import org.apache.wss4j.common.derivedKey.DerivationAlgorithm;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.derivedKey.ConversationConstants;
-import org.apache.wss4j.common.derivedKey.AlgoFactory;
-import org.apache.wss4j.common.derivedKey.DerivationAlgorithm;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.message.token.DerivedKeyToken;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import java.io.UnsupportedEncodingException;
-import java.security.cert.X509Certificate;
-
-import javax.crypto.SecretKey;
 
 /**
  * Base class for DerivedKey encryption and signature
@@ -199,13 +199,8 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
         int offset = 0;
         int length = getDerivedKeyLength();
         byte[] label;
-        try {
-            String labelText = clientLabel + serviceLabel;
-            label = labelText.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "empty", 
-                                          new Object[] {"UTF-8 encoding is not supported"});
-        }
+        String labelText = clientLabel + serviceLabel;
+        label = labelText.getBytes(StandardCharsets.UTF_8);
         byte[] nonce = WSSecurityUtil.generateNonce(16);
         
         byte[] seed = new byte[label.length + nonce.length];

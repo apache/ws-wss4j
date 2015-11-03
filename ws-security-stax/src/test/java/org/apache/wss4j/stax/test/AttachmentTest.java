@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -102,7 +103,7 @@ public class AttachmentTest extends AbstractTestBase {
         attachment.setMimeType("text/xml");
         attachment.addHeaders(getHeaders(attachmentId));
         attachment.setId(attachmentId);
-        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -121,7 +122,7 @@ public class AttachmentTest extends AbstractTestBase {
             securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -146,7 +147,7 @@ public class AttachmentTest extends AbstractTestBase {
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
         
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         Assert.assertEquals("text/xml", responseAttachment.getMimeType());
     }
 
@@ -158,7 +159,7 @@ public class AttachmentTest extends AbstractTestBase {
         attachment.setMimeType("text/xml");
         attachment.addHeaders(getHeaders(attachmentId));
         attachment.setId(attachmentId);
-        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -177,7 +178,7 @@ public class AttachmentTest extends AbstractTestBase {
             securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -199,7 +200,7 @@ public class AttachmentTest extends AbstractTestBase {
 
                         List<Attachment> attachments = new ArrayList<Attachment>();
                         attachment.setSourceStream(new ByteArrayInputStream(
-                                SOAPUtil.SAMPLE_SOAP_MSG.replace("15", "16").getBytes("UTF-8")));
+                                SOAPUtil.SAMPLE_SOAP_MSG.replace("15", "16").getBytes(StandardCharsets.UTF_8)));
                         attachments.add(attachment);
                         attachmentRequestCallback.setAttachments(attachments);
                     }
@@ -226,7 +227,7 @@ public class AttachmentTest extends AbstractTestBase {
         attachment.setMimeType("text/xml");
         attachment.addHeaders(getHeaders(attachmentId));
         attachment.setId(attachmentId);
-        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -245,7 +246,7 @@ public class AttachmentTest extends AbstractTestBase {
             securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -271,7 +272,7 @@ public class AttachmentTest extends AbstractTestBase {
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
         
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         Assert.assertEquals("text/xml", responseAttachment.getMimeType());
     }
 
@@ -283,7 +284,7 @@ public class AttachmentTest extends AbstractTestBase {
         attachment.setMimeType("text/xml");
         attachment.addHeaders(getHeaders(attachmentId));
         attachment.setId(attachmentId);
-        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -302,7 +303,7 @@ public class AttachmentTest extends AbstractTestBase {
             securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -352,14 +353,14 @@ public class AttachmentTest extends AbstractTestBase {
         attachment[0].setMimeType("text/xml");
         attachment[0].addHeaders(getHeaders(attachment1Id));
         attachment[0].setId(attachment1Id);
-        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
         final String attachment2Id = UUID.randomUUID().toString();
         attachment[1] = new Attachment();
         attachment[1].setMimeType("text/plain");
         attachment[1].addHeaders(getHeaders(attachment2Id));
         attachment[1].setId(attachment2Id);
-        attachment[1].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        attachment[1].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -378,7 +379,7 @@ public class AttachmentTest extends AbstractTestBase {
             securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -404,7 +405,7 @@ public class AttachmentTest extends AbstractTestBase {
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
         
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         Assert.assertEquals("text/xml", responseAttachment.getMimeType());
     }
 
@@ -416,7 +417,7 @@ public class AttachmentTest extends AbstractTestBase {
         attachment.setMimeType("text/xml");
         attachment.addHeaders(getHeaders(attachmentId));
         attachment.setId(attachmentId);
-        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         AttachmentCallbackHandler attachmentCallbackHandler = 
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
@@ -434,7 +435,7 @@ public class AttachmentTest extends AbstractTestBase {
             securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -472,7 +473,7 @@ public class AttachmentTest extends AbstractTestBase {
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
         
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         Assert.assertEquals("text/xml", responseAttachment.getMimeType());
 
         Map<String, String> attHeaders = responseAttachment.getHeaders();
@@ -486,7 +487,7 @@ public class AttachmentTest extends AbstractTestBase {
         attachment.setMimeType("text/xml");
         attachment.addHeaders(getHeaders(attachmentId));
         attachment.setId(attachmentId);
-        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         AttachmentCallbackHandler attachmentCallbackHandler = 
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
@@ -504,7 +505,7 @@ public class AttachmentTest extends AbstractTestBase {
             securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -547,7 +548,7 @@ public class AttachmentTest extends AbstractTestBase {
         // Different behaviour here for different JDKs...
         try {
             byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
-            Assert.assertFalse(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+            Assert.assertFalse(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
             Assert.assertEquals("text/xml", responseAttachment.getMimeType());
     
             Map<String, String> attHeaders = responseAttachment.getHeaders();
@@ -576,7 +577,7 @@ public class AttachmentTest extends AbstractTestBase {
         attachment.setMimeType("text/xml");
         attachment.addHeaders(getHeaders(attachmentId));
         attachment.setId(attachmentId);
-        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         AttachmentCallbackHandler attachmentCallbackHandler = 
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
@@ -623,7 +624,7 @@ public class AttachmentTest extends AbstractTestBase {
         Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         Assert.assertEquals("text/xml", responseAttachment.getMimeType());
 
         Map<String, String> attHeaders = responseAttachment.getHeaders();
@@ -638,7 +639,7 @@ public class AttachmentTest extends AbstractTestBase {
         attachment.setMimeType("text/xml");
         attachment.addHeaders(getHeaders(attachmentId));
         attachment.setId(attachmentId);
-        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         
         AttachmentCallbackHandler attachmentCallbackHandler = 
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
@@ -657,7 +658,7 @@ public class AttachmentTest extends AbstractTestBase {
             securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -696,7 +697,7 @@ public class AttachmentTest extends AbstractTestBase {
         Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         Assert.assertEquals("text/xml", responseAttachment.getMimeType());
 
         Map<String, String> attHeaders = responseAttachment.getHeaders();
@@ -711,7 +712,7 @@ public class AttachmentTest extends AbstractTestBase {
         attachment.setMimeType("text/xml");
         attachment.addHeaders(getHeaders(attachmentId));
         attachment.setId(attachmentId);
-        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
         AttachmentCallbackHandler attachmentCallbackHandler = 
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
@@ -730,7 +731,7 @@ public class AttachmentTest extends AbstractTestBase {
             securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
             
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -777,7 +778,7 @@ public class AttachmentTest extends AbstractTestBase {
             Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
             Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
             byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
-            Assert.assertFalse(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+            Assert.assertFalse(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
             Assert.assertEquals("text/xml", responseAttachment.getMimeType());
 
         }
@@ -792,14 +793,14 @@ public class AttachmentTest extends AbstractTestBase {
         attachment[0].setMimeType("text/xml");
         attachment[0].addHeaders(getHeaders(attachment1Id));
         attachment[0].setId(attachment1Id);
-        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
         final String attachment2Id = UUID.randomUUID().toString();
         attachment[1] = new Attachment();
         attachment[1].setMimeType("text/plain");
         attachment[1].addHeaders(getHeaders(attachment2Id));
         attachment[1].setId(attachment2Id);
-        attachment[1].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        attachment[1].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         
         AttachmentCallbackHandler attachmentCallbackHandler = 
             new AttachmentCallbackHandler(Arrays.asList(attachment));
@@ -818,7 +819,7 @@ public class AttachmentTest extends AbstractTestBase {
             securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -840,7 +841,7 @@ public class AttachmentTest extends AbstractTestBase {
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
         
         byte[] attachment1Bytes = readInputStream(responseAttachment.getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachment1Bytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        Assert.assertTrue(Arrays.equals(attachment1Bytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         Assert.assertEquals("text/xml", responseAttachment.getMimeType());
         Map<String, String> att1Headers = responseAttachment.getHeaders();
         Assert.assertEquals(6, att1Headers.size());
@@ -848,7 +849,7 @@ public class AttachmentTest extends AbstractTestBase {
         responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(1);
         
         byte[] attachment2Bytes = readInputStream(responseAttachment.getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachment2Bytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        Assert.assertTrue(Arrays.equals(attachment2Bytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         Assert.assertEquals("text/plain", responseAttachment.getMimeType());
         Map<String, String> att2Headers = responseAttachment.getHeaders();
         Assert.assertEquals(6, att2Headers.size());
@@ -863,7 +864,7 @@ public class AttachmentTest extends AbstractTestBase {
         attachment[0].setMimeType("text/xml");
         attachment[0].addHeaders(getHeaders(attachmentId));
         attachment[0].setId(attachmentId);
-        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -899,7 +900,7 @@ public class AttachmentTest extends AbstractTestBase {
             });
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -948,7 +949,7 @@ public class AttachmentTest extends AbstractTestBase {
         }
 
         byte[] attachmentBytes = readInputStream(attachment[0].getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         Assert.assertEquals("text/xml", attachment[0].getMimeType());
 
         Map<String, String> attHeaders = attachment[0].getHeaders();
@@ -964,7 +965,7 @@ public class AttachmentTest extends AbstractTestBase {
         attachment[0].setMimeType("text/xml");
         attachment[0].addHeaders(getHeaders(attachmentId));
         attachment[0].setId(attachmentId);
-        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -1000,7 +1001,7 @@ public class AttachmentTest extends AbstractTestBase {
             });
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -1057,7 +1058,7 @@ public class AttachmentTest extends AbstractTestBase {
         attachment[0].setMimeType("text/xml");
         attachment[0].addHeaders(getHeaders(attachmentId));
         attachment[0].setId(attachmentId);
-        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -1093,7 +1094,7 @@ public class AttachmentTest extends AbstractTestBase {
             });
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -1142,7 +1143,7 @@ public class AttachmentTest extends AbstractTestBase {
         }
 
         byte[] attachmentBytes = readInputStream(attachment[0].getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         Assert.assertEquals("text/xml", attachment[0].getMimeType());
 
         Map<String, String> attHeaders = attachment[0].getHeaders();
@@ -1158,7 +1159,7 @@ public class AttachmentTest extends AbstractTestBase {
         attachment[0].setMimeType("text/xml");
         attachment[0].addHeaders(getHeaders(attachmentId));
         attachment[0].setId(attachmentId);
-        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        attachment[0].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -1194,7 +1195,7 @@ public class AttachmentTest extends AbstractTestBase {
             });
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();

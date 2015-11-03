@@ -18,7 +18,7 @@
  */
 package org.apache.wss4j.stax.impl.processor.output;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -93,14 +93,8 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 }
             }
 
-            byte[] label;
-            try {
-                String defaultLabel = WSSConstants.WS_SecureConversation_DEFAULT_LABEL + WSSConstants.WS_SecureConversation_DEFAULT_LABEL;
-                label = defaultLabel.getBytes("UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "empty", 
-                                              new Object[] {"UTF-8 encoding is not supported"});
-            }
+            String defaultLabel = WSSConstants.WS_SecureConversation_DEFAULT_LABEL + WSSConstants.WS_SecureConversation_DEFAULT_LABEL;
+            byte[] label = defaultLabel.getBytes(StandardCharsets.UTF_8);
 
             byte[] nonce = WSSConstants.generateBytes(16);
 

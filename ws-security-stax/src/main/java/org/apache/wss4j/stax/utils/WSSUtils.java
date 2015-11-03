@@ -19,7 +19,7 @@
 package org.apache.wss4j.stax.utils;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -117,8 +117,8 @@ public class WSSUtils extends XMLSecurityUtils {
     public static String doPasswordDigest(byte[] nonce, String created, String password) throws WSSecurityException {
         try {
             byte[] b1 = nonce != null ? nonce : new byte[0];
-            byte[] b2 = created != null ? created.getBytes("UTF-8") : new byte[0];
-            byte[] b3 = password.getBytes("UTF-8");
+            byte[] b2 = created != null ? created.getBytes(StandardCharsets.UTF_8) : new byte[0];
+            byte[] b3 = password.getBytes(StandardCharsets.UTF_8);
             byte[] b4 = new byte[b1.length + b2.length + b3.length];
             int offset = 0;
             System.arraycopy(b1, 0, b4, offset, b1.length);
@@ -135,8 +135,6 @@ public class WSSUtils extends XMLSecurityUtils {
             return new String(Base64.encodeBase64(sha.digest()));
         } catch (NoSuchAlgorithmException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "decoding.general");
-        } catch (UnsupportedEncodingException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
     }
 

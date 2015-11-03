@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.dom.message;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Collections;
@@ -117,7 +118,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
     public void testDerivedKeyWithEncodedPasswordBaseline() throws Exception {
         String password = "password";
         // The SHA-1 of the password is known as a password equivalent in the UsernameToken specification.
-        byte[] passwordHash = MessageDigest.getInstance("SHA-1").digest(password.getBytes("UTF-8"));
+        byte[] passwordHash = MessageDigest.getInstance("SHA-1").digest(password.getBytes(StandardCharsets.UTF_8));
 
         byte[] salt = Base64.decode("LKpycbfgRzwDnBz6kkhAAQ==");
         int iteration = 1049;
@@ -188,7 +189,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordsAreEncoded(true);
-        builder.setUserInfo("bob", Base64.encode(MessageDigest.getInstance("SHA-1").digest("security".getBytes("UTF-8"))));
+        builder.setUserInfo("bob", Base64.encode(MessageDigest.getInstance("SHA-1").digest("security".getBytes(StandardCharsets.UTF_8))));
         builder.addDerivedKey(false, null, 1000);
         builder.prepare(doc);
         
@@ -391,7 +392,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordsAreEncoded(true);
-        builder.setUserInfo("bob", Base64.encode(MessageDigest.getInstance("SHA-1").digest("security".getBytes("UTF-8"))));
+        builder.setUserInfo("bob", Base64.encode(MessageDigest.getInstance("SHA-1").digest("security".getBytes(StandardCharsets.UTF_8))));
         builder.addDerivedKey(true, null, 1000);
         builder.prepare(doc);
         

@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -2168,7 +2169,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             securityProperties.setEncryptionKeyTransportAlgorithm("http://www.w3.org/2009/xmlenc11#rsa-oaep");
             securityProperties.setEncryptionKeyTransportDigestAlgorithm("http://www.w3.org/2001/04/xmldsig-more#sha384");
             securityProperties.setEncryptionKeyTransportMGFAlgorithm("http://www.w3.org/2009/xmlenc11#mgf1sha384");
-            securityProperties.setEncryptionKeyTransportOAEPParams(Base64.decode("ZHVtbXkxMjM=".getBytes("UTF-8")));
+            securityProperties.setEncryptionKeyTransportOAEPParams(Base64.decode("ZHVtbXkxMjM=".getBytes(StandardCharsets.UTF_8)));
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             baos = doOutboundSecurity(securityProperties, sourceDocument);
@@ -2236,7 +2237,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             properties.put(WSHandlerConstants.ENC_KEY_TRANSPORT, "http://www.w3.org/2009/xmlenc11#rsa-oaep");
             properties.put(WSHandlerConstants.ENC_DIGEST_ALGO, "http://www.w3.org/2001/04/xmldsig-more#sha384");
             properties.put(WSHandlerConstants.ENC_MGF_ALGO, "http://www.w3.org/2009/xmlenc11#mgf1sha384");
-            //properties.put(WSHandlerConstants.ENC_OAEP_PARAMS, Base64.decode("ZHVtbXkxMjM=".getBytes("UTF-8")));
+            //properties.put(WSHandlerConstants.ENC_OAEP_PARAMS, Base64.decode("ZHVtbXkxMjM=".getBytes(StandardCharsets.UTF_8)));
 
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
@@ -2512,7 +2513,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             );
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
 
             try {

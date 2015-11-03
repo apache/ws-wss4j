@@ -30,6 +30,7 @@ import javax.mail.internet.MimeUtility;
 
 import java.io.*;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -160,7 +161,7 @@ public final class AttachmentUtils {
             sortedHeaders.put(MIME_HEADER_CONTENT_TYPE, "text/plain;charset=\"us-ascii\"");
         }
 
-        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(os, "UTF-8");
+        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(os, StandardCharsets.UTF_8);
 
         Iterator<Map.Entry<String, String>> entryIterator = sortedHeaders.entrySet().iterator();
         while (entryIterator.hasNext()) {

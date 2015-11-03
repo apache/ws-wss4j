@@ -18,6 +18,7 @@
  */
 package org.apache.wss4j.stax.setup;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -240,7 +241,7 @@ public class InboundWSSec {
         securityContextImpl.put(WSSConstants.XMLINPUTFACTORY, xmlInputFactory);
 
         DocumentContextImpl documentContext = new DocumentContextImpl();
-        documentContext.setEncoding(xmlStreamReader.getEncoding() != null ? xmlStreamReader.getEncoding() : "UTF-8");
+        documentContext.setEncoding(xmlStreamReader.getEncoding() != null ? xmlStreamReader.getEncoding() : StandardCharsets.UTF_8.name());
         InputProcessorChainImpl inputProcessorChain = new InputProcessorChainImpl(securityContextImpl, documentContext);
         inputProcessorChain.addProcessor(new XMLEventReaderInputProcessor(securityProperties, xmlStreamReader));
         inputProcessorChain.addProcessor(new SecurityHeaderInputProcessor(securityProperties));
