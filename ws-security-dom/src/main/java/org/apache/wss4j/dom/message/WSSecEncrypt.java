@@ -737,8 +737,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         NamedNodeMap map = elementToEncrypt.getAttributes();
         for (int i = 0; i < map.getLength(); i++) {
             Attr attr = (Attr)map.item(i);
-            if (attr.getNamespaceURI().equals(WSConstants.URI_SOAP11_ENV)
-                || attr.getNamespaceURI().equals(WSConstants.URI_SOAP12_ENV)) {                         
+            if (WSConstants.URI_SOAP11_ENV.equals(attr.getNamespaceURI())
+                || WSConstants.URI_SOAP12_ENV.equals(attr.getNamespaceURI())) {
                 String soapEnvPrefix = 
                     WSSecurityUtil.setNamespace(
                         elem, attr.getNamespaceURI(), WSConstants.DEFAULT_SOAP_PREFIX
