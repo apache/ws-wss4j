@@ -18,7 +18,7 @@
  */
 package org.apache.wss4j.common.derivedKey;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 
@@ -40,15 +40,11 @@ public final class DerivedKeyUtils {
         throws WSSecurityException {
         DerivationAlgorithm algo = AlgoFactory.getInstance(algorithm);
         byte[] labelBytes;
-        try {
-            if (label == null || label.length() == 0) {
-                String defaultLabel = ConversationConstants.DEFAULT_LABEL + ConversationConstants.DEFAULT_LABEL;
-                labelBytes = defaultLabel.getBytes("UTF-8");
-            } else {
-                labelBytes = label.getBytes("UTF-8");
-            }
-        } catch (UnsupportedEncodingException ex) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
+        if (label == null || label.length() == 0) {
+            String defaultLabel = ConversationConstants.DEFAULT_LABEL + ConversationConstants.DEFAULT_LABEL;
+            labelBytes = defaultLabel.getBytes(StandardCharsets.UTF_8);
+        } else {
+            labelBytes = label.getBytes(StandardCharsets.UTF_8);
         }
 
         byte[] seed = new byte[labelBytes.length + nonce.length];

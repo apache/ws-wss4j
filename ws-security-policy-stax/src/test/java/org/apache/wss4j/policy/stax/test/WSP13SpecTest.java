@@ -28,6 +28,7 @@ import org.apache.wss4j.stax.test.InboundWSSecurityContextImplTest;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class WSP13SpecTest extends AbstractPolicyTestBase {
@@ -37,7 +38,7 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
     @Test
     public void testTransportBindingC11a() throws Exception {
         {
-            String policyString = loadResourceAsString("testdata/policy/transportBindingPolicyC11.xml", "UTF-8");
+            String policyString = loadResourceAsString("testdata/policy/transportBindingPolicyC11.xml", StandardCharsets.UTF_8);
     
             PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
     
@@ -45,7 +46,7 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
             applyPolicy(null, null, null, policyEnforcer, securityEventList);
         }
         {
-            String policyString = loadResourceAsString("testdata/policy/transportBindingPolicyC11.xml", "UTF-8");
+            String policyString = loadResourceAsString("testdata/policy/transportBindingPolicyC11.xml", StandardCharsets.UTF_8);
 
             PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
@@ -53,7 +54,7 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
             applyPolicy(WSSecurityEventConstants.HttpsToken, 2, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}HttpsToken not satisfied", policyEnforcer, securityEventList);
         }
         {
-            String policyString = loadResourceAsString("testdata/policy/transportBindingPolicyC11.xml", "UTF-8");
+            String policyString = loadResourceAsString("testdata/policy/transportBindingPolicyC11.xml", StandardCharsets.UTF_8);
 
             PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
@@ -61,7 +62,7 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
             applyPolicy(WSSecurityEventConstants.RequiredElement, 4, "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present", policyEnforcer, securityEventList);
             }
         {
-            String policyString = loadResourceAsString("testdata/policy/transportBindingPolicyC11.xml", "UTF-8");
+            String policyString = loadResourceAsString("testdata/policy/transportBindingPolicyC11.xml", StandardCharsets.UTF_8);
 
             PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
@@ -69,7 +70,7 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
             applyPolicy(WSSecurityEventConstants.UsernameToken, 0, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied", policyEnforcer, securityEventList);
         }
         {
-            String policyString = loadResourceAsString("testdata/policy/transportBindingPolicyC11.xml", "UTF-8");
+            String policyString = loadResourceAsString("testdata/policy/transportBindingPolicyC11.xml", StandardCharsets.UTF_8);
 
             PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
 
@@ -81,7 +82,7 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
     @Test
     public void testAsymmetricBindingC31a() throws Exception {
         {
-            String policyString = loadResourceAsString("testdata/policy/asymmetricBindingPolicyC31.xml", "UTF-8");
+            String policyString = loadResourceAsString("testdata/policy/asymmetricBindingPolicyC31.xml", StandardCharsets.UTF_8);
     
             PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
     
@@ -89,7 +90,7 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
             applyPolicy(null, null, null, policyEnforcer, securityEventList);
         }
         {
-            String policyString = loadResourceAsString("testdata/policy/asymmetricBindingPolicyC31.xml", "UTF-8");
+            String policyString = loadResourceAsString("testdata/policy/asymmetricBindingPolicyC31.xml", StandardCharsets.UTF_8);
     
             PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
     
@@ -97,7 +98,7 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
             applyPolicy(WSSecurityEventConstants.RequiredElement, 8, "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present", policyEnforcer, securityEventList);
         }
         {
-            String policyString = loadResourceAsString("testdata/policy/asymmetricBindingPolicyC31.xml", "UTF-8");
+            String policyString = loadResourceAsString("testdata/policy/asymmetricBindingPolicyC31.xml", StandardCharsets.UTF_8);
     
             PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
     
@@ -105,7 +106,7 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
             applyPolicy(SecurityEventConstants.X509Token, 0, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}X509Token not satisfied", policyEnforcer, securityEventList);
         }
         {
-            String policyString = loadResourceAsString("testdata/policy/asymmetricBindingPolicyC31.xml", "UTF-8");
+            String policyString = loadResourceAsString("testdata/policy/asymmetricBindingPolicyC31.xml", StandardCharsets.UTF_8);
     
             PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
     
@@ -117,7 +118,7 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
     @Test
     public void testSymmetricBindingC21a() throws Exception {
         {
-            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21a.xml", "UTF-8");
+            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21a.xml", StandardCharsets.UTF_8);
     
             PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
     
@@ -125,7 +126,7 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
             applyPolicy(null, null, null, policyEnforcer, securityEventList);
         }
         {
-            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21a.xml", "UTF-8");
+            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21a.xml", StandardCharsets.UTF_8);
     
             PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
     
@@ -133,7 +134,7 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
             applyPolicy(WSSecurityEventConstants.RequiredElement, 4, "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present", policyEnforcer, securityEventList);
         }
         {
-            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21a.xml", "UTF-8");
+            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21a.xml", StandardCharsets.UTF_8);
     
             PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
     
@@ -141,7 +142,7 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
             applyPolicy(WSSecurityEventConstants.SamlToken, -1, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}IssuedToken not satisfied", policyEnforcer, securityEventList);
         }
         {
-            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21a.xml", "UTF-8");
+            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21a.xml", StandardCharsets.UTF_8);
     
             PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
     
@@ -149,7 +150,7 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
             applyPolicy(WSSecurityEventConstants.UsernameToken, 0, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied", policyEnforcer, securityEventList);
         }
         {
-            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21a.xml", "UTF-8");
+            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21a.xml", StandardCharsets.UTF_8);
     
             PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
     
@@ -161,7 +162,7 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
     @Test
     public void testSymmetricBindingC21b() throws Exception {
         {
-            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21b.xml", "UTF-8");
+            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21b.xml", StandardCharsets.UTF_8);
     
             PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
     
@@ -169,7 +170,7 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
             applyPolicy(null, null, null, policyEnforcer, securityEventList);
         }
         {
-            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21b.xml", "UTF-8");
+            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21b.xml", StandardCharsets.UTF_8);
     
             PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
     
@@ -177,7 +178,7 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
             applyPolicy(WSSecurityEventConstants.RequiredElement, 4, "Element /{http://schemas.xmlsoap.org/soap/envelope/}Envelope/{http://schemas.xmlsoap.org/soap/envelope/}Header/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security/{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp must be present", policyEnforcer, securityEventList);
         }
         {
-            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21b.xml", "UTF-8");
+            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21b.xml", StandardCharsets.UTF_8);
     
             PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
     
@@ -185,7 +186,7 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
             applyPolicy(WSSecurityEventConstants.SamlToken, -1, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}IssuedToken not satisfied", policyEnforcer, securityEventList);
         }
         {
-            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21b.xml", "UTF-8");
+            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21b.xml", StandardCharsets.UTF_8);
     
             PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
     
@@ -193,7 +194,7 @@ public class WSP13SpecTest extends AbstractPolicyTestBase {
             applyPolicy(WSSecurityEventConstants.UsernameToken, 0, "Assertion {http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702}UsernameToken not satisfied", policyEnforcer, securityEventList);
         }
         {
-            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21b.xml", "UTF-8");
+            String policyString = loadResourceAsString("testdata/policy/symmetricBindingPolicyC21b.xml", StandardCharsets.UTF_8);
     
             PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
     

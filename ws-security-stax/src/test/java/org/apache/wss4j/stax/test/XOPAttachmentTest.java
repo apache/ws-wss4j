@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -106,7 +107,7 @@ public class XOPAttachmentTest extends AbstractTestBase {
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
         
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
-        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         Assert.assertEquals("text/xml", responseAttachment.getMimeType());
     }
     
@@ -124,7 +125,7 @@ public class XOPAttachmentTest extends AbstractTestBase {
         String attachmentId = UUID.randomUUID().toString();
         final Attachment attachment = new Attachment();
         attachment.setId(attachmentId);
-        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
         AttachmentCallbackHandler attachmentCallbackHandler = 
             new AttachmentCallbackHandler(Collections.singletonList(attachment));

@@ -21,6 +21,7 @@ package org.apache.wss4j.stax.test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -161,7 +162,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
             
             baos = new ByteArrayOutputStream();
             XMLStreamWriter xmlStreamWriter = 
-                wsSecOut.processOutMessage(baos, "UTF-8", outboundSecurityContext);
+                wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), outboundSecurityContext);
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -253,7 +254,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
             
             baos = new ByteArrayOutputStream();
             XMLStreamWriter xmlStreamWriter = 
-                wsSecOut.processOutMessage(baos, "UTF-8", outboundSecurityContext);
+                wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), outboundSecurityContext);
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -355,7 +356,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
 
             baos = new ByteArrayOutputStream();
             XMLStreamWriter xmlStreamWriter =
-                    wsSecOut.processOutMessage(baos, "UTF-8", outboundSecurityContext);
+                    wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), outboundSecurityContext);
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();

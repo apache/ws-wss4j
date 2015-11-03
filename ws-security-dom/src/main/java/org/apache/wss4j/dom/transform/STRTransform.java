@@ -21,6 +21,7 @@ package org.apache.wss4j.dom.transform;
 
 import java.io.ByteArrayInputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Iterator;
@@ -217,7 +218,7 @@ public class STRTransform extends TransformService {
             //
             buf = canon.canonicalizeSubtree(dereferencedToken, "#default", true);
             if (LOG.isDebugEnabled()) {
-                LOG.debug("after c14n: " + new String(buf, "UTF-8"));
+                LOG.debug("after c14n: " + new String(buf, StandardCharsets.UTF_8));
             }
 
             if (os != null) {

@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -190,7 +191,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             
             // Read in krb5.conf and substitute in the correct port
             Path path = FileSystems.getDefault().getPath(basedir, "/src/test/resources/kerberos/krb5.conf");
-            String content = new String(Files.readAllBytes(path), "UTF-8");
+            String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
             content = content.replaceAll("port", "" + super.getKdcServer().getTransports()[0].getPort());
             
             Path path2 = FileSystems.getDefault().getPath(basedir, "/target/test-classes/kerberos/krb5.conf");
@@ -753,7 +754,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -1020,7 +1021,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();

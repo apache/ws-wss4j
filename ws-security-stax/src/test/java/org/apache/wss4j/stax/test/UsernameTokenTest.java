@@ -21,6 +21,7 @@ package org.apache.wss4j.stax.test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -245,7 +246,7 @@ public class UsernameTokenTest extends AbstractTestBase {
                 "Ex2YESUvsa1qne1m6TM8XA==", createdString, "default"
             );
         
-        String req = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+        String req = "<?xml version=\"1.0\" encoding=\"UTF_8\"?>" +
                 "<env:Envelope xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
                 "    <env:Header>" +
                 "       <wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" env:mustUnderstand=\"1\">" +
@@ -294,7 +295,7 @@ public class UsernameTokenTest extends AbstractTestBase {
                 "Ex2YEKVvsa1qne1m6TM8XA==", createdString, "default"
             );
         
-        String req = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+        String req = "<?xml version=\"1.0\" encoding=\"UTF_8\"?>" +
                 "<env:Envelope xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
                 "    <env:Header>" +
                 "       <wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" env:mustUnderstand=\"1\">" +
@@ -341,7 +342,7 @@ public class UsernameTokenTest extends AbstractTestBase {
                 "Ex2YEKVvSa1qne1m6TM8XA==", createdString, "default"
             );
         
-        String req = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+        String req = "<?xml version=\"1.0\" encoding=\"UTF_8\"?>" +
                 "<env:Envelope xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
                 "    <env:Header>" +
                 "       <wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" env:mustUnderstand=\"1\">" +
@@ -381,7 +382,7 @@ public class UsernameTokenTest extends AbstractTestBase {
                 "Ex2YEKVvsa1Qne1m6TM8XA==", createdString, "default"
             );
         
-        String req = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+        String req = "<?xml version=\"1.0\" encoding=\"UTF_8\"?>" +
                 "<env:Envelope xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
                 "    <env:Header>" +
                 "       <wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" env:mustUnderstand=\"1\">" +
@@ -425,7 +426,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -461,7 +462,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -500,7 +501,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -535,7 +536,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -623,7 +624,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -727,7 +728,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             securityProperties.setAddUsernameTokenCreated(true);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -760,7 +761,7 @@ public class UsernameTokenTest extends AbstractTestBase {
 
             WSSSecurityProperties securityProperties = ConfigurationConverter.convert(config);
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();

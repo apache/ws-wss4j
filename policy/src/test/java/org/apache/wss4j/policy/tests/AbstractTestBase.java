@@ -22,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import javax.xml.stream.XMLOutputFactory;
@@ -58,7 +59,7 @@ public abstract class AbstractTestBase extends TestCase {
     }
 
     protected String loadPolicyFile(String classpathResource) throws Exception {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(classpathResource), "UTF-8"));
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(classpathResource), StandardCharsets.UTF_8));
         StringWriter writer = new StringWriter();
         char[] buf = new char[1024];
         int n;
@@ -118,6 +119,6 @@ public abstract class AbstractTestBase extends TestCase {
     }
     
     protected Policy loadPolicy(String policy, PolicyBuilder policyBuilder) throws Exception {
-        return policyBuilder.getPolicy(new ByteArrayInputStream(policy.getBytes("UTF-8")));
+        return policyBuilder.getPolicy(new ByteArrayInputStream(policy.getBytes(StandardCharsets.UTF_8)));
     }
 }

@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -580,7 +581,7 @@ public final class WSSecurityUtil {
 
         String attachmentId = null;
         try {
-            attachmentId = URLDecoder.decode(xopUri.substring("cid:".length()), "UTF-8");
+            attachmentId = URLDecoder.decode(xopUri.substring("cid:".length()), StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.INVALID_SECURITY,

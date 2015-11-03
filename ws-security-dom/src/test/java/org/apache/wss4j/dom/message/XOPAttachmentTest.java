@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -114,7 +115,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
         String attachmentId = UUID.randomUUID().toString();
         final Attachment attachment = new Attachment();
         attachment.setId(attachmentId);
-        attachment.setSourceStream(new ByteArrayInputStream(SOAP_BODY.getBytes("UTF-8")));
+        attachment.setSourceStream(new ByteArrayInputStream(SOAP_BODY.getBytes(StandardCharsets.UTF_8)));
 
         AttachmentCallbackHandler attachmentCallbackHandler = 
             new AttachmentCallbackHandler(Collections.singletonList(attachment));

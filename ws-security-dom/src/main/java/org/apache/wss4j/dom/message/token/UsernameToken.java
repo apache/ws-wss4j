@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.message.token;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -593,7 +594,7 @@ public class UsernameToken {
         String passwdDigest = null;
         try {
             byte[] b1 = nonce != null ? Base64.decode(nonce) : new byte[0];
-            byte[] b2 = created != null ? created.getBytes("UTF-8") : new byte[0];
+            byte[] b2 = created != null ? created.getBytes(StandardCharsets.UTF_8) : new byte[0];
             byte[] b3 = password;
             byte[] b4 = new byte[b1.length + b2.length + b3.length];
             int offset = 0;
@@ -618,7 +619,7 @@ public class UsernameToken {
     public static String doPasswordDigest(String nonce, String created, String password) {
         String passwdDigest = null;
         try {
-            passwdDigest = doPasswordDigest(nonce, created, password.getBytes("UTF-8"));
+            passwdDigest = doPasswordDigest(nonce, created, password.getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
             if (DO_DEBUG) {
                 LOG.debug(e.getMessage(), e);

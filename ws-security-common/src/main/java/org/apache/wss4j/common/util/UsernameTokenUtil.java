@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.common.util;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -99,15 +100,7 @@ public final class UsernameTokenUtil {
         byte[] salt, 
         int iteration
     ) throws WSSecurityException {
-        try {
-            return generateDerivedKey(password.getBytes("UTF-8"), salt, iteration);
-        } catch (final java.io.UnsupportedEncodingException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(e.getMessage(), e);
-            }
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
-                    "empty", new Object[] {"Unable to convert password to UTF-8"});
-        }
+        return generateDerivedKey(password.getBytes(StandardCharsets.UTF_8), salt, iteration);
     }
     
     /**

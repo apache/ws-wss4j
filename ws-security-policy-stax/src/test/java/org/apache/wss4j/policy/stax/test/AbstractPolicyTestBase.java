@@ -53,6 +53,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -93,7 +95,7 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
                 this.getClass().getClassLoader().getResourceAsStream("testdata/wsdl/wsdl-template.wsdl"));
         NodeList nodeList = document.getElementsByTagNameNS("*", SPConstants.P_LOCALNAME);
 
-        Document policyDocument = documentBuilder.parse(new ByteArrayInputStream(policyString.getBytes("UTF-8")));
+        Document policyDocument = documentBuilder.parse(new ByteArrayInputStream(policyString.getBytes(StandardCharsets.UTF_8)));
         Node policyNode = document.importNode(policyDocument.getDocumentElement(), true);
         Element element = (Element) nodeList.item(0);
         if (replacePolicyElement) {
@@ -177,7 +179,7 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
         return new ECKeyValueSecurityTokenImpl(ecKeyValueType, null, null);
     }
 
-    protected String loadResourceAsString(String resource, String encoding) throws IOException {
+    protected String loadResourceAsString(String resource, Charset encoding) throws IOException {
         InputStreamReader inputStreamReader = new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(resource), encoding);
         StringBuilder stringBuilder = new StringBuilder();
         int read = 0;

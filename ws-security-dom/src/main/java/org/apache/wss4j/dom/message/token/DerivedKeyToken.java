@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.dom.message.token;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
@@ -548,9 +549,9 @@ public class DerivedKeyToken {
             if (label == null || label.length() == 0) {
                 String defaultLabel = ConversationConstants.DEFAULT_LABEL 
                     + ConversationConstants.DEFAULT_LABEL;
-                labelBytes = defaultLabel.getBytes("UTF-8");
+                labelBytes = defaultLabel.getBytes(StandardCharsets.UTF_8);
             } else {
-                labelBytes = label.getBytes("UTF-8");
+                labelBytes = label.getBytes(StandardCharsets.UTF_8);
             }
             
             byte[] nonce = Base64.decode(getNonce());
