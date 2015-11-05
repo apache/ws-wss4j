@@ -308,8 +308,7 @@ public class PrincipalTest extends AbstractTestBase {
         //
         if ("IBM Corporation".equals(System.getProperty("java.vendor"))
             || System.getProperty("java.version") != null
-                &&  (System.getProperty("java.version").startsWith("1.8")
-                    || System.getProperty("java.version").startsWith("1.6"))) {
+                && System.getProperty("java.version").startsWith("1.8")) {
             return;
         }
 

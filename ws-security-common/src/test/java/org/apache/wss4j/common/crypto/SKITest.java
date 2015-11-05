@@ -21,6 +21,7 @@ package org.apache.wss4j.common.crypto;
 
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.security.Security;
 import java.security.cert.X509Certificate;
 
 import org.apache.wss4j.common.crypto.Crypto;
@@ -28,6 +29,7 @@ import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.xml.security.utils.Base64;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
  * This is a test for WSS-300 - "SubjectKeyIdentifier (SKI) incorrectly calculated for 2048-bit RSA key".
@@ -80,8 +82,14 @@ public class SKITest extends org.junit.Assert {
     
     @org.junit.Test
     public void testBouncyCastlePKCS12() throws Exception {
-        // Load the keystore
-        Crypto crypto = CryptoFactory.getInstance("alice_bouncycastle.properties");
-        assertNotNull(crypto);
+        try {
+            Security.addProvider(new BouncyCastleProvider());
+            
+            // Load the keystore
+            Crypto crypto = CryptoFactory.getInstance("alice_bouncycastle.properties");
+            assertNotNull(crypto);
+        } finally {
+            Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
+        }
     }
 }
