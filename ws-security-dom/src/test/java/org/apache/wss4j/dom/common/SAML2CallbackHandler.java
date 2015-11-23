@@ -60,6 +60,7 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
                 callback.setSamlVersion(Version.SAML_20);
                 callback.setIssuer(issuer);
+                callback.setIssuerFormat(issuerFormat);
                 if (conditions != null) {
                     callback.setConditions(conditions);
                 }

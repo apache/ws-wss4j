@@ -60,6 +60,16 @@ public class SAMLCallback implements Callback {
     private String issuer;
     
     /**
+     * The issuer format of the Assertion
+     */
+    private String issuerFormat;
+    
+    /**
+     * The issuer qualifier of the Assertion
+     */
+    private String issuerQualifier;
+    
+    /**
      * SAML Conditions representation
      */
     private ConditionsBean conditions;
@@ -382,5 +392,21 @@ public class SAMLCallback implements Callback {
 
     public void setAdvice(AdviceBean advice) {
         this.advice = advice;
+    }
+
+    public String getIssuerFormat() {
+        return issuerFormat;
+    }
+
+    public void setIssuerFormat(String issuerFormat) {
+        this.issuerFormat = issuerFormat;
+    }
+
+    public String getIssuerQualifier() {
+        return issuerQualifier;
+    }
+
+    public void setIssuerQualifier(String issuerQualifier) {
+        this.issuerQualifier = issuerQualifier;
     }
 }
