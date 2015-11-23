@@ -64,6 +64,7 @@ public class SAMLCallbackHandlerImpl implements CallbackHandler {
     private KeyInfoBean.CERT_IDENTIFIER certIdentifier = KeyInfoBean.CERT_IDENTIFIER.X509_CERT;
     private byte[] ephemeralKey = null;
     private String issuer = null;
+    private String issuerFormat;
     private Version samlVersion = Version.SAML_11;
 
     private String subjectNameIDFormat = null;
@@ -92,6 +93,7 @@ public class SAMLCallbackHandlerImpl implements CallbackHandler {
                 samlCallback.setIssuerKeyPassword("default");
                 samlCallback.setSignAssertion(this.signAssertion);
                 samlCallback.setIssuer(issuer);
+                samlCallback.setIssuerFormat(issuerFormat);
 
                 if (conditions != null) {
                     samlCallback.setConditions(conditions);
@@ -277,6 +279,10 @@ public class SAMLCallbackHandlerImpl implements CallbackHandler {
 
     public void setIssuer(String issuer) {
         this.issuer = issuer;
+    }
+    
+    public void setIssuerFormat(String issuerFormat) {
+        this.issuerFormat = issuerFormat;
     }
 
     public boolean isSignAssertion() {
