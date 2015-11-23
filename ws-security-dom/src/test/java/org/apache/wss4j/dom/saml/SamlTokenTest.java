@@ -1074,6 +1074,42 @@ public class SamlTokenTest extends org.junit.Assert {
         assertFalse(receivedSamlAssertion.isSigned());
     }
     
+    @org.junit.Test
+    public void testSAML2IssuerFormat() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+        callbackHandler.setIssuerFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent");
+        
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+        
+        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+
+        String outputString = 
+            XMLUtils.PrettyDocumentToString(unsignedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        assertTrue(outputString.contains("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"));
+        
+        List<WSSecurityEngineResult> results = verify(unsignedDoc);
+        WSSecurityEngineResult actionResult =
+            WSSecurityUtil.fetchActionResult(results, WSConstants.ST_UNSIGNED);
+        
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertFalse(receivedSamlAssertion.isSigned());
+    }
+    
     private void encryptElement(
         Document document,
         Element elementToEncrypt,

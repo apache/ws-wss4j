@@ -1145,6 +1145,40 @@ public class SAMLTokenTest extends AbstractTestBase {
         }
     }
     
+    @Test
+    public void testSAML2IssuerFormatOutbound() throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.SAML_TOKEN_UNSIGNED);
+            securityProperties.setActions(actions);
+            SAMLCallbackHandlerImpl callbackHandler = new SAMLCallbackHandlerImpl();
+            callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
+            callbackHandler.setIssuer("www.example.com");
+            callbackHandler.setSignAssertion(false);
+            callbackHandler.setIssuerFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent");
+            securityProperties.setSamlCallbackHandler(callbackHandler);
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+
+            Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
+            Assert.assertEquals(nodeList.getLength(), 0);
+        }
+
+        //done signature; now test sig-verification:
+        {
+            String action = WSHandlerConstants.SAML_TOKEN_UNSIGNED;
+            doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
+        }
+    }
+    
     private void encryptElement(
         Document document,
         Element elementToEncrypt,

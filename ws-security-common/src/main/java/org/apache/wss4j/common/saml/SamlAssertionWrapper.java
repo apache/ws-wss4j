@@ -1055,6 +1055,8 @@ public class SamlAssertionWrapper {
             samlVersion = SAMLVersion.VERSION_20;
         }
         String issuer = samlCallback.getIssuer();
+        String issuerFormat = samlCallback.getIssuerFormat();
+        String issuerQualifier = samlCallback.getIssuerQualifier();
         
         if (samlVersion.equals(SAMLVersion.VERSION_11)) {
             // Build a SAML v1.1 assertion
@@ -1104,7 +1106,7 @@ public class SamlAssertionWrapper {
         } else if (samlVersion.equals(SAMLVersion.VERSION_20)) {
             // Build a SAML v2.0 assertion
             saml2 = SAML2ComponentBuilder.createAssertion();
-            Issuer samlIssuer = SAML2ComponentBuilder.createIssuer(issuer);
+            Issuer samlIssuer = SAML2ComponentBuilder.createIssuer(issuer, issuerFormat, issuerQualifier);
 
             // Authn Statement(s)
             List<AuthnStatement> authnStatements = 
