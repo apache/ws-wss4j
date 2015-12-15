@@ -55,7 +55,7 @@ import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
  */
 public class InboundWSSec {
 
-    protected static final transient org.slf4j.Logger log = 
+    protected static final transient org.slf4j.Logger log =
         org.slf4j.LoggerFactory.getLogger(InboundWSSec.class);
 
     private static final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
@@ -80,7 +80,7 @@ public class InboundWSSec {
     public InboundWSSec(WSSSecurityProperties securityProperties) {
         this(securityProperties, false, false);
     }
-    
+
     public InboundWSSec(WSSSecurityProperties securityProperties, boolean initiator,
                         boolean returnSecurityError) {
         this.securityProperties = securityProperties;
@@ -103,7 +103,7 @@ public class InboundWSSec {
      * @param xmlStreamReader The original XMLStreamReader
      * @return A new XMLStreamReader which does transparently the security processing.
      * @throws XMLStreamException  thrown when a streaming error occurs
-     * @throws XMLSecurityException 
+     * @throws XMLSecurityException
      */
     public XMLStreamReader processInMessage(
             XMLStreamReader xmlStreamReader) throws XMLStreamException, WSSecurityException {
@@ -125,14 +125,14 @@ public class InboundWSSec {
      * @param xmlStreamReader       The original XMLStreamReader
      * @return A new XMLStreamReader which does transparently the security processing.
      * @throws XMLStreamException  thrown when a streaming error occurs
-     * @throws XMLSecurityException 
+     * @throws XMLSecurityException
      */
     public XMLStreamReader processInMessage(
             XMLStreamReader xmlStreamReader, List<SecurityEvent> requestSecurityEvents
     ) throws XMLStreamException, WSSecurityException {
         return this.processInMessage(xmlStreamReader, requestSecurityEvents, (SecurityEventListener)null);
     }
-    
+
     /**
      * Warning:
      * configure your xmlStreamReader correctly. Otherwise you can create a security hole.
@@ -149,12 +149,12 @@ public class InboundWSSec {
      * @param securityEventListener A SecurityEventListener to receive security-relevant events.
      * @return A new XMLStreamReader which does transparently the security processing.
      * @throws XMLStreamException  thrown when a streaming error occurs
-     * @throws XMLSecurityException 
+     * @throws XMLSecurityException
      */
     public XMLStreamReader processInMessage(
             XMLStreamReader xmlStreamReader, List<SecurityEvent> requestSecurityEvents,
             SecurityEventListener securityEventListener) throws XMLStreamException, WSSecurityException {
-        return this.processInMessage(xmlStreamReader, requestSecurityEvents, 
+        return this.processInMessage(xmlStreamReader, requestSecurityEvents,
                                      Collections.singletonList(securityEventListener));
     }
     /**
@@ -173,7 +173,7 @@ public class InboundWSSec {
      * @param securityEventListeners A list of SecurityEventListeners to receive security-relevant events.
      * @return A new XMLStreamReader which does transparently the security processing.
      * @throws XMLStreamException  thrown when a streaming error occurs
-     * @throws XMLSecurityException 
+     * @throws XMLSecurityException
      */
     public XMLStreamReader processInMessage(
             XMLStreamReader xmlStreamReader, List<SecurityEvent> requestSecurityEvents,

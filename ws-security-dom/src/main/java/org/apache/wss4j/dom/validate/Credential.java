@@ -33,11 +33,11 @@ import org.apache.wss4j.dom.message.token.UsernameToken;
 
 /**
  * This class stores various Credential types that can be validated and/or returned by a
- * Validator implementation. It also stores an optional Principal object which can provide 
+ * Validator implementation. It also stores an optional Principal object which can provide
  * context information to the validators.
  */
 public class Credential {
-    
+
     private PublicKey publicKey;
     private X509Certificate[] certs;
     private Timestamp timestamp;
@@ -50,7 +50,7 @@ public class Credential {
     private byte[] secretKey;
     private Subject subject;
     private Object delegationCredential;
-    
+
     /**
      * Set a SecurityContextToken to be validated
      * @param securityContextToken a SecurityContextToken to be validated
@@ -58,7 +58,7 @@ public class Credential {
     public void setSecurityContextToken(SecurityContextToken securityContextToken) {
         this.securityContextToken = securityContextToken;
     }
-    
+
     /**
      * Get a SecurityContextToken to be validated
      * @return a SecurityContextToken to be validated
@@ -66,7 +66,7 @@ public class Credential {
     public SecurityContextToken getSecurityContextToken() {
         return securityContextToken;
     }
-    
+
     /**
      * Set a SecretKey (byte[]) to be validated
      * @param secretKey a SecretKey (byte) to be validated
@@ -74,7 +74,7 @@ public class Credential {
     public void setSecretKey(byte[] secretKey) {
         this.secretKey = secretKey;
     }
-    
+
     /**
      * Get a SecretKey (byte[]) to be validated
      * @return a SecretKey (byte[]) to be validated
@@ -82,8 +82,8 @@ public class Credential {
     public byte[] getSecretKey() {
         return secretKey;
     }
-    
-    
+
+
     /**
      * Set a PublicKey to be validated
      * @param publicKey a PublicKey to be validated
@@ -91,7 +91,7 @@ public class Credential {
     public void setPublicKey(PublicKey publicKey) {
         this.publicKey = publicKey;
     }
-    
+
     /**
      * Get a PublicKey to be validated
      * @return a PublicKey to be validated
@@ -99,7 +99,7 @@ public class Credential {
     public PublicKey getPublicKey() {
         return publicKey;
     }
-    
+
     /**
      * Set an X509Certificate chain to be validated
      * @param certs an X509Certificate chain to be validated
@@ -107,7 +107,7 @@ public class Credential {
     public void setCertificates(X509Certificate[] certs) {
         this.certs = certs;
     }
-    
+
     /**
      * Get an X509Certificate chain to be validated
      * @return an X509Certificate chain to be validated
@@ -115,7 +115,7 @@ public class Credential {
     public X509Certificate[] getCertificates() {
         return certs;
     }
-    
+
     /**
      * Set a Timestamp to be validated
      * @param timestamp a Timestamp to be validated
@@ -123,7 +123,7 @@ public class Credential {
     public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
     }
-    
+
     /**
      * Get a Timestamp to be validated
      * @return a Timestamp to be validated
@@ -131,7 +131,7 @@ public class Credential {
     public Timestamp getTimestamp() {
         return timestamp;
     }
-    
+
     /**
      * Set a UsernameToken to be validated
      * @param usernametoken a UsernameToken to be validated
@@ -139,7 +139,7 @@ public class Credential {
     public void setUsernametoken(UsernameToken usernametoken) {
         this.usernametoken = usernametoken;
     }
-    
+
     /**
      * Get a UsernameToken to be validated
      * @return a UsernameToken to be validated
@@ -147,7 +147,7 @@ public class Credential {
     public UsernameToken getUsernametoken() {
         return usernametoken;
     }
-    
+
     /**
      * Set the BinarySecurityToken to be validated
      * @param binarySecurityToken the BinarySecurityToken to be validated
@@ -155,7 +155,7 @@ public class Credential {
     public void setBinarySecurityToken(BinarySecurity binarySecurityToken) {
         this.binarySecurityToken = binarySecurityToken;
     }
-    
+
     /**
      * Get the BinarySecurityToken to be validated
      * @return the BinarySecurityToken to be validated
@@ -163,7 +163,7 @@ public class Credential {
     public BinarySecurity getBinarySecurityToken() {
         return binarySecurityToken;
     }
-    
+
     /**
      * Set an SamlAssertionWrapper to be validated
      * @param samlAssertion an SamlAssertionWrapper to be validated
@@ -171,7 +171,7 @@ public class Credential {
     public void setSamlAssertion(SamlAssertionWrapper samlAssertion) {
         this.samlAssertion = samlAssertion;
     }
-    
+
     /**
      * Get an SamlAssertionWrapper to be validated
      * @return an SamlAssertionWrapper to be validated
@@ -179,7 +179,7 @@ public class Credential {
     public SamlAssertionWrapper getSamlAssertion() {
         return samlAssertion;
     }
-    
+
     /**
      * Set an SamlAssertionWrapper instance which corresponds to a Transformed Token.
      * @param transformedToken a transformed SamlAssertionWrapper instance
@@ -187,7 +187,7 @@ public class Credential {
     public void setTransformedToken(SamlAssertionWrapper transformedToken) {
         this.transformedToken = transformedToken;
     }
-    
+
     /**
      * Get an SamlAssertionWrapper instance which corresponds to a Transformed Token.
      * @return a transformed SamlAssertionWrapper instance
@@ -195,7 +195,7 @@ public class Credential {
     public SamlAssertionWrapper getTransformedToken() {
         return transformedToken;
     }
-    
+
     /**
      * Set the principal that supplies context information to the validators.
      * @param principal the principal that supplies context information to the validators
@@ -203,7 +203,7 @@ public class Credential {
     public void setPrincipal(Principal principal) {
         this.principal = principal;
     }
-    
+
     /**
      * Get the principal
      * @return the principal
@@ -211,7 +211,7 @@ public class Credential {
     public Principal getPrincipal() {
         return principal;
     }
-    
+
     /**
      * Set the subject that may result from the Validation process
      * @param subject the subject that may result from the Validation process
@@ -219,7 +219,7 @@ public class Credential {
     public void setSubject(Subject subject) {
         this.subject = subject;
     }
-    
+
     /**
      * Get the subject that may result from the Validation process
      * @return the subject that may result from the Validation process
@@ -235,5 +235,5 @@ public class Credential {
     public void setDelegationCredential(Object delegationCredential) {
         this.delegationCredential = delegationCredential;
     }
-    
+
 }

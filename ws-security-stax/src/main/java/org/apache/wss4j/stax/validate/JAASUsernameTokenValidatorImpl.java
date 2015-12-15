@@ -45,13 +45,13 @@ public class JAASUsernameTokenValidatorImpl implements UsernameTokenValidator {
 
     private static final transient org.slf4j.Logger log =
             org.slf4j.LoggerFactory.getLogger(JAASUsernameTokenValidatorImpl.class);
-    
+
     private String contextName = null;
-    
+
     public void setContextName(String name) {
         contextName = name;
     }
-    
+
     public String getContextName() {
         return contextName;
     }
@@ -65,13 +65,13 @@ public class JAASUsernameTokenValidatorImpl implements UsernameTokenValidator {
         if (passwordType != null && passwordType.getType() != null) {
             usernameTokenPasswordType = WSSConstants.UsernameTokenPasswordType.getUsernameTokenPasswordType(passwordType.getType());
         }
-        
+
         // Digest not supported
         if (usernameTokenPasswordType != WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT) {
             log.warn("Password type is not supported");
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);    
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
-        
+
         String username = null;
         if (usernameTokenType.getUsername() != null) {
             username = usernameTokenType.getUsername().getValue();
@@ -126,7 +126,7 @@ public class JAASUsernameTokenValidatorImpl implements UsernameTokenValidator {
         T token = (T)usernameSecurityToken;
         return token;
     }
-    
+
     protected CallbackHandler getCallbackHandler(String name, String password) {
         return new NamePasswordCallbackHandler(name, password);
     }

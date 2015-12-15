@@ -39,16 +39,16 @@ import org.apache.wss4j.dom.message.WSSecSignature;
 import org.w3c.dom.Document;
 
 public class CryptoTest extends org.junit.Assert {
-    
+
     public CryptoTest() {
         WSSConfig.init();
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     @org.junit.Test
     public void testCrypto() throws Exception {
         Crypto crypto = CryptoFactory.getInstance();
@@ -56,12 +56,12 @@ public class CryptoTest extends org.junit.Assert {
     }
 
     @org.junit.Test
-    public void testMerlinWithNullProperties() 
+    public void testMerlinWithNullProperties()
         throws Exception {
         Crypto crypto = new NullPropertiesCrypto();
         assertTrue(crypto != null);
     }
-    
+
     /**
      * Ensure that we can load a custom crypto implementation using a Map
      */
@@ -76,7 +76,7 @@ public class CryptoTest extends org.junit.Assert {
         CustomCrypto custom = (CustomCrypto)crypto;
         assertSame(tmp, custom.getConfig());
     }
-    
+
     /**
      * Test for WSS-149 - "Merlin requires org.apache.wss4j.crypto.merlin.file
      * to be set and point to an existing file"
@@ -88,7 +88,7 @@ public class CryptoTest extends org.junit.Assert {
         );
         assertNotNull(crypto);
     }
-    
+
     /**
      * Test that we can sign and verify a signature using dynamically loaded keystores/truststore
      */
@@ -97,11 +97,11 @@ public class CryptoTest extends org.junit.Assert {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         // Load the keystore
         Crypto crypto = new Merlin();
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -117,48 +117,48 @@ public class CryptoTest extends org.junit.Assert {
         input = Merlin.loadInputStream(loader, "keys/wss40CA.jks");
         trustStore.load(input, "security".toCharArray());
         ((Merlin)processCrypto).setTrustStore(trustStore);
-        
+
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.processSecurityHeader(signedDoc, null, null, processCrypto);
-        
+
         // Load a (bad) truststore
         processCrypto = new Merlin();
         trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
         input = Merlin.loadInputStream(loader, "keys/wss40badca.jks");
         trustStore.load(input, "security".toCharArray());
         ((Merlin)processCrypto).setTrustStore(trustStore);
-        
+
         try {
             secEngine.processSecurityHeader(signedDoc, null, null, processCrypto);
             fail("Expected failure on a bad trust store");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
     }
-    
+
     @org.junit.Test
     public void testCryptoFactoryMerlin() throws Exception {
         ClassLoader classLoader = this.getClass().getClassLoader();
         Properties properties = CryptoFactory.getProperties("crypto.properties", classLoader);
-        Crypto crypto = 
+        Crypto crypto =
             CryptoFactory.getInstance(properties, classLoader, null);
         assertTrue(crypto instanceof Merlin);
     }
-    
+
     @org.junit.Test
     public void testCryptoFactoryMerlinDevice() throws Exception {
         ClassLoader classLoader = this.getClass().getClassLoader();
         Properties properties = CryptoFactory.getProperties("crypto_device.properties", classLoader);
-        Crypto crypto = 
+        Crypto crypto =
             CryptoFactory.getInstance(properties, classLoader, null);
         assertTrue(crypto instanceof Merlin);
     }
-    
+
     /**
      * WSS-102 -- ensure Merlin with null properties can be instantiated
      */
     private static class NullPropertiesCrypto extends Merlin {
-        public NullPropertiesCrypto() 
+        public NullPropertiesCrypto()
             throws Exception {
             super(null, null, null);
         }

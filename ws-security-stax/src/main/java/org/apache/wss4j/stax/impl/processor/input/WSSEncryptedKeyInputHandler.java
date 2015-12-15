@@ -42,14 +42,14 @@ public class WSSEncryptedKeyInputHandler extends XMLEncryptedKeyInputHandler {
 
     private static final transient org.slf4j.Logger log =
         org.slf4j.LoggerFactory.getLogger(WSSEncryptedKeyInputHandler.class);
-    
+
     @Override
     public void handle(InputProcessorChain inputProcessorChain, EncryptedKeyType encryptedKeyType, XMLSecEvent responsibleXMLSecStartXMLEvent, XMLSecurityProperties securityProperties) throws XMLSecurityException {
         checkBSPCompliance(inputProcessorChain, encryptedKeyType);
-        
+
         // Check encryption algorithm against the required algorithm, if defined
         EncryptionMethodType encryptionMethodType = encryptedKeyType.getEncryptionMethod();
-        if (securityProperties.getEncryptionKeyTransportAlgorithm() != null 
+        if (securityProperties.getEncryptionKeyTransportAlgorithm() != null
             && encryptionMethodType != null) {
             String encryptionMethod = encryptionMethodType.getAlgorithm();
             if (!securityProperties.getEncryptionKeyTransportAlgorithm().equals(encryptionMethod)) {
@@ -59,14 +59,14 @@ public class WSSEncryptedKeyInputHandler extends XMLEncryptedKeyInputHandler {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
             }
         }
-        
+
         super.handle(inputProcessorChain, encryptedKeyType, responsibleXMLSecStartXMLEvent, securityProperties);
     }
 
     //if this EncryptedKey structure contains a reference list, instantiate a new DecryptInputProcessor
     //and add it to the chain
     @Override
-    protected void handleReferenceList(final InputProcessorChain inputProcessorChain, 
+    protected void handleReferenceList(final InputProcessorChain inputProcessorChain,
             final EncryptedKeyType encryptedKeyType,
             final XMLSecurityProperties securityProperties) throws XMLSecurityException {
         KeyInfoType keyInfoType = new KeyInfoType();
@@ -78,7 +78,7 @@ public class WSSEncryptedKeyInputHandler extends XMLEncryptedKeyInputHandler {
         keyInfoType.getContent().add(objectFactory.createSecurityTokenReference(securityTokenReferenceType));
         inputProcessorChain.addProcessor(
                 new DecryptInputProcessor(keyInfoType, encryptedKeyType.getReferenceList(),
-                        (WSSSecurityProperties) securityProperties, 
+                        (WSSSecurityProperties) securityProperties,
                         (WSInboundSecurityContext) inputProcessorChain.getSecurityContext())
                 );
     }

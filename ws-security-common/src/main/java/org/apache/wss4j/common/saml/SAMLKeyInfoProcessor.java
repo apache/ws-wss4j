@@ -26,6 +26,6 @@ import org.w3c.dom.Element;
  * This interface allows the user to plug in custom ways of processing a SAML KeyInfo.
  */
 public interface SAMLKeyInfoProcessor {
-    
+
     SAMLKeyInfo processSAMLKeyInfo(Element keyInfoElement) throws WSSecurityException;
 }

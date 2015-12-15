@@ -29,12 +29,12 @@ import org.apache.wss4j.dom.handler.WSHandler;
  * Interface for all actions
  */
 public interface Action {
-    
+
     void execute(
-        WSHandler handler, 
+        WSHandler handler,
         SecurityActionToken actionToken,
         Document doc,
         RequestData reqData
     ) throws WSSecurityException;
-    
+
 }

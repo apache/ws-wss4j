@@ -33,7 +33,7 @@ import java.security.PrivilegedAction;
 public final class Loader {
     private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(Loader.class);
-    
+
     private Loader() {
         // complete
     }
@@ -69,12 +69,12 @@ public final class Loader {
                 }
                 if (url != null) {
                     return url;
-                } 
+                }
             }
         } catch (Exception e) {
             LOG.warn("Caught Exception while in Loader.getResource. This may be innocuous.", e);
         }
-    
+
         ClassLoader cluClassloader = Loader.class.getClassLoader();
         if (cluClassloader == null) {
             cluClassloader = ClassLoader.getSystemClassLoader();
@@ -87,7 +87,7 @@ public final class Loader {
         if (url != null) {
             return url;
         }
-        
+
         // Last ditch attempt: get the resource from the class path. It
         // may be the case that clazz was loaded by the Extension class
         // loader which the parent of the system class loader. Hence the
@@ -137,11 +137,11 @@ public final class Loader {
         }
         return getResource(resource);
     }
-    
+
     /**
      * This is a convenience method to load a resource as a stream. <p/> The
      * algorithm used to find the resource is given in getResource()
-     * 
+     *
      * @param resourceName The name of the resource to load
      */
     public static InputStream getResourceAsStream(String resourceName) {
@@ -292,7 +292,7 @@ public final class Loader {
 
         return loadClass2(clazz, null);
     }
-    
+
     private static Class<?> loadClass2(String className, Class<?> callingClass)
         throws ClassNotFoundException {
         try {

@@ -24,14 +24,14 @@ import java.util.Date;
 /**
  * This interface allows the Time Source used to set dates and times to be
  * overridden by the application.
- * 
+ *
  */
 public interface WSTimeSource {
-   
+
    /**
     * Get the current date time
     * @return the current date/time as a date object
     */
    Date now();
-   
+
 }

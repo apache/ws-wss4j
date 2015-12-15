@@ -56,27 +56,27 @@ import org.w3c.dom.Node;
  */
 public class STRTransform extends TransformService {
 
-    public static final String TRANSFORM_URI = 
+    public static final String TRANSFORM_URI =
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#STR-Transform";
-    
+
     public static final String TRANSFORM_WS_DOC_INFO = "transform_ws_doc_info";
 
     private TransformParameterSpec params;
-    
+
     private Element transformElement;
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(STRTransform.class);
 
     public final AlgorithmParameterSpec getParameterSpec() {
         return params;
     }
-    
+
     public void init(TransformParameterSpec params)
         throws InvalidAlgorithmParameterException {
         this.params = params;
     }
-    
+
     public void init(XMLStructure parent, XMLCryptoContext context)
     throws InvalidAlgorithmParameterException {
         if (context != null && !(context instanceof DOMCryptoContext)) {
@@ -86,7 +86,7 @@ public class STRTransform extends TransformService {
         if (!(parent instanceof javax.xml.crypto.dom.DOMStructure)) {
             throw new ClassCastException("parent must be of type DOMStructure");
         }
-        transformElement = (Element) 
+        transformElement = (Element)
             ((javax.xml.crypto.dom.DOMStructure) parent).getNode();
     }
 
@@ -99,14 +99,14 @@ public class STRTransform extends TransformService {
         if (!(parent instanceof javax.xml.crypto.dom.DOMStructure)) {
             throw new ClassCastException("parent must be of type DOMStructure");
         }
-        Element transformElement2 = (Element) 
+        Element transformElement2 = (Element)
             ((javax.xml.crypto.dom.DOMStructure) parent).getNode();
         appendChild(transformElement2, transformElement);
         transformElement = transformElement2;
     }
 
-    
-    public Data transform(Data data, XMLCryptoContext xc) 
+
+    public Data transform(Data data, XMLCryptoContext xc)
         throws TransformException {
         if (data == null) {
             throw new NullPointerException("data must not be null");
@@ -114,7 +114,7 @@ public class STRTransform extends TransformService {
         return transformIt(data, xc, null);
     }
 
-    public Data transform(Data data, XMLCryptoContext xc, OutputStream os) 
+    public Data transform(Data data, XMLCryptoContext xc, OutputStream os)
         throws TransformException {
         if (data == null) {
             throw new NullPointerException("data must not be null");
@@ -124,9 +124,9 @@ public class STRTransform extends TransformService {
         }
         return transformIt(data, xc, os);
     }
-    
-    
-    private Data transformIt(Data data, XMLCryptoContext xc, OutputStream os) 
+
+
+    private Data transformIt(Data data, XMLCryptoContext xc, OutputStream os)
         throws TransformException {
 
         //
@@ -138,7 +138,7 @@ public class STRTransform extends TransformService {
             transformElement, "TransformationParameters", WSConstants.WSSE_NS
         );
         if (transformParams != null) {
-            Element canonElem = 
+            Element canonElem =
                 XMLUtils.getDirectChildElement(
                     transformParams, "CanonicalizationMethod", WSConstants.SIG_NS
                 );
@@ -146,7 +146,7 @@ public class STRTransform extends TransformService {
         }
         try {
             //
-            // Get the input (node) to transform. 
+            // Get the input (node) to transform.
             //
             Element str = null;
             if (data instanceof NodeSetData) {
@@ -161,7 +161,7 @@ public class STRTransform extends TransformService {
                 }
             } else {
                 try {
-                    XMLSignatureInput xmlSignatureInput = 
+                    XMLSignatureInput xmlSignatureInput =
                         new XMLSignatureInput(((OctetStreamData)data).getOctetStream());
                     str = (Element)xmlSignatureInput.getSubNode();
                 } catch (Exception ex) {
@@ -176,11 +176,11 @@ public class STRTransform extends TransformService {
             // element.
             //
             SecurityTokenReference secRef = new SecurityTokenReference(str, new BSPEnforcer());
-            
+
             Canonicalizer canon = Canonicalizer.getInstance(canonAlgo);
 
             byte[] buf = null;
-            
+
             //
             // Third and fourth step are performed by dereferenceSTR()
             //
@@ -194,12 +194,12 @@ public class STRTransform extends TransformService {
             }
 
             Document doc = str.getOwnerDocument();
-            Element dereferencedToken = 
+            Element dereferencedToken =
                 STRTransformUtil.dereferenceSTR(doc, secRef, wsDocInfo);
-            
+
             if (dereferencedToken != null) {
                 String type = dereferencedToken.getAttributeNS(null, "ValueType");
-                if (X509Security.X509_V3_TYPE.equals(type) 
+                if (X509Security.X509_V3_TYPE.equals(type)
                     || PKIPathSecurity.getType().equals(type)) {
                     //
                     // Add the WSSE/WSU namespaces to the element for C14n
@@ -212,7 +212,7 @@ public class STRTransform extends TransformService {
                     );
                 }
             }
-            
+
             //
             // C14n with specified algorithm. According to WSS Specification.
             //
@@ -230,8 +230,8 @@ public class STRTransform extends TransformService {
             throw new TransformException(ex);
         }
     }
-    
-    
+
+
     public final boolean isFeatureSupported(String feature) {
         if (feature == null) {
             throw new NullPointerException();
@@ -239,7 +239,7 @@ public class STRTransform extends TransformService {
             return false;
         }
     }
-    
+
     private static void appendChild(Node parent, Node child) {
         Document ownerDoc = null;
         if (parent.getNodeType() == Node.DOCUMENT_NODE) {

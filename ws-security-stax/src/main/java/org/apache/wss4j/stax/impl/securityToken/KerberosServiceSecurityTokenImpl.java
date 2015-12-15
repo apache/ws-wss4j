@@ -106,9 +106,9 @@ public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityTok
                 service = principals.iterator().next().getName();
             }
 
-            KerberosServiceExceptionAction action = 
+            KerberosServiceExceptionAction action =
                 new KerberosServiceExceptionAction(binaryContent,
-                                                   service, 
+                                                   service,
                                                    contextAndServiceNameCallback.isUsernameServiceNameForm(),
                                                    false);
             KerberosServiceContext krbServiceCtx = null;
@@ -131,7 +131,7 @@ public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityTok
             if (key != null) {
                 return key.getEncoded();
             }
-            
+
             if (kerberosTokenDecoder != null) {
                 kerberosTokenDecoder.clear();
                 kerberosTokenDecoder.setToken(binaryContent);

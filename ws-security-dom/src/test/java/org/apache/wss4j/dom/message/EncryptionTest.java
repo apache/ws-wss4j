@@ -59,7 +59,7 @@ import org.w3c.dom.Element;
  * A set of test-cases for encrypting and decrypting SOAP requests.
  */
 public class EncryptionTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(EncryptionTest.class);
     private static final javax.xml.namespace.QName SOAP_BODY =
         new javax.xml.namespace.QName(
@@ -73,19 +73,19 @@ public class EncryptionTest extends org.junit.Assert {
     private byte[] keyData;
     private SecretKey key;
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public EncryptionTest() throws Exception {
         crypto = CryptoFactory.getInstance("wss40.properties");
     }
-    
+
     /**
      * Setup method
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is a problem in setup
      */
     @org.junit.Before
@@ -102,7 +102,7 @@ public class EncryptionTest extends org.junit.Assert {
      * This test uses the RSA_15 algorithm to transport (wrap) the symmetric
      * key.
      * <p/>
-     * 
+     *
      * @throws Exception Thrown when there is any problem in signing or verification
      */
     @org.junit.Test
@@ -118,7 +118,7 @@ public class EncryptionTest extends org.junit.Assert {
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
         LOG.info("After Encryption Triple DES....");
 
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message, RSA-15 keytransport, 3DES:");
@@ -129,28 +129,28 @@ public class EncryptionTest extends org.junit.Assert {
         builder.getParts().clear();
 
         /*
-         * second run, same Junit set up, but change encryption method, 
+         * second run, same Junit set up, but change encryption method,
          * key identification, encryption mode (Element now), and data to encrypt.
-         * This tests if several runs of different algorithms on same builder/cipher 
+         * This tests if several runs of different algorithms on same builder/cipher
          * setup are ok.
          */
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         builder.setSymmetricKey(null);
-        
-        WSEncryptionPart encP = 
+
+        WSEncryptionPart encP =
             new WSEncryptionPart(
                 "add", "http://ws.apache.org/counter/counter_port_type", "Element"
             );
         builder.getParts().add(encP);
-        
+
         doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();        
+        secHeader.insertSecurityHeader();
         LOG.info("Before Encryption AES 128/RSA-15....");
         encryptedDoc = builder.build(doc, crypto, secHeader);
         LOG.info("After Encryption AES 128/RSA-15....");
-        outputString = 
+        outputString =
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message, RSA-15 keytransport, AES 128:");
@@ -165,12 +165,12 @@ public class EncryptionTest extends org.junit.Assert {
                 "add"
             )
         );
-        
+
         WSSecurityEngineResult actionResult =
                 results.getActionResults().get(WSConstants.ENCR).get(0);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
-        REFERENCE_TYPE referenceType = 
+        REFERENCE_TYPE referenceType =
             (REFERENCE_TYPE)actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
         assertTrue(referenceType == REFERENCE_TYPE.ISSUER_SERIAL);
     }
@@ -180,7 +180,7 @@ public class EncryptionTest extends org.junit.Assert {
      * This test uses the RSA OAEP algorithm to transport (wrap) the symmetric
      * key.
      * <p/>
-     * 
+     *
      * @throws Exception Thrown when there is any problem in signing or verification
      */
     @org.junit.Test
@@ -191,36 +191,36 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOEP);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();        
+        secHeader.insertSecurityHeader();
         LOG.info("Before Encryption Triple DES/RSA-OAEP....");
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
         LOG.info("After Encryption Triple DES/RSA-OAEP....");
 
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
             LOG.debug(outputString);
         }
         assertFalse(outputString.contains("counter_port_type"));
-        
+
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        WSHandlerResult results = 
+        WSHandlerResult results =
             newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
-        
+
         WSSecurityEngineResult actionResult =
                 results.getActionResults().get(WSConstants.ENCR).get(0);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
-        REFERENCE_TYPE referenceType = 
+        REFERENCE_TYPE referenceType =
             (REFERENCE_TYPE)actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
         assertTrue(referenceType == REFERENCE_TYPE.KEY_IDENTIFIER);
     }
-    
+
     /**
      * Test that encrypt and then again encrypts (Super encryption) WS-Security
      * envelope and then verifies it <p/>
-     * 
+     *
      * @throws Exception
      *             Thrown when there is any problem in encryption or
      *             verification
@@ -236,19 +236,19 @@ public class EncryptionTest extends org.junit.Assert {
         secHeader.insertSecurityHeader();
 
         Document encryptedDoc = encrypt.build(doc, encCrypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("After the first encryption:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
-        
+
         Document encryptedEncryptedDoc = encrypt.build(encryptedDoc, encCrypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("After the second encryption:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedEncryptedDoc);
             LOG.debug(outputString);
         }
@@ -256,12 +256,12 @@ public class EncryptionTest extends org.junit.Assert {
         LOG.info("After Encryption....");
         verify(encryptedEncryptedDoc, encCrypto, keystoreCallbackHandler);
     }
-    
+
     /**
      * Test that encrypts and decrypts a WS-Security envelope.
-     * The test uses the ThumbprintSHA1 key identifier type. 
+     * The test uses the ThumbprintSHA1 key identifier type.
      * <p/>
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
      */
     @org.junit.Test
@@ -270,38 +270,38 @@ public class EncryptionTest extends org.junit.Assert {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-        
+
         LOG.info("Before Encrypting ThumbprintSHA1....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();        
+        secHeader.insertSecurityHeader();
         Document encryptedDoc = builder.build(doc, encCrypto, secHeader);
-        
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message with THUMBPRINT_IDENTIFIER:");
             LOG.debug(outputString);
         }
         assertTrue(outputString.contains("#ThumbprintSHA1"));
-    
+
         LOG.info("After Encrypting ThumbprintSHA1....");
         WSHandlerResult results = verify(encryptedDoc, encCrypto, keystoreCallbackHandler);
-        
+
         WSSecurityEngineResult actionResult =
                 results.getActionResults().get(WSConstants.ENCR).get(0);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
-        REFERENCE_TYPE referenceType = 
+        REFERENCE_TYPE referenceType =
             (REFERENCE_TYPE)actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
         assertTrue(referenceType == REFERENCE_TYPE.THUMBPRINT_SHA1);
     }
-    
+
     /**
      * Test that encrypts and decrypts a WS-Security envelope.
-     * The test uses the EncryptedKeySHA1 key identifier type. 
+     * The test uses the EncryptedKeySHA1 key identifier type.
      * <p/>
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
      */
     @org.junit.Test
@@ -310,29 +310,29 @@ public class EncryptionTest extends org.junit.Assert {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
-     
+
         LOG.info("Before Encrypting EncryptedKeySHA1....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();        
+        secHeader.insertSecurityHeader();
         Document encryptedDoc = builder.build(doc, encCrypto, secHeader);
-     
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message with ENCRYPTED_KEY_SHA1_IDENTIFIER:");
             LOG.debug(outputString);
         }
         assertTrue(outputString.contains("#EncryptedKeySHA1"));
-     
+
         LOG.info("After Encrypting EncryptedKeySHA1....");
         verify(encryptedDoc, encCrypto, keystoreCallbackHandler);
     }
-    
+
     /**
-     * Test that encrypts using EncryptedKeySHA1, where it uses a symmetric key, rather than a 
+     * Test that encrypts using EncryptedKeySHA1, where it uses a symmetric key, rather than a
      * generated session key which is then encrypted using a public key.
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
      */
     @org.junit.Test
@@ -341,33 +341,33 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
         builder.setSymmetricKey(key);
         builder.setEncryptSymmKey(false);
-        
+
         LOG.info("Before Encrypting EncryptedKeySHA1....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
-        
+
         byte[] encodedBytes = KeyUtils.generateDigest(keyData);
         String identifier = Base64.encode(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
-     
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message with ENCRYPTED_KEY_SHA1_IDENTIFIER:");
             LOG.debug(outputString);
         }
         assertTrue(outputString.contains("#EncryptedKeySHA1"));
-     
+
         LOG.info("After Encrypting EncryptedKeySHA1....");
         verify(encryptedDoc, null, secretKeyCallbackHandler);
     }
-    
+
     /**
-     * Test that encrypts using EncryptedKeySHA1, where it uses a symmetric key (bytes), 
+     * Test that encrypts using EncryptedKeySHA1, where it uses a symmetric key (bytes),
      * rather than a generated session key which is then encrypted using a public key.
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
      */
     @org.junit.Test
@@ -376,35 +376,35 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
         builder.setEphemeralKey(keyData);
         builder.setEncryptSymmKey(false);
-        
+
         LOG.info("Before Encrypting EncryptedKeySHA1....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();        
+        secHeader.insertSecurityHeader();
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
-        
+
         byte[] encodedBytes = KeyUtils.generateDigest(keyData);
         String identifier = Base64.encode(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
-     
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message with ENCRYPTED_KEY_SHA1_IDENTIFIER:");
             LOG.debug(outputString);
         }
         assertTrue(outputString.contains("#EncryptedKeySHA1"));
-     
+
         LOG.info("After Encrypting EncryptedKeySHA1....");
         verify(encryptedDoc, crypto, secretKeyCallbackHandler);
     }
-    
-    
+
+
     /**
-     * Test that encrypts using EncryptedKeySHA1, where it uses a symmetric key, rather than a 
+     * Test that encrypts using EncryptedKeySHA1, where it uses a symmetric key, rather than a
      * generated session key which is then encrypted using a public key. The request is generated
      * using WSHandler, instead of coding it.
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
      */
     @org.junit.Test
@@ -419,35 +419,35 @@ public class EncryptionTest extends org.junit.Assert {
         messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, secretKeyCallbackHandler);
         reqData.setMsgContext(messageContext);
         reqData.setUsername("");
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         HandlerAction action = new HandlerAction(WSConstants.ENCR);
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             Collections.singletonList(action),
             true
         );
-        
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
+
         verify(doc, null, secretKeyCallbackHandler);
     }
-    
+
     /**
      * Test that encrypt and decrypt a WS-Security envelope.
-     * 
+     *
      * This test uses the RSA_15 algorithm to transport (wrap) the symmetric key.
      * The test case creates a ReferenceList element that references EncryptedData
      * elements. The ReferencesList element is put into the Security header, not
      * as child of the EncryptedKey. The EncryptedData elements contain a KeyInfo
      * that references the EncryptedKey via a STR/Reference structure.
-     * 
+     *
      * Refer to OASIS WS Security spec 1.1, chap 7.7
      */
     @org.junit.Test
@@ -496,7 +496,7 @@ public class EncryptionTest extends org.junit.Assert {
         Document encryptedDoc = doc;
         LOG.info("After Encryption Triple DES....");
 
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message, RSA-15 keytransport, 3DES:");
@@ -504,21 +504,21 @@ public class EncryptionTest extends org.junit.Assert {
         }
         assertFalse(outputString.contains("counter_port_type"));
         WSHandlerResult results = verify(encryptedDoc, crypto, keystoreCallbackHandler);
-        
-        outputString = 
+
+        outputString =
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         assertTrue(outputString.contains("counter_port_type"));
-        
+
         WSSecurityEngineResult actionResult =
                 results.getActionResults().get(WSConstants.ENCR).get(0);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
-        REFERENCE_TYPE referenceType = 
+        REFERENCE_TYPE referenceType =
             (REFERENCE_TYPE)actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
         assertTrue(referenceType == REFERENCE_TYPE.DIRECT_REF);
     }
-    
-    
+
+
     @org.junit.Test
     public void testBadAttribute() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
@@ -566,7 +566,7 @@ public class EncryptionTest extends org.junit.Assert {
 
         Document encryptedDoc = doc;
 
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
@@ -579,14 +579,14 @@ public class EncryptionTest extends org.junit.Assert {
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         RequestData data = new RequestData();
         data.setCallbackHandler(keystoreCallbackHandler);
         data.setDecCrypto(crypto);
         data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3209));
         newEngine.processSecurityHeader(encryptedDoc, data);
     }
-    
+
     /**
      * In this test an EncryptedKey structure is embedded in the EncryptedData structure.
      * The EncryptedKey structure refers to a certificate via the SKI_KEY_IDENTIFIER.
@@ -594,7 +594,7 @@ public class EncryptionTest extends org.junit.Assert {
     @org.junit.Test
     public void testEmbeddedEncryptedKey() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
@@ -612,12 +612,12 @@ public class EncryptionTest extends org.junit.Assert {
 
         builder.encrypt();
 
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
+
         verify(doc, crypto, keystoreCallbackHandler);
     }
 
@@ -626,7 +626,7 @@ public class EncryptionTest extends org.junit.Assert {
      * This test uses the RSA OAEP algorithm to transport (wrap) the symmetric
      * key and SHA-256.
      * <p/>
-     * 
+     *
      * @throws Exception Thrown when there is any problem in signing or verification
      */
     @org.junit.Test
@@ -637,28 +637,28 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setDigestAlgorithm(WSConstants.SHA256);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();        
+        secHeader.insertSecurityHeader();
         LOG.info("Before Encryption Triple DES/RSA-OAEP....");
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
         LOG.info("After Encryption Triple DES/RSA-OAEP....");
 
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
             LOG.debug(outputString);
         }
         assertFalse(outputString.contains("counter_port_type"));
-        
+
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        WSHandlerResult results = 
+        WSHandlerResult results =
             newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
-        
+
         WSSecurityEngineResult actionResult =
                 results.getActionResults().get(WSConstants.ENCR).get(0);
         assertNotNull(actionResult);
     }
-    
+
     // CN has a "*" in it
     @org.junit.Test
     public void testEncryptionWithRegexpCert() throws Exception {
@@ -668,28 +668,28 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOEP);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();        
+        secHeader.insertSecurityHeader();
         LOG.info("Before Encryption Triple DES/RSA-OAEP....");
-        
+
         Crypto regexpCrypto = CryptoFactory.getInstance("regexp.properties");
         Document encryptedDoc = builder.build(doc, regexpCrypto, secHeader);
         LOG.info("After Encryption Triple DES/RSA-OAEP....");
 
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
             LOG.debug(outputString);
         }
         assertFalse(outputString.contains("counter_port_type"));
-        
+
         WSSecurityEngine newEngine = new WSSecurityEngine();
         newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, regexpCrypto);
     }
-    
+
     /**
      * Verifies the soap envelope <p/>
-     * 
+     *
      * @param envelope
      * @throws Exception
      *             Thrown when there is a problem in verification
@@ -697,21 +697,21 @@ public class EncryptionTest extends org.junit.Assert {
     private WSHandlerResult verify(
         Document doc, Crypto decCrypto, CallbackHandler handler
     ) throws Exception {
-        WSHandlerResult results = 
+        WSHandlerResult results =
             secEngine.processSecurityHeader(doc, null, handler, decCrypto);
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         return results;
     }
-    
+
     /**
      * Verifies the soap envelope
      * <p/>
-     * 
-     * @param envelope 
+     *
+     * @param envelope
      * @throws Exception Thrown when there is a problem in verification
      */
     @SuppressWarnings("unchecked")
@@ -720,9 +720,9 @@ public class EncryptionTest extends org.junit.Assert {
         CallbackHandler handler,
         javax.xml.namespace.QName expectedEncryptedElement
     ) throws Exception {
-        final WSHandlerResult results = 
+        final WSHandlerResult results =
             secEngine.processSecurityHeader(doc, null, handler, null, crypto);
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
@@ -730,11 +730,11 @@ public class EncryptionTest extends org.junit.Assert {
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         //
         // walk through the results, and make sure there is an encryption
-        // action, together with a reference to the decrypted element 
+        // action, together with a reference to the decrypted element
         // (as a QName)
         //
         boolean encrypted = false;
-        for (java.util.Iterator<WSSecurityEngineResult> ipos = results.getResults().iterator(); 
+        for (java.util.Iterator<WSSecurityEngineResult> ipos = results.getResults().iterator();
             ipos.hasNext();) {
             final WSSecurityEngineResult result = ipos.next();
             final Integer action = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);

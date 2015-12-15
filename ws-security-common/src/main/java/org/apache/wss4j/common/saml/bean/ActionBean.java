@@ -26,15 +26,15 @@ package org.apache.wss4j.common.saml.bean;
  */
 public class ActionBean {
 
-    /** 
+    /**
      * A URI reference representing the namespace in which the name of the specified action is to be
-     * interpreted. If this element is absent, the namespace 
-     * urn:oasis:names:tc:SAML:1.0:action:rwedcnegation specified in Section 7.2.2 is in effect.  
+     * interpreted. If this element is absent, the namespace
+     * urn:oasis:names:tc:SAML:1.0:action:rwedcnegation specified in Section 7.2.2 is in effect.
      */
     private String actionNamespace;
 
-    /** 
-     * An action sought to be performed on the specified resource (i.e. Read, Write, Update, Delete) 
+    /**
+     * An action sought to be performed on the specified resource (i.e. Read, Write, Update, Delete)
      */
     private String contents;
 
@@ -90,7 +90,7 @@ public class ActionBean {
     public void setContents(String contents) {
         this.contents = contents;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -107,7 +107,7 @@ public class ActionBean {
         } else if (contents != null && !contents.equals(that.contents)) {
             return false;
         }
-        
+
         if (actionNamespace == null && that.actionNamespace != null) {
             return false;
         } else if (actionNamespace != null && !actionNamespace.equals(that.actionNamespace)) {

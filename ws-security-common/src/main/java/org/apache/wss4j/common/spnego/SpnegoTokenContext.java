@@ -43,10 +43,10 @@ import org.ietf.jgss.MessageProp;
  * This class wraps a GSSContext and provides some functionality to obtain and validate spnego tokens.
  */
 public class SpnegoTokenContext {
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SpnegoTokenContext.class);
-    
+
     private GSSContext secContext;
     private byte[] token;
     private boolean mutualAuth;
@@ -64,53 +64,53 @@ public class SpnegoTokenContext {
      * @throws WSSecurityException
      */
     public void retrieveServiceTicket(
-        String jaasLoginModuleName, 
+        String jaasLoginModuleName,
         CallbackHandler callbackHandler,
         String serviceName
     ) throws WSSecurityException {
         retrieveServiceTicket(jaasLoginModuleName, callbackHandler, serviceName, false);
     }
-    
-    
+
+
     /**
      * Retrieve a service ticket from a KDC using the Kerberos JAAS module, and set it in this
      * BinarySecurityToken.
      * @param jaasLoginModuleName the JAAS Login Module name to use
      * @param callbackHandler a CallbackHandler instance to retrieve a password (optional)
      * @param serviceName the desired Kerberized service
-     * @param isUsernameServiceNameForm 
+     * @param isUsernameServiceNameForm
      * @throws WSSecurityException
      */
     public void retrieveServiceTicket(
-        String jaasLoginModuleName, 
+        String jaasLoginModuleName,
         CallbackHandler callbackHandler,
         String serviceName,
         boolean isUsernameServiceNameForm
     ) throws WSSecurityException {
-        retrieveServiceTicket(jaasLoginModuleName, callbackHandler, serviceName, 
+        retrieveServiceTicket(jaasLoginModuleName, callbackHandler, serviceName,
                               isUsernameServiceNameForm, false, null);
     }
-    
+
     /**
      * Retrieve a service ticket from a KDC using the Kerberos JAAS module, and set it in this
      * BinarySecurityToken.
      * @param jaasLoginModuleName the JAAS Login Module name to use
      * @param callbackHandler a CallbackHandler instance to retrieve a password (optional)
      * @param serviceName the desired Kerberized service
-     * @param isUsernameServiceNameForm 
+     * @param isUsernameServiceNameForm
      * @param requestCredDeleg Whether to request credential delegation or not
      * @param delegationCredential The delegation credential to use
      * @throws WSSecurityException
      */
     public void retrieveServiceTicket(
-        String jaasLoginModuleName, 
+        String jaasLoginModuleName,
         CallbackHandler callbackHandler,
         String serviceName,
         boolean isUsernameServiceNameForm,
         boolean requestCredDeleg,
         GSSCredential delegationCredential
     ) throws WSSecurityException {
-        
+
         // Get a TGT from the KDC using JAAS
         LoginContext loginContext = null;
         try {
@@ -125,22 +125,22 @@ public class SpnegoTokenContext {
                 LOG.debug(ex.getMessage(), ex);
             }
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, ex, "kerberosLoginError", 
+                WSSecurityException.ErrorCode.FAILURE, ex, "kerberosLoginError",
                 new Object[] {ex.getMessage()});
         }
         if (LOG.isDebugEnabled()) {
             LOG.debug("Successfully authenticated to the TGT");
         }
-        
+
         Subject clientSubject = loginContext.getSubject();
         Set<Principal> clientPrincipals = clientSubject.getPrincipals();
         if (clientPrincipals.isEmpty()) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, 
+                WSSecurityException.ErrorCode.FAILURE,
                 "kerberosLoginError",
                 new Object[] {"No Client principals found after login"});
         }
-        
+
         // Get the service ticket
         if (clientAction != null) {
             clientAction.setServiceName(serviceName);
@@ -152,12 +152,12 @@ public class SpnegoTokenContext {
                     WSSecurityException.ErrorCode.FAILURE, "kerberosServiceTicketError"
                 );
             }
-            
+
             secContext = clientAction.getContext();
         } else {
-            KerberosClientExceptionAction action = 
-                new KerberosClientExceptionAction(null, serviceName, 
-                                                  isUsernameServiceNameForm, 
+            KerberosClientExceptionAction action =
+                new KerberosClientExceptionAction(null, serviceName,
+                                                  isUsernameServiceNameForm,
                                                   requestCredDeleg,
                                                   delegationCredential,
                                                   true,
@@ -165,14 +165,14 @@ public class SpnegoTokenContext {
             KerberosContext krbCtx = null;
             try {
                 krbCtx = (KerberosContext) Subject.doAs(clientSubject, action);
-    
+
                 token = krbCtx.getKerberosToken();
                 if (token == null) {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILURE, "kerberosServiceTicketError"
                     );
                 }
-                
+
                 secContext = krbCtx.getGssContext();
             } catch (PrivilegedActionException e) {
                 Throwable cause = e.getCause();
@@ -185,12 +185,12 @@ public class SpnegoTokenContext {
                 }
             }
         }
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("Successfully retrieved a service ticket");
         }
     }
-    
+
     /**
      * Validate a service ticket.
      * @param jaasLoginModuleName
@@ -200,14 +200,14 @@ public class SpnegoTokenContext {
      * @throws WSSecurityException
      */
     public void validateServiceTicket(
-        String jaasLoginModuleName, 
+        String jaasLoginModuleName,
         CallbackHandler callbackHandler,
         String serviceName,
         byte[] ticket
     ) throws WSSecurityException {
         validateServiceTicket(jaasLoginModuleName, callbackHandler, serviceName, false, ticket);
      }
-    
+
     /**
      * Validate a service ticket.
      * @param jaasLoginModuleName
@@ -217,7 +217,7 @@ public class SpnegoTokenContext {
      * @throws WSSecurityException
      */
     public void validateServiceTicket(
-        String jaasLoginModuleName, 
+        String jaasLoginModuleName,
         CallbackHandler callbackHandler,
         String serviceName,
         boolean isUsernameServiceNameForm,
@@ -237,7 +237,7 @@ public class SpnegoTokenContext {
                 LOG.debug(ex.getMessage(), ex);
             }
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, ex, "kerberosLoginError", 
+                WSSecurityException.ErrorCode.FAILURE, ex, "kerberosLoginError",
                 new Object[] {ex.getMessage()});
         }
         if (LOG.isDebugEnabled()) {
@@ -251,7 +251,7 @@ public class SpnegoTokenContext {
             Set<Principal> principals = subject.getPrincipals();
             if (principals.isEmpty()) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, 
+                    WSSecurityException.ErrorCode.FAILURE,
                     "kerberosLoginError",
                     new Object[] {"No Client principals found after login"});
             }
@@ -266,20 +266,20 @@ public class SpnegoTokenContext {
             token = Subject.doAs(subject, serviceAction);
             secContext = serviceAction.getContext();
         } else {
-            KerberosServiceExceptionAction action = 
-                new KerberosServiceExceptionAction(ticket, service, 
+            KerberosServiceExceptionAction action =
+                new KerberosServiceExceptionAction(ticket, service,
                                                    isUsernameServiceNameForm, true);
             KerberosServiceContext krbCtx = null;
             try {
                 krbCtx = (KerberosServiceContext) Subject.doAs(subject, action);
-    
+
                 token = krbCtx.getKerberosToken();
                 if (token == null) {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILURE, "kerberosServiceTicketError"
                     );
                 }
-                
+
                 secContext = krbCtx.getGssContext();
                 delegationCredential = krbCtx.getDelegationCredential();
                 spnegoPrincipal = krbCtx.getPrincipal();
@@ -294,12 +294,12 @@ public class SpnegoTokenContext {
                 }
             }
         }
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("Successfully validated a service ticket");
         }
     }
-    
+
     /**
      * Whether to enable mutual authentication or not. This only applies to retrieve service ticket.
      */
@@ -313,7 +313,7 @@ public class SpnegoTokenContext {
     public byte[] getToken() {
         return token;
     }
-    
+
     /**
      * Whether a connection has been established (at the service side)
      */
@@ -323,7 +323,7 @@ public class SpnegoTokenContext {
         }
         return secContext.isEstablished();
     }
-    
+
     /**
      * Unwrap a key
      */
@@ -340,7 +340,7 @@ public class SpnegoTokenContext {
             );
         }
     }
-    
+
     /**
      * Wrap a key
      */
@@ -357,21 +357,21 @@ public class SpnegoTokenContext {
             );
         }
     }
-    
+
     /**
      * Set a custom SpnegoClientAction implementation to use
      */
     public void setSpnegoClientAction(SpnegoClientAction spnegoClientAction) {
         this.clientAction = spnegoClientAction;
     }
-    
+
     /**
      * Set a custom SpnegoServiceAction implementation to use
      */
     public void setSpnegoServiceAction(SpnegoServiceAction spnegoServiceAction) {
         this.serviceAction = spnegoServiceAction;
     }
-    
+
     public void clear() {
         token = null;
         mutualAuth = false;

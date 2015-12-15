@@ -50,8 +50,8 @@ import java.util.Map;
  */
 
 public class IssuedTokenAssertionState extends TokenAssertionState {
-    
-    private static final String DEFAULT_CLAIMS_NAMESPACE = 
+
+    private static final String DEFAULT_CLAIMS_NAMESPACE =
         "http://schemas.xmlsoap.org/ws/2005/05/identity";
 
     public IssuedTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted,
@@ -77,7 +77,7 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
         }
 
         IssuedToken issuedToken = (IssuedToken) abstractToken;
-        IssuedTokenSecurityEvent<? extends SecurityToken> issuedTokenSecurityEvent 
+        IssuedTokenSecurityEvent<? extends SecurityToken> issuedTokenSecurityEvent
             = (IssuedTokenSecurityEvent<? extends SecurityToken>) tokenSecurityEvent;
         try {
             if (issuedToken.getIssuerName() != null &&
@@ -106,10 +106,10 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
                     }
                 }
             }
-            
+
             Element claims = issuedToken.getClaims();
             if (claims != null && issuedTokenSecurityEvent instanceof SamlTokenSecurityEvent) {
-                String errorMsg = 
+                String errorMsg =
                     validateClaims((Element) claims, (SamlTokenSecurityEvent)issuedTokenSecurityEvent);
                 if (errorMsg != null) {
                     setErrorMessage(errorMsg);
@@ -202,7 +202,7 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
         if (!DEFAULT_CLAIMS_NAMESPACE.equals(dialect)) {
             return null;
         }
-        
+
         Node child = claimsPolicy.getFirstChild();
         while (child != null) {
             if (child.getNodeType() != Node.ELEMENT_NODE) {

@@ -53,7 +53,7 @@ public class HttpsToken extends AbstractToken {
         super(version, includeTokenType, issuer, issuerName, claims, nestedPolicy);
 
         parseNestedPolicy(nestedPolicy, this);
-        
+
         if (requireClientCert) {
             setAuthenticationType(AuthenticationType.RequireClientCertificate);
         }

@@ -49,7 +49,7 @@ public class SP11Constants extends SPConstants {
 
     public final static String INCLUDE_ALWAYS_TO_RECIPIENT =
             SP11Constants.SP_NS + SPConstants.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT_SUFFIX;
-    
+
     public final static String INCLUDE_ALWAYS_TO_INITIATOR =
             SP11Constants.SP_NS + SPConstants.INCLUDE_TOKEN_ALWAYS_TO_INITIATOR_SUFFIX;
 
@@ -223,7 +223,7 @@ public class SP11Constants extends SPConstants {
 
     public static final QName PROTECT_TOKENS = new QName(
             SP11Constants.SP_NS, SPConstants.PROTECT_TOKENS, SP11Constants.SP_PREFIX);
-    
+
     public static final QName ENCRYPT_BEFORE_SIGNING = new QName(
             SP11Constants.SP_NS, SPConstants.ENCRYPT_BEFORE_SIGNING, SP11Constants.SP_PREFIX);
 

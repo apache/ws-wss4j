@@ -55,12 +55,12 @@ public class RequiredPartsAssertionState extends AssertionState implements Asser
             Header header = requiredParts.getHeaders().get(i);
             headers.put(header, Boolean.FALSE);
         }
-        
+
         this.policyAsserter = policyAsserter;
         if (this.policyAsserter == null) {
             this.policyAsserter = new DummyPolicyAsserter();
         }
-        
+
         if (asserted) {
             policyAsserter.assertPolicy(getAssertion());
         }

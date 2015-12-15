@@ -24,7 +24,7 @@ import java.util.Date;
 public final class DateUtil {
     private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(DateUtil.class);
-    
+
     private DateUtil() {
         // complete
     }
@@ -32,7 +32,7 @@ public final class DateUtil {
     /**
      * Return true if the "Created" value is before the current time minus the timeToLive
      * argument, and if the Created value is not "in the future".
-     * 
+     *
      * @param timeToLive the value in seconds for the validity of the Created time
      * @param futureTimeToLive the value in seconds for the future validity of the Created time
      * @return true if the Date is before (now-timeToLive), false otherwise
@@ -45,7 +45,7 @@ public final class DateUtil {
         if (createdDate == null) {
             return true;
         }
-        
+
         Date validCreation = new Date();
         long currentTime = validCreation.getTime();
         if (futureTimeToLive > 0) {
@@ -58,7 +58,7 @@ public final class DateUtil {
             }
             return false;
         }
-        
+
         // Calculate the time that is allowed for the message to travel
         currentTime -= (long)timeToLive * 1000L;
         validCreation.setTime(currentTime);
@@ -76,5 +76,5 @@ public final class DateUtil {
         }
         return true;
     }
-    
+
 }

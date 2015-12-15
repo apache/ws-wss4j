@@ -71,7 +71,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         if (usernameTokenType.getId() == null) {
             usernameTokenType.setId(IDGenerator.generateID(null));
         }
-        
+
         // Verify Created
         final WSSSecurityProperties wssSecurityProperties = (WSSSecurityProperties) securityProperties;
         Date createdDate = verifyCreated(wssSecurityProperties, usernameTokenType);
@@ -85,7 +85,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             if (replayCache.contains(nonce)) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
-            
+
             // If no Created, then just cache for the default time
             // Otherwise, cache for the configured TTL of the UsernameToken Created time, as any
             // older token will just get rejected anyway
@@ -99,7 +99,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
 
         final WSInboundSecurityContext wsInboundSecurityContext = (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
         final List<QName> elementPath = getElementPath(eventQueue);
-        
+
         final TokenContext tokenContext = new TokenContext(wssSecurityProperties, wsInboundSecurityContext, xmlSecEvents, elementPath);
 
         UsernameTokenValidator usernameTokenValidator =
@@ -192,7 +192,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         }
 
     }
-    
+
     private Date verifyCreated(
         WSSSecurityProperties wssSecurityProperties,
         UsernameTokenType usernameTokenType
@@ -200,10 +200,10 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         // Verify Created
         int ttl = wssSecurityProperties.getUtTTL();
         int futureTTL = wssSecurityProperties.getUtFutureTTL();
-        
+
         final AttributedDateTime attributedDateTimeCreated =
             XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsu_Created);
-        
+
         if (attributedDateTimeCreated != null) {
             // Parse the Date
             XMLGregorianCalendar created;
@@ -213,7 +213,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
             Date createdDate = created.toGregorianCalendar().getTime();
-            
+
             // Validate whether the security semantics have expired
             if (!DateUtil.verifyCreated(createdDate, ttl, futureTTL)) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED);

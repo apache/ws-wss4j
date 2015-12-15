@@ -75,14 +75,14 @@ public class KerberosServiceExceptionAction implements PrivilegedExceptionAction
         GSSManager gssManager = GSSManager.getInstance();
 
         GSSContext secContext = null;
-        GSSName gssService = gssManager.createName(serviceName, isUsernameServiceNameForm 
+        GSSName gssService = gssManager.createName(serviceName, isUsernameServiceNameForm
                                                    ? GSSName.NT_USER_NAME : GSSName.NT_HOSTBASED_SERVICE);
         if (spnego) {
             Oid oid = new Oid(JGSS_SPNEGO_TICKET_OID);
             secContext = gssManager.createContext(gssService, oid, null, GSSContext.DEFAULT_LIFETIME);
         } else {
             Oid oid = new Oid(JGSS_KERBEROS_TICKET_OID);
-            GSSCredential credentials = 
+            GSSCredential credentials =
                 gssManager.createCredential(
                     gssService, GSSCredential.DEFAULT_LIFETIME, oid, GSSCredential.ACCEPT_ONLY
                 );
@@ -94,17 +94,17 @@ public class KerberosServiceExceptionAction implements PrivilegedExceptionAction
         try{
             byte[] returnedToken = secContext.acceptSecContext(ticket, 0, ticket.length);
 
-            krbServiceCtx = new KerberosServiceContext();         
-            
+            krbServiceCtx = new KerberosServiceContext();
+
             if (secContext.getCredDelegState()) {
                 krbServiceCtx.setDelegationCredential(secContext.getDelegCred());
             }
-            
+
             GSSName clientName = secContext.getSrcName();
             krbServiceCtx.setPrincipal(new KerberosPrincipal(clientName.toString()));
             krbServiceCtx.setGssContext(secContext);
             krbServiceCtx.setKerberosToken(returnedToken);
-            
+
             try {
                 @SuppressWarnings("rawtypes")
                 Class inquireType = Class.forName(isIBMJavaVendor ? IBM_JGSS_INQUIRE_TYPE_CLASS : SUN_JGSS_INQUIRE_TYPE_CLASS);
@@ -128,9 +128,9 @@ public class KerberosServiceExceptionAction implements PrivilegedExceptionAction
             }
         } finally {
             if (null != secContext && !spnego) {
-                secContext.dispose();    
+                secContext.dispose();
             }
-        }               
+        }
 
         return krbServiceCtx;
     }

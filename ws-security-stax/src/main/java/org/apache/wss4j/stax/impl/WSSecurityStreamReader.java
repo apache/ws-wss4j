@@ -27,11 +27,11 @@ import org.apache.xml.security.stax.impl.XMLSecurityStreamReader;
 import javax.xml.stream.XMLStreamException;
 
 public class WSSecurityStreamReader extends XMLSecurityStreamReader {
-    
+
     private final boolean initiator;
     private final boolean returnSecurityError;
-    
-    public WSSecurityStreamReader(InputProcessorChain inputProcessorChain, 
+
+    public WSSecurityStreamReader(InputProcessorChain inputProcessorChain,
             XMLSecurityProperties securityProperties, boolean initiator,
             boolean returnSecurityError) {
         super(inputProcessorChain, securityProperties);
@@ -45,17 +45,17 @@ public class WSSecurityStreamReader extends XMLSecurityStreamReader {
             return super.next();
         } catch (XMLStreamException e) {
             Throwable cause = e.getCause();
-            
+
             // Allow a WSSPolicyException
-            if (returnSecurityError || initiator || 
+            if (returnSecurityError || initiator ||
                 cause != null && cause.getCause() instanceof WSSPolicyException) {
                 throw e;
             }
-            
+
             // Mask the real error
             throw new XMLStreamException(
                 new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_ERROR));
         }
     }
-    
+
 }

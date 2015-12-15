@@ -64,7 +64,7 @@ public class AttachmentCompleteSignatureTransform extends AttachmentContentSigna
             context.setProperty(ATTACHMENT_CALLBACKHANDLER, attachmentTransformParameterSpec.getAttachmentCallbackHandler());
         } else {
             attachment = attachmentRequestCallback(context, attachmentId);
-        }        
+        }
 
         try {
             OutputStream outputStream = os;

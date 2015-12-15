@@ -42,14 +42,14 @@ import org.w3c.dom.Element;
  * Some SAML Utility methods only for use in the DOM code.
  */
 public final class DOMSAMLUtil  {
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(DOMSAMLUtil.class);
-    
+
     private DOMSAMLUtil() {
         // complete
     }
-    
+
     public static void validateSAMLResults(
         WSHandlerResult handlerResults,
         Certificate[] tlsCerts,
@@ -76,7 +76,7 @@ public final class DOMSAMLUtil  {
         }
 
         for (WSSecurityEngineResult samlResult : samlResults) {
-            SamlAssertionWrapper assertionWrapper = 
+            SamlAssertionWrapper assertionWrapper =
                 (SamlAssertionWrapper)samlResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
 
             if (!checkHolderOfKey(assertionWrapper, signedResults, tlsCerts)) {
@@ -113,7 +113,7 @@ public final class DOMSAMLUtil  {
                 break;
             }
         }
-        
+
         if (isHolderOfKey) {
             if (tlsCerts == null && (signedResults == null || signedResults.isEmpty())) {
                 return false;
@@ -146,14 +146,14 @@ public final class DOMSAMLUtil  {
         //
         // Try to match the TLS certs first
         //
-        if (tlsCerts != null && tlsCerts.length > 0 && subjectCerts != null 
+        if (tlsCerts != null && tlsCerts.length > 0 && subjectCerts != null
             && subjectCerts.length > 0 && tlsCerts[0].equals(subjectCerts[0])) {
             return true;
         } else if (tlsCerts != null && tlsCerts.length > 0 && subjectPublicKey != null
             && tlsCerts[0].getPublicKey().equals(subjectPublicKey)) {
             return true;
         }
-        
+
         if (subjectPublicKey == null && subjectCerts != null && subjectCerts.length > 0) {
             subjectPublicKey = subjectCerts[0].getPublicKey();
         }
@@ -221,7 +221,7 @@ public final class DOMSAMLUtil  {
         if (tlsCerts != null && tlsCerts.length > 0) {
             return true;
         }
-        
+
         List<String> confirmationMethods = assertionWrapper.getConfirmationMethods();
         boolean isSenderVouches = false;
         for (String confirmationMethod : confirmationMethods) {
@@ -230,7 +230,7 @@ public final class DOMSAMLUtil  {
                 break;
             }
         }
-        
+
         if (isSenderVouches) {
             if (signed == null || signed.isEmpty()) {
                 return false;

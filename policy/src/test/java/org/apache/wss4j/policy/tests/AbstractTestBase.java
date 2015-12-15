@@ -117,7 +117,7 @@ public abstract class AbstractTestBase extends TestCase {
 
         return loadPolicy(policy, policyBuilder);
     }
-    
+
     protected Policy loadPolicy(String policy, PolicyBuilder policyBuilder) throws Exception {
         return policyBuilder.getPolicy(new ByteArrayInputStream(policy.getBytes(StandardCharsets.UTF_8)));
     }

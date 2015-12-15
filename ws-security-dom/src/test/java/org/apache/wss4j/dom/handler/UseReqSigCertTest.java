@@ -40,14 +40,14 @@ import org.w3c.dom.Document;
  * encrypt the response.
  */
 public class UseReqSigCertTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(UseReqSigCertTest.class);
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public UseReqSigCertTest() throws Exception {
         WSSConfig.init();
     }
@@ -58,7 +58,7 @@ public class UseReqSigCertTest extends org.junit.Assert {
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
-        
+
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
@@ -67,43 +67,43 @@ public class UseReqSigCertTest extends org.junit.Assert {
             WSHandlerConstants.SIGNATURE_PARTS, "{}{" + WSConstants.WSU_NS + "}Timestamp"
         );
         reqData.setMsgContext(config);
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         // Send the request
         CustomHandler handler = new CustomHandler();
         List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.SIGN));
         actions.add(new HandlerAction(WSConstants.TS));
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             actions,
             true
         );
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message:");
             LOG.debug(outputString);
         }
-        
+
         // Process the request
         WSHandlerResult results = processRequest(doc);
         List<WSHandlerResult> handlerResults = new ArrayList<>();
         handlerResults.add(0, results);
-        
+
         // Send the response
         sendResponse(handlerResults);
     }
-    
+
     @org.junit.Test
     public void testIssuerSerial() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
-        
+
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.SIG_KEY_ID, "IssuerSerial");
@@ -112,43 +112,43 @@ public class UseReqSigCertTest extends org.junit.Assert {
             WSHandlerConstants.SIGNATURE_PARTS, "{}{" + WSConstants.WSU_NS + "}Timestamp"
         );
         reqData.setMsgContext(config);
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         // Send the request
         CustomHandler handler = new CustomHandler();
         List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.SIGN));
         actions.add(new HandlerAction(WSConstants.TS));
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             actions,
             true
         );
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message:");
             LOG.debug(outputString);
         }
-        
+
         // Process the request
         WSHandlerResult results = processRequest(doc);
         List<WSHandlerResult> handlerResults = new ArrayList<>();
         handlerResults.add(0, results);
-        
+
         // Send the response
         sendResponse(handlerResults);
     }
-    
+
     @org.junit.Test
     public void testSKIKeyIdentifier() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
-        
+
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.SIG_KEY_ID, "SKIKeyIdentifier");
@@ -157,73 +157,73 @@ public class UseReqSigCertTest extends org.junit.Assert {
             WSHandlerConstants.SIGNATURE_PARTS, "{}{" + WSConstants.WSU_NS + "}Timestamp"
         );
         reqData.setMsgContext(config);
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         // Send the request
         CustomHandler handler = new CustomHandler();
         List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.SIGN));
         actions.add(new HandlerAction(WSConstants.TS));
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             actions,
             true
         );
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message:");
             LOG.debug(outputString);
         }
-        
+
         // Process the request
         WSHandlerResult results = processRequest(doc);
         List<WSHandlerResult> handlerResults = new ArrayList<>();
         handlerResults.add(0, results);
-        
+
         // Send the response
         sendResponse(handlerResults);
     }
-    
+
     private WSHandlerResult processRequest(Document doc) throws WSSecurityException {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        
+
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put(WSHandlerConstants.SIG_VER_PROP_FILE, "wss40.properties");
         reqData.setMsgContext(config);
-        
+
         CustomHandler handler = new CustomHandler();
         List<Integer> receivedActions = new ArrayList<>();
         receivedActions.add(WSConstants.SIGN);
         receivedActions.add(WSConstants.TS);
         handler.receive(receivedActions, reqData);
-        
+
         WSSecurityEngine securityEngine = new WSSecurityEngine();
         return securityEngine.processSecurityHeader(doc, reqData);
     }
-    
+
     private void sendResponse(List<WSHandlerResult> handlerResults) throws Exception {
         final RequestData reqData = new RequestData();
-        
+
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put(WSHandlerConstants.ENCRYPTION_USER, "useReqSigCert");
         config.put(WSHandlerConstants.RECV_RESULTS, handlerResults);
         reqData.setMsgContext(config);
-        
+
         final List<Integer> actions = new ArrayList<Integer>();
         actions.add(WSConstants.ENCR);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         // Send message
         CustomHandler handler = new CustomHandler();
         HandlerAction action = new HandlerAction(WSConstants.ENCR);
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             Collections.singletonList(action),
             true
         );

@@ -29,19 +29,19 @@ import org.apache.wss4j.dom.str.STRParser.REFERENCE_TYPE;
  * This class holds the results from parsing a SecurityTokenReference Element by a STRParser implementation.
  */
 public class STRParserResult {
-    
+
     private X509Certificate[] certs;
-    
+
     private byte[] secretKey;
-    
+
     private PublicKey publicKey;
-    
+
     private Principal principal;
-    
+
     private boolean trustedCredential;
-    
+
     private REFERENCE_TYPE referenceType;
-    
+
     /**
      * Get the X509Certificates associated with this SecurityTokenReference
      * @return the X509Certificates associated with this SecurityTokenReference
@@ -49,7 +49,7 @@ public class STRParserResult {
     public X509Certificate[] getCertificates() {
         return certs;
     }
-    
+
     /**
      * Get the Principal associated with this SecurityTokenReference
      * @return the Principal associated with this SecurityTokenReference
@@ -58,10 +58,10 @@ public class STRParserResult {
         if (principal == null && certs != null && certs.length > 0) {
             principal = certs[0].getSubjectX500Principal();
         }
-        
+
         return principal;
     }
-    
+
     /**
      * Get the PublicKey associated with this SecurityTokenReference
      * @return the PublicKey associated with this SecurityTokenReference
@@ -69,7 +69,7 @@ public class STRParserResult {
     public PublicKey getPublicKey() {
         return publicKey;
     }
-    
+
     /**
      * Get the Secret Key associated with this SecurityTokenReference
      * @return the Secret Key associated with this SecurityTokenReference
@@ -77,7 +77,7 @@ public class STRParserResult {
     public byte[] getSecretKey() {
         return secretKey;
     }
-    
+
     /**
      * Get whether the returned credential is already trusted or not. This is currently
      * applicable in the case of a credential extracted from a trusted HOK SAML Assertion,
@@ -96,7 +96,7 @@ public class STRParserResult {
     public REFERENCE_TYPE getCertificatesReferenceType() {
         return referenceType;
     }
-    
+
     public void setCerts(X509Certificate[] certs) {
         this.certs = certs;
     }
@@ -121,5 +121,5 @@ public class STRParserResult {
         this.referenceType = referenceType;
     }
 
-    
+
 }

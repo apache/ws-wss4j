@@ -82,7 +82,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            
+
             securityProperties.addSignaturePart(
                 new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), SecurePart.Modifier.Element)
             );
@@ -102,7 +102,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
-    
+
     @Test
     public void testEncryptionSymmetricOutbound() throws Exception {
 
@@ -115,11 +115,11 @@ public class SignatureEncryptionTest extends AbstractTestBase {
             securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
-            
+
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            
+
             // Symmetric Key
-            String keyAlgorithm = 
+            String keyAlgorithm =
                 JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(WSSConstants.NS_XENC_AES128);
             KeyGenerator keyGen;
             try {
@@ -134,7 +134,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
 
             final String ekId = IDGenerator.generateID(null);
 
-            final GenericOutboundSecurityToken encryptedKeySecurityToken = 
+            final GenericOutboundSecurityToken encryptedKeySecurityToken =
                 new GenericOutboundSecurityToken(ekId, WSSecurityTokenConstants.EncryptedKeyToken, symmetricKey);
 
             final SecurityTokenProvider<OutboundSecurityToken> encryptedKeySecurityTokenProvider =
@@ -153,15 +153,15 @@ public class SignatureEncryptionTest extends AbstractTestBase {
 
             final OutboundSecurityContextImpl outboundSecurityContext = new OutboundSecurityContextImpl();
             outboundSecurityContext.putList(SecurityEvent.class, new ArrayList<SecurityEvent>());
-            
+
             // Save Token on the security context
             outboundSecurityContext.registerSecurityTokenProvider(encryptedKeySecurityTokenProvider.getId(), encryptedKeySecurityTokenProvider);
             outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, encryptedKeySecurityTokenProvider.getId());
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            
+
             baos = new ByteArrayOutputStream();
-            XMLStreamWriter xmlStreamWriter = 
+            XMLStreamWriter xmlStreamWriter =
                 wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), outboundSecurityContext);
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
@@ -176,7 +176,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
-    
+
     @Test
     public void testSignatureEncryptionSymmetricOutbound() throws Exception {
 
@@ -190,27 +190,27 @@ public class SignatureEncryptionTest extends AbstractTestBase {
             securityProperties.setActions(actions);
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setEncryptionUser("receiver");
-            
+
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            
+
             securityProperties.setSignatureAlgorithm(WSSConstants.NS_XMLDSIG_HMACSHA1);
             securityProperties.setSignatureKeyIdentifier(
                 WSSecurityTokenConstants.KeyIdentifier_EncryptedKey
             );
-            
+
             securityProperties.addSignaturePart(
                 new SecurePart(new QName(WSSConstants.NS_WSU10, "Timestamp"), SecurePart.Modifier.Element)
             );
             securityProperties.addSignaturePart(
                 new SecurePart(new QName(WSSConstants.NS_SOAP11, "Body"), SecurePart.Modifier.Element)
             );
-            
+
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            
+
             // Symmetric Key
-            String keyAlgorithm = 
+            String keyAlgorithm =
                 JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(WSSConstants.NS_XENC_AES128);
             KeyGenerator keyGen;
             try {
@@ -224,8 +224,8 @@ public class SignatureEncryptionTest extends AbstractTestBase {
             final Key symmetricKey = keyGen.generateKey();
 
             final String ekId = IDGenerator.generateID(null);
-            
-            final GenericOutboundSecurityToken encryptedKeySecurityToken = 
+
+            final GenericOutboundSecurityToken encryptedKeySecurityToken =
                 new GenericOutboundSecurityToken(ekId, WSSecurityTokenConstants.EncryptedKeyToken, symmetricKey);
 
             final SecurityTokenProvider<OutboundSecurityToken> encryptedKeySecurityTokenProvider =
@@ -244,16 +244,16 @@ public class SignatureEncryptionTest extends AbstractTestBase {
 
             final OutboundSecurityContextImpl outboundSecurityContext = new OutboundSecurityContextImpl();
             outboundSecurityContext.putList(SecurityEvent.class, new ArrayList<SecurityEvent>());
-            
+
             // Save Token on the security context
             outboundSecurityContext.registerSecurityTokenProvider(encryptedKeySecurityTokenProvider.getId(), encryptedKeySecurityTokenProvider);
             outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, encryptedKeySecurityTokenProvider.getId());
             outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, encryptedKeySecurityTokenProvider.getId());
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            
+
             baos = new ByteArrayOutputStream();
-            XMLStreamWriter xmlStreamWriter = 
+            XMLStreamWriter xmlStreamWriter =
                 wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), outboundSecurityContext);
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);

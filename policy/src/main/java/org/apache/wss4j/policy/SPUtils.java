@@ -78,10 +78,10 @@ public class SPUtils {
         }
         return (Element) node;
     }
-    
+
     private static boolean isNodeEqualToQName(Node node, QName nodeName) {
         if ((node.getNamespaceURI() == null && nodeName.getNamespaceURI() == null
-            || node.getNamespaceURI() != null 
+            || node.getNamespaceURI() != null
                 && node.getNamespaceURI().equals(nodeName.getNamespaceURI()))
             && node.getLocalName().equals(nodeName.getLocalPart())) {
             return true;

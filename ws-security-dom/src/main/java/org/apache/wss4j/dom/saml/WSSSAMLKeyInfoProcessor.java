@@ -49,24 +49,24 @@ import org.apache.xml.security.utils.Base64;
  * This interface allows the user to plug in custom ways of processing a SAML KeyInfo.
  */
 public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
-    
+
     private static final String WST_NS = "http://schemas.xmlsoap.org/ws/2005/02/trust";
-    private static final String WST_NS_05_12 = 
+    private static final String WST_NS_05_12 =
         "http://docs.oasis-open.org/ws-sx/ws-trust/200512";
-    
-    private static final QName BINARY_SECRET = 
+
+    private static final QName BINARY_SECRET =
         new QName(WST_NS, "BinarySecret");
-    private static final QName BINARY_SECRET_05_12 = 
+    private static final QName BINARY_SECRET_05_12 =
         new QName(WST_NS_05_12, "BinarySecret");
-    
+
     private RequestData data;
     private WSDocInfo docInfo;
-    
+
     public WSSSAMLKeyInfoProcessor(RequestData data, WSDocInfo docInfo) {
         this.data = data;
         this.docInfo = docInfo;
     }
-    
+
     public SAMLKeyInfo processSAMLKeyInfo(Element keyInfoElement) throws WSSecurityException {
         //
         // First try to find an EncryptedKey, BinarySecret or a SecurityTokenReference via DOM
@@ -74,7 +74,7 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
         if (keyInfoElement == null) {
             return null;
         }
-        
+
         Node node = keyInfoElement.getFirstChild();
         while (node != null) {
             if (Node.ELEMENT_NODE == node.getNodeType()) {
@@ -83,7 +83,7 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
                     EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
                     List<WSSecurityEngineResult> result =
                         proc.handleToken((Element)node, data, docInfo, data.getSamlAlgorithmSuite());
-                    byte[] secret = 
+                    byte[] secret =
                         (byte[])result.get(0).get(
                             WSSecurityEngineResult.TAG_SECRET
                         );
@@ -101,17 +101,17 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
                     parameters.setData(data);
                     parameters.setWsDocInfo(docInfo);
                     parameters.setStrElement((Element)node);
-                    
+
                     STRParser strParser = new SignatureSTRParser();
                     STRParserResult parserResult = strParser.parseSecurityTokenReference(parameters);
                     SAMLKeyInfo samlKeyInfo = new SAMLKeyInfo(parserResult.getCertificates());
                     samlKeyInfo.setPublicKey(parserResult.getPublicKey());
                     samlKeyInfo.setSecret(parserResult.getSecretKey());
-                    
+
                     Principal principal = parserResult.getPrincipal();
-                    
+
                     // Check for compliance against the defined AlgorithmSuite
-                    AlgorithmSuite algorithmSuite = data.getSamlAlgorithmSuite(); 
+                    AlgorithmSuite algorithmSuite = data.getSamlAlgorithmSuite();
                     if (algorithmSuite != null && principal instanceof WSDerivedKeyTokenPrincipal) {
                         AlgorithmSuiteValidator algorithmSuiteValidator = new
                             AlgorithmSuiteValidator(algorithmSuite);
@@ -123,13 +123,13 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
                             ((WSDerivedKeyTokenPrincipal)principal).getLength()
                         );
                     }
-                    
+
                     return samlKeyInfo;
                 }
             }
             node = node.getNextSibling();
         }
-        
+
         return null;
     }
 }

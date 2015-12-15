@@ -104,7 +104,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             }
 
             String attachmentId = referenceType.getURI().substring(4);
-            
+
             AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
             attachmentRequestCallback.setAttachmentId(attachmentId);
             try {
@@ -142,7 +142,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                     if (!(transformer instanceof AttachmentContentSignatureTransform)) {
                         throw new WSSecurityException(
                                 WSSecurityException.ErrorCode.INVALID_SECURITY,
-                                "empty", 
+                                "empty",
                                 new Object[] {"First transform must be Attachment[Content|Complete]SignatureTransform"}
                         );
                     }
@@ -305,16 +305,16 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
     private void detectReplayAttack(InputProcessorChain inputProcessorChain) throws WSSecurityException {
         TimestampSecurityEvent timestampSecurityEvent =
                 inputProcessorChain.getSecurityContext().get(WSSConstants.PROP_TIMESTAMP_SECURITYEVENT);
-        ReplayCache replayCache = 
+        ReplayCache replayCache =
             ((WSSSecurityProperties)getSecurityProperties()).getTimestampReplayCache();
         if (timestampSecurityEvent != null && replayCache != null) {
-            final String cacheKey = 
+            final String cacheKey =
                     timestampSecurityEvent.getCreated().getTimeInMillis() +
                     "" + Arrays.hashCode(getSignatureType().getSignatureValue().getValue());
             if (replayCache.contains(cacheKey)) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
             }
-            
+
             // Store the Timestamp/SignatureValue combination in the cache
             Calendar expiresCal = timestampSecurityEvent.getExpires();
             if (expiresCal != null) {

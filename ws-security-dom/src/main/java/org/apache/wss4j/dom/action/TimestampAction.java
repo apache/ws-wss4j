@@ -27,7 +27,7 @@ import org.apache.wss4j.dom.message.WSSecTimestamp;
 import org.w3c.dom.Document;
 
 public class TimestampAction implements Action {
-    
+
     public void execute(WSHandler handler, SecurityActionToken actionToken,
                         Document doc, RequestData reqData)
         throws WSSecurityException {

@@ -44,7 +44,7 @@ import org.w3c.dom.Document;
  * be different than user name used for UsernameToken".
  */
 public class SignatureUTAliasTest extends org.junit.Assert implements CallbackHandler {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureUTAliasTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
 
@@ -52,14 +52,14 @@ public class SignatureUTAliasTest extends org.junit.Assert implements CallbackHa
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     /**
      * Test involving adding a Username Token to a SOAP message and signing it, where the
      * private key for signature is extracted from the KeyStore using a different username/alias
-     * to the UsernameToken. 
+     * to the UsernameToken.
      */
     @org.junit.Test
-    public void 
+    public void
     testUsernameTokenSignatureHandler() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -68,64 +68,64 @@ public class SignatureUTAliasTest extends org.junit.Assert implements CallbackHa
         reqData.setPwType(WSConstants.PASSWORD_TEXT);
         java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
         messageContext.put(
-            WSHandlerConstants.PW_CALLBACK_REF, 
+            WSHandlerConstants.PW_CALLBACK_REF,
             this
         );
         messageContext.put(WSHandlerConstants.SIGNATURE_USER, "wss40");
         messageContext.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         messageContext.put(
-            WSHandlerConstants.SIGNATURE_PARTS, 
+            WSHandlerConstants.SIGNATURE_PARTS,
             "{}{" + WSConstants.WSSE_NS + "}" + "UsernameToken"
         );
         messageContext.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
         reqData.setMsgContext(messageContext);
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.UT));
         actions.add(new HandlerAction(WSConstants.SIGN));
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             actions,
             true
         );
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         verify(doc);
-        
+
     }
-    
+
 
     /**
      * Verifies the soap envelope
      * <p/>
-     * 
-     * @param doc 
+     *
+     * @param doc
      * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc) throws Exception {
-        WSHandlerResult results = 
+        WSHandlerResult results =
             secEngine.processSecurityHeader(
                 doc, null, this, CryptoFactory.getInstance("wss40CA.properties")
             );
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         return results;
     }
 
-    
+
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
@@ -146,5 +146,5 @@ public class SignatureUTAliasTest extends org.junit.Assert implements CallbackHa
         }
     }
 
-    
+
 }

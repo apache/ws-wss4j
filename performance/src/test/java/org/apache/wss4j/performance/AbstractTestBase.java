@@ -97,7 +97,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
         LogManager.getLogManager().getLogger("org.jcp.xml.dsig.internal.dom").setLevel(Level.FINE);
         WSSConfig.init();
     }
-    
+
     @AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -160,7 +160,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
         xmlStreamWriter.close();
         return baos;
     }
-    
+
     protected ByteArrayOutputStream doOutboundSecurity(Map<String, Object> config, InputStream sourceDocument)
         throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -216,7 +216,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
         requestData.setMsgContext(messageContext);
         requestData.setCallbackHandler(new WSS4JCallbackHandlerImpl());
         requestData.setWssConfig(WSSConfig.getNewInstance());
-  
+
         wss4JHandler.doSender(messageContext, requestData, true);
 
         return messageContext;
@@ -267,14 +267,14 @@ public abstract class AbstractTestBase extends org.junit.Assert {
             requestData.setDecCrypto(crypto);
             requestData.setSigVerCrypto(crypto);
         }
-        
+
         if (properties.get(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD) != null) {
-            messageContext.put(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD, 
+            messageContext.put(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD,
                                properties.get(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD));
         } else if (WSHandlerConstants.USERNAME_TOKEN_SIGNATURE.equals(action)) {
             messageContext.put(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD, "true");
         }
-        
+
         // Disable PrefixList checking as the stax code doesn't support this yet
         //todo
         List<BSPRule> ignoredRules = new ArrayList<BSPRule>();
@@ -363,7 +363,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
 
     class CustomWSS4JHandler extends WSHandler {
 
-        private final org.slf4j.Logger log = 
+        private final org.slf4j.Logger log =
             org.slf4j.LoggerFactory.getLogger(CustomWSS4JHandler.class.getName());
         private final boolean doDebug = log.isDebugEnabled();
 

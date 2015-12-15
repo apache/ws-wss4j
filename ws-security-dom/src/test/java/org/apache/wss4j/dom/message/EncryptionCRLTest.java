@@ -41,41 +41,41 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 
 
 /**
- * This is a test for Certificate Revocation List checking before encryption. 
- * 
+ * This is a test for Certificate Revocation List checking before encryption.
+ *
  * This test reuses the revoked certificate from SignatureCRLTest
  */
 public class EncryptionCRLTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(EncryptionCRLTest.class);
-        
+
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler keystoreCallbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public EncryptionCRLTest() throws Exception {
         crypto = CryptoFactory.getInstance("wss40All.properties");
     }
-    
+
     /**
      * Setup method
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is a problem in setup
      */
     @org.junit.Before
     public void setUp() throws Exception {
         secEngine.setWssConfig(WSSConfig.getNewInstance());
     }
-    
+
     /**
      * Test that encrypts without certificate revocation check
      * so it should pass
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
      */
     @org.junit.Test
@@ -93,29 +93,29 @@ public class EncryptionCRLTest extends org.junit.Assert {
         messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, keystoreCallbackHandler);
         reqData.setMsgContext(messageContext);
         reqData.setUsername("wss40rev");
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             Collections.singletonList(new HandlerAction(WSConstants.ENCR)),
             true
         );
-        
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
+
         verify(doc, crypto, keystoreCallbackHandler);
     }
-    
+
     /**
      * Test that encrypts with certificate revocation check
      * so it should fail
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
      * TODO Re-enable once CRL issue fixed
      */
@@ -135,14 +135,14 @@ public class EncryptionCRLTest extends org.junit.Assert {
         messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, keystoreCallbackHandler);
         reqData.setMsgContext(messageContext);
         reqData.setUsername("wss40rev");
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         handler.setOption(WSHandlerConstants.ENABLE_REVOCATION, "true");
         try {
             handler.send(
-                doc, 
-                reqData, 
+                doc,
+                reqData,
                 Collections.singletonList(new HandlerAction(WSConstants.ENCR)),
                 true
             );
@@ -150,12 +150,12 @@ public class EncryptionCRLTest extends org.junit.Assert {
         } catch (Exception ex) { //NOPMD
             // expected
         }
-       
+
     }
-    
+
     /**
      * Verifies the soap envelope <p/>
-     * 
+     *
      * @param envelope
      * @throws Exception
      *             Thrown when there is a problem in verification
@@ -165,7 +165,7 @@ public class EncryptionCRLTest extends org.junit.Assert {
     ) throws Exception {
         secEngine.processSecurityHeader(doc, null, handler, decCrypto);
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }

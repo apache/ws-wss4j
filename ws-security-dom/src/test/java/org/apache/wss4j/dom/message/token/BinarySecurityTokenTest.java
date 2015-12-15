@@ -45,15 +45,15 @@ import java.security.cert.X509Certificate;
  * This is a test for constructing and processing BinarySecurityTokens.
  */
 public class BinarySecurityTokenTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(BinarySecurityTokenTest.class);
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public BinarySecurityTokenTest() throws Exception {
         crypto = CryptoFactory.getInstance("wss40.properties");
     }
@@ -67,38 +67,38 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
 
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         X509Security bst = new X509Security(doc);
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("wss40");
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         bst.setX509Certificate(certs[0]);
-        
+
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("BST output");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(WSSConfig.getNewInstance());
-        WSHandlerResult results = 
+        WSHandlerResult results =
             secEngine.processSecurityHeader(doc, null, null, crypto);
-        
+
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         assertNotNull(token);
-        
+
         BinarySecurity clone = new BinarySecurity(token.getElement(), new BSPEnforcer(true));
         assertTrue(clone.equals(token));
         assertTrue(clone.hashCode() == token.hashCode());
     }
-    
+
     /**
      * A unit test for an PKIPath BinarySecurityToken
      */
@@ -108,34 +108,34 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
 
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         PKIPathSecurity bst = new PKIPathSecurity(doc);
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("wss40");
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         bst.setX509Certificates(certs, crypto);
-        
+
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("PKIPath output");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(WSSConfig.getNewInstance());
-        WSHandlerResult results = 
+        WSHandlerResult results =
             secEngine.processSecurityHeader(doc, null, null, crypto);
-        
+
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.BST).get(0);
         PKIPathSecurity token =
             (PKIPathSecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         assertNotNull(token);
     }
-    
+
     /**
      * A unit test for a custom BinarySecurityToken
      */
@@ -145,19 +145,19 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
 
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         BinarySecurity bst = new BinarySecurity(doc);
         bst.setToken("12435677".getBytes());
-        
+
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("Custom Token output");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(WSSConfig.getNewInstance());
         // Processing should fail as we have no ValueType attribute
@@ -165,9 +165,9 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
             secEngine.processSecurityHeader(doc, null, null, crypto);
             fail("Expected failure on no ValueType");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         bst = new BinarySecurity(doc);
         bst.setToken("12435677".getBytes());
@@ -175,8 +175,8 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
         secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
-        
-        WSHandlerResult results = 
+
+        WSHandlerResult results =
             secEngine.processSecurityHeader(doc, null, null, crypto);
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.BST).get(0);
@@ -184,5 +184,5 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         assertNotNull(token);
     }
-    
+
 }

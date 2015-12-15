@@ -63,9 +63,9 @@ public class PasswordEncryptorTest extends AbstractTestBase {
             List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
             actions.add(WSSConstants.SIGNATURE);
             securityProperties.setActions(actions);
-            Properties properties = 
+            Properties properties =
                 CryptoFactory.getProperties("transmitter-crypto-enc.properties", this.getClass().getClassLoader());
-            PasswordEncryptor passwordEncryptor = 
+            PasswordEncryptor passwordEncryptor =
                 new JasyptPasswordEncryptor(new CallbackHandlerImpl());
             securityProperties.setSignatureCryptoProperties(properties, passwordEncryptor);
             securityProperties.setSignatureUser("transmitter");
@@ -101,7 +101,7 @@ public class PasswordEncryptorTest extends AbstractTestBase {
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
-    
+
     @Test
     public void testEncDecryptionCryptoPropertiesOutbound() throws Exception {
 
@@ -111,9 +111,9 @@ public class PasswordEncryptorTest extends AbstractTestBase {
             List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
             actions.add(WSSConstants.ENCRYPT);
             securityProperties.setActions(actions);
-            Properties properties = 
+            Properties properties =
                 CryptoFactory.getProperties("transmitter-crypto-enc.properties", this.getClass().getClassLoader());
-            PasswordEncryptor passwordEncryptor = 
+            PasswordEncryptor passwordEncryptor =
                 new JasyptPasswordEncryptor(new CallbackHandlerImpl());
             securityProperties.setEncryptionCryptoProperties(properties, passwordEncryptor);
             securityProperties.setEncryptionUser("receiver");

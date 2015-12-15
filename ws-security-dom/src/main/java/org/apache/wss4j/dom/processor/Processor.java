@@ -28,11 +28,11 @@ import org.w3c.dom.Element;
 import java.util.List;
 
 public interface Processor {
-    
+
     List<WSSecurityEngineResult> handleToken(
         Element elem,
         RequestData request,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException;
-    
+
 }

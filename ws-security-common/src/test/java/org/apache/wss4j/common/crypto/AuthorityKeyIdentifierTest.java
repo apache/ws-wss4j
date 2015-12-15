@@ -32,39 +32,39 @@ import org.apache.wss4j.common.util.Loader;
  * the certs using BouncyCastle.
  */
 public class AuthorityKeyIdentifierTest extends org.junit.Assert {
-    
+
     public AuthorityKeyIdentifierTest() {
         WSProviderConfig.init();
     }
-    
+
     @org.junit.Test
     public void testExtractKeyIdentifiers() throws Exception {
         // Load the keystore
         KeyStore keyStore = loadKeyStore("keys/wss40.jks", "security");
         assertNotNull(keyStore);
-        
+
         X509Certificate cert = (X509Certificate)keyStore.getCertificate("wss40");
         assertNotNull(cert);
-        
+
         // Get AuthorityKeyIdentifier from the cert
         byte[] keyIdentifierBytes = BouncyCastleUtils.getAuthorityKeyIdentifierBytes(cert);
         assertNotNull(keyIdentifierBytes);
-        
+
         // Now load the CA cert
         KeyStore caKeyStore = loadKeyStore("keys/wss40CA.jks", "security");
         assertNotNull(caKeyStore);
-        
+
         X509Certificate caCert = (X509Certificate)caKeyStore.getCertificate("wss40CA");
         assertNotNull(caCert);
-        
+
         // Get SubjectKeyIdentifier from the CA cert
-        byte[] subjectKeyIdentifierBytes = 
+        byte[] subjectKeyIdentifierBytes =
             BouncyCastleUtils.getSubjectKeyIdentifierBytes(caCert);
         assertNotNull(subjectKeyIdentifierBytes);
 
         assertTrue(Arrays.equals(keyIdentifierBytes, subjectKeyIdentifierBytes));
     }
-    
+
     @org.junit.Test
     public void testMerlinAKI() throws Exception {
         // Load the keystore
@@ -72,22 +72,22 @@ public class AuthorityKeyIdentifierTest extends org.junit.Assert {
         assertNotNull(keyStore);
         X509Certificate cert = (X509Certificate)keyStore.getCertificate("wss40");
         assertNotNull(cert);
-        
+
         // Now load the CA keystore + instantiate MerlinAKI
         KeyStore caKeyStore = loadKeyStore("keys/wss40CA.jks", "security");
         assertNotNull(caKeyStore);
         MerlinAKI crypto = new MerlinAKI();
         crypto.setTrustStore(caKeyStore);
-        
+
         // Verify trust...
         crypto.verifyTrust(new X509Certificate[]{cert}, false, null);
-        
+
         // Now test with a non-trusted cert
         KeyStore badKeyStore = loadKeyStore("keys/wss86.keystore", "security");
         assertNotNull(badKeyStore);
         X509Certificate badCert = (X509Certificate)badKeyStore.getCertificate("wss86");
         assertNotNull(badCert);
-        
+
         try {
             crypto.verifyTrust(new X509Certificate[]{badCert}, false, null);
             fail("Failure expected on trying to validate an untrusted cert");
@@ -95,13 +95,13 @@ public class AuthorityKeyIdentifierTest extends org.junit.Assert {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
     }
-    
+
     private KeyStore loadKeyStore(String path, String password) throws Exception {
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         ClassLoader loader = Loader.getClassLoader(AuthorityKeyIdentifierTest.class);
         InputStream input = Merlin.loadInputStream(loader, path);
         keyStore.load(input, password.toCharArray());
-        
+
         return keyStore;
     }
 }

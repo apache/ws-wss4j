@@ -70,7 +70,7 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
         return new SupportingTokens(getVersion(), getName(), nestedPolicy);
     }
-    
+
     @Override
     public Policy getPolicy() {
         return nestedPolicy;
@@ -184,7 +184,7 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
     protected void setEncryptedElements(EncryptedElements encryptedElements) {
         this.encryptedElements = encryptedElements;
     }
-    
+
     /**
      * @return true if the supporting token should be encrypted
      */
@@ -195,7 +195,7 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
         }
         return false;
     }
-    
+
     /**
      * @return true if the supporting token is endorsing
      */

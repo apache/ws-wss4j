@@ -135,22 +135,22 @@ import org.w3c.dom.NodeList;
 @ApplyLdifFiles("kerberos/kerberos.ldif")
 
 public class KerberosTest extends AbstractLdapTestUnit {
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(KerberosTest.class);
-    
+
     private static final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
     private static final TransformerFactory TRANSFORMER_FACTORY = TransformerFactory.newInstance();
     private static DocumentBuilderFactory dbf;
-    
+
     private static boolean runTests;
     private static boolean portUpdated;
-    
+
     @BeforeClass
     public static void setUp() throws Exception {
 
         WSSConfig.init();
-        
+
         //
         // This test fails with the IBM JDK
         //
@@ -163,15 +163,15 @@ public class KerberosTest extends AbstractLdapTestUnit {
 
             // System.setProperty("sun.security.krb5.debug", "true");
             System.setProperty("java.security.auth.login.config", basedir + "/src/test/resources/kerberos/kerberos.jaas");
-            
+
         }
-        
+
         dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         dbf.setIgnoringComments(false);
         dbf.setCoalescing(false);
         dbf.setIgnoringElementContentWhitespace(false);
-        
+
         xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, false);
         xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
     }
@@ -180,7 +180,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
     public static void tearDown() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     @Before
     public void updatePort() throws Exception {
         if (!portUpdated) {
@@ -188,25 +188,25 @@ public class KerberosTest extends AbstractLdapTestUnit {
             if (basedir == null) {
                 basedir = new File(".").getCanonicalPath();
             }
-            
+
             // Read in krb5.conf and substitute in the correct port
             Path path = FileSystems.getDefault().getPath(basedir, "/src/test/resources/kerberos/krb5.conf");
             String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
             content = content.replaceAll("port", "" + super.getKdcServer().getTransports()[0].getPort());
-            
+
             Path path2 = FileSystems.getDefault().getPath(basedir, "/target/test-classes/kerberos/krb5.conf");
             Files.write(path2, content.getBytes());
-            
+
             System.setProperty("java.security.krb5.conf", path2.toString());
-            
+
             portUpdated = true;
         }
     }
-    
+
     //
     // DOM tests
     //
-    
+
     /**
      * Test using the KerberosSecurity class to retrieve a service ticket from a KDC, wrap it
      * in a BinarySecurityToken, and process it.
@@ -217,12 +217,12 @@ public class KerberosTest extends AbstractLdapTestUnit {
             System.out.println("Skipping test because kerberos server could not be started");
             return;
         }
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         KerberosSecurity bst = new KerberosSecurity(doc);
         CallbackHandler callbackHandler = new CallbackHandler() {
             @Override
@@ -237,13 +237,13 @@ public class KerberosTest extends AbstractLdapTestUnit {
         };
         bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         // Configure the Validator
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         KerberosTokenValidator validator = new KerberosTokenValidator();
@@ -260,12 +260,12 @@ public class KerberosTest extends AbstractLdapTestUnit {
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         Assert.assertTrue(token != null);
-        
+
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         Assert.assertTrue(principal instanceof KerberosPrincipal);
         Assert.assertTrue(principal.getName().contains("alice"));
     }
-    
+
     /**
      * Get and validate a SPNEGO token.
      */
@@ -275,12 +275,12 @@ public class KerberosTest extends AbstractLdapTestUnit {
             System.out.println("Skipping test because kerberos server could not be started");
             return;
         }
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         SpnegoTokenContext spnegoToken = new SpnegoTokenContext();
         CallbackHandler callbackHandler = new CallbackHandler() {
             @Override
@@ -294,15 +294,15 @@ public class KerberosTest extends AbstractLdapTestUnit {
             }
         };
         spnegoToken.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
-        
+
         byte[] token = spnegoToken.getToken();
         Assert.assertNotNull(token);
-        
+
         spnegoToken = new SpnegoTokenContext();
         spnegoToken.validateServiceTicket("bob", callbackHandler, "bob@service.ws.apache.org", token);
         Assert.assertTrue(spnegoToken.isEstablished());
     }
-    
+
     /**
      * Various unit tests for a kerberos client
      */
@@ -312,7 +312,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             System.out.println("Skipping test because kerberos server could not be started");
             return;
         }
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         CallbackHandler callbackHandler = new CallbackHandler() {
@@ -334,8 +334,8 @@ public class KerberosTest extends AbstractLdapTestUnit {
         } catch (WSSecurityException ex) {
             Assert.assertTrue(ex.getMessage().startsWith("An error occurred in trying to obtain a TGT:"));
         }
-        
-        
+
+
         try {
             KerberosSecurity bst = new KerberosSecurity(doc);
             bst.retrieveServiceTicket("alice", callbackHandler, "bob2@service");
@@ -343,9 +343,9 @@ public class KerberosTest extends AbstractLdapTestUnit {
         } catch (WSSecurityException ex) {
             Assert.assertEquals(ex.getMessage(), "An error occurred in trying to obtain a service ticket");
         }
-        
+
     }
-    
+
     /**
      * Test using the KerberosSecurity class to retrieve a service ticket from a KDC, wrap it
      * in a BinarySecurityToken, and use the session key to sign the SOAP Body.
@@ -356,12 +356,12 @@ public class KerberosTest extends AbstractLdapTestUnit {
             System.out.println("Skipping test because kerberos server could not be started");
             return;
         }
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         KerberosSecurity bst = new KerberosSecurity(doc);
         CallbackHandler callbackHandler = new CallbackHandler() {
             @Override
@@ -379,24 +379,24 @@ public class KerberosTest extends AbstractLdapTestUnit {
         bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
         bst.setID("Id-" + bst.hashCode());
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
-        
+
         WSSecSignature sign = new WSSecSignature();
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setCustomTokenId(bst.getID());
         sign.setCustomTokenValueType(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
-        
+
         SecretKey secretKey = bst.getSecretKey();
         sign.setSecretKey(secretKey.getEncoded());
-        
+
         Document signedDoc = sign.build(doc, null, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         // Configure the Validator
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         KerberosTokenValidator validator = new KerberosTokenValidator();
@@ -405,21 +405,21 @@ public class KerberosTest extends AbstractLdapTestUnit {
         wssConfig.setValidator(WSConstants.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
-        
-        WSHandlerResult results = 
+
+        WSHandlerResult results =
             secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         Assert.assertTrue(token != null);
-        
+
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         Assert.assertTrue(principal instanceof KerberosPrincipal);
         Assert.assertTrue(principal.getName().contains("alice"));
     }
-    
-    
+
+
     /**
      * Test using the KerberosSecurity class to retrieve a service ticket from a KDC, wrap it
      * in a BinarySecurityToken, and use the session key to sign the SOAP Body.
@@ -430,12 +430,12 @@ public class KerberosTest extends AbstractLdapTestUnit {
             System.out.println("Skipping test because kerberos server could not be started");
             return;
         }
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         KerberosSecurity bst = new KerberosSecurity(doc);
         CallbackHandler callbackHandler = new CallbackHandler() {
             @Override
@@ -452,29 +452,29 @@ public class KerberosTest extends AbstractLdapTestUnit {
         };
         bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
         bst.setID("Id-" + bst.hashCode());
-        
+
         WSSecSignature sign = new WSSecSignature();
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
         sign.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
         sign.setCustomTokenValueType(WSConstants.WSS_KRB_KI_VALUE_TYPE);
-        
+
         SecretKey secretKey = bst.getSecretKey();
         byte[] keyData = secretKey.getEncoded();
         sign.setSecretKey(keyData);
-        
+
         byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
         sign.setCustomTokenId(Base64.encode(digestBytes));
-        
+
         Document signedDoc = sign.build(doc, null, secHeader);
-        
+
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         // Configure the Validator
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         KerberosTokenValidator validator = new KerberosTokenValidator();
@@ -483,21 +483,21 @@ public class KerberosTest extends AbstractLdapTestUnit {
         wssConfig.setValidator(WSConstants.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
-        
-        WSHandlerResult results = 
+
+        WSHandlerResult results =
             secEngine.processSecurityHeader(doc, null, callbackHandler, null);
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         Assert.assertTrue(token != null);
-        
+
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         Assert.assertTrue(principal instanceof KerberosPrincipal);
         Assert.assertTrue(principal.getName().contains("alice"));
     }
-    
-    
+
+
     /**
      * Test using the KerberosSecurity class to retrieve a service ticket from a KDC, wrap it
      * in a BinarySecurityToken, and use the session key to encrypt the SOAP Body.
@@ -508,12 +508,12 @@ public class KerberosTest extends AbstractLdapTestUnit {
             System.out.println("Skipping test because kerberos server could not be started");
             return;
         }
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         KerberosSecurity bst = new KerberosSecurity(doc);
         CallbackHandler callbackHandler = new CallbackHandler() {
             @Override
@@ -531,7 +531,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
         bst.setID("Id-" + bst.hashCode());
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
-        
+
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         SecretKey secretKey = bst.getSecretKey();
@@ -541,13 +541,13 @@ public class KerberosTest extends AbstractLdapTestUnit {
         builder.setEncKeyId(bst.getID());
 
         Document encryptedDoc = builder.build(doc, null, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
-        
+
         // Configure the Validator
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         KerberosTokenValidator validator = new KerberosTokenValidator();
@@ -556,20 +556,20 @@ public class KerberosTest extends AbstractLdapTestUnit {
         wssConfig.setValidator(WSConstants.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
-        
-        WSHandlerResult results = 
+
+        WSHandlerResult results =
             secEngine.processSecurityHeader(encryptedDoc, null, callbackHandler, null);
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         Assert.assertTrue(token != null);
-        
+
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         Assert.assertTrue(principal instanceof KerberosPrincipal);
         Assert.assertTrue(principal.getName().contains("alice"));
     }
-    
+
     /**
      * Test using the KerberosSecurity class to retrieve a service ticket from a KDC, wrap it
      * in a BinarySecurityToken, and use the session key to encrypt the SOAP Body.
@@ -580,12 +580,12 @@ public class KerberosTest extends AbstractLdapTestUnit {
             System.out.println("Skipping test because kerberos server could not be started");
             return;
         }
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         KerberosSecurity bst = new KerberosSecurity(doc);
         CallbackHandler callbackHandler = new CallbackHandler() {
             @Override
@@ -602,7 +602,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         };
         bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
         bst.setID("Id-" + bst.hashCode());
-        
+
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         SecretKey secretKey = bst.getSecretKey();
@@ -612,15 +612,15 @@ public class KerberosTest extends AbstractLdapTestUnit {
         builder.setEncKeyId(bst.getID());
 
         Document encryptedDoc = builder.build(doc, null, secHeader);
-        
+
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
-        
+
         // Configure the Validator
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         KerberosTokenValidator validator = new KerberosTokenValidator();
@@ -629,20 +629,20 @@ public class KerberosTest extends AbstractLdapTestUnit {
         wssConfig.setValidator(WSConstants.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
-        
-        WSHandlerResult results = 
+
+        WSHandlerResult results =
             secEngine.processSecurityHeader(encryptedDoc, null, callbackHandler, null);
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         Assert.assertTrue(token != null);
-        
+
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         Assert.assertTrue(principal instanceof KerberosPrincipal);
         Assert.assertTrue(principal.getName().contains("alice"));
     }
-    
+
     /**
      * Test using the KerberosSecurity class to retrieve a service ticket from a KDC, wrap it
      * in a BinarySecurityToken, and use the session key to encrypt the SOAP Body.
@@ -653,12 +653,12 @@ public class KerberosTest extends AbstractLdapTestUnit {
             System.out.println("Skipping test because kerberos server could not be started");
             return;
         }
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         KerberosSecurity bst = new KerberosSecurity(doc);
         CallbackHandler callbackHandler = new CallbackHandler() {
             @Override
@@ -675,7 +675,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         };
         bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
         bst.setID("Id-" + bst.hashCode());
-        
+
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         SecretKey secretKey = bst.getSecretKey();
@@ -685,17 +685,17 @@ public class KerberosTest extends AbstractLdapTestUnit {
 
         byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
         builder.setEncKeyId(Base64.encode(digestBytes));
-        
+
         Document encryptedDoc = builder.build(doc, null, secHeader);
-        
+
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
-        
+
         // Configure the Validator
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         KerberosTokenValidator validator = new KerberosTokenValidator();
@@ -704,20 +704,20 @@ public class KerberosTest extends AbstractLdapTestUnit {
         wssConfig.setValidator(WSConstants.BINARY_TOKEN, validator);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(wssConfig);
-        
-        WSHandlerResult results = 
+
+        WSHandlerResult results =
             secEngine.processSecurityHeader(encryptedDoc, null, callbackHandler, null);
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.BST).get(0);
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         Assert.assertTrue(token != null);
-        
+
         Principal principal = (Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         Assert.assertTrue(principal instanceof KerberosPrincipal);
         Assert.assertTrue(principal.getName().contains("alice"));
     }
-    
+
     //
     // Streaming tests
     //
@@ -727,7 +727,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             System.out.println("Skipping test because kerberos server could not be started");
             return;
         }
-        
+
         Document document;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -807,7 +807,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             System.out.println("Skipping test because kerberos server could not be started");
             return;
         }
-        
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -900,7 +900,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             System.out.println("Skipping test because kerberos server could not be started");
             return;
         }
-        
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -993,7 +993,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             System.out.println("Skipping test because kerberos server could not be started");
             return;
         }
-        
+
         Document document;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -1073,7 +1073,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             System.out.println("Skipping test because kerberos server could not be started");
             return;
         }
-        
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -1164,7 +1164,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             System.out.println("Skipping test because kerberos server could not be started");
             return;
         }
-        
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -1253,5 +1253,5 @@ public class KerberosTest extends AbstractLdapTestUnit {
             Assert.assertEquals(kerberosTokenSecurityEvents.size(), 1);
         }
     }
-    
+
 }

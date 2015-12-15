@@ -47,7 +47,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     private int derivedKeyLength = -1;
 
     private List<Element> attachmentEncryptedDataElements;
-    
+
     public WSSecDKEncrypt() {
         super();
     }
@@ -60,7 +60,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     }
 
     public Document build(Document doc, WSSecHeader secHeader) throws WSSecurityException {
-        
+
         //
         // Setup the encrypted key
         //
@@ -69,7 +69,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         // prepend elements in the right order to the security header
         //
         prependDKElementToHeader(secHeader);
-                
+
         Element externRefList = encrypt();
 
         addAttachmentEncryptedDataElements(secHeader);
@@ -78,7 +78,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
         return doc;
     }
-    
+
     public void addAttachmentEncryptedDataElements(WSSecHeader secHeader) {
         if (attachmentEncryptedDataElements != null) {
             for (int i = 0; i < attachmentEncryptedDataElements.size(); i++) {
@@ -89,31 +89,31 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
             }
         }
     }
-    
+
     public Element encrypt() throws WSSecurityException {
         if (getParts().isEmpty()) {
             getParts().add(WSSecurityUtil.getDefaultEncryptionPart(document));
         }
-        
+
         return encryptForExternalRef(null, getParts());
     }
 
     /**
      * Encrypt one or more parts or elements of the message (external).
-     * 
+     *
      * This method takes a vector of <code>WSEncryptionPart</code> object that
      * contain information about the elements to encrypt. The method call the
      * encryption method, takes the reference information generated during
      * encryption and add this to the <code>xenc:Reference</code> element.
      * This method can be called after <code>prepare()</code> and can be
      * called multiple times to encrypt a number of parts or elements.
-     * 
+     *
      * The method generates a <code>xenc:Reference</code> element that <i>must</i>
      * be added to the SecurityHeader. See <code>addExternalRefElement()</code>.
-     * 
+     *
      * If the <code>dataRef</code> parameter is <code>null</code> the method
      * creates and initializes a new Reference element.
-     * 
+     *
      * @param dataRef A <code>xenc:Reference</code> element or <code>null</code>
      * @param references A list containing WSEncryptionPart objects
      * @return Returns the updated <code>xenc:Reference</code> element
@@ -121,28 +121,28 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
      */
     public Element encryptForExternalRef(Element dataRef, List<WSEncryptionPart> references)
         throws WSSecurityException {
-        
+
         KeyInfo keyInfo = createKeyInfo();
 
         SecretKey key = getDerivedKey(symEncAlgo);
 
-        List<String> encDataRefs = 
+        List<String> encDataRefs =
             WSSecEncrypt.doEncryption(
-                document, getIdAllocator(), keyInfo, key, symEncAlgo, references, callbackLookup, 
+                document, getIdAllocator(), keyInfo, key, symEncAlgo, references, callbackLookup,
                 attachmentCallbackHandler, attachmentEncryptedDataElements, storeBytesInAttachment
             );
         if (dataRef == null) {
-            dataRef = 
+            dataRef =
                 document.createElementNS(
                     WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":ReferenceList"
                 );
         }
         return WSSecEncrypt.createDataRefList(document, dataRef, encDataRefs);
     }
-    
+
     /**
      * Create a KeyInfo object
-     * @throws ConversationException 
+     * @throws ConversationException
      */
     private KeyInfo createKeyInfo() throws WSSecurityException {
         KeyInfo keyInfo = new KeyInfo(document);
@@ -150,8 +150,8 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         secToken.addWSSENamespace();
         Reference ref = new Reference(document);
         ref.setURI("#" + getId());
-        String ns = 
-            ConversationConstants.getWSCNs(getWscVersion()) 
+        String ns =
+            ConversationConstants.getWSCNs(getWscVersion())
                 + ConversationConstants.TOKEN_TYPE_DERIVED_KEY_TOKEN;
         ref.setValueType(ns);
         secToken.setReference(ref);
@@ -161,17 +161,17 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         keyInfoElement.setAttributeNS(
             WSConstants.XMLNS_NS, "xmlns:" + WSConstants.SIG_PREFIX, WSConstants.SIG_NS
         );
-        
+
         return keyInfo;
     }
-    
+
     /**
      * Adds (prepends) the external Reference element to the Security header.
-     * 
+     *
      * The reference element <i>must</i> be created by the
      * <code>encryptForExternalRef() </code> method. The method adds the
      * reference element in the SecurityHeader.
-     * 
+     *
      * @param referenceList The external <code>enc:Reference</code> element
      * @param secHeader The security header.
      */
@@ -181,8 +181,8 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
             if (node != null && Node.ELEMENT_NODE == node.getNodeType()) {
                 secHeader.getSecurityHeader().insertBefore(referenceList, node);
             } else {
-                // If (at this moment) DerivedKeyToken is the LAST element of 
-                // the security header 
+                // If (at this moment) DerivedKeyToken is the LAST element of
+                // the security header
                 secHeader.getSecurityHeader().appendChild(referenceList);
             }
         }
@@ -198,10 +198,10 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     }
 
     protected int getDerivedKeyLength() throws WSSecurityException{
-        return derivedKeyLength > 0 ? derivedKeyLength : 
+        return derivedKeyLength > 0 ? derivedKeyLength :
             KeyUtils.getKeyLength(symEncAlgo);
     }
-    
+
     public void setDerivedKeyLength(int keyLength) {
         derivedKeyLength = keyLength;
     }

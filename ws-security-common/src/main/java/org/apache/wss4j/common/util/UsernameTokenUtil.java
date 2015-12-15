@@ -28,18 +28,18 @@ import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 
 public final class UsernameTokenUtil {
     public static final int DEFAULT_ITERATION = 1000;
-    
+
     private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(UsernameTokenUtil.class);
-    
+
     private UsernameTokenUtil() {
         // complete
     }
-    
+
     /**
      * This static method generates a derived key as defined in WSS Username
      * Token Profile.
-     * 
+     *
      * @param password The password to include in the key generation
      * @param salt The Salt value
      * @param iteration The Iteration value. If zero (0) is given the method uses the
@@ -48,8 +48,8 @@ public final class UsernameTokenUtil {
      * @throws WSSecurityException
      */
     public static byte[] generateDerivedKey(
-        byte[] password, 
-        byte[] salt, 
+        byte[] password,
+        byte[] salt,
         int iteration
     ) throws WSSecurityException {
         byte[] pwSalt = new byte[salt.length + password.length];
@@ -83,11 +83,11 @@ public final class UsernameTokenUtil {
         }
         return k;
     }
-    
+
     /**
      * This static method generates a derived key as defined in WSS Username
      * Token Profile.
-     * 
+     *
      * @param password The password to include in the key generation
      * @param salt The Salt value
      * @param iteration The Iteration value. If zero (0) is given the method uses the
@@ -96,17 +96,17 @@ public final class UsernameTokenUtil {
      * @throws WSSecurityException
      */
     public static byte[] generateDerivedKey(
-        String password, 
-        byte[] salt, 
+        String password,
+        byte[] salt,
         int iteration
     ) throws WSSecurityException {
         return generateDerivedKey(password.getBytes(StandardCharsets.UTF_8), salt, iteration);
     }
-    
+
     /**
      * This static method generates a 128 bit salt value as defined in WSS
      * Username Token Profile.
-     * 
+     *
      * @param useForMac If <code>true</code> define the Salt for use in a MAC
      * @return Returns the 128 bit salt value as byte array
      */
@@ -129,7 +129,7 @@ public final class UsernameTokenUtil {
     /**
      * Generate a nonce of the given length using the SHA1PRNG algorithm. The SecureRandom
      * instance that backs this method is cached for efficiency.
-     * 
+     *
      * @return a nonce of the given length
      * @throws WSSecurityException
      */

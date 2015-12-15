@@ -36,10 +36,10 @@ import java.util.Map;
  * A Callback Handler implementation for the case of storing a secret key.
  */
 public class SecretKeyCallbackHandler implements CallbackHandler {
-    
+
     private Map<String, byte[]> secrets = new HashMap<>();
     private byte[] outboundSecret = null;
-    
+
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
@@ -59,11 +59,11 @@ public class SecretKeyCallbackHandler implements CallbackHandler {
             }
         }
     }
-    
+
     public void addSecretKey(String identifier, byte[] secretKey) {
         secrets.put(identifier, secretKey);
     }
-    
+
     public void setOutboundSecret(byte[] secret) throws WSSecurityException {
         outboundSecret = secret;
         byte[] encodedBytes = KeyUtils.generateDigest(outboundSecret);

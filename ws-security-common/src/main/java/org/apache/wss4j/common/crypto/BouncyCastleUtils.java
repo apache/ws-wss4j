@@ -26,7 +26,7 @@ import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 
 public final class BouncyCastleUtils {
-    
+
     private BouncyCastleUtils() {
         // complete
     }
@@ -34,26 +34,26 @@ public final class BouncyCastleUtils {
     public static byte[] getAuthorityKeyIdentifierBytes(X509Certificate cert) {
         byte[] extensionValue = cert.getExtensionValue("2.5.29.35"); //NOPMD
         if (extensionValue != null) {
-            byte[] octets = ASN1OctetString.getInstance(extensionValue).getOctets();     
-            AuthorityKeyIdentifier authorityKeyIdentifier = 
+            byte[] octets = ASN1OctetString.getInstance(extensionValue).getOctets();
+            AuthorityKeyIdentifier authorityKeyIdentifier =
                 AuthorityKeyIdentifier.getInstance(octets);
             return authorityKeyIdentifier.getKeyIdentifier();
         }
         return null;
     }
-    
+
     public static byte[] getSubjectKeyIdentifierBytes(X509Certificate cert) {
         byte[] extensionValue = cert.getExtensionValue("2.5.29.14"); //NOPMD
         if (extensionValue != null) {
-            byte[] subjectOctets = 
-                ASN1OctetString.getInstance(extensionValue).getOctets();     
+            byte[] subjectOctets =
+                ASN1OctetString.getInstance(extensionValue).getOctets();
             SubjectKeyIdentifier subjectKeyIdentifier =
                 SubjectKeyIdentifier.getInstance(subjectOctets);
             return subjectKeyIdentifier.getKeyIdentifier();
         }
         return null;
     }
-    
+
 }
 
 

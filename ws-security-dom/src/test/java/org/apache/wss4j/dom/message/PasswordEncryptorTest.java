@@ -49,31 +49,31 @@ import org.w3c.dom.Document;
  * password
  */
 public class PasswordEncryptorTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(PasswordEncryptorTest.class);
-    
+
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
-    private PasswordEncryptor passwordEncryptor = 
+    private PasswordEncryptor passwordEncryptor =
         new JasyptPasswordEncryptor("this-is-a-secret");
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public PasswordEncryptorTest() throws Exception {
         WSSConfig.init();
-        Properties properties = 
-            CryptoFactory.getProperties("crypto_enc.properties", 
+        Properties properties =
+            CryptoFactory.getProperties("crypto_enc.properties",
                                         Loader.getClassLoader(CryptoFactory.class));
-        crypto = 
-            CryptoFactory.getInstance(properties, 
+        crypto =
+            CryptoFactory.getInstance(properties,
                                       Loader.getClassLoader(CryptoFactory.class),
                                       passwordEncryptor);
     }
-    
+
     @org.junit.Test
     public void testEncryptedPassword() throws Exception {
         String encryptedPassword = passwordEncryptor.encrypt("security");
@@ -86,20 +86,20 @@ public class PasswordEncryptorTest extends org.junit.Assert {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         verify(signedDoc);
     }
-    
+
     @org.junit.Test
     public void testSignatureWSHandler() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
@@ -110,47 +110,47 @@ public class PasswordEncryptorTest extends org.junit.Assert {
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto_enc.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         reqData.setMsgContext(config);
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         HandlerAction action = new HandlerAction(WSConstants.SIGN);
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             Collections.singletonList(action),
             true
         );
-        
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
+
         verify(doc);
     }
-    
+
     @org.junit.Test
     public void testDecryption() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOEP);
-      
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();        
+        secHeader.insertSecurityHeader();
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
 
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-            
+
         verify(encryptedDoc);
     }
-    
+
     @org.junit.Test
     public void testDecryptionWSHandler() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
@@ -161,30 +161,30 @@ public class PasswordEncryptorTest extends org.junit.Assert {
         config.put(WSHandlerConstants.ENC_PROP_FILE, "crypto_enc.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         reqData.setMsgContext(config);
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         HandlerAction action = new HandlerAction(WSConstants.ENCR);
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             Collections.singletonList(action),
             true
         );
-        
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
+
         verify(doc);
     }
-    
+
     /**
      * Verifies the soap envelope.
-     * This method verifies all the signature generated. 
-     * 
+     * This method verifies all the signature generated.
+     *
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */

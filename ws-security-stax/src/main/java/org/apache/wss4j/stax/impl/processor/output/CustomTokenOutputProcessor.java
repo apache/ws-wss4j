@@ -48,7 +48,7 @@ public class CustomTokenOutputProcessor extends AbstractOutputProcessor {
         addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
         addBeforeProcessor(EncryptedKeyOutputProcessor.class.getName());
     }
-    
+
     @Override
     public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
         try {
@@ -56,7 +56,7 @@ public class CustomTokenOutputProcessor extends AbstractOutputProcessor {
             if (tokenId == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
-                
+
             WSPasswordCallback wsPasswordCallback = new WSPasswordCallback(tokenId, WSPasswordCallback.CUSTOM_TOKEN);
             WSSUtils.doPasswordCallback(
                     ((WSSSecurityProperties) getSecurityProperties()).getCallbackHandler(),
@@ -65,8 +65,8 @@ public class CustomTokenOutputProcessor extends AbstractOutputProcessor {
             if (customToken == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
-            
-            FinalUnknownTokenOutputProcessor outputProcessor = 
+
+            FinalUnknownTokenOutputProcessor outputProcessor =
                 new FinalUnknownTokenOutputProcessor(customToken);
             outputProcessor.setXMLSecurityProperties(getSecurityProperties());
             outputProcessor.setAction(getAction());
@@ -78,7 +78,7 @@ public class CustomTokenOutputProcessor extends AbstractOutputProcessor {
         }
         outputProcessorChain.processEvent(xmlSecEvent);
     }
-    
+
     class FinalUnknownTokenOutputProcessor extends AbstractOutputProcessor {
 
         private final Element token;
@@ -88,26 +88,26 @@ public class CustomTokenOutputProcessor extends AbstractOutputProcessor {
             this.addAfterProcessor(CustomTokenOutputProcessor.class.getName());
             this.token = token;
         }
-        
+
         @Override
         public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
             throws XMLStreamException, XMLSecurityException {
-    
+
             outputProcessorChain.processEvent(xmlSecEvent);
-    
+
             if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
-                
+
                 final QName headerElementName = new QName(token.getNamespaceURI(), token.getLocalName());
                 OutputProcessorUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
-    
+
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
-    
+
                 outputToken(token, subOutputProcessorChain);
-    
+
                 outputProcessorChain.removeProcessor(this);
             }
         }
-        
+
         private void outputToken(Element element, OutputProcessorChain outputProcessorChain)
                 throws XMLStreamException, XMLSecurityException {
 

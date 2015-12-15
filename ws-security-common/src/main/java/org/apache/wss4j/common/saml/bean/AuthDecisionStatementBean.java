@@ -29,33 +29,33 @@ import java.util.ArrayList;
  */
 public class AuthDecisionStatementBean {
 
-    /** 
-     * The SAML subject  
+    /**
+     * The SAML subject
      */
     private SubjectBean subject;
 
-    /** 
-     * enum representing the possible decision types as specified in the SAML spec 
+    /**
+     * enum representing the possible decision types as specified in the SAML spec
      */
     public enum Decision {PERMIT, INDETERMINATE, DENY}
 
-    /** 
-     * The decision rendered by the SAML authority with respect to the specified resource 
+    /**
+     * The decision rendered by the SAML authority with respect to the specified resource
      */
     private Decision decision;
 
-    /** 
-     * A URI reference identifying the resource to which access authorization is sought 
+    /**
+     * A URI reference identifying the resource to which access authorization is sought
      */
     private String resource;
 
-    /** 
-     * The set of actions authorized to be performed on the specified resource (one or more) 
+    /**
+     * The set of actions authorized to be performed on the specified resource (one or more)
      */
     private List<ActionBean> actionBeans;
 
-    /** 
-     * A set of assertions that the SAML authority relied on in making the decision (optional) 
+    /**
+     * A set of assertions that the SAML authority relied on in making the decision (optional)
      */
     private Object evidence;
 
@@ -76,8 +76,8 @@ public class AuthDecisionStatementBean {
      * @param actionBeans of type List<SamlAction>
      */
     public AuthDecisionStatementBean(
-        Decision decision, 
-        String resource, 
+        Decision decision,
+        String resource,
         SubjectBean subject,
         Object evidence,
         List<ActionBean> actionBeans
@@ -176,7 +176,7 @@ public class AuthDecisionStatementBean {
     public void setSubject(SubjectBean subject) {
         this.subject = subject;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -193,25 +193,25 @@ public class AuthDecisionStatementBean {
         } else if (subject != null && !subject.equals(that.subject)) {
             return false;
         }
-        
+
         if (decision == null && that.decision != null) {
             return false;
         } else if (decision != null && !decision.equals(that.decision)) {
             return false;
         }
-        
+
         if (evidence == null && that.evidence != null) {
             return false;
         } else if (evidence != null && !evidence.equals(that.evidence)) {
             return false;
         }
-        
+
         if (actionBeans == null && that.actionBeans != null) {
             return false;
         } else if (actionBeans != null && !actionBeans.equals(that.actionBeans)) {
             return false;
         }
-        
+
         if (resource == null && that.resource != null) {
             return false;
         } else if (resource != null && !resource.equals(that.resource)) {

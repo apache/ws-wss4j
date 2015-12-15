@@ -30,13 +30,13 @@ import org.w3c.dom.Element;
 import java.util.List;
 
 public class SignatureConfirmationProcessor implements Processor {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureConfirmationProcessor.class);
-    
+
     public List<WSSecurityEngineResult> handleToken(
-        Element elem, 
+        Element elem,
         RequestData data,
-        WSDocInfo wsDocInfo 
+        WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Found SignatureConfirmation list element");
@@ -46,7 +46,7 @@ public class SignatureConfirmationProcessor implements Processor {
         //
         SignatureConfirmation sigConf = new SignatureConfirmation(elem, data.getBSPEnforcer());
 
-        WSSecurityEngineResult result = 
+        WSSecurityEngineResult result =
             new WSSecurityEngineResult(WSConstants.SC, sigConf);
         String tokenId = sigConf.getID();
         if (!"".equals(tokenId)) {
@@ -56,5 +56,5 @@ public class SignatureConfirmationProcessor implements Processor {
         wsDocInfo.addTokenElement(elem);
         return java.util.Collections.singletonList(result);
     }
-    
+
 }

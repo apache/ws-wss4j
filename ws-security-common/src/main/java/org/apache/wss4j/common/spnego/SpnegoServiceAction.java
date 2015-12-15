@@ -24,37 +24,37 @@ import java.security.PrivilegedAction;
 import org.ietf.jgss.GSSContext;
 
 /**
- * This interface represents a PrivilegedAction implementation to validate a received (SPNEGO) 
+ * This interface represents a PrivilegedAction implementation to validate a received (SPNEGO)
  * ticket to a KDC.
  */
 public interface SpnegoServiceAction extends PrivilegedAction<byte[]> {
-    
+
     /**
      * Set the ticket to validate
      */
     void setTicket(byte[] ticket);
-    
+
     /**
      * The Service Name
      */
     void setServiceName(String serviceName);
-    
+
     /**
      * If true - sets the SPN form to "username"
      * <br/>If false<b>(default)</b> - the SPN form is "hostbased"
-     * 
+     *
      * @param isUsernameServiceNameForm the isUsernameServiceNameForm to set
      */
     void setUsernameServiceNameForm(boolean isUsernameServiceNameForm);
-    
+
     /**
      * Validate a service ticket
      */
     byte[] run();
-    
+
     /**
      * Get the GSSContext that was created after a service ticket was obtained
      */
     GSSContext getContext();
-    
+
 }

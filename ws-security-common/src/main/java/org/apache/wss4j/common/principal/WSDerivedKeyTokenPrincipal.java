@@ -24,13 +24,13 @@ import java.security.Principal;
 /**
  * This class implements the <code>Principal</code> interface and
  * represents a <code>DerivedKeyToken</code>.
- * The principal's name will be the <code>wsu:Id</code> value of the 
+ * The principal's name will be the <code>wsu:Id</code> value of the
  * <code>DerivedKeyToken</code>
  */
 public class WSDerivedKeyTokenPrincipal implements java.io.Serializable, Principal {
 
     private static final long serialVersionUID = -8576876885462234466L;
-    
+
     private String algorithm;
     private String id;
     private String nonce;
@@ -43,7 +43,7 @@ public class WSDerivedKeyTokenPrincipal implements java.io.Serializable, Princip
     public WSDerivedKeyTokenPrincipal(String id) {
         this.id = id;
     }
-    
+
     public String getLabel() {
         return label;
     }
@@ -51,11 +51,11 @@ public class WSDerivedKeyTokenPrincipal implements java.io.Serializable, Princip
     public void setLabel(String label) {
         this.label = label;
     }
-    
+
     public byte[] getSecret() {
         return secret;
     }
-    
+
     public void setSecret(byte[] secret) {
         this.secret = secret;
     }
@@ -83,7 +83,7 @@ public class WSDerivedKeyTokenPrincipal implements java.io.Serializable, Princip
     public String getName() {
         return id;
     }
-    
+
     public void setNonce(String nonce) {
         this.nonce = nonce;
     }
@@ -95,7 +95,7 @@ public class WSDerivedKeyTokenPrincipal implements java.io.Serializable, Princip
     public void setBasetokenId(String basetokenId) {
         this.basetokenId = basetokenId;
     }
-    
+
     public String getAlgorithm() {
         return algorithm;
     }

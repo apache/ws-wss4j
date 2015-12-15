@@ -33,8 +33,8 @@ import org.w3c.dom.Element;
  * This abstract class encapsulates configuration for Signature + Encryption Actions.
  */
 public abstract class SignatureEncryptionActionToken implements SecurityActionToken {
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureEncryptionActionToken.class);
 
     private X509Certificate certificate;
@@ -55,7 +55,7 @@ public abstract class SignatureEncryptionActionToken implements SecurityActionTo
     private int derivedKeyLength;
     private int derivedKeyIdentifier;
     private boolean includeToken;
-    
+
     public X509Certificate getCertificate() {
         return certificate;
     }
@@ -80,7 +80,7 @@ public abstract class SignatureEncryptionActionToken implements SecurityActionTo
     public void setUser(String user) {
         this.user = user;
     }
-    
+
     public synchronized Crypto getCrypto() throws WSSecurityException {
         if (crypto != null) {
             return crypto;
@@ -94,12 +94,12 @@ public abstract class SignatureEncryptionActionToken implements SecurityActionTo
                 LOG.debug(ex.getMessage(), ex);
             }
             Properties properties = CryptoFactory.getProperties(cryptoProperties, classLoader);
-            crypto = 
+            crypto =
                 CryptoFactory.getInstance(properties, classLoader, null);
         }
         return crypto;
     }
-    
+
     public synchronized void setCrypto(Crypto crypto) {
         this.crypto = crypto;
     }
@@ -137,11 +137,11 @@ public abstract class SignatureEncryptionActionToken implements SecurityActionTo
     public synchronized void setCryptoProperties(String cryptoProperties) {
         this.cryptoProperties = cryptoProperties;
     }
-    
+
     public synchronized String getCryptoProperties() {
         return cryptoProperties;
     }
-    
+
     public String getTokenType() {
         return tokenType;
     }

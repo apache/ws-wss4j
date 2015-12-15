@@ -36,12 +36,12 @@ import java.util.TreeMap;
  * and the max TTL is 60 minutes.
  */
 public class MemoryReplayCache implements ReplayCache {
-    
+
     public static final long DEFAULT_TTL = 60L * 5L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
     private final SortedMap<Date, List<String>> cache = new TreeMap<>();
     private final Set<String> ids = Collections.synchronizedSet(new HashSet<String>());
-    
+
     /**
      * Add the given identifier to the cache. It will be cached for a default amount of time.
      * @param identifier The identifier to be added
@@ -49,7 +49,7 @@ public class MemoryReplayCache implements ReplayCache {
     public void add(String identifier) {
         add(identifier, DEFAULT_TTL);
     }
-    
+
     /**
      * Add the given identifier to the cache to be cached for the given time
      * @param identifier The identifier to be added
@@ -59,16 +59,16 @@ public class MemoryReplayCache implements ReplayCache {
         if (identifier == null || "".equals(identifier)) {
             return;
         }
-        
+
         long ttl = timeToLive;
         if (ttl < 0 || ttl > MAX_TTL) {
             ttl = DEFAULT_TTL;
         }
-        
+
         Date expires = new Date();
         long currentTime = expires.getTime();
         expires.setTime(currentTime + ttl * 1000L);
-        
+
         synchronized (cache) {
             List<String> list = cache.get(expires);
             if (list == null) {
@@ -79,20 +79,20 @@ public class MemoryReplayCache implements ReplayCache {
         }
         ids.add(identifier);
     }
-    
+
     /**
      * Return true if the given identifier is contained in the cache
      * @param identifier The identifier to check
      */
     public boolean contains(String identifier) {
         processTokenExpiry();
-        
+
         if (identifier != null && !"".equals(identifier)) {
             return ids.contains(identifier);
         }
         return false;
     }
-    
+
     protected void processTokenExpiry() {
         Date current = new Date();
         synchronized (cache) {

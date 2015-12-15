@@ -43,14 +43,14 @@ public class SecurityContextToken {
      * Identifier element
      */
     private Element elementIdentifier;
-    
+
     /**
      * Instance element
      */
     private Element elementInstance;
-    
+
     private String tokenType = WSConstants.WSC_SCT;
-    
+
     /**
      * Constructor to create the SCT
      *
@@ -77,19 +77,19 @@ public class SecurityContextToken {
     public SecurityContextToken(int version, Document doc) throws WSSecurityException {
 
         String ns = ConversationConstants.getWSCNs(version);
-        
-        element = 
+
+        element =
             doc.createElementNS(ns, "wsc:" + ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
 
         XMLUtils.setNamespace(element, ns, ConversationConstants.WSC_PREFIX);
 
-        elementIdentifier = 
+        elementIdentifier =
             doc.createElementNS(ns, "wsc:" + ConversationConstants.IDENTIFIER_LN);
 
         element.appendChild(elementIdentifier);
 
         String uuid = IDGenerator.generateID("uuid:");
-        
+
         elementIdentifier.appendChild(doc.createTextNode(uuid));
     }
 
@@ -101,26 +101,26 @@ public class SecurityContextToken {
     public SecurityContextToken(int version, Document doc, String uuid) throws WSSecurityException {
 
         String ns = ConversationConstants.getWSCNs(version);
-        
-        element = 
+
+        element =
             doc.createElementNS(ns, "wsc:" + ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
 
         XMLUtils.setNamespace(element, ns, ConversationConstants.WSC_PREFIX);
 
-        elementIdentifier = 
+        elementIdentifier =
             doc.createElementNS(ns, "wsc:" + ConversationConstants.IDENTIFIER_LN);
 
         element.appendChild(elementIdentifier);
 
         elementIdentifier.appendChild(doc.createTextNode(uuid));
-        
+
         if (version == ConversationConstants.VERSION_05_02) {
             tokenType = WSConstants.WSC_SCT;
         } else {
             tokenType = WSConstants.WSC_SCT_05_12;
         }
     }
-    
+
     /**
      * Constructor to create the SCT with a given uuid and instance
      *
@@ -129,7 +129,7 @@ public class SecurityContextToken {
     public SecurityContextToken(int version, Document doc, String uuid, String instance)
         throws WSSecurityException {
         this(version, doc, uuid);
-        
+
         if (instance != null) {
             String ns = ConversationConstants.getWSCNs(version);
             elementInstance = doc.createElementNS(ns, ConversationConstants.INSTANCE_LN);
@@ -137,7 +137,7 @@ public class SecurityContextToken {
             elementInstance.appendChild(doc.createTextNode(instance));
         }
     }
-    
+
     /**
      * This is used to create a SecurityContextToken using a DOM Element
      *
@@ -157,21 +157,21 @@ public class SecurityContextToken {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN);
         }
 
-        elementIdentifier = 
+        elementIdentifier =
             XMLUtils.getDirectChildElement(
-                element, 
+                element,
                 ConversationConstants.IDENTIFIER_LN,
                 el.getNamespaceURI()
             );
-        
-        elementInstance = 
+
+        elementInstance =
             XMLUtils.getDirectChildElement(
-                element, 
+                element,
                 ConversationConstants.INSTANCE_LN,
                 el.getNamespaceURI()
             );
     }
-    
+
     /**
      * Add the WSU Namespace to this SCT. The namespace is not added by default for
      * efficiency purposes.
@@ -278,7 +278,7 @@ public class SecurityContextToken {
     public void setID(String id) {
         element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -288,7 +288,7 @@ public class SecurityContextToken {
         }
         return result;
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (!(object instanceof SecurityContextToken)) {
@@ -300,9 +300,9 @@ public class SecurityContextToken {
         }
         return true;
     }
-    
+
     private boolean compare(String item1, String item2) {
-        if (item1 == null && item2 != null) { 
+        if (item1 == null && item2 != null) {
             return false;
         } else if (item1 != null && !item1.equals(item2)) {
             return false;

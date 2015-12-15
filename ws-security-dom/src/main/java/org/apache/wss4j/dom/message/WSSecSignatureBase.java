@@ -54,17 +54,17 @@ import org.w3c.dom.Node;
  * verification.
  */
 public class WSSecSignatureBase extends WSSecBase {
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSecSignatureBase.class);
-    
+
     public WSSecSignatureBase() {
         super();
     }
-    
+
     /**
      * This method adds references to the Signature.
-     * 
+     *
      * @param doc The parent document
      * @param references The list of references to sign
      * @param wsDocInfo The WSDocInfo object to store protection elements in
@@ -97,7 +97,7 @@ public class WSSecSignatureBase extends WSSecBase {
         //are processed.
         List<javax.xml.crypto.dsig.Reference> attachmentReferenceList = null;
         List<javax.xml.crypto.dsig.Reference> referenceList = new ArrayList<>();
-        
+
         for (WSEncryptionPart encPart : references) {
             String idToSign = encPart.getId();
             String elemName = encPart.getName();
@@ -109,7 +109,7 @@ public class WSSecSignatureBase extends WSSecBase {
             //
             try {
                 if ("cid:Attachments".equals(idToSign) && attachmentReferenceList == null) {
-                    attachmentReferenceList = 
+                    attachmentReferenceList =
                         addAttachmentReferences(encPart, digestMethod, signatureFactory);
                     continue;
                 }
@@ -117,7 +117,7 @@ public class WSSecSignatureBase extends WSSecBase {
                     Transform transform = null;
                     if ("STRTransform".equals(elemName)) {
                         Element ctx = createSTRParameter(doc);
-                        
+
                         XMLStructure structure = new DOMStructure(ctx);
                         transform =
                             signatureFactory.newTransform(
@@ -147,9 +147,9 @@ public class WSSecSignatureBase extends WSSecBase {
                     } else if (!encPart.isRequired()) {
                         continue;
                     }
-                    javax.xml.crypto.dsig.Reference reference = 
+                    javax.xml.crypto.dsig.Reference reference =
                         signatureFactory.newReference(
-                            "#" + idToSign, 
+                            "#" + idToSign,
                             digestMethod,
                             Collections.singletonList(transform),
                             null,
@@ -165,7 +165,7 @@ public class WSSecSignatureBase extends WSSecBase {
                         if (callbackLookup == null) {
                             callbackLookup = new DOMCallbackLookup(doc);
                         }
-                        elementsToSign = 
+                        elementsToSign =
                             WSSecurityUtil.findElements(encPart, callbackLookup, doc);
                     }
                     if (elementsToSign == null || elementsToSign.size() == 0) {
@@ -173,7 +173,7 @@ public class WSSecSignatureBase extends WSSecBase {
                             continue;
                         }
                         throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.FAILURE, 
+                            WSSecurityException.ErrorCode.FAILURE,
                             "noEncElement",
                             new Object[] {nmSpace + ", " + elemName});
                     }
@@ -188,9 +188,9 @@ public class WSSecSignatureBase extends WSSecBase {
                                 WSConstants.C14N_EXCL_OMIT_COMMENTS,
                                 transformSpec
                             );
-                        javax.xml.crypto.dsig.Reference reference = 
+                        javax.xml.crypto.dsig.Reference reference =
                             signatureFactory.newReference(
-                                "#" + setWsuId(elementToSign), 
+                                "#" + setWsuId(elementToSign),
                                 digestMethod,
                                 Collections.singletonList(transform),
                                 null,
@@ -207,16 +207,16 @@ public class WSSecSignatureBase extends WSSecBase {
                 );
             }
         }
-        
+
         //append attachment references now
         if (attachmentReferenceList != null) {
             referenceList.addAll(attachmentReferenceList);
         }
         return referenceList;
     }
-    
+
     private List<javax.xml.crypto.dsig.Reference> addAttachmentReferences(
-        WSEncryptionPart encPart, 
+        WSEncryptionPart encPart,
         DigestMethod digestMethod,
         XMLSignatureFactory signatureFactory
     ) throws WSSecurityException {
@@ -238,53 +238,53 @@ public class WSSecSignatureBase extends WSSecBase {
         } catch (Exception e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
-        
+
         List<javax.xml.crypto.dsig.Reference> attachmentReferenceList = new ArrayList<>();
         if (attachmentRequestCallback.getAttachments() != null) {
             for (Attachment attachment : attachmentRequestCallback.getAttachments()) {
                 try {
                     List<Transform> transforms = new ArrayList<>();
-    
+
                     AttachmentTransformParameterSpec attachmentTransformParameterSpec =
                         new AttachmentTransformParameterSpec(
                             attachmentCallbackHandler, attachment
                         );
-    
+
                     String attachmentSignatureTransform = WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS;
                     if ("Element".equals(encPart.getEncModifier())) {
                         attachmentSignatureTransform = WSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS;
                     }
-    
+
                     transforms.add(
                         signatureFactory.newTransform(
                             attachmentSignatureTransform, attachmentTransformParameterSpec)
                         );
-    
+
                     javax.xml.crypto.dsig.Reference reference =
                         signatureFactory.newReference(
                             "cid:" + attachment.getId(), digestMethod, transforms, null, null
                         );
-    
+
                     attachmentReferenceList.add(reference);
                 } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException e) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
                 }
             }
         }
-        
+
         return attachmentReferenceList;
     }
-    
+
     /**
-     * Get the List of inclusive prefixes from the DOM Element argument 
+     * Get the List of inclusive prefixes from the DOM Element argument
      */
     public List<String> getInclusivePrefixes(Element target) {
         return getInclusivePrefixes(target, true);
     }
-    
-    
+
+
     /**
-     * Get the List of inclusive prefixes from the DOM Element argument 
+     * Get the List of inclusive prefixes from the DOM Element argument
      */
     public List<String> getInclusivePrefixes(Element target, boolean excludeVisible) {
         List<String> result = new ArrayList<>();
@@ -330,18 +330,18 @@ public class WSSecSignatureBase extends WSSecBase {
 
         return result;
     }
-    
+
     /**
      * Create an STRTransformationParameters element
      */
     public Element createSTRParameter(Document doc) {
-        Element transformParam = 
+        Element transformParam =
             doc.createElementNS(
                 WSConstants.WSSE_NS,
                 WSConstants.WSSE_PREFIX + ":TransformationParameters"
             );
 
-        Element canonElem = 
+        Element canonElem =
             doc.createElementNS(
                 WSConstants.SIG_NS,
                 WSConstants.SIG_PREFIX + ":CanonicalizationMethod"
@@ -351,5 +351,5 @@ public class WSSecSignatureBase extends WSSecBase {
         transformParam.appendChild(canonElem);
         return transformParam;
     }
-    
+
 }

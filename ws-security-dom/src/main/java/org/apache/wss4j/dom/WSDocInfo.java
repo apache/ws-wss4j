@@ -20,14 +20,14 @@
 package org.apache.wss4j.dom;
 
 /**
- * WSDocInfo holds information about the document to process. It provides a 
- * method to store and access document information about BinarySecurityToken, 
+ * WSDocInfo holds information about the document to process. It provides a
+ * method to store and access document information about BinarySecurityToken,
  * used Crypto, and others.
- * 
+ *
  * Using the Document's hash a caller can identify a document and get
  * the stored information that me be necessary to process the document.
  * The main usage for this is (are) the transformation functions that
- * are called during Signature/Verification process. 
+ * are called during Signature/Verification process.
  */
 
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ import org.w3c.dom.Element;
 public class WSDocInfo {
     private Document doc;
     private Crypto crypto;
-    
+
     // Here we map the token "Id" to the token itself. The token "Id" is the key as it must be unique to guard
     // against various wrapping attacks. The "Id" name/namespace is stored as part of the entry (along with the
     // element), so that we know what namespace to use when setting the token on the crypto context for signature
@@ -74,7 +74,7 @@ public class WSDocInfo {
             this.doc = doc;
         }
     }
-    
+
     /**
      * Clears the data stored in this object
      */
@@ -87,18 +87,18 @@ public class WSDocInfo {
         results.clear();
         actionResults.clear();
     }
-    
+
     /**
-     * Store a token element for later retrieval. Before storing the token, we check for a 
+     * Store a token element for later retrieval. Before storing the token, we check for a
      * previously processed token with the same (wsu/SAML) Id.
      * @param element is the token element to store
      */
     public void addTokenElement(Element element) throws WSSecurityException {
         addTokenElement(element, true);
     }
-    
+
     /**
-     * Store a token element for later retrieval. Before storing the token, we check for a 
+     * Store a token element for later retrieval. Before storing the token, we check for a
      * previously processed token with the same (wsu/SAML) Id.
      * @param element is the token element to store
      * @param checkMultipleElements check for a previously stored element with the same Id.
@@ -107,7 +107,7 @@ public class WSDocInfo {
         if (element == null) {
             return;
         }
-        
+
         if (element.hasAttributeNS(WSConstants.WSU_NS, "Id")) {
             String id = element.getAttributeNS(WSConstants.WSU_NS, "Id");
             TokenValue tokenValue = new TokenValue("Id", WSConstants.WSU_NS, element);
@@ -156,11 +156,11 @@ public class WSDocInfo {
         }
 
     }
-    
-    
+
+
     /**
-     * Get a token Element for the given Id. The Id can be either a wsu:Id or a 
-     * SAML AssertionID/ID. 
+     * Get a token Element for the given Id. The Id can be either a wsu:Id or a
+     * SAML AssertionID/ID.
      * @param uri is the (relative) uri of the id
      * @return the token element or null if nothing found
      */
@@ -169,7 +169,7 @@ public class WSDocInfo {
         if (id == null) {
             return null;
         }
-        
+
         TokenValue token = tokens.get(id);
         if (token != null) {
             return token.getToken();
@@ -191,7 +191,7 @@ public class WSDocInfo {
             }
         }
     }
-    
+
     public void setTokenOnContext(String uri, DOMCryptoContext context) {
         String id = XMLUtils.getIDFromReference(uri);
         if (id == null || context == null) {
@@ -205,9 +205,9 @@ public class WSDocInfo {
         }
     }
 
-    
+
     /**
-     * Store a WSSecurityEngineResult for later retrieval. 
+     * Store a WSSecurityEngineResult for later retrieval.
      * @param result is the WSSecurityEngineResult to store
      */
     public void addResult(WSSecurityEngineResult result) {
@@ -222,7 +222,7 @@ public class WSDocInfo {
             actionResults.put(resultTag, storedResults);
         }
     }
-    
+
     /**
      * Get a copy of the security results list. Modifying the subsequent list does not
      * change the internal results list.
@@ -233,7 +233,7 @@ public class WSDocInfo {
         }
         return new ArrayList<>(results);
     }
-    
+
     /**
      * Return a copy of the map between security actions + results. Modifying the subsequent
      * map does not change the internal map.
@@ -244,7 +244,7 @@ public class WSDocInfo {
         }
         return new HashMap<>(actionResults);
     }
-    
+
     /**
      * Get a WSSecurityEngineResult for the given Id.
      * @param uri is the (relative) uri of the id
@@ -255,7 +255,7 @@ public class WSDocInfo {
         if (id == null) {
             return null;
         }
-        
+
         if (!results.isEmpty()) {
             for (WSSecurityEngineResult result : results) {
                 String cId = (String)result.get(WSSecurityEngineResult.TAG_ID);
@@ -266,7 +266,7 @@ public class WSDocInfo {
         }
         return null;
     }
-    
+
     /**
      * Get a unmodifiable list of WSSecurityEngineResults of the given Integer tag
      */
@@ -274,10 +274,10 @@ public class WSDocInfo {
         if (actionResults.isEmpty() || !actionResults.containsKey(tag)) {
             return Collections.emptyList();
         }
-        
+
         return Collections.unmodifiableList(actionResults.get(tag));
     }
-    
+
     /**
      * See whether we have a WSSecurityEngineResult of the given Integer tag for the given Id
      */
@@ -286,7 +286,7 @@ public class WSDocInfo {
         if (id == null || "".equals(uri)) {
             return false;
         }
-        
+
         if (!actionResults.isEmpty() && actionResults.containsKey(tag)) {
             for (WSSecurityEngineResult result : actionResults.get(tag)) {
                 String cId = (String)result.get(WSSecurityEngineResult.TAG_ID);
@@ -321,14 +321,14 @@ public class WSDocInfo {
     public void setCrypto(Crypto crypto) {
         this.crypto = crypto;
     }
-    
+
     /**
      * @param callbackLookup The CallbackLookup object to retrieve elements
      */
     public void setCallbackLookup(CallbackLookup callbackLookup) {
         this.callbackLookup = callbackLookup;
     }
-    
+
     /**
      * @return the CallbackLookup object to retrieve elements
      */
@@ -342,16 +342,16 @@ public class WSDocInfo {
     public Element getSecurityHeader() {
         return securityHeader;
     }
-    
+
     /**
      * Sets the wsse header being processed
-     * 
+     *
      * @param securityHeader
      */
     public void setSecurityHeader(Element securityHeader) {
         this.securityHeader = securityHeader;
     }
-    
+
     private static class TokenValue {
         private final String idName;
         private final String idNamespace;

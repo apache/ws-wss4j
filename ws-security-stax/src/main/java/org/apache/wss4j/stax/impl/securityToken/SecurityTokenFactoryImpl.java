@@ -129,7 +129,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             if (securityTokenReferenceType.getId() == null) {
                 securityTokenReferenceType.setId(IDGenerator.generateID(null));
             }
-            
+
             //todo BSP.R3027 KeyName? not supported ATM
             //todo BSP.R3060,BSP.R3025,BSP.R3056 only one Embedded element? Not supported ATM
             final X509DataType x509DataType
@@ -182,10 +182,10 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                             x509CertificateBytes, securityTokenReferenceType.getId(), securityProperties);
                 }
             }
-            
-            String tokenType = 
+
+            String tokenType =
                     XMLSecurityUtils.getQNameAttribute(
-                        securityTokenReferenceType.getOtherAttributes(), 
+                        securityTokenReferenceType.getOtherAttributes(),
                         WSSConstants.ATT_wsse11_TokenType);
 
             final KeyIdentifierType keyIdentifierType
@@ -206,7 +206,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     } else {
                         ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3071);
                     }
-                } else if (encodingType != null 
+                } else if (encodingType != null
                         && (WSSConstants.NS_SAML10_TYPE.equals(valueType) || WSSConstants.NS_SAML20_TYPE.equals(valueType))) {
                     ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6604);
                 }
@@ -264,11 +264,11 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                         return createSecurityTokenProxy(securityTokenProvider.getSecurityToken(),
                             WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                     }
-                    
+
                     // Delegate to a CallbackHandler, in case the token is not in the request
-                    return new SamlSecurityTokenImpl((WSInboundSecurityContext) inboundSecurityContext, 
+                    return new SamlSecurityTokenImpl((WSInboundSecurityContext) inboundSecurityContext,
                                                      keyIdentifierType.getValue(),
-                                                     WSSecurityTokenConstants.KeyIdentifier_ExternalReference, 
+                                                     WSSecurityTokenConstants.KeyIdentifier_ExternalReference,
                                                      securityProperties);
                 } else if (WSSConstants.NS_Kerberos5_AP_REQ_SHA1.equals(valueType)) {
                     SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider =
@@ -277,7 +277,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                         return createSecurityTokenProxy(securityTokenProvider.getSecurityToken(),
                                 WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
                     }
-                    
+
                     try {
                         //ok we have to find the token via digesting...
                         MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
@@ -301,7 +301,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
 
                     // Finally, just delegate to a Callback as per EncryptedKeySHA1
                     return new EncryptedKeySha1SecurityTokenImpl(
-                            (WSInboundSecurityContext) inboundSecurityContext, callbackHandler, 
+                            (WSInboundSecurityContext) inboundSecurityContext, callbackHandler,
                             keyIdentifierType.getValue(), securityTokenReferenceType.getId());
                 } else {
                     //we do enforce BSP compliance here but will fail anyway since we cannot identify the referenced token
@@ -325,9 +325,9 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     included = false;
                     // Delegate to a CallbackHandler, in case the token is not in the request
                     try {
-                        return new ExternalSecurityTokenImpl((WSInboundSecurityContext) inboundSecurityContext, 
+                        return new ExternalSecurityTokenImpl((WSInboundSecurityContext) inboundSecurityContext,
                                                      uri,
-                                                     WSSecurityTokenConstants.KeyIdentifier_ExternalReference, 
+                                                     WSSecurityTokenConstants.KeyIdentifier_ExternalReference,
                                                      securityProperties, false);
                     } catch (WSSecurityException ex) { //NOPMD
                         // just continue
@@ -354,9 +354,9 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                         inboundSecurityContext.getSecurityTokenProvider(uri);
                 if (securityTokenProvider == null) {
                     // Delegate to a CallbackHandler, in case the token is not in the request
-                    return new ExternalSecurityTokenImpl((WSInboundSecurityContext) inboundSecurityContext, 
+                    return new ExternalSecurityTokenImpl((WSInboundSecurityContext) inboundSecurityContext,
                                                      uri,
-                                                     WSSecurityTokenConstants.KeyIdentifier_ExternalReference, 
+                                                     WSSecurityTokenConstants.KeyIdentifier_ExternalReference,
                                                      securityProperties, included);
                 }
                 if (securityTokenProvider.getSecurityToken() instanceof SecurityTokenReference) {
@@ -394,7 +394,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                         ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6611);
                     }
                 }
-                
+
                 return createSecurityTokenProxy(securityTokenProvider.getSecurityToken(),
                         WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
             }

@@ -38,7 +38,7 @@ public final class DOM2Writer {
     public static final char NL = '\n';
     public static final String LS = System.getProperty("line.separator",
             Character.valueOf(NL).toString());
-    
+
     private DOM2Writer() {
         // Complete
     }

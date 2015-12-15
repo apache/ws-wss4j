@@ -173,14 +173,14 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
                 outputProcessorChain.removeProcessor(this);
             }
         }
-        
+
         private QName getHeaderElementName() {
             if (use200512Namespace) {
                 return WSSConstants.TAG_wsc0512_SecurityContextToken;
             }
             return WSSConstants.TAG_wsc0502_SecurityContextToken;
         }
-        
+
         private QName getIdentifierName() {
             if (use200512Namespace) {
                 return WSSConstants.TAG_wsc0512_Identifier;

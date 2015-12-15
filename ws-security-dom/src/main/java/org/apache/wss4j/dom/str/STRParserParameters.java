@@ -28,43 +28,43 @@ import org.apache.wss4j.dom.handler.RequestData;
  * This class holds the parameters for parsing a SecurityTokenReference Element by a STRParser implementation.
  */
 public class STRParserParameters {
-    
+
     private int derivationKeyLength;
     private Element strElement;
     private RequestData data;
     private WSDocInfo wsDocInfo;
-    
+
     public int getDerivationKeyLength() {
         return derivationKeyLength;
     }
-    
+
     public void setDerivationKeyLength(int derivationKeyLength) {
         this.derivationKeyLength = derivationKeyLength;
     }
-    
+
     public Element getStrElement() {
         return strElement;
     }
-    
+
     public void setStrElement(Element strElement) {
         this.strElement = strElement;
     }
-    
+
     public RequestData getData() {
         return data;
     }
-    
+
     public void setData(RequestData data) {
         this.data = data;
     }
-    
+
     public WSDocInfo getWsDocInfo() {
         return wsDocInfo;
     }
-    
+
     public void setWsDocInfo(WSDocInfo wsDocInfo) {
         this.wsDocInfo = wsDocInfo;
     }
 
-    
+
 }

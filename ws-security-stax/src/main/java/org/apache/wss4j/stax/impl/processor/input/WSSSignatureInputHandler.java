@@ -51,7 +51,7 @@ import org.apache.xml.security.stax.securityToken.SecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityTokenFactory;
 
 public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
-    
+
     private static final transient org.slf4j.Logger log =
         org.slf4j.LoggerFactory.getLogger(WSSSignatureInputHandler.class);
 
@@ -64,7 +64,7 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
         checkBSPCompliance(inputProcessorChain, signatureType);
-        
+
         String algorithm = signatureType.getSignedInfo().getSignatureMethod().getAlgorithm();
         if (securityProperties.getSignatureAlgorithm() != null
             && !securityProperties.getSignatureAlgorithm().equals(algorithm)) {
@@ -93,11 +93,11 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
     private void checkBSPCompliance(InputProcessorChain inputProcessorChain, SignatureType signatureType) throws WSSecurityException {
         String algorithm = signatureType.getSignedInfo().getSignatureMethod().getAlgorithm();
         final WSInboundSecurityContext securityContext = (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
-        if (!(WSSConstants.NS_XMLDSIG_HMACSHA1.equals(algorithm) 
+        if (!(WSSConstants.NS_XMLDSIG_HMACSHA1.equals(algorithm)
             || WSSConstants.NS_XMLDSIG_RSASHA1.equals(algorithm)
-            || WSSConstants.NS_XMLDSIG_HMACSHA256.equals(algorithm) 
-            || WSSConstants.NS_XMLDSIG_HMACSHA384.equals(algorithm) 
-            || WSSConstants.NS_XMLDSIG_HMACSHA512.equals(algorithm) 
+            || WSSConstants.NS_XMLDSIG_HMACSHA256.equals(algorithm)
+            || WSSConstants.NS_XMLDSIG_HMACSHA384.equals(algorithm)
+            || WSSConstants.NS_XMLDSIG_HMACSHA512.equals(algorithm)
             || WSSConstants.NS_XMLDSIG_RSASHA256.equals(algorithm)
             || WSSConstants.NS_XMLDSIG_RSASHA384.equals(algorithm)
             || WSSConstants.NS_XMLDSIG_RSASHA512.equals(algorithm))) {
@@ -179,7 +179,7 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
 
             //we have to emit a TokenSecurityEvent here too since it could be an embedded token
             inboundSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_Signature);
-            TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent 
+            TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent
                 = WSSUtils.createTokenSecurityEvent(inboundSecurityToken, signatureType.getId());
             inboundSecurityContext.registerSecurityEvent(tokenSecurityEvent);
 

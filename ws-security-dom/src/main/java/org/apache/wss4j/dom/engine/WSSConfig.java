@@ -56,9 +56,9 @@ import org.apache.xml.security.utils.resolver.ResourceResolver;
  * the latest specs. Do this only if you know what you are doing.</b> <p/>
  */
 public class WSSConfig {
-    
+
     public static final DatatypeFactory datatypeFactory;
-    
+
     static {
         try {
             datatypeFactory = DatatypeFactory.newInstance();
@@ -66,8 +66,8 @@ public class WSSConfig {
             throw new RuntimeException(e);
         }
     }
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSConfig.class);
 
     /**
@@ -203,7 +203,7 @@ public class WSSConfig {
         }
         DEFAULT_PROCESSORS = java.util.Collections.unmodifiableMap(tmp);
     }
-    
+
     /**
      * The default collection of validators supported by the toolkit
      */
@@ -238,7 +238,7 @@ public class WSSConfig {
         }
         DEFAULT_VALIDATORS = java.util.Collections.unmodifiableMap(tmp);
     }
-    
+
     /**
      * a static boolean flag that determines whether default JCE providers
      * should be added at the time of construction.
@@ -247,7 +247,7 @@ public class WSSConfig {
      * with some JVMs (such as IBMs).
      */
     private static boolean addJceProviders = true;
-    
+
     /**
      * a boolean flag to record whether we have already been statically
      * initialized.  This flag prevents repeated and unnecessary calls
@@ -259,9 +259,9 @@ public class WSSConfig {
      * This allows the user to specify a different time than that of the current System time.
      */
     private WSTimeSource currentTime;
-    
+
     public static final WsuIdAllocator DEFAULT_ID_ALLOCATOR = new WsuIdAllocator() {
-        
+
         public String createId(String prefix, Object o) {
             if (prefix == null) {
                 return IDGenerator.generateID("_");
@@ -275,10 +275,10 @@ public class WSSConfig {
         }
     };
     protected WsuIdAllocator idAllocator = DEFAULT_ID_ALLOCATOR;
-    
+
     /**
-     * The known actions. This map is of the form <Integer, Class<?>> or 
-     * <Integer, Action>. 
+     * The known actions. This map is of the form <Integer, Class<?>> or
+     * <Integer, Action>.
      * The known actions are initialized from a set of defaults,
      * but the list may be modified via the setAction operations.
      */
@@ -291,7 +291,7 @@ public class WSSConfig {
      * but the list may be modified via the setProcessor operations.
      */
     private final Map<QName, Object> processorMap = new HashMap<QName, Object>(DEFAULT_PROCESSORS);
-    
+
     /**
      * The known validators. This map is of the form <QName, Class<?>> or
      * <QName, Validator>.
@@ -299,7 +299,7 @@ public class WSSConfig {
      * but the list may be modified via the setValidator operations.
      */
     private final Map<QName, Object> validatorMap = new HashMap<QName, Object>(DEFAULT_VALIDATORS);
-    
+
     static {
         try {
             Transform.register(WSConstants.SWA_ATTACHMENT_CIPHERTEXT_TRANS,
@@ -312,11 +312,11 @@ public class WSSConfig {
 
         ResourceResolver.register(new ResolverAttachment(), false);
     }
-    
+
     private WSSConfig() {
         // complete
     }
-    
+
     public static synchronized void init() {
         if (!staticallyInitialized) {
             if (addJceProviders) {
@@ -324,22 +324,22 @@ public class WSSConfig {
                     public Boolean run() {
                         Security.removeProvider("STRTransform");
                         WSProviderConfig.appendJceProvider(
-                            "STRTransform", 
+                            "STRTransform",
                             new org.apache.wss4j.dom.transform.STRTransformProvider()
                         );
-    
+
                         Security.removeProvider("AttachmentContentSignatureTransform");
                         WSProviderConfig.appendJceProvider(
                                 "AttachmentContentSignatureTransform",
                                 new AttachmentContentSignatureTransformProvider()
                         );
-    
+
                         Security.removeProvider("AttachmentCompleteSignatureTransform");
                         WSProviderConfig.appendJceProvider(
                                 "AttachmentCompleteSignatureTransform",
                                 new AttachmentCompleteSignatureTransformProvider()
                         );
-    
+
                         return true;
                     }
                 });
@@ -367,13 +367,13 @@ public class WSSConfig {
     public void setIdAllocator(WsuIdAllocator idAllocator) {
         this.idAllocator = idAllocator;
     }
-    
+
     /**
      * Associate an action instance with a specific action code.
      *
      * This operation allows applications to supply their own
      * actions for well-known operations.
-     * 
+     *
      * Please note that the Action object does NOT get class-loaded per invocation, and so
      * it is up to the implementing class to ensure that it is thread-safe.
      */
@@ -386,7 +386,7 @@ public class WSSConfig {
         }
         return null;
     }
-    
+
     /**
      * Associate an action instance with a specific action code.
      *
@@ -405,14 +405,14 @@ public class WSSConfig {
 
     /**
      * Lookup action
-     * 
+     *
      * @param action
      * @return An action class to create a security token
      * @throws WSSecurityException
      */
     public Action getAction(int action) throws WSSecurityException {
         final Object actionObject = actionMap.get(action);
-        
+
         if (actionObject instanceof Class<?>) {
             try {
                 return (Action)((Class<?>)actionObject).newInstance();
@@ -428,12 +428,12 @@ public class WSSConfig {
         }
         return null;
     }
-    
+
     /**
      * Associate a SOAP processor name with a specified SOAP Security header
      * element QName.  Processors registered under this QName will be
      * called when processing header elements with the specified type.
-     * 
+     *
      * Please note that the Processor object does NOT get class-loaded per invocation, and so
      * it is up to the implementing class to ensure that it is thread-safe.
      */
@@ -446,7 +446,7 @@ public class WSSConfig {
         }
         return null;
     }
-    
+
     /**
      * Associate a SOAP processor name with a specified SOAP Security header
      * element QName.  Processors registered under this QName will be
@@ -461,12 +461,12 @@ public class WSSConfig {
         }
         return null;
     }
-    
+
     /**
      * Associate a SOAP validator name with a specified SOAP Security header
      * element QName.  Validators registered under this QName will be
      * called when processing header elements with the specified type.
-     * 
+     *
      * Please note that the Validator object does NOT get class-loaded per invocation, and so
      * it is up to the implementing class to ensure that it is thread-safe.
      */
@@ -479,7 +479,7 @@ public class WSSConfig {
         }
         return null;
     }
-    
+
     /**
      * Associate a SOAP validator name with a specified SOAP Security header
      * element QName.  validator registered under this QName will be
@@ -494,17 +494,17 @@ public class WSSConfig {
         }
         return null;
     }
-    
+
     /**
      * @return      the SOAP Validator associated with the specified
      *              QName.  The QName is intended to refer to an element
      *              in a SOAP security header.  This operation returns
-     *              null if there is no Validator associated with the 
+     *              null if there is no Validator associated with the
      *              specified QName.
      */
     public Validator getValidator(QName el) throws WSSecurityException {
         final Object validatorObject = validatorMap.get(el);
-        
+
         if (validatorObject instanceof Class<?>) {
             try {
                 return (Validator)((Class<?>)validatorObject).newInstance();
@@ -520,17 +520,17 @@ public class WSSConfig {
         }
         return null;
     }
-    
+
     /**
      * @return      the SOAP processor associated with the specified
      *              QName.  The QName is intended to refer to an element
      *              in a SOAP security header.  This operation returns
-     *              null if there is no processor associated with the 
+     *              null if there is no processor associated with the
      *              specified QName.
      */
     public Processor getProcessor(QName el) throws WSSecurityException {
         final Object processorObject = processorMap.get(el);
-        
+
         if (processorObject instanceof Class<?>) {
             try {
                 return (Processor)((Class<?>)processorObject).newInstance();
@@ -557,7 +557,7 @@ public class WSSConfig {
     public void setCurrentTime(WSTimeSource currentTime) {
         this.currentTime = currentTime;
     }
-    
+
 
     public static boolean isAddJceProviders() {
         return addJceProviders;

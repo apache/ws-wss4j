@@ -53,14 +53,14 @@ import org.w3c.dom.Element;
 
 /**
  * This will process incoming <code>xenc:EncryptedData</code> elements.
- * This processor will not be invoked for encrypted content referenced by a 
+ * This processor will not be invoked for encrypted content referenced by a
  * <code>xenc:ReferenceList</code>.
  */
 public class EncryptedDataProcessor implements Processor {
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(EncryptedDataProcessor.class);
-    
+
     public List<WSSecurityEngineResult> handleToken(
         Element elem,
         RequestData request,
@@ -80,26 +80,26 @@ public class EncryptedDataProcessor implements Processor {
                 WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noKeyinfo"
             );
         }
-        
+
         String symEncAlgo = X509Util.getEncAlgo(elem);
         checkBSPCompliance(symEncAlgo, request.getBSPEnforcer());
-        
+
         // Get the Key either via a SecurityTokenReference or an EncryptedKey
-        Element secRefToken = 
+        Element secRefToken =
             XMLUtils.getDirectChildElement(
                 kiElem, "SecurityTokenReference", WSConstants.WSSE_NS
             );
-        Element encryptedKeyElement = 
+        Element encryptedKeyElement =
             XMLUtils.getDirectChildElement(
                 kiElem, WSConstants.ENC_KEY_LN, WSConstants.ENC_NS
             );
-        
+
         if (request.isRequireSignedEncryptedDataElements()) {
-            List<WSSecurityEngineResult> signedResults = 
+            List<WSSecurityEngineResult> signedResults =
                 wsDocInfo.getResultsByTag(WSConstants.SIGN);
             WSSecurityUtil.verifySignedElement(elem, signedResults);
         }
-        
+
         SecretKey key = null;
         List<WSSecurityEngineResult> encrKeyResults = null;
         Principal principal = null;
@@ -111,7 +111,7 @@ public class EncryptedDataProcessor implements Processor {
             if (symEncAlgo != null) {
                 parameters.setDerivationKeyLength(KeyUtils.getKeyLength(symEncAlgo));
             }
-            
+
             STRParser strParser = new SecurityTokenRefSTRParser();
             STRParserResult parserResult = strParser.parseSecurityTokenReference(parameters);
             byte[] secretKey = parserResult.getSecretKey();
@@ -121,7 +121,7 @@ public class EncryptedDataProcessor implements Processor {
         } else if (encryptedKeyElement != null) {
             EncryptedKeyProcessor encrKeyProc = new EncryptedKeyProcessor();
             encrKeyResults = encrKeyProc.handleToken(encryptedKeyElement, request, wsDocInfo);
-            byte[] symmKey = 
+            byte[] symmKey =
                 (byte[])encrKeyResults.get(0).get(WSSecurityEngineResult.TAG_SECRET);
             key = KeyUtils.prepareSecretKey(symEncAlgo, symmKey);
         } else {
@@ -129,7 +129,7 @@ public class EncryptedDataProcessor implements Processor {
                 WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noEncKey"
             );
         }
-        
+
         // Check for compliance against the defined AlgorithmSuite
         AlgorithmSuite algorithmSuite = request.getAlgorithmSuite();
         if (algorithmSuite != null) {
@@ -149,7 +149,7 @@ public class EncryptedDataProcessor implements Processor {
         }
 
         WSDataRef dataRef = EncryptionUtils.decryptEncryptedData(
-                elem.getOwnerDocument(), encryptedDataId, elem, key, symEncAlgo, 
+                elem.getOwnerDocument(), encryptedDataId, elem, key, symEncAlgo,
                 request.getAttachmentCallbackHandler());
 
         WSSecurityEngineResult result =
@@ -159,11 +159,11 @@ public class EncryptedDataProcessor implements Processor {
         }
         wsDocInfo.addResult(result);
         wsDocInfo.addTokenElement(elem);
-        
+
         List<WSSecurityEngineResult> completeResults = new LinkedList<>();
         completeResults.addAll(encrKeyResults);
         completeResults.add(result);
-        
+
         WSSConfig wssConfig = request.getWssConfig();
         if (wssConfig != null) {
             // Get hold of the plain text element
@@ -184,7 +184,7 @@ public class EncryptedDataProcessor implements Processor {
         }
         return completeResults;
     }
-    
+
     /**
      * Check for BSP compliance
      * @param encAlgo The encryption algorithm

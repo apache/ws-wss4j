@@ -117,7 +117,7 @@ public class SubjectConfirmationDataBean {
     public void setNotAfter(DateTime notAfter) {
         this.notAfter = notAfter;
     }
-    
+
     /**
      * Method equals ...
      *
@@ -140,25 +140,25 @@ public class SubjectConfirmationDataBean {
         } else if (recipient != null && !recipient.equals(that.recipient)) {
             return false;
         }
-        
+
         if (address == null && that.address != null) {
             return false;
         } else if (address != null && !address.equals(that.address)) {
             return false;
         }
-        
+
         if (inResponseTo == null && that.inResponseTo != null) {
             return false;
         } else if (inResponseTo != null && !inResponseTo.equals(that.inResponseTo)) {
             return false;
         }
-        
+
         if (notBefore == null && that.notBefore != null) {
             return false;
         } else if (notBefore != null && !notBefore.equals(that.notBefore)) {
             return false;
         }
-        
+
         if (notAfter == null && that.notAfter != null) {
             return false;
         } else if (notAfter != null && !notAfter.equals(that.notAfter)) {

@@ -21,10 +21,10 @@ package org.apache.wss4j.dom;
 
 /**
  * WSDataRef stores information about decrypted/signed elements
- * 
- * When a processor decrypts/verifies an element it stores information 
- * about that element in a WSDataRef so this information can 
- * be used for validation. 
+ *
+ * When a processor decrypts/verifies an element it stores information
+ * about that element in a WSDataRef so this information can
+ * be used for validation.
  */
 
 import java.util.List;
@@ -33,56 +33,56 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
 public class WSDataRef {
-    
+
     /**
      * wsu:Id of the protected element
      */
     private String wsuId;
-    
+
     /**
      * QName of the protected element
      */
     private QName name;
-    
+
     /**
      * An xpath expression pointing to the data element
      */
     private String xpath;
-    
+
     /**
      * Algorithm used to encrypt/sign the element
      */
     private String algorithm;
-    
+
     /**
      * A list of algorithms used to transform the element before digest
      */
     private List<String> transformAlgorithms;
-    
+
     /**
      * If this reference represents signed content, this field
      * represents the digest algorithm applied to the content.
      */
     private String digestAlgorithm;
-    
+
     /**
      * If this reference represents signed content, this field
      * represents the digest bytes obtained after applying the digestAlgorithm
      */
     private byte[] digestValue;
-    
+
     private boolean content;
-    
+
     /**
      * The protected DOM element
      */
     private Element protectedElement;
-    
+
     /**
      * Whether the protected Reference is an Attachment or not
      */
     private boolean attachment;
-    
+
     /**
      * If this reference represents encrypted content, then this is the EncryptedData Element
      */
@@ -115,7 +115,7 @@ public class WSDataRef {
     public void setName(QName name) {
         this.name = name;
     }
-    
+
     /**
      * @param element The protected DOM element to set
      */
@@ -123,18 +123,18 @@ public class WSDataRef {
         protectedElement = element;
         String prefix = element.getPrefix();
         if (prefix == null) {
-            name = 
+            name =
                 new QName(
                     element.getNamespaceURI(), element.getLocalName()
                 );
         } else {
-            name = 
+            name =
                 new QName(
                     element.getNamespaceURI(), element.getLocalName(), prefix
                 );
         }
     }
-    
+
     /**
      * @return the protected DOM element
      */
@@ -169,7 +169,7 @@ public class WSDataRef {
     public void setContent(boolean content) {
         this.content = content;
     }
-    
+
     /**
      * @return the algorithm used for encryption/signature
      */
@@ -183,9 +183,9 @@ public class WSDataRef {
     public void setAlgorithm(String algo) {
         algorithm = algo;
     }
-    
+
     /**
-     * @return if this reference represents signed content, 
+     * @return if this reference represents signed content,
      * the digest algorithm applied to the content.
      */
     public String getDigestAlgorithm() {
@@ -193,20 +193,20 @@ public class WSDataRef {
     }
 
     /**
-     * @param digestAlgorithm if this reference represents 
+     * @param digestAlgorithm if this reference represents
      * signed content, the digest algorithm applied to the content.
      */
     public void setDigestAlgorithm(String digestAlgorithm) {
         this.digestAlgorithm = digestAlgorithm;
     }
-    
+
     /**
      * Set the Transform algorithm URIs used to transform the element before digest
      */
     public void setTransformAlgorithms(List<String> transformAlgorithms) {
         this.transformAlgorithms = transformAlgorithms;
     }
-    
+
     /**
      * Get the Transform algorithm URIs used to transform the element before digest
      */

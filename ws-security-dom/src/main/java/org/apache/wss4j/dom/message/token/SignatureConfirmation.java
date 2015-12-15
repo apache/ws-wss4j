@@ -38,26 +38,26 @@ import org.w3c.dom.Element;
  */
 public class SignatureConfirmation {
 
-    public static final String SC_VALUE_ATTR = "Value"; 
+    public static final String SC_VALUE_ATTR = "Value";
     private Element element;
     private byte[] signatureValue;
-    
+
     /**
      * Constructs a <code>SignatureConfirmation</code> object and parses the
      * <code>wsse11:SignatureConfirmation</code> element to initialize it.
      *
      * @param elem the <code>wsse11:SignatureCOnfirmation</code> element that
      *             contains the confirmation data
-     * @param bspEnforcer a BSPEnforcer instance used to enforce BSP rules             
+     * @param bspEnforcer a BSPEnforcer instance used to enforce BSP rules
      */
     public SignatureConfirmation(Element elem, BSPEnforcer bspEnforcer) throws WSSecurityException {
         element = elem;
-        
+
         String id = getID();
         if (id == null || "".equals(id)) {
             bspEnforcer.handleBSPRule(BSPRule.R5441);
         }
-        
+
         String sv = element.getAttributeNS(null, SC_VALUE_ATTR);
         if (sv != null) {
             try {
@@ -75,13 +75,13 @@ public class SignatureConfirmation {
      * to the defined parameters.
      *
      * @param doc the SOAP envelope as <code>Document</code>
-     * @param signVal the Signature value as byte[] of <code>null</code> 
+     * @param signVal the Signature value as byte[] of <code>null</code>
      * if no value available.
      */
     public SignatureConfirmation(Document doc, byte[] signVal) {
-        element = 
+        element =
             doc.createElementNS(
-                WSConstants.WSSE11_NS, 
+                WSConstants.WSSE11_NS,
                 WSConstants.WSSE11_PREFIX + ":"  + WSConstants.SIGNATURE_CONFIRMATION_LN
             );
         XMLUtils.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
@@ -90,7 +90,7 @@ public class SignatureConfirmation {
             element.setAttributeNS(null, SC_VALUE_ATTR, sv);
         }
     }
-    
+
     /**
      * Add the WSU Namespace to this SC. The namespace is not added by default for
      * efficiency purposes.
@@ -116,7 +116,7 @@ public class SignatureConfirmation {
     public String toString() {
         return DOM2Writer.nodeToString(element);
     }
-    
+
     /**
      * Set wsu:Id attribute of this SignatureConfirmation element.
      * @param id
@@ -124,7 +124,7 @@ public class SignatureConfirmation {
     public void setID(String id) {
         element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
     }
-    
+
     /**
      * Returns the value of the wsu:Id attribute
      * @return the WSU ID
@@ -139,7 +139,7 @@ public class SignatureConfirmation {
     public byte[] getSignatureValue() {
         return signatureValue;
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -148,7 +148,7 @@ public class SignatureConfirmation {
         }
         return result;
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (!(object instanceof SignatureConfirmation)) {
@@ -161,5 +161,5 @@ public class SignatureConfirmation {
         }
         return true;
     }
-    
+
 }

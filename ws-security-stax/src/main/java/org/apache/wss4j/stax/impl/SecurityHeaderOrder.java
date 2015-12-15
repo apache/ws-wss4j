@@ -23,7 +23,7 @@ import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import javax.xml.namespace.QName;
 
 public class SecurityHeaderOrder {
-    
+
     private QName securityHeaderElementName;
     private XMLSecurityConstants.Action action;
     private boolean encrypted;

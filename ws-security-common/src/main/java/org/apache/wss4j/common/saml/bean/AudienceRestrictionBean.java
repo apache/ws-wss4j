@@ -46,7 +46,7 @@ public class AudienceRestrictionBean {
             this.audienceURIs.addAll(audienceURIs);
         }
     }
-    
+
     /**
      * Get the audienceURI instances
      *
@@ -55,7 +55,7 @@ public class AudienceRestrictionBean {
     public List<String> getAudienceURIs() {
         return audienceURIs;
     }
-    
+
     /**
      * Set the audienceURI instance
      *
@@ -65,7 +65,7 @@ public class AudienceRestrictionBean {
         this.audienceURIs.clear();
         this.audienceURIs.addAll(audienceURIs);
     }
-    
+
     /**
      * Method equals ...
      *
@@ -84,9 +84,9 @@ public class AudienceRestrictionBean {
         AudienceRestrictionBean that = (AudienceRestrictionBean) o;
 
         if (!audienceURIs.equals(that.audienceURIs)) {
-            return false; 
+            return false;
         }
-        
+
         return true;
     }
 

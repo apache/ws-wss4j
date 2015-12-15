@@ -37,10 +37,10 @@ import org.apache.wss4j.dom.handler.RequestData;
  * children are not supported, only an EncryptedData structure.
  */
 public class EncryptedAssertionProcessor implements Processor {
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(EncryptedAssertionProcessor.class);
-    
+
     public List<WSSecurityEngineResult> handleToken(
         Element elem,
         RequestData request,
@@ -49,25 +49,25 @@ public class EncryptedAssertionProcessor implements Processor {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Found EncryptedAssertion element");
         }
-        
+
         Element encryptedDataElement =
             XMLUtils.getDirectChildElement(elem, WSConstants.ENC_DATA_LN, WSConstants.ENC_NS);
         if (encryptedDataElement == null) {
             // Maybe it has already been decrypted...
             return Collections.emptyList();
         }
-        
+
         // Type must be "Element" if specified
         String typeStr = encryptedDataElement.getAttributeNS(null, "Type");
         if (typeStr != null && !(WSConstants.ENC_NS + "Element").equals(typeStr)) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY, "badElement", 
+                WSSecurityException.ErrorCode.INVALID_SECURITY, "badElement",
                 new Object[] {"Element", typeStr}
             );
         }
-        
+
         // Now hand it off to another processor (EncryptedDataProcessor)
-        QName el = 
+        QName el =
             new QName(encryptedDataElement.getNamespaceURI(), encryptedDataElement.getLocalName());
         Processor proc = request.getWssConfig().getProcessor(el);
         if (proc != null) {
@@ -76,8 +76,8 @@ public class EncryptedAssertionProcessor implements Processor {
             }
             return proc.handleToken(encryptedDataElement, request, wsDocInfo);
         }
-        
+
         return Collections.emptyList();
     }
-    
+
 }

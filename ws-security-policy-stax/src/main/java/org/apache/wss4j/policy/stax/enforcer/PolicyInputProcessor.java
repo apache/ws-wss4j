@@ -222,7 +222,7 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
                 break;
         }
     }
-    
+
     protected String getId(XMLSecEvent xmlSecEvent) {
         XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
         if (!xmlSecStartElement.getOnElementDeclaredAttributes().isEmpty()) {

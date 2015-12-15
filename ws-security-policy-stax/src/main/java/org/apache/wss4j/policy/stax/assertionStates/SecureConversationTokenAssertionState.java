@@ -31,8 +31,8 @@ public class SecureConversationTokenAssertionState extends SecurityContextTokenA
 
     //todo sp:SC13SecurityContextToken:
     //todo MustNotSendCancel etc...
-    
-    public SecureConversationTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, 
+
+    public SecureConversationTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted,
                                                  PolicyAsserter policyAsserter, boolean initiator) {
         super(assertion, asserted, policyAsserter, initiator);
     }

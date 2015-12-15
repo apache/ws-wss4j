@@ -52,7 +52,7 @@ import org.apache.xml.security.utils.Base64;
  * This class holds per request data.
  */
 public class RequestData {
-    
+
     private Object msgContext;
     private SOAPConstants soapConstants;
     private String actor;
@@ -94,7 +94,7 @@ public class RequestData {
     private final List<String> audienceRestrictions = new ArrayList<>();
     private boolean requireTimestampExpires;
     private boolean storeBytesInAttachment;
-    
+
     /**
      * Whether to add an InclusiveNamespaces PrefixList as a CanonicalizationMethod
      * child when generating Signatures using WSConstants.C14N_EXCL_OMIT_COMMENTS.
@@ -114,66 +114,66 @@ public class RequestData {
     /**
      * If set to true then the timestamp handling will throw an exception if the
      * timestamp contains an expires element and the semantics are expired.
-     * 
+     *
      * If set to false, no exception will be thrown, even if the semantics are
      * expired.
      */
     private boolean timeStampStrict = true;
-    
+
     /**
-     * If this value is not null, then username token handling will throw an 
+     * If this value is not null, then username token handling will throw an
      * exception if the password type of the Username Token does not match this value
      */
     private String requiredPasswordType;
-    
+
     /**
-     * This variable controls whether a UsernameToken with no password element is allowed. 
-     * The default value is "false". Set it to "true" to allow deriving keys from UsernameTokens 
+     * This variable controls whether a UsernameToken with no password element is allowed.
+     * The default value is "false". Set it to "true" to allow deriving keys from UsernameTokens
      * or to support UsernameTokens for purposes other than authentication.
      */
     private boolean allowUsernameTokenNoPassword;
-    
+
     /**
      * The time in seconds between creation and expiry for a Timestamp. The default
      * is 300 seconds (5 minutes).
      */
     private int timeStampTTL = 300;
-    
+
     /**
-     * The time in seconds in the future within which the Created time of an incoming 
+     * The time in seconds in the future within which the Created time of an incoming
      * Timestamp is valid. The default is 60 seconds.
      */
     private int timeStampFutureTTL = 60;
-    
+
     /**
      * The time in seconds between creation and expiry for a UsernameToken Created
      * element. The default is 300 seconds (5 minutes).
      */
     private int utTTL = 300;
-    
+
     /**
-     * The time in seconds in the future within which the Created time of an incoming 
+     * The time in seconds in the future within which the Created time of an incoming
      * UsernameToken is valid. The default is 60 seconds.
      */
     private int utFutureTTL = 60;
-    
+
     /**
      * This variable controls whether types other than PasswordDigest or PasswordText
-     * are allowed when processing UsernameTokens. 
-     * 
+     * are allowed when processing UsernameTokens.
+     *
      * By default this is set to false so that the user doesn't have to explicitly
      * reject custom token types in the callback handler.
      */
     private boolean handleCustomPasswordTypes;
-    
+
     /**
      * This variable controls whether (wsse) namespace qualified password types are
      * accepted when processing UsernameTokens.
-     * 
+     *
      * By default this is set to false.
      */
     private boolean allowNamespaceQualifiedPasswordTypes;
-    
+
     /**
      * Whether the password should be treated as a binary value.  This
      * is needed to properly handle password equivalence for UsernameToken
@@ -186,13 +186,13 @@ public class RequestData {
      * See https://issues.apache.org/jira/browse/WSS-239
      */
     private boolean encodePasswords;
-    
+
     /**
      * Whether to validate the SubjectConfirmation requirements of a received SAML Token
      * (sender-vouches or holder-of-key). The default is true.
      */
     private boolean validateSamlSubjectConfirmation = true;
-    
+
     private boolean expandXopIncludeForSignature = true;
 
     public boolean isEnableTimestampReplayCache() {
@@ -234,7 +234,7 @@ public class RequestData {
     public void setActor(String actor) {
         this.actor = actor;
     }
-    
+
     public String getUsername() {
         return username;
     }
@@ -242,7 +242,7 @@ public class RequestData {
     public void setUsername(String username) {
         this.username = username;
     }
-    
+
     public String getPwType() {
         return pwType;
     }
@@ -280,7 +280,7 @@ public class RequestData {
     public void setWssConfig(WSSConfig wssConfig) {
         this.wssConfig = wssConfig;
     }
-    
+
     /**
      * @return Returns the list of stored signature values.
      */
@@ -301,7 +301,7 @@ public class RequestData {
     public void setSecHeader(WSSecHeader secHeader) {
         this.secHeader = secHeader;
     }
-    
+
     /**
      * Set the derived key iterations. Default is 1000.
      * @param iterations The number of iterations to use when deriving a key
@@ -309,7 +309,7 @@ public class RequestData {
     public void setDerivedKeyIterations(int iterations) {
         derivedKeyIterations = iterations;
     }
-    
+
     /**
      * Get the derived key iterations.
      * @return The number of iterations to use when deriving a key
@@ -317,7 +317,7 @@ public class RequestData {
     public int getDerivedKeyIterations() {
         return derivedKeyIterations;
     }
-    
+
     /**
      * Whether to use the derived key for a MAC.
      * @param useMac Whether to use the derived key for a MAC.
@@ -325,7 +325,7 @@ public class RequestData {
     public void setUseDerivedKeyForMAC(boolean useMac) {
         useDerivedKeyForMAC = useMac;
     }
-    
+
     /**
      * Whether to use the derived key for a MAC.
      * @return Whether to use the derived key for a MAC.
@@ -333,15 +333,15 @@ public class RequestData {
     public boolean isUseDerivedKeyForMAC() {
         return useDerivedKeyForMAC;
     }
-    
+
     /**
      * Set whether to enable CRL checking or not when verifying trust in a certificate.
-     * @param enableRevocation whether to enable CRL checking 
+     * @param enableRevocation whether to enable CRL checking
      */
     public void setEnableRevocation(boolean enableRevocation) {
         this.enableRevocation = enableRevocation;
     }
-    
+
     /**
      * Get whether to enable CRL checking or not when verifying trust in a certificate.
      * @return whether to enable CRL checking
@@ -349,7 +349,7 @@ public class RequestData {
     public boolean isRevocationEnabled() {
         return enableRevocation;
     }
-    
+
     /**
      * @return whether EncryptedData elements are required to be signed
      */
@@ -362,21 +362,21 @@ public class RequestData {
      * are in a signed subtree of the document. This can be used to
      * prevent some wrapping based attacks when encrypt-before-sign
      * token protection is selected.
-     *  
+     *
      * @param requireSignedEncryptedDataElements
      */
     public void setRequireSignedEncryptedDataElements(boolean requireSignedEncryptedDataElements) {
         this.requireSignedEncryptedDataElements = requireSignedEncryptedDataElements;
     }
-    
+
     /**
      * Sets the CallbackHandler used for this request
      * @param cb
      */
-    public void setCallbackHandler(CallbackHandler cb) { 
+    public void setCallbackHandler(CallbackHandler cb) {
         callback = cb;
     }
-    
+
     /**
      * Returns the CallbackHandler used for this request.
      * @return the CallbackHandler used for this request.
@@ -405,7 +405,7 @@ public class RequestData {
         }
         return null;
     }
-    
+
     /**
      * Set the replay cache for Timestamps
      */
@@ -415,22 +415,22 @@ public class RequestData {
 
     /**
      * Get the replay cache for Timestamps
-     * @throws WSSecurityException 
+     * @throws WSSecurityException
      */
     public ReplayCache getTimestampReplayCache() throws WSSecurityException {
         if (enableTimestampReplayCache && timestampReplayCache == null) {
             timestampReplayCache = createCache("wss4j.timestamp.cache-");
         }
-        
+
         return timestampReplayCache;
     }
-    
+
     private synchronized ReplayCache createCache(String key) throws WSSecurityException {
         ReplayCacheFactory replayCacheFactory = ReplayCacheFactory.newInstance();
         String cacheKey = key + Base64.encode(WSSecurityUtil.generateNonce(10));
         return replayCacheFactory.newReplayCache(cacheKey, null);
     }
-    
+
     /**
      * Set the replay cache for Nonces
      */
@@ -440,16 +440,16 @@ public class RequestData {
 
     /**
      * Get the replay cache for Nonces
-     * @throws WSSecurityException 
+     * @throws WSSecurityException
      */
     public ReplayCache getNonceReplayCache() throws WSSecurityException {
         if (enableNonceReplayCache && nonceReplayCache == null) {
             nonceReplayCache = createCache("wss4j.nonce.cache-");
         }
-        
+
         return nonceReplayCache;
     }
-    
+
     /**
      * Set the replay cache for SAML2 OneTimeUse Assertions
      */
@@ -459,16 +459,16 @@ public class RequestData {
 
     /**
      * Get the replay cache for SAML2 OneTimeUse Assertions
-     * @throws WSSecurityException 
+     * @throws WSSecurityException
      */
     public ReplayCache getSamlOneTimeUseReplayCache() throws WSSecurityException {
         if (enableSamlOneTimeUseReplayCache && samlOneTimeUseReplayCache == null) {
             samlOneTimeUseReplayCache = createCache("wss4j.saml.one.time.use.cache-");
         }
-        
+
         return samlOneTimeUseReplayCache;
     }
-    
+
     /**
      * Set the Signature Subject Cert Constraints
      */
@@ -477,14 +477,14 @@ public class RequestData {
             subjectDNPatterns.addAll(subjectCertConstraints);
         }
     }
-    
+
     /**
      * Get the Signature Subject Cert Constraints
      */
     public Collection<Pattern> getSubjectCertConstraints() {
         return subjectDNPatterns;
     }
-    
+
     /**
      * Set the Audience Restrictions
      */
@@ -493,14 +493,14 @@ public class RequestData {
             this.audienceRestrictions.addAll(audienceRestrictions);
         }
     }
-    
+
     /**
      * Get the Audience Restrictions
      */
     public List<String> getAudienceRestrictions() {
         return audienceRestrictions;
     }
-    
+
     public void setIgnoredBSPRules(List<BSPRule> bspRules) {
         ignoredBSPRules.clear();
         ignoredBSPRules.addAll(bspRules);
@@ -509,7 +509,7 @@ public class RequestData {
     public List<BSPRule> getIgnoredBSPRules() {
         return Collections.unmodifiableList(ignoredBSPRules);
     }
-    
+
     public BSPEnforcer getBSPEnforcer() {
         if (disableBSPEnforcement) {
             return new BSPEnforcer(true);
@@ -532,7 +532,7 @@ public class RequestData {
     public void setAlgorithmSuite(AlgorithmSuite algorithmSuite) {
         this.algorithmSuite = algorithmSuite;
     }
-    
+
     public AlgorithmSuite getSamlAlgorithmSuite() {
         return samlAlgorithmSuite;
     }
@@ -732,7 +732,7 @@ public class RequestData {
     public void setPrecisionInMilliSeconds(boolean precisionInMilliSeconds) {
         this.precisionInMilliSeconds = precisionInMilliSeconds;
     }
-        
+
     public boolean isEnableSignatureConfirmation() {
         return enableSignatureConfirmation;
     }

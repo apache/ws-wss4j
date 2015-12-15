@@ -38,25 +38,25 @@ import org.w3c.dom.Element;
  * Some tests for the SecurityTokenReference class.
  */
 public class SecurityTokenReferenceTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SecurityTokenReferenceTest.class);
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public SecurityTokenReferenceTest() {
         WSSConfig.init();
     }
-    
+
     /**
      * Test for a Reference with no URI
      */
     @org.junit.Test
     public void testReferenceNoURI() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         // Create the STR
         SecurityTokenReference str = new SecurityTokenReference(doc);
         str.addWSSENamespace();
@@ -64,11 +64,11 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
         ref.setValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
         ref.setURI(null);
         str.setReference(ref);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug(str.toString());
         }
-        
+
         // Process the STR
         Element strElement = str.getElement();
         try {
@@ -85,42 +85,42 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
     @org.junit.Test
     public void testMultipleChildren() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         // Create the STR
         SecurityTokenReference str = new SecurityTokenReference(doc);
         str.addWSSENamespace();
         str.setKeyIdentifierEncKeySHA1("123456");
         Element strElement = str.getElement();
-        
+
         Reference ref = new Reference(doc);
         ref.setValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
         ref.setURI("#123");
         strElement.appendChild(ref.getElement());
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug(str.toString());
         }
-        
+
         BSPEnforcer bspEnforcer = new BSPEnforcer();
         // Process the STR
         try {
             new SecurityTokenReference(strElement,bspEnforcer);
             fail("Failure expected on multiple data references");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         bspEnforcer.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3061));
         new SecurityTokenReference(strElement, bspEnforcer);
     }
-    
+
     /**
      * Test for a SecurityTokenReference having a Key Identifier with no ValueType
      */
     @org.junit.Test
     public void testKeyIdentifierNoValueType() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         // Create the STR
         SecurityTokenReference str = new SecurityTokenReference(doc);
         str.addWSSENamespace();
@@ -130,87 +130,87 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug(str.toString());
         }
-        
+
         BSPEnforcer bspEnforcer = new BSPEnforcer();
         // Process the STR
         try {
             new SecurityTokenReference(strElement,bspEnforcer);
             fail("Failure expected on a Key Identifier with no ValueType");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         bspEnforcer.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3054));
     }
-    
+
     /**
      * Test for a SecurityTokenReference having a Key Identifier with a bad EncodingType
      */
     @org.junit.Test
     public void testKeyIdentifierBadEncodingType() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         // Create the STR
         SecurityTokenReference str = new SecurityTokenReference(doc);
         str.addWSSENamespace();
         Element strElement = str.getElement();
-        
+
         Element keyId = doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
         keyId.setAttributeNS(null, "ValueType", SecurityTokenReference.ENC_KEY_SHA1_URI);
         keyId.setAttributeNS(null, "EncodingType", "http://bad_encoding");
         keyId.appendChild(doc.createTextNode("#123"));
         strElement.appendChild(keyId);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug(str.toString());
         }
-        
+
         BSPEnforcer bspEnforcer = new BSPEnforcer();
         // Process the STR
         try {
             new SecurityTokenReference(strElement,bspEnforcer);
             fail("Failure expected on a Key Identifier with a Bad EncodingType");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         bspEnforcer.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3071));
     }
-    
-    
+
+
     /**
      * Test for a SecurityTokenReference having a Key Identifier with no EncodingType
      */
     @org.junit.Test
     public void testKeyIdentifierNoEncodingType() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         // Create the STR
         SecurityTokenReference str = new SecurityTokenReference(doc);
         str.addWSSENamespace();
         Element strElement = str.getElement();
-        
+
         Element keyId = doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
         keyId.setAttributeNS(null, "ValueType", SecurityTokenReference.ENC_KEY_SHA1_URI);
         keyId.appendChild(doc.createTextNode("#123"));
         strElement.appendChild(keyId);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug(str.toString());
         }
-        
+
         BSPEnforcer bspEnforcer = new BSPEnforcer();
         // Process the STR
         try {
             new SecurityTokenReference(strElement,bspEnforcer);
             fail("Failure expected on a Key Identifier with no EncodingType");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         bspEnforcer.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3070));
     }
-    
+
     /**
      * Test for a SecurityTokenReference having a Key Identifier with no EncodingType, but
      * it should pass as the ValueType is for a SAML Assertion.
@@ -218,61 +218,61 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
     @org.junit.Test
     public void testKeyIdentifierSAMLNoEncodingType() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         // Create the STR
         SecurityTokenReference str = new SecurityTokenReference(doc);
         str.addWSSENamespace();
         Element strElement = str.getElement();
-        
+
         Element keyId = doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
         keyId.setAttributeNS(null, "ValueType", WSConstants.WSS_SAML_KI_VALUE_TYPE);
         keyId.appendChild(doc.createTextNode("#123"));
         strElement.appendChild(keyId);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug(str.toString());
         }
-        
+
         BSPEnforcer bspEnforcer = new BSPEnforcer();
         new SecurityTokenReference(strElement, bspEnforcer);
     }
-    
+
     /**
-     * Test for a SecurityTokenReference having an Embedded Child, which in turn has a 
+     * Test for a SecurityTokenReference having an Embedded Child, which in turn has a
      * SecurityTokenReference child.
      */
     @org.junit.Test
     public void testEmbeddedSTRChild() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         // Create the STR
         SecurityTokenReference str = new SecurityTokenReference(doc);
         str.addWSSENamespace();
         Element strElement = str.getElement();
-        
+
         Element embedded = doc.createElementNS(WSConstants.WSSE_NS, "wsse:Embedded");
         str = new SecurityTokenReference(doc);
         str.addWSSENamespace();
         embedded.appendChild(str.getElement());
-        
+
         strElement.appendChild(embedded);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug(DOM2Writer.nodeToString(strElement));
         }
-        
+
         BSPEnforcer bspEnforcer = new BSPEnforcer();
         // Process the STR
         try {
             new SecurityTokenReference(strElement,bspEnforcer);
             fail("Failure expected on an Embedded Child with a SecurityTokenReference child");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         bspEnforcer.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3056));
     }
-    
+
     /**
      * Test for a SecurityTokenReference having an Embedded Child, which has multiple
      * children.
@@ -280,34 +280,34 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
     @org.junit.Test
     public void testMultipleEmbeddedChildren() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         // Create the STR
         SecurityTokenReference str = new SecurityTokenReference(doc);
         str.addWSSENamespace();
         Element strElement = str.getElement();
-        
+
         Element embedded = doc.createElementNS(WSConstants.WSSE_NS, "wsse:Embedded");
         Element embedded1 = doc.createElementNS(WSConstants.WSSE_NS, "wsse:Reference");
         Element embedded2 = doc.createElementNS(WSConstants.WSSE_NS, "wsse:Reference");
         embedded.appendChild(embedded1);
         embedded.appendChild(embedded2);
-        
+
         strElement.appendChild(embedded);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug(DOM2Writer.nodeToString(strElement));
         }
-        
+
         BSPEnforcer bspEnforcer = new BSPEnforcer();
         // Process the STR
         try {
             new SecurityTokenReference(strElement,bspEnforcer);
             fail("Failure expected on an Embedded Child with multiple children");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         bspEnforcer.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3060));
     }
-    
+
 }

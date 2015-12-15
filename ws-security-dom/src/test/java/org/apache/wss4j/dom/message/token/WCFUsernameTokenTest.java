@@ -45,10 +45,10 @@ import org.w3c.dom.Document;
  * qualified (incorrectly). WSS-199 added the ability to process these Username Tokens.
  */
 public class WCFUsernameTokenTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WCFUsernameTokenTest.class);
-    private static final String SOAPUTMSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+    private static final String SOAPUTMSG =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
         + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
         + "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
         + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
@@ -57,21 +57,21 @@ public class WCFUsernameTokenTest extends org.junit.Assert {
         + "xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">"
         + "<wsse:UsernameToken wsu:Id=\"UsernameToken-29477163\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">"
         + "<wsse:Username>wernerd</wsse:Username>"
-        + "<wsse:Password " 
+        + "<wsse:Password "
         + "wsse:Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\">verySecret</wsse:Password>"
         + "</wsse:UsernameToken></wsse:Security></SOAP-ENV:Header>"
-        + "<SOAP-ENV:Body>" 
-        + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
-        + "<value xmlns=\"\">15</value>" + "</add>" 
+        + "<SOAP-ENV:Body>"
+        + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">"
+        + "<value xmlns=\"\">15</value>" + "</add>"
         + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
-    
+
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     /**
      * Test that adds a UserNameToken with a namespace qualified type. This should fail
      * as WSS4J rejects these tokens by default.
@@ -82,7 +82,7 @@ public class WCFUsernameTokenTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Digest:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
@@ -90,11 +90,11 @@ public class WCFUsernameTokenTest extends org.junit.Assert {
             verify(doc);
             fail("Failure expected on a bad password type");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
     }
-    
-    
+
+
     /**
      * Test that adds a UserNameToken with a namespace qualified type. This should pass
      * as WSS4J has been configured to accept these tokens.
@@ -105,26 +105,26 @@ public class WCFUsernameTokenTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Digest:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         RequestData requestData = new RequestData();
         requestData.setAllowNamespaceQualifiedPasswordTypes(true);
         requestData.setWssConfig(WSSConfig.getNewInstance());
         requestData.setIgnoredBSPRules(Collections.singletonList(BSPRule.R4201));
         verify(doc, requestData);
     }
-    
-    
+
+
     /**
      * Verifies the soap envelope
      */
     private WSHandlerResult verify(Document doc) throws Exception {
         return verify(doc, new ArrayList<BSPRule>(0));
     }
-    
+
     /**
      * Verifies the soap envelope
      */
@@ -137,7 +137,7 @@ public class WCFUsernameTokenTest extends org.junit.Assert {
         requestData.setCallbackHandler(callbackHandler);
         return secEngine.processSecurityHeader(doc, requestData);
     }
-    
+
     /**
      * Verifies the soap envelope
      */
@@ -148,6 +148,6 @@ public class WCFUsernameTokenTest extends org.junit.Assert {
         requestData.setCallbackHandler(callbackHandler);
         return secEngine.processSecurityHeader(doc, requestData);
     }
-    
+
 
 }

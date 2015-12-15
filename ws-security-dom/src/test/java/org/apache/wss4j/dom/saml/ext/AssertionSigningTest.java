@@ -69,7 +69,7 @@ public class AssertionSigningTest extends Assert {
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public AssertionSigningTest() throws Exception {
         WSSConfig.init();
         // Load the issuer keystore
@@ -80,7 +80,7 @@ public class AssertionSigningTest extends Assert {
                 "keys/client_keystore.jks");
         keyStore.load(input, "password".toCharArray());
         ((Merlin) issuerCrypto).setKeyStore(keyStore);
-        
+
         dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
     }
@@ -97,11 +97,11 @@ public class AssertionSigningTest extends Assert {
         callbackHandler
                 .setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         callbackHandler.setIssuer("www.example.com");
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-        
+
         samlAssertion.signAssertion("client_certchain", "password", issuerCrypto,
                 false);
         Signature signature = samlAssertion.getSaml2().getSignature();
@@ -111,18 +111,18 @@ public class AssertionSigningTest extends Assert {
                         defaultDSASignatureAlgorithm));
         Assert.assertEquals(defaultCanonicalizationAlgorithm,
                 signature.getCanonicalizationAlgorithm());
-        
+
         // Verify Signature
         SAMLKeyInfo keyInfo = new SAMLKeyInfo();
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("client_certchain");
         keyInfo.setCerts(issuerCrypto.getX509Certificates(cryptoType));
-        
+
         Document doc = dbf.newDocumentBuilder().newDocument();
-        
+
         Element assertionElement = samlAssertion.toDOM(doc);
         doc.appendChild(assertionElement);
-        
+
         samlAssertion = new SamlAssertionWrapper(assertionElement);
         samlAssertion.verifySignature(keyInfo);
     }
@@ -138,11 +138,11 @@ public class AssertionSigningTest extends Assert {
         callbackHandler
                 .setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         callbackHandler.setIssuer("www.example.com");
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-        
+
         samlAssertion.signAssertion("client_certchain", "password", issuerCrypto,
                 false, customCanonicalizationAlgorithm,
                 customSignatureAlgorithm, customSignatureDigestAlgorithm);
@@ -151,9 +151,9 @@ public class AssertionSigningTest extends Assert {
                 signature.getSignatureAlgorithm());
         Assert.assertEquals(customCanonicalizationAlgorithm,
                 signature.getCanonicalizationAlgorithm());
-        
+
         Document doc = dbf.newDocumentBuilder().newDocument();
-        
+
         Element assertionElement = samlAssertion.toDOM(doc);
         doc.appendChild(assertionElement);
         String assertionString = DOM2Writer.nodeToString(assertionElement);
@@ -164,9 +164,9 @@ public class AssertionSigningTest extends Assert {
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("client_certchain");
         keyInfo.setCerts(issuerCrypto.getX509Certificates(cryptoType));
-        
+
         samlAssertion = new SamlAssertionWrapper(assertionElement);
         samlAssertion.verifySignature(keyInfo);
     }
-    
+
 }

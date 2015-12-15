@@ -42,7 +42,7 @@ import java.util.List;
  * WSP1.3, 4.1.1 SignedParts Assertion
  */
 public class SignedPartsAssertionState extends AssertionState implements Assertable {
-    
+
     private int attachmentCount;
     private int signedAttachmentCount;
     private boolean signedAttachmentRequired;
@@ -54,12 +54,12 @@ public class SignedPartsAssertionState extends AssertionState implements Asserta
     ) {
         super(assertion, asserted);
         this.attachmentCount = attachmentCount;
-        
+
         this.policyAsserter = policyAsserter;
         if (this.policyAsserter == null) {
             this.policyAsserter = new DummyPolicyAsserter();
         }
-        
+
         if (asserted) {
             policyAsserter.assertPolicy(getAssertion());
         }
@@ -77,7 +77,7 @@ public class SignedPartsAssertionState extends AssertionState implements Asserta
 
         SignedPartSecurityEvent signedPartSecurityEvent = (SignedPartSecurityEvent) securityEvent;
         SignedParts signedParts = (SignedParts) getAssertion();
-        
+
         if (signedParts.getAttachments() != null) {
             signedAttachmentRequired = true;
             if (signedPartSecurityEvent.isAttachment()) {
@@ -141,7 +141,7 @@ public class SignedPartsAssertionState extends AssertionState implements Asserta
         policyAsserter.assertPolicy(getAssertion());
         return true;
     }
-    
+
     @Override
     public boolean isAsserted() {
         if (signedAttachmentRequired && signedAttachmentCount < attachmentCount) {

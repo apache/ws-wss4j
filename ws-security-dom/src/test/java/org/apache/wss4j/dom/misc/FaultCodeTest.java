@@ -52,12 +52,12 @@ import org.w3c.dom.Document;
 public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public FaultCodeTest() throws Exception {
         crypto = CryptoFactory.getInstance("wss40.properties");
         WSSConfig.init();
@@ -74,9 +74,9 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();        
+        secHeader.insertSecurityHeader();
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
-        
+
         try {
             verify(encryptedDoc);
             fail("Failure expected with a bad password");
@@ -87,7 +87,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
             assertTrue(ex.getFaultCode().equals(faultCode));
         }
     }
-    
+
     /**
      * Test for the wsse:UnsupportedAlgorithm faultcode. This will fail due to the argument
      * passed to getCipherInstance.
@@ -105,7 +105,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
             assertTrue(ex.getFaultCode().equals(faultCode));
         }
     }
-    
+
     /**
      * Test for the wsse:MessageExpired faultcode. This will fail due to the argument
      * passed to setTimeToLive.
@@ -114,12 +114,12 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
     public void testMessageExpired() throws Exception {
         WSSecTimestamp builder = new WSSecTimestamp();
         builder.setTimeToLive(-1);
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();        
+        secHeader.insertSecurityHeader();
         Document timestampedDoc = builder.build(doc, secHeader);
-        
+
         try {
             verify(timestampedDoc);
             fail("Failure expected on an expired message");
@@ -130,7 +130,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
             assertTrue(ex.getFaultCode().equals(faultCode));
         }
     }
-    
+
     /**
      * Test for the wsse:FailedAuthentication faultcode. This will fail due to a bad password in
      * the callback handler.
@@ -141,12 +141,12 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
         builder.addCreated();
         builder.addNonce();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();        
+        secHeader.insertSecurityHeader();
         Document timestampedDoc = builder.build(doc, secHeader);
-        
+
         try {
             verify(timestampedDoc);
             fail("Failure expected on a bad password");
@@ -157,7 +157,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
             assertTrue(ex.getFaultCode().equals(faultCode));
         }
     }
-    
+
     /**
      * Test for the wsse:InvalidSecurityToken faultcode. This will fail due to the fact
      * that a null username is used.
@@ -168,12 +168,12 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
         builder.addCreated();
         builder.addNonce();
         builder.setUserInfo(null, "security");
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();        
+        secHeader.insertSecurityHeader();
         builder.build(doc, secHeader);
-        
+
         try {
             new UsernameToken(doc.getDocumentElement(), false, new BSPEnforcer());
             fail("Failure expected on an invalid security token");
@@ -184,9 +184,9 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
             assertTrue(ex.getFaultCode().equals(faultCode));
         }
     }
-    
+
     /**
-     * Test for the wsse:InvalidSecurity faultcode. 
+     * Test for the wsse:InvalidSecurity faultcode.
      */
     @org.junit.Test
     public void testInvalidSecurity() throws Exception {
@@ -200,19 +200,19 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
             assertTrue(ex.getFaultCode().equals(faultCode));
         }
     }
-    
-    
+
+
     /**
      * Verifies the soap envelope.
-     * 
+     *
      * @param doc soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, this, crypto);
     }
-    
-    
+
+
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {

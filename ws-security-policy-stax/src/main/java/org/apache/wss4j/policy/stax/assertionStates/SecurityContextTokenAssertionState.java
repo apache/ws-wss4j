@@ -38,10 +38,10 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 public class SecurityContextTokenAssertionState extends TokenAssertionState {
 
-    public SecurityContextTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, 
+    public SecurityContextTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted,
                                               PolicyAsserter policyAsserter, boolean initiator) {
         super(assertion, asserted, policyAsserter, initiator);
-        
+
         if (asserted) {
             SecurityContextToken token = (SecurityContextToken) getAssertion();
             String namespace = token.getName().getNamespaceURI();
@@ -78,7 +78,7 @@ public class SecurityContextTokenAssertionState extends TokenAssertionState {
             getPolicyAsserter().unassertPolicy(getAssertion(), getErrorMessage());
             return false;
         }
-        
+
         String namespace = getAssertion().getName().getNamespaceURI();
         if (securityContextToken.isRequireExternalUriReference()) {
             if (!securityContextTokenSecurityEvent.isExternalUriRef()) {
@@ -99,7 +99,7 @@ public class SecurityContextTokenAssertionState extends TokenAssertionState {
         if (securityContextToken.isSc13SecurityContextToken()) {
             getPolicyAsserter().assertPolicy(new QName(namespace, SPConstants.SC13_SECURITY_CONTEXT_TOKEN));
         }
-        
+
         getPolicyAsserter().assertPolicy(getAssertion());
         return true;
     }

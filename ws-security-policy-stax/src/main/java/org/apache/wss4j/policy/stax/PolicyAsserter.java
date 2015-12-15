@@ -29,10 +29,10 @@ import org.apache.neethi.Assertion;
 public interface PolicyAsserter {
 
     void assertPolicy(Assertion assertion);
-    
+
     void unassertPolicy(Assertion assertion, String reason);
-    
+
     void assertPolicy(QName qName);
-    
+
     void unassertPolicy(QName qName, String reason);
 }

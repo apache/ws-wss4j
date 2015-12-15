@@ -45,7 +45,7 @@ public class TestMessageTransformer extends org.junit.Assert {
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public static Element duplicateEncryptedDataInWsseHeader(Element saaj, boolean moveReferenceList) throws TransformerException, IOException {
         if (moveReferenceList) {
             moveReferenceList(saaj);
@@ -120,7 +120,7 @@ public class TestMessageTransformer extends org.junit.Assert {
         print(saaj.getOwnerDocument());
         return newEncData;
     }
-    
+
     public static Element duplicateEncryptedDataInWrapperBody(Element saaj) throws TransformerException, IOException {
         Element body = getFirstChildElement(saaj, new QName("http://schemas.xmlsoap.org/soap/envelope/",
                                                             "Body"), true);
@@ -141,7 +141,7 @@ public class TestMessageTransformer extends org.junit.Assert {
         }
         Element wrapper = encData.getOwnerDocument().createElementNS(null, "a");
         wrapper.appendChild(newEncData);
-        
+
         body.appendChild(wrapper);
         while (cur != null) {
             cur = copyHeadersAndUpdateRefList(cur, newWsseHeader, newId);
@@ -155,7 +155,7 @@ public class TestMessageTransformer extends org.junit.Assert {
         print(saaj.getOwnerDocument());
         return newEncData;
     }
-    
+
     public static Element duplicateEncryptedDataAfterWrapperBody(Element saaj) throws TransformerException, IOException {
         Element body = getFirstChildElement(saaj, new QName("http://schemas.xmlsoap.org/soap/envelope/",
                                                             "Body"), true);
@@ -178,7 +178,7 @@ public class TestMessageTransformer extends org.junit.Assert {
         Node clonedBody = body.cloneNode(false);
         clonedBody.appendChild(newEncData);
         wrapper.appendChild(clonedBody);
-        
+
         body.getParentNode().appendChild(wrapper);
         while (cur != null) {
             cur = copyHeadersAndUpdateRefList(cur, newWsseHeader, newId);
@@ -231,7 +231,7 @@ public class TestMessageTransformer extends org.junit.Assert {
         print(saaj.getOwnerDocument());
         return newEncData;
     }
-    
+
     public static Element addEncryptedDataWithEmbeddedEncryptedKeyInWsseHeader(Element saaj) throws TransformerException, IOException {
         moveReferenceList(saaj);
         Element body = getFirstChildElement(saaj, new QName("http://schemas.xmlsoap.org/soap/envelope/",

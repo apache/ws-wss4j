@@ -64,16 +64,16 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                 || WSSConstants.KERBEROS_TOKEN.equals(getAction())) {
                 tokenId = outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_KERBEROS);
             }
-            
+
             SecurityTokenProvider<OutboundSecurityToken> tokenProvider = null;
             if (tokenId != null) {
-                tokenProvider = 
+                tokenProvider =
                     outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
                 if (tokenProvider != null) {
                     securityToken = (GenericOutboundSecurityToken)tokenProvider.getSecurityToken();
                 }
             }
-            
+
             boolean includeToken = false;
             WSSecurityTokenConstants.KeyIdentifier keyIdentifier = null;
             if (WSSConstants.SIGNATURE.equals(action) || WSSConstants.SAML_TOKEN_SIGNED.equals(action)) {
@@ -166,8 +166,8 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                                 ((KerberosClientSecurityToken)securityToken).getTicket())
                     );
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);
-                    if (WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN.equals(getAction())) {                    
-                        OutputProcessorUtils.updateSecurityHeaderOrder(outputProcessorChain, WSSConstants.TAG_xenc_ReferenceList, getAction(), false);                    
+                    if (WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN.equals(getAction())) {
+                        OutputProcessorUtils.updateSecurityHeaderOrder(outputProcessorChain, WSSConstants.TAG_xenc_ReferenceList, getAction(), false);
                         WSSUtils.createReferenceListStructureForEncryption(this, subOutputProcessorChain);
                     }
                 } else {
@@ -179,6 +179,6 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
 
                 outputProcessorChain.removeProcessor(this);
             }
-        }        
+        }
     }
 }

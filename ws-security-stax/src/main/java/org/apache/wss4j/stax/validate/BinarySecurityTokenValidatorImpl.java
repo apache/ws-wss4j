@@ -34,7 +34,7 @@ import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 public class BinarySecurityTokenValidatorImpl implements BinarySecurityTokenValidator {
 
-    private static final transient org.slf4j.Logger log = 
+    private static final transient org.slf4j.Logger log =
         org.slf4j.LoggerFactory.getLogger(BinarySecurityTokenValidatorImpl.class);
 
     @Override

@@ -96,7 +96,7 @@ public class SamlTokenTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
         SamlTokenSecurityEvent recipientTokenSecurityEvent = new SamlTokenSecurityEvent();
-        securityToken = 
+        securityToken =
             new SamlSecurityTokenImpl(
                     samlAssertionWrapper, getX509Token(WSSecurityTokenConstants.X509V3Token), null, null,
                     WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference, null);
@@ -181,7 +181,7 @@ public class SamlTokenTest extends AbstractPolicyTestBase {
         samlAssertionWrapper = createSamlAssertionWrapper(samlCallback);
 
         SamlTokenSecurityEvent recipientTokenSecurityEvent = new SamlTokenSecurityEvent();
-        securityToken = 
+        securityToken =
             new SamlSecurityTokenImpl(
                     samlAssertionWrapper, getX509Token(WSSecurityTokenConstants.X509V3Token), null, null,
                     WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference, null);

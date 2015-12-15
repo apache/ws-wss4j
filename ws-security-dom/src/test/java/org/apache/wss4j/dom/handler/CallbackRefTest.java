@@ -38,23 +38,23 @@ import javax.security.auth.callback.CallbackHandler;
  * https://issues.apache.org/jira/browse/WSS-245
  */
 public class CallbackRefTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(CallbackRefTest.class);
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     /**
-     * A test for WSHandler.getPassword(...), where the password is obtained from a 
+     * A test for WSHandler.getPassword(...), where the password is obtained from a
      * Callback Handler, which is placed on the Message Context using a reference.
      */
     @org.junit.Test
     public void
     testMessageContextRef() throws Exception {
-        
+
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
@@ -62,24 +62,24 @@ public class CallbackRefTest extends org.junit.Assert {
         reqData.setPwType(WSConstants.PASSWORD_TEXT);
         java.util.Map<String, Object> messageContext = new java.util.TreeMap<String, Object>();
         messageContext.put(
-            WSHandlerConstants.PW_CALLBACK_REF, 
+            WSHandlerConstants.PW_CALLBACK_REF,
             callbackHandler
         );
         reqData.setMsgContext(messageContext);
-        
+
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(WSConstants.UT);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         HandlerAction action = new HandlerAction(WSConstants.UT);
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             Collections.singletonList(action),
             true
         );
-        
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
@@ -87,22 +87,22 @@ public class CallbackRefTest extends org.junit.Assert {
         assertTrue(outputString.contains("alice"));
         assertTrue(outputString.contains("securityPassword"));
     }
-    
+
     /**
-     * A test for WSHandler.getPassword(...) where the password is obtained from a 
+     * A test for WSHandler.getPassword(...) where the password is obtained from a
      * Callback Handler, which is obtained from the handler options using a ref.
      */
     @org.junit.Test
     public void
     testHandlerOptionRef() throws Exception {
-        
+
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("alice");
         reqData.setPwType(WSConstants.PASSWORD_TEXT);
         reqData.setMsgContext(new java.util.TreeMap<String, String>());
-        
+
         final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(WSConstants.UT);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -110,13 +110,13 @@ public class CallbackRefTest extends org.junit.Assert {
         handler.setOption(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         HandlerAction action = new HandlerAction(WSConstants.UT);
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             Collections.singletonList(action),
             true
         );
-        
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
@@ -124,5 +124,5 @@ public class CallbackRefTest extends org.junit.Assert {
         assertTrue(outputString.contains("alice"));
         assertTrue(outputString.contains("securityPassword"));
     }
-    
+
 }

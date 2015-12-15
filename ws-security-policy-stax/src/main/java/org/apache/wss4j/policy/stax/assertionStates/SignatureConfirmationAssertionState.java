@@ -35,17 +35,17 @@ import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 public class SignatureConfirmationAssertionState extends AssertionState implements Assertable {
 
     private PolicyAsserter policyAsserter;
-    
-    public SignatureConfirmationAssertionState(AbstractSecurityAssertion assertion, 
+
+    public SignatureConfirmationAssertionState(AbstractSecurityAssertion assertion,
                                                PolicyAsserter policyAsserter,
                                                boolean asserted) {
         super(assertion, asserted);
-        
+
         this.policyAsserter = policyAsserter;
         if (this.policyAsserter == null) {
             this.policyAsserter = new DummyPolicyAsserter();
         }
-        
+
         if (asserted) {
             String namespace = getAssertion().getName().getNamespaceURI();
             policyAsserter.assertPolicy(new QName(namespace, SPConstants.REQUIRE_SIGNATURE_CONFIRMATION));

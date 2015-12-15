@@ -50,18 +50,18 @@ import javax.security.auth.callback.CallbackHandler;
  * about Java KeyStores, but just wraps a list of trusted certificates.
  */
 public class CertificateStoreTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(CertificateStoreTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto senderCrypto = CryptoFactory.getInstance("wss40.properties");
     private Crypto receiverCrypto = null;
     private CallbackHandler keystoreCallbackHandler = new KeystoreCallbackHandler();
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public CertificateStoreTest() throws Exception {
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("wss40");
@@ -84,9 +84,9 @@ public class CertificateStoreTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, senderCrypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
@@ -94,14 +94,14 @@ public class CertificateStoreTest extends org.junit.Assert {
         // Verify the signature
         //
         WSHandlerResult results = verify(signedDoc, receiverCrypto);
-        List<WSSecurityEngineResult> signatureResults = 
+        List<WSSecurityEngineResult> signatureResults =
             results.getActionResults().get(WSConstants.SIGN);
         WSSecurityEngineResult result = signatureResults.get(0);
-        X509Certificate cert = 
+        X509Certificate cert =
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertTrue (cert != null);
     }
-    
+
     /**
      * Test signing a SOAP message using an X.509 Key Identifier.
      */
@@ -116,9 +116,9 @@ public class CertificateStoreTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, senderCrypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
@@ -131,15 +131,15 @@ public class CertificateStoreTest extends org.junit.Assert {
         data.setSigVerCrypto(receiverCrypto);
         data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3063));
         WSHandlerResult results = newEngine.processSecurityHeader(signedDoc, data);
-        
-        List<WSSecurityEngineResult> signatureResults = 
+
+        List<WSSecurityEngineResult> signatureResults =
             results.getActionResults().get(WSConstants.SIGN);
         WSSecurityEngineResult result = signatureResults.get(0);
-        X509Certificate cert = 
+        X509Certificate cert =
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertTrue (cert != null);
     }
-    
+
     /**
      * Test signing a SOAP message using Issuer Serial.
      */
@@ -154,26 +154,26 @@ public class CertificateStoreTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, senderCrypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         //
         // Verify the signature
         //
         WSHandlerResult results = verify(signedDoc, receiverCrypto);
-        
-        List<WSSecurityEngineResult> signatureResults = 
+
+        List<WSSecurityEngineResult> signatureResults =
             results.getActionResults().get(WSConstants.SIGN);
         WSSecurityEngineResult result = signatureResults.get(0);
-        X509Certificate cert = 
+        X509Certificate cert =
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertTrue (cert != null);
     }
-    
+
     /**
      * Test signing a SOAP message using a Thumbprint
      */
@@ -188,26 +188,26 @@ public class CertificateStoreTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, senderCrypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         //
         // Verify the signature
         //
         WSHandlerResult results = verify(signedDoc, receiverCrypto);
-        List<WSSecurityEngineResult> signatureResults = 
+        List<WSSecurityEngineResult> signatureResults =
             results.getActionResults().get(WSConstants.SIGN);
         WSSecurityEngineResult result = signatureResults.get(0);
-        
-        X509Certificate cert = 
+
+        X509Certificate cert =
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertTrue (cert != null);
     }
-    
+
     /**
      * Test signing a SOAP message using a SKI Key Identifier
      */
@@ -222,26 +222,26 @@ public class CertificateStoreTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, senderCrypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         //
         // Verify the signature
         //
         WSHandlerResult results = verify(signedDoc, receiverCrypto);
-        
-        List<WSSecurityEngineResult> signatureResults = 
+
+        List<WSSecurityEngineResult> signatureResults =
             results.getActionResults().get(WSConstants.SIGN);
         WSSecurityEngineResult result = signatureResults.get(0);
-        X509Certificate cert = 
+        X509Certificate cert =
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertTrue (cert != null);
     }
-    
+
     /**
      * Test signing a SOAP message using a BST. The certificate is not known to the
      * CertificateStore and so should throw an exception.
@@ -257,9 +257,9 @@ public class CertificateStoreTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, CryptoFactory.getInstance(), secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
@@ -270,15 +270,15 @@ public class CertificateStoreTest extends org.junit.Assert {
             verify(signedDoc, receiverCrypto);
             fail("Failure expected on an unknown certificate");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
     }
-    
+
     /**
      * Verifies the soap envelope
      * <p/>
-     * 
-     * @param doc 
+     *
+     * @param doc
      * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc, Crypto crypto) throws Exception {
@@ -287,12 +287,12 @@ public class CertificateStoreTest extends org.junit.Assert {
         );
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         return results;
     }
 
-    
+
 }

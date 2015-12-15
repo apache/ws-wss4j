@@ -36,42 +36,42 @@ import org.joda.time.DateTime;
 import org.opensaml.saml.common.SAMLVersion;
 
 public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implements SamlTokenValidator {
-    
+
     private static final transient org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SamlTokenValidatorImpl.class);
-                                          
+
     /**
      * The time in seconds in the future within which the NotBefore time of an incoming
      * Assertion is valid. The default is 60 seconds.
      */
     private int futureTTL = 60;
-    
+
     /**
      * The time in seconds within which a SAML Assertion is valid, if it does not contain
      * a NotOnOrAfter Condition. The default is 30 minutes.
      */
     private int ttl = 60 * 30;
-    
+
     /**
-     * Whether to validate the signature of the Assertion (if it exists) against the 
+     * Whether to validate the signature of the Assertion (if it exists) against the
      * relevant profile. Default is true.
      */
     private boolean validateSignatureAgainstProfile = true;
-    
+
     /**
      * If this is set, then the value must appear as one of the Subject Confirmation Methods
      */
     private String requiredSubjectConfirmationMethod;
-    
+
     /**
      * If this is set, at least one of the standard Subject Confirmation Methods *must*
      * be present in the assertion (Bearer / SenderVouches / HolderOfKey).
      */
     private boolean requireStandardSubjectConfirmationMethod = true;
-    
+
     /**
      * If this is set, an Assertion with a Bearer SubjectConfirmation Method must be
-     * signed 
+     * signed
      */
     private boolean requireBearerSignature = true;
 
@@ -82,9 +82,9 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
     public void setFutureTTL(int newFutureTTL) {
         futureTTL = newFutureTTL;
     }
-    
+
     /**
-     * Whether to validate the signature of the Assertion (if it exists) against the 
+     * Whether to validate the signature of the Assertion (if it exists) against the
      * relevant profile. Default is true.
      */
     public boolean isValidateSignatureAgainstProfile() {
@@ -92,13 +92,13 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
     }
 
     /**
-     * Whether to validate the signature of the Assertion (if it exists) against the 
+     * Whether to validate the signature of the Assertion (if it exists) against the
      * relevant profile. Default is true.
      */
     public void setValidateSignatureAgainstProfile(boolean validateSignatureAgainstProfile) {
         this.validateSignatureAgainstProfile = validateSignatureAgainstProfile;
     }
-    
+
     public String getRequiredSubjectConfirmationMethod() {
         return requiredSubjectConfirmationMethod;
     }
@@ -114,17 +114,17 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
         // Check conditions
         checkConditions(samlAssertionWrapper,
                         tokenContext.getWssSecurityProperties().getAudienceRestrictions());
-        
+
         // Check the AuthnStatements of the assertion (if any)
         checkAuthnStatements(samlAssertionWrapper);
-        
+
         // Check the Subject Confirmation requirements
         verifySubjectConfirmationMethod(samlAssertionWrapper);
-        
+
         // Check OneTimeUse Condition
-        checkOneTimeUse(samlAssertionWrapper, 
+        checkOneTimeUse(samlAssertionWrapper,
                         tokenContext.getWssSecurityProperties().getSamlOneTimeUseReplayCache());
-        
+
         // Validate the assertion against schemas/profiles
         validateAssertion(samlAssertionWrapper);
 
@@ -152,20 +152,20 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
     protected void verifySubjectConfirmationMethod(
         SamlAssertionWrapper samlAssertion
     ) throws WSSecurityException {
-        
+
         List<String> methods = samlAssertion.getConfirmationMethods();
         if (methods == null || methods.isEmpty()) {
             if (requiredSubjectConfirmationMethod != null) {
                 LOG.debug("A required subject confirmation method was not present");
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                           "invalidSAMLsecurity");
             } else if (requireStandardSubjectConfirmationMethod) {
                 LOG.debug("A standard subject confirmation method was not present");
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                           "invalidSAMLsecurity");
             }
         }
-        
+
         boolean signed = samlAssertion.isSigned();
         boolean requiredMethodFound = false;
         boolean standardMethodFound = false;
@@ -174,12 +174,12 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
             if (OpenSAMLUtil.isMethodHolderOfKey(method)) {
                 if (!signed) {
                     LOG.debug("A holder-of-key assertion must be signed");
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                                   "invalidSAMLsecurity");
                 }
                 standardMethodFound = true;
             }
-            
+
             if (method != null) {
                 if (method.equals(requiredSubjectConfirmationMethod)) {
                     requiredMethodFound = true;
@@ -189,7 +189,7 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
                     standardMethodFound = true;
                     if (requireBearerSignature && !signed) {
                         LOG.debug("A Bearer Assertion was not signed");
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                                       "invalidSAMLsecurity");
                     }
                 } else if (SAML2Constants.CONF_SENDER_VOUCHES.equals(method)
@@ -198,20 +198,20 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
                 }
             }
         }
-        
+
         if (!requiredMethodFound && requiredSubjectConfirmationMethod != null) {
             LOG.debug("A required subject confirmation method was not present");
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                           "invalidSAMLsecurity");
         }
-        
+
         if (!standardMethodFound && requireStandardSubjectConfirmationMethod) {
             LOG.debug("A standard subject confirmation method was not present");
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                       "invalidSAMLsecurity");
         }
     }
-    
+
     /**
      * Check the Conditions of the Assertion.
      */
@@ -221,7 +221,7 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
         checkConditions(samlAssertion);
         samlAssertion.checkAudienceRestrictions(audienceRestrictions);
     }
-    
+
     /**
      * Check the Conditions of the Assertion.
      */
@@ -229,14 +229,14 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
         samlAssertion.checkConditions(futureTTL);
         samlAssertion.checkIssueInstant(futureTTL, ttl);
     }
-    
+
     /**
      * Check the AuthnStatements of the Assertion (if any)
      */
     protected void checkAuthnStatements(SamlAssertionWrapper samlAssertion) throws WSSecurityException {
         samlAssertion.checkAuthnStatements(futureTTL);
     }
-    
+
     /**
      * Check the "OneTimeUse" Condition of the Assertion. If this is set then the Assertion
      * is cached (if a cache is defined), and must not have been previously cached
@@ -249,14 +249,14 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
             && samlAssertion.getSaml2().getConditions() != null
             && samlAssertion.getSaml2().getConditions().getOneTimeUse() != null) {
             String identifier = samlAssertion.getId();
-            
+
             if (replayCache.contains(identifier)) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY,
                     "badSamlToken",
                     new Object[] {"A replay attack has been detected"});
             }
-            
+
             DateTime expires = samlAssertion.getSaml2().getConditions().getNotOnOrAfter();
             if (expires != null) {
                 Date rightNow = new Date();
@@ -268,7 +268,7 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
             }
         }
     }
-    
+
     /**
      * Validate the samlAssertion against schemas/profiles
      */
@@ -293,7 +293,7 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
     public void setRequireBearerSignature(boolean requireBearerSignature) {
         this.requireBearerSignature = requireBearerSignature;
     }
-    
+
     public int getTtl() {
         return ttl;
     }
@@ -301,5 +301,5 @@ public class SamlTokenValidatorImpl extends SignatureTokenValidatorImpl implemen
     public void setTtl(int ttl) {
         this.ttl = ttl;
     }
-    
+
 }

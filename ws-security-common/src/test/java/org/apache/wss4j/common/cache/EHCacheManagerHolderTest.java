@@ -29,53 +29,53 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class EHCacheManagerHolderTest extends Assert {
 
     @Test
     public void testCreateCacheManager() {
-        Configuration conf = 
+        Configuration conf =
             ConfigurationFactory.parseConfiguration(EHCacheManagerHolder.class.getResource("/test-ehcache.xml"));
-            
+
         assertNotNull(conf);
         conf.setName("testCache");
-        
+
         CacheManager manager1 = EHCacheManagerHolder.createCacheManager(conf);
         assertNotNull(manager1);
         CacheManager manager2 = EHCacheManagerHolder.createCacheManager();
         assertNotNull(manager2);
-        
+
         manager1.shutdown();
         assertEquals(Status.STATUS_SHUTDOWN, manager1.getStatus());
-        
+
         assertEquals(Status.STATUS_ALIVE, manager2.getStatus());
-        
+
         manager2.shutdown();
         assertEquals(Status.STATUS_SHUTDOWN, manager2.getStatus());
-        
+
     }
-    
+
     @Test
     public void testCacheNames() {
-        CacheManager cacheManager = 
-            EHCacheManagerHolder.getCacheManager("testCache2", 
+        CacheManager cacheManager =
+            EHCacheManagerHolder.getCacheManager("testCache2",
                                                  EHCacheManagerHolder.class.getResource("/test-ehcache2.xml"));
-        
+
         String key = "org.apache.wss4j.TokenStore";
-        CacheConfiguration cacheConfig = 
+        CacheConfiguration cacheConfig =
             EHCacheManagerHolder.getCacheConfiguration(key, cacheManager);
         assertEquals(3600, cacheConfig.getTimeToIdleSeconds());
-        
+
         key = "org.apache.wss4j.TokenStore-{http://ws.apache.org}wss4j";
-        CacheConfiguration cacheConfig2 = 
+        CacheConfiguration cacheConfig2 =
             EHCacheManagerHolder.getCacheConfiguration(key, cacheManager);
         assertEquals(360000, cacheConfig2.getTimeToIdleSeconds());
-        
+
         key = "org.apache.wss4j.TokenStore-{http://ws.apache.org}wss4junknown";
-        CacheConfiguration cacheConfig3 = 
+        CacheConfiguration cacheConfig3 =
             EHCacheManagerHolder.getCacheConfiguration(key, cacheManager);
         assertEquals(3600, cacheConfig3.getTimeToIdleSeconds());
-        
+
     }
 }

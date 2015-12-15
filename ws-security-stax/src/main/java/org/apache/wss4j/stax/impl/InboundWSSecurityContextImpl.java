@@ -476,7 +476,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
                 if (signedElementSecurityEvent.isSigned()
                         && tokenSecurityEvent.getSecurityToken() != null
                         && signedElementSecurityEvent.getXmlSecEvent() != null
-                        && signedElementSecurityEvent.getXmlSecEvent() == 
+                        && signedElementSecurityEvent.getXmlSecEvent() ==
                             ((InboundSecurityToken)tokenSecurityEvent.getSecurityToken()).getXMLSecEvent()
                         && !securityTokenList.contains((InboundSecurityToken)signedElementSecurityEvent.getSecurityToken())) {
                     securityTokenList.add((InboundSecurityToken)signedElementSecurityEvent.getSecurityToken());
@@ -502,7 +502,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
                 if (encryptedElementSecurityEvent.isEncrypted()
                         && tokenSecurityEvent.getSecurityToken() != null
                         && encryptedElementSecurityEvent.getXmlSecEvent() != null
-                        && encryptedElementSecurityEvent.getXmlSecEvent() == 
+                        && encryptedElementSecurityEvent.getXmlSecEvent() ==
                             ((InboundSecurityToken)tokenSecurityEvent.getSecurityToken()).getXMLSecEvent()
                         && !securityTokenList.contains((InboundSecurityToken)encryptedElementSecurityEvent.getSecurityToken())) {
                     securityTokenList.add((InboundSecurityToken)encryptedElementSecurityEvent.getSecurityToken());

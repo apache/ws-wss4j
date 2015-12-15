@@ -92,11 +92,11 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
             outputDOMElement(securityToken.getCustomTokenReference(), outputProcessorChain);
             return;
         }
-        
+
         WSSecurityTokenConstants.KeyIdentifier keyIdentifier = getSecurityProperties().getSignatureKeyIdentifier();
 
         X509Certificate[] x509Certificates = securityToken.getX509Certificates();
-        
+
         if (WSSecurityTokenConstants.KeyIdentifier_KeyValue.equals(keyIdentifier)) {
             WSSUtils.createKeyValueTokenStructure(this, outputProcessorChain, x509Certificates);
         } else {
@@ -118,7 +118,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
             } else if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier) && !useSingleCertificate) {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_X509PKIPathv1));
-            } 
+            }
             createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
 
             String tokenId = securityToken.getId();
@@ -186,7 +186,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
             } else if (WSSecurityTokenConstants.KeyIdentifier_UsernameTokenReference.equals(keyIdentifier)) {
                 WSSUtils.createUsernameTokenReferenceStructure(this, outputProcessorChain, tokenId);
             } else {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "unsupportedSecurityToken", 
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "unsupportedSecurityToken",
                                               new Object[] {keyIdentifier});
             }
             createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference);
@@ -251,18 +251,18 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
             switch (xmlSecEvent.getEventType()) {
                 case XMLStreamConstants.START_ELEMENT:
                     if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, actor)) {
-                        
+
                         OutputProcessorUtils.updateSecurityHeaderOrder(
                                 outputProcessorChain, WSSConstants.TAG_dsig_Signature, getAction(), true);
-                        
-                        List<SecurityHeaderOrder> securityHeaderOrderList = 
+
+                        List<SecurityHeaderOrder> securityHeaderOrderList =
                                 outputProcessorChain.getSecurityContext().getAsList(SecurityHeaderOrder.class);
                         List<SecurityHeaderOrder> tmpList = null;
                         if (securityHeaderOrderList != null) {
                             tmpList = new ArrayList<>(securityHeaderOrderList);
                             securityHeaderOrderList.clear();
                         }
-                        
+
                         outputProcessorChain.reset();
                         outputProcessorChain.processEvent(xmlSecEvent);
 

@@ -73,7 +73,7 @@ public class OperationPolicy {
         OperationPolicy other = (OperationPolicy) obj;
         return getOperationName().equals(other.getOperationName());
     }
-    
+
     @Override
     public int hashCode() {
         int hashcode = 17;

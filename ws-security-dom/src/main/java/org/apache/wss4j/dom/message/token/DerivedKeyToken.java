@@ -58,7 +58,7 @@ import org.w3c.dom.Text;
 
 public class DerivedKeyToken {
 
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(DerivedKeyToken.class);
 
     // These are the elements that are used to create the SecurityContextToken
@@ -70,11 +70,11 @@ public class DerivedKeyToken {
     private Element elementLength;
     private Element elementLabel;
     private Element elementNonce;
-    
+
     private String ns;
-    
+
     private final BSPEnforcer bspEnforcer;
-    
+
     /**
      * This will create an empty DerivedKeyToken
      *
@@ -91,10 +91,10 @@ public class DerivedKeyToken {
      */
     public DerivedKeyToken(int version, Document doc) throws WSSecurityException {
         LOG.debug("DerivedKeyToken: created");
-        
+
         ns = ConversationConstants.getWSCNs(version);
-        element = 
-            doc.createElementNS(ns, ConversationConstants.WSC_PREFIX + ":" 
+        element =
+            doc.createElementNS(ns, ConversationConstants.WSC_PREFIX + ":"
                 + ConversationConstants.DERIVED_KEY_TOKEN_LN);
         XMLUtils.setNamespace(element, ns, ConversationConstants.WSC_PREFIX);
         bspEnforcer = new BSPEnforcer();
@@ -112,48 +112,48 @@ public class DerivedKeyToken {
         element = elem;
         this.bspEnforcer = bspEnforcer;
         QName el = new QName(element.getNamespaceURI(), element.getLocalName());
-        
+
         if (!(el.equals(ConversationConstants.DERIVED_KEY_TOKEN_QNAME_05_02) ||
             el.equals(ConversationConstants.DERIVED_KEY_TOKEN_QNAME_05_12))) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN
             );
         }
-        elementSecurityTokenReference = 
+        elementSecurityTokenReference =
             XMLUtils.getDirectChildElement(
                 element,
                 ConversationConstants.SECURITY_TOKEN_REFERENCE_LN,
                 WSConstants.WSSE_NS
             );
-        
+
         ns = el.getNamespaceURI();
-        
-        elementProperties = 
+
+        elementProperties =
             XMLUtils.getDirectChildElement(
                 element, ConversationConstants.PROPERTIES_LN, ns
             );
-        elementGeneration = 
+        elementGeneration =
             XMLUtils.getDirectChildElement(
                 element, ConversationConstants.GENERATION_LN, ns
             );
-        elementOffset = 
+        elementOffset =
             XMLUtils.getDirectChildElement(
                 element, ConversationConstants.OFFSET_LN, ns
             );
-        elementLength = 
+        elementLength =
             XMLUtils.getDirectChildElement(
                 element, ConversationConstants.LENGTH_LN, ns
             );
-        elementLabel = 
+        elementLabel =
             XMLUtils.getDirectChildElement(
                 element, ConversationConstants.LABEL_LN, ns
             );
-        elementNonce = 
+        elementNonce =
             XMLUtils.getDirectChildElement(
                 element, ConversationConstants.NONCE_LN, ns
             );
     }
-    
+
     /**
      * Add the WSU Namespace to this DKT. The namespace is not added by default for
      * efficiency purposes.
@@ -172,12 +172,12 @@ public class DerivedKeyToken {
         elementSecurityTokenReference = ref.getElement();
         WSSecurityUtil.prependChildElement(element, ref.getElement());
     }
-    
+
     public void setSecurityTokenReference(Element elem) {
         elementSecurityTokenReference = elem;
         WSSecurityUtil.prependChildElement(element, elem);
     }
-    
+
     /**
      * Returns the SecurityTokenReference of the derived key token
      *
@@ -190,7 +190,7 @@ public class DerivedKeyToken {
         }
         return null;
     }
-    
+
     /**
      * Returns the SecurityTokenReference element of the derived key token
      *
@@ -199,7 +199,7 @@ public class DerivedKeyToken {
     public Element getSecurityTokenReferenceElement() {
         return elementSecurityTokenReference;
     }
-    
+
     /**
      * This adds a property into
      * /DerivedKeyToken/Properties
@@ -209,14 +209,14 @@ public class DerivedKeyToken {
      */
     private void addProperty(String propName, String propValue) {
         if (elementProperties == null) { //Create the properties element if it is not there
-            elementProperties = 
+            elementProperties =
                 element.getOwnerDocument().createElementNS(
                     ns, ConversationConstants.WSC_PREFIX + ":" + ConversationConstants.PROPERTIES_LN
                 );
             element.appendChild(elementProperties);
         }
-        Element tempElement = 
-            element.getOwnerDocument().createElementNS(ns, ConversationConstants.WSC_PREFIX + ":" 
+        Element tempElement =
+            element.getOwnerDocument().createElementNS(ns, ConversationConstants.WSC_PREFIX + ":"
                 + propName);
         tempElement.appendChild(element.getOwnerDocument().createTextNode(propValue));
 
@@ -254,7 +254,7 @@ public class DerivedKeyToken {
                 String propertyName = entry.getValue();
                 //Check whether this property is already there
                 //If so change the value
-                Element node = 
+                Element node =
                     XMLUtils.findElement(elementProperties, propertyName, ns);
                 if (node != null) { //If the node is not null
                     Text node1 = getFirstNode(node);
@@ -292,7 +292,7 @@ public class DerivedKeyToken {
      * @param length The length of the derived key as a long
      */
     public void setLength(int length) {
-        elementLength = 
+        elementLength =
             element.getOwnerDocument().createElementNS(
                 ns, ConversationConstants.WSC_PREFIX + ":" + ConversationConstants.LENGTH_LN
             );
@@ -320,7 +320,7 @@ public class DerivedKeyToken {
     public void setOffset(int offset) throws WSSecurityException {
         //This element MUST NOT be used if the <Generation> element is specified
         if (elementGeneration == null) {
-            elementOffset = 
+            elementOffset =
                 element.getOwnerDocument().createElementNS(
                     ns, ConversationConstants.WSC_PREFIX + ":" + ConversationConstants.OFFSET_LN
                 );
@@ -352,7 +352,7 @@ public class DerivedKeyToken {
     public void setGeneration(int generation) throws WSSecurityException {
         //This element MUST NOT be used if the <Offset> element is specified
         if (elementOffset == null) {
-            elementGeneration = 
+            elementGeneration =
                 element.getOwnerDocument().createElementNS(
                     ns, ConversationConstants.WSC_PREFIX + ":" + ConversationConstants.GENERATION_LN
                 );
@@ -381,7 +381,7 @@ public class DerivedKeyToken {
      * @param label Label value as a string
      */
     public void setLabel(String label) {
-        elementLabel = 
+        elementLabel =
             element.getOwnerDocument().createElementNS(
                 ns, ConversationConstants.WSC_PREFIX + ":" + ConversationConstants.LABEL_LN
             );
@@ -395,7 +395,7 @@ public class DerivedKeyToken {
      * @param nonce Nonce value as a string
      */
     public void setNonce(String nonce) {
-        elementNonce = 
+        elementNonce =
             element.getOwnerDocument().createElementNS(
                 ns, ConversationConstants.WSC_PREFIX + ":" + ConversationConstants.NONCE_LN
             );
@@ -497,7 +497,7 @@ public class DerivedKeyToken {
             return algo;
         }
     }
-    
+
     /**
      * Create a WSDerivedKeyTokenPrincipal from this DerivedKeyToken object
      */
@@ -508,7 +508,7 @@ public class DerivedKeyToken {
         principal.setLength(getLength());
         principal.setOffset(getOffset());
         principal.setAlgorithm(getAlgorithm());
-        
+
         String basetokenId = null;
         SecurityTokenReference securityTokenReference = getSecurityTokenReference();
         if (securityTokenReference != null && securityTokenReference.getReference() != null) {
@@ -519,7 +519,7 @@ public class DerivedKeyToken {
             basetokenId = securityTokenReference.getKeyIdentifierValue();
         }
         principal.setBasetokenId(basetokenId);
-        
+
         return principal;
     }
 
@@ -534,7 +534,7 @@ public class DerivedKeyToken {
             element.setAttributeNS(ns, "Algorithm", algo);
         }
     }
-    
+
     /**
      * Derive a key from this DerivedKeyToken instance
      * @param length
@@ -547,31 +547,31 @@ public class DerivedKeyToken {
             byte[] labelBytes = null;
             String label = getLabel();
             if (label == null || label.length() == 0) {
-                String defaultLabel = ConversationConstants.DEFAULT_LABEL 
+                String defaultLabel = ConversationConstants.DEFAULT_LABEL
                     + ConversationConstants.DEFAULT_LABEL;
                 labelBytes = defaultLabel.getBytes(StandardCharsets.UTF_8);
             } else {
                 labelBytes = label.getBytes(StandardCharsets.UTF_8);
             }
-            
+
             byte[] nonce = Base64.decode(getNonce());
             byte[] seed = new byte[labelBytes.length + nonce.length];
             System.arraycopy(labelBytes, 0, seed, 0, labelBytes.length);
             System.arraycopy(nonce, 0, seed, labelBytes.length, nonce.length);
-            
+
             int keyLength = length;
             if (keyLength <= 0) {
                 keyLength = getLength();
             }
             return algo.createKey(secret, seed, getOffset(), keyLength);
-            
+
         } catch (Exception e) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, e
             );
         }
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -587,7 +587,7 @@ public class DerivedKeyToken {
         } catch (WSSecurityException e) {
             LOG.error(e.getMessage(), e);
         }
-        
+
         Map<String, String> properties = getProperties();
         if (properties != null) {
             result = 31 * result + properties.hashCode();
@@ -612,10 +612,10 @@ public class DerivedKeyToken {
         if (nonce != null) {
             result = 31 * result + nonce.hashCode();
         }
-        
+
         return result;
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (!(object instanceof DerivedKeyToken)) {
@@ -626,7 +626,7 @@ public class DerivedKeyToken {
             return false;
         }
         try {
-            if (getSecurityTokenReference() != null 
+            if (getSecurityTokenReference() != null
                 && !getSecurityTokenReference().equals(token.getSecurityTokenReference())
                 || getSecurityTokenReference() == null && token.getSecurityTokenReference() != null) {
                 return false;
@@ -655,18 +655,18 @@ public class DerivedKeyToken {
         }
         return true;
     }
-    
+
     private boolean compare(String item1, String item2) {
-        if (item1 == null && item2 != null) { 
+        if (item1 == null && item2 != null) {
             return false;
         } else if (item1 != null && !item1.equals(item2)) {
             return false;
         }
         return true;
     }
-    
+
     private boolean compare(Map<String, String> item1, Map<String, String> item2) {
-        if (item1 == null && item2 != null) { 
+        if (item1 == null && item2 != null) {
             return false;
         } else if (item1 != null && !item1.equals(item2)) {
             return false;

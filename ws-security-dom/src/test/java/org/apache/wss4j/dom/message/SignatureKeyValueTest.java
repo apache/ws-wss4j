@@ -43,15 +43,15 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
  * WS-Security, it's necessary to support it for WCF interop.
  */
 public class SignatureKeyValueTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureKeyValueTest.class);
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public SignatureKeyValueTest() throws Exception {
         WSSConfig.init();
         crypto = CryptoFactory.getInstance("wss40.properties");
@@ -70,34 +70,34 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
         assertTrue(outputString.contains("RSAKeyValue"));
-        
+
         WSSecurityEngine secEngine = new WSSecurityEngine();
         RequestData data = new RequestData();
         data.setSigVerCrypto(crypto);
         data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R5417));
-        final WSHandlerResult results = 
+        final WSHandlerResult results =
             secEngine.processSecurityHeader(signedDoc, data);
 
-        WSSecurityEngineResult actionResult = 
+        WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
-        
-        java.security.Principal principal = 
+
+        java.security.Principal principal =
             (java.security.Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(principal instanceof PublicKeyPrincipal);
-        java.security.PublicKey publicKey = 
+        java.security.PublicKey publicKey =
             ((PublicKeyPrincipal)principal).getPublicKey();
         assertTrue(publicKey instanceof java.security.interfaces.RSAPublicKey);
-        
+
     }
-    
-    
+
+
     /**
      * Failed RSAKeyValue test, where a message is signed using a key-pair which doesn't
      * correspond to the public key in the "trust"-store.
@@ -110,16 +110,16 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = 
+        Document signedDoc =
             builder.build(doc, CryptoFactory.getInstance("wss86.properties"), secHeader);
 
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
         assertTrue(outputString.contains("RSAKeyValue"));
-        
+
         try {
             WSSecurityEngine secEngine = new WSSecurityEngine();
             RequestData data = new RequestData();
@@ -128,12 +128,12 @@ public class SignatureKeyValueTest extends org.junit.Assert {
             secEngine.processSecurityHeader(signedDoc, data);
             fail("Failure expected on bad public key");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
-        
+
     }
-    
-    
+
+
     /**
      * Successful DSAKeyValue test.
      */
@@ -147,30 +147,30 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
         assertTrue(outputString.contains("DSAKeyValue"));
-        
+
         WSSecurityEngine secEngine = new WSSecurityEngine();
         RequestData data = new RequestData();
         data.setSigVerCrypto(crypto);
         data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R5417));
-        final WSHandlerResult results = 
+        final WSHandlerResult results =
             secEngine.processSecurityHeader(signedDoc, data);
-        
-        WSSecurityEngineResult actionResult = 
+
+        WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
-        
-        java.security.Principal principal = 
+
+        java.security.Principal principal =
             (java.security.Principal)actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(principal instanceof PublicKeyPrincipal);
-        java.security.PublicKey publicKey = 
+        java.security.PublicKey publicKey =
             ((PublicKeyPrincipal)principal).getPublicKey();
         assertTrue(publicKey instanceof java.security.interfaces.DSAPublicKey);
     }
-    
+
 }

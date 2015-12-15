@@ -45,10 +45,10 @@ import org.w3c.dom.Document;
  * Some tests for SAML Authentication Assertions
  */
 public class SamlAuthnTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SamlAuthnTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -60,102 +60,102 @@ public class SamlAuthnTest extends org.junit.Assert {
         config.setValidator(WSConstants.SAML2_TOKEN, new CustomSamlAssertionValidator());
         secEngine.setWssConfig(config);
     }
-    
+
     @org.junit.Test
     public void testSAML1AuthnAssertion() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         createAndVerifyMessage(callbackHandler, true);
     }
-    
+
     @org.junit.Test
     public void testSAML2AuthnAssertion() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         createAndVerifyMessage(callbackHandler, true);
     }
-    
+
     @org.junit.Test
     public void testSAML1FutureAuthnInstant() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         callbackHandler.setAuthenticationInstant(new DateTime().plusMinutes(70));
-        
+
         createAndVerifyMessage(callbackHandler, false);
     }
-    
+
     @org.junit.Test
     public void testSAML2FutureAuthnInstant() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         callbackHandler.setAuthenticationInstant(new DateTime().plusMinutes(70));
-        
+
         createAndVerifyMessage(callbackHandler, false);
     }
-    
+
     @org.junit.Test
     public void testSAML2StaleSessionNotOnOrAfter() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         callbackHandler.setSessionNotOnOrAfter(new DateTime().minusMinutes(70));
-        
+
         createAndVerifyMessage(callbackHandler, false);
     }
-    
+
     @org.junit.Test
     public void testSAML1ValidSubjectLocality() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         callbackHandler.setSubjectLocality("127.0.0.1", "xyz.ws.apache.org");   //NOPMD
-        
+
         createAndVerifyMessage(callbackHandler, true);
     }
-    
+
     @org.junit.Test
     public void testSAML2ValidSubjectLocality() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         callbackHandler.setSubjectLocality("127.0.0.1", "xyz.ws.apache.org");   //NOPMD
-        
+
         createAndVerifyMessage(callbackHandler, true);
     }
-    
+
     @org.junit.Test
     public void testSAML1InvalidSubjectLocality() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         callbackHandler.setSubjectLocality("xyz.ws.apache.org", "xyz.ws.apache.org");
-        
+
         createAndVerifyMessage(callbackHandler, false);
     }
-    
+
     @org.junit.Test
     public void testSAML2InalidSubjectLocality() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         callbackHandler.setSubjectLocality("xyz.ws.apache.org", "xyz.ws.apache.org");
-        
+
         createAndVerifyMessage(callbackHandler, false);
     }
-    
+
     private void createAndVerifyMessage(
         CallbackHandler samlCallbackHandler, boolean success
     ) throws Exception {
@@ -168,15 +168,15 @@ public class SamlAuthnTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
-        
+
         try {
             verify(unsignedDoc);
             if (!success) {
@@ -187,23 +187,23 @@ public class SamlAuthnTest extends org.junit.Assert {
             assertTrue(ex.getMessage().contains("SAML token security failure"));
         }
     }
-    
+
     /**
      * Verifies the soap envelope
      * <p/>
-     * 
-     * @param envelope 
+     *
+     * @param envelope
      * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc) throws Exception {
         RequestData requestData = new RequestData();
         requestData.setValidateSamlSubjectConfirmation(false);
-        
+
         WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         return results;
     }
-    
+
 }

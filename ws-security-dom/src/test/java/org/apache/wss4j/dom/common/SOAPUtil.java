@@ -26,26 +26,26 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 public class SOAPUtil {
-    
-    public static final String SAMPLE_SOAP_MSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+
+    public static final String SAMPLE_SOAP_MSG =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
         + "<SOAP-ENV:Envelope "
         +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
         +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
-        +   "<SOAP-ENV:Body>" 
-        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
-        +           "<value xmlns=\"\">15</value>" 
-        +       "</add>" 
-        +   "</SOAP-ENV:Body>" 
+        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
+        +   "<SOAP-ENV:Body>"
+        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">"
+        +           "<value xmlns=\"\">15</value>"
+        +       "</add>"
+        +   "</SOAP-ENV:Body>"
         + "</SOAP-ENV:Envelope>";
-    
+
     private static DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    
+
     static {
         factory.setNamespaceAware(true);
     }
-    
+
     /**
      * Convert an SOAP Envelope as a String to a org.w3c.dom.Document.
      */
@@ -55,5 +55,5 @@ public class SOAPUtil {
             return builder.parse(in);
         }
     }
-    
+
 }

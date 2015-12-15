@@ -46,7 +46,7 @@ public class SignatureAction implements Action {
         if (callbackHandler == null) {
             callbackHandler = handler.getPasswordCallbackHandler(reqData);
         }
-        
+
         SignatureActionToken signatureToken = null;
         if (actionToken instanceof SignatureActionToken) {
             signatureToken = (SignatureActionToken)actionToken;
@@ -54,8 +54,8 @@ public class SignatureAction implements Action {
         if (signatureToken == null) {
             signatureToken = reqData.getSignatureToken();
         }
-        
-        WSPasswordCallback passwordCallback = 
+
+        WSPasswordCallback passwordCallback =
             handler.getPasswordCB(signatureToken.getUser(), WSConstants.SIGN, callbackHandler, reqData);
         WSSecSignature wsSign = new WSSecSignature();
         wsSign.setIdAllocator(reqData.getWssConfig().getIdAllocator());
@@ -73,12 +73,12 @@ public class SignatureAction implements Action {
         if (signatureToken.getC14nAlgorithm() != null) {
             wsSign.setSigCanonicalization(signatureToken.getC14nAlgorithm());
         }
-        
+
         wsSign.setIncludeSignatureToken(signatureToken.isIncludeToken());
 
         wsSign.setUserInfo(signatureToken.getUser(), passwordCallback.getPassword());
         wsSign.setUseSingleCertificate(signatureToken.isUseSingleCert());
-        
+
         if (passwordCallback.getKey() != null) {
             wsSign.setSecretKey(passwordCallback.getKey());
         } else if (signatureToken.getKey() != null) {
@@ -86,7 +86,7 @@ public class SignatureAction implements Action {
         } else if (signatureToken.getUser() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSignatureUser");
         }
-        
+
         if (signatureToken.getTokenId() != null) {
             wsSign.setCustomTokenId(signatureToken.getTokenId());
         }
@@ -111,7 +111,7 @@ public class SignatureAction implements Action {
                 } else if (reqData.isAppendSignatureAfterTimestamp()
                         && WSConstants.WSU_NS.equals(part.getNamespace())
                         && "Timestamp".equals(part.getName())) {
-                    int originalSignatureActionIndex = 
+                    int originalSignatureActionIndex =
                         reqData.getOriginalSignatureActionPosition();
                     // Need to figure out where to put the Signature Element in the header
                     if (originalSignatureActionIndex > 0) {
@@ -137,17 +137,17 @@ public class SignatureAction implements Action {
             if (signBST) {
                 wsSign.prependBSTElementToHeader(reqData.getSecHeader());
             }
-            
+
             List<WSEncryptionPart> parts = signatureToken.getParts();
             if (parts == null || parts.isEmpty()) {
                 parts = new ArrayList<>(1);
                 parts.add(WSSecurityUtil.getDefaultEncryptionPart(doc));
             }
-            
+
             List<javax.xml.crypto.dsig.Reference> referenceList =
                 wsSign.addReferencesToSign(parts, reqData.getSecHeader());
 
-            if (signBST || 
+            if (signBST ||
                 reqData.isAppendSignatureAfterTimestamp() && siblingElementToPrepend == null) {
                 wsSign.computeSignature(referenceList, false, null);
             } else {
@@ -159,7 +159,7 @@ public class SignatureAction implements Action {
             }
             reqData.getSignatureValues().add(wsSign.getSignatureValue());
         } catch (WSSecurityException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "empty", 
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "empty",
                                           new Object[] {"Error during Signature: "});
         }
     }

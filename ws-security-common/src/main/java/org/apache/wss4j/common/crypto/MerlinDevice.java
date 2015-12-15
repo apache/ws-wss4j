@@ -38,29 +38,29 @@ import org.apache.wss4j.common.ext.WSSecurityException;
  * allowing loading of keystores using a null InputStream - for example on a smart-card device.
  */
 public class MerlinDevice extends Merlin {
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(MerlinDevice.class);
     private static final boolean DO_DEBUG = LOG.isDebugEnabled();
 
     public MerlinDevice() {
         super();
     }
-    
-    public MerlinDevice(Properties properties, ClassLoader loader, PasswordEncryptor passwordEncryptor) 
+
+    public MerlinDevice(Properties properties, ClassLoader loader, PasswordEncryptor passwordEncryptor)
         throws WSSecurityException, IOException {
         super(properties, loader, passwordEncryptor);
     }
-    
+
     @Override
-    public void loadProperties(Properties properties, ClassLoader loader, PasswordEncryptor passwordEncryptor) 
+    public void loadProperties(Properties properties, ClassLoader loader, PasswordEncryptor passwordEncryptor)
         throws WSSecurityException, IOException {
         if (properties == null) {
             return;
         }
         this.properties = properties;
         this.passwordEncryptor = passwordEncryptor;
-        
+
         String prefix = PREFIX;
         for (Object key : properties.keySet()) {
             if (key instanceof String) {
@@ -73,7 +73,7 @@ public class MerlinDevice extends Merlin {
                 }
             }
         }
-        
+
         //
         // Load the provider(s)
         //
@@ -113,7 +113,7 @@ public class MerlinDevice extends Merlin {
                 keystore = load(is, keyStorePassword, provider, keyStoreType);
                 if (DO_DEBUG) {
                     LOG.debug(
-                        "The KeyStore " + keyStoreLocation + " of type " + keyStoreType 
+                        "The KeyStore " + keyStoreLocation + " of type " + keyStoreType
                         + " has been loaded"
                     );
                 }
@@ -121,7 +121,7 @@ public class MerlinDevice extends Merlin {
         } else {
             keystore = load(null, keyStorePassword, provider, keyStoreType);
         }
-        
+
         //
         // Load the TrustStore
         //
@@ -146,7 +146,7 @@ public class MerlinDevice extends Merlin {
                 truststore = load(is, trustStorePassword, provider, trustStoreType);
                 if (DO_DEBUG) {
                     LOG.debug(
-                        "The TrustStore " + trustStoreLocation + " of type " + trustStoreType 
+                        "The TrustStore " + trustStoreLocation + " of type " + trustStoreType
                         + " has been loaded"
                     );
                 }
@@ -182,15 +182,15 @@ public class MerlinDevice extends Merlin {
             try (InputStream is = loadInputStream(loader, crlLocation)) {
                 CertificateFactory cf = getCertificateFactory();
                 X509CRL crl = (X509CRL)cf.generateCRL(is);
-                
+
                 if (provider == null || provider.length() == 0) {
-                    crlCertStore = 
+                    crlCertStore =
                         CertStore.getInstance(
                             "Collection",
                             new CollectionCertStoreParameters(Collections.singletonList(crl))
                         );
                 } else {
-                    crlCertStore = 
+                    crlCertStore =
                         CertStore.getInstance(
                             "Collection",
                             new CollectionCertStoreParameters(Collections.singletonList(crl)),

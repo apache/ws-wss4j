@@ -58,12 +58,12 @@ public class ContentEncryptedElementsAssertionState extends AssertionState imple
             List<QName> elements = PolicyUtils.getElementPath(xPath);
             pathElements.add(elements);
         }
-        
+
         this.policyAsserter = policyAsserter;
         if (this.policyAsserter == null) {
             this.policyAsserter = new DummyPolicyAsserter();
         }
-        
+
         if (asserted) {
             policyAsserter.assertPolicy(getAssertion());
         }

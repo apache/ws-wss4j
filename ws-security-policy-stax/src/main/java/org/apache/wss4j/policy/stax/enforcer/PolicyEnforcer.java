@@ -124,9 +124,9 @@ public class PolicyEnforcer implements SecurityEventListener {
     // HttpsToken Algorithms
     //unused tokens must be checked (algorithms etc)
 
-    private static final transient org.slf4j.Logger LOG = 
+    private static final transient org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(PolicyEnforcer.class);
-    
+
     private static final QName SOAP11_FAULT = new QName(WSSConstants.NS_SOAP11, "Fault");
     private static final QName SOAP12_FAULT = new QName(WSSConstants.NS_SOAP12, "Fault");
 
@@ -143,7 +143,7 @@ public class PolicyEnforcer implements SecurityEventListener {
     private boolean noSecurityHeader;
     private boolean faultOccurred;
     private final PolicyAsserter policyAsserter;
-    
+
     public PolicyEnforcer(List<OperationPolicy> operationPolicies, String soapAction, boolean initiator,
                           String actorOrRole, int attachmentCount) throws WSSPolicyException {
         this(operationPolicies, soapAction, initiator, actorOrRole, attachmentCount, null);
@@ -157,7 +157,7 @@ public class PolicyEnforcer implements SecurityEventListener {
         this.attachmentCount = attachmentCount;
         assertionStateMap = new LinkedList<>();
         failedAssertionStateMap = new LinkedList<>();
-        
+
         if (policyAsserter == null) {
             this.policyAsserter = new DummyPolicyAsserter();
         } else {
@@ -186,7 +186,7 @@ public class PolicyEnforcer implements SecurityEventListener {
     private OperationPolicy findPolicyBySOAPOperationName(List<OperationPolicy> operationPolicies, QName soapOperationName) {
         Iterator<OperationPolicy> operationPolicyIterator = operationPolicies.iterator();
         OperationPolicy noNamespaceOperation = null;
-        
+
         while (operationPolicyIterator.hasNext()) {
             OperationPolicy operationPolicy = operationPolicyIterator.next();
             if (operationPolicy.getOperationName() != null) {
@@ -199,7 +199,7 @@ public class PolicyEnforcer implements SecurityEventListener {
                 }
             }
         }
-        
+
         return noNamespaceOperation;
     }
 
@@ -280,7 +280,7 @@ public class PolicyEnforcer implements SecurityEventListener {
         boolean tokenRequired = true;
         if (abstractSecurityAssertion instanceof AbstractToken) {
             // Don't return a Token that is not required
-            SPConstants.IncludeTokenType includeTokenType = 
+            SPConstants.IncludeTokenType includeTokenType =
                 ((AbstractToken)abstractSecurityAssertion).getIncludeTokenType();
             if (includeTokenType == IncludeTokenType.INCLUDE_TOKEN_NEVER) {
                 tokenRequired = false;
@@ -292,7 +292,7 @@ public class PolicyEnforcer implements SecurityEventListener {
                 tokenRequired = false;
             }
         }
-        
+
         if (abstractSecurityAssertion instanceof ContentEncryptedElements) {
             //initialized with asserted=true because it could be that parent elements are encrypted and therefore these element are also encrypted
             //the test if it is really encrypted is done via the PolicyInputProcessor which emits EncryptedElementEvents for unencrypted elements with the unencrypted flag
@@ -333,7 +333,7 @@ public class PolicyEnforcer implements SecurityEventListener {
         } else if (abstractSecurityAssertion instanceof RelToken) {
             assertableList.add(new RelTokenAssertionState(abstractSecurityAssertion, !tokenRequired, policyAsserter, initiator));
         } else if (abstractSecurityAssertion instanceof HttpsToken) {
-            assertableList.add(new HttpsTokenAssertionState(abstractSecurityAssertion, 
+            assertableList.add(new HttpsTokenAssertionState(abstractSecurityAssertion,
                                                             !tokenRequired || initiator, policyAsserter, initiator));
         } else if (abstractSecurityAssertion instanceof KeyValueToken) {
             assertableList.add(new KeyValueTokenAssertionState(abstractSecurityAssertion, !tokenRequired, policyAsserter, initiator));
@@ -372,12 +372,12 @@ public class PolicyEnforcer implements SecurityEventListener {
                 List<QName> timestampElementPath = new LinkedList<>();
                 timestampElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
                 timestampElementPath.add(WSSConstants.TAG_wsu_Timestamp);
-                RequiredElementsAssertionState requiredElementsAssertionState = 
+                RequiredElementsAssertionState requiredElementsAssertionState =
                     new RequiredElementsAssertionState(abstractBinding, policyAsserter, false);
                 requiredElementsAssertionState.addElement(timestampElementPath);
                 assertableList.add(requiredElementsAssertionState);
 
-                SignedElementsAssertionState signedElementsAssertionState = 
+                SignedElementsAssertionState signedElementsAssertionState =
                     new SignedElementsAssertionState(abstractSecurityAssertion, policyAsserter, true);
                 signedElementsAssertionState.addElement(timestampElementPath);
                 assertableList.add(signedElementsAssertionState);
@@ -386,7 +386,7 @@ public class PolicyEnforcer implements SecurityEventListener {
             Wss10 wss10 = (Wss10)abstractSecurityAssertion;
             String namespace = wss10.getName().getNamespaceURI();
             policyAsserter.assertPolicy(abstractSecurityAssertion);
-            
+
             if (wss10.isMustSupportRefEmbeddedToken()) {
                 policyAsserter.assertPolicy(new QName(namespace, SPConstants.MUST_SUPPORT_REF_EMBEDDED_TOKEN));
             }
@@ -399,7 +399,7 @@ public class PolicyEnforcer implements SecurityEventListener {
             if (wss10.isMustSupportRefKeyIdentifier()) {
                 policyAsserter.assertPolicy(new QName(namespace, SPConstants.MUST_SUPPORT_REF_KEY_IDENTIFIER));
             }
-            
+
             if (abstractSecurityAssertion instanceof Wss11) {
                 Wss11 wss11 = (Wss11)abstractSecurityAssertion;
                 if (wss11.isMustSupportRefEncryptedKey()) {
@@ -415,12 +415,12 @@ public class PolicyEnforcer implements SecurityEventListener {
                         List<QName> signatureConfirmationElementPath = new LinkedList<>();
                         signatureConfirmationElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
                         signatureConfirmationElementPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
-                        RequiredElementsAssertionState requiredElementsAssertionState = 
+                        RequiredElementsAssertionState requiredElementsAssertionState =
                             new RequiredElementsAssertionState(wss11, policyAsserter, false);
                         requiredElementsAssertionState.addElement(signatureConfirmationElementPath);
                         assertableList.add(requiredElementsAssertionState);
 
-                        SignedElementsAssertionState signedElementsAssertionState = 
+                        SignedElementsAssertionState signedElementsAssertionState =
                             new SignedElementsAssertionState(wss11, policyAsserter, true);
                         signedElementsAssertionState.addElement(signatureConfirmationElementPath);
                         assertableList.add(signedElementsAssertionState);
@@ -431,7 +431,7 @@ public class PolicyEnforcer implements SecurityEventListener {
             Trust10 trust10 = (Trust10)abstractSecurityAssertion;
             String namespace = trust10.getName().getNamespaceURI();
             policyAsserter.assertPolicy(abstractSecurityAssertion);
-            
+
             if (trust10.isMustSupportClientChallenge()) {
                 policyAsserter.assertPolicy(new QName(namespace, SPConstants.MUST_SUPPORT_CLIENT_CHALLENGE));
             }
@@ -647,7 +647,7 @@ public class PolicyEnforcer implements SecurityEventListener {
         if (this.failedAssertionStateMap.isEmpty()) {
             return;
         }
-        
+
         Iterator<Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>>> assertionStateMapIterator = this.failedAssertionStateMap.iterator();
         while (assertionStateMapIterator.hasNext()) {
             Map<SecurityEventConstants.Event, Map<Assertion, List<Assertable>>> map = assertionStateMapIterator.next();
@@ -680,7 +680,7 @@ public class PolicyEnforcer implements SecurityEventListener {
         if (!noSecurityHeader && securityEvent instanceof NoSecuritySecurityEvent) {
             noSecurityHeader = true;
         }
-        
+
         if (operationSecurityEventOccured) {
             try {
                 verifyPolicy(securityEvent);
@@ -696,7 +696,7 @@ public class PolicyEnforcer implements SecurityEventListener {
                 || SOAP12_FAULT.equals(operationSecurityEvent.getOperation()))) {
                 faultOccurred = true;
             }
-            
+
             if (effectivePolicy == null) {
                 effectivePolicy = findPolicyBySOAPOperationName(operationPolicies, operationSecurityEvent.getOperation());
                 if (effectivePolicy == null) {

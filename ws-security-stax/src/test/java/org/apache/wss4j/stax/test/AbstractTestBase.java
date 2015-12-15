@@ -105,7 +105,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
         LogManager.getLogManager().getLogger("org.jcp.xml.dsig.internal.dom").setLevel(Level.FINE);
         WSSConfig.init();
     }
-    
+
     @AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -168,7 +168,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
         xmlStreamWriter.close();
         return baos;
     }
-    
+
     protected ByteArrayOutputStream doOutboundSecurity(Map<String, Object> config, InputStream sourceDocument)
         throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -226,7 +226,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
             requestData.setCallbackHandler(new WSS4JCallbackHandlerImpl());
         }
         requestData.setWssConfig(WSSConfig.getNewInstance());
-  
+
         wss4JHandler.doSender(messageContext, requestData, true);
 
         return messageContext;
@@ -277,14 +277,14 @@ public abstract class AbstractTestBase extends org.junit.Assert {
             requestData.setDecCrypto(crypto);
             requestData.setSigVerCrypto(crypto);
         }
-        
+
         if (properties.get(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD) != null) {
-            messageContext.put(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD, 
+            messageContext.put(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD,
                                properties.get(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD));
         } else if (WSHandlerConstants.USERNAME_TOKEN_SIGNATURE.equals(action)) {
             messageContext.put(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD, "true");
         }
-        
+
         // Disable PrefixList checking as the stax code doesn't support this yet
         //todo
         List<BSPRule> ignoredRules = new ArrayList<BSPRule>();
@@ -373,7 +373,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
 
     class CustomWSS4JHandler extends WSHandler {
 
-        private final org.slf4j.Logger log = 
+        private final org.slf4j.Logger log =
             org.slf4j.LoggerFactory.getLogger(CustomWSS4JHandler.class.getName());
         private final boolean doDebug = log.isDebugEnabled();
 
@@ -381,7 +381,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
          * Handles incoming web service requests and outgoing responses
          *
          * @throws TransformerException
-         * @throws IOException 
+         * @throws IOException
          */
         public boolean doSender(Map<String, Object> mc, RequestData reqData, boolean isRequest)
                 throws WSSecurityException, TransformerException, IOException {
@@ -462,7 +462,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
                 throws WSSecurityException {
             String action = (String) mc.get(WSHandlerConstants.ACTION);
             if (action == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", 
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                                               new Object[] {"WSS4JHandler: No action defined"});
             }
             List<Integer> actions = WSSecurityUtil.decodeAction(action);
@@ -580,12 +580,12 @@ public abstract class AbstractTestBase extends org.junit.Assert {
             for (WSSecurityEngineResult result : wsSecurityEngineResults) {
                 final Integer act = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
                 if (act != null) {
-                    if (act.intValue() == WSConstants.SC || act.intValue() == WSConstants.BST 
-                        || act.intValue() == WSConstants.DKT || act.intValue() == WSConstants.SCT 
+                    if (act.intValue() == WSConstants.SC || act.intValue() == WSConstants.BST
+                        || act.intValue() == WSConstants.DKT || act.intValue() == WSConstants.SCT
                         || act.intValue() == WSConstants.UT_NOPASSWORD) {
                         continue;
                     }
-    
+
                     if (ai >= size || actions.get(ai++).intValue() != act) {
                         return false;
                     }

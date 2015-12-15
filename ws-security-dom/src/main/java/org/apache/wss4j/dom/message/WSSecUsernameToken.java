@@ -33,11 +33,11 @@ import org.w3c.dom.Element;
 
 /**
  * Builds a WS UsernameToken.
- * 
+ *
  * Refer to the WS specification, UsernameToken profile
  */
 public class WSSecUsernameToken extends WSSecBase {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSecUsernameToken.class);
 
     private String passwordType = WSConstants.PASSWORD_DIGEST;
@@ -59,7 +59,7 @@ public class WSSecUsernameToken extends WSSecBase {
     /**
      * Defines how to construct the password element of the
      * <code>UsernameToken</code>.
-     * 
+     *
      * @param pwType
      *            contains the password type. Only allowed values are
      *            {@link WSConstants#PASSWORD_DIGEST} and
@@ -83,7 +83,7 @@ public class WSSecUsernameToken extends WSSecBase {
     public void addCreated() {
         created = true;
     }
-    
+
     /**
      * Add a derived key to the UsernameToken
      * @param useMac whether the derived key is to be used for a MAC or not
@@ -102,11 +102,11 @@ public class WSSecUsernameToken extends WSSecBase {
 
     /**
      * Get the derived key.
-     * 
+     *
      * After the <code>prepare()</code> method was called use this method
      * to compute a derived key. The generation of this secret key is according
      * to the UsernameTokenProfile 1.1 specification (section 4 - Key Derivation).
-     * 
+     *
      * @return Return the derived key of this token or null if <code>prepare()</code>
      * was not called before.
      */
@@ -144,9 +144,9 @@ public class WSSecUsernameToken extends WSSecBase {
 
     /**
      * Get the id generated during <code>prepare()</code>.
-     * 
-     * Returns the the value of wsu:Id attribute of this UsernameToken. 
-     * 
+     *
+     * Returns the the value of wsu:Id attribute of this UsernameToken.
+     *
      * @return Return the wsu:Id of this token or null if <code>prepare()</code>
      * was not called before.
      */
@@ -159,13 +159,13 @@ public class WSSecUsernameToken extends WSSecBase {
 
     /**
      * Creates a Username token.
-     * 
+     *
      * The method prepares and initializes a WSSec UsernameToken structure after
      * the relevant information was set. A Before calling
      * <code>prepare()</code> all parameters such as user, password,
      * passwordType etc. must be set. A complete <code>UsernameToken</code> is
      * constructed.
-     * 
+     *
      * @param doc The SOAP envelope as W3C document
      */
     public void prepare(Document doc) {
@@ -190,11 +190,11 @@ public class WSSecUsernameToken extends WSSecBase {
     /**
      * Prepends the UsernameToken element to the elements already in the
      * Security header.
-     * 
+     *
      * The method can be called any time after <code>prepare()</code>.
      * This allows to insert the UsernameToken element at any position in the
      * Security header.
-     * 
+     *
      * @param secHeader The security header that holds the Signature element.
      */
     public void prependToHeader(WSSecHeader secHeader) {
@@ -204,26 +204,26 @@ public class WSSecUsernameToken extends WSSecBase {
     /**
      * Appends the UsernameToken element to the elements already in the
      * Security header.
-     * 
+     *
      * The method can be called any time after <code>prepare()</code>.
      * This allows to insert the UsernameToken element at any position in the
      * Security header.
-     * 
+     *
      * @param secHeader The security header that holds the Signature element.
      */
     public void appendToHeader(WSSecHeader secHeader) {
         Element secHeaderElement = secHeader.getSecurityHeader();
         secHeaderElement.appendChild(ut.getElement());
     }
-    
+
     /**
      * Adds a new <code>UsernameToken</code> to a soap envelope.
-     * 
+     *
      * Before calling <code>build()</code> all parameters such as user,
      * password, passwordType etc. must be set. A complete
      * <code>UsernameToken</code> is constructed and added to the
      * <code>wsse:Security</code> header.
-     * 
+     *
      * @param doc The SOAP envelope as W3C document
      * @param secHeader The security header inside the SOAP envelope
      * @return Document with UsernameToken added
@@ -239,15 +239,15 @@ public class WSSecUsernameToken extends WSSecBase {
 
     /**
      * Returns the <code>UsernameToken</code> element.
-     * 
+     *
      * The method can be called any time after <code>prepare()</code>.
      * This allows to insert the UsernameToken element at any position in the
      * Security header.
-     * 
+     *
      * @return the Username Token element
      */
     public Element getUsernameTokenElement() {
-       return ut.getElement(); 
+       return ut.getElement();
     }
 
     public boolean isPrecisionInMilliSeconds() {

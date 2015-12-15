@@ -31,19 +31,19 @@ import org.apache.xml.security.utils.I18n;
  * ResourceBundle for WSS4J
  */
 public class WSS4JResourceBundle extends ResourceBundle {
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSS4JResourceBundle.class);
-    
+
     private final ResourceBundle wss4jSecResourceBundle;
     private final ResourceBundle xmlSecResourceBundle;
-    
+
     public WSS4JResourceBundle() {
         wss4jSecResourceBundle = ResourceBundle.getBundle("messages.wss4j_errors");
-        
+
         ResourceBundle tmpResourceBundle;
         try {
-            tmpResourceBundle = 
+            tmpResourceBundle =
                 ResourceBundle.getBundle(Constants.exceptionMessagesResourceBundleBase,
                         Locale.getDefault(),
                         I18n.class.getClassLoader());
@@ -51,7 +51,7 @@ public class WSS4JResourceBundle extends ResourceBundle {
             // Using a Locale of which there is no properties file.
             LOG.debug(ex.getMessage());
             // Default to en/US
-            tmpResourceBundle = 
+            tmpResourceBundle =
                 ResourceBundle.getBundle(Constants.exceptionMessagesResourceBundleBase,
                                          new Locale("en", "US"), I18n.class.getClassLoader());
         }
@@ -77,6 +77,6 @@ public class WSS4JResourceBundle extends ResourceBundle {
     public Enumeration<String> getKeys() {
         throw new UnsupportedOperationException("getKeys not supported");
     }
-    
-    
+
+
 }

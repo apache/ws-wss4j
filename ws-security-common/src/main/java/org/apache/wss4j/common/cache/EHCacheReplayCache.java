@@ -34,20 +34,20 @@ import net.sf.ehcache.config.CacheConfiguration;
  * max TTL is 12 hours.
  */
 public class EHCacheReplayCache implements ReplayCache {
-    
+
     public static final long DEFAULT_TTL = 3600L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
     protected Ehcache cache;
     protected CacheManager cacheManager;
     private long ttl = DEFAULT_TTL;
-    
+
     public EHCacheReplayCache(String key, URL configFileURL) {
         this(key, EHCacheManagerHolder.getCacheManager("", configFileURL));
     }
-    
+
     public EHCacheReplayCache(String key, CacheManager cacheManager) {
         this.cacheManager = cacheManager;
-        
+
         CacheConfiguration cc = EHCacheManagerHolder.getCacheConfiguration(key, cacheManager);
 
         Cache newCache = new RefCountCache(cc);
@@ -86,7 +86,7 @@ public class EHCacheReplayCache implements ReplayCache {
     public void setTTL(long newTtl) {
         ttl = newTtl;
     }
-    
+
     /**
      * Get the (default) TTL value in seconds
      * @return the (default) TTL value in seconds
@@ -94,7 +94,7 @@ public class EHCacheReplayCache implements ReplayCache {
     public long getTTL() {
         return ttl;
     }
-    
+
     /**
      * Add the given identifier to the cache. It will be cached for a default amount of time.
      * @param identifier The identifier to be added
@@ -102,7 +102,7 @@ public class EHCacheReplayCache implements ReplayCache {
     public void add(String identifier) {
         add(identifier, ttl);
     }
-    
+
     /**
      * Add the given identifier to the cache to be cached for the given time
      * @param identifier The identifier to be added
@@ -112,7 +112,7 @@ public class EHCacheReplayCache implements ReplayCache {
         if (identifier == null || "".equals(identifier)) {
             return;
         }
-        
+
         int parsedTTL = (int)timeToLive;
         if (timeToLive != (long)parsedTTL || parsedTTL < 0 || parsedTTL > MAX_TTL) {
             // Default to configured value
@@ -122,12 +122,12 @@ public class EHCacheReplayCache implements ReplayCache {
                 parsedTTL = 3600;
             }
         }
-        
+
         Element cacheElement = new Element(identifier, identifier, parsedTTL, parsedTTL);
         cacheElement.resetAccessStatistics();
         cache.put(cacheElement);
     }
-    
+
     /**
      * Return true if the given identifier is contained in the cache
      * @param identifier The identifier to check
@@ -157,7 +157,7 @@ public class EHCacheReplayCache implements ReplayCache {
                         && ((RefCountCache)cache).decrementAndGet() == 0) {
                         cacheManager.removeCache(cache.getName());
                     }
-                }                
+                }
             }
 
             EHCacheManagerHolder.releaseCacheManger(cacheManager);
@@ -174,5 +174,5 @@ public class EHCacheReplayCache implements ReplayCache {
     public void postShutdown() {
         close();
     }
-    
+
 }

@@ -40,22 +40,22 @@ import org.w3c.dom.Element;
 /**
  * This test encrypts a Timestamp and the SOAP Body, and appends the ReferenceList Element after the
  * EncryptedData Element that is the Timestamp. When processing, the EncryptedData Element gets decrypted,
- * and then the ReferenceListProcessor must check to see whether the Data Reference pointing to the 
+ * and then the ReferenceListProcessor must check to see whether the Data Reference pointing to the
  * encrypted Timestamp needs to be decrypted or not.
  */
 public class EncryptedDataInHeaderTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(EncryptedDataInHeaderTest.class);
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public EncryptedDataInHeaderTest() throws Exception {
         crypto = CryptoFactory.getInstance();
         WSSConfig.init();
@@ -66,61 +66,61 @@ public class EncryptedDataInHeaderTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);
         timestamp.build(doc, secHeader);
-        
+
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        
+
         // Encrypt the Timestamp and SOAP Body
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp", WSConstants.WSU_NS, "");
         encrypt.getParts().add(encP);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
-        encP = 
+        encP =
             new WSEncryptionPart(
                 WSConstants.ELEM_BODY, soapNamespace, "Content"
             );
         encrypt.getParts().add(encP);
-        
+
         encrypt.prepare(doc, crypto);
         encrypt.prependToHeader(secHeader);
-        
+
         // Append Reference List to security header
         Element refs = encrypt.encrypt();
         secHeader.getSecurityHeader().appendChild(refs);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         WSHandlerResult results = verify(doc);
-        WSSecurityEngineResult actionResult = 
+        WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.ENCR).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
     }
-    
-    
+
+
     /**
      * Verifies the soap envelope
      * <p/>
-     * 
-     * @param doc 
+     *
+     * @param doc
      * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc) throws Exception {
-        WSHandlerResult results = 
+        WSHandlerResult results =
             secEngine.processSecurityHeader(doc, null, callbackHandler, null, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verified and decrypted message:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }

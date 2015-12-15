@@ -50,7 +50,7 @@ import org.apache.xml.security.stax.impl.util.IDGenerator;
  */
 public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
 
-    protected static final org.slf4j.Logger LOG = 
+    protected static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SecurityHeaderInputProcessor.class);
 
     private final ArrayDeque<XMLSecEvent> xmlSecEventList = new ArrayDeque<XMLSecEvent>();
@@ -148,7 +148,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                             engageSecurityHeaderHandler(subInputProcessorChain, getSecurityProperties(),
                                     xmlSecEventList, startIndexForProcessor, xmlSecEndElement.getName());
                         }
-                        
+
                         // Check for multiple timestamps
                         if (xmlSecEndElement.getName().equals(WSSConstants.TAG_wsu_Timestamp)) {
                             if (timestampFound) {
@@ -207,7 +207,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                                              QName elementName)
             throws WSSecurityException, XMLStreamException {
 
-        Class<XMLSecurityHeaderHandler> clazz = 
+        Class<XMLSecurityHeaderHandler> clazz =
             (Class<XMLSecurityHeaderHandler>)SecurityHeaderHandlerMapper.getSecurityHeaderHandler(elementName);
         if (clazz == null) {
             LOG.warn("No matching handler found for " + elementName);

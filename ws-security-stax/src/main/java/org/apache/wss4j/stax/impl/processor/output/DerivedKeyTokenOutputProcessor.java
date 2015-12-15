@@ -102,15 +102,15 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             System.arraycopy(label, 0, seed, 0, label.length);
             System.arraycopy(nonce, 0, seed, label.length, nonce.length);
 
-            DerivationAlgorithm derivationAlgorithm = 
+            DerivationAlgorithm derivationAlgorithm =
                 AlgoFactory.getInstance(WSSConstants.P_SHA_1);
-            
+
             byte[] secret;
             if (WSSecurityTokenConstants.SecurityContextToken.equals(wrappingSecurityToken.getTokenType())) {
                 WSPasswordCallback passwordCallback = new WSPasswordCallback(wsuIdDKT, WSPasswordCallback.SECRET_KEY);
                 WSSUtils.doSecretKeyCallback(((WSSSecurityProperties)securityProperties).getCallbackHandler(), passwordCallback, wsuIdDKT);
                 if (passwordCallback.getKey() == null) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKey", 
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKey",
                                                   new Object[] {wsuIdDKT});
                 }
                 secret = passwordCallback.getKey();
@@ -158,7 +158,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                     return wsuIdDKT;
                 }
             };
-            
+
             if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, wsuIdDKT);
             } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
@@ -193,7 +193,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
         private final boolean use200512Namespace;
         private final String sha1Identifier;
 
-        FinalDerivedKeyTokenOutputProcessor(OutboundSecurityToken securityToken, int offset, 
+        FinalDerivedKeyTokenOutputProcessor(OutboundSecurityToken securityToken, int offset,
                                             int length, String nonce, boolean use200512Namespace,
                                             String sha1Identifier) throws XMLSecurityException {
 
@@ -260,7 +260,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
             } else if (WSSecurityTokenConstants.KerberosToken.equals(wrappingToken.getTokenType())) {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_GSS_Kerberos5_AP_REQ));
-            } 
+            }
             createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
 
             X509Certificate[] x509Certificates = wrappingToken.getX509Certificates();
@@ -307,28 +307,28 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             }
             createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference);
         }
-        
+
         private QName getHeaderElementName() {
             if (use200512Namespace) {
                 return WSSConstants.TAG_wsc0512_DerivedKeyToken;
             }
             return WSSConstants.TAG_wsc0502_DerivedKeyToken;
         }
-        
+
         private QName getOffsetName() {
             if (use200512Namespace) {
                 return WSSConstants.TAG_wsc0512_Offset;
             }
             return WSSConstants.TAG_wsc0502_Offset;
         }
-        
+
         private QName getLengthName() {
             if (use200512Namespace) {
                 return WSSConstants.TAG_wsc0512_Length;
             }
             return WSSConstants.TAG_wsc0502_Length;
         }
-        
+
         private QName getNonceName() {
             if (use200512Namespace) {
                 return WSSConstants.TAG_wsc0512_Nonce;

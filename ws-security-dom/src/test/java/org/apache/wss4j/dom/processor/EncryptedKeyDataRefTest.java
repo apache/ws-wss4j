@@ -41,39 +41,39 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Test that checks for correct WSDataRef which should be returned by 
- * <code>org.apache.wss4j.dom.processor.EncryptedKeyProcessor</code> 
- * 
+ * Test that checks for correct WSDataRef which should be returned by
+ * <code>org.apache.wss4j.dom.processor.EncryptedKeyProcessor</code>
+ *
  * This test uses the RSA_15 algorithm to transport (wrap) the symmetric key.
  * The test case creates a ReferenceList element that references EncryptedData
- * elements. The ReferencesList element is put into the EncryptedKey. The 
- * EncryptedData elements contain a KeyInfo that references the EncryptedKey via 
+ * elements. The ReferencesList element is put into the EncryptedKey. The
+ * EncryptedData elements contain a KeyInfo that references the EncryptedKey via
  * a STR/Reference structure.
- * 
- * WSDataRef object must contain the correct QName of the decrypted element. 
- * 
+ *
+ * WSDataRef object must contain the correct QName of the decrypted element.
+ *
  */
 public class EncryptedKeyDataRefTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(EncryptedKeyDataRefTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public EncryptedKeyDataRefTest() throws Exception {
         crypto = CryptoFactory.getInstance("wss40.properties");
         WSSConfig.init();
     }
 
     /**
-     * Test that check for correct WSDataRef object from EncryptedKey Processor 
-     * 
-     * 
+     * Test that check for correct WSDataRef object from EncryptedKey Processor
+     *
+     *
      * @throws Exception
      *             Thrown when there is an error in encryption or decryption
      */
@@ -96,7 +96,7 @@ public class EncryptedKeyDataRefTest extends org.junit.Assert {
         /*
          * Set up the parts structure to encrypt the body
          */
-        WSEncryptionPart encP = 
+        WSEncryptionPart encP =
             new WSEncryptionPart(
                 "add", "http://ws.apache.org/counter/counter_port_type", "Element"
             );
@@ -108,9 +108,9 @@ public class EncryptedKeyDataRefTest extends org.junit.Assert {
          * itself as a child.
          */
         Element refs = builder.encrypt();
-        
+
         /*
-         * We use this method because we want the reference list to be inside the 
+         * We use this method because we want the reference list to be inside the
          * EncryptedKey element
          */
         builder.addInternalRefElement(refs);
@@ -131,35 +131,35 @@ public class EncryptedKeyDataRefTest extends org.junit.Assert {
 
     /**
      * Verifies the soap envelope <p/>
-     * 
+     *
      * @param envelope
      * @throws Exception
      *             Thrown when there is a problem in verification
      */
     @SuppressWarnings("unchecked")
     private void checkDataRef(Document doc) throws Exception {
-        
-        // Retrieve the wsResults List 
-        WSHandlerResult wsResults = 
+
+        // Retrieve the wsResults List
+        WSHandlerResult wsResults =
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         boolean found = false;
-                
+
         for (int i = 0; i < wsResults.getResults().size(); i++) {
             WSSecurityEngineResult wsSecEngineResult = wsResults.getResults().get(i);
             int action = (Integer)
                     wsSecEngineResult.get(WSSecurityEngineResult.TAG_ACTION);
-            
+
             // We want to filter only encryption results
             if (action != WSConstants.ENCR) {
                 continue;
             }
             List<WSDataRef> dataRefs = (List<WSDataRef>)wsSecEngineResult
                 .get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
-            
-            //We want check only the DATA_REF_URIS 
+
+            //We want check only the DATA_REF_URIS
             if (dataRefs != null && dataRefs.size() > 0) {
                 for (int j = 0; j < dataRefs.size(); j++) {
-                    Object obj = dataRefs.get(i);                            
+                    Object obj = dataRefs.get(i);
 
                     // ReferenceList Processor must Return a WSDataRef objects
                     assertTrue(obj instanceof WSDataRef);
@@ -169,13 +169,13 @@ public class EncryptedKeyDataRefTest extends org.junit.Assert {
                     // Check whether QName is correctly set
                     assertEquals("add", dataRef.getName().getLocalPart());
                     assertEquals(
-                        "http://ws.apache.org/counter/counter_port_type", 
+                        "http://ws.apache.org/counter/counter_port_type",
                         dataRef.getName().getNamespaceURI()
                     );
 
                     // Check whether wsu:Id is set
                     assertNotNull(dataRef.getWsuId());
-                    
+
                     // Check the encryption algorithm was set
                     assertEquals(WSConstants.TRIPLE_DES, dataRef.getAlgorithm());
 
@@ -185,10 +185,10 @@ public class EncryptedKeyDataRefTest extends org.junit.Assert {
                 }
             }
         }
-        
+
         // Make sure the element is actually found in the decrypted elements
         assertTrue(found);
-        
+
     }
 
 }

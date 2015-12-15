@@ -45,26 +45,26 @@ import java.util.List;
  * A test for adding custom actions/processors etc.
  */
 public class CustomActionProcessorTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(CustomActionProcessorTest.class);
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public CustomActionProcessorTest() throws Exception {
         WSSConfig.init();
         crypto = CryptoFactory.getInstance();
     }
 
     /**
-     * Test to see that a custom processor configured through a 
+     * Test to see that a custom processor configured through a
      * WSSConfig instance is called
      */
     @org.junit.Test
-    public void 
+    public void
     testCustomUserProcessor() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -77,7 +77,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
@@ -92,7 +92,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         );
         final WSSecurityEngine engine = new WSSecurityEngine();
         engine.setWssConfig(cfg);
-        final WSHandlerResult results = 
+        final WSHandlerResult results =
             engine.processSecurityHeader(doc, null, null, crypto);
         boolean found = false;
         for (WSSecurityEngineResult result : results.getResults()) {
@@ -103,13 +103,13 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         }
         assertTrue("Unable to find result from CustomProcessor", found);
     }
-    
+
     /**
-     * Test to see that a custom processor (object) configured through a 
+     * Test to see that a custom processor (object) configured through a
      * WSSConfig instance is called
      */
     @org.junit.Test
-    public void 
+    public void
     testCustomUserProcessorObject() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -122,7 +122,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
@@ -132,10 +132,10 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         //
         WSSConfig cfg = WSSConfig.getNewInstance();
         cfg.setProcessor(WSConstants.SIGNATURE, CustomProcessor.class);
-        
+
         final WSSecurityEngine engine = new WSSecurityEngine();
         engine.setWssConfig(cfg);
-        final WSHandlerResult results = 
+        final WSHandlerResult results =
             engine.processSecurityHeader(doc, null, null, crypto);
         boolean found = false;
         for (WSSecurityEngineResult result : results.getResults()) {
@@ -146,7 +146,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         }
         assertTrue("Unable to find result from CustomProcessor", found);
     }
-    
+
     /**
      * Test to see that a custom action configured through a
      * WSSConfig instance is called
@@ -154,26 +154,26 @@ public class CustomActionProcessorTest extends org.junit.Assert {
     @org.junit.Test
     public void
     testCustomAction() throws Exception {
-        
+
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final int action = 0xDEADF000;
         cfg.setAction(action, CustomAction.class);
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         reqData.setMsgContext("bread");
         assertEquals(reqData.getMsgContext(), "bread");
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             Collections.singletonList(new HandlerAction(action)),
             true
         );
         assertEquals(reqData.getMsgContext(), "crumb");
     }
-    
+
     /**
      * Test to see that a custom action object configured through a
      * WSSConfig instance is called
@@ -181,26 +181,26 @@ public class CustomActionProcessorTest extends org.junit.Assert {
     @org.junit.Test
     public void
     testCustomActionObject() throws Exception {
-        
+
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final int action = 0xDEADF000;
         cfg.setAction(action, CustomAction.class);
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         reqData.setMsgContext("bread");
         assertEquals(reqData.getMsgContext(), "bread");
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             Collections.singletonList(new HandlerAction(action)),
             true
         );
         assertEquals(reqData.getMsgContext(), "crumb");
     }
-    
+
     /**
      * Test to see that a custom action can be configured via WSSecurityUtil.decodeAction.
      * A standard Timestamp action is also configured.
@@ -208,11 +208,11 @@ public class CustomActionProcessorTest extends org.junit.Assert {
     @org.junit.Test
     public void
     testDecodeCustomAction() throws Exception {
-        
+
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final int customAction = 0xDEADF000;
-        
-        String actionString = 
+
+        String actionString =
             WSHandlerConstants.TIMESTAMP + " " + Integer.valueOf(customAction).toString();
         //
         // This parsing will fail as WSSConfig doesn't know what the custom action is
@@ -221,45 +221,45 @@ public class CustomActionProcessorTest extends org.junit.Assert {
             WSSecurityUtil.decodeHandlerAction(actionString, cfg);
             fail("Failure expected on unknown action");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
-        
+
         //
         // This parsing will fail as the action String is badly formed
         //
         try {
-            String badActionString = 
+            String badActionString =
                 WSHandlerConstants.TIMESTAMP + " " + "NewCustomAction";
             WSSecurityUtil.decodeHandlerAction(badActionString, cfg);
             fail("Failure expected on unknown action");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
-        
+
         //
         // This parsing should pass as WSSConfig has been configured with the custom action
         //
         cfg.setAction(customAction, CustomAction.class);
         List<HandlerAction> actionList = WSSecurityUtil.decodeHandlerAction(actionString, cfg);
-        
+
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         reqData.setMsgContext("bread");
         assertEquals(reqData.getMsgContext(), "bread");
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             actionList,
             true
         );
         assertEquals(reqData.getMsgContext(), "crumb");
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }

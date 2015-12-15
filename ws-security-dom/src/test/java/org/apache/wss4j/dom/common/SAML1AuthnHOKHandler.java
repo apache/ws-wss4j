@@ -43,25 +43,25 @@ import java.util.Collections;
  * Holder of Key.
  */
 public class SAML1AuthnHOKHandler implements CallbackHandler {
-    
+
     private String subjectName = "uid=joe,ou=people,ou=saml-demo,o=example.com";
     private String subjectQualifier = "www.example.com";
     private X509Certificate[] certs;
-    
+
     public SAML1AuthnHOKHandler() throws WSSecurityException {
         Crypto crypto = CryptoFactory.getInstance("wss40.properties");
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("wss40");
         certs = crypto.getX509Certificates(cryptoType);
     }
-    
+
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
                 callback.setSamlVersion(Version.SAML_11);
-                SubjectBean subjectBean = 
+                SubjectBean subjectBean =
                     new SubjectBean(
                         subjectName, subjectQualifier, SAML1Constants.CONF_HOLDER_KEY
                     );

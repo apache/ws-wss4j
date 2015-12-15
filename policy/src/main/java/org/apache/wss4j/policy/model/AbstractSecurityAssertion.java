@@ -33,7 +33,7 @@ public abstract class AbstractSecurityAssertion implements Assertion {
 
     private boolean isOptional;
     private boolean isIgnorable;
-    
+
     // if normalized is null, then this policy hasn't been normalized yet
     // if normalized == this, then this policy is already in normalized form
     // else, normalized contains the normalized version of this policy
@@ -79,24 +79,24 @@ public abstract class AbstractSecurityAssertion implements Assertion {
             Policy policy = new Policy();
             ExactlyOne exactlyOne = new ExactlyOne();
             policy.addPolicyComponent(exactlyOne);
-    
+
             if (isOptional()) {
                 exactlyOne.addPolicyComponent(new All());
             }
-    
+
             AbstractSecurityAssertion a = clone(null);
             a.normalized = a;
             a.setOptional(false);
-    
+
             All all = new All();
             all.addPolicyComponent(a);
             exactlyOne.addPolicyComponent(all);
-    
+
             normalized = policy;
         }
         return normalized;
     }
-    
+
     public boolean isNormalized() {
         return normalized == this;
     }
@@ -104,36 +104,36 @@ public abstract class AbstractSecurityAssertion implements Assertion {
     public PolicyComponent normalize(Policy nestedPolicy) {
         if (normalized == null) {
             Policy normalizedNestedPolicy = nestedPolicy.normalize(true);
-    
+
             Policy policy = new Policy();
             ExactlyOne exactlyOne = new ExactlyOne();
             policy.addPolicyComponent(exactlyOne);
-    
+
             if (isOptional()) {
                 exactlyOne.addPolicyComponent(new All());
             }
-    
+
             // for all alternatives in normalized nested policy
             Iterator<List<Assertion>> alternatives = normalizedNestedPolicy.getAlternatives();
             while (alternatives.hasNext()) {
                 List<Assertion> alternative = alternatives.next();
-    
+
                 Policy ncp = new Policy(nestedPolicy.getPolicyRegistry(), nestedPolicy.getNamespace());
                 ExactlyOne nceo = new ExactlyOne();
                 ncp.addPolicyComponent(nceo);
-    
+
                 All nca = new All();
                 nceo.addPolicyComponent(nca);
                 nca.addPolicyComponents(alternative);
-    
+
                 AbstractSecurityAssertion a = clone(ncp);
                 a.normalized = a;
                 a.setOptional(false);
-    
+
                 All all = new All();
                 all.addPolicyComponent(a);
                 exactlyOne.addPolicyComponent(all);
-    
+
             }
             normalized = policy;
         }

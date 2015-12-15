@@ -48,20 +48,20 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * A set of test-cases for signing and verifying SOAP requests when specifying an 
+ * A set of test-cases for signing and verifying SOAP requests when specifying an
  * AlgorithmSuite policy.
  */
 public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureAlgorithmSuiteTest.class);
-    
+
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public SignatureAlgorithmSuiteTest() throws Exception {
         WSSConfig.init();
         crypto = CryptoFactory.getInstance();
@@ -80,30 +80,30 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         Element securityHeader = WSSecurityUtil.getSecurityHeader(signedDoc, null);
         AlgorithmSuite algorithmSuite = createAlgorithmSuite();
-        
+
         verify(securityHeader, algorithmSuite, crypto);
-        
+
         algorithmSuite.setMinimumAsymmetricKeyLength(1024);
-        
+
         try {
             verify(securityHeader, algorithmSuite, crypto);
             fail("Expected failure as 512-bit keys are not allowed");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
     }
-    
+
     @org.junit.Test
     public void testSignatureMethodDSA() throws Exception {
         Crypto dsaCrypto = CryptoFactory.getInstance("wss40.properties");
-        
+
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40DSA", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
@@ -115,57 +115,57 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         Document signedDoc = builder.build(doc, dsaCrypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         Element securityHeader = WSSecurityUtil.getSecurityHeader(signedDoc, null);
         AlgorithmSuite algorithmSuite = createAlgorithmSuite();
-        
+
         try {
             verify(securityHeader, algorithmSuite, dsaCrypto);
             fail("Expected failure as DSA is not allowed");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         algorithmSuite.addSignatureMethod(WSConstants.DSA);
         verify(securityHeader, algorithmSuite, dsaCrypto);
     }
-    
+
     @org.junit.Test
     public void testSymmetricKey() throws Exception {
-        
+
         KeyGenerator keyGen = KeyGenerator.getInstance("AES");
         keyGen.init(128);
         SecretKey key = keyGen.generateKey();
         byte[] keyData = key.getEncoded();
-        
+
         WSSecSignature builder = new WSSecSignature();
         builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
         builder.setSecretKey(keyData);
         builder.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         byte[] encodedBytes = KeyUtils.generateDigest(keyData);
         String identifier = Base64.encode(encodedBytes);
         SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
-        
+
         Element securityHeader = WSSecurityUtil.getSecurityHeader(signedDoc, null);
         AlgorithmSuite algorithmSuite = createAlgorithmSuite();
-        
+
         WSSecurityEngine secEngine = new WSSecurityEngine();
         RequestData data = new RequestData();
         SignatureActionToken actionToken = new SignatureActionToken();
@@ -173,17 +173,17 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         data.setSignatureToken(actionToken);
         data.setCallbackHandler(secretKeyCallbackHandler);
         data.setAlgorithmSuite(algorithmSuite);
-        
+
         try {
             secEngine.processSecurityHeader(securityHeader, data);
             fail("Expected failure as HMAC-SHA1 is not allowed");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         algorithmSuite.addSignatureMethod(WSConstants.HMAC_SHA1);
         secEngine.processSecurityHeader(securityHeader, data);
-        
+
         algorithmSuite.setMinimumSymmetricKeyLength(256);
         try {
             secEngine.processSecurityHeader(securityHeader, data);
@@ -191,7 +191,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         algorithmSuite.setMinimumSymmetricKeyLength(64);
         algorithmSuite.setMaximumSymmetricKeyLength(120);
         try {
@@ -201,7 +201,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
     }
-    
+
     @org.junit.Test
     public void testC14nMethod() throws Exception {
         WSSecSignature builder = new WSSecSignature();
@@ -216,25 +216,25 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
         Element securityHeader = WSSecurityUtil.getSecurityHeader(signedDoc, null);
         AlgorithmSuite algorithmSuite = createAlgorithmSuite();
-        
+
         try {
             verify(securityHeader, algorithmSuite, crypto);
             fail("Expected failure as C14n algorithm is not allowed");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         algorithmSuite.addC14nAlgorithm(WSConstants.C14N_EXCL_WITH_COMMENTS);
         verify(securityHeader, algorithmSuite, crypto);
     }
-    
+
     @org.junit.Test
     public void testDigestMethod() throws Exception {
         WSSecSignature builder = new WSSecSignature();
@@ -249,32 +249,32 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
         Element securityHeader = WSSecurityUtil.getSecurityHeader(signedDoc, null);
         AlgorithmSuite algorithmSuite = createAlgorithmSuite();
-        
+
         try {
             verify(securityHeader, algorithmSuite, crypto);
             fail("Expected failure as Digest algorithm is not allowed");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         algorithmSuite.addDigestAlgorithm(WSConstants.SHA256);
         verify(securityHeader, algorithmSuite, crypto);
     }
-    
+
     private AlgorithmSuite createAlgorithmSuite() {
         AlgorithmSuite algorithmSuite = new AlgorithmSuite();
         algorithmSuite.addSignatureMethod(WSConstants.RSA_SHA1);
         algorithmSuite.setMinimumAsymmetricKeyLength(512);
         algorithmSuite.addC14nAlgorithm(WSConstants.C14N_EXCL_OMIT_COMMENTS);
         algorithmSuite.addDigestAlgorithm(WSConstants.SHA1);
-        
+
         return algorithmSuite;
     }
 
@@ -284,14 +284,14 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         RequestData data = new RequestData();
         data.setSigVerCrypto(sigVerCrypto);
-        
+
         data.setAlgorithmSuite(algorithmSuite);
-        
+
         List<BSPRule> ignoredRules = new ArrayList<>();
         ignoredRules.add(BSPRule.R5404);
         ignoredRules.add(BSPRule.R5406);
         data.setIgnoredBSPRules(ignoredRules);
-        
+
         return secEngine.processSecurityHeader(securityHeader, data);
     }
 

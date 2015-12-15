@@ -43,15 +43,15 @@ public class SubjectBean {
      * @param subjectConfirmationMethod of type String
      */
     public SubjectBean(
-        String subjectName, 
-        String subjectNameQualifier, 
+        String subjectName,
+        String subjectNameQualifier,
         String subjectConfirmationMethod
     ) {
         nameID.setNameValue(subjectName);
         nameID.setNameQualifier(subjectNameQualifier);
         this.subjectConfirmationMethod = subjectConfirmationMethod;
     }
-    
+
     /**
      * Constructor SubjectBean creates a new SubjectBean instance.
      *
@@ -61,8 +61,8 @@ public class SubjectBean {
      * @param subjectNameIDFormat of type String
      */
     public SubjectBean(
-        String subjectName, 
-        String subjectNameQualifier, 
+        String subjectName,
+        String subjectNameQualifier,
         String subjectConfirmationMethod,
         String subjectNameIDFormat
     ) {
@@ -87,7 +87,7 @@ public class SubjectBean {
     public void setSubjectName(String subjectName) {
         nameID.setNameValue(subjectName);
     }
-    
+
     /**
      * Method getSubjectNameQualifier returns the subjectNameQualifier of this SubjectBean object.
      *
@@ -105,7 +105,7 @@ public class SubjectBean {
     public void setSubjectNameQualifier(String subjectNameQualifier) {
         nameID.setNameQualifier(subjectNameQualifier);
     }
-    
+
     /**
      * Method getSubjectConfirmationMethod returns the subjectConfirmationMethod of
      * this SubjectBean object.
@@ -120,15 +120,15 @@ public class SubjectBean {
      * Method setSubjectConfirmationMethod sets the subjectConfirmationMethod of
      * this SubjectBean object.
      *
-     * @param subjectConfirmationMethod the subjectConfirmationMethod of this 
+     * @param subjectConfirmationMethod the subjectConfirmationMethod of this
      *        SubjectBean object.
      */
     public void setSubjectConfirmationMethod(String subjectConfirmationMethod) {
         this.subjectConfirmationMethod = subjectConfirmationMethod;
     }
-    
+
     /**
-     * Method getSubjectNameIDFormat returns the subjectNameIDFormat of this SubjectBean 
+     * Method getSubjectNameIDFormat returns the subjectNameIDFormat of this SubjectBean
      * object.
      *
      * @return the subjectNameIDFormat (type String) of this SubjectBean object.
@@ -138,7 +138,7 @@ public class SubjectBean {
     }
 
     /**
-     * Method setSubjectNameIDFormat sets the subjectNameIDFormat of this SubjectBean 
+     * Method setSubjectNameIDFormat sets the subjectNameIDFormat of this SubjectBean
      * object.
      *
      * @param subjectNameIDFormat the subjectNameIDFormat of this SubjectBean object.
@@ -146,7 +146,7 @@ public class SubjectBean {
     public void setSubjectNameIDFormat(String subjectNameIDFormat) {
         nameID.setNameIDFormat(subjectNameIDFormat);
     }
-    
+
     /**
      * Method getKeyInfo returns the keyInfo of this SubjectBean object.
      *
@@ -164,7 +164,7 @@ public class SubjectBean {
     public void setKeyInfo(KeyInfoBean keyInfo) {
         this.keyInfo = keyInfo;
     }
-    
+
     /**
      * Set the SubjectConfirmationData of this SubjectBean object
      * @return the SubjectConfirmationData of this SubjectBean object
@@ -182,7 +182,7 @@ public class SubjectBean {
     ) {
         this.subjectConfirmationData = subjectConfirmationData;
     }
-    
+
     /**
      * Method equals ...
      *
@@ -203,23 +203,23 @@ public class SubjectBean {
         if (!nameID.equals(that.nameID)) {
             return false;
         }
-        
+
         if (subjectConfirmationMethod == null && that.subjectConfirmationMethod != null) {
             return false;
-        } else if (subjectConfirmationMethod != null && 
+        } else if (subjectConfirmationMethod != null &&
             !subjectConfirmationMethod.equals(that.subjectConfirmationMethod)) {
             return false;
         }
-        
+
         if (keyInfo == null && that.keyInfo != null) {
             return false;
         } else if (keyInfo != null && !keyInfo.equals(that.keyInfo)) {
             return false;
         }
-        
+
         if (subjectConfirmationData == null && that.subjectConfirmationData != null) {
             return false;
-        } else if (subjectConfirmationData != null 
+        } else if (subjectConfirmationData != null
             && !subjectConfirmationData.equals(that.subjectConfirmationData)) {
             return false;
         }

@@ -41,7 +41,7 @@ public class HttpsTokenAssertionState extends TokenAssertionState {
     public HttpsTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted,
                                     PolicyAsserter policyAsserter, boolean initiator) {
         super(assertion, asserted, policyAsserter, initiator);
-        
+
         if (asserted) {
             HttpsToken token = (HttpsToken) getAssertion();
             String namespace = token.getName().getNamespaceURI();
@@ -75,7 +75,7 @@ public class HttpsTokenAssertionState extends TokenAssertionState {
         }
         if (!isInitiator() && httpsToken.getAuthenticationType() != null) {
             String namespace = getAssertion().getName().getNamespaceURI();
-            
+
             switch (httpsToken.getAuthenticationType()) {
                 case HttpBasicAuthentication:
                     if (httpsTokenSecurityEvent.getAuthenticationType() != HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication) {
@@ -106,7 +106,7 @@ public class HttpsTokenAssertionState extends TokenAssertionState {
                     break;
             }
         }
-        
+
         getPolicyAsserter().assertPolicy(getAssertion());
         return true;
     }

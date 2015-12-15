@@ -122,8 +122,8 @@ public class KerberosTokenValidator implements Validator {
     }
 
     /**
-     * Validate the credential argument. It must contain a non-null BinarySecurityToken. 
-     * 
+     * Validate the credential argument. It must contain a non-null BinarySecurityToken.
+     *
      * @param credential the Credential to be validated
      * @param data the RequestData associated with the request
      * @throws WSSecurityException on a failed validation
@@ -166,7 +166,7 @@ public class KerberosTokenValidator implements Validator {
             }
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, ex,
-                "kerberosLoginError", 
+                "kerberosLoginError",
                 new Object[] {ex.getMessage()}
             );
         }
@@ -183,7 +183,7 @@ public class KerberosTokenValidator implements Validator {
             Set<Principal> principals = subject.getPrincipals();
             if (principals.isEmpty()) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, 
+                    WSSecurityException.ErrorCode.FAILURE,
                     "kerberosLoginError",
                     new Object[] {"No Client principals found after login"});
             }
@@ -191,8 +191,8 @@ public class KerberosTokenValidator implements Validator {
         }
 
         // Validate the ticket
-        KerberosServiceExceptionAction action = 
-            new KerberosServiceExceptionAction(token, service, 
+        KerberosServiceExceptionAction action =
+            new KerberosServiceExceptionAction(token, service,
                                                isUsernameServiceNameForm(), spnego);
         KerberosServiceContext krbServiceCtx = null;
         try {
@@ -220,11 +220,11 @@ public class KerberosTokenValidator implements Validator {
         } else {
             LOG.debug("Session key is not found in the KerberosServiceContext.");
         }
-        
+
         // Otherwise, try to extract the session key from the token if a KerberosTokenDecoder implementation is
         // available
-        if (null == credential.getSecretKey() && kerberosTokenDecoder != null) {    
-            LOG.debug("KerberosTokenDecoder is set.Trying to obtain the session key from it.");            
+        if (null == credential.getSecretKey() && kerberosTokenDecoder != null) {
+            LOG.debug("KerberosTokenDecoder is set.Trying to obtain the session key from it.");
             kerberosTokenDecoder.clear();
             kerberosTokenDecoder.setToken(token);
             kerberosTokenDecoder.setSubject(subject);
@@ -239,7 +239,7 @@ public class KerberosTokenValidator implements Validator {
             } catch (KerberosTokenDecoderException e) {
                 // TODO
                 throw new WSSecurityException(ErrorCode.FAILURE, e, "Error retrieving session key.");
-            }            
+            }
         } else {
             LOG.debug("KerberosTokenDecoder is not set.");
         }
@@ -255,9 +255,9 @@ public class KerberosTokenValidator implements Validator {
      * SPN can be configured to be in either <b>"hostbased"</b> or <b>"username"</b> form.<br/>
      *     - <b>"hostbased"</b> - specifies that the service principal name should be interpreted as a "host-based" name as specified in GSS API Rfc, section "4.1: Host-Based Service Name Form" - The service name, as it is specified in LDAP/AD, as it is listed in the KDC.<br/>
      *     - <b>"username"</b> - specifies that the service principal name should be interpreted as a "username" name as specified in GSS API Rfc, section "4.2: User Name Form" � This is usually the client username in LDAP/AD used for authentication to the KDC.
-     * 
+     *
      * <br/><br/>Default is <b>"hostbased"</b>.
-     * 
+     *
      * @return the isUsernameServiceNameForm
      */
     public boolean isUsernameServiceNameForm() {
@@ -267,9 +267,9 @@ public class KerberosTokenValidator implements Validator {
     /**
      * If true - sets the SPN form to "username"
      * <br/>If false<b>(default)</b> - the SPN form is "hostbased"
-     * 
+     *
      * @see KerberosSecurity#retrieveServiceTicket(String, CallbackHandler, String, boolean)
-     * 
+     *
      * @param isUsernameServiceNameForm the isUsernameServiceNameForm to set
      */
     public void setUsernameServiceNameForm(boolean isUsernameServiceNameForm) {

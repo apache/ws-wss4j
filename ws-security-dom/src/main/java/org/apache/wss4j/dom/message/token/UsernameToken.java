@@ -60,7 +60,7 @@ import org.w3c.dom.Text;
 
 /**
  * UsernameToken according to WS Security specifications, UsernameToken profile.
- * 
+ *
  * Enhanced to support digest password type for username token signature
  * Enhanced to support passwordless usernametokens as allowed by spec.
  */
@@ -68,10 +68,10 @@ public class UsernameToken {
     public static final String BASE64_ENCODING = WSConstants.SOAPMESSAGE_NS + "#Base64Binary";
     public static final String PASSWORD_TYPE = "passwordType";
     public static final int DEFAULT_ITERATION = 1000;
-    public static final QName TOKEN = 
+    public static final QName TOKEN =
         new QName(WSConstants.WSSE_NS, WSConstants.USERNAME_TOKEN_LN);
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(UsernameToken.class);
     private static final boolean DO_DEBUG = LOG.isDebugEnabled();
 
@@ -87,11 +87,11 @@ public class UsernameToken {
     private String rawPassword;        // enhancement by Alberto Coletti
     private boolean passwordsAreEncoded;
     private Date createdDate;
-    
+
     /**
      * Constructs a <code>UsernameToken</code> object and parses the
      * <code>wsse:UsernameToken</code> element to initialize it.
-     * 
+     *
      * @param elem the <code>wsse:UsernameToken</code> element that contains
      *             the UsernameToken data
      * @param allowNamespaceQualifiedPasswordTypes whether to allow (wsse)
@@ -100,7 +100,7 @@ public class UsernameToken {
      * @throws WSSecurityException
      */
     public UsernameToken(
-        Element elem, 
+        Element elem,
         boolean allowNamespaceQualifiedPasswordTypes,
         BSPEnforcer bspEnforcer
     ) throws WSSecurityException {
@@ -113,27 +113,27 @@ public class UsernameToken {
                 new Object[] {TOKEN, el}
             );
         }
-        elementUsername = 
+        elementUsername =
             XMLUtils.getDirectChildElement(
                 element, WSConstants.USERNAME_LN, WSConstants.WSSE_NS
             );
-        elementPassword = 
+        elementPassword =
             XMLUtils.getDirectChildElement(
                 element, WSConstants.PASSWORD_LN, WSConstants.WSSE_NS
             );
-        elementNonce = 
+        elementNonce =
             XMLUtils.getDirectChildElement(
                 element, WSConstants.NONCE_LN, WSConstants.WSSE_NS
             );
-        elementCreated = 
+        elementCreated =
             XMLUtils.getDirectChildElement(
                 element, WSConstants.CREATED_LN, WSConstants.WSU_NS
             );
-        elementSalt = 
+        elementSalt =
             XMLUtils.getDirectChildElement(
                 element, WSConstants.SALT_LN, WSConstants.WSSE11_NS
             );
-        elementIteration = 
+        elementIteration =
             XMLUtils.getDirectChildElement(
                 element, WSConstants.ITERATION_LN, WSConstants.WSSE11_NS
             );
@@ -144,9 +144,9 @@ public class UsernameToken {
                 new Object[] {"Username is missing"}
             );
         }
-        
+
         checkBSPCompliance(bspEnforcer);
-        
+
         hashed = false;
         if (elementSalt != null) {
             //
@@ -163,7 +163,7 @@ public class UsernameToken {
             }
             return;
         }
-        
+
         // Guard against a malicious user sending a bogus iteration value
         if (elementIteration != null) {
             String iter = XMLUtils.getElementText(elementIteration);
@@ -178,7 +178,7 @@ public class UsernameToken {
                 }
             }
         }
-        
+
         if (elementPassword != null) {
             if (elementPassword.hasAttributeNS(null, WSConstants.PASSWORD_TYPE_ATTR)) {
                 passwordType = elementPassword.getAttributeNS(null, WSConstants.PASSWORD_TYPE_ATTR);
@@ -186,7 +186,7 @@ public class UsernameToken {
                 WSConstants.WSSE_NS, WSConstants.PASSWORD_TYPE_ATTR)
             ) {
                 if (allowNamespaceQualifiedPasswordTypes) {
-                    passwordType = 
+                    passwordType =
                         elementPassword.getAttributeNS(
                             WSConstants.WSSE_NS, WSConstants.PASSWORD_TYPE_ATTR
                         );
@@ -198,7 +198,7 @@ public class UsernameToken {
                     );
                 }
             }
-            
+
         }
         if (WSConstants.PASSWORD_DIGEST.equals(passwordType)) {
             hashed = true;
@@ -210,13 +210,13 @@ public class UsernameToken {
                 );
             }
         }
-        
+
         if (elementCreated != null) {
             String createdString = getCreated();
             if (createdString != null && !"".equals(createdString)) {
                 XMLGregorianCalendar createdCalendar = null;
                 try {
-                    createdCalendar = 
+                    createdCalendar =
                         WSSConfig.datatypeFactory.newXMLGregorianCalendar(createdString);
                 } catch (IllegalArgumentException e) {
                     throw new WSSecurityException(
@@ -234,7 +234,7 @@ public class UsernameToken {
      * Constructs a <code>UsernameToken</code> object according to the defined
      * parameters. <p/> This constructs set the password encoding to
      * {@link WSConstants#PASSWORD_DIGEST}
-     * 
+     *
      * @param doc the SOAP envelope as <code>Document</code>
      */
     public UsernameToken(boolean milliseconds, Document doc) {
@@ -244,29 +244,29 @@ public class UsernameToken {
     /**
      * Constructs a <code>UsernameToken</code> object according to the defined
      * parameters.
-     * 
+     *
      * @param doc the SOAP envelope as <code>Document</code>
      * @param pwType the required password encoding, either
      *               {@link WSConstants#PASSWORD_DIGEST} or
-     *               {@link WSConstants#PASSWORD_TEXT} or 
+     *               {@link WSConstants#PASSWORD_TEXT} or
      *               {@link WSConstants#PW_NONE} <code>null</code> if no
      *               password required
      */
     public UsernameToken(boolean milliseconds, Document doc, String pwType) {
         this(milliseconds, doc, new WSCurrentTimeSource(), pwType);
     }
-    
+
     public UsernameToken(boolean milliseconds, Document doc, WSTimeSource timeSource, String pwType) {
-        element = 
+        element =
             doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.USERNAME_TOKEN_LN);
 
-        elementUsername = 
+        elementUsername =
             doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.USERNAME_LN);
         elementUsername.appendChild(doc.createTextNode(""));
         element.appendChild(elementUsername);
 
         if (pwType != null) {
-            elementPassword = 
+            elementPassword =
                 doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.PASSWORD_LN);
             elementPassword.appendChild(doc.createTextNode(""));
             element.appendChild(elementPassword);
@@ -280,7 +280,7 @@ public class UsernameToken {
             }
         }
     }
-    
+
     /**
      * Add the WSSE Namespace to this UT. The namespace is not added by default for
      * efficiency purposes.
@@ -288,7 +288,7 @@ public class UsernameToken {
     public void addWSSENamespace() {
         XMLUtils.setNamespace(element, WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX);
     }
-    
+
     /**
      * Add the WSU Namespace to this UT. The namespace is not added by default for
      * efficiency purposes.
@@ -323,7 +323,7 @@ public class UsernameToken {
     public void addCreated(boolean milliseconds, Document doc) {
         addCreated(milliseconds, new WSCurrentTimeSource(), doc);
     }
-    
+
     /**
      * Creates and adds a Created element to this UsernameToken
      */
@@ -338,7 +338,7 @@ public class UsernameToken {
             zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
             zulu.setTimeZone(TimeZone.getTimeZone("UTC"));
         }
-        elementCreated = 
+        elementCreated =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
             );
@@ -349,10 +349,10 @@ public class UsernameToken {
 
     /**
      * Adds and optionally creates a Salt element to this UsernameToken.
-     * 
+     *
      * If the <code>saltValue</code> is <code>null</code> the the method
      * generates a new salt. Otherwise it uses the the given value.
-     * 
+     *
      * @param doc The Document for the UsernameToken
      * @param saltValue The salt to add, if null generate a new salt value
      * @param mac If <code>true</code> then an optionally generated value is
@@ -363,7 +363,7 @@ public class UsernameToken {
         if (saltValue == null) {
             saltValue = UsernameTokenUtil.generateSalt(mac);
         }
-        elementSalt = 
+        elementSalt =
             doc.createElementNS(
                 WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX + ":" + WSConstants.SALT_LN
             );
@@ -378,7 +378,7 @@ public class UsernameToken {
      */
     public void addIteration(Document doc, int iteration) {
         String text = "" + iteration;
-        elementIteration = 
+        elementIteration =
             doc.createElementNS(
                 WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX + ":" + WSConstants.ITERATION_LN
             );
@@ -389,7 +389,7 @@ public class UsernameToken {
 
     /**
      * Get the user name.
-     * 
+     *
      * @return the data from the user name element.
      */
     public String getName() {
@@ -398,7 +398,7 @@ public class UsernameToken {
 
     /**
      * Set the user name.
-     * 
+     *
      * @param name sets a text node containing the use name into the user name
      *             element.
      */
@@ -409,7 +409,7 @@ public class UsernameToken {
 
     /**
      * Get the nonce.
-     * 
+     *
      * @return the data from the nonce element.
      */
     public String getNonce() {
@@ -418,13 +418,13 @@ public class UsernameToken {
 
     /**
      * Get the created timestamp.
-     * 
+     *
      * @return the data from the created time element.
      */
     public String getCreated() {
         return XMLUtils.getElementText(elementCreated);
     }
-    
+
     /**
      * Return the Created Element as a Date object
      * @return the Created Date
@@ -437,7 +437,7 @@ public class UsernameToken {
      * Gets the password string. This is the password as it is in the password
      * element of a username token. Thus it can be either plain text or the
      * password digest value.
-     * 
+     *
      * @return the password string or <code>null</code> if no such node exists.
      */
     public String getPassword() {
@@ -448,7 +448,7 @@ public class UsernameToken {
         }
         return password;
     }
-    
+
     /**
      * Return true if this UsernameToken contains a Password element
      */
@@ -458,7 +458,7 @@ public class UsernameToken {
 
     /**
      * Get the Salt value of this UsernameToken.
-     * 
+     *
      * @return Returns the binary Salt value or <code>null</code> if no Salt
      *         value is available in the username token.
      * @throws WSSecurityException
@@ -479,7 +479,7 @@ public class UsernameToken {
 
     /**
      * Get the Iteration value of this UsernameToken.
-     * 
+     *
      * @return Returns the Iteration value. If no Iteration was specified in the
      *         username token the default value according to the specification
      *         is returned.
@@ -514,7 +514,7 @@ public class UsernameToken {
      * <code>UsernameToken</code> either as plain text or encodes the password
      * according to the WS Security specifications, UsernameToken profile, into
      * a password digest.
-     * 
+     *
      * @param pwd the password to use
      */
     public void setPassword(String pwd) {
@@ -526,7 +526,7 @@ public class UsernameToken {
                 return;
             }
         }
-        
+
         rawPassword = pwd;             // enhancement by Alberto coletti
         Text node = getFirstNode(elementPassword);
         try {
@@ -557,10 +557,10 @@ public class UsernameToken {
             LOG.debug("CallbackHandler is null");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
-        
-        WSPasswordCallback pwCb = 
+
+        WSPasswordCallback pwCb =
             new WSPasswordCallback(
-                getName(), getPassword(), getPasswordType(), 
+                getName(), getPassword(), getPasswordType(),
                 WSPasswordCallback.USERNAME_TOKEN
             );
         try {
@@ -575,21 +575,21 @@ public class UsernameToken {
         }
         rawPassword = pwCb.getPassword();
     }
-    
+
     /**
      * @param passwordsAreEncoded whether passwords are encoded
      */
     public void setPasswordsAreEncoded(boolean passwordsAreEncoded) {
         this.passwordsAreEncoded = passwordsAreEncoded;
     }
-    
+
     /**
      * @return whether passwords are encoded
      */
     public boolean getPasswordsAreEncoded() {
         return passwordsAreEncoded;
     }
-    
+
     public static String doPasswordDigest(String nonce, String created, byte[] password) {
         String passwdDigest = null;
         try {
@@ -600,12 +600,12 @@ public class UsernameToken {
             int offset = 0;
             System.arraycopy(b1, 0, b4, offset, b1.length);
             offset += b1.length;
-            
+
             System.arraycopy(b2, 0, b4, offset, b2.length);
             offset += b2.length;
 
             System.arraycopy(b3, 0, b4, offset, b3.length);
-            
+
             byte[] digestBytes = KeyUtils.generateDigest(b4);
             passwdDigest = Base64.encode(digestBytes);
         } catch (Exception e) {
@@ -630,7 +630,7 @@ public class UsernameToken {
 
     /**
      * Returns the first text node of an element.
-     * 
+     *
      * @param e the element to get the node from
      * @return the first text node or <code>null</code> if node is null or is
      *         not a text node
@@ -642,7 +642,7 @@ public class UsernameToken {
 
     /**
      * Returns the dom element of this <code>UsernameToken</code> object.
-     * 
+     *
      * @return the <code>wsse:UsernameToken</code> element
      */
     public Element getElement() {
@@ -651,7 +651,7 @@ public class UsernameToken {
 
     /**
      * Returns the string representation of the token.
-     * 
+     *
      * @return a XML string representation
      */
     public String toString() {
@@ -660,7 +660,7 @@ public class UsernameToken {
 
     /**
      * Gets the id.
-     * 
+     *
      * @return the value of the <code>wsu:Id</code> attribute of this username
      *         token
      */
@@ -670,7 +670,7 @@ public class UsernameToken {
 
     /**
      * Set the id of this username token.
-     * 
+     *
      * @param id
      *            the value for the <code>wsu:Id</code> attribute of this
      *            username token
@@ -681,7 +681,7 @@ public class UsernameToken {
 
     /**
      * This method gets a derived key as defined in WSS Username Token Profile.
-     * 
+     *
      * @return Returns the derived key as a byte array
      * @throws WSSecurityException
      */
@@ -690,7 +690,7 @@ public class UsernameToken {
             LOG.debug("The raw password was null");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
-        
+
         if (elementSalt == null) {
             // We must have a salt element to use this token for a derived key
             bspEnforcer.handleBSPRule(BSPRule.R4217);
@@ -704,7 +704,7 @@ public class UsernameToken {
                 bspEnforcer.handleBSPRule(BSPRule.R4218);
             }
         }
-        
+
         int iteration = getIteration();
         byte[] salt = getSalt();
         if (passwordsAreEncoded) {
@@ -719,12 +719,12 @@ public class UsernameToken {
             return UsernameTokenUtil.generateDerivedKey(rawPassword, salt, iteration);
         }
     }
-    
+
     /**
      * Return whether the UsernameToken represented by this class is to be used
      * for key derivation as per the UsernameToken Profile 1.1. It does this by
      * checking that the username token has salt and iteration values.
-     * 
+     *
      * @throws WSSecurityException
      */
     public boolean isDerivedKey() throws WSSecurityException {
@@ -733,7 +733,7 @@ public class UsernameToken {
         }
         return false;
     }
-    
+
     /**
      * Create a WSUsernameTokenPrincipal from this UsernameToken object
      */
@@ -751,11 +751,11 @@ public class UsernameToken {
             );
         }
     }
-    
+
     /**
      * Return true if the "Created" value is before the current time minus the timeToLive
      * argument, and if the Created value is not "in the future".
-     * 
+     *
      * @param timeToLive the value in seconds for the validity of the Created time
      * @param futureTimeToLive the value in seconds for the future validity of the Created time
      * @return true if the UsernameToken is before (now-timeToLive), false otherwise
@@ -766,7 +766,7 @@ public class UsernameToken {
     ) {
         return DateUtil.verifyCreated(createdDate, timeToLive, futureTimeToLive);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -801,10 +801,10 @@ public class UsernameToken {
             }
         }
         result = 31 * result + Integer.valueOf(getIteration()).hashCode();
-        
+
         return result;
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (!(object instanceof UsernameToken)) {
@@ -842,9 +842,9 @@ public class UsernameToken {
         }
         return true;
     }
-    
+
     private boolean compare(String item1, String item2) {
-        if (item1 == null && item2 != null) { 
+        if (item1 == null && item2 != null) {
             return false;
         } else if (item1 != null && !item1.equals(item2)) {
             return false;
@@ -857,7 +857,7 @@ public class UsernameToken {
      * @throws WSSecurityException
      */
     private void checkBSPCompliance(BSPEnforcer bspEnforcer) throws WSSecurityException {
-        List<Element> passwordElements = 
+        List<Element> passwordElements =
             WSSecurityUtil.getDirectChildElements(
                 element, WSConstants.PASSWORD_LN, WSConstants.WSSE_NS
             );
@@ -868,7 +868,7 @@ public class UsernameToken {
             }
             bspEnforcer.handleBSPRule(BSPRule.R4222);
         }
-        
+
         // We must have a password type
         if (passwordElements.size() == 1) {
             Element passwordChild = passwordElements.get(0);
@@ -880,8 +880,8 @@ public class UsernameToken {
                 bspEnforcer.handleBSPRule(BSPRule.R4201);
             }
         }
-        
-        List<Element> createdElements = 
+
+        List<Element> createdElements =
             WSSecurityUtil.getDirectChildElements(
                 element, WSConstants.CREATED_LN, WSConstants.WSU_NS
             );
@@ -892,8 +892,8 @@ public class UsernameToken {
             }
             bspEnforcer.handleBSPRule(BSPRule.R4223);
         }
-        
-        List<Element> nonceElements = 
+
+        List<Element> nonceElements =
             WSSecurityUtil.getDirectChildElements(
                 element, WSConstants.NONCE_LN, WSConstants.WSSE_NS
             );
@@ -904,7 +904,7 @@ public class UsernameToken {
             }
             bspEnforcer.handleBSPRule(BSPRule.R4225);
         }
-        
+
         if (nonceElements.size() == 1) {
             Element nonce = nonceElements.get(0);
             String encodingType = nonce.getAttributeNS(null, "EncodingType");

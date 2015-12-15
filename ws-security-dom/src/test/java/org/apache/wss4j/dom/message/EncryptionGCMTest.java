@@ -46,7 +46,7 @@ import java.util.List;
  * https://issues.apache.org/jira/browse/WSS-325
  */
 public class EncryptionGCMTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(EncryptionGCMTest.class);
     private static final javax.xml.namespace.QName SOAP_BODY =
         new javax.xml.namespace.QName(
@@ -57,26 +57,26 @@ public class EncryptionGCMTest extends org.junit.Assert {
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler keystoreCallbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public EncryptionGCMTest() throws Exception {
         crypto = CryptoFactory.getInstance("wss40.properties");
     }
-    
+
     /**
      * Setup method
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is a problem in setup
      */
     @org.junit.Before
     public void setUp() throws Exception {
         secEngine.setWssConfig(WSSConfig.getNewInstance());
     }
-    
+
     @org.junit.Test
     public void testAES128GCM() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
@@ -88,7 +88,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
         secHeader.insertSecurityHeader();
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
 
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message:");
@@ -97,7 +97,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
         assertFalse(outputString.contains("counter_port_type"));
         verify(encryptedDoc, keystoreCallbackHandler, SOAP_BODY);
     }
-    
+
     @org.junit.Test
     public void testAES256GCM() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
@@ -109,7 +109,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
         secHeader.insertSecurityHeader();
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
 
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message:");
@@ -150,7 +150,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
     /**
      * Verifies the soap envelope
      * <p/>
-     * 
+     *
      * @throws Exception Thrown when there is a problem in verification
      */
     @SuppressWarnings("unchecked")
@@ -167,7 +167,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
         requestData.setCallbackHandler(handler);
         requestData.setDecCrypto(crypto);
         final WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
@@ -175,11 +175,11 @@ public class EncryptionGCMTest extends org.junit.Assert {
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         //
         // walk through the results, and make sure there is an encryption
-        // action, together with a reference to the decrypted element 
+        // action, together with a reference to the decrypted element
         // (as a QName)
         //
         boolean encrypted = false;
-        for (java.util.Iterator<WSSecurityEngineResult> ipos = results.getResults().iterator(); 
+        for (java.util.Iterator<WSSecurityEngineResult> ipos = results.getResults().iterator();
             ipos.hasNext();) {
             final WSSecurityEngineResult result = ipos.next();
             final Integer action = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);

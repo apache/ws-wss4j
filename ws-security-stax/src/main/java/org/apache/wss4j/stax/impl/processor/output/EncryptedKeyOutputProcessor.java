@@ -81,7 +81,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
             if (wrappingSecurityToken == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
-            
+
             SecurityTokenProvider<OutboundSecurityToken> encryptedKeySecurityTokenProvider = null;
             GenericOutboundSecurityToken encryptedKeySecurityToken = null;
 
@@ -318,10 +318,10 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                         );
                     }
                     byte[] encryptedEphemeralKey = cipher.wrap(secretKey);
-                    
+
                     if (((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler() != null) {
                         // Store the Encrypted Key in the CallbackHandler for processing on the inbound side
-                        WSPasswordCallback callback = 
+                        WSPasswordCallback callback =
                             new WSPasswordCallback(securityToken.getId(), WSPasswordCallback.SECRET_KEY);
                         callback.setKey(encryptedEphemeralKey);
                         try {
@@ -360,8 +360,8 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
             if (securityToken.getCustomTokenReference() != null) {
                 outputDOMElement(securityToken.getCustomTokenReference(), outputProcessorChain);
                 return;
-            } 
-            
+            }
+
             List<XMLSecAttribute> attributes = new ArrayList<>(2);
             attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
             if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier) && !useSingleCertificate) {

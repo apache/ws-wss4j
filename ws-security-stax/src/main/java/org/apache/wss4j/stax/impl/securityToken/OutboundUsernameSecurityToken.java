@@ -37,7 +37,7 @@ public class OutboundUsernameSecurityToken extends GenericOutboundSecurityToken 
     private byte[] salt;
     private int iterations;
 
-    public OutboundUsernameSecurityToken(String username, String password, String createdTime, 
+    public OutboundUsernameSecurityToken(String username, String password, String createdTime,
                                          byte[] nonce, String id, byte[] salt, int iterations) {
         super(id, WSSecurityTokenConstants.UsernameToken);
         this.username = username;
@@ -70,10 +70,10 @@ public class OutboundUsernameSecurityToken extends GenericOutboundSecurityToken 
         if (key != null) {
             return key;
         }
-        
-        byte[] secretToken = 
+
+        byte[] secretToken =
             UsernameTokenUtil.generateDerivedKey(getPassword(), salt, iterations);
-        
+
         String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
         key = new SecretKeySpec(secretToken, algoFamily);
         setSecretKey(algorithmURI, key);

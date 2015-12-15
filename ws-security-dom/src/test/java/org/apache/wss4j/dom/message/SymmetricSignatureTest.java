@@ -51,23 +51,23 @@ import org.w3c.dom.Document;
 
 /**
  * Test symmetric key signature created using an encrypted key
- * Demonstrates that Signature Crypto object can have null values when 
+ * Demonstrates that Signature Crypto object can have null values when
  * calling processSecurityHeader method of WSSecurityEngine.
  */
 public class SymmetricSignatureTest extends org.junit.Assert implements CallbackHandler {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SymmetricSignatureTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
     private byte[] keyData;
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public SymmetricSignatureTest() throws Exception {
         WSSConfig.init();
         crypto = CryptoFactory.getInstance("wss40.properties");
@@ -76,7 +76,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
     /**
      * Setup method
      * <p/>
-     * 
+     *
      * @throws Exception Thrown when there is a problem in setup
      */
     @org.junit.Before
@@ -93,32 +93,32 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
     @org.junit.Test
     public void testSymmetricSignatureSHA1() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecSignature sign = new WSSecSignature();
         sign.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
         sign.setSecretKey(keyData);
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
 
         Document signedDoc = sign.build(doc, crypto, secHeader);
-        
+
         byte[] encodedBytes = KeyUtils.generateDigest(keyData);
         String identifier = Base64.encode(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed symmetric message SHA1:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
         secEngine.processSecurityHeader(doc, null, secretKeyCallbackHandler, null, crypto);
     }
-    
-    
+
+
     /**
      * Test signing a message body using a symmetric key with Direct Reference to an
      * EncryptedKey
@@ -126,16 +126,16 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
     @org.junit.Test
     public void testSymmetricSignatureDR() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
         encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         encrKey.setUserInfo("wss40", "security");
         encrKey.setSymmetricEncAlgorithm(WSConstants.AES_192);
         encrKey.prepare(doc, crypto);
-        
+
         WSSecSignature sign = new WSSecSignature();
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setCustomTokenId(encrKey.getId());
@@ -145,21 +145,21 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
 
         Document signedDoc = sign.build(doc, crypto, secHeader);
         encrKey.prependToHeader(secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed symmetric message DR:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         verify(signedDoc);
     }
 
     /**
      * Test that first signs, then encrypts a WS-Security envelope.
      * <p/>
-     * 
+     *
      * @throws Exception Thrown when there is any problem in signing, encryption,
      *                   decryption, or verification
      */
@@ -167,16 +167,16 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
     public void testEncryptedKeySignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         LOG.info("Before Sign/Encryption....");
-        
+
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
         encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         encrKey.setUserInfo("wss40", "security");
         encrKey.setSymmetricEncAlgorithm(WSConstants.AES_192);
-        encrKey.prepare(doc, crypto);   
-        
+        encrKey.prepare(doc, crypto);
+
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setEncKeyId(encrKey.getId());
         encrypt.setEphemeralKey(encrKey.getEphemeralKey());
@@ -196,17 +196,17 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed and encrypted message with IssuerSerial key identifier (both), 3DES:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
             LOG.debug(outputString);
         }
-        
+
         LOG.info("After Sign/Encryption....");
         verify(encryptedSignedDoc);
     }
 
     /**
-     * Test signing a message body using a symmetric key with EncryptedKeySHA1. 
+     * Test signing a message body using a symmetric key with EncryptedKeySHA1.
      * The request is generated using WSHandler, instead of coding it.
      */
     @org.junit.Test
@@ -220,48 +220,48 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, this);
         reqData.setMsgContext(messageContext);
         reqData.setUsername("");
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         HandlerAction action = new HandlerAction(WSConstants.SIGN);
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             Collections.singletonList(action),
             true
         );
-        
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
+
         reqData = new RequestData();
         reqData.setWssConfig(WSSConfig.getNewInstance());
         messageContext = new java.util.TreeMap<String, Object>();
         messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, this);
         reqData.setMsgContext(messageContext);
         reqData.setUsername("");
-        
+
         handler.receive(Collections.singletonList(WSConstants.SIGN), reqData);
-        
+
         secEngine.processSecurityHeader(doc, null, this, null, crypto);
     }
-    
-    
+
+
     /**
      * Verifies the soap envelope
      * <p/>
-     * 
-     * @param doc 
+     *
+     * @param doc
      * @throws Exception Thrown when there is a problem in verification
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, callbackHandler, null, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
@@ -285,6 +285,6 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
             }
         }
     }
-    
+
 
 }

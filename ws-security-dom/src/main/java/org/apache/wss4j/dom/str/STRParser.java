@@ -26,9 +26,9 @@ import org.apache.wss4j.common.ext.WSSecurityException;
  * elements. The implementations are used by various processors.
  */
 public interface STRParser {
-    
+
     /**
-     * ISSUER_SERIAL - A certificate (chain) is located by the issuer name and serial number of the 
+     * ISSUER_SERIAL - A certificate (chain) is located by the issuer name and serial number of the
      * (root) cert
      * THUMBPRINT_SHA1 - A certificate (chain) is located by the SHA1 thumbprint of the (root) cert
      * KEY_IDENTIFIER - A certificate (chain) is located via a Key Identifier Element
@@ -38,14 +38,14 @@ public interface STRParser {
     enum REFERENCE_TYPE {
         ISSUER_SERIAL, THUMBPRINT_SHA1, KEY_IDENTIFIER, DIRECT_REF
     }
-    
+
     /**
      * Parse a SecurityTokenReference element and extract credentials.
-     * 
+     *
      * @param parameters The parameters to parse
      * @return the STRParserResult Object containing the parsing results
      * @throws WSSecurityException
      */
     STRParserResult parseSecurityTokenReference(STRParserParameters parameters) throws WSSecurityException;
-    
+
 }

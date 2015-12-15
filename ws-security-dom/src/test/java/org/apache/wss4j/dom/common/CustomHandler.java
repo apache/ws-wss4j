@@ -36,30 +36,30 @@ import java.util.Map;
  * A trivial extension of the WSHandler type for use in unit-testing.
  */
 public class CustomHandler extends WSHandler {
-    
+
     private Map<String, Object> optionsMap = new HashMap<>();
 
-    public Object 
+    public Object
     getOption(String key) {
         return optionsMap.get(key);
     }
-    
+
     public void
     setOption(String key, Object option) {
         optionsMap.put(key, option);
     }
 
     @SuppressWarnings("unchecked")
-    public void 
+    public void
     setProperty(
-        Object ctx, 
-        String key, 
+        Object ctx,
+        String key,
         Object value
     ) {
         ((Map<String, Object>)ctx).put(key, value);
     }
 
-    public Object 
+    public Object
     getProperty(Object ctx, String key) {
         if (ctx instanceof Map<?,?>) {
             return ((Map<?,?>)ctx).get(key);
@@ -67,11 +67,11 @@ public class CustomHandler extends WSHandler {
         return null;
     }
 
-    public void 
+    public void
     setPassword(Object msgContext, String password) {
     }
 
-    public String 
+    public String
     getPassword(Object msgContext) {
         if (msgContext instanceof Map<?,?>) {
             return (String)((Map<?,?>)msgContext).get("password");
@@ -81,24 +81,24 @@ public class CustomHandler extends WSHandler {
 
     public void send(
         Document doc,
-        RequestData reqData, 
+        RequestData reqData,
         List<HandlerAction> actions,
         boolean request
     ) throws WSSecurityException {
         doSenderAction(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             actions,
             request
         );
     }
-    
+
     public void receive(
-        List<Integer> actions, 
+        List<Integer> actions,
         RequestData reqData
     ) throws WSSecurityException {
         doReceiverAction(
-            actions, 
+            actions,
             reqData
         );
     }
@@ -109,7 +109,7 @@ public class CustomHandler extends WSHandler {
     ) throws WSSecurityException {
         checkSignatureConfirmation(requestData, handlerResults);
     }
-    
+
     public boolean checkResults(
         List<WSSecurityEngineResult> results,
         List<Integer> actions
@@ -123,6 +123,6 @@ public class CustomHandler extends WSHandler {
     ) throws WSSecurityException {
         return checkReceiverResultsAnyOrder(results, actions);
     }
-    
-    
+
+
 }

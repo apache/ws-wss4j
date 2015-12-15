@@ -49,18 +49,18 @@ import org.w3c.dom.Element;
  * Some utilities for the STRParsers.
  */
 public final class STRParserUtil {
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(STRParserUtil.class);
-    
+
     private STRParserUtil() {
         // complete
     }
-    
+
     /**
      * Get an SamlAssertionWrapper object from parsing a SecurityTokenReference that uses
      * a KeyIdentifier that points to a SAML Assertion.
-     * 
+     *
      * @param secRef the SecurityTokenReference to the SAML Assertion
      * @param strElement The SecurityTokenReference DOM element
      * @param request The RequestData instance used to obtain configuration
@@ -85,7 +85,7 @@ public final class STRParserUtil {
                 (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
             return samlAssertion;
         } else {
-            token = 
+            token =
                 findProcessedTokenElement(
                     strElement.getOwnerDocument(), wsDocInfo, request.getCallbackHandler(),
                     keyIdentifierValue, type
@@ -98,12 +98,12 @@ public final class STRParserUtil {
                 }
                 return new SamlAssertionWrapper(token);
             }
-            token = 
+            token =
                 findUnprocessedTokenElement(
-                    strElement.getOwnerDocument(), wsDocInfo, request.getCallbackHandler(), 
+                    strElement.getOwnerDocument(), wsDocInfo, request.getCallbackHandler(),
                     keyIdentifierValue, type
                 );
-            
+
             if (token == null || !"Assertion".equals(token.getLocalName())) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity"
@@ -112,16 +112,16 @@ public final class STRParserUtil {
             Processor proc = request.getWssConfig().getProcessor(WSConstants.SAML_TOKEN);
             List<WSSecurityEngineResult> samlResult =
                 proc.handleToken(token, request, wsDocInfo);
-            return 
+            return
                 (SamlAssertionWrapper)samlResult.get(0).get(
                     WSSecurityEngineResult.TAG_SAML_ASSERTION
                 );
         }
     }
-    
+
 
     /**
-     * Check that the BinarySecurityToken referenced by the SecurityTokenReference argument 
+     * Check that the BinarySecurityToken referenced by the SecurityTokenReference argument
      * is BSP compliant.
      * @param secRef The SecurityTokenReference to the BinarySecurityToken
      * @param token The BinarySecurityToken
@@ -138,21 +138,21 @@ public final class STRParserUtil {
             String valueType = secRef.getReference().getValueType();
             if (token instanceof X509Security && !X509Security.X509_V3_TYPE.equals(valueType)
                 || token instanceof PKIPathSecurity && !PKIPathSecurity.PKI_TYPE.equals(valueType)
-                || token instanceof KerberosSecurity 
+                || token instanceof KerberosSecurity
                         && !(valueType == null || "".equals(valueType))
                         && !WSConstants.WSS_GSS_KRB_V5_AP_REQ.equals(valueType)) {
                 bspEnforcer.handleBSPRule(BSPRule.R3058);
             }
         } else if (secRef.containsKeyIdentifier()) {
             String valueType = secRef.getKeyIdentifierValueType();
-            if (!SecurityTokenReference.SKI_URI.equals(valueType) 
+            if (!SecurityTokenReference.SKI_URI.equals(valueType)
                 && !SecurityTokenReference.THUMB_URI.equals(valueType)
                 && !WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(valueType)
                 && !X509Security.X509_V3_TYPE.equals(valueType)) {
                 bspEnforcer.handleBSPRule(BSPRule.R3063);
             }
         }
-        
+
         // Check TokenType attributes
         if (token instanceof PKIPathSecurity) {
             String tokenType = secRef.getTokenType();
@@ -161,9 +161,9 @@ public final class STRParserUtil {
             }
         }
     }
-    
+
     /**
-     * Check that the EncryptedKey referenced by the SecurityTokenReference argument 
+     * Check that the EncryptedKey referenced by the SecurityTokenReference argument
      * is BSP compliant.
      * @param secRef The SecurityTokenReference to the BinarySecurityToken
      * @param bspEnforcer a BSPEnforcer instance to enforce BSP rules
@@ -178,15 +178,15 @@ public final class STRParserUtil {
                 bspEnforcer.handleBSPRule(BSPRule.R3063);
             }
         }
-        
+
         String tokenType = secRef.getTokenType();
         if (!WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(tokenType)) {
             bspEnforcer.handleBSPRule(BSPRule.R5215);
         }
     }
-    
+
     /**
-     * Check that the SAML token referenced by the SecurityTokenReference argument 
+     * Check that the SAML token referenced by the SecurityTokenReference argument
      * is BSP compliant.
      * @param secRef The SecurityTokenReference to the SAML token
      * @param samlAssertion The SAML Token SamlAssertionWrapper object
@@ -214,7 +214,7 @@ public final class STRParserUtil {
                 bspEnforcer.handleBSPRule(BSPRule.R6604);
             }
         }
-        
+
         // Check the TokenType attribute
         String tokenType = secRef.getTokenType();
         if (samlAssertion.getSaml1() != null && !WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)) {
@@ -223,7 +223,7 @@ public final class STRParserUtil {
         if (samlAssertion.getSaml2() != null && !WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)) {
             bspEnforcer.handleBSPRule(BSPRule.R6617);
         }
-        
+
         // Check the ValueType attribute of the Reference for SAML2
         if (samlAssertion.getSaml2() != null && secRef.containsReference()) {
             String valueType = secRef.getReference().getValueType();
@@ -232,9 +232,9 @@ public final class STRParserUtil {
             }
         }
     }
-    
+
     /**
-     * Check that the Username token referenced by the SecurityTokenReference argument 
+     * Check that the Username token referenced by the SecurityTokenReference argument
      * is BSP compliant.
      * @param secRef The SecurityTokenReference to the Username token
      * @param bspEnforcer a BSPEnforcer instance to enforce BSP rules
@@ -247,7 +247,7 @@ public final class STRParserUtil {
             // BSP does not permit using a KeyIdentifier to refer to a U/T
             bspEnforcer.handleBSPRule(BSPRule.R4215);
         }
-        
+
         if (secRef.getReference() != null) {
             String valueType = secRef.getReference().getValueType();
             if (!WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE.equals(valueType)) {
@@ -272,7 +272,7 @@ public final class STRParserUtil {
         RequestData data
     ) throws WSSecurityException {
         String uri = XMLUtils.getIDFromReference(id);
-        WSPasswordCallback pwcb = 
+        WSPasswordCallback pwcb =
             new WSPasswordCallback(uri, null, type, identifier);
         try {
             Callback[] callbacks = new Callback[]{pwcb};
@@ -288,7 +288,7 @@ public final class STRParserUtil {
 
         return null;
     }
-    
+
     public static Element getTokenElement(
         Document doc, WSDocInfo docInfo, CallbackHandler cb,
         String uri, String valueType
@@ -297,19 +297,19 @@ public final class STRParserUtil {
             LOG.debug("Token reference uri: " + uri);
             LOG.debug("Token reference ValueType: " + valueType);
         }
-        
+
         if (uri == null) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.INVALID_SECURITY, "badReferenceURI"
             );
         }
-        
-        Element tokElement = 
+
+        Element tokElement =
             findProcessedTokenElement(doc, docInfo, cb, uri, valueType);
         if (tokElement == null) {
             tokElement = findUnprocessedTokenElement(doc, docInfo, cb, uri, valueType);
         }
-        
+
         if (tokElement == null) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE,
@@ -317,7 +317,7 @@ public final class STRParserUtil {
         }
         return tokElement;
     }
-    
+
     /**
      * Find a token that has not been processed already - in other words, it searches for
      * the element, rather than trying to access previous results to find the element
@@ -349,7 +349,7 @@ public final class STRParserUtil {
         }
         return callbackLookup.getElement(id, type, true);
     }
-    
+
     /**
      * Find a token that has been processed already - in other words, it access previous
      * results to find the element, rather than conducting a general search
@@ -379,16 +379,16 @@ public final class STRParserUtil {
             }
         }
 
-        // 
+        //
         // Try to find a custom token
         //
         if (cb != null && (WSConstants.WSC_SCT.equals(type)
             || WSConstants.WSC_SCT_05_12.equals(type)
-            || WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(type) 
+            || WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(type)
             || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(type)
             || KerberosSecurity.isKerberosToken(type))) {
             //try to find a custom token
-            WSPasswordCallback pwcb = 
+            WSPasswordCallback pwcb =
                 new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
             try {
                 cb.handle(new Callback[]{pwcb});

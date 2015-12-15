@@ -34,12 +34,12 @@ public class PublicKeyPrincipalImpl implements Serializable, PublicKeyPrincipal 
     public PublicKeyPrincipalImpl(PublicKey publicKey) {
         this.publicKey = publicKey;
     }
-    
+
     @Override
     public PublicKey getPublicKey() {
         return publicKey;
     }
-    
+
     public String getName() {
         return publicKey.toString();
     }

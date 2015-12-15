@@ -332,18 +332,18 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         }
         signatureWSSCrypto.setKeyStore(keyStore);
     }
-    
+
     public Properties getSignatureCryptoProperties() {
         if (signatureWSSCrypto != null) {
             return signatureWSSCrypto.getCryptoProperties();
         }
         return null;
     }
-    
+
     public void setSignatureCryptoProperties(Properties cryptoProperties) {
         this.setSignatureCryptoProperties(cryptoProperties, null);
     }
-    
+
     public void setSignatureCryptoProperties(Properties cryptoProperties,
                                              PasswordEncryptor passwordEncryptor) {
         if (signatureWSSCrypto == null) {
@@ -374,7 +374,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
         return signatureWSSCrypto.getCrypto();
     }
-    
+
     public void setSignatureCrypto(Crypto sigCrypto) {
         if (signatureWSSCrypto == null) {
             signatureWSSCrypto = new WSSCrypto();
@@ -397,7 +397,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         }
         signatureVerificationWSSCrypto.setKeyStore(keyStore);
     }
-    
+
     public void loadCRLCertStore(URL url) throws Exception {
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
         X509CRL crl = (X509CRL)cf.generateCRL(url.openStream());
@@ -407,18 +407,18 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
                 new CollectionCertStoreParameters(Collections.singletonList(crl))
             );
     }
-    
+
     public Properties getSignatureVerificationCryptoProperties() {
         if (signatureVerificationWSSCrypto != null) {
             return signatureVerificationWSSCrypto.getCryptoProperties();
         }
         return null;
     }
-    
+
     public void setSignatureVerificationCryptoProperties(Properties cryptoProperties) {
         this.setSignatureVerificationCryptoProperties(cryptoProperties, null);
     }
-    
+
     public void setSignatureVerificationCryptoProperties(Properties cryptoProperties,
                                                          PasswordEncryptor passwordEncryptor) {
         if (signatureVerificationWSSCrypto == null) {
@@ -440,7 +440,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
             signatureVerificationWSSCrypto = new WSSCrypto();
         }
         this.signatureVerificationWSSCrypto.setCryptoClass(signatureVerificationCryptoClass);
-        
+
     }
 
     public Crypto getSignatureVerificationCrypto() throws WSSConfigurationException {
@@ -451,7 +451,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         signatureVerificationWSSCrypto.setCrlCertStore(crlCertStore);
         return signatureVerificationWSSCrypto.getCrypto();
     }
-    
+
     public void setSignatureVerificationCrypto(Crypto sigVerCrypto) {
         if (signatureVerificationWSSCrypto == null) {
             signatureVerificationWSSCrypto = new WSSCrypto();
@@ -486,18 +486,18 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         }
         decryptionWSSCrypto.setKeyStore(keyStore);
     }
-    
+
     public Properties getDecryptionCryptoProperties() {
         if (decryptionWSSCrypto != null) {
             return decryptionWSSCrypto.getCryptoProperties();
         }
         return null;
     }
-    
+
     public void setDecryptionCryptoProperties(Properties cryptoProperties) {
         this.setDecryptionCryptoProperties(cryptoProperties, null);
     }
-    
+
     public void setDecryptionCryptoProperties(Properties cryptoProperties,
                                               PasswordEncryptor passwordEncryptor) {
         if (decryptionWSSCrypto == null) {
@@ -545,7 +545,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
         return decryptionWSSCrypto.getCrypto();
     }
-    
+
     public void setDecryptionCrypto(Crypto decCrypto) {
         if (decryptionWSSCrypto == null) {
             decryptionWSSCrypto = new WSSCrypto();
@@ -587,12 +587,12 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         }
         return null;
     }
-    
+
     public void setEncryptionCryptoProperties(Properties cryptoProperties) {
         this.setEncryptionCryptoProperties(cryptoProperties, null);
     }
-    
-    public void setEncryptionCryptoProperties(Properties cryptoProperties, 
+
+    public void setEncryptionCryptoProperties(Properties cryptoProperties,
                                               PasswordEncryptor passwordEncryptor) {
         if (encryptionWSSCrypto == null) {
             encryptionWSSCrypto = new WSSCrypto();
@@ -640,14 +640,14 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         encryptionWSSCrypto.setCrlCertStore(this.getCrlCertStore());
         return encryptionWSSCrypto.getCrypto();
     }
-    
+
     public void setEncryptionCrypto(Crypto encCrypto) {
         if (encryptionWSSCrypto == null) {
             encryptionWSSCrypto = new WSSCrypto();
         }
         encryptionWSSCrypto.setCrypto(encCrypto);
     }
-    
+
     /**
      * Returns the alias for the encryption key in the keystore
      *
@@ -720,8 +720,8 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public void setUtFutureTTL(Integer utFutureTTL) {
         this.utFutureTTL = utFutureTTL;
-    }    
-    
+    }
+
     /**
      * Set the replay cache for Timestamps
      */
@@ -731,16 +731,16 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     /**
      * Get the replay cache for Timestamps
-     * @throws WSSecurityException 
+     * @throws WSSecurityException
      */
     public ReplayCache getTimestampReplayCache() throws WSSecurityException {
         if (enableTimestampReplayCache && timestampReplayCache == null) {
             timestampReplayCache = createCache("wss4j.timestamp.cache-");
         }
-        
+
         return timestampReplayCache;
     }
-    
+
     private synchronized ReplayCache createCache(String key) throws WSSecurityException {
         ReplayCacheFactory replayCacheFactory = ReplayCacheFactory.newInstance();
         byte[] nonceValue;
@@ -752,7 +752,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
     }
-    
+
     /**
      * Set the replay cache for Nonces
      */
@@ -762,16 +762,16 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     /**
      * Get the replay cache for Nonces
-     * @throws WSSecurityException 
+     * @throws WSSecurityException
      */
     public ReplayCache getNonceReplayCache() throws WSSecurityException {
         if (enableNonceReplayCache && nonceReplayCache == null) {
             nonceReplayCache = createCache("wss4j.nonce.cache-");
         }
-        
+
         return nonceReplayCache;
     }
-    
+
     /**
      * Set the replay cache for SAML2 OneTimeUse Assertions
      */
@@ -781,13 +781,13 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     /**
      * Get the replay cache for SAML2 OneTimeUse Assertions
-     * @throws WSSecurityException 
+     * @throws WSSecurityException
      */
     public ReplayCache getSamlOneTimeUseReplayCache() throws WSSecurityException {
         if (enableSamlOneTimeUseReplayCache && samlOneTimeUseReplayCache == null) {
             samlOneTimeUseReplayCache = createCache("wss4j.saml.one.time.use.cache-");
         }
-        
+
         return samlOneTimeUseReplayCache;
     }
 
@@ -894,7 +894,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     public void setEnableNonceReplayCache(boolean enableNonceReplayCache) {
         this.enableNonceReplayCache = enableNonceReplayCache;
     }
-    
+
     public boolean isEnableSamlOneTimeUseReplayCache() {
         return enableSamlOneTimeUseReplayCache;
     }
@@ -910,7 +910,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     public void setEncryptSymmetricEncryptionKey(boolean encryptSymmetricEncrytionKey) {
         this.encryptSymmetricEncrytionKey = encryptSymmetricEncrytionKey;
     }
-    
+
     /**
      * Set the Signature Subject Cert Constraints
      */
@@ -919,14 +919,14 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
             subjectDNPatterns.addAll(subjectCertConstraints);
         }
     }
-    
+
     /**
      * Get the Signature Subject Cert Constraints
      */
     public Collection<Pattern> getSubjectCertConstraints() {
         return subjectDNPatterns;
     }
-    
+
     /**
      * Set the Audience Restrictions
      */
@@ -935,7 +935,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
             this.audienceRestrictions.addAll(audienceRestrictions);
         }
     }
-    
+
     /**
      * Get the Audience Restrictions
      */

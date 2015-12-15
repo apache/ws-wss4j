@@ -75,7 +75,7 @@ public class XOPAttachmentTest extends AbstractTestBase {
         return byteArrayOutputStream.toByteArray();
     }
 
-    // Set up a test to encrypt the SOAP Body + an attachment, which is the same content as 
+    // Set up a test to encrypt the SOAP Body + an attachment, which is the same content as
     // the SOAP Body. Then replace the encrypted SOAP Body with a xop:Include to the attachment,
     // and modify the request to remove the encryption stuff pointing to the attachment.
     @org.junit.Test
@@ -83,11 +83,11 @@ public class XOPAttachmentTest extends AbstractTestBase {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         List<Attachment> attachments = createEncryptedBodyInAttachment(doc);
         // System.out.println("DOC: " + DOM2Writer.nodeToString(doc));
-        
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
         transformer.transform(new DOMSource(doc), new StreamResult(baos));
-        
+
         //done signature; now test sig-verification:
         AttachmentCallbackHandler attachmentCallbackHandler = new AttachmentCallbackHandler(attachments);
         {
@@ -105,12 +105,12 @@ public class XOPAttachmentTest extends AbstractTestBase {
         }
         Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
-        
+
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
         Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         Assert.assertEquals("text/xml", responseAttachment.getMimeType());
     }
-    
+
     private List<Attachment> createEncryptedBodyInAttachment(Document doc) throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("receiver", "default");
@@ -127,7 +127,7 @@ public class XOPAttachmentTest extends AbstractTestBase {
         attachment.setId(attachmentId);
         attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
@@ -138,41 +138,41 @@ public class XOPAttachmentTest extends AbstractTestBase {
         sigProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.password", "default");
         Crypto crypto = new Merlin(sigProperties, this.getClass().getClassLoader(), null);
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
-        
+
         // Find the SOAP Body + replace with a xop:Include to the attachment!
         Element soapBody = WSSecurityUtil.findBodyElement(encryptedDoc);
         assertNotNull(soapBody);
-        Element encryptedData = 
+        Element encryptedData =
             XMLUtils.getDirectChildElement(soapBody, "EncryptedData", WSConstants.ENC_NS);
         encryptedData.removeAttributeNS(null, "Type");
-        Element cipherData = 
+        Element cipherData =
             XMLUtils.getDirectChildElement(encryptedData, "CipherData", WSConstants.ENC_NS);
         assertNotNull(cipherData);
-        Element cipherValue = 
+        Element cipherValue =
             XMLUtils.getDirectChildElement(cipherData, "CipherValue", WSConstants.ENC_NS);
         assertNotNull(cipherValue);
-        
+
         XMLUtils.setNamespace(cipherValue, WSS4JConstants.XOP_NS, "xop");
-        
+
         Element cipherValueChild = encryptedDoc.createElementNS(WSConstants.XOP_NS, "Include");
         cipherValueChild.setAttributeNS(null, "href", "cid:" + encryptedAttachments.get(0).getId());
         cipherValue.replaceChild(cipherValueChild, cipherValue.getFirstChild());
-        
+
         // Remove EncryptedData structure from the security header (which encrypted the attachment
         // in the first place)
-        Element securityHeader = 
+        Element securityHeader =
             WSSecurityUtil.findWsseSecurityHeaderBlock(encryptedDoc, encryptedDoc.getDocumentElement(), false);
-        Element encryptedAttachmentData = 
+        Element encryptedAttachmentData =
             XMLUtils.getDirectChildElement(securityHeader, "EncryptedData", WSConstants.ENC_NS);
         assertNotNull(encryptedAttachmentData);
         String encryptedDataId = encryptedAttachmentData.getAttributeNS(null, "Id");
         securityHeader.removeChild(encryptedAttachmentData);
 
         // Now get EncryptedKey + remove the reference to the EncryptedData above
-        Element encryptedKey = 
+        Element encryptedKey =
             XMLUtils.getDirectChildElement(securityHeader, "EncryptedKey", WSConstants.ENC_NS);
         assertNotNull(encryptedKey);
-        Element referenceList = 
+        Element referenceList =
             XMLUtils.getDirectChildElement(encryptedKey, "ReferenceList", WSConstants.ENC_NS);
         assertNotNull(referenceList);
         Node child = referenceList.getFirstChild();
@@ -187,8 +187,8 @@ public class XOPAttachmentTest extends AbstractTestBase {
             }
             child = child.getNextSibling();
         }
-        
+
         return encryptedAttachments;
     }
-    
+
 }

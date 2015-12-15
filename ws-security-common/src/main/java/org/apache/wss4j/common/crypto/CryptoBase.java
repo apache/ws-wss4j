@@ -54,16 +54,16 @@ public abstract class CryptoBase implements Crypto {
      * http://www.ietf.org/rfc/rfc3280.txt (s. 4.2.1.11)
      */
     public static final String NAME_CONSTRAINTS_OID = "2.5.29.30";  //NOPMD - not an IP address
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(CryptoBase.class);
-                    
+
     private static final Constructor<?> BC_509CLASS_CONS;
 
     protected CertificateFactory certificateFactory;
     private String defaultAlias;
     private String cryptoProvider;
-    
+
     static {
         Constructor<?> cons = null;
         try {
@@ -74,13 +74,13 @@ public abstract class CryptoBase implements Crypto {
         }
         BC_509CLASS_CONS = cons;
     }
-    
+
     /**
      * Constructor
      */
     protected CryptoBase() {
     }
-    
+
     /**
      * Get the crypto provider associated with this implementation
      * @return the crypto provider
@@ -88,7 +88,7 @@ public abstract class CryptoBase implements Crypto {
     public String getCryptoProvider() {
         return cryptoProvider;
     }
-    
+
     /**
      * Set the crypto provider associated with this implementation
      * @param provider the crypto provider to set
@@ -96,11 +96,11 @@ public abstract class CryptoBase implements Crypto {
     public void setCryptoProvider(String provider) {
         cryptoProvider = provider;
     }
-    
+
     /**
-     * Retrieves the identifier name of the default certificate. This should be the certificate 
-     * that is used for signature and encryption. This identifier corresponds to the certificate 
-     * that should be used whenever KeyInfo is not present in a signed or an encrypted 
+     * Retrieves the identifier name of the default certificate. This should be the certificate
+     * that is used for signature and encryption. This identifier corresponds to the certificate
+     * that should be used whenever KeyInfo is not present in a signed or an encrypted
      * message. May return null. The identifier is implementation specific, e.g. it could be the
      * KeyStore alias.
      *
@@ -109,11 +109,11 @@ public abstract class CryptoBase implements Crypto {
     public String getDefaultX509Identifier() throws WSSecurityException {
         return defaultAlias;
     }
-    
+
     /**
-     * Sets the identifier name of the default certificate. This should be the certificate 
-     * that is used for signature and encryption. This identifier corresponds to the certificate 
-     * that should be used whenever KeyInfo is not present in a signed or an encrypted 
+     * Sets the identifier name of the default certificate. This should be the certificate
+     * that is used for signature and encryption. This identifier corresponds to the certificate
+     * that should be used whenever KeyInfo is not present in a signed or an encrypted
      * message. The identifier is implementation specific, e.g. it could be the KeyStore alias.
      *
      * @param identifier name of the default X509 certificate.
@@ -121,7 +121,7 @@ public abstract class CryptoBase implements Crypto {
     public void setDefaultX509Identifier(String identifier) {
         defaultAlias = identifier;
     }
-    
+
     /**
      * Sets the CertificateFactory instance on this Crypto instance
      *
@@ -130,7 +130,7 @@ public abstract class CryptoBase implements Crypto {
     public void setCertificateFactory(CertificateFactory certFactory) {
         this.certificateFactory = certFactory;
     }
-    
+
     /**
      * Get the CertificateFactory instance on this Crypto instance
      *
@@ -142,7 +142,7 @@ public abstract class CryptoBase implements Crypto {
         if (certificateFactory != null) {
             return certificateFactory;
         }
-        
+
         try {
             String provider = getCryptoProvider();
             if (provider == null || provider.length() == 0) {
@@ -159,7 +159,7 @@ public abstract class CryptoBase implements Crypto {
                 WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, e, "noSecProvider"
             );
         }
-        
+
         return certificateFactory;
     }
 
@@ -269,7 +269,7 @@ public abstract class CryptoBase implements Crypto {
                 WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, e, "parseError"
             );
         }
-        
+
         List<?> l = path.getCertificates();
         X509Certificate[] certs = new X509Certificate[l.size()];
         int i = 0;
@@ -283,7 +283,7 @@ public abstract class CryptoBase implements Crypto {
     public void verifyDirectTrust(X509Certificate[] certs) throws WSSecurityException {
         verifyTrust(certs, true, null);
     }
-    
+
     protected Object createBCX509Name(String s) {
         if (BC_509CLASS_CONS != null) {
              try {
@@ -294,7 +294,7 @@ public abstract class CryptoBase implements Crypto {
         }
         return new X500Principal(s);
     }
-    
+
     /**
      * @return      true if the certificate's SubjectDN matches the constraints defined in the
      *              subject DNConstraints; false, otherwise. The certificate subject DN only
@@ -329,8 +329,8 @@ public abstract class CryptoBase implements Crypto {
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
 }

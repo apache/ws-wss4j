@@ -53,14 +53,14 @@ import org.xml.sax.SAXException;
  * with this class.
  */
 public class WSSec {
-    
+
     //todo outgoing client setup per policy
 
     static {
         WSProviderConfig.init();
         try {
             Init.init(ClassLoaderUtils.getResource("wss/wss-config.xml", WSSec.class).toURI(), WSSec.class);
-            
+
             WSSConstants.setJaxbContext(
                     JAXBContext.newInstance(
                             org.apache.wss4j.binding.wss10.ObjectFactory.class,
@@ -75,7 +75,7 @@ public class WSSec {
                             org.apache.xml.security.binding.excc14n.ObjectFactory.class
                     )
             );
-            
+
             Schema schema = loadWSSecuritySchemas();
             WSSConstants.setJaxbSchemas(schema);
         } catch (XMLSecurityException | JAXBException
@@ -83,11 +83,11 @@ public class WSSec {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-    
+
     public static void init() {
         // Do nothing
     }
-    
+
     /**
      * Creates and configures an outbound streaming security engine
      *
@@ -106,7 +106,7 @@ public class WSSec {
         securityProperties = validateAndApplyDefaultsToOutboundSecurityProperties(securityProperties);
         return new OutboundWSSec(securityProperties);
     }
-    
+
     /**
      * Creates and configures an inbound streaming security engine
      *
@@ -120,7 +120,7 @@ public class WSSec {
     public static InboundWSSec getInboundWSSec(WSSSecurityProperties securityProperties) throws WSSecurityException {
         return getInboundWSSec(securityProperties, false);
     }
-    
+
     /**
      * Creates and configures an inbound streaming security engine
      *
@@ -136,7 +136,7 @@ public class WSSec {
             boolean initiator) throws WSSecurityException {
         return getInboundWSSec(securityProperties, false, false);
     }
-    
+
     /**
      * Creates and configures an inbound streaming security engine
      *
@@ -159,7 +159,7 @@ public class WSSec {
         securityProperties = validateAndApplyDefaultsToInboundSecurityProperties(securityProperties);
         return new InboundWSSec(securityProperties, initiator, returnSecurityError);
     }
-    
+
     /**
      * Validates the user supplied configuration and applies default values as apropriate for the outbound security engine
      *
@@ -172,9 +172,9 @@ public class WSSec {
         if (securityProperties.getActions() == null || securityProperties.getActions().isEmpty()) {
             throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noOutputAction");
         }
-        
+
         // Check for duplicate actions
-        if (new HashSet<XMLSecurityConstants.Action>(securityProperties.getActions()).size() 
+        if (new HashSet<XMLSecurityConstants.Action>(securityProperties.getActions()).size()
             != securityProperties.getActions().size()) {
             throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "stax.duplicateActions");
         }
@@ -404,7 +404,7 @@ public class WSSec {
         }
         return new WSSSecurityProperties(securityProperties);
     }
-    
+
     private static void checkDefaultSecureParts(boolean signature, WSSSecurityProperties securityProperties) {
         if (signature) {
             List<SecurePart> signatureParts = securityProperties.getSignatureSecureParts();
@@ -436,7 +436,7 @@ public class WSSec {
     public static WSSSecurityProperties validateAndApplyDefaultsToInboundSecurityProperties(WSSSecurityProperties securityProperties) throws WSSConfigurationException {
         return new WSSSecurityProperties(securityProperties);
     }
-    
+
     public static Schema loadWSSecuritySchemas() throws SAXException {
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         schemaFactory.setResourceResolver(new LSResourceResolver() {
@@ -466,7 +466,7 @@ public class WSSec {
                 return null;
             }
         });
-        
+
         Schema schema = schemaFactory.newSchema(
                 new Source[] {
                         new StreamSource(ClassLoaderUtils.getResourceAsStream("schemas/xml.xsd", WSSec.class)),

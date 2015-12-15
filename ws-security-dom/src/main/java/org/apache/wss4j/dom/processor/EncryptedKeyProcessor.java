@@ -65,19 +65,19 @@ import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.XMLCipher;
 
 public class EncryptedKeyProcessor implements Processor {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(EncryptedKeyProcessor.class);
-    
+
     public List<WSSecurityEngineResult> handleToken(
-        Element elem, 
+        Element elem,
         RequestData data,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         return handleToken(elem, data, wsDocInfo, data.getAlgorithmSuite());
     }
-    
+
     public List<WSSecurityEngineResult> handleToken(
-        Element elem, 
+        Element elem,
         RequestData data,
         WSDocInfo wsDocInfo,
         AlgorithmSuite algorithmSuite
@@ -85,18 +85,18 @@ public class EncryptedKeyProcessor implements Processor {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Found encrypted key element");
         }
-        
+
         // See if this key has already been processed. If so then just return the result
         String id = elem.getAttributeNS(null, "Id");
         if (!"".equals(id)) {
              WSSecurityEngineResult result = wsDocInfo.getResult(id);
-             if (result != null && 
+             if (result != null &&
                  WSConstants.ENCR == (Integer)result.get(WSSecurityEngineResult.TAG_ACTION)
              ) {
                  return Collections.singletonList(result);
              }
         }
-        
+
         if (data.getCallbackHandler() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
         }
@@ -119,10 +119,10 @@ public class EncryptedKeyProcessor implements Processor {
             );
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-            
+
         // Check BSP Compliance
         checkBSPCompliance(elem, encryptedKeyTransportMethod, data.getBSPEnforcer());
-        
+
         //
         // Now lookup CipherValue.
         //
@@ -130,20 +130,20 @@ public class EncryptedKeyProcessor implements Processor {
         if (xencCipherValue == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noCipher");
         }
-        
+
         Element keyInfoChildElement = getKeyInfoChildElement(elem, data);
-        
+
         X509Certificate[] certs = null;
         STRParser.REFERENCE_TYPE referenceType = null;
         boolean symmetricKeyWrap = isSymmetricKeyWrap(encryptedKeyTransportMethod);
         if (!symmetricKeyWrap) {
-            if (SecurityTokenReference.SECURITY_TOKEN_REFERENCE.equals(keyInfoChildElement.getLocalName()) 
+            if (SecurityTokenReference.SECURITY_TOKEN_REFERENCE.equals(keyInfoChildElement.getLocalName())
                 && WSConstants.WSSE_NS.equals(keyInfoChildElement.getNamespaceURI())) {
                 STRParserParameters parameters = new STRParserParameters();
                 parameters.setData(data);
                 parameters.setWsDocInfo(wsDocInfo);
                 parameters.setStrElement(keyInfoChildElement);
-                
+
                 STRParser strParser = new EncryptedKeySTRParser();
                 STRParserResult parserResult = strParser.parseSecurityTokenReference(parameters);
 
@@ -152,11 +152,11 @@ public class EncryptedKeyProcessor implements Processor {
             } else {
                 certs = getCertificatesFromX509Data(keyInfoChildElement, data);
             }
-            
+
             if (certs == null || certs.length < 1 || certs[0] == null) {
                 throw new WSSecurityException(
                                           WSSecurityException.ErrorCode.FAILURE,
-                                          "noCertsFound", 
+                                          "noCertsFound",
                                           new Object[] {"decryption (KeyId)"});
             }
         }
@@ -173,12 +173,12 @@ public class EncryptedKeyProcessor implements Processor {
                 encryptedKeyTransportMethod
             );
         }
-        
+
         byte[] encryptedEphemeralKey = null;
         byte[] decryptedBytes = null;
-        Element refList = 
+        Element refList =
             XMLUtils.getDirectChildElement(elem, "ReferenceList", WSConstants.ENC_NS);
-        
+
         // Get the key bytes from CipherValue directly or via an attachment
         String xopUri = EncryptionUtils.getXOPURIFromCipherValue(xencCipherValue);
         if (xopUri != null && xopUri.startsWith("cid:")) {
@@ -186,7 +186,7 @@ public class EncryptedKeyProcessor implements Processor {
         } else {
             encryptedEphemeralKey = EncryptionUtils.getDecodedBase64EncodedData(xencCipherValue);
         }
-        
+
         if (symmetricKeyWrap) {
             decryptedBytes = getSymmetricDecryptedBytes(data, wsDocInfo, keyInfoChildElement,
                                                         refList, encryptedEphemeralKey);
@@ -195,18 +195,18 @@ public class EncryptedKeyProcessor implements Processor {
                                                          encryptedEphemeralKey, refList,
                                                          elem, certs[0]);
         }
-        
+
         List<WSDataRef> dataRefs = decryptDataRefs(refList, wsDocInfo, decryptedBytes, data);
-        
+
         WSSecurityEngineResult result = new WSSecurityEngineResult(
-                WSConstants.ENCR, 
+                WSConstants.ENCR,
                 decryptedBytes,
                 encryptedEphemeralKey,
                 dataRefs,
                 certs
             );
         result.put(
-            WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD, 
+            WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD,
             encryptedKeyTransportMethod
         );
         result.put(WSSecurityEngineResult.TAG_TOKEN_ELEMENT, elem);
@@ -221,7 +221,7 @@ public class EncryptedKeyProcessor implements Processor {
         wsDocInfo.addTokenElement(elem);
         return Collections.singletonList(result);
     }
-    
+
     private static byte[] getSymmetricDecryptedBytes(
         RequestData data,
         WSDocInfo wsDocInfo,
@@ -233,15 +233,15 @@ public class EncryptedKeyProcessor implements Processor {
         String uri = getFirstDataRefURI(refList);
         String algorithmURI = null;
         if (uri != null) {
-            Element ee = 
-                EncryptionUtils.findEncryptedDataElement(refList.getOwnerDocument(), 
+            Element ee =
+                EncryptionUtils.findEncryptedDataElement(refList.getOwnerDocument(),
                                                          wsDocInfo, uri);
             algorithmURI = X509Util.getEncAlgo(ee);
         }
-        return X509Util.getSecretKey(keyInfoChildElement, algorithmURI, 
+        return X509Util.getSecretKey(keyInfoChildElement, algorithmURI,
                                      data.getCallbackHandler(), encryptedEphemeralKey);
     }
-    
+
     private static byte[] getAsymmetricDecryptedBytes(
         RequestData data,
         WSDocInfo wsDocInfo,
@@ -287,7 +287,7 @@ public class EncryptedKeyProcessor implements Processor {
                     pSource = new PSource.PSpecified(pSourceBytes);
                 }
 
-                oaepParameterSpec = 
+                oaepParameterSpec =
                     new OAEPParameterSpec(
                         jceDigestAlgorithm, "MGF1", mgfParameterSpec, pSource
                     );
@@ -310,7 +310,7 @@ public class EncryptedKeyProcessor implements Processor {
             return getRandomKey(refList, wsDocInfo);
         }
     }
-    
+
     private static boolean isSymmetricKeyWrap(String transportAlgorithm) {
         return XMLCipher.AES_128_KeyWrap.equals(transportAlgorithm)
             || XMLCipher.AES_192_KeyWrap.equals(transportAlgorithm)
@@ -321,7 +321,7 @@ public class EncryptedKeyProcessor implements Processor {
             || XMLCipher.CAMELLIA_256_KeyWrap.equals(transportAlgorithm)
             || XMLCipher.SEED_128_KeyWrap.equals(transportAlgorithm);
     }
-    
+
     /**
      * Generates a random secret key using the algorithm specified in the
      * first DataReference URI
@@ -331,10 +331,10 @@ public class EncryptedKeyProcessor implements Processor {
             String alg = "AES";
             int size = 16;
             String uri = getFirstDataRefURI(refList);
-            
+
             if (uri != null) {
-                Element ee = 
-                    EncryptionUtils.findEncryptedDataElement(refList.getOwnerDocument(), 
+                Element ee =
+                    EncryptionUtils.findEncryptedDataElement(refList.getOwnerDocument(),
                                                                     wsDocInfo, uri);
                 String algorithmURI = X509Util.getEncAlgo(ee);
                 alg = JCEMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
@@ -356,7 +356,7 @@ public class EncryptedKeyProcessor implements Processor {
             }
         }
     }
-    
+
     private static String getFirstDataRefURI(Element refList) {
         // Lookup the references that are encrypted with this key
         if (refList != null) {
@@ -371,11 +371,11 @@ public class EncryptedKeyProcessor implements Processor {
         }
         return null;
     }
-    
+
     private Element getKeyInfoChildElement(
         Element xencEncryptedKey, RequestData data
     ) throws WSSecurityException {
-        Element keyInfo = 
+        Element keyInfo =
             XMLUtils.getDirectChildElement(xencEncryptedKey, "KeyInfo", WSConstants.SIG_NS);
         if (keyInfo != null) {
             Element strElement = null;
@@ -443,7 +443,7 @@ public class EncryptedKeyProcessor implements Processor {
 
         return null;
     }
-    
+
     private Element getFirstElement(Element element) {
         for (Node currentChild = element.getFirstChild();
              currentChild != null;
@@ -455,11 +455,11 @@ public class EncryptedKeyProcessor implements Processor {
         }
         return null;
     }
-    
+
     /**
      * Decrypt all data references
      */
-    private List<WSDataRef> decryptDataRefs(Element refList, WSDocInfo docInfo, 
+    private List<WSDataRef> decryptDataRefs(Element refList, WSDocInfo docInfo,
                                             byte[] decryptedBytes, RequestData data
     ) throws WSSecurityException {
         //
@@ -469,7 +469,7 @@ public class EncryptedKeyProcessor implements Processor {
         if (refList == null) {
             return null;
         }
-        
+
         List<WSDataRef> dataRefs = new ArrayList<>();
         for (Node node = refList.getFirstChild(); node != null; node = node.getNextSibling()) {
             if (Node.ELEMENT_NODE == node.getNodeType()
@@ -477,13 +477,13 @@ public class EncryptedKeyProcessor implements Processor {
                     && "DataReference".equals(node.getLocalName())) {
                 String dataRefURI = ((Element) node).getAttributeNS(null, "URI");
                 dataRefURI = XMLUtils.getIDFromReference(dataRefURI);
-                
-                WSDataRef dataRef = 
+
+                WSDataRef dataRef =
                     decryptDataRef(refList.getOwnerDocument(), dataRefURI, docInfo, decryptedBytes, data);
                 dataRefs.add(dataRef);
             }
         }
-        
+
         return dataRefs;
     }
 
@@ -491,8 +491,8 @@ public class EncryptedKeyProcessor implements Processor {
      * Decrypt an EncryptedData element referenced by dataRefURI
      */
     private WSDataRef decryptDataRef(
-        Document doc, 
-        String dataRefURI, 
+        Document doc,
+        String dataRefURI,
         WSDocInfo docInfo,
         byte[] decryptedData,
         RequestData data
@@ -503,10 +503,10 @@ public class EncryptedKeyProcessor implements Processor {
         //
         // Find the encrypted data element referenced by dataRefURI
         //
-        Element encryptedDataElement = 
+        Element encryptedDataElement =
             EncryptionUtils.findEncryptedDataElement(doc, docInfo, dataRefURI);
         if (encryptedDataElement != null && data.isRequireSignedEncryptedDataElements()) {
-            List<WSSecurityEngineResult> signedResults = 
+            List<WSSecurityEngineResult> signedResults =
                 docInfo.getResultsByTag(WSConstants.SIGN);
             WSSecurityUtil.verifySignedElement(encryptedDataElement, signedResults);
         }
@@ -514,13 +514,13 @@ public class EncryptedKeyProcessor implements Processor {
         // Prepare the SecretKey object to decrypt EncryptedData
         //
         String symEncAlgo = X509Util.getEncAlgo(encryptedDataElement);
-        
+
         // EncryptionAlgorithm cannot be null
         if (symEncAlgo == null) {
             LOG.debug("No encryption algorithm was specified in the request");
-            throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "badEncAlgo", 
+            throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "badEncAlgo",
                                           new Object[] {null});
-            
+
         }
         // EncryptionAlgorithm must be 3DES, or AES128, or AES256
         if (!WSConstants.TRIPLE_DES.equals(symEncAlgo)
@@ -530,16 +530,16 @@ public class EncryptedKeyProcessor implements Processor {
             && !WSConstants.AES_256_GCM.equals(symEncAlgo)) {
             data.getBSPEnforcer().handleBSPRule(BSPRule.R5620);
         }
-        
+
         SecretKey symmetricKey = null;
         try {
             symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, decryptedData);
         } catch (IllegalArgumentException ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex, "badEncAlgo", 
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex, "badEncAlgo",
                 new Object[] {symEncAlgo});
         }
-        
+
         // Check for compliance against the defined AlgorithmSuite
         AlgorithmSuite algorithmSuite = data.getAlgorithmSuite();
         if (algorithmSuite != null) {
@@ -554,7 +554,7 @@ public class EncryptedKeyProcessor implements Processor {
             doc, dataRefURI, encryptedDataElement, symmetricKey, symEncAlgo, data.getAttachmentCallbackHandler()
         );
     }
-    
+
     /**
      * A method to check that the EncryptedKey is compliant with the BSP spec.
      * @throws WSSecurityException
@@ -578,7 +578,7 @@ public class EncryptedKeyProcessor implements Processor {
         if (attribute != null && !"".equals(attribute)) {
             bspEnforcer.handleBSPRule(BSPRule.R5602);
         }
-        
+
         // EncryptionAlgorithm must be RSA15, or RSAOEP.
         if (!(WSConstants.KEYTRANSPORT_RSA15.equals(encAlgo)
             || WSConstants.KEYTRANSPORT_RSAOEP.equals(encAlgo)
@@ -586,5 +586,5 @@ public class EncryptedKeyProcessor implements Processor {
             bspEnforcer.handleBSPRule(BSPRule.R5621);
         }
     }
-  
+
 }

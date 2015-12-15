@@ -49,11 +49,11 @@ import org.w3c.dom.Text;
  * chapter 10 / appendix A.2
  */
 public class Timestamp {
-    
+
     private Element element;
     private Date createdDate;
     private Date expiresDate;
-    
+
     /**
      * Constructs a <code>Timestamp</code> object and parses the
      * <code>wsu:Timestamp</code> element to initialize it.
@@ -110,7 +110,7 @@ public class Timestamp {
                 }
             }
         }
-        
+
         // We must have a Created element
         if (strCreated == null) {
             bspEnforcer.handleBSPRule(BSPRule.R3203);
@@ -120,12 +120,12 @@ public class Timestamp {
         if (strCreated != null) {
             XMLGregorianCalendar createdCalendar = null;
             try {
-                createdCalendar = 
+                createdCalendar =
                     WSSConfig.datatypeFactory.newXMLGregorianCalendar(strCreated);
             } catch (IllegalArgumentException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
-            
+
             if (createdCalendar.getFractionalSecond() != null
                 && createdCalendar.getFractionalSecond().scale() > 3) {
                 bspEnforcer.handleBSPRule(BSPRule.R3220);
@@ -138,16 +138,16 @@ public class Timestamp {
             }
             createdDate = createdCalendar.toGregorianCalendar().getTime();
         }
-        
+
         if (strExpires != null) {
             XMLGregorianCalendar expiresCalendar = null;
             try {
-                expiresCalendar = 
+                expiresCalendar =
                     WSSConfig.datatypeFactory.newXMLGregorianCalendar(strExpires);
             } catch (IllegalArgumentException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
-            
+
             if (expiresCalendar.getFractionalSecond() != null
                 && expiresCalendar.getFractionalSecond().scale() > 3) {
                 bspEnforcer.handleBSPRule(BSPRule.R3229);
@@ -173,7 +173,7 @@ public class Timestamp {
     public Timestamp(boolean milliseconds, Document doc, int ttl) {
         this(milliseconds, doc, new WSCurrentTimeSource(), ttl);
     }
-    
+
     /**
      * Constructs a <code>Timestamp</code> object according
      * to the defined parameters.
@@ -183,7 +183,7 @@ public class Timestamp {
      */
     public Timestamp(boolean milliseconds, Document doc, WSTimeSource timeSource, int ttl) {
 
-        element = 
+        element =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
             );
@@ -214,7 +214,7 @@ public class Timestamp {
             element.appendChild(elementExpires);
         }
     }
-    
+
     /**
      * Add the WSU Namespace to this T. The namespace is not added by default for
      * efficiency purposes.
@@ -266,14 +266,14 @@ public class Timestamp {
     public void setID(String id) {
         element.setAttributeNS(WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":Id", id);
     }
-    
+
     /**
      * @return the value of the wsu:Id attribute
      */
     public String getID() {
         return element.getAttributeNS(WSConstants.WSU_NS, "Id");
     }
-    
+
     /**
      * Return true if the current Timestamp is expired, meaning if the "Expires" value
      * is before the current time. It returns false if there is no Expires value.
@@ -285,12 +285,12 @@ public class Timestamp {
         }
         return false;
     }
-    
-    
+
+
     /**
      * Return true if the "Created" value is before the current time minus the timeToLive
      * argument, and if the Created value is not "in the future".
-     * 
+     *
      * @param timeToLive the value in seconds for the validity of the Created time
      * @param futureTimeToLive the value in seconds for the future validity of the Created time
      * @return true if the timestamp is before (now-timeToLive), false otherwise
@@ -302,7 +302,7 @@ public class Timestamp {
         return DateUtil.verifyCreated(createdDate, timeToLive, futureTimeToLive);
     }
 
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -314,7 +314,7 @@ public class Timestamp {
         }
         return result;
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (!(object instanceof Timestamp)) {
@@ -329,14 +329,14 @@ public class Timestamp {
         }
         return true;
     }
-    
+
     private boolean compare(Date item1, Date item2) {
-        if (item1 == null && item2 != null) { 
+        if (item1 == null && item2 != null) {
             return false;
         } else if (item1 != null && !item1.equals(item2)) {
             return false;
         }
         return true;
     }
-    
+
 }

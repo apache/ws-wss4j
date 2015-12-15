@@ -33,15 +33,15 @@ import java.util.Map;
  * A Callback Handler implementation for the case of processing a Username Token.
  */
 public class UsernamePasswordCallbackHandler implements CallbackHandler {
-    
+
     private Map<String, String> users = new HashMap<>();
-    
+
     public UsernamePasswordCallbackHandler() {
         users.put("wernerd", "verySecret");
         users.put("bob", "security");
         users.put("alice", "securityPassword");
     }
-    
+
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {

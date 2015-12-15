@@ -47,7 +47,7 @@ public abstract class X509SecurityTokenImpl
 
     private static final transient org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(X509SecurityTokenImpl.class);
-    
+
     private CallbackHandler callbackHandler;
     private Crypto crypto;
     private WSSSecurityProperties securityProperties;
@@ -120,7 +120,7 @@ public abstract class X509SecurityTokenImpl
             getCrypto().verifyTrust(x509Certificates, enableRevocation, subjectCertConstraints);
         }
     }
-    
+
     /**
      * @return      true if the certificate's SubjectDN matches the constraints defined in the
      *              subject DNConstraints; false, otherwise. The certificate subject DN only
@@ -154,10 +154,10 @@ public abstract class X509SecurityTokenImpl
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
     protected abstract String getAlias() throws XMLSecurityException;
 
     @Override
@@ -180,7 +180,7 @@ public abstract class X509SecurityTokenImpl
         }
         return this.principal;
     }
-    
+
     @Override
     public TokenType getTokenType() {
         TokenType storedTokenType = super.getTokenType();
@@ -195,9 +195,9 @@ public abstract class X509SecurityTokenImpl
                 return storedTokenType;
             }
         }
-        
+
         return storedTokenType;
-        
-        
+
+
     }
 }

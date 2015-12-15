@@ -42,24 +42,24 @@ import javax.security.auth.callback.CallbackHandler;
 import java.util.Collections;
 
 /**
- * WS-Security Test Case for UsernameToken Key Derivation, as defined in the 
+ * WS-Security Test Case for UsernameToken Key Derivation, as defined in the
  * UsernameTokenProfile 1.1 specification. The derived keys are used for signature.
  * Note that this functionality is different to the UTDerivedKeyTest test case,
  * which uses the derived key in conjunction with wsc:DerivedKeyToken. It's also
- * different to UTWseSignatureTest, which derives a key for signature using a 
+ * different to UTWseSignatureTest, which derives a key for signature using a
  * non-standard implementation.
  */
 public class UTSignatureTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(UTSignatureTest.class);
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public UTSignatureTest() throws Exception {
         crypto = CryptoFactory.getInstance();
     }
@@ -72,23 +72,23 @@ public class UTSignatureTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("bob", "security");
         builder.addDerivedKey(true, null, 1000);
         builder.prepare(doc);
-        
+
         WSSecSignature sign = new WSSecSignature();
         sign.setCustomTokenValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
         sign.setCustomTokenId(builder.getId());
         sign.setSecretKey(builder.getDerivedKey());
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-        
+
         Document signedDoc = sign.build(doc, null, secHeader);
         builder.prependToHeader(secHeader);
-        
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(signedDoc);
         assertTrue(outputString.contains("wsse:Username"));
         assertFalse(outputString.contains("wsse:Password"));
@@ -97,23 +97,23 @@ public class UTSignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
+
         WSHandlerResult results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.UT_SIGN).get(0);
-        java.security.Principal principal = 
+        java.security.Principal principal =
             (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(principal.getName().contains("bob"));
-        
+
         try {
             verify(signedDoc, false);
             fail("Failure expected on deriving keys from a UsernameToken not allowed");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
     }
-    
-    
+
+
     /**
      * Test using a UsernameToken derived key for signing a SOAP body. In this test the
      * user is "colm" rather than "bob", and so signature verification should fail.
@@ -123,23 +123,23 @@ public class UTSignatureTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("colm", "security");
         builder.addDerivedKey(true, null, 1000);
         builder.prepare(doc);
-        
+
         WSSecSignature sign = new WSSecSignature();
         sign.setCustomTokenValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
         sign.setCustomTokenId(builder.getId());
         sign.setSecretKey(builder.getDerivedKey());
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-        
+
         Document signedDoc = sign.build(doc, null, secHeader);
         builder.prependToHeader(secHeader);
-        
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
@@ -153,13 +153,13 @@ public class UTSignatureTest extends org.junit.Assert {
             // expected
         }
     }
-    
+
     /**
      * Test using a UsernameToken derived key for signing a SOAP body via WSHandler
      */
     @org.junit.Test
     public void testHandlerSignature() throws Exception {
-        
+
         final WSSConfig cfg = WSSConfig.getNewInstance();
         RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
@@ -167,18 +167,18 @@ public class UTSignatureTest extends org.junit.Assert {
         messageContext.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         reqData.setMsgContext(messageContext);
         reqData.setUsername("bob");
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         HandlerAction action = new HandlerAction(WSConstants.UT_SIGN);
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             Collections.singletonList(action),
             true
         );
-        
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.contains("wsse:Username"));
         assertFalse(outputString.contains("wsse:Password"));
@@ -187,21 +187,21 @@ public class UTSignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
+
         WSHandlerResult results = verify(doc);
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.UT_SIGN).get(0);
-        java.security.Principal principal = 
+        java.security.Principal principal =
             (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(principal.getName().contains("bob"));
     }
-    
+
     /**
      * Test using a UsernameToken derived key for signing a SOAP body via WSHandler
      */
     @org.junit.Test
     public void testHandlerSignatureIterations() throws Exception {
-        
+
         final WSSConfig cfg = WSSConfig.getNewInstance();
         RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
@@ -210,18 +210,18 @@ public class UTSignatureTest extends org.junit.Assert {
         messageContext.put(WSHandlerConstants.DERIVED_KEY_ITERATIONS, "1234");
         reqData.setMsgContext(messageContext);
         reqData.setUsername("bob");
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         HandlerAction action = new HandlerAction(WSConstants.UT_SIGN);
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             Collections.singletonList(action),
             true
         );
-        
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.contains("wsse:Username"));
         assertFalse(outputString.contains("wsse:Password"));
@@ -231,37 +231,37 @@ public class UTSignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
+
         WSHandlerResult results = verify(doc);
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.UT_SIGN).get(0);
-        java.security.Principal principal = 
+        java.security.Principal principal =
             (java.security.Principal) actionResult.get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(principal.getName().contains("bob"));
     }
-    
+
     /**
      * Verifies the soap envelope.
-     * 
+     *
      * @param doc soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc) throws Exception {
         return verify(doc, true);
     }
-    
+
     private WSHandlerResult verify(
-        Document doc, 
+        Document doc,
         boolean allowUsernameTokenDerivedKeys
     ) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
-        
+
         RequestData requestData = new RequestData();
         requestData.setAllowUsernameTokenNoPassword(allowUsernameTokenDerivedKeys);
         requestData.setCallbackHandler(callbackHandler);
         requestData.setSigVerCrypto(crypto);
         requestData.setDecCrypto(crypto);
-        
+
         return secEngine.processSecurityHeader(doc, requestData);
     }
 

@@ -25,53 +25,53 @@ package org.apache.wss4j.common.saml.builder;
  * the SAML v1.x specification.
  */
 public final class SAML1Constants {
-    
+
     //
     // NAME ID FORMAT
     //
-    
-    public static final String NAMEID_FORMAT_UNSPECIFIED = 
+
+    public static final String NAMEID_FORMAT_UNSPECIFIED =
         "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified";
-    
-    public static final String NAMEID_FORMAT_EMAIL_ADDRESS = 
+
+    public static final String NAMEID_FORMAT_EMAIL_ADDRESS =
         "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress";
-    
-    public static final String NAMEID_FORMAT_X509_SUBJECT_NAME = 
+
+    public static final String NAMEID_FORMAT_X509_SUBJECT_NAME =
         "urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName";
-    
-    public static final String NAMEID_FORMAT_WINDOWS_DQN = 
+
+    public static final String NAMEID_FORMAT_WINDOWS_DQN =
         "urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName";
 
     //
     // SUBJECT CONFIRMATION
-    // 
-    
+    //
+
     /**
      * Assertion Bearer Confirmation Method Identifier
      */
-    public static final String CONF_BEARER = 
+    public static final String CONF_BEARER =
         "urn:oasis:names:tc:SAML:1.0:cm:bearer";
 
     /**
      * Holder of Key Confirmation Method Identifier
      */
-    public static final String CONF_HOLDER_KEY = 
+    public static final String CONF_HOLDER_KEY =
         "urn:oasis:names:tc:SAML:1.0:cm:holder-of-key";
 
     /**
      * Sender Vouches Confirmation Method Identifier
      */
-    public static final String CONF_SENDER_VOUCHES = 
+    public static final String CONF_SENDER_VOUCHES =
         "urn:oasis:names:tc:SAML:1.0:cm:sender-vouches";
 
     //
     // AUTH METHOD
     //
-    
+
     /**
      * The authentication was performed by means of a password.
      */
-    public static final String AUTH_METHOD_PASSWORD = 
+    public static final String AUTH_METHOD_PASSWORD =
         "urn:oasis:names:tc:SAML:1.0:am:password";
 
     /**
@@ -81,7 +81,7 @@ public final class SAML1Constants {
     public static final String AUTH_METHOD_KERBEROS = "urn:ietf:rfc:1510";
 
     /**
-     * The authentication was performed by means of Secure Remote Password protocol as specified in 
+     * The authentication was performed by means of Secure Remote Password protocol as specified in
      * [RFC 2945].
      */
     public static final String AUTH_METHOD_SRP = "urn:ietf:rfc:2945";
@@ -89,11 +89,11 @@ public final class SAML1Constants {
     /**
      * The authentication was performed by means of an unspecified hardware token.
      */
-    public static final String AUTH_METHOD_HARDWARE_TOKEN = 
+    public static final String AUTH_METHOD_HARDWARE_TOKEN =
         "urn:oasis:names:tc:SAML:1.0:am:HardwareToken";
 
     /**
-     * The authentication was performed using either the SSL or TLS protocol with certificate 
+     * The authentication was performed using either the SSL or TLS protocol with certificate
      * based client authentication. TLS is described in [RFC 2246].
      */
     public static final String AUTH_METHOD_TLS_CLIENT = "urn:ietf:rfc:2246";
@@ -103,31 +103,31 @@ public final class SAML1Constants {
      * means of an X.509 PKI [X.500][PKIX]. It may have been one of the mechanisms for which a more
      * specific identifier has been defined.
      */
-    public static final String AUTH_METHOD_X509 = 
+    public static final String AUTH_METHOD_X509 =
         "urn:oasis:names:tc:SAML:1.0:am:X509-PKI";
 
     /**
-     * The authentication was performed by some (unspecified) mechanism on a key authenticated by 
-     * means of a PGP web of trust [PGP]. It may have been one of the mechanisms for which a more 
+     * The authentication was performed by some (unspecified) mechanism on a key authenticated by
+     * means of a PGP web of trust [PGP]. It may have been one of the mechanisms for which a more
      * specific identifier has been defined.
      */
-    public static final String AUTH_METHOD_PGP = 
+    public static final String AUTH_METHOD_PGP =
         "urn:oasis:names:tc:SAML:1.0:am:PGP";
 
     /**
-     * The authentication was performed by some (unspecified) mechanism on a key authenticated by 
-     * means of a SPKI PKI [SPKI]. It may have been one of the mechanisms for which a more specific 
+     * The authentication was performed by some (unspecified) mechanism on a key authenticated by
+     * means of a SPKI PKI [SPKI]. It may have been one of the mechanisms for which a more specific
      * identifier has been defined.
      */
-    public static final String AUTH_METHOD_SPKI = 
+    public static final String AUTH_METHOD_SPKI =
         "urn:oasis:names:tc:SAML:1.0:am:SPKI";
 
     /**
-     * The authentication was performed by some (unspecified) mechanism on a key authenticated by 
+     * The authentication was performed by some (unspecified) mechanism on a key authenticated by
      * means of a XKMS trust service [XKMS]. It may have been one of the mechanisms for which a more
      * specific identifier has been defined.
      */
-    public static final String AUTH_METHOD_XKMS = 
+    public static final String AUTH_METHOD_XKMS =
         "urn:oasis:names:tc:SAML:1.0:am:XKMS";
 
     /**
@@ -138,9 +138,9 @@ public final class SAML1Constants {
     /**
      * The authentication was performed by an unspecified means.
      */
-    public static final String AUTH_METHOD_UNSPECIFIED = 
+    public static final String AUTH_METHOD_UNSPECIFIED =
         "urn:oasis:names:tc:SAML:1.0:am:unspecified";
-    
+
     private SAML1Constants() {
         // Complete
     }

@@ -85,64 +85,64 @@ import org.w3c.dom.Element;
  */
 public final class SAML2ComponentBuilder {
     private static volatile SAMLObjectBuilder<Assertion> assertionBuilder;
-    
+
     private static volatile SAMLObjectBuilder<Issuer> issuerBuilder;
-    
+
     private static volatile SAMLObjectBuilder<Subject> subjectBuilder;
-    
+
     private static volatile SAMLObjectBuilder<NameID> nameIdBuilder;
-    
+
     private static volatile SAMLObjectBuilder<SubjectConfirmation> subjectConfirmationBuilder;
-    
+
     private static volatile SAMLObjectBuilder<OneTimeUse> oneTimeUseBuilder;
-    
+
     private static volatile SAMLObjectBuilder<ProxyRestriction> proxyRestrictionBuilder;
-    
+
     private static volatile SAMLObjectBuilder<Conditions> conditionsBuilder;
-    
+
     private static volatile SAMLObjectBuilder<Advice> adviceBuilder;
-    
+
     private static volatile SAMLObjectBuilder<AssertionIDRef> assertionIDRefBuilder;
-    
+
     private static volatile SAMLObjectBuilder<AssertionURIRef> assertionURIRefBuilder;
-    
+
     private static volatile SAMLObjectBuilder<SubjectConfirmationData> subjectConfirmationDataBuilder;
-    
+
     private static volatile SAMLObjectBuilder<KeyInfoConfirmationDataType> keyInfoConfirmationDataBuilder;
-    
+
     private static volatile SAMLObjectBuilder<AuthnStatement> authnStatementBuilder;
-    
+
     private static volatile SAMLObjectBuilder<AuthnContext> authnContextBuilder;
-    
+
     private static volatile SAMLObjectBuilder<AuthnContextClassRef> authnContextClassRefBuilder;
-    
+
     private static volatile SAMLObjectBuilder<AttributeStatement> attributeStatementBuilder;
-    
+
     private static volatile SAMLObjectBuilder<Attribute> attributeBuilder;
-    
+
     private static volatile XSStringBuilder stringBuilder;
-    
+
     private static volatile SAMLObjectBuilder<AudienceRestriction> audienceRestrictionBuilder;
-    
+
     private static volatile SAMLObjectBuilder<DelegationRestrictionType> delegationRestrictionBuilder;
-    
+
     private static volatile SAMLObjectBuilder<Audience> audienceBuilder;
-    
+
     private static volatile SAMLObjectBuilder<Delegate> delegateBuilder;
-    
+
     private static volatile SAMLObjectBuilder<AuthzDecisionStatement> authorizationDecisionStatementBuilder;
-    
+
     private static volatile SAMLObjectBuilder<Action> actionElementBuilder;
-    
-    private static volatile XMLObjectBuilderFactory builderFactory = 
+
+    private static volatile XMLObjectBuilderFactory builderFactory =
         XMLObjectProviderRegistrySupport.getBuilderFactory();
-    
+
     private static volatile SAMLObjectBuilder<SubjectLocality> subjectLocalityBuilder;
 
     private SAML2ComponentBuilder() {
         // Complete
     }
-    
+
     /**
      * Create a SAML 2 assertion
      *
@@ -151,7 +151,7 @@ public final class SAML2ComponentBuilder {
     @SuppressWarnings("unchecked")
     public static Assertion createAssertion() {
         if (assertionBuilder == null) {
-            assertionBuilder = (SAMLObjectBuilder<Assertion>) 
+            assertionBuilder = (SAMLObjectBuilder<Assertion>)
                 builderFactory.getBuilder(Assertion.DEFAULT_ELEMENT_NAME);
             if (assertionBuilder == null) {
                 throw new IllegalStateException(
@@ -160,7 +160,7 @@ public final class SAML2ComponentBuilder {
                 );
             }
         }
-        Assertion assertion = 
+        Assertion assertion =
             assertionBuilder.buildObject(Assertion.DEFAULT_ELEMENT_NAME, Assertion.TYPE_NAME);
         assertion.setID(IDGenerator.generateID("_"));
         assertion.setVersion(SAMLVersion.VERSION_20);
@@ -179,13 +179,13 @@ public final class SAML2ComponentBuilder {
     @SuppressWarnings("unchecked")
     public static Issuer createIssuer(String issuerValue, String issuerFormat, String issuerQualifier) {
         if (issuerBuilder == null) {
-            issuerBuilder = (SAMLObjectBuilder<Issuer>) 
+            issuerBuilder = (SAMLObjectBuilder<Issuer>)
                 builderFactory.getBuilder(Issuer.DEFAULT_ELEMENT_NAME);
-            
+
         }
         Issuer issuer = issuerBuilder.buildObject();
         //
-        // The SAML authority that is making the claim(s) in the assertion. The issuer SHOULD 
+        // The SAML authority that is making the claim(s) in the assertion. The issuer SHOULD
         // be unambiguous to the intended relying parties.
         issuer.setValue(issuerValue);
         issuer.setFormat(issuerFormat);
@@ -202,23 +202,23 @@ public final class SAML2ComponentBuilder {
     @SuppressWarnings("unchecked")
     public static Conditions createConditions(ConditionsBean conditionsBean) {
         if (conditionsBuilder == null) {
-            conditionsBuilder = (SAMLObjectBuilder<Conditions>) 
+            conditionsBuilder = (SAMLObjectBuilder<Conditions>)
                 builderFactory.getBuilder(Conditions.DEFAULT_ELEMENT_NAME);
         }
-        
+
         Conditions conditions = conditionsBuilder.buildObject();
-        
+
         if (conditionsBean == null) {
             DateTime newNotBefore = new DateTime();
             conditions.setNotBefore(newNotBefore);
             conditions.setNotOnOrAfter(newNotBefore.plusMinutes(5));
             return conditions;
         }
-        
+
         long tokenPeriodSeconds = conditionsBean.getTokenPeriodSeconds();
         DateTime notBefore = conditionsBean.getNotBefore();
         DateTime notAfter = conditionsBean.getNotAfter();
-        
+
         if (notBefore != null && notAfter != null) {
             if (notBefore.isAfter(notAfter)) {
                 throw new IllegalStateException(
@@ -233,81 +233,81 @@ public final class SAML2ComponentBuilder {
             if (tokenPeriodSeconds <= 0) {
                 tokenPeriodSeconds = 5L * 60L;
             }
-            DateTime notOnOrAfter = 
+            DateTime notOnOrAfter =
                 new DateTime(newNotBefore.getMillis() + tokenPeriodSeconds * 1000L);
-            
+
             conditions.setNotOnOrAfter(notOnOrAfter);
         }
-        
-        if (conditionsBean.getAudienceRestrictions() != null 
+
+        if (conditionsBean.getAudienceRestrictions() != null
             && !conditionsBean.getAudienceRestrictions().isEmpty()) {
-            for (AudienceRestrictionBean audienceRestrictionBean 
+            for (AudienceRestrictionBean audienceRestrictionBean
                 : conditionsBean.getAudienceRestrictions()) {
-                AudienceRestriction audienceRestriction = 
+                AudienceRestriction audienceRestriction =
                         createAudienceRestriction(audienceRestrictionBean);
                 conditions.getAudienceRestrictions().add(audienceRestriction);
             }
         }
-        
+
         if (conditionsBean.isOneTimeUse()) {
             conditions.getConditions().add(createOneTimeUse());
         }
-        
+
         if (conditionsBean.getProxyRestriction() != null) {
             conditions.getConditions().add(createProxyRestriction(conditionsBean.getProxyRestriction()));
         }
-        
+
         if (conditionsBean.getDelegates() != null && !conditionsBean.getDelegates().isEmpty()) {
-            DelegationRestrictionType delegationRestriction = 
+            DelegationRestrictionType delegationRestriction =
                 createDelegationRestriction(conditionsBean.getDelegates());
             conditions.getConditions().add(delegationRestriction);
         }
-        
+
         return conditions;
     }
-    
+
     /**
      * Create a Advice object
      *
      * @param adviceBean A AdviceBean object
      * @return a Advice object
-     * @throws WSSecurityException 
+     * @throws WSSecurityException
      */
     @SuppressWarnings("unchecked")
     public static Advice createAdvice(AdviceBean adviceBean) throws WSSecurityException {
         if (adviceBuilder == null) {
-            adviceBuilder = (SAMLObjectBuilder<Advice>) 
+            adviceBuilder = (SAMLObjectBuilder<Advice>)
                 builderFactory.getBuilder(Advice.DEFAULT_ELEMENT_NAME);
         }
-        
+
         Advice advice = adviceBuilder.buildObject();
-        
+
         if (!adviceBean.getIdReferences().isEmpty()) {
             if (assertionIDRefBuilder == null) {
-                assertionIDRefBuilder = (SAMLObjectBuilder<AssertionIDRef>) 
+                assertionIDRefBuilder = (SAMLObjectBuilder<AssertionIDRef>)
                     builderFactory.getBuilder(AssertionIDRef.DEFAULT_ELEMENT_NAME);
             }
-            
+
             for (String ref : adviceBean.getIdReferences()) {
                 AssertionIDRef assertionIdRef = assertionIDRefBuilder.buildObject();
                 assertionIdRef.setAssertionID(ref);
                 advice.getAssertionIDReferences().add(assertionIdRef);
             }
         }
-        
+
         if (!adviceBean.getUriReferences().isEmpty()) {
             if (assertionURIRefBuilder == null) {
-                assertionURIRefBuilder = (SAMLObjectBuilder<AssertionURIRef>) 
+                assertionURIRefBuilder = (SAMLObjectBuilder<AssertionURIRef>)
                     builderFactory.getBuilder(AssertionURIRef.DEFAULT_ELEMENT_NAME);
             }
-            
+
             for (String ref : adviceBean.getUriReferences()) {
                 AssertionURIRef assertionURIRef = assertionURIRefBuilder.buildObject();
                 assertionURIRef.setAssertionURI(ref);
                 advice.getAssertionURIReferences().add(assertionURIRef);
             }
         }
-        
+
         if (!adviceBean.getAssertions().isEmpty()) {
             for (Element assertionElement : adviceBean.getAssertions()) {
                 XMLObject xmlObject = OpenSAMLUtil.fromDom(assertionElement);
@@ -317,7 +317,7 @@ public final class SAML2ComponentBuilder {
                 }
             }
         }
-        
+
         return advice;
     }
 
@@ -332,16 +332,16 @@ public final class SAML2ComponentBuilder {
         AudienceRestrictionBean audienceRestrictionBean
     ) {
         if (audienceRestrictionBuilder == null) {
-            audienceRestrictionBuilder = (SAMLObjectBuilder<AudienceRestriction>) 
+            audienceRestrictionBuilder = (SAMLObjectBuilder<AudienceRestriction>)
                 builderFactory.getBuilder(AudienceRestriction.DEFAULT_ELEMENT_NAME);
         }
         if (audienceBuilder == null) {
-            audienceBuilder = (SAMLObjectBuilder<Audience>) 
+            audienceBuilder = (SAMLObjectBuilder<Audience>)
                 builderFactory.getBuilder(Audience.DEFAULT_ELEMENT_NAME);
         }
-       
+
         AudienceRestriction audienceRestriction = audienceRestrictionBuilder.buildObject();
-        
+
         for (String audienceURI : audienceRestrictionBean.getAudienceURIs()) {
             Audience audience = audienceBuilder.buildObject();
             audience.setAudienceURI(audienceURI);
@@ -349,7 +349,7 @@ public final class SAML2ComponentBuilder {
         }
         return audienceRestriction;
     }
-    
+
     /**
      * Create an DelegationRestrictionType object
      *
@@ -365,17 +365,17 @@ public final class SAML2ComponentBuilder {
                 builderFactory.getBuilder(DelegationRestrictionType.TYPE_NAME);
         }
         DelegationRestrictionType delegationRestriction = delegationRestrictionBuilder.buildObject();
-        
+
         if (delegateBuilder == null) {
             delegateBuilder = (SAMLObjectBuilder<Delegate>)
                 builderFactory.getBuilder(Delegate.DEFAULT_ELEMENT_NAME);
         }
-        
+
         for (DelegateBean delegateBean : delegates) {
             Delegate delegate = delegateBuilder.buildObject();
             delegate.setConfirmationMethod(delegateBean.getConfirmationMethod());
             delegate.setDelegationInstant(delegateBean.getDelegationInstant());
-            
+
             if (delegateBean.getNameIDBean() == null) {
                 throw new IllegalStateException(
                    "The value of NameIDBean in DelegateBean may not be null"
@@ -385,10 +385,10 @@ public final class SAML2ComponentBuilder {
             delegate.setNameID(nameID);
             delegationRestriction.getDelegates().add(delegate);
         }
-        
+
         return delegationRestriction;
     }
-    
+
     /**
      * Create a OneTimeUse object
      *
@@ -397,13 +397,13 @@ public final class SAML2ComponentBuilder {
     @SuppressWarnings("unchecked")
     public static OneTimeUse createOneTimeUse() {
         if (oneTimeUseBuilder == null) {
-            oneTimeUseBuilder = (SAMLObjectBuilder<OneTimeUse>) 
+            oneTimeUseBuilder = (SAMLObjectBuilder<OneTimeUse>)
                 builderFactory.getBuilder(OneTimeUse.DEFAULT_ELEMENT_NAME);
         }
-       
+
         return oneTimeUseBuilder.buildObject();
     }
-    
+
     /**
      * Create a ProxyRestriction object
      *
@@ -412,18 +412,18 @@ public final class SAML2ComponentBuilder {
     @SuppressWarnings("unchecked")
     public static ProxyRestriction createProxyRestriction(ProxyRestrictionBean proxyRestrictionBean) {
         if (proxyRestrictionBuilder == null) {
-            proxyRestrictionBuilder = (SAMLObjectBuilder<ProxyRestriction>) 
+            proxyRestrictionBuilder = (SAMLObjectBuilder<ProxyRestriction>)
                 builderFactory.getBuilder(ProxyRestriction.DEFAULT_ELEMENT_NAME);
         }
-        
+
         ProxyRestriction proxyRestriction = proxyRestrictionBuilder.buildObject();
         if (proxyRestrictionBean.getCount() > 0) {
             proxyRestriction.setProxyCount(proxyRestrictionBean.getCount());
         }
-        
+
         if (!proxyRestrictionBean.getAudienceURIs().isEmpty()) {
             if (audienceBuilder == null) {
-                audienceBuilder = (SAMLObjectBuilder<Audience>) 
+                audienceBuilder = (SAMLObjectBuilder<Audience>)
                     builderFactory.getBuilder(Audience.DEFAULT_ELEMENT_NAME);
             }
             for (String audienceURI : proxyRestrictionBean.getAudienceURIs()) {
@@ -432,7 +432,7 @@ public final class SAML2ComponentBuilder {
                 proxyRestriction.getAudiences().add(audience);
             }
         }
-        
+
         return proxyRestriction;
     }
 
@@ -447,24 +447,24 @@ public final class SAML2ComponentBuilder {
         List<AuthenticationStatementBean> authBeans
     ) {
         List<AuthnStatement> authnStatements = new ArrayList<>();
-        
+
         if (authnStatementBuilder == null) {
-            authnStatementBuilder = (SAMLObjectBuilder<AuthnStatement>) 
+            authnStatementBuilder = (SAMLObjectBuilder<AuthnStatement>)
                 builderFactory.getBuilder(AuthnStatement.DEFAULT_ELEMENT_NAME);
         }
         if (authnContextBuilder == null) {
-            authnContextBuilder = (SAMLObjectBuilder<AuthnContext>) 
+            authnContextBuilder = (SAMLObjectBuilder<AuthnContext>)
                 builderFactory.getBuilder(AuthnContext.DEFAULT_ELEMENT_NAME);
         }
         if (authnContextClassRefBuilder == null) {
-            authnContextClassRefBuilder = (SAMLObjectBuilder<AuthnContextClassRef>) 
+            authnContextClassRefBuilder = (SAMLObjectBuilder<AuthnContextClassRef>)
                 builderFactory.getBuilder(AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
         }
         if (subjectLocalityBuilder == null) {
-            subjectLocalityBuilder = (SAMLObjectBuilder<SubjectLocality>) 
+            subjectLocalityBuilder = (SAMLObjectBuilder<SubjectLocality>)
             builderFactory.getBuilder(SubjectLocality.DEFAULT_ELEMENT_NAME);
         }
-        
+
         if (authBeans != null && authBeans.size() > 0) {
             for (AuthenticationStatementBean statementBean : authBeans) {
                 AuthnStatement authnStatement = authnStatementBuilder.buildObject();
@@ -473,16 +473,16 @@ public final class SAML2ComponentBuilder {
                     authInstant = new DateTime();
                 }
                 authnStatement.setAuthnInstant(authInstant);
-                
+
                 DateTime sessionNotOnOrAfter = statementBean.getSessionNotOnOrAfter();
                 if (sessionNotOnOrAfter != null) {
                     authnStatement.setSessionNotOnOrAfter(sessionNotOnOrAfter);
                 }
-                
+
                 if (statementBean.getSessionIndex() != null) {
                     authnStatement.setSessionIndex(statementBean.getSessionIndex());
                 }
-                
+
                 AuthnContextClassRef authnContextClassRef = authnContextClassRefBuilder.buildObject();
                 authnContextClassRef.setAuthnContextClassRef(
                     transformAuthenticationMethod(statementBean.getAuthenticationMethod())
@@ -499,7 +499,7 @@ public final class SAML2ComponentBuilder {
 
                     authnStatement.setSubjectLocality(subjectLocality);
                 }
-                
+
                 authnStatements.add(authnStatement);
             }
         }
@@ -508,7 +508,7 @@ public final class SAML2ComponentBuilder {
     }
 
     /**
-     * Transform the user-supplied authentication method value into one of the supported 
+     * Transform the user-supplied authentication method value into one of the supported
      * specification-compliant values.
      *
      * @param sourceMethod of type String
@@ -542,10 +542,10 @@ public final class SAML2ComponentBuilder {
             stringBuilder = (XSStringBuilder)builderFactory.getBuilder(XSString.TYPE_NAME);
         }
         Attribute attribute = createAttribute(friendlyName, name, nameFormat);
-        
+
         for (Object value : values) {
             if (value instanceof String) {
-                XSString attributeValue = 
+                XSString attributeValue =
                     stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
                 attributeValue.setValue((String)value);
                 attribute.getAttributeValues().add(attributeValue);
@@ -564,39 +564,39 @@ public final class SAML2ComponentBuilder {
      * @return a Subject
      */
     @SuppressWarnings("unchecked")
-    public static Subject createSaml2Subject(SubjectBean subjectBean) 
+    public static Subject createSaml2Subject(SubjectBean subjectBean)
         throws org.opensaml.security.SecurityException, WSSecurityException {
         if (subjectBuilder == null) {
-            subjectBuilder = (SAMLObjectBuilder<Subject>) 
+            subjectBuilder = (SAMLObjectBuilder<Subject>)
                 builderFactory.getBuilder(Subject.DEFAULT_ELEMENT_NAME);
         }
         Subject subject = subjectBuilder.buildObject();
-        
+
         NameID nameID = SAML2ComponentBuilder.createNameID(subjectBean);
         subject.setNameID(nameID);
-        
+
         SubjectConfirmationData subjectConfData = null;
         if (subjectBean.getKeyInfo() != null || subjectBean.getSubjectConfirmationData() != null) {
-            subjectConfData = 
+            subjectConfData =
                 SAML2ComponentBuilder.createSubjectConfirmationData(
-                    subjectBean.getSubjectConfirmationData(), 
-                    subjectBean.getKeyInfo() 
+                    subjectBean.getSubjectConfirmationData(),
+                    subjectBean.getKeyInfo()
                 );
         }
-        
+
         String confirmationMethodStr = subjectBean.getSubjectConfirmationMethod();
         if (confirmationMethodStr == null) {
             confirmationMethodStr = SAML2Constants.CONF_SENDER_VOUCHES;
         }
-        SubjectConfirmation subjectConfirmation = 
+        SubjectConfirmation subjectConfirmation =
             SAML2ComponentBuilder.createSubjectConfirmation(
                 confirmationMethodStr, subjectConfData
             );
-        
+
         subject.getSubjectConfirmations().add(subjectConfirmation);
         return subject;
     }
-    
+
     /**
      * Create a SubjectConfirmationData object
      *
@@ -613,20 +613,20 @@ public final class SAML2ComponentBuilder {
         KeyInfo keyInfo = null;
         if (keyInfoBean == null) {
             if (subjectConfirmationDataBuilder == null) {
-                subjectConfirmationDataBuilder = (SAMLObjectBuilder<SubjectConfirmationData>) 
+                subjectConfirmationDataBuilder = (SAMLObjectBuilder<SubjectConfirmationData>)
                     builderFactory.getBuilder(SubjectConfirmationData.DEFAULT_ELEMENT_NAME);
             }
             subjectConfirmationData = subjectConfirmationDataBuilder.buildObject();
         } else {
             if (keyInfoConfirmationDataBuilder == null) {
-                keyInfoConfirmationDataBuilder = (SAMLObjectBuilder<KeyInfoConfirmationDataType>) 
+                keyInfoConfirmationDataBuilder = (SAMLObjectBuilder<KeyInfoConfirmationDataType>)
                     builderFactory.getBuilder(KeyInfoConfirmationDataType.TYPE_NAME);
             }
             subjectConfirmationData = keyInfoConfirmationDataBuilder.buildObject();
             keyInfo = SAML1ComponentBuilder.createKeyInfo(keyInfoBean);
             ((KeyInfoConfirmationDataType)subjectConfirmationData).getKeyInfos().add(keyInfo);
         }
-        
+
         if (subjectConfirmationDataBean != null) {
             if (subjectConfirmationDataBean.getInResponseTo() != null) {
                 subjectConfirmationData.setInResponseTo(subjectConfirmationDataBean.getInResponseTo());
@@ -644,10 +644,10 @@ public final class SAML2ComponentBuilder {
                 subjectConfirmationData.setNotBefore(subjectConfirmationDataBean.getNotBefore());
             }
         }
-        
+
         return subjectConfirmationData;
     }
-    
+
     /**
      * Create a SubjectConfirmation object
      * One of the following subject confirmation methods MUST be used:
@@ -665,10 +665,10 @@ public final class SAML2ComponentBuilder {
         SubjectConfirmationData subjectConfirmationData
     ) {
         if (subjectConfirmationBuilder == null) {
-            subjectConfirmationBuilder = (SAMLObjectBuilder<SubjectConfirmation>) 
+            subjectConfirmationBuilder = (SAMLObjectBuilder<SubjectConfirmation>)
                 builderFactory.getBuilder(SubjectConfirmation.DEFAULT_ELEMENT_NAME);
         }
-        
+
         SubjectConfirmation subjectConfirmation = subjectConfirmationBuilder.buildObject();
         subjectConfirmation.setMethod(method);
         subjectConfirmation.setSubjectConfirmationData(subjectConfirmationData);
@@ -701,7 +701,7 @@ public final class SAML2ComponentBuilder {
     @SuppressWarnings("unchecked")
     public static NameID createNameID(NameIDBean nameIDBean) {
         if (nameIdBuilder == null) {
-            nameIdBuilder = (SAMLObjectBuilder<NameID>) 
+            nameIdBuilder = (SAMLObjectBuilder<NameID>)
                 builderFactory.getBuilder(NameID.DEFAULT_ELEMENT_NAME);
         }
         NameID nameID = nameIdBuilder.buildObject();
@@ -723,7 +723,7 @@ public final class SAML2ComponentBuilder {
     ) {
         List<AttributeStatement> attributeStatements = new ArrayList<>();
         if (attributeStatementBuilder == null) {
-            attributeStatementBuilder = (SAMLObjectBuilder<AttributeStatement>) 
+            attributeStatementBuilder = (SAMLObjectBuilder<AttributeStatement>)
             builderFactory.getBuilder(AttributeStatement.DEFAULT_ELEMENT_NAME);
         }
 
@@ -732,9 +732,9 @@ public final class SAML2ComponentBuilder {
                 AttributeStatement attributeStatement = attributeStatementBuilder.buildObject();
                 for (AttributeBean values : statementBean.getSamlAttributes()) {
                     List<Object> attributeValues = values.getAttributeValues();
-                    Attribute samlAttribute = 
+                    Attribute samlAttribute =
                         createAttribute(
-                            values.getSimpleName(), 
+                            values.getSimpleName(),
                             values.getQualifiedName(),
                             values.getNameFormat(),
                             attributeValues
@@ -763,7 +763,7 @@ public final class SAML2ComponentBuilder {
             attributeBuilder = (SAMLObjectBuilder<Attribute>)
                 builderFactory.getBuilder(Attribute.DEFAULT_ELEMENT_NAME);
         }
-        
+
         Attribute attribute = attributeBuilder.buildObject();
         attribute.setFriendlyName(friendlyName);
         if (nameFormat == null) {
@@ -787,14 +787,14 @@ public final class SAML2ComponentBuilder {
     ) {
         List<AuthzDecisionStatement> authDecisionStatements = new ArrayList<>();
         if (authorizationDecisionStatementBuilder == null) {
-            authorizationDecisionStatementBuilder = 
+            authorizationDecisionStatementBuilder =
                 (SAMLObjectBuilder<AuthzDecisionStatement>)
                     builderFactory.getBuilder(AuthzDecisionStatement.DEFAULT_ELEMENT_NAME);
         }
 
         if (decisionData != null && decisionData.size() > 0) {
             for (AuthDecisionStatementBean decisionStatementBean : decisionData) {
-                AuthzDecisionStatement authDecision = 
+                AuthzDecisionStatement authDecision =
                     authorizationDecisionStatementBuilder.buildObject();
                 authDecision.setResource(decisionStatementBean.getResource());
                 authDecision.setDecision(
@@ -806,10 +806,10 @@ public final class SAML2ComponentBuilder {
                     authDecision.getActions().add(actionElement);
                 }
 
-                if (decisionStatementBean.getEvidence() instanceof Evidence) {                                    
+                if (decisionStatementBean.getEvidence() instanceof Evidence) {
                     authDecision.setEvidence((Evidence)decisionStatementBean.getEvidence());
                 }
-                
+
                 authDecisionStatements.add(authDecision);
             }
         }
@@ -844,7 +844,7 @@ public final class SAML2ComponentBuilder {
      * Create a DecisionTypeEnumeration object
      *
      * @param decision of type Decision
-     * @return a DecisionTypeEnumeration object 
+     * @return a DecisionTypeEnumeration object
      */
     private static DecisionTypeEnumeration transformDecisionType(
         AuthDecisionStatementBean.Decision decision

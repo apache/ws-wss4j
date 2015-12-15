@@ -35,14 +35,14 @@ import java.util.TimeZone;
  */
 public class XmlSchemaDateFormat extends DateFormat {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 5152684993503882396L;
 
     /**
      * Logger.
      */
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(XmlSchemaDateFormat.class);
 
     /**
@@ -54,7 +54,7 @@ public class XmlSchemaDateFormat extends DateFormat {
     static {
         DATEFORMAT_XSD_ZULU.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
-    
+
     @Override
     public void setLenient(boolean lenient) {
         DATEFORMAT_XSD_ZULU.setLenient(lenient);
@@ -206,7 +206,7 @@ public class XmlSchemaDateFormat extends DateFormat {
     private void handleParseError(ParsePosition parsePos, String errorReason)
             throws ParseException {
         throw new ParseException(
-            "INVALID_XSD_DATETIME: " + errorReason, 
+            "INVALID_XSD_DATETIME: " + errorReason,
             parsePos.getErrorIndex()
         );
     }

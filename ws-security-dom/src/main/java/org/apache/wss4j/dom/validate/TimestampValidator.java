@@ -29,10 +29,10 @@ import org.apache.wss4j.dom.message.token.Timestamp;
  * the validate method.
  */
 public class TimestampValidator implements Validator {
-    
+
     /**
      * Validate the credential argument. It must contain a non-null Timestamp.
-     * 
+     *
      * @param credential the Credential to be validated
      * @param data the RequestData associated with the request
      * @throws WSSecurityException on a failed validation
@@ -42,15 +42,15 @@ public class TimestampValidator implements Validator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCredential");
         }
         if (data.getWssConfig() == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", 
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                                           new Object[] {"WSSConfig cannot be null"});
         }
         boolean timeStampStrict = data.isTimeStampStrict();
         int timeStampTTL = data.getTimeStampTTL();
         int futureTimeToLive = data.getTimeStampFutureTTL();
-        
+
         Timestamp timeStamp = credential.getTimestamp();
-        
+
         // See if the Timestamp has expired
         if (timeStampStrict && timeStamp.isExpired()) {
             throw new WSSecurityException(
@@ -58,7 +58,7 @@ public class TimestampValidator implements Validator {
                 "invalidTimestamp",
                 new Object[] {"The message timestamp has expired"});
         }
-        
+
         // Validate the Created date
         if (!timeStamp.verifyCreated(timeStampTTL, futureTimeToLive)) {
             throw new WSSecurityException(
@@ -66,7 +66,7 @@ public class TimestampValidator implements Validator {
                 "invalidTimestamp",
                 new Object[] {"The message timestamp is out of range"});
         }
-        
+
         if (data.isRequireTimestampExpires() && timeStamp.getExpires() == null) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.SECURITY_ERROR,
@@ -75,7 +75,7 @@ public class TimestampValidator implements Validator {
         }
         return credential;
     }
-    
 
-   
+
+
 }

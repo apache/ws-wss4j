@@ -45,42 +45,42 @@ import java.util.Properties;
  * This is a test for WSS-40. Essentially it just tests that a message is signed using a
  * keyEntry from one keystore, and verified at the other end with a keystore with just the
  * CA cert in it.
- * 
+ *
  * http://issues.apache.org/jira/browse/WSS-40
- * 
+ *
  * Generate the CA keys/certs + export the CA cert to a keystore
- * 
- * openssl req -x509 -newkey rsa:1024 -keyout wss40CAKey.pem -out wss40CA.pem 
+ *
+ * openssl req -x509 -newkey rsa:1024 -keyout wss40CAKey.pem -out wss40CA.pem
  * -config ca.config -days 3650
  * openssl x509 -outform DER -in wss40CA.pem -out wss40CA.crt
  * keytool -import -file wss40CA.crt -alias wss40CA -keystore wss40CA.jks
- * 
+ *
  * Generate the client keypair, make a csr, sign it with the CA key
- * 
- * keytool -genkey -validity 3650 -alias wss40 -keyalg RSA -keystore wss40.jks 
+ *
+ * keytool -genkey -validity 3650 -alias wss40 -keyalg RSA -keystore wss40.jks
  * -dname "CN=Colm,OU=WSS4J,O=Apache,L=Dublin,ST=Leinster,C=IE"
  * keytool -certreq -alias wss40 -keystore wss40.jks -file wss40.cer
  * openssl ca -config ca.config -policy policy_anything -days 3650 -out wss40.pem -infiles wss40.cer
  * openssl x509 -outform DER -in wss40.pem -out wss40.crt
- * 
+ *
  * Import the CA cert into wss40.jks and import the new signed certificate
- * 
+ *
  * keytool -import -file wss40CA.crt -alias wss40CA -keystore wss40.jks
  * keytool -import -file wss40.crt -alias wss40 -keystore wss40.jks
- * 
+ *
  */
 public class SignatureCertTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureCertTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = null;
     private Crypto cryptoCA = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public SignatureCertTest() throws Exception {
         WSSConfig.init();
         crypto = CryptoFactory.getInstance("wss40.properties");
@@ -101,9 +101,9 @@ public class SignatureCertTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
@@ -111,13 +111,13 @@ public class SignatureCertTest extends org.junit.Assert {
         // Verify the signature
         //
         WSHandlerResult results = verify(signedDoc, cryptoCA);
-        WSSecurityEngineResult result = 
+        WSSecurityEngineResult result =
             results.getActionResults().get(WSConstants.SIGN).get(0);
-        X509Certificate cert = 
+        X509Certificate cert =
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertTrue (cert != null);
     }
-    
+
     //disabling this test as the certs are expired
     @org.junit.Test
     @org.junit.Ignore
@@ -133,15 +133,15 @@ public class SignatureCertTest extends org.junit.Assert {
         sign.setUserInfo("Client_CertChain", "password");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         sign.setUseSingleCertificate(false);
-       
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, clientCrypto, secHeader);
-                
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug("BST CA Cert");
             LOG.debug(outputString);
@@ -151,16 +151,16 @@ public class SignatureCertTest extends org.junit.Assert {
         //
         Crypto serverCrypto = CryptoFactory.getInstance("wss40_server.properties");
         WSHandlerResult results = verify(signedDoc, serverCrypto);
-        WSSecurityEngineResult result = 
+        WSSecurityEngineResult result =
             results.getActionResults().get(WSConstants.SIGN).get(0);
-        X509Certificate cert = 
+        X509Certificate cert =
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertTrue (cert != null);
-        X509Certificate[] certs = 
+        X509Certificate[] certs =
             (X509Certificate[])result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
         assertTrue (certs != null && certs.length == 2);
     }
-    
+
     /**
      * Test signing a SOAP message using a BST, sending the CA cert as well in the
      * message.
@@ -177,9 +177,9 @@ public class SignatureCertTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug("BST CA Cert");
             LOG.debug(outputString);
@@ -188,17 +188,17 @@ public class SignatureCertTest extends org.junit.Assert {
         // Verify the signature
         //
         WSHandlerResult results = verify(signedDoc, cryptoCA);
-        WSSecurityEngineResult result = 
+        WSSecurityEngineResult result =
             results.getActionResults().get(WSConstants.SIGN).get(0);
-        X509Certificate cert = 
+        X509Certificate cert =
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertTrue (cert != null);
-        X509Certificate[] certs = 
+        X509Certificate[] certs =
             (X509Certificate[])result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
         assertTrue (certs != null && certs.length == 2);
     }
-    
-    
+
+
     /**
      * Test signing a SOAP message using Issuer Serial. Note that this should fail, as the
      * trust-store does not contain the cert corresponding to wss40, only the CA cert
@@ -215,13 +215,13 @@ public class SignatureCertTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         try {
             verify(signedDoc, cryptoCA);
             fail("Failure expected on issuer serial");
@@ -229,8 +229,8 @@ public class SignatureCertTest extends org.junit.Assert {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
         }
     }
-    
-    
+
+
     /**
      * Test signing a SOAP message using a BST. The signature verification passes, but the trust
      * verification will fail as the CA cert is out of date.
@@ -245,11 +245,11 @@ public class SignatureCertTest extends org.junit.Assert {
 
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = 
+        Document signedDoc =
             sign.build(doc, CryptoFactory.getInstance("wss40badca.properties"), secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
@@ -263,7 +263,7 @@ public class SignatureCertTest extends org.junit.Assert {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
     }
-    
+
     /**
      * A test for "SignatureAction does not set DigestAlgorithm on WSSecSignature instance"
      */
@@ -279,55 +279,55 @@ public class SignatureCertTest extends org.junit.Assert {
         config.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
         config.put(WSHandlerConstants.USE_SINGLE_CERTIFICATE, "false");
         reqData.setMsgContext(config);
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         HandlerAction action = new HandlerAction(WSConstants.SIGN);
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             Collections.singletonList(action),
             true
         );
-        
+
         //
         // Verify the signature
         //
         WSHandlerResult results = verify(doc, cryptoCA);
-        WSSecurityEngineResult result = 
+        WSSecurityEngineResult result =
             results.getActionResults().get(WSConstants.SIGN).get(0);
-        X509Certificate cert = 
+        X509Certificate cert =
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertTrue (cert != null);
-        X509Certificate[] certs = 
+        X509Certificate[] certs =
             (X509Certificate[])result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
         assertTrue (certs != null && certs.length == 2);
     }
-    
+
     @org.junit.Test
     public void testExpiredCert() throws Exception {
         Properties clientProperties = new Properties();
-        clientProperties.put("org.apache.wss4j.crypto.provider", 
+        clientProperties.put("org.apache.wss4j.crypto.provider",
                 "org.apache.wss4j.common.crypto.Merlin");
         clientProperties.put("org.apache.wss4j.crypto.merlin.keystore.type", "jks");
         clientProperties.put("org.apache.wss4j.crypto.merlin.keystore.password", "security");
         clientProperties.put("org.apache.wss4j.crypto.merlin.keystore.alias", "wss40exp");
         clientProperties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/wss40exp.jks");
-        
+
         Crypto clientCrypto = new Merlin(clientProperties, this.getClass().getClassLoader(), null);
-        
+
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("wss40exp", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-       
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, clientCrypto, secHeader);
-                
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
@@ -342,31 +342,31 @@ public class SignatureCertTest extends org.junit.Assert {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
     }
-    
+
     @org.junit.Test
     public void testExpiredCertInKeystore() throws Exception {
         Properties clientProperties = new Properties();
-        clientProperties.put("org.apache.wss4j.crypto.provider", 
+        clientProperties.put("org.apache.wss4j.crypto.provider",
                 "org.apache.wss4j.common.crypto.Merlin");
         clientProperties.put("org.apache.wss4j.crypto.merlin.keystore.type", "jks");
         clientProperties.put("org.apache.wss4j.crypto.merlin.keystore.password", "security");
         clientProperties.put("org.apache.wss4j.crypto.merlin.keystore.alias", "wss40exp");
         clientProperties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/wss40exp.jks");
-        
+
         Crypto clientCrypto = new Merlin(clientProperties, this.getClass().getClassLoader(), null);
-        
+
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("wss40exp", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-       
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, clientCrypto, secHeader);
-                
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
@@ -381,12 +381,12 @@ public class SignatureCertTest extends org.junit.Assert {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
         }
     }
-    
+
     /**
      * Verifies the soap envelope
      * <p/>
-     * 
-     * @param doc 
+     *
+     * @param doc
      * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc, Crypto crypto) throws Exception {
@@ -395,12 +395,12 @@ public class SignatureCertTest extends org.junit.Assert {
         );
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         return results;
     }
 
-    
+
 }

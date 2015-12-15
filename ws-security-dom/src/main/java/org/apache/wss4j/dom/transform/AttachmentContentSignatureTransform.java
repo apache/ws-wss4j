@@ -174,8 +174,8 @@ public class AttachmentContentSignatureTransform extends TransformService {
             if (mimeType != null) {
                 lowerCaseMimeType = mimeType.toLowerCase();
             }
-            
-            if (lowerCaseMimeType != null 
+
+            if (lowerCaseMimeType != null
                 && (lowerCaseMimeType.startsWith("text/xml")
                     || lowerCaseMimeType.startsWith("application/xml")
                     || lowerCaseMimeType.matches("(application|image)/.*\\+xml.*"))) {

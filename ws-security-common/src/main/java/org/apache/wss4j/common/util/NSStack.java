@@ -221,7 +221,7 @@ public class NSStack {
                     continue;
                 }
 
-                // now make sure that this is the first occurance of this 
+                // now make sure that this is the first occurance of this
                 // particular prefix
                 int ppHash = possiblePrefix.hashCode();
                 for (int cursor2 = top; true; cursor2--) {

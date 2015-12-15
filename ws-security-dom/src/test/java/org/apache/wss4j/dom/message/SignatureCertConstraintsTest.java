@@ -43,16 +43,16 @@ import org.w3c.dom.Element;
  * verify the signature is validated against a set of cert constraints.
  */
 public class SignatureCertConstraintsTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureCertConstraintsTest.class);
     private Crypto crypto = null;
     private Crypto cryptoCA = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public SignatureCertConstraintsTest() throws Exception {
         WSSConfig.init();
         crypto = CryptoFactory.getInstance("wss40.properties");
@@ -75,24 +75,24 @@ public class SignatureCertConstraintsTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with BST key identifier:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         Element securityHeader = WSSecurityUtil.getSecurityHeader(signedDoc, null);
         String certConstraint = ".*CN=Colm.*O=Apache.*";
         verify(securityHeader, cryptoCA, certConstraint);
-        
+
         certConstraint = ".*CN=Colm2.*O=Apache.*";
         try {
             verify(securityHeader, cryptoCA, certConstraint);
             fail("Failure expected on a bad cert constraint");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
     }
-    
+
     /**
      * The test uses the BinarySecurityToken key identifier type.
      */
@@ -110,36 +110,36 @@ public class SignatureCertConstraintsTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with BST key identifier:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         Element securityHeader = WSSecurityUtil.getSecurityHeader(signedDoc, null);
         String certConstraint = ".*CN=Colm.*O=Apache.*";
         verify(securityHeader, cryptoCA, certConstraint);
-        
+
         certConstraint = ".*CN=Colm2.*O=Apache.*";
         try {
             verify(securityHeader, cryptoCA, certConstraint);
             fail("Failure expected on a bad cert constraint");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
     }
-    
+
     private WSHandlerResult verify(
         Element securityHeader, Crypto sigCrypto, String certConstraint
     ) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         RequestData data = new RequestData();
         data.setSigVerCrypto(sigCrypto);
-        
+
         if (certConstraint != null) {
             Pattern subjectDNPattern = Pattern.compile(certConstraint.trim());
             data.setSubjectCertConstraints(Collections.singletonList(subjectDNPattern));
         }
-        
+
         return secEngine.processSecurityHeader(securityHeader, data);
     }
 

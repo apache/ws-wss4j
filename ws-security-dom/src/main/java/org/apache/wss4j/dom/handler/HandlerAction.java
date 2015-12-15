@@ -26,23 +26,23 @@ import org.apache.wss4j.common.SecurityActionToken;
  * This class associates an "Action" Integer with a (optional) SecurityActionToken
  */
 public class HandlerAction {
-    
+
     private Integer action;
     private SecurityActionToken actionToken;
-    
+
     public HandlerAction() {
-        
+
     }
-    
+
     public HandlerAction(Integer action) {
         this(action, null);
     }
-    
+
     public HandlerAction(Integer action, SecurityActionToken actionToken) {
         this.action = action;
         this.actionToken = actionToken;
     }
-    
+
     public Integer getAction() {
         return action;
     }

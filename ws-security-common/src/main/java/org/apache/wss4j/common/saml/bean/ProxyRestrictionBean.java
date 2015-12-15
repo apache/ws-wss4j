@@ -50,7 +50,7 @@ public class ProxyRestrictionBean {
             this.audienceURIs.addAll(audienceURIs);
         }
     }
-    
+
     /**
      * Get the audienceURI instances
      *
@@ -88,11 +88,11 @@ public class ProxyRestrictionBean {
         if (count != that.count) {
             return false;
         }
-        
+
         if (!audienceURIs.equals(that.audienceURIs)) {
-            return false; 
+            return false;
         }
-        
+
         return true;
     }
 

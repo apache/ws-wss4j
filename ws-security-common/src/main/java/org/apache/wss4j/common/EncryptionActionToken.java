@@ -22,14 +22,14 @@ package org.apache.wss4j.common;
 /**
  * This class encapsulates configuration for Encryption Actions.
  */
-public class EncryptionActionToken extends SignatureEncryptionActionToken {  
+public class EncryptionActionToken extends SignatureEncryptionActionToken {
 
     private boolean encSymmetricEncryptionKey = true;
     private String mgfAlgorithm;
     private String symmetricAlgorithm;
     private String keyTransportAlgorithm;
     private boolean getSymmetricKeyFromCallbackHandler;
-    
+
     public boolean isEncSymmetricEncryptionKey() {
         return encSymmetricEncryptionKey;
     }
@@ -60,6 +60,6 @@ public class EncryptionActionToken extends SignatureEncryptionActionToken {
     public void setGetSymmetricKeyFromCallbackHandler(boolean getSymmetricKeyFromCallbackHandler) {
         this.getSymmetricKeyFromCallbackHandler = getSymmetricKeyFromCallbackHandler;
     }
- 
+
 }
 

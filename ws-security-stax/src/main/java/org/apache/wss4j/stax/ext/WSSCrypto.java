@@ -35,7 +35,7 @@ import org.apache.xml.security.stax.config.ConfigurationProperties;
  */
 class WSSCrypto {
 
-    protected static final transient org.slf4j.Logger log = 
+    protected static final transient org.slf4j.Logger log =
         org.slf4j.LoggerFactory.getLogger(WSSCrypto.class);
 
     private Class<? extends Merlin> cryptoClass = Merlin.class;
@@ -45,19 +45,19 @@ class WSSCrypto {
     private KeyStore keyStore;
     private CertStore crlCertStore;
     private PasswordEncryptor passwordEncryptor;
-    
+
     public Crypto getCrypto() throws WSSConfigurationException {
-        
+
         if (keyStore == cachedKeyStore && cachedCrypto != null) {
             return cachedCrypto;
         }
-        
+
         Merlin crypto = null;
         if (cryptoProperties != null) {
             try {
-                Constructor<?> ctor = 
+                Constructor<?> ctor =
                     cryptoClass.getConstructor(Properties.class, ClassLoader.class, PasswordEncryptor.class);
-                crypto = (Merlin)ctor.newInstance(cryptoProperties, 
+                crypto = (Merlin)ctor.newInstance(cryptoProperties,
                                                   Loader.getClassLoader(CryptoFactory.class),
                                                   passwordEncryptor);
                 keyStore = crypto.getKeyStore();
@@ -76,12 +76,12 @@ class WSSCrypto {
                 throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, e, "signatureCryptoFailure");
             }
         }
-        
+
         cachedCrypto = crypto;
         cachedKeyStore = crypto.getKeyStore();
         return crypto;
     }
-    
+
     public void setCrypto(Crypto crypto) {
         cachedCrypto = crypto;
         if (crypto instanceof Merlin) {
@@ -89,27 +89,27 @@ class WSSCrypto {
             cachedKeyStore = keyStore;
         }
     }
-    
+
     public Class<? extends Merlin> getCryptoClass() {
         return cryptoClass;
     }
-    
+
     public void setCryptoClass(Class<? extends Merlin> cryptoClass) {
         this.cryptoClass = cryptoClass;
     }
-    
+
     public Properties getCryptoProperties() {
         return cryptoProperties;
     }
-    
+
     public void setCryptoProperties(Properties cryptoProperties) {
         this.cryptoProperties = cryptoProperties;
     }
-    
+
     public KeyStore getKeyStore() {
         return keyStore;
     }
-    
+
     public void setKeyStore(KeyStore keyStore) {
         this.keyStore = keyStore;
     }
@@ -121,7 +121,7 @@ class WSSCrypto {
     public void setCrlCertStore(CertStore crlCertStore) {
         this.crlCertStore = crlCertStore;
     }
-    
+
     public PasswordEncryptor getPasswordEncryptor() {
         return passwordEncryptor;
     }

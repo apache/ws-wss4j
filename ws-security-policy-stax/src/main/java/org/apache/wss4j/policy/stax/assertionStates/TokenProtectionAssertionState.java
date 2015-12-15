@@ -53,16 +53,16 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
     private final List<TokenSecurityEvent<? extends SecurityToken>> tokenSecurityEvents = new ArrayList<>();
     private PolicyAsserter policyAsserter;
 
-    public TokenProtectionAssertionState(Assertion assertion, 
+    public TokenProtectionAssertionState(Assertion assertion,
                                          PolicyAsserter policyAsserter,
                                          boolean initialAssertionState) {
         super(assertion, initialAssertionState);
-        
+
         this.policyAsserter = policyAsserter;
         if (this.policyAsserter == null) {
             this.policyAsserter = new DummyPolicyAsserter();
         }
-        
+
         if (initialAssertionState) {
             String namespace = getAssertion().getName().getNamespaceURI();
             policyAsserter.assertPolicy(new QName(namespace, SPConstants.PROTECT_TOKENS));
@@ -100,7 +100,7 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
             }
         } else if (securityEvent instanceof TokenSecurityEvent) {
             @SuppressWarnings("unchecked")
-            TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent 
+            TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent
                 = (TokenSecurityEvent<? extends SecurityToken>) securityEvent;
             tokenSecurityEvents.add(tokenSecurityEvent);
         } else { //Operation
@@ -147,7 +147,7 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                 }
             }
         }
-        
+
         policyAsserter.assertPolicy(new QName(namespace, SPConstants.PROTECT_TOKENS));
         return true;
     }

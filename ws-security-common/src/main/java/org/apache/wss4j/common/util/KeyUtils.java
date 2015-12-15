@@ -37,26 +37,26 @@ public final class KeyUtils {
     private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(KeyUtils.class);
     private static final int MAX_SYMMETRIC_KEY_SIZE = 1024;
-    
+
     /**
      * A cached MessageDigest object
      */
     private static MessageDigest digest;
-    
+
     private KeyUtils() {
         // complete
     }
 
     /**
      * Returns the length of the key in # of bytes
-     * 
+     *
      * @param algorithm
      * @return the key length
      */
     public static int getKeyLength(String algorithm) throws WSSecurityException {
         return JCEMapper.getKeyLengthFromURI(algorithm) / 8;
     }
-    
+
     /**
      * Convert the raw key bytes into a SecretKey object of type algorithm.
      */
@@ -74,13 +74,13 @@ public final class KeyUtils {
         String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(algorithm);
         SecretKeySpec keySpec;
         if (size > 0 && !algorithm.endsWith("gcm") && !algorithm.contains("hmac-")) {
-            keySpec = 
+            keySpec =
                 new SecretKeySpec(
                     rawKey, 0, rawKey.length > size ? size : rawKey.length, keyAlgorithm
                 );
         } else if (rawKey.length > MAX_SYMMETRIC_KEY_SIZE) {
             // Prevent a possible attack where a huge secret key is specified
-            keySpec = 
+            keySpec =
                 new SecretKeySpec(
                     rawKey, 0, MAX_SYMMETRIC_KEY_SIZE, keyAlgorithm
                 );
@@ -89,7 +89,7 @@ public final class KeyUtils {
         }
         return keySpec;
     }
-    
+
     public static KeyGenerator getKeyGenerator(String algorithm) throws WSSecurityException {
         try {
             //
@@ -117,25 +117,25 @@ public final class KeyUtils {
             );
         }
     }
-    
-    
+
+
     /**
      * Translate the "cipherAlgo" URI to a JCE ID, and return a javax.crypto.Cipher instance
-     * of this type. 
+     * of this type.
      */
     public static Cipher getCipherInstance(String cipherAlgo)
         throws WSSecurityException {
         try {
             String keyAlgorithm = JCEMapper.translateURItoJCEID(cipherAlgo);
             String provider = JCEMapper.getProviderId();
-            
+
             if (provider == null) {
                 return Cipher.getInstance(keyAlgorithm);
             }
             return Cipher.getInstance(keyAlgorithm, provider);
         } catch (NoSuchPaddingException ex) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex, "unsupportedKeyTransp", 
+                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex, "unsupportedKeyTransp",
                 new Object[] {"No such padding: " + cipherAlgo});
         } catch (NoSuchAlgorithmException ex) {
             // Check to see if an RSA OAEP MGF-1 with SHA-1 algorithm was requested
@@ -159,10 +159,10 @@ public final class KeyUtils {
                 new Object[] {"No such provider " + JCEMapper.getProviderId() + " for: " + cipherAlgo});
         }
     }
-    
+
     /**
      * Generate a (SHA1) digest of the input bytes. The MessageDigest instance that backs this
-     * method is cached for efficiency.  
+     * method is cached for efficiency.
      * @param inputBytes the bytes to digest
      * @return the digest of the input bytes
      * @throws WSSecurityException

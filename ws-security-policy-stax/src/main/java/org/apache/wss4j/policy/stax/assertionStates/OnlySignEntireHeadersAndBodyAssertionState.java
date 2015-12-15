@@ -43,18 +43,18 @@ public class OnlySignEntireHeadersAndBodyAssertionState extends AssertionState i
     private String roleOrActor;
     private PolicyAsserter policyAsserter;
 
-    public OnlySignEntireHeadersAndBodyAssertionState(AbstractSecurityAssertion assertion, 
+    public OnlySignEntireHeadersAndBodyAssertionState(AbstractSecurityAssertion assertion,
                                                       PolicyAsserter policyAsserter,
-                                                      boolean asserted, 
+                                                      boolean asserted,
                                                       String roleOrActor) {
         super(assertion, asserted);
         this.roleOrActor = roleOrActor;
-        
+
         this.policyAsserter = policyAsserter;
         if (this.policyAsserter == null) {
             this.policyAsserter = new DummyPolicyAsserter();
         }
-        
+
         if (asserted) {
             String namespace = getAssertion().getName().getNamespaceURI();
             policyAsserter.assertPolicy(new QName(namespace, SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY));
@@ -72,7 +72,7 @@ public class OnlySignEntireHeadersAndBodyAssertionState extends AssertionState i
     @Override
     public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
         String namespace = getAssertion().getName().getNamespaceURI();
-        
+
         AbstractSecuredElementSecurityEvent abstractSecuredElementSecurityEvent = (AbstractSecuredElementSecurityEvent) securityEvent;
         if (abstractSecuredElementSecurityEvent.isSigned() && !abstractSecuredElementSecurityEvent.isAttachment()) {
             List<QName> elementPath = abstractSecuredElementSecurityEvent.getElementPath();
@@ -97,7 +97,7 @@ public class OnlySignEntireHeadersAndBodyAssertionState extends AssertionState i
                                           getErrorMessage());
             return false;
         }
-        
+
         policyAsserter.assertPolicy(new QName(namespace, SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY));
         return true;
     }

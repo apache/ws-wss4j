@@ -47,7 +47,7 @@ public class SignedElementsAssertionState extends AssertionState implements Asse
     private final List<List<QName>> pathElements = new ArrayList<>();
     private PolicyAsserter policyAsserter;
 
-    public SignedElementsAssertionState(AbstractSecurityAssertion assertion, 
+    public SignedElementsAssertionState(AbstractSecurityAssertion assertion,
                                         PolicyAsserter policyAsserter,
                                         boolean asserted) {
         super(assertion, asserted);
@@ -60,12 +60,12 @@ public class SignedElementsAssertionState extends AssertionState implements Asse
                 pathElements.add(elements);
             }
         }
-        
+
         this.policyAsserter = policyAsserter;
         if (this.policyAsserter == null) {
             this.policyAsserter = new DummyPolicyAsserter();
         }
-        
+
         if (asserted) {
             policyAsserter.assertPolicy(getAssertion());
         }

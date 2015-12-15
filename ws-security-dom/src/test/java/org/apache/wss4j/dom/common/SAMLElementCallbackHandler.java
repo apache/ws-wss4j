@@ -37,13 +37,13 @@ import org.w3c.dom.Element;
  * the SAMLCallback object.
  */
 public class SAMLElementCallbackHandler extends AbstractSAMLCallbackHandler {
-    
+
     public SAMLElementCallbackHandler() {
         subjectName = "uid=joe,ou=people,ou=saml-demo,o=example.com";
         subjectQualifier = "www.example.com";
         confirmationMethod = SAML1Constants.CONF_SENDER_VOUCHES;
     }
-    
+
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
@@ -56,27 +56,27 @@ public class SAMLElementCallbackHandler extends AbstractSAMLCallbackHandler {
                     throw new IOException(e.getMessage());
                 }
                 callback.setAssertionElement(assertionElement);
-                
+
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
             }
         }
     }
-    
+
     /**
      * Mock up a SAML Assertion by using another SAMLCallbackHandler
-     * @throws Exception 
+     * @throws Exception
      */
     private Element getSAMLAssertion() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setIssuer(issuer);
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
-        
+
         SamlAssertionWrapper samlAssertionWrapper = new SamlAssertionWrapper(samlCallback);
-        
+
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         return samlAssertionWrapper.toDOM(factory.newDocumentBuilder().newDocument());
     }
-    
+
 }

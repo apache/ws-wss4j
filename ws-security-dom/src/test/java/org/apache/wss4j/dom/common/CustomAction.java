@@ -29,10 +29,10 @@ import org.apache.wss4j.dom.handler.RequestData;
  * a custom action that leaves a breadcumb
  */
 public class CustomAction implements Action {
-    
-    public void 
+
+    public void
     execute(
-        WSHandler handler, 
+        WSHandler handler,
         SecurityActionToken action,
         org.w3c.dom.Document doc,
         RequestData reqData

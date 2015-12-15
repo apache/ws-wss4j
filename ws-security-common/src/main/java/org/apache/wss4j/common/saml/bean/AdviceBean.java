@@ -29,23 +29,23 @@ import org.w3c.dom.Element;
  * Represents a SAML Advice Element.
  */
 public class AdviceBean {
-    
+
     private List<String> idReferences = new ArrayList<>();
     private List<String> uriReferences = new ArrayList<>();
     private List<Element> assertions = new ArrayList<>();
-    
+
     public List<String> getIdReferences() {
         return idReferences;
     }
-    
+
     public List<String> getUriReferences() {
         return uriReferences;
     }
-    
+
     public List<Element> getAssertions() {
         return assertions;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -62,19 +62,19 @@ public class AdviceBean {
         } else if (idReferences != null && !idReferences.equals(that.idReferences)) {
             return false;
         }
-        
+
         if (uriReferences == null && that.uriReferences != null) {
             return false;
         } else if (uriReferences != null && !uriReferences.equals(that.uriReferences)) {
             return false;
         }
-        
+
         if (assertions == null && that.assertions != null) {
             return false;
         } else if (assertions != null && !assertions.equals(that.assertions)) {
             return false;
         }
-        
+
         return true;
     }
 

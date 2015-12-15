@@ -47,12 +47,12 @@ import org.w3c.dom.Element;
  * Utility methods for SAML stuff
  */
 public final class SAMLUtil {
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SAMLUtil.class);
-    
+
     private static final String SIG_NS = "http://www.w3.org/2000/09/xmldsig#";
-    
+
     private SAMLUtil() {
         // Complete
     }
@@ -60,7 +60,7 @@ public final class SAMLUtil {
     /**
      * Parse a SAML Assertion to obtain a SAMLKeyInfo object from
      * the Subject of the assertion
-     * 
+     *
      * @param samlAssertion The SAML Assertion
      * @param keyInfoProcessor A pluggable way to parse the KeyInfo
      * @return a SAMLKeyInfo object
@@ -81,11 +81,11 @@ public final class SAMLUtil {
                 samlAssertion.getSaml2(), keyInfoProcessor, sigCrypto, callbackHandler
             );
         }
-        
+
         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                                       new Object[] {"Cannot get credentials from an unknown SAML Assertion"});
     }
-    
+
     /**
      * Try to get the secret key from a CallbackHandler implementation
      * @param cb a CallbackHandler implementation
@@ -96,7 +96,7 @@ public final class SAMLUtil {
         CallbackHandler cb
     ) {
         if (cb != null) {
-            WSPasswordCallback pwcb = 
+            WSPasswordCallback pwcb =
                 new WSPasswordCallback(id, WSPasswordCallback.SECRET_KEY);
             try {
                 cb.handle(new Callback[]{pwcb});
@@ -108,9 +108,9 @@ public final class SAMLUtil {
         }
         return null;
     }
-    
+
     /**
-     * Get the SAMLKeyInfo object corresponding to the credential stored in the Subject of a 
+     * Get the SAMLKeyInfo object corresponding to the credential stored in the Subject of a
      * SAML 1.1 assertion
      * @param assertion The SAML 1.1 assertion
      * @param keyInfoProcessor A pluggable way to parse the KeyInfo
@@ -130,15 +130,15 @@ public final class SAMLUtil {
         if (key != null && key.length > 0) {
             return new SAMLKeyInfo(key);
         }
-        
+
         for (org.opensaml.saml.saml1.core.Statement stmt : assertion.getStatements()) {
             org.opensaml.saml.saml1.core.Subject samlSubject = null;
             if (stmt instanceof org.opensaml.saml.saml1.core.AttributeStatement) {
-                org.opensaml.saml.saml1.core.AttributeStatement attrStmt = 
+                org.opensaml.saml.saml1.core.AttributeStatement attrStmt =
                     (org.opensaml.saml.saml1.core.AttributeStatement) stmt;
                 samlSubject = attrStmt.getSubject();
             } else if (stmt instanceof org.opensaml.saml.saml1.core.AuthenticationStatement) {
-                org.opensaml.saml.saml1.core.AuthenticationStatement authStmt = 
+                org.opensaml.saml.saml1.core.AuthenticationStatement authStmt =
                     (org.opensaml.saml.saml1.core.AuthenticationStatement) stmt;
                 samlSubject = authStmt.getSubject();
             } else {
@@ -146,10 +146,10 @@ public final class SAMLUtil {
                     (org.opensaml.saml.saml1.core.AuthorizationDecisionStatement)stmt;
                 samlSubject = authzStmt.getSubject();
             }
-            
+
             if (samlSubject != null && samlSubject.getSubjectConfirmation() != null) {
                 Element sub = samlSubject.getSubjectConfirmation().getDOM();
-                Element keyInfoElement = 
+                Element keyInfoElement =
                     XMLUtils.getDirectChildElement(sub, "KeyInfo", SIG_NS);
                 if (keyInfoElement != null) {
                     return getCredentialFromKeyInfo(
@@ -161,9 +161,9 @@ public final class SAMLUtil {
 
         return null;
     }
-    
+
     /**
-     * Get the SAMLKeyInfo object corresponding to the credential stored in the Subject of a 
+     * Get the SAMLKeyInfo object corresponding to the credential stored in the Subject of a
      * SAML 2 assertion
      * @param assertion The SAML 2 assertion
      * @param keyInfoProcessor A pluggable way to parse the KeyInfo
@@ -183,17 +183,17 @@ public final class SAMLUtil {
         if (key != null && key.length > 0) {
             return new SAMLKeyInfo(key);
         }
-        
+
         org.opensaml.saml.saml2.core.Subject samlSubject = assertion.getSubject();
         if (samlSubject != null) {
-            List<org.opensaml.saml.saml2.core.SubjectConfirmation> subjectConfList = 
+            List<org.opensaml.saml.saml2.core.SubjectConfirmation> subjectConfList =
                 samlSubject.getSubjectConfirmations();
             for (org.opensaml.saml.saml2.core.SubjectConfirmation subjectConfirmation : subjectConfList) {
-                SubjectConfirmationData subjConfData = 
+                SubjectConfirmationData subjConfData =
                     subjectConfirmation.getSubjectConfirmationData();
                 if (subjConfData != null) {
                     Element sub = subjConfData.getDOM();
-                    Element keyInfoElement = 
+                    Element keyInfoElement =
                         XMLUtils.getDirectChildElement(sub, "KeyInfo", SIG_NS);
                     if (keyInfoElement != null) {
                         return getCredentialFromKeyInfo(
@@ -206,7 +206,7 @@ public final class SAMLUtil {
 
         return null;
     }
-    
+
     /**
      * This method returns a SAMLKeyInfo corresponding to the credential found in the
      * KeyInfo (DOM Element) argument.
@@ -230,7 +230,7 @@ public final class SAMLUtil {
                 return samlKeyInfo;
             }
         }
-        
+
         //
         // Next marshal the KeyInfo DOM element into a javax KeyInfo object and get the
         // (public key) credential
@@ -245,7 +245,7 @@ public final class SAMLUtil {
         XMLStructure keyInfoStructure = new DOMStructure(keyInfoElement);
 
         try {
-            javax.xml.crypto.dsig.keyinfo.KeyInfo keyInfo = 
+            javax.xml.crypto.dsig.keyinfo.KeyInfo keyInfo =
                 keyInfoFactory.unmarshalKeyInfo(keyInfoStructure);
             List<?> list = keyInfo.getContent();
 
@@ -270,7 +270,7 @@ public final class SAMLUtil {
                             }
                             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
                             cryptoType.setIssuerSerial(
-                                ((X509IssuerSerial)x509obj).getIssuerName(), 
+                                ((X509IssuerSerial)x509obj).getIssuerName(),
                                 ((X509IssuerSerial)x509obj).getSerialNumber()
                             );
                             certs = sigCrypto.getX509Certificates(cryptoType);
@@ -293,7 +293,7 @@ public final class SAMLUtil {
         }
         return null;
     }
-    
+
     public static void doSAMLCallback(
         CallbackHandler callbackHandler, SAMLCallback callback
     ) {

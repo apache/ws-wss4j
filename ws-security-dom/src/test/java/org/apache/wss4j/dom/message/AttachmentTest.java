@@ -107,7 +107,7 @@ public class AttachmentTest extends Assert {
         attachment.setId(attachmentId);
         attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         builder.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
@@ -126,7 +126,7 @@ public class AttachmentTest extends Assert {
         NodeList sigReferences = signedDoc.getElementsByTagNameNS(WSConstants.SIG_NS, "Reference");
         Assert.assertEquals(2, sigReferences.getLength());
 
-        attachmentCallbackHandler = 
+        attachmentCallbackHandler =
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         verify(signedDoc, attachmentCallbackHandler);
 
@@ -152,7 +152,7 @@ public class AttachmentTest extends Assert {
         attachment.setId(attachmentId);
         attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         builder.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
@@ -208,7 +208,7 @@ public class AttachmentTest extends Assert {
         attachment.setId(attachmentId);
         attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         builder.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
@@ -227,7 +227,7 @@ public class AttachmentTest extends Assert {
         NodeList sigReferences = signedDoc.getElementsByTagNameNS(WSConstants.SIG_NS, "Reference");
         Assert.assertEquals(2, sigReferences.getLength());
 
-        attachmentCallbackHandler = 
+        attachmentCallbackHandler =
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         verify(signedDoc, attachmentCallbackHandler);
 
@@ -253,7 +253,7 @@ public class AttachmentTest extends Assert {
         attachment.setId(attachmentId);
         attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         builder.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
@@ -316,10 +316,10 @@ public class AttachmentTest extends Assert {
         attachment[1].setId(attachment2Id);
         attachment[1].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Arrays.asList(attachment));
         builder.setAttachmentCallbackHandler(attachmentCallbackHandler);
-        
+
         LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -370,7 +370,7 @@ public class AttachmentTest extends Assert {
         attachment.setId(attachmentId);
         attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
@@ -429,7 +429,7 @@ public class AttachmentTest extends Assert {
         attachment.setId(attachmentId);
         attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
@@ -441,11 +441,11 @@ public class AttachmentTest extends Assert {
             LOG.debug(outputString);
         }
 
-        final PushbackInputStream pis = 
+        final PushbackInputStream pis =
             new PushbackInputStream(encryptedAttachments.get(0).getSourceStream(), 1);
         pis.unread('K');
         encryptedAttachments.get(0).setSourceStream(pis);
-        
+
         attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
         verify(encryptedDoc, attachmentCallbackHandler);
 
@@ -456,7 +456,7 @@ public class AttachmentTest extends Assert {
             byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
             Assert.assertFalse(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
             Assert.assertEquals("text/xml", responseAttachment.getMimeType());
-    
+
             Map<String, String> attHeaders = responseAttachment.getHeaders();
             Assert.assertEquals(6, attHeaders.size());
         } catch (IOException ex) { //NOPMD
@@ -484,7 +484,7 @@ public class AttachmentTest extends Assert {
         attachment.setId(attachmentId);
         attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
@@ -520,7 +520,7 @@ public class AttachmentTest extends Assert {
 
         Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
-        
+
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
         Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         Assert.assertEquals("text/xml", responseAttachment.getMimeType());
@@ -549,7 +549,7 @@ public class AttachmentTest extends Assert {
         attachment.setId(attachmentId);
         attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
@@ -613,7 +613,7 @@ public class AttachmentTest extends Assert {
         attachment.setId(attachmentId);
         attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
@@ -661,7 +661,7 @@ public class AttachmentTest extends Assert {
         attachment.setId(attachmentId);
         attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
@@ -674,18 +674,18 @@ public class AttachmentTest extends Assert {
         }
 
         try {
-            final PushbackInputStream pis = 
+            final PushbackInputStream pis =
                 new PushbackInputStream(encryptedAttachments.get(0).getSourceStream(), 1);
             pis.unread('K');
             encryptedAttachments.get(0).setSourceStream(pis);
-            
+
             attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
             verify(encryptedDoc, attachmentCallbackHandler);
         } catch (WSSecurityException e) {
             // Assert.assertEquals(e.getMessage(), "The signature or decryption was invalid");
             return;
         }
-        
+
         Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
@@ -721,7 +721,7 @@ public class AttachmentTest extends Assert {
         attachment[1].setId(attachment2Id);
         attachment[1].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Arrays.asList(attachment));
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
@@ -774,7 +774,7 @@ public class AttachmentTest extends Assert {
         attachment.setId(attachmentId);
         attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         signature.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
@@ -785,7 +785,7 @@ public class AttachmentTest extends Assert {
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         encrypt.getParts().addAll(signature.getParts());
 
-        attachmentCallbackHandler = 
+        attachmentCallbackHandler =
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
@@ -939,7 +939,7 @@ public class AttachmentTest extends Assert {
         attachment.setId(attachmentId);
         attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();

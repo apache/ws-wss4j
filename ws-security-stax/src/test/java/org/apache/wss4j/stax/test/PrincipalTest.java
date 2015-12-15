@@ -92,7 +92,7 @@ public class PrincipalTest extends AbstractTestBase {
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
             // Check principal
-            UsernameTokenSecurityEvent event = 
+            UsernameTokenSecurityEvent event =
                 (UsernameTokenSecurityEvent)securityEventListener.getSecurityEvent(WSSecurityEventConstants.UsernameToken);
             Assert.assertNotNull(event);
             UsernameSecurityToken usernameSecurityToken = event.getSecurityToken();
@@ -107,7 +107,7 @@ public class PrincipalTest extends AbstractTestBase {
             Assert.assertTrue(WSSConstants.NS_PASSWORD_DIGEST.equals(usernameTokenPrincipal.getPasswordType()));
         }
     }
-    
+
     @Test
     public void testSAMLToken() throws Exception {
 
@@ -150,7 +150,7 @@ public class PrincipalTest extends AbstractTestBase {
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
             // Check principal
-            SamlTokenSecurityEvent event = 
+            SamlTokenSecurityEvent event =
                 (SamlTokenSecurityEvent)securityEventListener.getSecurityEvent(WSSecurityEventConstants.SamlToken);
             Assert.assertNotNull(event);
             SamlSecurityToken token = event.getSecurityToken();
@@ -193,7 +193,7 @@ public class PrincipalTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
 
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-            
+
             // Check principal
             X509TokenSecurityEvent event =
                 (X509TokenSecurityEvent)securityEventListener.getSecurityEvent(WSSecurityEventConstants.X509Token);
@@ -301,7 +301,7 @@ public class PrincipalTest extends AbstractTestBase {
 
     @Test
     public void testECKeyValue() throws Exception {
-        
+
         //
         // This test fails with the IBM JDK and with JDK 1.8
         // TODO - Re-enable with JDK 1.8 when we fix Santuario

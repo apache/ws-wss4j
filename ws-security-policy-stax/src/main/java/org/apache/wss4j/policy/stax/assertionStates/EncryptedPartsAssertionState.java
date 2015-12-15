@@ -42,24 +42,24 @@ import java.util.List;
  * WSP1.3, 4.2.1 EncryptedParts Assertion
  */
 public class EncryptedPartsAssertionState extends AssertionState implements Assertable {
-    
+
     private int attachmentCount;
     private int encryptedAttachmentCount;
     private boolean encryptedAttachmentRequired;
     private PolicyAsserter policyAsserter;
 
     public EncryptedPartsAssertionState(
-        AbstractSecurityAssertion assertion, 
+        AbstractSecurityAssertion assertion,
         PolicyAsserter policyAsserter,
         boolean asserted, int attachmentCount) {
         super(assertion, asserted);
         this.attachmentCount = attachmentCount;
-        
+
         this.policyAsserter = policyAsserter;
         if (this.policyAsserter == null) {
             this.policyAsserter = new DummyPolicyAsserter();
         }
-        
+
         if (asserted) {
             policyAsserter.assertPolicy(getAssertion());
         }
@@ -77,7 +77,7 @@ public class EncryptedPartsAssertionState extends AssertionState implements Asse
 
         EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
         EncryptedParts encryptedParts = (EncryptedParts) getAssertion();
-        
+
         if (encryptedParts.getAttachments() != null) {
             encryptedAttachmentRequired = true;
             if (encryptedPartSecurityEvent.isAttachment()) {
@@ -128,7 +128,7 @@ public class EncryptedPartsAssertionState extends AssertionState implements Asse
         policyAsserter.assertPolicy(getAssertion());
         return true;
     }
-    
+
     @Override
     public boolean isAsserted() {
         if (encryptedAttachmentRequired && encryptedAttachmentCount < attachmentCount) {

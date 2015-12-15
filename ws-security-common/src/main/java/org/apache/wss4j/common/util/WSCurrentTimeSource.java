@@ -22,7 +22,7 @@ package org.apache.wss4j.common.util;
 import java.util.Date;
 
 public class WSCurrentTimeSource implements WSTimeSource {
-   
+
    /**
     * Get the current date time
     * @return the current date/time as a date object
@@ -30,5 +30,5 @@ public class WSCurrentTimeSource implements WSTimeSource {
    public Date now() {
        return new Date();
    }
-   
+
 }

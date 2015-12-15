@@ -811,24 +811,24 @@ public class InteroperabilityTest extends AbstractTestBase {
                 securityProperties.addSignaturePart(new SecurePart(new QName("http://www.w3.org/1999/XMLSchema", "complexType"), SecurePart.Modifier.Element));
                 securityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments");
                 securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-    
+
                 OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
                 XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
                 XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
                 XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
                 xmlStreamWriter.close();
-    
+
                 securedDocument = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
                 NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
                 Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
             }
-    
+
             {
                 String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
                 Properties properties = new Properties();
                 doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action, properties, false);
             }
-    
+
             //done signature; now test sig-verification:
             {
                 WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -839,7 +839,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                 securityProperties.addIgnoreBSPRule(BSPRule.R5423);
                 securityProperties.addIgnoreBSPRule(BSPRule.R5412);
                 InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-    
+
                 WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
                         WSSecurityEventConstants.AlgorithmSuite,
                         WSSecurityEventConstants.AlgorithmSuite,
@@ -929,14 +929,14 @@ public class InteroperabilityTest extends AbstractTestBase {
                 final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
                 XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(
                         xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
-    
+
                 Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-    
+
                 //header element must still be there
                 NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
                 Assert.assertEquals(nodeList.getLength(), 1);
                 Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
-    
+
                 securityEventListener.compare();
             }
         }

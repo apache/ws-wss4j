@@ -25,10 +25,10 @@ import java.net.URL;
  * A factory to return an EHCacheReplayCache instance.
  */
 public class EHCacheReplayCacheFactory extends ReplayCacheFactory {
-    
+
     public ReplayCache newReplayCache(String key, Object configuration) {
         URL configFileURL = getConfigFileURL(configuration);
         return new EHCacheReplayCache(key, configFileURL);
     }
-    
+
 }

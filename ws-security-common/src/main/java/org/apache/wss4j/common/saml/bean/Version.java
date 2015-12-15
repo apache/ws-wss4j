@@ -24,7 +24,7 @@ package org.apache.wss4j.common.saml.bean;
  * The SAML Version
  */
 public enum Version {
-    
+
     SAML_20, SAML_11, SAML_10;
 
 }

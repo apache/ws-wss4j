@@ -29,8 +29,8 @@ import org.apache.wss4j.dom.engine.WSSConfig;
  */
 public class ReferenceTest extends org.junit.Assert {
 
-    private static final String 
-    TEST_REFERENCE_TEMPLATE = 
+    private static final String
+    TEST_REFERENCE_TEMPLATE =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
         +   "<wss:Reference "
         +       "xmlns:wss=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" "
@@ -39,8 +39,8 @@ public class ReferenceTest extends org.junit.Assert {
         +       "/>"
         ;
 
-    private static final String 
-    BOGUS_REFERENCE_TEMPLATE = 
+    private static final String
+    BOGUS_REFERENCE_TEMPLATE =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
         +   "<wss:Reference "
         +       "xmlns:wss=\"http://something-completely-different\" "
@@ -52,20 +52,20 @@ public class ReferenceTest extends org.junit.Assert {
     private Reference ref;
     private Reference refEqual;
     private Reference refNotEqual;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public ReferenceTest() throws Exception{
         ref = new Reference (createReferenceDocument(TEST_REFERENCE_TEMPLATE, "test", "equalscheck").getDocumentElement());
         refEqual = new Reference (createReferenceDocument(TEST_REFERENCE_TEMPLATE, "test", "equalscheck").getDocumentElement());
         refNotEqual = new Reference (createReferenceDocument(TEST_REFERENCE_TEMPLATE, "test", "unequalscheck").getDocumentElement());
         WSSConfig.init();
     }
-    
- 
+
+
     @org.junit.Test
     public void testConstructor() throws Exception {
         //
@@ -75,7 +75,7 @@ public class ReferenceTest extends org.junit.Assert {
             new Reference((org.w3c.dom.Element) null);
             fail("Expected failure on null Element passed to ctor");
         } catch (final WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
         //
         // The XML doesn't conform to the WSS namespace
@@ -89,7 +89,7 @@ public class ReferenceTest extends org.junit.Assert {
             );
             fail("Expected failure on bogus template");
         } catch (final WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
         //
         // create a Reference from valid XML
@@ -107,7 +107,7 @@ public class ReferenceTest extends org.junit.Assert {
             ).getDocumentElement()
         );
     }
-    
+
     @org.junit.Test
     public void
     testAccessors() throws Exception {
@@ -120,22 +120,22 @@ public class ReferenceTest extends org.junit.Assert {
         assertEquals(ref.getValueType(), "foo");
         assertEquals(ref.getURI(), "bar");
     }
-    
+
     @org.junit.Test
     public void testEquals() throws Exception{
         assertTrue(ref.equals(refEqual));
         assertTrue(refEqual.equals(ref));
         assertFalse(ref.equals(refNotEqual));
         assertFalse(ref.equals(null));
-        assertFalse(ref.equals("string"));        
+        assertFalse(ref.equals("string"));
     }
-    
+
     @org.junit.Test
     public void testHashcode() throws Exception{
         assertEquals(ref.hashCode(), refEqual.hashCode());
         assertFalse(ref.hashCode() == refNotEqual.hashCode());
     }
-    
+
     private static org.w3c.dom.Document
     createReferenceDocument(
         final String template,
@@ -144,7 +144,7 @@ public class ReferenceTest extends org.junit.Assert {
     ) throws javax.xml.parsers.ParserConfigurationException,
              org.xml.sax.SAXException,
              java.io.IOException {
-        final java.io.InputStream in = 
+        final java.io.InputStream in =
             new java.io.ByteArrayInputStream(
                 template.replaceFirst(
                     "TheValueType", valueType
@@ -152,7 +152,7 @@ public class ReferenceTest extends org.junit.Assert {
                     "TheURI", uri
                 ).getBytes()
             );
-        final javax.xml.parsers.DocumentBuilderFactory factory = 
+        final javax.xml.parsers.DocumentBuilderFactory factory =
             javax.xml.parsers.DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         final javax.xml.parsers.DocumentBuilder builder = factory.newDocumentBuilder();

@@ -48,19 +48,19 @@ import org.apache.xml.security.utils.Base64;
  */
 public class SecurityTokenReference {
     public static final String SECURITY_TOKEN_REFERENCE = "SecurityTokenReference";
-    public static final QName STR_QNAME = 
+    public static final QName STR_QNAME =
         new QName(WSS4JConstants.WSSE_NS, SECURITY_TOKEN_REFERENCE);
-    public static final String SKI_URI = 
+    public static final String SKI_URI =
         WSS4JConstants.X509TOKEN_NS + "#X509SubjectKeyIdentifier";
-    public static final String THUMB_URI = 
+    public static final String THUMB_URI =
         WSS4JConstants.SOAPMESSAGE_NS11 + "#" + WSS4JConstants.THUMBPRINT;
-    public static final String ENC_KEY_SHA1_URI = 
+    public static final String ENC_KEY_SHA1_URI =
         WSS4JConstants.SOAPMESSAGE_NS11 + "#" + WSS4JConstants.ENC_KEY_SHA1_URI;
     public static final String X509_V3_TYPE = WSS4JConstants.X509TOKEN_NS + "#X509v3";
-    
+
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SecurityTokenReference.class);
-    
+
     private Element element;
     private DOMX509IssuerSerial issuerSerial;
     private byte[] skiBytes;
@@ -77,12 +77,12 @@ public class SecurityTokenReference {
         element = elem;
         QName el = new QName(element.getNamespaceURI(), element.getLocalName());
         if (!STR_QNAME.equals(el)) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "badElement", 
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "badElement",
                                           new Object[] {STR_QNAME, el});
         }
-        
+
         checkBSPCompliance(bspEnforcer);
-        
+
         if (containsReference()) {
             Node node = element.getFirstChild();
             while (node != null) {
@@ -105,7 +105,7 @@ public class SecurityTokenReference {
     public SecurityTokenReference(Document doc) {
         element = doc.createElementNS(WSS4JConstants.WSSE_NS, "wsse:SecurityTokenReference");
     }
-    
+
     /**
      * Add the WSSE Namespace to this STR. The namespace is not added by default for
      * efficiency purposes.
@@ -113,7 +113,7 @@ public class SecurityTokenReference {
     public void addWSSENamespace() {
         XMLUtils.setNamespace(element, WSS4JConstants.WSSE_NS, WSS4JConstants.WSSE_PREFIX);
     }
-    
+
     /**
      * Add the WSU Namespace to this STR. The namespace is not added by default for
      * efficiency purposes.
@@ -121,7 +121,7 @@ public class SecurityTokenReference {
     public void addWSUNamespace() {
         XMLUtils.setNamespace(element, WSS4JConstants.WSU_NS, WSS4JConstants.WSU_PREFIX);
     }
-    
+
     /**
      * Add a wsse11:TokenType attribute to this SecurityTokenReference
      * @param tokenType the wsse11:TokenType attribute to add
@@ -130,13 +130,13 @@ public class SecurityTokenReference {
         if (tokenType != null) {
             XMLUtils.setNamespace(element, WSS4JConstants.WSSE11_NS, WSS4JConstants.WSSE11_PREFIX);
             element.setAttributeNS(
-                WSS4JConstants.WSSE11_NS, 
-                WSS4JConstants.WSSE11_PREFIX + ":" + WSS4JConstants.TOKEN_TYPE, 
+                WSS4JConstants.WSSE11_NS,
+                WSS4JConstants.WSSE11_PREFIX + ":" + WSS4JConstants.TOKEN_TYPE,
                 tokenType
             );
         }
     }
-    
+
     /**
      * Get the wsse11:TokenType attribute of this SecurityTokenReference
      * @return the value of the wsse11:TokenType attribute
@@ -193,7 +193,7 @@ public class SecurityTokenReference {
             );
         }
         Text text = doc.createTextNode(Base64.encode(data));
-        
+
         createKeyIdentifier(doc, X509_V3_TYPE, text, true);
     }
 
@@ -216,7 +216,7 @@ public class SecurityTokenReference {
                 WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                 "invalidCertForSKI", new Object[] {cert.getVersion()});
         }
-        
+
         Document doc = element.getOwnerDocument();
         // Fall back to Merlin if crypto parameter is null
         Crypto skiCrypto = crypto;
@@ -224,19 +224,19 @@ public class SecurityTokenReference {
             skiCrypto = new Merlin();
         }
         byte data[] = skiCrypto.getSKIBytesFromCert(cert);
-        
+
         Text text = doc.createTextNode(Base64.encode(data));
-        createKeyIdentifier(doc, SKI_URI, text, true);        
+        createKeyIdentifier(doc, SKI_URI, text, true);
     }
 
     /**
      * Sets the KeyIdentifier Element as a Thumbprint.
-     * 
+     *
      * Takes a X509 certificate, computes its thumbprint using SHA-1, converts
      * into base 64 and inserts it into a <code>wsse:KeyIdentifier</code>
      * element, which is placed in the <code>wsse:SecurityTokenReference</code>
      * element.
-     * 
+     *
      * @param cert is the X509 certificate to get the thumbprint
      */
     public void setKeyIdentifierThumb(X509Certificate cert) throws WSSecurityException {
@@ -259,18 +259,18 @@ public class SecurityTokenReference {
             );
         }
     }
-    
+
     public void setKeyIdentifierEncKeySHA1(String value) throws WSSecurityException {
         Document doc = element.getOwnerDocument();
         Text text = doc.createTextNode(value);
         createKeyIdentifier(doc, ENC_KEY_SHA1_URI, text, true);
     }
-    
+
     public void setKeyIdentifier(String valueType, String keyIdVal) throws WSSecurityException {
         setKeyIdentifier(valueType, keyIdVal, false);
     }
-    
-    public void setKeyIdentifier(String valueType, String keyIdVal, boolean base64) 
+
+    public void setKeyIdentifier(String valueType, String keyIdVal, boolean base64)
         throws WSSecurityException {
         Document doc = element.getOwnerDocument();
         createKeyIdentifier(doc, valueType, doc.createTextNode(keyIdVal), base64);
@@ -319,7 +319,7 @@ public class SecurityTokenReference {
         if (crypto == null) {
             return null;
         }
-        
+
         Element elem = getFirstElement();
         String value = elem.getAttributeNS(null, "ValueType");
 
@@ -351,38 +351,38 @@ public class SecurityTokenReference {
                 }
             }
         }
-        
+
         return null;
     }
-    
+
     public String getKeyIdentifierValue() {
         if (containsKeyIdentifier()) {
             return XMLUtils.getElementText(getFirstElement());
-        } 
+        }
         return null;
     }
-    
+
     public String getKeyIdentifierValueType() {
         if (containsKeyIdentifier()) {
             Element elem = getFirstElement();
             return elem.getAttributeNS(null, "ValueType");
-        } 
+        }
         return null;
     }
-    
+
     public String getKeyIdentifierEncodingType() {
         if (containsKeyIdentifier()) {
             Element elem = getFirstElement();
             return elem.getAttributeNS(null, "EncodingType");
-        } 
+        }
         return null;
     }
-    
+
     public X509Certificate getX509SKIAlias(Crypto crypto) throws WSSecurityException {
         if (crypto == null) {
             return null;
         }
-        
+
         if (skiBytes == null) {
             skiBytes = getSKIBytes();
             if (skiBytes == null) {
@@ -414,7 +414,7 @@ public class SecurityTokenReference {
         return skiBytes;
     }
 
-    
+
     /**
      * Set an unknown element.
      *
@@ -439,7 +439,7 @@ public class SecurityTokenReference {
         if (crypto == null) {
             return null;
         }
-        
+
         if (issuerSerial == null) {
             issuerSerial = getIssuerSerial();
             if (issuerSerial == null) {
@@ -460,7 +460,7 @@ public class SecurityTokenReference {
             return null;
         }
         if (WSS4JConstants.X509_DATA_LN.equals(elem.getLocalName())) {
-            elem = 
+            elem =
                 XMLUtils.findElement(
                     elem, WSS4JConstants.X509_ISSUER_SERIAL_LN, WSS4JConstants.SIG_NS
                 );
@@ -499,7 +499,7 @@ public class SecurityTokenReference {
     public boolean containsX509Data() {
         return containsElement(WSS4JConstants.SIG_NS, WSS4JConstants.X509_DATA_LN);
     }
-    
+
     /**
      * Method containsKeyIdentifier.
      *
@@ -509,7 +509,7 @@ public class SecurityTokenReference {
     public boolean containsKeyIdentifier() {
         return containsElement(WSS4JConstants.WSSE_NS, "KeyIdentifier");
     }
-    
+
     private boolean containsElement(String namespace, String localname) {
         Node node = element.getFirstChild();
         while (node != null) {
@@ -545,7 +545,7 @@ public class SecurityTokenReference {
     public void setID(String id) {
         element.setAttributeNS(WSS4JConstants.WSU_NS, WSS4JConstants.WSU_PREFIX + ":Id", id);
     }
-    
+
     /**
      * Get the id
      * @return the wsu ID of the element
@@ -562,7 +562,7 @@ public class SecurityTokenReference {
     public String toString() {
         return DOM2Writer.nodeToString(element);
     }
-    
+
     /**
      * A method to check that the SecurityTokenReference is compliant with the BSP spec.
      * @throws WSSecurityException
@@ -582,9 +582,9 @@ public class SecurityTokenReference {
         if (result != 1) {
             bspEnforcer.handleBSPRule(BSPRule.R3061);
         }
-        if ("KeyIdentifier".equals(child.getLocalName()) 
+        if ("KeyIdentifier".equals(child.getLocalName())
             && WSS4JConstants.WSSE_NS.equals(child.getNamespaceURI())) {
-            
+
             String valueType = getKeyIdentifierValueType();
             // ValueType cannot be null
             if (valueType == null || "".equals(valueType)) {
@@ -597,7 +597,7 @@ public class SecurityTokenReference {
             }
             // Encoding type must be specified other than for a SAML Assertion
 
-            if (!WSS4JConstants.WSS_SAML_KI_VALUE_TYPE.equals(valueType) 
+            if (!WSS4JConstants.WSS_SAML_KI_VALUE_TYPE.equals(valueType)
                 && !WSS4JConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)
                 && "".equals(encodingType)) {
                 bspEnforcer.handleBSPRule(BSPRule.R3070);
@@ -622,7 +622,7 @@ public class SecurityTokenReference {
             }
         }
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -656,7 +656,7 @@ public class SecurityTokenReference {
         }
         String issuer = null;
         BigInteger serialNumber = null;
-        
+
         try {
             issuer = getIssuerSerial().getIssuer();
             serialNumber = getIssuerSerial().getSerialNumber();
@@ -671,7 +671,7 @@ public class SecurityTokenReference {
         }
         return result;
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (!(object instanceof SecurityTokenReference)) {
@@ -708,27 +708,27 @@ public class SecurityTokenReference {
                 }
                 if (!compare(getIssuerSerial().getSerialNumber(), tokenReference.getIssuerSerial().getSerialNumber())) {
                     return false;
-                } 
+                }
             }
         } catch (WSSecurityException e) {
            LOG.error(e.getMessage(), e);
            return false;
         }
-            
+
         return true;
     }
-    
+
     private boolean compare(String item1, String item2) {
-        if (item1 == null && item2 != null) { 
+        if (item1 == null && item2 != null) {
             return false;
         } else if (item1 != null && !item1.equals(item2)) {
             return false;
         }
         return true;
     }
-    
+
     private boolean compare(BigInteger item1, BigInteger item2) {
-        if (item1 == null && item2 != null) { 
+        if (item1 == null && item2 != null) {
             return false;
         } else if (item1 != null && !item1.equals(item2)) {
             return false;

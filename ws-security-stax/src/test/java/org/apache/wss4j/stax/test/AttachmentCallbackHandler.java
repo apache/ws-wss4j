@@ -34,15 +34,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A Callback Handler implementation for the case of signing/encrypting Attachments via the SwA 
+ * A Callback Handler implementation for the case of signing/encrypting Attachments via the SwA
  * (SOAP with Attachments) specification.
  */
 public class AttachmentCallbackHandler implements CallbackHandler {
-    
+
     private final List<Attachment> originalRequestAttachments;
     private Map<String, Attachment> attachmentMap = new HashMap<String, Attachment>();
     private List<Attachment> responseAttachments = new ArrayList<Attachment>();
-    
+
     public AttachmentCallbackHandler(List<Attachment> attachments) {
         originalRequestAttachments = attachments;
         if (attachments != null) {
@@ -51,26 +51,26 @@ public class AttachmentCallbackHandler implements CallbackHandler {
             }
         }
     }
-    
+
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof AttachmentRequestCallback) {
-                AttachmentRequestCallback attachmentRequestCallback = 
+                AttachmentRequestCallback attachmentRequestCallback =
                     (AttachmentRequestCallback) callbacks[i];
 
-                List<Attachment> attachments = 
+                List<Attachment> attachments =
                     getAttachmentsToAdd(attachmentRequestCallback.getAttachmentId());
                 if (attachments.isEmpty()) {
                     throw new RuntimeException("wrong attachment requested");
                 }
-                
+
                 attachmentRequestCallback.setAttachments(attachments);
             } else if (callbacks[i] instanceof AttachmentResultCallback) {
-                AttachmentResultCallback attachmentResultCallback = 
+                AttachmentResultCallback attachmentResultCallback =
                     (AttachmentResultCallback) callbacks[i];
                 responseAttachments.add(attachmentResultCallback.getAttachment());
-                attachmentMap.put(attachmentResultCallback.getAttachment().getId(), 
+                attachmentMap.put(attachmentResultCallback.getAttachment().getId(),
                                   attachmentResultCallback.getAttachment());
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
@@ -81,7 +81,7 @@ public class AttachmentCallbackHandler implements CallbackHandler {
     public List<Attachment> getResponseAttachments() {
         return responseAttachments;
     }
-    
+
     // Try to match the Attachment Id. Otherwise, add all Attachments.
     private List<Attachment> getAttachmentsToAdd(String id) {
         List<Attachment> attachments = new ArrayList<Attachment>();
@@ -92,7 +92,7 @@ public class AttachmentCallbackHandler implements CallbackHandler {
                 attachments.addAll(originalRequestAttachments);
             }
         }
-        
+
         return attachments;
     }
 

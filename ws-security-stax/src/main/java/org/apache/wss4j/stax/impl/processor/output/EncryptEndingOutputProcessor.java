@@ -75,17 +75,17 @@ public class EncryptEndingOutputProcessor extends AbstractEncryptEndingOutputPro
                             OutputProcessorUtils.updateSecurityHeaderOrder(
                                     outputProcessorChain, WSSConstants.TAG_xenc_EncryptedData, getAction(), true);
                         }
-                        List<SecurityHeaderOrder> securityHeaderOrderList = 
+                        List<SecurityHeaderOrder> securityHeaderOrderList =
                                 outputProcessorChain.getSecurityContext().getAsList(SecurityHeaderOrder.class);
                         List<SecurityHeaderOrder> tmpList = null;
                         if (securityHeaderOrderList != null) {
                             tmpList = new ArrayList<>(securityHeaderOrderList);
                             securityHeaderOrderList.clear();
                         }
-                        
+
                         outputProcessorChain.reset();
                         outputProcessorChain.processEvent(xmlSecEvent);
-                        
+
                         if (securityHeaderOrderList != null) {
                             securityHeaderOrderList.addAll(tmpList);
                         }

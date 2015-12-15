@@ -280,7 +280,7 @@ public class SAMLCallbackHandlerImpl implements CallbackHandler {
     public void setIssuer(String issuer) {
         this.issuer = issuer;
     }
-    
+
     public void setIssuerFormat(String issuerFormat) {
         this.issuerFormat = issuerFormat;
     }

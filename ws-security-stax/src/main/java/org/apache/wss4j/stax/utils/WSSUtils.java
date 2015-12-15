@@ -329,7 +329,7 @@ public class WSSUtils extends XMLSecurityUtils {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
     }
-    
+
     public static void createEncryptedKeySha1IdentifierStructure(AbstractOutputProcessor abstractOutputProcessor,
                                                                  OutputProcessorChain outputProcessorChain, String identifier)
             throws XMLStreamException, XMLSecurityException {
@@ -341,7 +341,7 @@ public class WSSUtils extends XMLSecurityUtils {
         abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, identifier);
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
     }
-    
+
     public static void createKerberosSha1IdentifierStructure(AbstractOutputProcessor abstractOutputProcessor,
                                                                  OutputProcessorChain outputProcessorChain, String identifier)
             throws XMLStreamException, XMLSecurityException {
@@ -382,7 +382,7 @@ public class WSSUtils extends XMLSecurityUtils {
         abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, referenceId);
         abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
     }
-    
+
     public static void createSAMLKeyIdentifierStructure(AbstractOutputProcessor abstractOutputProcessor,
                                                             OutputProcessorChain outputProcessorChain,
                                                             WSSecurityTokenConstants.TokenType tokenType, String referenceId)
@@ -454,7 +454,7 @@ public class WSSUtils extends XMLSecurityUtils {
     public static void createEncryptedDataStructureForAttachments(
             AbstractOutputProcessor abstractOutputProcessor, OutputProcessorChain outputProcessorChain)
             throws XMLStreamException, XMLSecurityException {
-        
+
         List<EncryptionPartDef> encryptionPartDefs =
                 outputProcessorChain.getSecurityContext().getAsList(EncryptionPartDef.class);
         if (encryptionPartDefs == null) {
@@ -549,7 +549,7 @@ public class WSSUtils extends XMLSecurityUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static TokenSecurityEvent<? extends InboundSecurityToken> 
+    public static TokenSecurityEvent<? extends InboundSecurityToken>
         createTokenSecurityEvent(final InboundSecurityToken inboundSecurityToken, String correlationID) throws WSSecurityException {
         WSSecurityTokenConstants.TokenType tokenType = inboundSecurityToken.getTokenType();
 
@@ -636,5 +636,5 @@ public class WSSUtils extends XMLSecurityUtils {
         }
         return tmp;
     }
-    
+
 }

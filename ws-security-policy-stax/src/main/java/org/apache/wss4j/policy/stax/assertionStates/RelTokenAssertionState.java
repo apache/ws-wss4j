@@ -35,7 +35,7 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 public class RelTokenAssertionState extends TokenAssertionState {
 
-    public RelTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, 
+    public RelTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted,
                                   PolicyAsserter policyAsserter, boolean initiator) {
         super(assertion, asserted, policyAsserter, initiator);
     }
