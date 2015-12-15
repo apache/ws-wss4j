@@ -91,15 +91,15 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         Element securityHeader = WSSecurityUtil.getSecurityHeader(signedDoc, null);
         AlgorithmSuite algorithmSuite = createAlgorithmSuite();
         
-        verify(securityHeader, algorithmSuite, crypto, false);
+        verify(securityHeader, algorithmSuite, crypto);
         
         algorithmSuite.setMinimumAsymmetricKeyLength(1024);
         
         try {
-            verify(securityHeader, algorithmSuite, crypto, false);
+            verify(securityHeader, algorithmSuite, crypto);
             fail("Expected failure as 512-bit keys are not allowed");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
     }
     
@@ -136,14 +136,14 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         AlgorithmSuite algorithmSuite = createAlgorithmSuite();
         
         try {
-            verify(securityHeader, algorithmSuite, dsaCrypto, false);
+            verify(securityHeader, algorithmSuite, dsaCrypto);
             fail("Expected failure as DSA is not allowed");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         algorithmSuite.addSignatureMethod(WSConstants.DSA);
-        verify(securityHeader, algorithmSuite, dsaCrypto, false);
+        verify(securityHeader, algorithmSuite, dsaCrypto);
     }
     
     @org.junit.Test
@@ -179,14 +179,14 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         AlgorithmSuite algorithmSuite = createAlgorithmSuite();
         
         try {
-            verify(securityHeader, algorithmSuite, crypto, false);
+            verify(securityHeader, algorithmSuite, crypto);
             fail("Expected failure as C14n algorithm is not allowed");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         algorithmSuite.addC14nAlgorithm(WSConstants.C14N_EXCL_WITH_COMMENTS);
-        verify(securityHeader, algorithmSuite, crypto, false);
+        verify(securityHeader, algorithmSuite, crypto);
     }
 
     private AlgorithmSuite createAlgorithmSuite() {
@@ -200,8 +200,7 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
     }
 
     private WSHandlerResult verify(
-        Element securityHeader, AlgorithmSuite algorithmSuite, Crypto sigVerCrypto,
-        boolean saml2
+        Element securityHeader, AlgorithmSuite algorithmSuite, Crypto sigVerCrypto
     ) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         RequestData data = new RequestData();

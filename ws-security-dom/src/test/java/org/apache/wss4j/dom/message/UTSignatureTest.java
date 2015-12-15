@@ -109,7 +109,7 @@ public class UTSignatureTest extends org.junit.Assert {
             verify(signedDoc, false);
             fail("Failure expected on deriving keys from a UsernameToken not allowed");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION); 
         }
     }
     

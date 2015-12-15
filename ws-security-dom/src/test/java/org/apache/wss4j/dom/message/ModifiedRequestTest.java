@@ -113,11 +113,11 @@ public class ModifiedRequestTest extends org.junit.Assert {
         // Replace the signed element with a modified element, and move the original
         // signed element into the SOAP header
         //
-        org.w3c.dom.Element secHeaderElement = secHeader.getSecurityHeader();
-        org.w3c.dom.Element envelopeElement = signedDoc.getDocumentElement();
-        org.w3c.dom.Node valueNode = 
+        Element secHeaderElement = secHeader.getSecurityHeader();
+        Element envelopeElement = signedDoc.getDocumentElement();
+        Node valueNode = 
             envelopeElement.getElementsByTagNameNS("http://blah.com", "value").item(0);
-        org.w3c.dom.Node clonedValueNode = valueNode.cloneNode(true);
+        Node clonedValueNode = valueNode.cloneNode(true);
         secHeaderElement.appendChild(clonedValueNode);
         valueNode.getFirstChild().setNodeValue("250");
         
@@ -167,14 +167,14 @@ public class ModifiedRequestTest extends org.junit.Assert {
         // Replace the signed element with a modified element, and move the original
         // signed element into the SOAP header
         //
-        org.w3c.dom.Element secHeaderElement = secHeader.getSecurityHeader();
-        org.w3c.dom.Element envelopeElement = signedDoc.getDocumentElement();
-        org.w3c.dom.Node valueNode = 
+        Element secHeaderElement = secHeader.getSecurityHeader();
+        Element envelopeElement = signedDoc.getDocumentElement();
+        Node valueNode = 
             envelopeElement.getElementsByTagNameNS("http://blah.com", "value").item(0);
-        org.w3c.dom.Node clonedValueNode = valueNode.cloneNode(true);
+        Node clonedValueNode = valueNode.cloneNode(true);
         secHeaderElement.appendChild(clonedValueNode);
         valueNode.getFirstChild().setNodeValue("250");
-        ((org.w3c.dom.Element)valueNode).setAttributeNS(
+        ((Element)valueNode).setAttributeNS(
              WSConstants.WSU_NS, "wsu:Id", "id-250"
         );
         
@@ -194,19 +194,19 @@ public class ModifiedRequestTest extends org.junit.Assert {
         // Finally we need to check that the Element that was signed is what we expect to be signed
         //
         envelopeElement = signedDoc.getDocumentElement();
-        org.w3c.dom.Node bodyNode = 
+        Node bodyNode = 
             envelopeElement.getElementsByTagNameNS(
                 WSConstants.URI_SOAP11_ENV, "Body"
             ).item(0);
         valueNode = 
-            ((org.w3c.dom.Element)bodyNode).getElementsByTagNameNS(
+            ((Element)bodyNode).getElementsByTagNameNS(
                 "http://blah.com", "value"
             ).item(0);
         
         List<WSSecurityEngineResult> signedResults = 
             results.getActionResults().get(WSConstants.SIGN);
         try {
-            WSSecurityUtil.verifySignedElement((org.w3c.dom.Element)valueNode, signedResults);
+            WSSecurityUtil.verifySignedElement((Element)valueNode, signedResults);
             fail("Failure expected on the required element not being signed");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
@@ -342,7 +342,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
             newEngine.processSecurityHeader(doc, null, new KeystoreCallbackHandler(), wssCrypto);
             fail("Failure expected on a modified EncryptedData structure");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
     }
     

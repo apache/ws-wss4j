@@ -134,7 +134,7 @@ public class ValidatorTest extends org.junit.Assert {
             newEngine.processSecurityHeader(signedDoc, data);
             fail("Failure expected on issuer serial");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
         }
         
         // Now switch out the default signature validator
@@ -172,7 +172,6 @@ public class ValidatorTest extends org.junit.Assert {
             fail("Failure expected on a bad password text");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
-            // expected
         }
         
         // Now switch out the default UsernameToken validator
@@ -257,7 +256,7 @@ public class ValidatorTest extends org.junit.Assert {
             secEngine.processSecurityHeader(doc, null, null, crypto);
             fail("Expected failure on untrusted signature");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
         }
         
         config.setValidator(WSConstants.BINARY_TOKEN, new BSTValidator());

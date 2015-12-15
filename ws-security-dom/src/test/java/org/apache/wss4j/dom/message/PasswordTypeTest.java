@@ -197,7 +197,7 @@ public class PasswordTypeTest extends org.junit.Assert {
             secEngine.processSecurityHeader(doc, reqData);
             fail("Expected failure on the wrong password type");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
     }
 

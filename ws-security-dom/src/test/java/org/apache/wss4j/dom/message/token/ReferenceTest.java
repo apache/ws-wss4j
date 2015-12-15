@@ -22,6 +22,7 @@ package org.apache.wss4j.dom.message.token;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.engine.WSSConfig;
 
 /**
  * unit test for the Reference type
@@ -61,20 +62,20 @@ public class ReferenceTest extends org.junit.Assert {
         ref = new Reference (createReferenceDocument(TEST_REFERENCE_TEMPLATE, "test", "equalscheck").getDocumentElement());
         refEqual = new Reference (createReferenceDocument(TEST_REFERENCE_TEMPLATE, "test", "equalscheck").getDocumentElement());
         refNotEqual = new Reference (createReferenceDocument(TEST_REFERENCE_TEMPLATE, "test", "unequalscheck").getDocumentElement());
+        WSSConfig.init();
     }
     
  
     @org.junit.Test
-    public void
-    testConstructor() throws Exception {
+    public void testConstructor() throws Exception {
         //
         // null input
         //
         try {
             new Reference((org.w3c.dom.Element) null);
             fail("Expected failure on null Element passed to ctor");
-        } catch (final WSSecurityException e) {
-            // complete
+        } catch (final WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         //
         // The XML doesn't conform to the WSS namespace
@@ -87,8 +88,8 @@ public class ReferenceTest extends org.junit.Assert {
                 ).getDocumentElement()
             );
             fail("Expected failure on bogus template");
-        } catch (final Exception e) {
-            // complete
+        } catch (final WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
         }
         //
         // create a Reference from valid XML
@@ -132,7 +133,7 @@ public class ReferenceTest extends org.junit.Assert {
     @org.junit.Test
     public void testHashcode() throws Exception{
         assertEquals(ref.hashCode(), refEqual.hashCode());
-        assertFalse((ref.hashCode() == refNotEqual.hashCode()));
+        assertFalse(ref.hashCode() == refNotEqual.hashCode());
     }
     
     private static org.w3c.dom.Document

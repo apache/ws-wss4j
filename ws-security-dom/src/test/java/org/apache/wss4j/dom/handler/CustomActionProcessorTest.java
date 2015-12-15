@@ -88,8 +88,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         WSSConfig cfg = WSSConfig.getNewInstance();
         String p = "org.apache.wss4j.dom.common.CustomProcessor";
         cfg.setProcessor(
-            WSConstants.SIGNATURE,
-            org.apache.wss4j.dom.common.CustomProcessor.class
+            WSConstants.SIGNATURE, CustomProcessor.class
         );
         final WSSecurityEngine engine = new WSSecurityEngine();
         engine.setWssConfig(cfg);
@@ -98,10 +97,8 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         boolean found = false;
         for (WSSecurityEngineResult result : results.getResults()) {
             Object obj = result.get("foo");
-            if (obj != null) {
-                if (obj.getClass().getName().equals(p)) {
-                    found = true;
-                }
+            if (obj != null && obj.getClass().getName().equals(p)) {
+                found = true;
             }
         }
         assertTrue("Unable to find result from CustomProcessor", found);
@@ -143,10 +140,8 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         boolean found = false;
         for (WSSecurityEngineResult result : results.getResults()) {
             Object obj = result.get("foo");
-            if (obj != null) {
-                if (obj.getClass().getName().equals(CustomProcessor.class.getName())) {
-                    found = true;
-                }
+            if (obj != null && obj.getClass().getName().equals(CustomProcessor.class.getName())) {
+                found = true;
             }
         }
         assertTrue("Unable to find result from CustomProcessor", found);
@@ -162,7 +157,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final int action = 0xDEADF000;
-        cfg.setAction(action, org.apache.wss4j.dom.common.CustomAction.class);
+        cfg.setAction(action, CustomAction.class);
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         
@@ -226,7 +221,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
             WSSecurityUtil.decodeHandlerAction(actionString, cfg);
             fail("Failure expected on unknown action");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
         }
         
         //
@@ -238,13 +233,13 @@ public class CustomActionProcessorTest extends org.junit.Assert {
             WSSecurityUtil.decodeHandlerAction(badActionString, cfg);
             fail("Failure expected on unknown action");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
         }
         
         //
         // This parsing should pass as WSSConfig has been configured with the custom action
         //
-        cfg.setAction(customAction, org.apache.wss4j.dom.common.CustomAction.class);
+        cfg.setAction(customAction, CustomAction.class);
         List<HandlerAction> actionList = WSSecurityUtil.decodeHandlerAction(actionString, cfg);
         
         final RequestData reqData = new RequestData();

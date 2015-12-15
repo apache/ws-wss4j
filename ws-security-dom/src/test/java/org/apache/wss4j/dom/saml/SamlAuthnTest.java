@@ -118,7 +118,7 @@ public class SamlAuthnTest extends org.junit.Assert {
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
         
-        callbackHandler.setSubjectLocality("127.0.0.1", "xyz.ws.apache.org");
+        callbackHandler.setSubjectLocality("127.0.0.1", "xyz.ws.apache.org");   //NOPMD
         
         createAndVerifyMessage(callbackHandler, true);
     }
@@ -129,7 +129,7 @@ public class SamlAuthnTest extends org.junit.Assert {
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
         
-        callbackHandler.setSubjectLocality("127.0.0.1", "xyz.ws.apache.org");
+        callbackHandler.setSubjectLocality("127.0.0.1", "xyz.ws.apache.org");   //NOPMD
         
         createAndVerifyMessage(callbackHandler, true);
     }

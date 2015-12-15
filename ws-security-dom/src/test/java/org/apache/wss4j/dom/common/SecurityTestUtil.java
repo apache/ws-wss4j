@@ -35,7 +35,7 @@ public final class SecurityTestUtil {
             File[] tmpFiles = new File(tmpDir).listFiles();
             if (tmpFiles != null) {
                 for (File tmpFile : tmpFiles) {
-                    if (tmpFile.exists() && (tmpFile.getName().endsWith(".data"))) {
+                    if (tmpFile.exists() && tmpFile.getName().endsWith(".data")) {
                         tmpFile.delete();
                     }
                 }

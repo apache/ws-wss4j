@@ -260,7 +260,7 @@ public class SignaturePartsTest extends org.junit.Assert {
             sign.build(doc, crypto, secHeader);
             fail("Failure expected on not signing a required element");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_SIGNATURE); 
         }
     }
     
@@ -369,7 +369,7 @@ public class SignaturePartsTest extends org.junit.Assert {
             sign.build(doc, crypto, secHeader);
             fail("Failure expected on a bad localname");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_SIGNATURE);
         }
     }
     
@@ -398,7 +398,7 @@ public class SignaturePartsTest extends org.junit.Assert {
             sign.build(doc, crypto, secHeader);
             fail("Failure expected on a bad namespace");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_SIGNATURE);
         }
     }
     
@@ -451,8 +451,8 @@ public class SignaturePartsTest extends org.junit.Assert {
         assertFalse(actionResult.isEmpty());
         
         @SuppressWarnings("unchecked")
-        final java.util.List<WSDataRef> refs =
-            (java.util.List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        final List<WSDataRef> refs =
+            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs != null && !refs.isEmpty());
         
         boolean foundFoo = false;

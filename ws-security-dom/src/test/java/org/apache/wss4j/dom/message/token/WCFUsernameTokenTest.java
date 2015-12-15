@@ -90,7 +90,7 @@ public class WCFUsernameTokenTest extends org.junit.Assert {
             verify(doc);
             fail("Failure expected on a bad password type");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
     }
     

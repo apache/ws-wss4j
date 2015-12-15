@@ -270,7 +270,7 @@ public class CertificateStoreTest extends org.junit.Assert {
             verify(signedDoc, receiverCrypto);
             fail("Failure expected on an unknown certificate");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
         }
     }
     

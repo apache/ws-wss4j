@@ -57,7 +57,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class AttachmentTest extends org.junit.Assert {
+public class AttachmentTest extends Assert {
 
     private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(AttachmentTest.class);
@@ -459,7 +459,7 @@ public class AttachmentTest extends org.junit.Assert {
     
             Map<String, String> attHeaders = responseAttachment.getHeaders();
             Assert.assertEquals(6, attHeaders.size());
-        } catch (IOException ex) {
+        } catch (IOException ex) { //NOPMD
             // expected
         }
     }

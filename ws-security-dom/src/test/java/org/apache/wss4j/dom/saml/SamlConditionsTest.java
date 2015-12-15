@@ -501,7 +501,7 @@ public class SamlConditionsTest extends org.junit.Assert {
             newEngine.processSecurityHeader(doc, data);
             fail("Failure expected on a bad audience restriction");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getMessage().contains("SAML token security failure"));
         }
         
         // Now add the correct audience back in...
@@ -561,7 +561,7 @@ public class SamlConditionsTest extends org.junit.Assert {
             newEngine.processSecurityHeader(doc, data);
             fail("Failure expected on a bad audience restriction");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getMessage().contains("SAML token security failure"));
         }
         
         // Now add the correct audience back in...
@@ -674,7 +674,7 @@ public class SamlConditionsTest extends org.junit.Assert {
             newEngine.processSecurityHeader(doc, data);
             fail("Failure expected on a bad audience restriction");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getMessage().contains("SAML token security failure"));
         }
         
         // Now add the correct audience back in...

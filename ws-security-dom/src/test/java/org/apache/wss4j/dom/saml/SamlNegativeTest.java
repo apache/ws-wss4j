@@ -130,7 +130,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         //
         Element envelope = signedDoc.getDocumentElement();
         NodeList list = envelope.getElementsByTagNameNS(WSConstants.SAML2_NS, "Assertion");
-        Element assertionElement = (org.w3c.dom.Element)list.item(0);
+        Element assertionElement = (Element)list.item(0);
         assertionElement.setAttributeNS(null, "MinorVersion", "5");
 
         if (LOG.isDebugEnabled()) {
@@ -143,8 +143,8 @@ public class SamlNegativeTest extends org.junit.Assert {
         try {
             verify(signedDoc, trustCrypto);
             fail("Failure expected on a modified SAML Assertion");
-        } catch (Exception ex) {
-            // expected
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK); 
         }
     }
     
@@ -180,11 +180,11 @@ public class SamlNegativeTest extends org.junit.Assert {
         //
         Element envelope = signedDoc.getDocumentElement();
         NodeList list = envelope.getElementsByTagNameNS(WSConstants.SAML_NS, "Assertion");
-        Element assertionElement = (org.w3c.dom.Element)list.item(0);
+        Element assertionElement = (Element)list.item(0);
         list = assertionElement.getElementsByTagNameNS(WSConstants.SIG_NS, "Signature");
-        Element sigElement = (org.w3c.dom.Element)list.item(0);
+        Element sigElement = (Element)list.item(0);
         list = sigElement.getElementsByTagNameNS(WSConstants.SIG_NS, "Transform");
-        Element transformElement = (org.w3c.dom.Element)list.item(0);
+        Element transformElement = (Element)list.item(0);
         transformElement.setAttributeNS(null, "Algorithm", WSConstants.C14N_EXCL_OMIT_COMMENTS);
         
         if (LOG.isDebugEnabled()) {
@@ -198,7 +198,7 @@ public class SamlNegativeTest extends org.junit.Assert {
             verify(signedDoc, trustCrypto);
             fail("Expected failure on a modified signature");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
         }
     }
     
@@ -231,7 +231,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         //
         Element envelope = signedDoc.getDocumentElement();
         NodeList list = envelope.getElementsByTagNameNS(WSConstants.SAML2_NS, "Assertion");
-        Element assertionElement = (org.w3c.dom.Element)list.item(0);
+        Element assertionElement = (Element)list.item(0);
         assertionElement.setAttributeNS(null, "MinorVersion", "5");
         
         if (LOG.isDebugEnabled()) {
@@ -245,7 +245,7 @@ public class SamlNegativeTest extends org.junit.Assert {
             verify(signedDoc, trustCrypto);
             fail("Expected failure on a modified signature");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
         }
     }
     
@@ -284,7 +284,7 @@ public class SamlNegativeTest extends org.junit.Assert {
             verify(signedDoc, trustCrypto);
             fail("Expected failure on a holder-of-key confirmation method with no KeyInfo");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
         }
     }
     
@@ -327,7 +327,7 @@ public class SamlNegativeTest extends org.junit.Assert {
             verify(signedDoc, trustCrypto);
             fail("Expected failure on an unsigned assertion with holder-of-key confirmation method");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getMessage().contains("SAML token security failure"));
         }
     }
     
@@ -375,7 +375,7 @@ public class SamlNegativeTest extends org.junit.Assert {
             verify(signedDoc, trustCrypto);
             fail ("Failure expected on an untrusted signed assertion");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
         }
     }
     

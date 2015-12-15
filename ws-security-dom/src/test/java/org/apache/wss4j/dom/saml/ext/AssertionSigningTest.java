@@ -48,7 +48,7 @@ import org.w3c.dom.Element;
  * SamlAssertionWrapper class implementation.
  */
 
-public class AssertionSigningTest extends org.junit.Assert {
+public class AssertionSigningTest extends Assert {
 
     private Crypto issuerCrypto = null;
     // Default Canonicalization algorithm used by SamlAssertionWrapper class.

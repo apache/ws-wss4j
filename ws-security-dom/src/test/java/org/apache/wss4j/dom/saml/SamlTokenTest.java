@@ -89,6 +89,7 @@ public class SamlTokenTest extends org.junit.Assert {
     private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(SamlTokenTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
+    private static final String IP_ADDRESS = "12.34.56.78"; //NOPMD
     
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
@@ -406,7 +407,7 @@ public class SamlTokenTest extends org.junit.Assert {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        callbackHandler.setSubjectLocality("12.34.56.78", "test-dns");
+        callbackHandler.setSubjectLocality(IP_ADDRESS, "test-dns");
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
@@ -426,7 +427,7 @@ public class SamlTokenTest extends org.junit.Assert {
             LOG.debug("SAML 1.1 Authn Assertion (sender vouches):");
             LOG.debug(outputString);
         }
-        assertTrue(outputString.contains("12.34.56.78"));
+        assertTrue(outputString.contains(IP_ADDRESS));
         assertTrue(outputString.contains("test-dns"));
         
         WSHandlerResult results = verify(unsignedDoc);
@@ -489,7 +490,7 @@ public class SamlTokenTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        callbackHandler.setSubjectLocality("12.34.56.78", "test-dns");
+        callbackHandler.setSubjectLocality(IP_ADDRESS, "test-dns");
         
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
@@ -509,7 +510,7 @@ public class SamlTokenTest extends org.junit.Assert {
             LOG.debug("SAML 2 Authn Assertion (sender vouches):");
             LOG.debug(outputString);
         }
-        assertTrue(outputString.contains("12.34.56.78"));
+        assertTrue(outputString.contains(IP_ADDRESS));
         assertTrue(outputString.contains("test-dns"));
         
         WSHandlerResult results = verify(unsignedDoc);
@@ -945,7 +946,7 @@ public class SamlTokenTest extends org.junit.Assert {
             newEngine.processSecurityHeader(unsignedDoc, null, null, null);
             fail("Failure expected on an incorrect subject confirmation method");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
     }
     
@@ -973,7 +974,7 @@ public class SamlTokenTest extends org.junit.Assert {
             newEngine.processSecurityHeader(unsignedDoc, null, null, null);
             fail("Failure expected on an unknown subject confirmation method");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
 
         // Now disable this check
@@ -1015,7 +1016,7 @@ public class SamlTokenTest extends org.junit.Assert {
             newEngine.processSecurityHeader(unsignedDoc, null, null, null);
             fail("Failure expected on an unsigned bearer token");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
 
         // Now disable this check

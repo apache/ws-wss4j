@@ -122,8 +122,8 @@ public class EncryptionPartsTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ENCR).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
-        final java.util.List<WSDataRef> refs =
-            (java.util.List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        final List<WSDataRef> refs =
+            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         
         assertEquals(WSConstants.KEYTRANSPORT_RSAOEP, 
                 actionResult.get(WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD));
@@ -243,7 +243,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
             encrypt.build(doc, crypto, secHeader);
             fail("Failure expected on not encrypting a required element");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
         }
     }
     
@@ -285,8 +285,8 @@ public class EncryptionPartsTest extends org.junit.Assert {
                 results.getActionResults().get(WSConstants.ENCR).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
-        final java.util.List<WSDataRef> refs =
-            (java.util.List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        final List<WSDataRef> refs =
+            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         
         assertEquals(WSConstants.KEYTRANSPORT_RSAOEP, 
                 actionResult.get(WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD));
@@ -333,8 +333,8 @@ public class EncryptionPartsTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.ENCR).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
-        final java.util.List<WSDataRef> refs =
-            (java.util.List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        final List<WSDataRef> refs =
+            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
 
         assertEquals(WSConstants.KEYTRANSPORT_RSAOEP,
             actionResult.get(WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD));
@@ -369,7 +369,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
             encrypt.build(doc, crypto, secHeader);
             fail("Failure expected on a bad localname");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
         }
     }
     
@@ -399,7 +399,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
             encrypt.build(doc, crypto, secHeader);
             fail("Failure expected on a bad namespace");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
         }
     }
     
@@ -452,8 +452,8 @@ public class EncryptionPartsTest extends org.junit.Assert {
         assertFalse(actionResult.isEmpty());
         
         @SuppressWarnings("unchecked")
-        final java.util.List<WSDataRef> refs =
-            (java.util.List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+        final List<WSDataRef> refs =
+            (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs != null && !refs.isEmpty());
         
         boolean foundFoo = false;

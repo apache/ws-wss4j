@@ -185,8 +185,8 @@ public class EncryptionGCMTest extends org.junit.Assert {
             final Integer action = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
             assertNotNull(action);
             if ((action & WSConstants.ENCR) != 0) {
-                final java.util.List<WSDataRef> refs =
-                    (java.util.List<WSDataRef>) result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+                final List<WSDataRef> refs =
+                    (List<WSDataRef>) result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
                 assertNotNull(refs);
                 encrypted = true;
                 for (java.util.Iterator<WSDataRef> jpos = refs.iterator(); jpos.hasNext();) {

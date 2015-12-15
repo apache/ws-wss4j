@@ -577,7 +577,7 @@ public class EncryptionTest extends org.junit.Assert {
             newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
             fail("Failure expected on a bad attribute type");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
         
         RequestData data = new RequestData();

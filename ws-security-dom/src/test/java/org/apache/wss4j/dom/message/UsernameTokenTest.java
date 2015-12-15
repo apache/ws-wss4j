@@ -53,6 +53,8 @@ import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * WS-Security Test Case for UsernameTokens.
@@ -526,7 +528,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             newEngine.processSecurityHeader(doc, null, callbackHandler, null);
             fail("Expected failure as it is not BSP compliant");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         RequestData data = new RequestData();
         data.setCallbackHandler(callbackHandler);
@@ -707,10 +709,10 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         //
         // Manually find the Nonce node and set the content to null
         //
-        org.w3c.dom.Element elem = builder.getUsernameTokenElement();
-        org.w3c.dom.NodeList list = elem.getElementsByTagNameNS(WSConstants.WSSE_NS, "Nonce");
-        org.w3c.dom.Node nonceNode = list.item(0);
-        org.w3c.dom.Node childNode = nonceNode.getFirstChild();
+        Element elem = builder.getUsernameTokenElement();
+        NodeList list = elem.getElementsByTagNameNS(WSConstants.WSSE_NS, "Nonce");
+        Node nonceNode = list.item(0);
+        Node childNode = nonceNode.getFirstChild();
         childNode.setNodeValue("");
         
         if (LOG.isDebugEnabled()) {
@@ -750,10 +752,10 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         //
         // Manually find the Created node and set the content to null
         //
-        org.w3c.dom.Element elem = builder.getUsernameTokenElement();
-        org.w3c.dom.NodeList list = elem.getElementsByTagNameNS(WSConstants.WSU_NS, "Created");
-        org.w3c.dom.Node nonceNode = list.item(0);
-        org.w3c.dom.Node childNode = nonceNode.getFirstChild();
+        Element elem = builder.getUsernameTokenElement();
+        NodeList list = elem.getElementsByTagNameNS(WSConstants.WSU_NS, "Created");
+        Node nonceNode = list.item(0);
+        Node childNode = nonceNode.getFirstChild();
         childNode.setNodeValue("");
         
         if (LOG.isDebugEnabled()) {
@@ -900,10 +902,10 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         //
         // Manually find the Nonce node and duplicate it
         //
-        org.w3c.dom.Element elem = builder.getUsernameTokenElement();
-        org.w3c.dom.NodeList list = elem.getElementsByTagNameNS(WSConstants.WSSE_NS, "Nonce");
-        org.w3c.dom.Node nonceNode = list.item(0);
-        org.w3c.dom.Node nonceCopy = nonceNode.cloneNode(true);
+        Element elem = builder.getUsernameTokenElement();
+        NodeList list = elem.getElementsByTagNameNS(WSConstants.WSSE_NS, "Nonce");
+        Node nonceNode = list.item(0);
+        Node nonceCopy = nonceNode.cloneNode(true);
         nonceNode.getParentNode().insertBefore(nonceCopy, nonceNode);
         
         if (LOG.isDebugEnabled()) {
@@ -917,7 +919,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             newEngine.processSecurityHeader(doc, null, callbackHandler, null);
             fail("Expected failure as it is not BSP compliant");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY      ); 
         }
 
         RequestData data = new RequestData();
@@ -943,10 +945,10 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         //
         // Manually find the Created node and duplicate it
         //
-        org.w3c.dom.Element elem = builder.getUsernameTokenElement();
-        org.w3c.dom.NodeList list = elem.getElementsByTagNameNS(WSConstants.WSU_NS, "Created");
-        org.w3c.dom.Node createdNode = list.item(0);
-        org.w3c.dom.Node createdCopy = createdNode.cloneNode(true);
+        Element elem = builder.getUsernameTokenElement();
+        NodeList list = elem.getElementsByTagNameNS(WSConstants.WSU_NS, "Created");
+        Node createdNode = list.item(0);
+        Node createdCopy = createdNode.cloneNode(true);
         createdNode.getParentNode().insertBefore(createdCopy, createdNode);
         
         if (LOG.isDebugEnabled()) {
@@ -960,7 +962,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             newEngine.processSecurityHeader(doc, null, callbackHandler, null);
             fail("Expected failure as it is not BSP compliant");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         RequestData data = new RequestData();
@@ -986,10 +988,10 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         //
         // Manually find the Nonce node and duplicate it
         //
-        org.w3c.dom.Element elem = builder.getUsernameTokenElement();
-        org.w3c.dom.NodeList list = elem.getElementsByTagNameNS(WSConstants.WSSE_NS, "Password");
-        org.w3c.dom.Node passwordNode = list.item(0);
-        org.w3c.dom.Node passwordCopy = passwordNode.cloneNode(true);
+        Element elem = builder.getUsernameTokenElement();
+        NodeList list = elem.getElementsByTagNameNS(WSConstants.WSSE_NS, "Password");
+        Node passwordNode = list.item(0);
+        Node passwordCopy = passwordNode.cloneNode(true);
         passwordNode.getParentNode().insertBefore(passwordCopy, passwordNode);
         
         if (LOG.isDebugEnabled()) {
@@ -1003,7 +1005,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             newEngine.processSecurityHeader(doc, null, callbackHandler, null);
             fail("Expected failure as it is not BSP compliant");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         RequestData data = new RequestData();
@@ -1029,10 +1031,10 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         //
         // Manually find the Nonce node and duplicate it
         //
-        org.w3c.dom.Element elem = builder.getUsernameTokenElement();
-        org.w3c.dom.NodeList list = elem.getElementsByTagNameNS(WSConstants.WSSE_NS, "Nonce");
-        org.w3c.dom.Node nonceNode = list.item(0);
-        ((org.w3c.dom.Element)nonceNode).setAttributeNS(
+        Element elem = builder.getUsernameTokenElement();
+        NodeList list = elem.getElementsByTagNameNS(WSConstants.WSSE_NS, "Nonce");
+        Node nonceNode = list.item(0);
+        ((Element)nonceNode).setAttributeNS(
             null, "EncodingType", "http://bad_encoding_type"
         );
         
@@ -1047,7 +1049,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             newEngine.processSecurityHeader(doc, null, callbackHandler, null);
             fail("Expected failure as it is not BSP compliant");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         RequestData data = new RequestData();
