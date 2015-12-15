@@ -102,10 +102,8 @@ public class CRLFOutputStreamTest {
                 if (res[i + 1] != '\n') {
                     throw new Exception("Missing \\n in\n" + createEscapedString(res) + "\n input string: " + createEscapedString(testString.toByteArray()));
                 }
-            } else if (re == '\n') {
-                if (res[i - 1] != '\r') {
-                    throw new Exception("Missing \\r in\n" + createEscapedString(res) + "\n input string: " + createEscapedString(testString.toByteArray()));
-                }
+            } else if (re == '\n' && res[i - 1] != '\r') {
+                throw new Exception("Missing \\r in\n" + createEscapedString(res) + "\n input string: " + createEscapedString(testString.toByteArray()));
             }
         }
     }

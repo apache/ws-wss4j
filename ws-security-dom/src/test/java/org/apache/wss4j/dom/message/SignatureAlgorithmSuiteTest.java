@@ -96,7 +96,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
             verify(securityHeader, algorithmSuite, crypto);
             fail("Expected failure as 512-bit keys are not allowed");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
     }
     
@@ -127,7 +127,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
             verify(securityHeader, algorithmSuite, dsaCrypto);
             fail("Expected failure as DSA is not allowed");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
         
         algorithmSuite.addSignatureMethod(WSConstants.DSA);
@@ -178,7 +178,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
             secEngine.processSecurityHeader(securityHeader, data);
             fail("Expected failure as HMAC-SHA1 is not allowed");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
         
         algorithmSuite.addSignatureMethod(WSConstants.HMAC_SHA1);
@@ -189,7 +189,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
             secEngine.processSecurityHeader(securityHeader, data);
             fail("Expected failure as a 128 bit key is not allowed");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
         
         algorithmSuite.setMinimumSymmetricKeyLength(64);
@@ -198,7 +198,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
             secEngine.processSecurityHeader(securityHeader, data);
             fail("Expected failure as a 128 bit key is not allowed");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
     }
     
@@ -228,7 +228,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
             verify(securityHeader, algorithmSuite, crypto);
             fail("Expected failure as C14n algorithm is not allowed");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
         
         algorithmSuite.addC14nAlgorithm(WSConstants.C14N_EXCL_WITH_COMMENTS);
@@ -261,7 +261,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
             verify(securityHeader, algorithmSuite, crypto);
             fail("Expected failure as Digest algorithm is not allowed");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
         
         algorithmSuite.addDigestAlgorithm(WSConstants.SHA256);

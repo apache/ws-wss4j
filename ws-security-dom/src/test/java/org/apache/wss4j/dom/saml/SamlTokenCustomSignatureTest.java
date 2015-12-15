@@ -109,7 +109,7 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
             verify(doc);
             fail("Failure expected on a signature that doesn't conform with the signature profile");
         } catch (WSSecurityException ex) {
-            // expected failure
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
         }
         
         // This should pass as we are disabling signature profile validation in the Validator
@@ -150,7 +150,7 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
             verify(doc);
             fail("Failure expected on a signature that doesn't conform with the signature profile");
         } catch (WSSecurityException ex) {
-            // expected failure
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
         }
         
         // This should pass as we are disabling signature profile validation in the Validator

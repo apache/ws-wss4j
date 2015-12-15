@@ -69,8 +69,7 @@ public class CryptoTest extends org.junit.Assert {
     public void testCustomCrypto() throws Exception {
         java.util.Map<Object, Object> tmp = new java.util.TreeMap<>();
         Crypto crypto = CryptoFactory.getInstance(
-            org.apache.wss4j.dom.common.CustomCrypto.class,
-            tmp
+            CustomCrypto.class, tmp
         );
         assertNotNull(crypto);
         assertTrue(crypto instanceof CustomCrypto);
@@ -133,7 +132,7 @@ public class CryptoTest extends org.junit.Assert {
             secEngine.processSecurityHeader(signedDoc, null, null, processCrypto);
             fail("Expected failure on a bad trust store");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
         }
     }
     

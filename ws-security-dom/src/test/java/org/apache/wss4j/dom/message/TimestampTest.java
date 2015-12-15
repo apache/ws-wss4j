@@ -157,7 +157,7 @@ public class TimestampTest extends org.junit.Assert {
             secEngine.processSecurityHeader(doc, requestData);
             fail("Failure expected on no Expires Element");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.SECURITY_ERROR); 
         }
 
         requestData.setWssConfig(WSSConfig.getNewInstance());
@@ -383,7 +383,7 @@ public class TimestampTest extends org.junit.Assert {
             verify(doc);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
-            //
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
         }
     }
     
@@ -418,7 +418,7 @@ public class TimestampTest extends org.junit.Assert {
             verify(createdDoc);
             fail("Expected failure on multiple timestamps");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         verify(createdDoc, Collections.singletonList(BSPRule.R3227));
@@ -464,7 +464,7 @@ public class TimestampTest extends org.junit.Assert {
             verify(doc);
             fail("The timestamp validation should have failed on multiple Created elements");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         verify(doc, Collections.singletonList(BSPRule.R3203));
@@ -511,7 +511,7 @@ public class TimestampTest extends org.junit.Assert {
             verify(doc);
             fail("The timestamp validation should have failed on no Created element");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         List<BSPRule> rules = new ArrayList<>();
@@ -571,7 +571,7 @@ public class TimestampTest extends org.junit.Assert {
             verify(doc);
             fail("The timestamp validation should have failed on multiple Expires elements");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         verify(doc, Collections.singletonList(BSPRule.R3224));
@@ -625,7 +625,7 @@ public class TimestampTest extends org.junit.Assert {
             verify(doc);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         verify(doc, Collections.singletonList(BSPRule.R3221));
@@ -672,7 +672,7 @@ public class TimestampTest extends org.junit.Assert {
             verify(doc, wssConfig, new ArrayList<BSPRule>());
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
-            //assertTrue(ex.getMessage().contains("Unparseable date"));
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
     }
     
@@ -719,7 +719,7 @@ public class TimestampTest extends org.junit.Assert {
             verify(doc);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
-            //
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         // Now it should pass...
@@ -783,7 +783,7 @@ public class TimestampTest extends org.junit.Assert {
             verify(doc);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
-            //
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         // Now it should pass...

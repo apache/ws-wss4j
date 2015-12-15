@@ -49,7 +49,7 @@ import org.junit.Assert;
 /**
  * A set of tests for using a derived key for encryption/signature using WSHandler actions.
  */
-public class DerivedKeyActionTest extends org.junit.Assert {
+public class DerivedKeyActionTest extends Assert {
     private static final org.slf4j.Logger LOG = 
         org.slf4j.LoggerFactory.getLogger(DerivedKeyActionTest.class);
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();

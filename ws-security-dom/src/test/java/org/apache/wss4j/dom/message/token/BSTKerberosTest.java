@@ -245,7 +245,7 @@ public class BSTKerberosTest extends org.junit.Assert {
             customEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
             fail("Failure expected on a bad token");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION); 
         }
     }
     

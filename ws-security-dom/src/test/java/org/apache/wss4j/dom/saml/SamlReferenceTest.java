@@ -385,8 +385,8 @@ public class SamlReferenceTest extends org.junit.Assert {
         //
         // Remove the assertion its place in the security header and then append it
         //
-        org.w3c.dom.Element secHeaderElement = secHeader.getSecurityHeader();
-        org.w3c.dom.Node assertionNode = 
+        Element secHeaderElement = secHeader.getSecurityHeader();
+        Node assertionNode = 
             secHeaderElement.getElementsByTagNameNS(WSConstants.SAML_NS, "Assertion").item(0);
         secHeaderElement.removeChild(assertionNode);
         secHeaderElement.appendChild(assertionNode);

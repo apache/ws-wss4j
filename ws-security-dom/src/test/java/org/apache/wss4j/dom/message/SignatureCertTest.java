@@ -227,7 +227,6 @@ public class SignatureCertTest extends org.junit.Assert {
             fail("Failure expected on issuer serial");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
-            // expected
         }
     }
     
@@ -261,7 +260,7 @@ public class SignatureCertTest extends org.junit.Assert {
             verify(signedDoc, CryptoFactory.getInstance("wss40badcatrust.properties"));
             fail("Failure expected on bad CA cert!");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
     }
     
@@ -340,7 +339,7 @@ public class SignatureCertTest extends org.junit.Assert {
             newEngine.processSecurityHeader(doc, null, null, cryptoCA);
             fail("Failure expected on an expired cert");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
     }
     
@@ -379,7 +378,7 @@ public class SignatureCertTest extends org.junit.Assert {
             newEngine.processSecurityHeader(doc, null, null, clientCrypto);
             fail("Failure expected on an expired cert");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
         }
     }
     

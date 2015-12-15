@@ -98,7 +98,7 @@ public class SecurityHeaderTest extends org.junit.Assert {
             secEngine.processSecurityHeader(doc, null, null, null);
             fail("Failure expected on a null actor");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
     }
     
@@ -112,7 +112,7 @@ public class SecurityHeaderTest extends org.junit.Assert {
             secEngine.processSecurityHeader(doc, "user", null, null);
             fail("Failure expected on a duplicate actor");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
     }
     

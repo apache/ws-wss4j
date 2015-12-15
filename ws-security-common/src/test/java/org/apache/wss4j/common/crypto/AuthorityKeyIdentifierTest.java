@@ -24,6 +24,7 @@ import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
 
 /**
@@ -90,8 +91,8 @@ public class AuthorityKeyIdentifierTest extends org.junit.Assert {
         try {
             crypto.verifyTrust(new X509Certificate[]{badCert}, false, null);
             fail("Failure expected on trying to validate an untrusted cert");
-        } catch (Exception ex) {
-            // expected
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
     }
     

@@ -29,6 +29,7 @@ import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
@@ -142,8 +143,8 @@ public class SignatureCRLTest extends org.junit.Assert {
         try {
             verify(signedDoc, cryptoCA, true);
             fail ("Failure expected on a revoked certificate");
-        } catch (Exception ex) {
-            // expected
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION); 
         }
     }
     
@@ -180,8 +181,8 @@ public class SignatureCRLTest extends org.junit.Assert {
         try {
             verify(signedDoc, crypto, true);
             fail ("Failure expected on a revoked certificate");
-        } catch (Exception ex) {
-            // expected
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION); 
         }
     }
     

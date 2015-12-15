@@ -165,7 +165,7 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
             secEngine.processSecurityHeader(doc, null, null, crypto);
             fail("Expected failure on no ValueType");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);

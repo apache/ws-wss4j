@@ -89,7 +89,7 @@ public class SignatureCertConstraintsTest extends org.junit.Assert {
             verify(securityHeader, cryptoCA, certConstraint);
             fail("Failure expected on a bad cert constraint");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION); 
         }
     }
     
@@ -124,7 +124,7 @@ public class SignatureCertConstraintsTest extends org.junit.Assert {
             verify(securityHeader, cryptoCA, certConstraint);
             fail("Failure expected on a bad cert constraint");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION); 
         }
     }
     

@@ -81,7 +81,7 @@ public class DerivedKeyTokenTest extends org.junit.Assert {
     @org.junit.Test
     public void testHashcode() throws Exception{
         assertEquals(token.hashCode(), tokenEqual.hashCode());
-        assertFalse((token.hashCode() == tokenNotEqual.hashCode()));
+        assertFalse(token.hashCode() == tokenNotEqual.hashCode());
     }
 
     private static org.w3c.dom.Document createReferenceDocument(

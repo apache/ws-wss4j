@@ -147,7 +147,7 @@ public class EncryptionCRLTest extends org.junit.Assert {
                 true
             );
             fail ("Failure expected on a revoked certificate");
-        } catch (Exception ex) {
+        } catch (Exception ex) { //NOPMD
             // expected
         }
        

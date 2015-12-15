@@ -92,7 +92,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
             verify(securityHeader, algorithmSuite, crypto);
             fail("Expected failure as 512-bit keys are not allowed");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
     }
     
@@ -126,7 +126,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
             verify(securityHeader, algorithmSuite, wssCrypto);
             fail("Expected failure as RSA 15 is not allowed");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         algorithmSuite.addKeyWrapAlgorithm(WSConstants.KEYTRANSPORT_RSA15);
@@ -162,7 +162,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
             verify(securityHeader, null, wssCrypto);
             fail("Expected failure as RSA 15 is not allowed");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         // Now enable RSA v1.5 processing
@@ -205,7 +205,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
             verify(securityHeader, algorithmSuite, wssCrypto);
             fail("Expected failure as AES 128 is not allowed");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         algorithmSuite.addEncryptionMethod(WSConstants.AES_128);
@@ -260,7 +260,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
             secEngine.processSecurityHeader(securityHeader, data);
             fail("Expected failure as a 128 bit key is not allowed");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         algorithmSuite.setMinimumSymmetricKeyLength(64);
@@ -269,7 +269,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
             secEngine.processSecurityHeader(securityHeader, data);
             fail("Expected failure as a 128 bit key is not allowed");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
     }
     

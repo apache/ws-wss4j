@@ -26,6 +26,7 @@ import org.w3c.dom.Document;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.SOAPUtil;
@@ -126,8 +127,8 @@ public class SignatureKeyValueTest extends org.junit.Assert {
             data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R5417));
             secEngine.processSecurityHeader(signedDoc, data);
             fail("Failure expected on bad public key");
-        } catch (Exception ex) {
-            // expected
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION); 
         }
         
     }

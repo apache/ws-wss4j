@@ -23,9 +23,6 @@ import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 
-import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.xml.security.utils.Base64;
 

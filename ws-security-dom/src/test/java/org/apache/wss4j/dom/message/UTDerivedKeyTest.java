@@ -174,7 +174,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
             verify(encryptedDoc, false);
             fail("Failure expected on deriving keys from a UsernameToken not allowed");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION); 
         }
     }
     
@@ -277,7 +277,6 @@ public class UTDerivedKeyTest extends org.junit.Assert {
             fail("Failure expected on a bad derived encryption");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
-            // expected
         }
     }
     
@@ -328,7 +327,6 @@ public class UTDerivedKeyTest extends org.junit.Assert {
             fail("Failure expected on a bad derived encryption");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
-            // expected
         }
     }
     
@@ -486,7 +484,6 @@ public class UTDerivedKeyTest extends org.junit.Assert {
             fail("Failure expected on a bad derived signature");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
-            // expected
         }
     }
     
@@ -532,7 +529,6 @@ public class UTDerivedKeyTest extends org.junit.Assert {
             fail("Failure expected on a bad derived signature");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
-            // expected
         }
     }
     
@@ -583,7 +579,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
             verify(encryptedDoc);
             fail("Failure expected on no salt element");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
         }
     }
     
@@ -632,7 +628,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
             verify(encryptedDoc);
             fail("Failure expected on no iteration element");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN); 
         }
     }
     
@@ -682,7 +678,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
             verify(encryptedDoc);
             fail("Failure expected on a low iteration value");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
 
         RequestData data = new RequestData();
@@ -744,7 +740,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
             verify(encryptedDoc);
             fail("Failure expected on a bad value type");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         // Turn off BSP compliance and it should work
@@ -812,7 +808,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
             verify(encryptedDoc);
             fail("Failure expected on a key identifier");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         WSSecurityEngine newEngine = new WSSecurityEngine();

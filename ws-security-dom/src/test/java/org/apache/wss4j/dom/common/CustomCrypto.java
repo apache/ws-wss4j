@@ -28,7 +28,7 @@ public class CustomCrypto extends Merlin {
     public
     CustomCrypto(
         java.util.Map<String, Object> config,
-        java.lang.ClassLoader loader
+        java.lang.ClassLoader loader    //NOPMD
     ) {
         this.config = config;
     }

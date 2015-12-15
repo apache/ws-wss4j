@@ -214,7 +214,7 @@ public class UseReqSigCertTest extends org.junit.Assert {
         config.put(WSHandlerConstants.RECV_RESULTS, handlerResults);
         reqData.setMsgContext(config);
         
-        final java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
+        final List<Integer> actions = new ArrayList<Integer>();
         actions.add(WSConstants.ENCR);
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         

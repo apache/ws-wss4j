@@ -30,6 +30,7 @@ import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.apache.wss4j.dom.engine.WSSConfig;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -43,6 +44,10 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
+    }
+    
+    public SecurityTokenReferenceTest() {
+        WSSConfig.init();
     }
     
     /**
@@ -102,7 +107,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
             new SecurityTokenReference(strElement,bspEnforcer);
             fail("Failure expected on multiple data references");
         } catch (WSSecurityException ex) {
-            // Expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         bspEnforcer.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3061));
@@ -132,7 +137,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
             new SecurityTokenReference(strElement,bspEnforcer);
             fail("Failure expected on a Key Identifier with no ValueType");
         } catch (WSSecurityException ex) {
-            // Expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         bspEnforcer.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3054));
@@ -166,7 +171,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
             new SecurityTokenReference(strElement,bspEnforcer);
             fail("Failure expected on a Key Identifier with a Bad EncodingType");
         } catch (WSSecurityException ex) {
-            // Expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         bspEnforcer.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3071));
@@ -200,7 +205,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
             new SecurityTokenReference(strElement,bspEnforcer);
             fail("Failure expected on a Key Identifier with no EncodingType");
         } catch (WSSecurityException ex) {
-            // Expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         bspEnforcer.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3070));
@@ -262,7 +267,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
             new SecurityTokenReference(strElement,bspEnforcer);
             fail("Failure expected on an Embedded Child with a SecurityTokenReference child");
         } catch (WSSecurityException ex) {
-            // Expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         bspEnforcer.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3056));
@@ -299,7 +304,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
             new SecurityTokenReference(strElement,bspEnforcer);
             fail("Failure expected on an Embedded Child with multiple children");
         } catch (WSSecurityException ex) {
-            // Expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         bspEnforcer.setIgnoredBSPRules(Collections.singletonList(BSPRule.R3060));

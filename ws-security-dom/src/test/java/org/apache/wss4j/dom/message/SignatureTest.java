@@ -212,7 +212,7 @@ public class SignatureTest extends org.junit.Assert {
             newEngine.processSecurityHeader(doc, null, null, crypto);
             fail("Failure expected on a bad c14n algorithm");
         } catch (WSSecurityException ex) {
-            // expected
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
         }
         
         RequestData data = new RequestData();
@@ -476,10 +476,10 @@ public class SignatureTest extends org.junit.Assert {
         builder.getParts().add(encP);
         
         Document signedDoc = builder.build(createdDoc, crypto, secHeader);
-        org.w3c.dom.Element secHeaderElement = secHeader.getSecurityHeader();
-        org.w3c.dom.Node timestampNode = 
+        Element secHeaderElement = secHeader.getSecurityHeader();
+        Node timestampNode = 
             secHeaderElement.getElementsByTagNameNS(WSConstants.WSU_NS, "Timestamp").item(0);
-        ((org.w3c.dom.Element)timestampNode).setAttributeNS(
+        ((Element)timestampNode).setAttributeNS(
             WSConstants.XMLNS_NS, "xmlns", WSConstants.WSU_NS
         );
         
@@ -586,9 +586,9 @@ public class SignatureTest extends org.junit.Assert {
         Document signedDoc = builder.build(doc, crypto, secHeader);
         
         // Add a comment node as the first node element
-        org.w3c.dom.Node firstChild = signedDoc.getFirstChild();
-        org.w3c.dom.Node newNode = signedDoc.removeChild(firstChild);
-        org.w3c.dom.Node commentNode = signedDoc.createComment("This is a comment");
+        Node firstChild = signedDoc.getFirstChild();
+        Node newNode = signedDoc.removeChild(firstChild);
+        Node commentNode = signedDoc.createComment("This is a comment");
         signedDoc.appendChild(commentNode);
         signedDoc.appendChild(newNode);
 
@@ -907,7 +907,7 @@ public class SignatureTest extends org.junit.Assert {
         
         // Add a comment node
         Element body = WSSecurityUtil.findBodyElement(signedDoc);
-        org.w3c.dom.Node commentNode = signedDoc.createComment("This is a comment");
+        Node commentNode = signedDoc.createComment("This is a comment");
         body.getFirstChild().appendChild(commentNode);
 
         if (LOG.isDebugEnabled()) {
