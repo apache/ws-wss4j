@@ -158,7 +158,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
             Assert.assertNotNull(node);
 
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
         //test streaming decryption
@@ -225,8 +225,8 @@ public class EncDecryptionTest extends AbstractTestBase {
                 }
             }
 
-            org.junit.Assert.assertEquals(4, encryptedPartSecurityEvents.size());
-            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+            Assert.assertEquals(4, encryptedPartSecurityEvents.size());
+            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() + encryptedPartSecurityEvents.size());
         }
     }
@@ -302,7 +302,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
             Assert.assertNotNull(node);
 
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
         //test streaming decryption
@@ -371,8 +371,8 @@ public class EncDecryptionTest extends AbstractTestBase {
                 }
             }
 
-            org.junit.Assert.assertEquals(4, encryptedPartSecurityEvents.size());
-            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+            Assert.assertEquals(4, encryptedPartSecurityEvents.size());
+            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() + encryptedPartSecurityEvents.size());
         }
     }
@@ -443,7 +443,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
 
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
         //test streaming decryption
@@ -623,24 +623,24 @@ public class EncDecryptionTest extends AbstractTestBase {
                 }
             }
 
-            org.junit.Assert.assertEquals(4, encryptedPartSecurityEvents1.size());
-            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents2.size());
-            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents3.size());
-            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents4.size());
-            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents5.size());
-            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents6.size());
-            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents7.size());
-            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents8.size());
-            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents9.size());
-            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents10.size());
-            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents11.size());
-            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents12.size());
-            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents13.size());
-            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents14.size());
-            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents15.size());
-            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents16.size());
-            org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents17.size());
-            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+            Assert.assertEquals(4, encryptedPartSecurityEvents1.size());
+            Assert.assertEquals(3, encryptedPartSecurityEvents2.size());
+            Assert.assertEquals(3, encryptedPartSecurityEvents3.size());
+            Assert.assertEquals(3, encryptedPartSecurityEvents4.size());
+            Assert.assertEquals(3, encryptedPartSecurityEvents5.size());
+            Assert.assertEquals(3, encryptedPartSecurityEvents6.size());
+            Assert.assertEquals(3, encryptedPartSecurityEvents7.size());
+            Assert.assertEquals(3, encryptedPartSecurityEvents8.size());
+            Assert.assertEquals(3, encryptedPartSecurityEvents9.size());
+            Assert.assertEquals(3, encryptedPartSecurityEvents10.size());
+            Assert.assertEquals(3, encryptedPartSecurityEvents11.size());
+            Assert.assertEquals(3, encryptedPartSecurityEvents12.size());
+            Assert.assertEquals(3, encryptedPartSecurityEvents13.size());
+            Assert.assertEquals(3, encryptedPartSecurityEvents14.size());
+            Assert.assertEquals(3, encryptedPartSecurityEvents15.size());
+            Assert.assertEquals(3, encryptedPartSecurityEvents16.size());
+            Assert.assertEquals(3, encryptedPartSecurityEvents17.size());
+            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() +
                     encryptedPartSecurityEvents1.size() +
                     encryptedPartSecurityEvents2.size() +
@@ -757,7 +757,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
 
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
@@ -874,7 +874,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
 
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
@@ -942,8 +942,8 @@ public class EncDecryptionTest extends AbstractTestBase {
                 }
             }
 
-            org.junit.Assert.assertEquals(4, encryptedPartSecurityEvents.size());
-            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+            Assert.assertEquals(4, encryptedPartSecurityEvents.size());
+            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() + encryptedPartSecurityEvents.size());
         }
     }
@@ -965,8 +965,8 @@ public class EncDecryptionTest extends AbstractTestBase {
                 doOutboundSecurity(securityProperties, sourceDocument);
                 Assert.fail("Exception expected");
             } catch (XMLStreamException e) {
-                org.junit.Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
-                org.junit.Assert.assertEquals("Part to encrypt not found: {http://www.wrongnamespace.org}complexType", e.getCause().getMessage());
+                Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
+                Assert.assertEquals("Part to encrypt not found: {http://www.wrongnamespace.org}complexType", e.getCause().getMessage());
             }
         }
     }
@@ -1086,7 +1086,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
             Assert.assertNotNull(node);
 
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
@@ -1163,7 +1163,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
             Assert.assertNotNull(node);
 
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
@@ -1206,7 +1206,7 @@ public class EncDecryptionTest extends AbstractTestBase {
      * parentElement.removeChild(node);
      * parentElement.appendChild(node);
      * <p/>
-     * javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+     * Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
      * transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
      * }
      * <p/>
@@ -1333,7 +1333,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
             Assert.assertNotNull(node);
 
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
@@ -1410,7 +1410,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
             Assert.assertNotNull(node);
 
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
@@ -1487,7 +1487,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
             Assert.assertNotNull(node);
 
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
@@ -1578,7 +1578,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
             Assert.assertNotNull(node);
 
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
@@ -1662,7 +1662,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             String action = WSHandlerConstants.ENCRYPT;
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
 
             securedDocument = doOutboundSecurityWithWSS4J(new ByteArrayInputStream(baos.toByteArray()), action, new Properties());
@@ -1817,8 +1817,8 @@ public class EncDecryptionTest extends AbstractTestBase {
                 }
             }
 
-            org.junit.Assert.assertEquals(4, encryptedPartSecurityEvents.size());
-            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+            Assert.assertEquals(4, encryptedPartSecurityEvents.size());
+            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() + encryptedPartSecurityEvents.size());
         }
     }
@@ -1907,7 +1907,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
             Assert.assertNotNull(node);
 
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
         //test streaming decryption
@@ -2021,7 +2021,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
             Assert.assertNotNull(node);
 
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
         //test streaming decryption
@@ -2145,7 +2145,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
             Assert.assertNotNull(node);
 
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
         //test streaming decryption
@@ -2285,7 +2285,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
             Assert.assertNotNull(node);
 
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
         //test streaming decryption
@@ -2324,7 +2324,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
             Assert.assertNotNull(node);
 
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
         //test streaming decryption
@@ -2434,7 +2434,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
             Assert.assertNotNull(node);
 
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
         //test streaming decryption
@@ -2509,8 +2509,8 @@ public class EncDecryptionTest extends AbstractTestBase {
                 }
             }
 
-            org.junit.Assert.assertEquals(4, encryptedPartSecurityEvents.size());
-            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+            Assert.assertEquals(4, encryptedPartSecurityEvents.size());
+            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() + encryptedPartSecurityEvents.size());
         }
     }
@@ -2544,8 +2544,8 @@ public class EncDecryptionTest extends AbstractTestBase {
                 xmlStreamWriter.close();
                 Assert.fail("Exception expected");
             } catch (XMLStreamException e) {
-                org.junit.Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
-                org.junit.Assert.assertEquals("Part to encrypt not found: {http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}UsernameToken", e.getCause().getMessage());
+                Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
+                Assert.assertEquals("Part to encrypt not found: {http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}UsernameToken", e.getCause().getMessage());
             }
         }
     }
@@ -2577,7 +2577,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             builder.addExternalRefElement(ref, secHeader);
             builder.prependToHeader(secHeader);
 
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
         }
 
@@ -2620,7 +2620,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             builder.addExternalRefElement(ref, secHeader);
             builder.prependToHeader(secHeader);
 
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
         }
 
@@ -2664,7 +2664,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             //builder.addExternalRefElement(ref, secHeader);
             securityHeaderElement.appendChild(ref);
 
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
+            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
         }
 

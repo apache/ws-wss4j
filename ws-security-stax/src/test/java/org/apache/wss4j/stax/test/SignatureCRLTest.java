@@ -123,7 +123,8 @@ public class SignatureCRLTest extends AbstractTestBase {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("Expected failure on a revocation check");
             } catch (Exception ex) {
-                // Expected
+                Assert.assertNotNull(ex.getCause());
+                Assert.assertTrue(ex.getCause() instanceof WSSecurityException);
             }
         }
     }

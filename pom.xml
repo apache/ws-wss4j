@@ -134,7 +134,7 @@
                     <failOnViolation>true</failOnViolation>
                     <linkXRef>false</linkXRef>
                     <verbose>true</verbose>
-                    <!--<includeTests>true</includeTests>-->
+                    <includeTests>true</includeTests>
                     <targetJdk>${targetJdk}</targetJdk>
                     <excludeRoots>
                         <excludeRoot>${basedir}/src/main/generated</excludeRoot>

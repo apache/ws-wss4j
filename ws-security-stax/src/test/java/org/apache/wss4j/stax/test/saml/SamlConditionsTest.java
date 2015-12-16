@@ -423,7 +423,7 @@ public class SamlConditionsTest extends AbstractTestBase {
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with a ProxyRestriction Element
      */
-    @org.junit.Test
+    @Test
     public void testSAML2ProxyRestriction() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -469,7 +469,7 @@ public class SamlConditionsTest extends AbstractTestBase {
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with an AudienceRestriction Element
      */
-    @org.junit.Test
+    @Test
     public void testSAML2AudienceRestriction() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -511,7 +511,7 @@ public class SamlConditionsTest extends AbstractTestBase {
     }
 
     // Now test AudienceRestrictions with supplied restrictions
-    @org.junit.Test
+    @Test
     public void testSAML2AudienceRestrictionValidation() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         List<String> audiences = new ArrayList<String>();
@@ -573,7 +573,7 @@ public class SamlConditionsTest extends AbstractTestBase {
     }
 
     // Now test AudienceRestrictions with supplied restrictions
-    @org.junit.Test
+    @Test
     public void testSAML1AudienceRestrictionValidation() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         List<String> audiences = new ArrayList<String>();
@@ -638,7 +638,7 @@ public class SamlConditionsTest extends AbstractTestBase {
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with two AudienceRestriction Elements
      */
-    @org.junit.Test
+    @Test
     public void testSAML2AudienceRestrictionSeparateRestrictions() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -686,7 +686,7 @@ public class SamlConditionsTest extends AbstractTestBase {
     }
 
     // Now test AudienceRestrictions with supplied restrictions
-    @org.junit.Test
+    @Test
     public void testSAML1AudienceRestrictionSeparateRestrictionsValidation() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {

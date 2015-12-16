@@ -553,7 +553,7 @@ public class AttachmentTest extends AbstractTestBase {
 
             Map<String, String> attHeaders = responseAttachment.getHeaders();
             Assert.assertEquals(6, attHeaders.size());
-        } catch (IOException ex) {
+        } catch (IOException ex) { //NOPMD
             // expected
         }
     }

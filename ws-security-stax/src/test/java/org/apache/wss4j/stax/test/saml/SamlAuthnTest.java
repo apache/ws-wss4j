@@ -49,6 +49,8 @@ import org.w3c.dom.NodeList;
  */
 public class SamlAuthnTest extends AbstractTestBase {
 
+    private static final String IP_ADDRESS = "127.0.0.1"; //NOPMD
+
     @Test
     public void testSAML1AuthnAssertion() throws Exception {
 
@@ -118,7 +120,7 @@ public class SamlAuthnTest extends AbstractTestBase {
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
 
-        callbackHandler.setSubjectLocality("127.0.0.1", "xyz.ws.apache.org");
+        callbackHandler.setSubjectLocality(IP_ADDRESS, "xyz.ws.apache.org");
 
         createDOMMessageAndVerifyStAX(callbackHandler, true);
     }
@@ -131,7 +133,7 @@ public class SamlAuthnTest extends AbstractTestBase {
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
 
-        callbackHandler.setSubjectLocality("127.0.0.1", "xyz.ws.apache.org");
+        callbackHandler.setSubjectLocality(IP_ADDRESS, "xyz.ws.apache.org");
 
         createDOMMessageAndVerifyStAX(callbackHandler, true);
     }

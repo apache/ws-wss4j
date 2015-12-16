@@ -358,7 +358,7 @@ public class TimestampTest extends AbstractTestBase {
         // now allow future TTL of 2 hours +
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            securityProperties.setTimeStampFutureTTL((2 * 60 * 60) + 100);
+            securityProperties.setTimeStampFutureTTL(2 * 60 * 60 + 100);
 
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
@@ -553,7 +553,8 @@ public class TimestampTest extends AbstractTestBase {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 fail("Failure expected on no Expires Element");
             } catch (XMLStreamException e) {
-                // expected
+                Assert.assertNotNull(e.getCause());
+                Assert.assertTrue(e.getCause() instanceof WSSecurityException);
             }
         }
 

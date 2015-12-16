@@ -214,8 +214,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
                 }
             }
 
-            org.junit.Assert.assertEquals(5, encryptedPartSecurityEvents.size());
-            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+            Assert.assertEquals(5, encryptedPartSecurityEvents.size());
+            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() +
                             encryptedPartSecurityEvents.size()
             );
@@ -295,8 +295,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
                 }
             }
 
-            org.junit.Assert.assertEquals(5, encryptedPartSecurityEvents.size());
-            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+            Assert.assertEquals(5, encryptedPartSecurityEvents.size());
+            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() +
                             encryptedPartSecurityEvents.size()
             );
@@ -431,9 +431,9 @@ public class SecurityContextTokenTest extends AbstractTestBase {
                 }
             }
 
-            org.junit.Assert.assertEquals(3, signedElementSecurityEvents.size());
-            org.junit.Assert.assertEquals(6, signatureValueSecurityEvents.size());
-            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+            Assert.assertEquals(3, signedElementSecurityEvents.size());
+            Assert.assertEquals(6, signatureValueSecurityEvents.size());
+            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() +
                             signedElementSecurityEvents.size() + signatureValueSecurityEvents.size()
             );
@@ -520,9 +520,9 @@ public class SecurityContextTokenTest extends AbstractTestBase {
                 }
             }
 
-            org.junit.Assert.assertEquals(3, signedElementSecurityEvents.size());
-            org.junit.Assert.assertEquals(6, signatureValueSecurityEvents.size());
-            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+            Assert.assertEquals(3, signedElementSecurityEvents.size());
+            Assert.assertEquals(6, signatureValueSecurityEvents.size());
+            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() +
                             signedElementSecurityEvents.size() + signatureValueSecurityEvents.size()
             );
@@ -690,10 +690,10 @@ public class SecurityContextTokenTest extends AbstractTestBase {
                 }
             }
 
-            org.junit.Assert.assertEquals(3, signedElementSecurityEvents.size());
-            org.junit.Assert.assertEquals(5, signatureValueSecurityEvents.size());
-            org.junit.Assert.assertEquals(5, encryptedPartSecurityEvents.size());
-            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+            Assert.assertEquals(3, signedElementSecurityEvents.size());
+            Assert.assertEquals(5, signatureValueSecurityEvents.size());
+            Assert.assertEquals(5, encryptedPartSecurityEvents.size());
+            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() +
                             signedElementSecurityEvents.size() + signatureValueSecurityEvents.size() + encryptedPartSecurityEvents.size()
             );
@@ -789,10 +789,10 @@ public class SecurityContextTokenTest extends AbstractTestBase {
                 }
             }
 
-            org.junit.Assert.assertEquals(3, signedElementSecurityEvents.size());
-            org.junit.Assert.assertEquals(5, signatureValueSecurityEvents.size());
-            org.junit.Assert.assertEquals(5, encryptedPartSecurityEvents.size());
-            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+            Assert.assertEquals(3, signedElementSecurityEvents.size());
+            Assert.assertEquals(5, signatureValueSecurityEvents.size());
+            Assert.assertEquals(5, encryptedPartSecurityEvents.size());
+            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() +
                             signedElementSecurityEvents.size() + signatureValueSecurityEvents.size() + encryptedPartSecurityEvents.size()
             );
@@ -913,10 +913,10 @@ public class SecurityContextTokenTest extends AbstractTestBase {
                 }
             }
 
-            org.junit.Assert.assertEquals(3, signedElementSecurityEvents.size());
-            org.junit.Assert.assertEquals(5, signatureValueSecurityEvents.size());
-            org.junit.Assert.assertEquals(5, encryptedPartSecurityEvents.size());
-            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+            Assert.assertEquals(3, signedElementSecurityEvents.size());
+            Assert.assertEquals(5, signatureValueSecurityEvents.size());
+            Assert.assertEquals(5, encryptedPartSecurityEvents.size());
+            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() +
                             signedElementSecurityEvents.size() + signatureValueSecurityEvents.size() + encryptedPartSecurityEvents.size()
             );
@@ -1012,10 +1012,10 @@ public class SecurityContextTokenTest extends AbstractTestBase {
                 }
             }
 
-            org.junit.Assert.assertEquals(3, signedElementSecurityEvents.size());
-            org.junit.Assert.assertEquals(5, signatureValueSecurityEvents.size());
-            org.junit.Assert.assertEquals(5, encryptedPartSecurityEvents.size());
-            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+            Assert.assertEquals(3, signedElementSecurityEvents.size());
+            Assert.assertEquals(5, signatureValueSecurityEvents.size());
+            Assert.assertEquals(5, encryptedPartSecurityEvents.size());
+            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() +
                             signedElementSecurityEvents.size() + signatureValueSecurityEvents.size() + encryptedPartSecurityEvents.size()
             );
@@ -1106,9 +1106,9 @@ public class SecurityContextTokenTest extends AbstractTestBase {
                 }
             }
 
-            org.junit.Assert.assertEquals(3, signedElementSecurityEvents.size());
-            org.junit.Assert.assertEquals(4, signatureValueSecurityEvents.size());
-            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+            Assert.assertEquals(3, signedElementSecurityEvents.size());
+            Assert.assertEquals(4, signatureValueSecurityEvents.size());
+            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() +
                             signedElementSecurityEvents.size() + signatureValueSecurityEvents.size()
             );

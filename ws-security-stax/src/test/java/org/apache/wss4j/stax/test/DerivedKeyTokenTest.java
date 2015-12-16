@@ -212,9 +212,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
                 }
             }
 
-            org.junit.Assert.assertEquals(6, encryptedPartSecurityEvents.size());
-            org.junit.Assert.assertEquals(1, operationSecurityEvents.size());
-            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(), operationSecurityEvents.size() + encryptedPartSecurityEvents.size());
+            Assert.assertEquals(6, encryptedPartSecurityEvents.size());
+            Assert.assertEquals(1, operationSecurityEvents.size());
+            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(), operationSecurityEvents.size() + encryptedPartSecurityEvents.size());
         }
     }
 
@@ -289,9 +289,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
                 }
             }
 
-            org.junit.Assert.assertEquals(6, encryptedPartSecurityEvents.size());
-            org.junit.Assert.assertEquals(1, operationSecurityEvents.size());
-            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(), operationSecurityEvents.size() + encryptedPartSecurityEvents.size());
+            Assert.assertEquals(6, encryptedPartSecurityEvents.size());
+            Assert.assertEquals(1, operationSecurityEvents.size());
+            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(), operationSecurityEvents.size() + encryptedPartSecurityEvents.size());
         }
     }
 
@@ -966,10 +966,10 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
                 }
             }
 
-            org.junit.Assert.assertEquals(5, encryptedPartSecurityEvents.size());
-            org.junit.Assert.assertEquals(3, signedElementSecurityEvents.size());
-            org.junit.Assert.assertEquals(6, signatureValueSecurityEvents.size());
-            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+            Assert.assertEquals(5, encryptedPartSecurityEvents.size());
+            Assert.assertEquals(3, signedElementSecurityEvents.size());
+            Assert.assertEquals(6, signatureValueSecurityEvents.size());
+            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() + encryptedPartSecurityEvents.size() +
                             signedElementSecurityEvents.size() + signatureValueSecurityEvents.size());
         }

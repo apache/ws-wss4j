@@ -96,8 +96,8 @@ public class ReplayTest extends AbstractTestBase {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("Exception expected");
             } catch (XMLStreamException e) {
-                org.junit.Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
-                org.junit.Assert.assertEquals("The message has expired", e.getCause().getMessage());
+                Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
+                Assert.assertEquals("The message has expired", e.getCause().getMessage());
             }
         }
     }
@@ -149,7 +149,7 @@ public class ReplayTest extends AbstractTestBase {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("Exception expected");
             } catch (XMLStreamException e) {
-                org.junit.Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
+                Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
             }
         }
     }
@@ -160,7 +160,7 @@ public class ReplayTest extends AbstractTestBase {
      * no "OneTimeUse" Element is defined there is no problem with replaying it.
      * with a OneTimeUse Element
      */
-    @org.junit.Test
+    @Test
     public void testEhCacheReplayedSAML2() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -224,7 +224,7 @@ public class ReplayTest extends AbstractTestBase {
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with a OneTimeUse Element
      */
-    @org.junit.Test
+    @Test
     public void testEhCacheReplayedSAML2OneTimeUse() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
@@ -284,7 +284,7 @@ public class ReplayTest extends AbstractTestBase {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 Assert.fail("Exception expected");
             } catch (XMLStreamException e) {
-                org.junit.Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
+                Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
             }
         }
     }
