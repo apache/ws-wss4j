@@ -111,7 +111,7 @@ public class SignatureCRLTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.SIGN).get(0);
         X509Certificate cert =
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-        assertTrue (cert != null);
+        assertTrue(cert != null);
     }
 
     /**

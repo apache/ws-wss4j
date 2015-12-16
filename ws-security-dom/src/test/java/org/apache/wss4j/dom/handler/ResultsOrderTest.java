@@ -62,8 +62,8 @@ public class ResultsOrderTest extends org.junit.Assert {
         actions.add(WSConstants.TS);
         actions.add(WSConstants.SIGN);
 
-        assertTrue (handler.checkResults(results, actions));
-        assertTrue (handler.checkResultsAnyOrder(results, actions));
+        assertTrue(handler.checkResults(results, actions));
+        assertTrue(handler.checkResultsAnyOrder(results, actions));
     }
 
     /**
@@ -92,9 +92,9 @@ public class ResultsOrderTest extends org.junit.Assert {
         actions.add(WSConstants.TS);
         actions.add(WSConstants.SIGN);
 
-        assertFalse (handler.checkResults(results, actions));
-        assertTrue (handler.checkResultsAnyOrder(results, actions));
-        assertTrue (results.size() == 4 && actions.size() == 3);
+        assertFalse(handler.checkResults(results, actions));
+        assertTrue(handler.checkResultsAnyOrder(results, actions));
+        assertTrue(results.size() == 4 && actions.size() == 3);
     }
 
     /**
@@ -124,9 +124,9 @@ public class ResultsOrderTest extends org.junit.Assert {
         actions.add(WSConstants.TS);
         actions.add(WSConstants.SIGN);
 
-        assertFalse (handler.checkResults(results, actions));
-        assertTrue (handler.checkResultsAnyOrder(results, actions));
-        assertFalse (actions.isEmpty());
+        assertFalse(handler.checkResults(results, actions));
+        assertTrue(handler.checkResultsAnyOrder(results, actions));
+        assertFalse(actions.isEmpty());
     }
 
     /**
@@ -156,8 +156,8 @@ public class ResultsOrderTest extends org.junit.Assert {
         actions.add(WSConstants.UT);
         actions.add(WSConstants.TS);
 
-        assertFalse (handler.checkResults(results, actions));
-        assertTrue (handler.checkResultsAnyOrder(results, actions));
+        assertFalse(handler.checkResults(results, actions));
+        assertTrue(handler.checkResultsAnyOrder(results, actions));
     }
 
     /**
@@ -184,8 +184,8 @@ public class ResultsOrderTest extends org.junit.Assert {
         actions.add(WSConstants.UT);
         actions.add(WSConstants.SIGN);
 
-        assertFalse (handler.checkResults(results, actions));
-        assertFalse (handler.checkResultsAnyOrder(results, actions));
+        assertFalse(handler.checkResults(results, actions));
+        assertFalse(handler.checkResultsAnyOrder(results, actions));
     }
 
     /**
@@ -214,8 +214,8 @@ public class ResultsOrderTest extends org.junit.Assert {
         actions.add(WSConstants.TS);
         actions.add(WSConstants.UT);
 
-        assertFalse (handler.checkResults(results, actions));
-        assertFalse (handler.checkResultsAnyOrder(results, actions));
+        assertFalse(handler.checkResults(results, actions));
+        assertFalse(handler.checkResultsAnyOrder(results, actions));
     }
 
     /**
@@ -231,8 +231,8 @@ public class ResultsOrderTest extends org.junit.Assert {
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(WSConstants.TS);
 
-        assertFalse (handler.checkResults(results, actions));
-        assertFalse (handler.checkResultsAnyOrder(results, actions));
+        assertFalse(handler.checkResults(results, actions));
+        assertFalse(handler.checkResultsAnyOrder(results, actions));
     }
 
     /**
@@ -250,8 +250,8 @@ public class ResultsOrderTest extends org.junit.Assert {
 
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
 
-        assertFalse (handler.checkResults(results, actions));
-        assertFalse (handler.checkResultsAnyOrder(results, actions));
+        assertFalse(handler.checkResults(results, actions));
+        assertFalse(handler.checkResultsAnyOrder(results, actions));
     }
 
     /**
@@ -278,8 +278,8 @@ public class ResultsOrderTest extends org.junit.Assert {
         actions.add(WSConstants.UT);
         actions.add(WSConstants.UT);
 
-        assertFalse (handler.checkResults(results, actions));
-        assertFalse (handler.checkResultsAnyOrder(results, actions));
+        assertFalse(handler.checkResults(results, actions));
+        assertFalse(handler.checkResultsAnyOrder(results, actions));
     }
 
 }

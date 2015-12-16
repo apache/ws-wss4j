@@ -104,7 +104,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
         BSPEnforcer bspEnforcer = new BSPEnforcer();
         // Process the STR
         try {
-            new SecurityTokenReference(strElement,bspEnforcer);
+            new SecurityTokenReference(strElement, bspEnforcer);
             fail("Failure expected on multiple data references");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
@@ -134,7 +134,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
         BSPEnforcer bspEnforcer = new BSPEnforcer();
         // Process the STR
         try {
-            new SecurityTokenReference(strElement,bspEnforcer);
+            new SecurityTokenReference(strElement, bspEnforcer);
             fail("Failure expected on a Key Identifier with no ValueType");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
@@ -168,7 +168,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
         BSPEnforcer bspEnforcer = new BSPEnforcer();
         // Process the STR
         try {
-            new SecurityTokenReference(strElement,bspEnforcer);
+            new SecurityTokenReference(strElement, bspEnforcer);
             fail("Failure expected on a Key Identifier with a Bad EncodingType");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
@@ -202,7 +202,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
         BSPEnforcer bspEnforcer = new BSPEnforcer();
         // Process the STR
         try {
-            new SecurityTokenReference(strElement,bspEnforcer);
+            new SecurityTokenReference(strElement, bspEnforcer);
             fail("Failure expected on a Key Identifier with no EncodingType");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
@@ -301,7 +301,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
         BSPEnforcer bspEnforcer = new BSPEnforcer();
         // Process the STR
         try {
-            new SecurityTokenReference(strElement,bspEnforcer);
+            new SecurityTokenReference(strElement, bspEnforcer);
             fail("Failure expected on an Embedded Child with multiple children");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
