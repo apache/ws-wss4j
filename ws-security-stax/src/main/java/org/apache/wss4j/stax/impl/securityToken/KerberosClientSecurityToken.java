@@ -80,15 +80,15 @@ public class KerberosClientSecurityToken extends GenericOutboundSecurityToken {
             if (clientPrincipals.isEmpty()) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE,
-                    "kerberosLoginError", 
+                    "kerberosLoginError",
                     new Object[] {"No Client principals found after login"}
                 );
             }
             // Store the TGT
             KerberosTicket tgt = getKerberosTicket(clientSubject, null);
 
-            // Get the service ticket           
-            KerberosClientExceptionAction action = 
+            // Get the service ticket
+            KerberosClientExceptionAction action =
                 new KerberosClientExceptionAction(clientPrincipals.iterator().next(),
                                                   contextAndServiceNameCallback.getServiceName(),
                                                   contextAndServiceNameCallback.isUsernameServiceNameForm(),

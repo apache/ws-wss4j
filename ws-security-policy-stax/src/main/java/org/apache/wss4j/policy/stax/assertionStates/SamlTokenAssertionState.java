@@ -42,10 +42,10 @@ import org.apache.xml.security.stax.securityToken.SecurityToken;
 
 public class SamlTokenAssertionState extends TokenAssertionState {
 
-    public SamlTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, 
+    public SamlTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted,
                                    PolicyAsserter policyAsserter, boolean initiator) {
         super(assertion, asserted, policyAsserter, initiator);
-        
+
         if (asserted) {
             SamlToken token = (SamlToken) getAssertion();
             String namespace = token.getName().getNamespaceURI();
@@ -79,7 +79,7 @@ public class SamlTokenAssertionState extends TokenAssertionState {
             getPolicyAsserter().unassertPolicy(getAssertion(), getErrorMessage());
             return false;
         }
-        
+
         String namespace = getAssertion().getName().getNamespaceURI();
         if (samlToken.isRequireKeyIdentifierReference()) {
             if (!WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier.equals(samlTokenSecurityEvent.getSecurityToken().getKeyIdentifier())) {

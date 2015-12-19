@@ -40,7 +40,7 @@ public class WSSecSecurityContextToken {
     private SecurityContextToken sct;
 
     /**
-     * The <code>wsu:Id</code> of the <code>wsc:SecurityContextToken</code> 
+     * The <code>wsu:Id</code> of the <code>wsc:SecurityContextToken</code>
      */
     private String sctId;
 
@@ -54,13 +54,13 @@ public class WSSecSecurityContextToken {
      * The symmetric secret associated with the SecurityContextToken
      */
     private byte[] secret;
-    
+
     private int wscVersion = ConversationConstants.DEFAULT_VERSION;
     private WSSConfig wssConfig;
-    
+
     public WSSecSecurityContextToken() {
     }
-    
+
     public WSSecSecurityContextToken(WSSConfig config) {
         wssConfig = config;
     }
@@ -153,7 +153,7 @@ public class WSSecSecurityContextToken {
     public void setWscVersion(int wscVersion) {
         this.wscVersion = wscVersion;
     }
-    
+
     private WSSConfig getWsConfig() {
         if (wssConfig == null) {
             wssConfig = WSSConfig.getNewInstance();

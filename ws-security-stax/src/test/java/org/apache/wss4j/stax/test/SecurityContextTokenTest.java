@@ -74,19 +74,19 @@ import org.w3c.dom.NodeList;
 public class SecurityContextTokenTest extends AbstractTestBase {
 
     final int version;
-    
+
     public SecurityContextTokenTest(int version) {
         this.version = version;
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
-       
+
         return Arrays.asList(new Object[][] {{ConversationConstants.VERSION_05_02},
                                              {ConversationConstants.VERSION_05_12}
         });
     }
-    
+
     @BeforeClass
     public static void setUp() throws Exception {
         WSSConfig.init();
@@ -221,7 +221,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             );
         }
     }
-    
+
     @Test
     public void testSCTDKTEncryptInboundAction() throws Exception {
 
@@ -230,7 +230,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.ENCRYPT_DERIVED;
-            
+
             Properties properties = new Properties();
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(tempSecret);
             properties.put(WSHandlerConstants.PW_CALLBACK_REF,  callbackHandler);
@@ -239,7 +239,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
                 properties.put(WSHandlerConstants.USE_2005_12_NAMESPACE, "false");
             }
             properties.put(WSHandlerConstants.USER, "receiver");
-            properties.put(WSHandlerConstants.ENC_SYM_ALGO, 
+            properties.put(WSHandlerConstants.ENC_SYM_ALGO,
                            "http://www.w3.org/2001/04/xmlenc#aes128-cbc");
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
@@ -250,7 +250,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
-        
+
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
@@ -448,7 +448,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SIGNATURE_DERIVED;
-            
+
             Properties properties = new Properties();
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(tempSecret);
             properties.put(WSHandlerConstants.PW_CALLBACK_REF,  callbackHandler);
@@ -457,7 +457,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
                 properties.put(WSHandlerConstants.USE_2005_12_NAMESPACE, "false");
             }
             properties.put(WSHandlerConstants.USER, "transmitter");
-            properties.put(WSHandlerConstants.ENC_SYM_ALGO, 
+            properties.put(WSHandlerConstants.ENC_SYM_ALGO,
                            "http://www.w3.org/2001/04/xmlenc#aes128-cbc");
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
@@ -468,7 +468,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
-        
+
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
@@ -528,7 +528,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             );
         }
     }
-    
+
     @Test
     public void testSCTKDKTSignAbsoluteInbound() throws Exception {
 
@@ -622,7 +622,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             encrBuilder.build(doc, secHeader);
 
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
-            
+
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
         }
@@ -699,7 +699,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             );
         }
     }
-    
+
     @Test()
     public void testSCTKDKTSignEncryptAction() throws Exception {
 
@@ -707,9 +707,9 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = 
+            String action =
                 WSHandlerConstants.SIGNATURE_DERIVED + " " + WSHandlerConstants.ENCRYPT_DERIVED;
-            
+
             Properties properties = new Properties();
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(tempSecret);
             properties.put(WSHandlerConstants.PW_CALLBACK_REF,  callbackHandler);
@@ -718,14 +718,14 @@ public class SecurityContextTokenTest extends AbstractTestBase {
                 properties.put(WSHandlerConstants.USE_2005_12_NAMESPACE, "false");
             }
             properties.put(WSHandlerConstants.USER, "transmitter");
-            properties.put(WSHandlerConstants.ENC_SYM_ALGO, 
+            properties.put(WSHandlerConstants.ENC_SYM_ALGO,
                            "http://www.w3.org/2001/04/xmlenc#aes128-cbc");
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
-        
+
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
@@ -922,7 +922,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             );
         }
     }
-    
+
     @Test
     public void testSCTKDKTEncryptSignAction() throws Exception {
 
@@ -930,9 +930,9 @@ public class SecurityContextTokenTest extends AbstractTestBase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = 
+            String action =
                 WSHandlerConstants.ENCRYPT_DERIVED + " " + WSHandlerConstants.SIGNATURE_DERIVED;
-            
+
             Properties properties = new Properties();
             CallbackHandlerImpl callbackHandler = new CallbackHandlerImpl(tempSecret);
             properties.put(WSHandlerConstants.PW_CALLBACK_REF,  callbackHandler);
@@ -941,7 +941,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
                 properties.put(WSHandlerConstants.USE_2005_12_NAMESPACE, "false");
             }
             properties.put(WSHandlerConstants.USER, "transmitter");
-            properties.put(WSHandlerConstants.ENC_SYM_ALGO, 
+            properties.put(WSHandlerConstants.ENC_SYM_ALGO,
                            "http://www.w3.org/2001/04/xmlenc#aes128-cbc");
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 

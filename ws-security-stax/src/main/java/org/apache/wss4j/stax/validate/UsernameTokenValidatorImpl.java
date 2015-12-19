@@ -35,7 +35,7 @@ import org.apache.xml.security.stax.ext.XMLSecurityUtils;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
-    
+
     private static final transient org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UsernameTokenValidatorImpl.class);
 
     @Override
@@ -53,17 +53,17 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
         }
 
         boolean handleCustomPasswordTypes = tokenContext.getWssSecurityProperties().getHandleCustomPasswordTypes();
-        boolean allowUsernameTokenNoPassword = 
-            tokenContext.getWssSecurityProperties().isAllowUsernameTokenNoPassword() 
+        boolean allowUsernameTokenNoPassword =
+            tokenContext.getWssSecurityProperties().isAllowUsernameTokenNoPassword()
                 || Boolean.parseBoolean((String)tokenContext.getWsSecurityContext().get(WSSConstants.PROP_ALLOW_USERNAMETOKEN_NOPASSWORD));
 
         // Check received password type against required type
-        WSSConstants.UsernameTokenPasswordType requiredPasswordType = 
+        WSSConstants.UsernameTokenPasswordType requiredPasswordType =
             tokenContext.getWssSecurityProperties().getUsernameTokenPasswordType();
         if (requiredPasswordType != null) {
             if (passwordType == null || passwordType.getType() == null) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Authentication failed as the received password type does not " 
+                    log.debug("Authentication failed as the received password type does not "
                         + "match the required password type of: " + requiredPasswordType);
                 }
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
@@ -72,13 +72,13 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
                 WSSConstants.UsernameTokenPasswordType.getUsernameTokenPasswordType(passwordType.getType());
             if (requiredPasswordType != usernameTokenPasswordType) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Authentication failed as the received password type does not " 
+                    log.debug("Authentication failed as the received password type does not "
                         + "match the required password type of: " + requiredPasswordType);
                 }
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
         }
-        
+
         WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType = WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE;
         if (passwordType != null && passwordType.getType() != null) {
             usernameTokenPasswordType = WSSConstants.UsernameTokenPasswordType.getUsernameTokenPasswordType(passwordType.getType());
@@ -117,7 +117,7 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
         } else if (usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT
                 || passwordType != null && passwordType.getValue() != null
                 && usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE) {
-            
+
             verifyPlaintextPassword(username.getValue(), passwordType, tokenContext);
         } else if (passwordType != null && passwordType.getValue() != null) {
             if (!handleCustomPasswordTypes) {
@@ -158,7 +158,7 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
         T token = (T)usernameSecurityToken;
         return token;
     }
-    
+
     /**
      * Verify a UsernameToken containing a password digest.
      */
@@ -189,7 +189,7 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
         }
         passwordType.setValue(pwCb.getPassword());
     }
-    
+
     /**
      * Verify a UsernameToken containing a plaintext password.
      */
@@ -217,7 +217,7 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
         }
         passwordType.setValue(pwCb.getPassword());
     }
-    
+
     /**
      * Verify a UsernameToken containing a password of some unknown (but specified) password
      * type.

@@ -28,14 +28,14 @@ import org.apache.wss4j.policy.SPConstants.SPVersion;
 
 /**
  * A BootstrapPolicy is held internally to a SecureConversationToken
- * 
+ *
  * While a BootstrapPolicy element DOES contain an internal Policy, this
- * token is NOT considered a PolicyContainingAssertion for the purpose of 
+ * token is NOT considered a PolicyContainingAssertion for the purpose of
  * calculating things like normalized policies and vocabulary.
  */
 public class BootstrapPolicy extends AbstractSecurityAssertion {
     private final Policy nestedPolicy;
-    
+
     public BootstrapPolicy(SPVersion version, Policy nestedPolicy) {
         super(version);
         this.nestedPolicy = nestedPolicy;
@@ -44,7 +44,7 @@ public class BootstrapPolicy extends AbstractSecurityAssertion {
     public QName getName() {
         return super.getVersion().getSPConstants().getBootstrapPolicy();
     }
-    
+
     public Policy getPolicy() {
         return nestedPolicy;
     }

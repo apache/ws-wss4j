@@ -37,11 +37,11 @@ import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
 
 public class UsernameTokenProcessor implements Processor {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(UsernameTokenProcessor.class);
-    
+
     public List<WSSecurityEngineResult> handleToken(
-        Element elem, 
+        Element elem,
         RequestData data,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
@@ -61,19 +61,19 @@ public class UsernameTokenProcessor implements Processor {
                 );
             }
         }
-        
+
         Validator validator = data.getValidator(WSConstants.USERNAME_TOKEN);
         Credential credential = handleUsernameToken(elem, validator, data);
         UsernameToken token = credential.getUsernametoken();
-        
+
         int action = WSConstants.UT;
         byte[] secretKey = null;
-        if (token.getPassword() == null) { 
+        if (token.getPassword() == null) {
             action = WSConstants.UT_NOPASSWORD;
             if (token.isDerivedKey()) {
                 token.setRawPassword(data.getCallbackHandler());
                 secretKey = token.getDerivedKey(data.getBSPEnforcer());
-            } 
+            }
         }
         WSSecurityEngineResult result = new WSSecurityEngineResult(action, token);
         String tokenId = token.getID();
@@ -81,7 +81,7 @@ public class UsernameTokenProcessor implements Processor {
             result.put(WSSecurityEngineResult.TAG_ID, tokenId);
         }
         result.put(WSSecurityEngineResult.TAG_SECRET, secretKey);
-        
+
         if (validator != null) {
             result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
             if (credential.getTransformedToken() != null) {
@@ -108,7 +108,7 @@ public class UsernameTokenProcessor implements Processor {
             }
             result.put(WSSecurityEngineResult.TAG_SUBJECT, credential.getSubject());
         }
-        
+
         wsDocInfo.addTokenElement(elem);
         wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);
@@ -122,22 +122,22 @@ public class UsernameTokenProcessor implements Processor {
      * @return a Credential object corresponding to the (validated) Username Token
      * @throws WSSecurityException
      */
-    private Credential 
+    private Credential
     handleUsernameToken(
-        Element token, 
+        Element token,
         Validator validator,
         RequestData data
     ) throws WSSecurityException {
         boolean allowNamespaceQualifiedPasswordTypes = data.isAllowNamespaceQualifiedPasswordTypes();
         int utTTL = data.getUtTTL();
         int futureTimeToLive = data.getUtFutureTTL();
-        
+
         //
         // Parse and validate the UsernameToken element
         //
-        UsernameToken ut = 
+        UsernameToken ut =
             new UsernameToken(token, allowNamespaceQualifiedPasswordTypes, data.getBSPEnforcer());
-        
+
         // Test for replay attacks
         ReplayCache replayCache = data.getNonceReplayCache();
         if (replayCache != null && ut.getNonce() != null) {
@@ -148,7 +148,7 @@ public class UsernameTokenProcessor implements Processor {
                     new Object[] {"A replay attack has been detected"}
                 );
             }
-            
+
             // If no Created, then just cache for the default time
             // Otherwise, cache for the configured TTL of the UsernameToken Created time, as any
             // older token will just get rejected anyway
@@ -159,12 +159,12 @@ public class UsernameTokenProcessor implements Processor {
                 replayCache.add(ut.getNonce(), utTTL + 1L);
             }
         }
-        
+
         // Validate whether the security semantics have expired
         if (!ut.verifyCreated(utTTL, futureTimeToLive)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
         }
-        
+
         Credential credential = new Credential();
         credential.setUsernametoken(ut);
         if (validator != null) {

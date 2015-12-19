@@ -56,18 +56,18 @@ import org.w3c.dom.Node;
  * A set of test-cases for signing and verifying SOAP requests.
  */
 public class SignatureTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureTest.class);
-    
+
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public SignatureTest() throws Exception {
         WSSConfig.init();
         crypto = CryptoFactory.getInstance();
@@ -76,7 +76,7 @@ public class SignatureTest extends org.junit.Assert {
     /**
      * The test uses the Issuer Serial key identifier type.
      * <p/>
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     @org.junit.Test
@@ -92,22 +92,22 @@ public class SignatureTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After Signing IS....");
         WSHandlerResult results = verify(signedDoc);
-        
+
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
-        REFERENCE_TYPE referenceType = 
+        REFERENCE_TYPE referenceType =
             (REFERENCE_TYPE)actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
         assertTrue(referenceType == REFERENCE_TYPE.ISSUER_SERIAL);
     }
-    
+
     @org.junit.Test
     public void testX509SignatureISAttached() throws Exception {
         WSSecSignature builder = new WSSecSignature();
@@ -122,27 +122,27 @@ public class SignatureTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After Signing IS....");
         WSHandlerResult results = verify(signedDoc);
-        
+
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
-        REFERENCE_TYPE referenceType = 
+        REFERENCE_TYPE referenceType =
             (REFERENCE_TYPE)actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
         assertTrue(referenceType == REFERENCE_TYPE.ISSUER_SERIAL);
     }
-    
+
 
     /**
      * Test that signs (twice) and verifies a WS-Security envelope.
      * <p/>
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     @org.junit.Test
@@ -156,11 +156,11 @@ public class SignatureTest extends org.junit.Assert {
         Document signedDoc1 = builder.build(signedDoc, crypto, secHeader);
         verify(signedDoc1);
     }
-    
+
     /**
      * Test that signs and verifies a WS-Security envelope
      * <p/>
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     @org.junit.Test
@@ -175,18 +175,18 @@ public class SignatureTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         verify(signedDoc);
     }
-    
+
     /**
      * Test that signs and verifies a WS-Security envelope
      * <p/>
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     @org.junit.Test
@@ -202,19 +202,19 @@ public class SignatureTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         WSSecurityEngine newEngine = new WSSecurityEngine();
         try {
             newEngine.processSecurityHeader(doc, null, null, crypto);
             fail("Failure expected on a bad c14n algorithm");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         RequestData data = new RequestData();
         data.setSigVerCrypto(crypto);
         List<BSPRule> ignoredRules = new ArrayList<>();
@@ -223,11 +223,11 @@ public class SignatureTest extends org.junit.Assert {
         data.setIgnoredBSPRules(ignoredRules);
         newEngine.processSecurityHeader(doc, data);
     }
-    
+
     /**
      * Test that signs and verifies a WS-Security envelope
      * <p/>
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     @org.junit.Test
@@ -243,18 +243,18 @@ public class SignatureTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         verify(signedDoc);
     }
-    
+
     /**
      * Test that signs and verifies a WS-Security envelope
      * <p/>
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     @org.junit.Test
@@ -270,26 +270,26 @@ public class SignatureTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         WSHandlerResult results = verify(signedDoc);
-        
+
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
-        REFERENCE_TYPE referenceType = 
+        REFERENCE_TYPE referenceType =
             (REFERENCE_TYPE)actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
         assertTrue(referenceType == REFERENCE_TYPE.DIRECT_REF);
     }
-    
+
     /**
      * Test that signs and verifies a WS-Security envelope
      * <p/>
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     @org.junit.Test
@@ -302,24 +302,24 @@ public class SignatureTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Crypto pkiCrypto = CryptoFactory.getInstance("wss40.properties");
         Document signedDoc = builder.build(doc, pkiCrypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After PKI Signing....");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         secEngine.processSecurityHeader(doc, null, callbackHandler, pkiCrypto, null);
     }
-    
+
     /**
      * Test that signs and verifies a WS-Security envelope
      * <p/>
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     @org.junit.Test
@@ -335,29 +335,29 @@ public class SignatureTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         WSSecurityEngine newEngine = new WSSecurityEngine();
-        WSHandlerResult results = 
+        WSHandlerResult results =
             newEngine.processSecurityHeader(doc, null, null, crypto);
 
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
-        REFERENCE_TYPE referenceType = 
+        REFERENCE_TYPE referenceType =
             (REFERENCE_TYPE)actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
         assertTrue(referenceType == REFERENCE_TYPE.KEY_IDENTIFIER);
     }
-    
+
     /**
      * Test that signs and verifies a WS-Security envelope.
-     * The test uses the ThumbprintSHA1 key identifier type. 
+     * The test uses the ThumbprintSHA1 key identifier type.
      * <p/>
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     @org.junit.Test
@@ -367,7 +367,7 @@ public class SignatureTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
         LOG.info("Before Signing ThumbprintSHA1....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
@@ -375,19 +375,19 @@ public class SignatureTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with ThumbprintSHA1 key identifier:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After Signing ThumbprintSHA1....");
-        
+
         WSHandlerResult results = verify(signedDoc);
-        
+
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
-        REFERENCE_TYPE referenceType = 
+        REFERENCE_TYPE referenceType =
             (REFERENCE_TYPE)actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
         assertTrue(referenceType == REFERENCE_TYPE.THUMBPRINT_SHA1);
     }
@@ -400,7 +400,7 @@ public class SignatureTest extends org.junit.Assert {
         builder.setIncludeSignatureToken(true);
         LOG.info("Before Signing ThumbprintSHA1....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
@@ -408,28 +408,28 @@ public class SignatureTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with ThumbprintSHA1 key identifier:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After Signing ThumbprintSHA1....");
-        
+
         WSHandlerResult results = verify(signedDoc);
-        
+
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
-        REFERENCE_TYPE referenceType = 
+        REFERENCE_TYPE referenceType =
             (REFERENCE_TYPE)actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
         assertTrue(referenceType == REFERENCE_TYPE.THUMBPRINT_SHA1);
     }
-    
+
     /**
      * Test that signs (twice) and verifies a WS-Security envelope.
      * The test uses the ThumbprintSHA1 key identifier type.
      * <p/>
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     @org.junit.Test
@@ -438,7 +438,7 @@ public class SignatureTest extends org.junit.Assert {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
@@ -446,13 +446,13 @@ public class SignatureTest extends org.junit.Assert {
         Document signedDoc1 = builder.build(signedDoc, crypto, secHeader);
         verify(signedDoc1);
     }
-    
-    
+
+
     /**
      * Test that signs and verifies a Timestamp. The request is then modified so that the
      * Timestamp has a default (WSU) namespace inserted. The signature validation should still
      * pass due to c14n (see WSS-181).
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     @org.junit.Test
@@ -463,40 +463,40 @@ public class SignatureTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
-        
+
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp",
                 WSConstants.WSU_NS,
                 "");
         builder.getParts().add(encP);
-        
+
         Document signedDoc = builder.build(createdDoc, crypto, secHeader);
         Element secHeaderElement = secHeader.getSecurityHeader();
-        Node timestampNode = 
+        Node timestampNode =
             secHeaderElement.getElementsByTagNameNS(WSConstants.WSU_NS, "Timestamp").item(0);
         ((Element)timestampNode).setAttributeNS(
             WSConstants.XMLNS_NS, "xmlns", WSConstants.WSU_NS
         );
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         verify(signedDoc);
     }
-    
+
     /**
      * Sign using a different digest algorithm (SHA-256).
      * <p/>
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     @org.junit.Test
@@ -514,14 +514,14 @@ public class SignatureTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After Signing IS....");
         verify(signedDoc);
     }
-    
+
     /**
      * A test for "SignatureAction does not set DigestAlgorithm on WSSecSignature instance"
      */
@@ -536,25 +536,25 @@ public class SignatureTest extends org.junit.Assert {
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         config.put("password", "security");
         config.put(
-            WSHandlerConstants.SIG_ALGO, 
+            WSHandlerConstants.SIG_ALGO,
             "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
         );
         config.put(
-            WSHandlerConstants.SIG_DIGEST_ALGO, 
+            WSHandlerConstants.SIG_DIGEST_ALGO,
             "http://www.w3.org/2001/04/xmlenc#sha256"
         );
         reqData.setMsgContext(config);
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         HandlerAction action = new HandlerAction(WSConstants.SIGN);
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             Collections.singletonList(action),
             true
         );
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message:");
@@ -566,14 +566,14 @@ public class SignatureTest extends org.junit.Assert {
         assertTrue(
                 outputString.contains("http://www.w3.org/2001/04/xmlenc#sha256")
         );
-        
+
         verify(doc);
     }
-    
+
     /**
-     * This is a test for WSS-234 - 
-     * "When a document contains a comment as its first child element, 
-     * wss4j will not find the SOAP body." 
+     * This is a test for WSS-234 -
+     * "When a document contains a comment as its first child element,
+     * wss4j will not find the SOAP body."
      */
     @org.junit.Test
     public void testWSS234() throws Exception {
@@ -584,7 +584,7 @@ public class SignatureTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, crypto, secHeader);
-        
+
         // Add a comment node as the first node element
         Node firstChild = signedDoc.getFirstChild();
         Node newNode = signedDoc.removeChild(firstChild);
@@ -594,14 +594,14 @@ public class SignatureTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         verify(signedDoc);
     }
-    
+
     /**
      * Test that signs and verifies a Timestamp. The Signature element is appended to the security
      * header, and so appears after the Timestamp element.
@@ -611,42 +611,42 @@ public class SignatureTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
-        
+
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        
+
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp",
                 WSConstants.WSU_NS,
                 "");
         builder.getParts().add(encP);
-        
+
         builder.prepare(createdDoc, crypto, secHeader);
-        
-        List<javax.xml.crypto.dsig.Reference> referenceList = 
+
+        List<javax.xml.crypto.dsig.Reference> referenceList =
             builder.addReferencesToSign(builder.getParts(), secHeader);
 
         builder.computeSignature(referenceList, false, null);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         verify(doc);
     }
-    
+
     /**
-     * This is a test for WSS-283 - "ClassCastException when signing message with existing 
+     * This is a test for WSS-283 - "ClassCastException when signing message with existing
      * WSSE header containing Text as first child":
-     * 
+     *
      * https://issues.apache.org/jira/browse/WSS-283
      */
     @org.junit.Test
@@ -654,24 +654,24 @@ public class SignatureTest extends org.junit.Assert {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         Element secHeaderElement = secHeader.insertSecurityHeader();
         Node textNode = doc.createTextNode("This is a text node");
         secHeaderElement.appendChild(textNode);
         Document signedDoc = builder.build(doc, crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with text node:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         verify(signedDoc);
     }
-    
+
     /**
      * Create a signature that uses a custom SecurityTokenReference.
      */
@@ -684,32 +684,32 @@ public class SignatureTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         SecurityTokenReference secRef = new SecurityTokenReference(doc);
         Reference ref = new Reference(doc);
         ref.setURI("custom-uri");
         secRef.setReference(ref);
         builder.setSecurityTokenReference(secRef);
-        
+
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
     }
-    
+
     /**
      * The test uses the Issuer Serial key identifier type.
      * <p/>
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     @org.junit.Test
     public void testX509SignatureDefaultPassword() throws Exception {
         Crypto passwordCrypto = CryptoFactory.getInstance("alice.properties");
-        
+
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo(passwordCrypto.getDefaultX509Identifier(), null);
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
@@ -721,7 +721,7 @@ public class SignatureTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
@@ -729,7 +729,7 @@ public class SignatureTest extends org.junit.Assert {
         WSSecurityEngine newEngine = new WSSecurityEngine();
         newEngine.processSecurityHeader(doc, null, null, passwordCrypto);
     }
-    
+
     /**
      * A test for "There is an issue with the position of the <Timestamp> element in the
      * <Security> header when using WSS4J calling .NET Web Services with WS-Security."
@@ -741,7 +741,7 @@ public class SignatureTest extends org.junit.Assert {
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
-        
+
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         config.put("password", "security");
@@ -749,33 +749,33 @@ public class SignatureTest extends org.junit.Assert {
             WSHandlerConstants.SIGNATURE_PARTS, "{}{" + WSConstants.WSU_NS + "}Timestamp"
         );
         reqData.setMsgContext(config);
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.SIGN));
         actions.add(new HandlerAction(WSConstants.TS));
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             actions,
             true
         );
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message:");
             LOG.debug(outputString);
         }
-        
+
         WSHandlerResult results = verify(doc);
-            
+
         List<Integer> receivedActions = new ArrayList<>();
         receivedActions.add(WSConstants.SIGN);
         receivedActions.add(WSConstants.TS);
         assertTrue(handler.checkResults(results.getResults(), receivedActions));
     }
-    
+
     @org.junit.Test
     public void
     testSignatureEncryptTimestampOrder() throws Exception {
@@ -783,7 +783,7 @@ public class SignatureTest extends org.junit.Assert {
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
-        
+
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         config.put(WSHandlerConstants.ENC_PROP_FILE, "crypto.properties");
@@ -792,7 +792,7 @@ public class SignatureTest extends org.junit.Assert {
             WSHandlerConstants.SIGNATURE_PARTS, "{}{" + WSConstants.WSU_NS + "}Timestamp"
         );
         reqData.setMsgContext(config);
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         List<HandlerAction> actions = new ArrayList<>();
@@ -800,19 +800,19 @@ public class SignatureTest extends org.junit.Assert {
         actions.add(new HandlerAction(WSConstants.ENCR));
         actions.add(new HandlerAction(WSConstants.TS));
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             actions,
             true
         );
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message:");
             LOG.debug(outputString);
         }
     }
-    
+
     @org.junit.Test
     public void
     testEncryptSignatureTimestampOrder() throws Exception {
@@ -820,7 +820,7 @@ public class SignatureTest extends org.junit.Assert {
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
-        
+
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         config.put(WSHandlerConstants.ENC_PROP_FILE, "crypto.properties");
@@ -829,7 +829,7 @@ public class SignatureTest extends org.junit.Assert {
             WSHandlerConstants.SIGNATURE_PARTS, "{}{" + WSConstants.WSU_NS + "}Timestamp"
         );
         reqData.setMsgContext(config);
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         List<HandlerAction> actions = new ArrayList<>();
@@ -837,64 +837,64 @@ public class SignatureTest extends org.junit.Assert {
         actions.add(new HandlerAction(WSConstants.SIGN));
         actions.add(new HandlerAction(WSConstants.TS));
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             actions,
             true
         );
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message:");
             LOG.debug(outputString);
         }
     }
-    
+
     @org.junit.Test
     public void testWSHandlerSignatureCanonicalization() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
-        
+
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         config.put(WSHandlerConstants.SIG_C14N_ALGO, WSConstants.C14N_WITH_COMMENTS);
         config.put("password", "security");
         reqData.setMsgContext(config);
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         HandlerAction action = new HandlerAction(WSConstants.SIGN);
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             Collections.singletonList(action),
             true
         );
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message:");
             LOG.debug(outputString);
         }
-        
+
         RequestData data = new RequestData();
         data.setWssConfig(WSSConfig.getNewInstance());
         data.setSigVerCrypto(crypto);
-        
+
         List<BSPRule> disabledRules = new ArrayList<>();
         disabledRules.add(BSPRule.R5404);
         disabledRules.add(BSPRule.R5406);
         data.setIgnoredBSPRules(disabledRules);
-        
+
         WSSecurityEngine newSecEngine = new WSSecurityEngine();
-        WSHandlerResult results = 
+        WSHandlerResult results =
             newSecEngine.processSecurityHeader(doc, data);
-        assertTrue(handler.checkResults(results.getResults(), 
+        assertTrue(handler.checkResults(results.getResults(),
                                         Collections.singletonList(WSConstants.SIGN)));
     }
-    
+
     @org.junit.Test
     public void testCommentInSOAPBody() throws Exception {
         WSSecSignature builder = new WSSecSignature();
@@ -904,26 +904,26 @@ public class SignatureTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, crypto, secHeader);
-        
+
         // Add a comment node
         Element body = WSSecurityUtil.findBodyElement(signedDoc);
         Node commentNode = signedDoc.createComment("This is a comment");
         body.getFirstChild().appendChild(commentNode);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         verify(signedDoc);
     }
-    
+
 
     /**
      * Verifies the soap envelope.
-     * This method verifies all the signature generated. 
-     * 
+     * This method verifies all the signature generated.
+     *
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */

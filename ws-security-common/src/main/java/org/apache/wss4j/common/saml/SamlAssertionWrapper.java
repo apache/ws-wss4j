@@ -76,7 +76,7 @@ public class SamlAssertionWrapper {
     /**
      * Field log
      */
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SamlAssertionWrapper.class);
 
     /**
@@ -93,12 +93,12 @@ public class SamlAssertionWrapper {
      * The Assertion as a DOM element
      */
     private Element assertionElement;
-    
+
     /**
      * The SAMLKeyInfo object associated with the Subject KeyInfo
      */
     private SAMLKeyInfo subjectKeyInfo;
-    
+
     /**
      * The SAMLKeyInfo object associated with the Signature on the Assertion
      */
@@ -118,17 +118,17 @@ public class SamlAssertionWrapper {
      * Default DSA Signature algorithm used for signing.
      */
     private final String defaultDSASignatureAlgorithm = SignatureConstants.ALGO_ID_SIGNATURE_DSA;
-    
+
     /**
      * Default Signature Digest algorithm
      */
     private final String defaultSignatureDigestAlgorithm = SignatureConstants.ALGO_ID_DIGEST_SHA1;
-    
+
     /**
      * Whether this object was instantiated with a DOM Element or an XMLObject initially
      */
     private final boolean fromDOM;
-    
+
     /**
      * Constructor SamlAssertionWrapper creates a new SamlAssertionWrapper instance.
      *
@@ -137,7 +137,7 @@ public class SamlAssertionWrapper {
      */
     public SamlAssertionWrapper(Element element) throws WSSecurityException {
         OpenSAMLUtil.initSamlEngine();
-        
+
         parseElement(element);
         fromDOM = true;
     }
@@ -152,7 +152,7 @@ public class SamlAssertionWrapper {
      */
     public SamlAssertionWrapper(SAMLObject samlObject) throws WSSecurityException {
         OpenSAMLUtil.initSamlEngine();
-        
+
         this.samlObject = samlObject;
         if (samlObject instanceof org.opensaml.saml.saml1.core.Assertion) {
             samlVersion = SAMLVersion.VERSION_11;
@@ -169,7 +169,7 @@ public class SamlAssertionWrapper {
         }
         fromDOM = false;
     }
-    
+
     /**
      * Constructor SamlAssertionWrapper creates a new SamlAssertionWrapper instance.
      * This constructor is primarily called on the client side to initialize
@@ -295,7 +295,7 @@ public class SamlAssertionWrapper {
         } else if (samlVersion == SAMLVersion.VERSION_11
             && ((org.opensaml.saml.saml1.core.Assertion)samlObject).getIssuer() != null) {
             return ((org.opensaml.saml.saml1.core.Assertion)samlObject).getIssuer();
-        } 
+        }
         LOG.error(
             "SamlAssertionWrapper: unable to return Issuer string - no saml assertion "
             + "object or issuer is null"
@@ -309,7 +309,7 @@ public class SamlAssertionWrapper {
      */
     public String getSubjectName() {
         if (samlVersion == SAMLVersion.VERSION_20) {
-            org.opensaml.saml.saml2.core.Subject subject = 
+            org.opensaml.saml.saml2.core.Subject subject =
                 ((org.opensaml.saml.saml2.core.Assertion)samlObject).getSubject();
             if (subject != null && subject.getNameID() != null) {
                 return subject.getNameID().getValue();
@@ -324,7 +324,7 @@ public class SamlAssertionWrapper {
                     AuthenticationStatement authStmt = (AuthenticationStatement) stmt;
                     samlSubject = authStmt.getSubject();
                 } else {
-                    AuthorizationDecisionStatement authzStmt = 
+                    AuthorizationDecisionStatement authzStmt =
                         (AuthorizationDecisionStatement)stmt;
                     samlSubject = authzStmt.getSubject();
                 }
@@ -344,7 +344,7 @@ public class SamlAssertionWrapper {
     }
 
     /**
-     * Method getConfirmationMethods returns the confirmationMethods of this 
+     * Method getConfirmationMethods returns the confirmationMethods of this
      * SamlAssertionWrapper object.
      *
      * @return the confirmationMethods of this SamlAssertionWrapper object.
@@ -352,16 +352,16 @@ public class SamlAssertionWrapper {
     public List<String> getConfirmationMethods() {
         List<String> methods = new ArrayList<>();
         if (samlVersion == SAMLVersion.VERSION_20) {
-            org.opensaml.saml.saml2.core.Subject subject =  
+            org.opensaml.saml.saml2.core.Subject subject =
                 ((org.opensaml.saml.saml2.core.Assertion)samlObject).getSubject();
-            List<org.opensaml.saml.saml2.core.SubjectConfirmation> confirmations = 
+            List<org.opensaml.saml.saml2.core.SubjectConfirmation> confirmations =
                 subject.getSubjectConfirmations();
             for (org.opensaml.saml.saml2.core.SubjectConfirmation confirmation : confirmations) {
                 methods.add(confirmation.getMethod());
             }
         } else if (samlVersion == SAMLVersion.VERSION_11) {
             List<SubjectStatement> subjectStatements = new ArrayList<>();
-            org.opensaml.saml.saml1.core.Assertion saml1 = 
+            org.opensaml.saml.saml1.core.Assertion saml1 =
                 ((org.opensaml.saml.saml1.core.Assertion)samlObject);
             subjectStatements.addAll(saml1.getSubjectStatements());
             subjectStatements.addAll(saml1.getAuthenticationStatements());
@@ -377,7 +377,7 @@ public class SamlAssertionWrapper {
                             ConfirmationMethod method = (ConfirmationMethod) data;
                             methods.add(method.getConfirmationMethod());
                         }
-                        List<ConfirmationMethod> confirmationMethods = 
+                        List<ConfirmationMethod> confirmationMethods =
                             confirmation.getConfirmationMethods();
                         for (ConfirmationMethod confirmationMethod : confirmationMethods) {
                             methods.add(confirmationMethod.getConfirmationMethod());
@@ -395,8 +395,8 @@ public class SamlAssertionWrapper {
      * @return the signed (type boolean) of this SamlAssertionWrapper object.
      */
     public boolean isSigned() {
-        if (samlObject instanceof SignableSAMLObject 
-            && (((SignableSAMLObject)samlObject).isSigned() 
+        if (samlObject instanceof SignableSAMLObject
+            && (((SignableSAMLObject)samlObject).isSigned()
                 || ((SignableSAMLObject)samlObject).getSignature() != null)) {
             return true;
         }
@@ -411,7 +411,7 @@ public class SamlAssertionWrapper {
     public void setSignature(Signature signature) {
         setSignature(signature, defaultSignatureDigestAlgorithm);
     }
-    
+
     /**
      * Method setSignature sets the signature of this SamlAssertionWrapper object.
      *
@@ -426,7 +426,7 @@ public class SamlAssertionWrapper {
             if (digestAlg == null) {
                 digestAlg = defaultSignatureDigestAlgorithm;
             }
-            SAMLObjectContentReference contentRef = 
+            SAMLObjectContentReference contentRef =
                 (SAMLObjectContentReference)signature.getContentReferences().get(0);
             contentRef.setDigestAlgorithm(digestAlg);
             signableObject.releaseDOM();
@@ -435,10 +435,10 @@ public class SamlAssertionWrapper {
             LOG.error("Attempt to sign an unsignable object " + samlObject.getClass().getName());
         }
     }
-    
+
     /**
      * Create an enveloped signature on the assertion that has been created.
-     * 
+     *
      * @param issuerKeyName the Issuer KeyName to use with the issuerCrypto argument
      * @param issuerKeyPassword the Issuer Password to use with the issuerCrypto argument
      * @param issuerCrypto the Issuer Crypto instance
@@ -453,10 +453,10 @@ public class SamlAssertionWrapper {
                 sendKeyValue, defaultCanonicalizationAlgorithm,
                 defaultRSASignatureAlgorithm, defaultSignatureDigestAlgorithm);
     }
-    
+
     /**
      * Create an enveloped signature on the assertion that has been created.
-     * 
+     *
      * @param issuerKeyName the Issuer KeyName to use with the issuerCrypto argument
      * @param issuerKeyPassword the Issuer Password to use with the issuerCrypto argument
      * @param issuerCrypto the Issuer Crypto instance
@@ -472,10 +472,10 @@ public class SamlAssertionWrapper {
         signAssertion(issuerKeyName, issuerKeyPassword, issuerCrypto, sendKeyValue,
                 canonicalizationAlgorithm, signatureAlgorithm, defaultSignatureDigestAlgorithm);
     }
-    
+
     /**
      * Create an enveloped signature on the assertion that has been created.
-     * 
+     *
      * @param issuerKeyName the Issuer KeyName to use with the issuerCrypto argument
      * @param issuerKeyPassword the Issuer Password to use with the issuerCrypto argument
      * @param issuerCrypto the Issuer Crypto instance
@@ -539,7 +539,7 @@ public class SamlAssertionWrapper {
 
         signature.setSignatureAlgorithm(sigAlgo);
 
-        BasicX509Credential signingCredential = 
+        BasicX509Credential signingCredential =
             new BasicX509Credential(issuerCerts[0], privateKey);
 
         signature.setSigningCredential(signingCredential);
@@ -579,7 +579,7 @@ public class SamlAssertionWrapper {
                     new Object[] {"cannot get certificate or key"}
                 );
             }
-            SAMLKeyInfo samlKeyInfo = 
+            SAMLKeyInfo samlKeyInfo =
                 SAMLUtil.getCredentialFromKeyInfo(keyInfo.getDOM(), keyInfoProcessor, sigCrypto);
             verifySignature(samlKeyInfo);
         } else {
@@ -587,7 +587,7 @@ public class SamlAssertionWrapper {
         }
 
     }
-    
+
     /**
      * Verify the signature of this assertion
      *
@@ -619,7 +619,7 @@ public class SamlAssertionWrapper {
                 Thread.currentThread().setContextClassLoader(SignerProvider.class.getClassLoader());
                 SignatureValidator.validate(sig, credential);
             } catch (SignatureException ex) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex, 
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex,
                         "empty", new Object[] {"SAML signature validation failed"});
             } finally {
                 Thread.currentThread().setContextClassLoader(loader);
@@ -629,7 +629,7 @@ public class SamlAssertionWrapper {
             LOG.debug("SamlAssertionWrapper: no signature to validate");
         }
     }
-    
+
     /**
      * Validate the signature of the Assertion against the Profile. This does not actually
      * verify the signature itself (see the verifySignature method for this)
@@ -647,7 +647,7 @@ public class SamlAssertionWrapper {
             }
         }
     }
-    
+
     /**
      * This method parses the KeyInfo of the Subject. It then stores the SAMLKeyInfo object that
      * has been obtained for future processing.
@@ -659,20 +659,20 @@ public class SamlAssertionWrapper {
         CallbackHandler callbackHandler
     ) throws WSSecurityException {
         if (samlVersion == SAMLVersion.VERSION_11) {
-            subjectKeyInfo = 
+            subjectKeyInfo =
                 SAMLUtil.getCredentialFromSubject(
-                    (org.opensaml.saml.saml1.core.Assertion)samlObject, keyInfoProcessor, 
+                    (org.opensaml.saml.saml1.core.Assertion)samlObject, keyInfoProcessor,
                     sigCrypto, callbackHandler
                 );
         } else if (samlVersion == SAMLVersion.VERSION_20) {
-            subjectKeyInfo = 
+            subjectKeyInfo =
                 SAMLUtil.getCredentialFromSubject(
-                    (org.opensaml.saml.saml2.core.Assertion)samlObject, keyInfoProcessor, 
+                    (org.opensaml.saml.saml2.core.Assertion)samlObject, keyInfoProcessor,
                     sigCrypto, callbackHandler
                 );
         }
     }
-    
+
 
     /**
      * Method getSamlVersion returns the samlVersion of this SamlAssertionWrapper object.
@@ -709,7 +709,7 @@ public class SamlAssertionWrapper {
     public Element getElement() {
         return assertionElement;
     }
-    
+
     /**
      * Get the SAMLKeyInfo associated with the signature of the assertion
      * @return the SAMLKeyInfo associated with the signature of the assertion
@@ -717,7 +717,7 @@ public class SamlAssertionWrapper {
     public SAMLKeyInfo getSignatureKeyInfo() {
         return signatureKeyInfo;
     }
-    
+
     /**
      * Get the SAMLKeyInfo associated with the Subject KeyInfo
      * @return the SAMLKeyInfo associated with the Subject KeyInfo
@@ -725,10 +725,10 @@ public class SamlAssertionWrapper {
     public SAMLKeyInfo getSubjectKeyInfo() {
         return subjectKeyInfo;
     }
-    
+
     /**
-     * Get the SignatureValue bytes of the signed SAML Assertion 
-     * @return the SignatureValue bytes of the signed SAML Assertion 
+     * Get the SignatureValue bytes of the signed SAML Assertion
+     * @return the SignatureValue bytes of the signed SAML Assertion
      * @throws WSSecurityException
      */
     public byte[] getSignatureValue() throws WSSecurityException {
@@ -741,14 +741,14 @@ public class SamlAssertionWrapper {
         }
         return null;
     }
-    
+
     private byte[] getSignatureValue(Signature signature) throws WSSecurityException {
         Element signatureElement = signature.getDOM();
-        
+
         if (signatureElement != null) {
             Element signedInfoElem = XMLUtils.getNextElement(signatureElement.getFirstChild());
             if (signedInfoElem != null) {
-                Element signatureValueElement = 
+                Element signatureValueElement =
                     XMLUtils.getNextElement(signedInfoElem.getNextSibling());
                 if (signatureValueElement != null) {
                     try {
@@ -761,7 +761,7 @@ public class SamlAssertionWrapper {
                 }
             }
         }
-        
+
         return null;
     }
 
@@ -771,18 +771,18 @@ public class SamlAssertionWrapper {
         }
         return null;
     }
-    
+
     public SAMLObject getSamlObject() {
         return samlObject;
     }
-    
+
     /**
      * Check the Conditions of the Assertion.
      */
     public void checkConditions(int futureTTL) throws WSSecurityException {
         DateTime validFrom = null;
         DateTime validTill = null;
-        
+
         if (getSamlVersion().equals(SAMLVersion.VERSION_20)
             && getSaml2().getConditions() != null) {
             validFrom = getSaml2().getConditions().getNotBefore();
@@ -792,7 +792,7 @@ public class SamlAssertionWrapper {
             validFrom = getSaml1().getConditions().getNotBefore();
             validTill = getSaml1().getConditions().getNotOnOrAfter();
         }
-        
+
         if (validFrom != null) {
             DateTime currentTime = new DateTime();
             currentTime = currentTime.plusSeconds(futureTTL);
@@ -807,14 +807,14 @@ public class SamlAssertionWrapper {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
     }
-    
+
     /**
      * Check the IssueInstant value of the Assertion.
      */
     public void checkIssueInstant(int futureTTL, int ttl) throws WSSecurityException {
         DateTime issueInstant = null;
         DateTime validTill = null;
-        
+
         if (getSamlVersion().equals(SAMLVersion.VERSION_20)
             && getSaml2().getConditions() != null) {
             validTill = getSaml2().getConditions().getNotOnOrAfter();
@@ -824,7 +824,7 @@ public class SamlAssertionWrapper {
             validTill = getSaml1().getConditions().getNotOnOrAfter();
             issueInstant = getSaml1().getIssueInstant();
         }
-        
+
         // Check the IssueInstant is not in the future, subject to the future TTL
         if (issueInstant != null) {
             DateTime currentTime = new DateTime();
@@ -833,21 +833,21 @@ public class SamlAssertionWrapper {
                 LOG.debug("SAML Token IssueInstant not met");
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
-            
+
             // If there is no NotOnOrAfter, then impose a TTL on the IssueInstant.
             if (validTill == null) {
                 currentTime = new DateTime();
                 currentTime.minusSeconds(ttl);
-                
+
                 if (issueInstant.isBefore(currentTime)) {
                     LOG.debug("SAML Token IssueInstant not met. The assertion was created too long ago.");
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
                 }
             }
         }
-        
+
     }
-    
+
     /**
      * Check the AudienceRestrictions of the Assertion
      */
@@ -856,16 +856,16 @@ public class SamlAssertionWrapper {
         if (audienceRestrictions == null || audienceRestrictions.isEmpty()) {
             return;
         }
-        
+
         if (getSamlVersion().equals(SAMLVersion.VERSION_20) && getSaml2().getConditions() != null) {
             org.opensaml.saml.saml2.core.Conditions conditions = getSaml2().getConditions();
             if (conditions != null && conditions.getAudienceRestrictions() != null
                 && !conditions.getAudienceRestrictions().isEmpty()) {
                 boolean foundAddress = false;
-                for (org.opensaml.saml.saml2.core.AudienceRestriction audienceRestriction 
+                for (org.opensaml.saml.saml2.core.AudienceRestriction audienceRestriction
                     : conditions.getAudienceRestrictions()) {
                     if (audienceRestriction.getAudiences() != null) {
-                        List<org.opensaml.saml.saml2.core.Audience> audiences = 
+                        List<org.opensaml.saml.saml2.core.Audience> audiences =
                             audienceRestriction.getAudiences();
                         for (org.opensaml.saml.saml2.core.Audience audience : audiences) {
                             String audienceURI = audience.getAudienceURI();
@@ -876,7 +876,7 @@ public class SamlAssertionWrapper {
                         }
                     }
                 }
-                
+
                 if (!foundAddress) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
                 }
@@ -886,10 +886,10 @@ public class SamlAssertionWrapper {
             if (conditions != null && conditions.getAudienceRestrictionConditions() != null
                 && !conditions.getAudienceRestrictionConditions().isEmpty()) {
                 boolean foundAddress = false;
-                for (org.opensaml.saml.saml1.core.AudienceRestrictionCondition audienceRestriction 
+                for (org.opensaml.saml.saml1.core.AudienceRestrictionCondition audienceRestriction
                     : conditions.getAudienceRestrictionConditions()) {
                     if (audienceRestriction.getAudiences() != null) {
-                        List<org.opensaml.saml.saml1.core.Audience> audiences = 
+                        List<org.opensaml.saml.saml1.core.Audience> audiences =
                             audienceRestriction.getAudiences();
                         for (org.opensaml.saml.saml1.core.Audience audience : audiences) {
                             String audienceURI = audience.getUri();
@@ -900,14 +900,14 @@ public class SamlAssertionWrapper {
                         }
                     }
                 }
-                
+
                 if (!foundAddress) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
                 }
             }
         }
     }
-    
+
     /**
      * Check the various attributes of the AuthnStatements of the assertion (if any)
      */
@@ -915,7 +915,7 @@ public class SamlAssertionWrapper {
         if (getSamlVersion().equals(SAMLVersion.VERSION_20)
             && getSaml2().getAuthnStatements() != null) {
             List<AuthnStatement> authnStatements = getSaml2().getAuthnStatements();
-           
+
             for (AuthnStatement authnStatement : authnStatements) {
                 DateTime authnInstant = authnStatement.getAuthnInstant();
                 DateTime sessionNotOnOrAfter = authnStatement.getSessionNotOnOrAfter();
@@ -925,15 +925,15 @@ public class SamlAssertionWrapper {
                     && authnStatement.getSubjectLocality().getAddress() != null) {
                     subjectLocalityAddress = authnStatement.getSubjectLocality().getAddress();
                 }
-                
-                validateAuthnStatement(authnInstant, sessionNotOnOrAfter, 
+
+                validateAuthnStatement(authnInstant, sessionNotOnOrAfter,
                                        subjectLocalityAddress, futureTTL);
             }
         } else if (getSamlVersion().equals(SAMLVersion.VERSION_11)
             && getSaml1().getAuthenticationStatements() != null) {
-            List<AuthenticationStatement> authnStatements = 
+            List<AuthenticationStatement> authnStatements =
                 getSaml1().getAuthenticationStatements();
-            
+
             for (AuthenticationStatement authnStatement : authnStatements) {
                 DateTime authnInstant = authnStatement.getAuthenticationInstant();
                 String subjectLocalityAddress = null;
@@ -942,13 +942,13 @@ public class SamlAssertionWrapper {
                     && authnStatement.getSubjectLocality().getIPAddress() != null) {
                     subjectLocalityAddress = authnStatement.getSubjectLocality().getIPAddress();
                 }
-                
-                validateAuthnStatement(authnInstant, null, 
+
+                validateAuthnStatement(authnInstant, null,
                                        subjectLocalityAddress, futureTTL);
             }
         }
     }
-    
+
     private void validateAuthnStatement(
         DateTime authnInstant, DateTime sessionNotOnOrAfter, String subjectLocalityAddress,
         int futureTTL
@@ -960,13 +960,13 @@ public class SamlAssertionWrapper {
             LOG.debug("SAML Token AuthnInstant not met");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
-        
+
         // Stale SessionNotOnOrAfter
         if (sessionNotOnOrAfter != null && sessionNotOnOrAfter.isBeforeNow()) {
             LOG.debug("SAML Token SessionNotOnOrAfter not met");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
-        
+
         // Check that the SubjectLocality address is an IP address
         if (subjectLocalityAddress != null
             && !(InetAddressUtils.isIPv4Address(subjectLocalityAddress)
@@ -975,7 +975,7 @@ public class SamlAssertionWrapper {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
     }
-    
+
     /**
      * Parse the DOM Element into Opensaml objects.
      */
@@ -993,10 +993,10 @@ public class SamlAssertionWrapper {
                 + (xmlObject != null ? xmlObject.getClass().getName() : xmlObject)
             );
         }
-        
+
         assertionElement = element;
     }
-    
+
     /**
      * Parse a SAMLCallback object to create a SAML Assertion
      */
@@ -1010,41 +1010,41 @@ public class SamlAssertionWrapper {
         String issuer = samlCallback.getIssuer();
         String issuerFormat = samlCallback.getIssuerFormat();
         String issuerQualifier = samlCallback.getIssuerQualifier();
-        
+
         if (samlVersion.equals(SAMLVersion.VERSION_11)) {
             // Build a SAML v1.1 assertion
-            org.opensaml.saml.saml1.core.Assertion saml1 = 
+            org.opensaml.saml.saml1.core.Assertion saml1 =
                 SAML1ComponentBuilder.createSamlv1Assertion(issuer);
 
             try {
                 // Process the SAML authentication statement(s)
-                List<AuthenticationStatement> authenticationStatements = 
+                List<AuthenticationStatement> authenticationStatements =
                     SAML1ComponentBuilder.createSamlv1AuthenticationStatement(
                         samlCallback.getAuthenticationStatementData()
                     );
                 saml1.getAuthenticationStatements().addAll(authenticationStatements);
-    
-                // Process the SAML attribute statement(s)            
+
+                // Process the SAML attribute statement(s)
                 List<AttributeStatement> attributeStatements =
                         SAML1ComponentBuilder.createSamlv1AttributeStatement(
                             samlCallback.getAttributeStatementData()
                         );
                 saml1.getAttributeStatements().addAll(attributeStatements);
-    
+
                 // Process the SAML authorization decision statement(s)
                 List<AuthorizationDecisionStatement> authDecisionStatements =
                         SAML1ComponentBuilder.createSamlv1AuthorizationDecisionStatement(
                             samlCallback.getAuthDecisionStatementData()
                         );
                 saml1.getAuthorizationDecisionStatements().addAll(authDecisionStatements);
-    
+
                 // Build the complete assertion
-                org.opensaml.saml.saml1.core.Conditions conditions = 
+                org.opensaml.saml.saml1.core.Conditions conditions =
                     SAML1ComponentBuilder.createSamlv1Conditions(samlCallback.getConditions());
                 saml1.setConditions(conditions);
-                
+
                 if (samlCallback.getAdvice() != null) {
-                    org.opensaml.saml.saml1.core.Advice advice = 
+                    org.opensaml.saml.saml1.core.Advice advice =
                         SAML1ComponentBuilder.createAdvice(samlCallback.getAdvice());
                     saml1.setAdvice(advice);
                 }
@@ -1063,14 +1063,14 @@ public class SamlAssertionWrapper {
             Issuer samlIssuer = SAML2ComponentBuilder.createIssuer(issuer, issuerFormat, issuerQualifier);
 
             // Authn Statement(s)
-            List<AuthnStatement> authnStatements = 
+            List<AuthnStatement> authnStatements =
                 SAML2ComponentBuilder.createAuthnStatement(
                     samlCallback.getAuthenticationStatementData()
                 );
             saml2.getAuthnStatements().addAll(authnStatements);
 
             // Attribute statement(s)
-            List<org.opensaml.saml.saml2.core.AttributeStatement> attributeStatements = 
+            List<org.opensaml.saml.saml2.core.AttributeStatement> attributeStatements =
                 SAML2ComponentBuilder.createAttributeStatement(
                     samlCallback.getAttributeStatementData()
                 );
@@ -1085,9 +1085,9 @@ public class SamlAssertionWrapper {
 
             // Build the SAML v2.0 assertion
             saml2.setIssuer(samlIssuer);
-            
+
             try {
-                org.opensaml.saml.saml2.core.Subject subject = 
+                org.opensaml.saml.saml2.core.Subject subject =
                     SAML2ComponentBuilder.createSaml2Subject(samlCallback.getSubject());
                 saml2.setSubject(subject);
             } catch (org.opensaml.security.SecurityException ex) {
@@ -1095,13 +1095,13 @@ public class SamlAssertionWrapper {
                     new Object[] {"Error generating KeyInfo from signing credential"}
                 );
             }
-            
-            org.opensaml.saml.saml2.core.Conditions conditions = 
+
+            org.opensaml.saml.saml2.core.Conditions conditions =
                 SAML2ComponentBuilder.createConditions(samlCallback.getConditions());
             saml2.setConditions(conditions);
-            
+
             if (samlCallback.getAdvice() != null) {
-                org.opensaml.saml.saml2.core.Advice advice = 
+                org.opensaml.saml.saml2.core.Advice advice =
                     SAML2ComponentBuilder.createAdvice(samlCallback.getAdvice());
                 saml2.setAdvice(advice);
             }

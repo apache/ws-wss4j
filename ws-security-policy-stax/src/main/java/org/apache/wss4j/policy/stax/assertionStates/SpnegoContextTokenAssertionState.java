@@ -35,10 +35,10 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
 public class SpnegoContextTokenAssertionState extends TokenAssertionState {
 
-    public SpnegoContextTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, 
+    public SpnegoContextTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted,
                                             PolicyAsserter policyAsserter, boolean initiator) {
         super(assertion, asserted, policyAsserter, initiator);
-        
+
         if (asserted) {
             getPolicyAsserter().assertPolicy(getAssertion());
         }
@@ -66,7 +66,7 @@ public class SpnegoContextTokenAssertionState extends TokenAssertionState {
             getPolicyAsserter().unassertPolicy(getAssertion(), getErrorMessage());
             return false;
         }
-        
+
         //todo MustNotSend* ?
         //always return true to prevent false alarm in case additional tokens with the same usage
         //appears in the message but do not fulfill the policy and are also not needed to fulfil the policy.

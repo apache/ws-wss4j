@@ -55,7 +55,7 @@ import org.opensaml.xmlsec.signature.Signature;
 import org.w3c.dom.Element;
 
 public class SAMLTokenProcessor implements Processor {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SAMLTokenProcessor.class);
     private XMLSignatureFactory signatureFactory;
 
@@ -70,30 +70,30 @@ public class SAMLTokenProcessor implements Processor {
     }
 
     public List<WSSecurityEngineResult> handleToken(
-        Element elem, 
-        RequestData data, 
-        WSDocInfo wsDocInfo 
+        Element elem,
+        RequestData data,
+        WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Found SAML Assertion element");
         }
-        
-        Validator validator = 
+
+        Validator validator =
             data.getValidator(new QName(elem.getNamespaceURI(), elem.getLocalName()));
-        
+
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(elem);
-        XMLSignature xmlSignature = 
+        XMLSignature xmlSignature =
             verifySignatureKeysAndAlgorithms(samlAssertion, data, wsDocInfo);
         List<WSDataRef> dataRefs = createDataRefs(elem, samlAssertion, xmlSignature);
-        
-        Credential credential = 
+
+        Credential credential =
             handleSAMLToken(samlAssertion, data, validator, wsDocInfo);
         samlAssertion = credential.getSamlAssertion();
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML Assertion issuer " + samlAssertion.getIssuerString());
             LOG.debug(DOM2Writer.nodeToString(elem));
         }
-        
+
         // See if the token has been previously processed
         String id = samlAssertion.getId();
         Element foundElement = wsDocInfo.getTokenElement(id);
@@ -114,7 +114,7 @@ public class SAMLTokenProcessor implements Processor {
         } else {
             result = new WSSecurityEngineResult(WSConstants.ST_UNSIGNED, samlAssertion);
         }
-        
+
         if (!"".equals(id)) {
             result.put(WSSecurityEngineResult.TAG_ID, id);
         }
@@ -144,17 +144,17 @@ public class SAMLTokenProcessor implements Processor {
     }
 
     public Credential handleSAMLToken(
-        SamlAssertionWrapper samlAssertion, 
+        SamlAssertionWrapper samlAssertion,
         RequestData data,
         Validator validator,
         WSDocInfo docInfo
     ) throws WSSecurityException {
         // Parse the subject if it exists
         samlAssertion.parseSubject(
-            new WSSSAMLKeyInfoProcessor(data, docInfo), data.getSigVerCrypto(), 
+            new WSSSAMLKeyInfoProcessor(data, docInfo), data.getSigVerCrypto(),
             data.getCallbackHandler()
         );
-            
+
         // Now delegate the rest of the verification to the Validator
         Credential credential = new Credential();
         credential.setSamlAssertion(samlAssertion);
@@ -163,7 +163,7 @@ public class SAMLTokenProcessor implements Processor {
         }
         return credential;
     }
-    
+
     private XMLSignature verifySignatureKeysAndAlgorithms(
         SamlAssertionWrapper samlAssertion,
         RequestData data,
@@ -178,11 +178,11 @@ public class SAMLTokenProcessor implements Processor {
                     new Object[] {"cannot get certificate or key"}
                 );
             }
-            SAMLKeyInfo samlKeyInfo = 
+            SAMLKeyInfo samlKeyInfo =
                 SAMLUtil.getCredentialFromKeyInfo(
                     keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(data, wsDocInfo), data.getSigVerCrypto()
                 );
-            
+
             PublicKey key = null;
             if (samlKeyInfo.getCerts() != null && samlKeyInfo.getCerts()[0] != null) {
                 key = samlKeyInfo.getCerts()[0].getPublicKey();
@@ -193,7 +193,7 @@ public class SAMLTokenProcessor implements Processor {
                     WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity",
                     new Object[] {"cannot get certificate or key"});
             }
-            
+
             // Not checking signature here, just marshalling into an XMLSignature
             // structure for testing the transform/digest algorithms etc.
             XMLValidateContext context = new DOMValidateContext(key, sig.getDOM());
@@ -205,11 +205,11 @@ public class SAMLTokenProcessor implements Processor {
                 xmlSignature = signatureFactory.unmarshalXMLSignature(context);
             } catch (MarshalException ex) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILED_CHECK, ex, "invalidSAMLsecurity", 
+                    WSSecurityException.ErrorCode.FAILED_CHECK, ex, "invalidSAMLsecurity",
                     new Object[] {"cannot get certificate or key"}
                 );
             }
-            
+
             // Check for compliance against the defined AlgorithmSuite
             AlgorithmSuite algorithmSuite = data.getSamlAlgorithmSuite();
             if (algorithmSuite != null) {
@@ -217,7 +217,7 @@ public class SAMLTokenProcessor implements Processor {
                     AlgorithmSuiteValidator(algorithmSuite);
 
                 algorithmSuiteValidator.checkSignatureAlgorithms(xmlSignature);
-                
+
                 if (samlKeyInfo.getCerts() != null && samlKeyInfo.getCerts().length > 0) {
                     algorithmSuiteValidator.checkAsymmetricKeyLength(samlKeyInfo.getCerts());
                 } else {
@@ -226,10 +226,10 @@ public class SAMLTokenProcessor implements Processor {
             }
 
             samlAssertion.verifySignature(samlKeyInfo);
-            
+
             return xmlSignature;
         }
-        
+
         return null;
     }
 
@@ -239,15 +239,15 @@ public class SAMLTokenProcessor implements Processor {
         if (xmlSignature == null) {
             return null;
         }
-        
+
         List<WSDataRef> protectedRefs = new ArrayList<>();
-        String signatureMethod = 
+        String signatureMethod =
             xmlSignature.getSignedInfo().getSignatureMethod().getAlgorithm();
-        
+
         for (Object refObject : xmlSignature.getSignedInfo().getReferences()) {
             Reference reference = (Reference)refObject;
-            
-            if ("".equals(reference.getURI()) 
+
+            if ("".equals(reference.getURI())
                 || reference.getURI().equals(samlAssertion.getId())
                 || reference.getURI().equals("#" + samlAssertion.getId())) {
                 WSDataRef ref = new WSDataRef();
@@ -256,7 +256,7 @@ public class SAMLTokenProcessor implements Processor {
                 ref.setAlgorithm(signatureMethod);
                 ref.setDigestAlgorithm(reference.getDigestMethod().getAlgorithm());
                 ref.setDigestValue(reference.getDigestValue());
-    
+
                 // Set the Transform algorithms as well
                 @SuppressWarnings("unchecked")
                 List<Transform> transforms = (List<Transform>)reference.getTransforms();
@@ -265,12 +265,12 @@ public class SAMLTokenProcessor implements Processor {
                     transformAlgorithms.add(transform.getAlgorithm());
                 }
                 ref.setTransformAlgorithms(transformAlgorithms);
-    
+
                 ref.setXpath(EncryptionUtils.getXPath(token));
                 protectedRefs.add(ref);
             }
         }
-        
+
         return protectedRefs;
     }
 }

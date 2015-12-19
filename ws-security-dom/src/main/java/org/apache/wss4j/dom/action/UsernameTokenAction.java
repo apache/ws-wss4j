@@ -31,21 +31,21 @@ import org.apache.wss4j.dom.message.WSSecUsernameToken;
 import org.w3c.dom.Document;
 
 public class UsernameTokenAction implements Action {
-    
+
     public void execute(WSHandler handler, SecurityActionToken actionToken,
                         Document doc, RequestData reqData)
         throws WSSecurityException {
         String username = reqData.getUsername();
         String password = null;
         if (reqData.getPwType() != null) {
-            CallbackHandler callbackHandler = 
+            CallbackHandler callbackHandler =
                 handler.getPasswordCallbackHandler(reqData);
-            WSPasswordCallback passwordCallback = 
+            WSPasswordCallback passwordCallback =
                 handler.getPasswordCB(reqData.getUsername(), WSConstants.UT, callbackHandler, reqData);
             username = passwordCallback.getIdentifier();
             password = passwordCallback.getPassword();
         }
-        
+
         if (username == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noUser");
         }
@@ -61,11 +61,11 @@ public class UsernameTokenAction implements Action {
         if (reqData.isAddUsernameTokenNonce()) {
             builder.addNonce();
         }
-        
+
         if (reqData.isAddUsernameTokenCreated()) {
             builder.addCreated();
         }
 
-        builder.build(doc, reqData.getSecHeader());        
+        builder.build(doc, reqData.getSecHeader());
     }
 }

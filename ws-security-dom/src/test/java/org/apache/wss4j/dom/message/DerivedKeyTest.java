@@ -42,17 +42,17 @@ import javax.security.auth.callback.CallbackHandler;
  * A set of tests for using a derived key for encryption/signature.
  */
 public class DerivedKeyTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(DerivedKeyTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public DerivedKeyTest() throws Exception {
         crypto = CryptoFactory.getInstance("wss40.properties");
         WSSConfig.init();
@@ -60,7 +60,7 @@ public class DerivedKeyTest extends org.junit.Assert {
 
     /**
      * Test encryption using a DerivedKeyToken using TRIPLEDES
-     * @throws Exception Thrown when there is any problem in signing or 
+     * @throws Exception Thrown when there is any problem in signing or
      * verification
      */
     @org.junit.Test
@@ -77,20 +77,20 @@ public class DerivedKeyTest extends org.junit.Assert {
 
         //Key information from the EncryptedKey
         byte[] ek = encrKeyBuilder.getEphemeralKey();
-        String tokenIdentifier = encrKeyBuilder.getId();  
-        
+        String tokenIdentifier = encrKeyBuilder.getId();
+
         //Derived key encryption
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         encrBuilder.setExternalKey(ek, tokenIdentifier);
         Document encryptedDoc = encrBuilder.build(doc, secHeader);
-        
+
         encrKeyBuilder.prependToHeader(secHeader);
         encrKeyBuilder.prependBSTElementToHeader(secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: 3DES  + DerivedKeys");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
@@ -98,7 +98,7 @@ public class DerivedKeyTest extends org.junit.Assert {
     }
 
     /**
-     * Test encryption using a DerivedKeyToken using AES128 
+     * Test encryption using a DerivedKeyToken using AES128
      * @throws Exception Thrown when there is any problem in signing or verification
      */
     @org.junit.Test
@@ -115,7 +115,7 @@ public class DerivedKeyTest extends org.junit.Assert {
 
         //Key information from the EncryptedKey
         byte[] ek = encrKeyBuilder.getEphemeralKey();
-        String tokenIdentifier = encrKeyBuilder.getId();  
+        String tokenIdentifier = encrKeyBuilder.getId();
 
         //Derived key encryption
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
@@ -128,13 +128,13 @@ public class DerivedKeyTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: 3DES  + DerivedKeys");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
         verify(doc);
      }
-     
+
     @org.junit.Test
     public void testSignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -149,7 +149,7 @@ public class DerivedKeyTest extends org.junit.Assert {
 
         //Key information from the EncryptedKey
         byte[] ek = encrKeyBuilder.getEphemeralKey();
-        String tokenIdentifier = encrKeyBuilder.getId();         
+        String tokenIdentifier = encrKeyBuilder.getId();
 
         //Derived key encryption
         WSSecDKSign sigBuilder = new WSSecDKSign();
@@ -162,13 +162,13 @@ public class DerivedKeyTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message: 3DES  + DerivedKeys");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         WSHandlerResult results = verify(doc);
-        
-        WSSecurityEngineResult actionResult = 
+
+        WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
@@ -204,13 +204,13 @@ public class DerivedKeyTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: ThumbprintSHA1 + DerivedKeys");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         WSHandlerResult results = verify(doc);
-        
-        WSSecurityEngineResult actionResult = 
+
+        WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
@@ -245,13 +245,13 @@ public class DerivedKeyTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: SKI + DerivedKeys");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         WSHandlerResult results = verify(doc);
-        
-        WSSecurityEngineResult actionResult = 
+
+        WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
@@ -292,7 +292,7 @@ public class DerivedKeyTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: 3DES  + DerivedKeys");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedEncryptedDoc);
             LOG.debug(outputString);
         }
@@ -333,7 +333,7 @@ public class DerivedKeyTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: 3DES  + DerivedKeys");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
             LOG.debug(outputString);
         }
@@ -344,17 +344,17 @@ public class DerivedKeyTest extends org.junit.Assert {
     /**
      * Verifies the soap envelope
      * <p/>
-     * 
-     * @param envelope 
+     *
+     * @param envelope
      * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc) throws Exception {
-        WSHandlerResult results = 
+        WSHandlerResult results =
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
-        
+
         return results;
     }
 

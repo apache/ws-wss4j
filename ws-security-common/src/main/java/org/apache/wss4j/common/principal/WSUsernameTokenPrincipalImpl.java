@@ -24,7 +24,7 @@ import java.util.Arrays;
 
 /**
  * This class implements the <code>Principal</code> interface and
- * represents a UsernameToken user. 
+ * represents a UsernameToken user.
  * <p/>In addition to the principal's name
  * this principal object also contains the nonce and created time of the
  * UsernameToken (refer to the OASIS WS Security specification, UsernameToken
@@ -35,11 +35,11 @@ import java.util.Arrays;
  * attribute of the password element inside the username token. Refer to the
  * OASIS WSS specification for predefined password types. <p/>The
  * <code>equals()</code> method use the prinicipal's name only and does not
- * compare nonce or created time. 
+ * compare nonce or created time.
  * <p/>Modelled according to the example provided
- * by JAAS documentation 
+ * by JAAS documentation
  * <p/>
- * 
+ *
  * @see java.security.Principal
  * @see javax.security.auth.Subject
  */
@@ -155,14 +155,14 @@ public class WSUsernameTokenPrincipalImpl implements java.io.Serializable, Usern
     public String getPasswordType() {
         return passwordType;
     }
-    
+
     /**
      * @param passwordType The passwordType to set.
      */
     public void setPasswordType(String passwordType) {
         this.passwordType = passwordType;
     }
-    
+
     /**
      * Compares the specified Object with this <code>WSUsernameTokenPrincipal</code>
      * for equality.  Returns true if the given object is also a
@@ -223,8 +223,8 @@ public class WSUsernameTokenPrincipalImpl implements java.io.Serializable, Usern
         hashcode = 31 * hashcode + (password == null ? 0 : password.hashCode());
         hashcode = 31 * hashcode + (createdTime == null ? 0 : createdTime.hashCode());
         hashcode = 31 * hashcode + (passwordType == null ? 0 : passwordType.hashCode());
-        
+
         return hashcode;
     }
-    
+
 }

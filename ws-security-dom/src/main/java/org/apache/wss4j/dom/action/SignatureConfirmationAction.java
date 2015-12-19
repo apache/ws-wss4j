@@ -35,7 +35,7 @@ import org.w3c.dom.Document;
 import java.util.List;
 
 public class SignatureConfirmationAction implements Action {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureConfirmationAction.class);
 
     @SuppressWarnings("unchecked")
@@ -46,14 +46,14 @@ public class SignatureConfirmationAction implements Action {
             LOG.debug("Perform Signature confirmation");
         }
 
-        List<WSHandlerResult> results = 
+        List<WSHandlerResult> results =
             (List<WSHandlerResult>) handler.getProperty(
                 reqData.getMsgContext(), WSHandlerConstants.RECV_RESULTS
             );
         if (results == null || results.isEmpty()) {
             return;
         }
-        
+
         //
         // prepare a SignatureConfirmation token
         //
@@ -64,7 +64,7 @@ public class SignatureConfirmationAction implements Action {
             signatureToken = reqData.getSignatureToken();
         }
         List<WSEncryptionPart> signatureParts = signatureToken.getParts();
-        
+
         //
         // Loop over all the (signature) results gathered by all the processors
         //
@@ -74,10 +74,10 @@ public class SignatureConfirmationAction implements Action {
 
             for (WSSecurityEngineResult result : resultList) {
                 Integer resultAction = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
-                
+
                 // See if it's a signature action
                 if (resultAction != null
-                    && (WSConstants.SIGN == resultAction.intValue() 
+                    && (WSConstants.SIGN == resultAction.intValue()
                         || WSConstants.ST_SIGNED == resultAction.intValue()
                         || WSConstants.UT_SIGN == resultAction.intValue())) {
                     byte[] sigVal = (byte[]) result.get(WSSecurityEngineResult.TAG_SIGNATURE_VALUE);
@@ -96,5 +96,5 @@ public class SignatureConfirmationAction implements Action {
             reqData.getMsgContext(), WSHandlerConstants.SIG_CONF_DONE, ""
         );
     }
-    
+
 }

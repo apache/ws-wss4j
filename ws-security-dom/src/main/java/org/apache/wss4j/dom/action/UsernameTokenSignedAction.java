@@ -39,8 +39,8 @@ import org.w3c.dom.Document;
 
 /**
  * Sign a request using a secret key derived from UsernameToken data.
- * 
- * Enhanced by Alberto Coletti to support digest password type for 
+ *
+ * Enhanced by Alberto Coletti to support digest password type for
  * username token signature
  */
 
@@ -52,22 +52,22 @@ public class UsernameTokenSignedAction implements Action {
         if (callbackHandler == null) {
             callbackHandler = handler.getPasswordCallbackHandler(reqData);
         }
-        WSPasswordCallback passwordCallback = 
+        WSPasswordCallback passwordCallback =
             handler.getPasswordCB(reqData.getUsername(), WSConstants.UT_SIGN, callbackHandler, reqData);
 
         if (reqData.getUsername() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noUser");
         }
-        
+
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setIdAllocator(reqData.getWssConfig().getIdAllocator());
         builder.setPrecisionInMilliSeconds(reqData.isPrecisionInMilliSeconds());
         builder.setWsTimeSource(reqData.getWssConfig().getCurrentTime());
-        
+
         int iterations = reqData.getDerivedKeyIterations();
         boolean useMac = reqData.isUseDerivedKeyForMAC();
         builder.addDerivedKey(useMac, null, iterations);
-        
+
         builder.setUserInfo(reqData.getUsername(), passwordCallback.getPassword());
         builder.addCreated();
         builder.addNonce();
@@ -81,14 +81,14 @@ public class UsernameTokenSignedAction implements Action {
         //              data structures, XML element, fills in the algorithms
         //              and other data.
         // fourth step: Get the references. These references identify the parts
-        //              of the document that will be included into the 
+        //              of the document that will be included into the
         //              signature. If no references are given sign the message
         //              body by default.
         // fifth step:  compute the signature
         //
         // after "prepare" the Signature XML element is ready and may prepend
         // this to the security header.
-        
+
         SignatureActionToken signatureToken = null;
         if (actionToken instanceof SignatureActionToken) {
             signatureToken = (SignatureActionToken)actionToken;
@@ -96,11 +96,11 @@ public class UsernameTokenSignedAction implements Action {
         if (signatureToken == null) {
             signatureToken = reqData.getSignatureToken();
         }
-        
+
         WSSecSignature sign = new WSSecSignature();
         sign.setIdAllocator(reqData.getWssConfig().getIdAllocator());
         sign.setAddInclusivePrefixes(reqData.isAddInclusivePrefixes());
-        
+
         sign.setCustomTokenValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
         sign.setCustomTokenId(builder.getId());
         sign.setSecretKey(builder.getDerivedKey());
@@ -108,7 +108,7 @@ public class UsernameTokenSignedAction implements Action {
         if (signatureToken.getDigestAlgorithm() != null) {
             sign.setDigestAlgo(signatureToken.getDigestAlgorithm());
         }
-        
+
         if (signatureToken.getSignatureAlgorithm() != null) {
             sign.setSignatureAlgorithm(signatureToken.getSignatureAlgorithm());
         } else {
@@ -119,7 +119,7 @@ public class UsernameTokenSignedAction implements Action {
 
         // prepend in this order: first the Signature Element and then the
         // UsernameToken Element. This way the server gets the UsernameToken
-        // first, can check it and are prepared to compute the Signature key.  
+        // first, can check it and are prepared to compute the Signature key.
         // sign.prependToHeader(reqData.getSecHeader());
         // builder.prependToHeader(reqData.getSecHeader());
 
@@ -130,7 +130,7 @@ public class UsernameTokenSignedAction implements Action {
             parts = new ArrayList<>(1);
             parts.add(WSSecurityUtil.getDefaultEncryptionPart(doc));
         }
-        List<javax.xml.crypto.dsig.Reference> referenceList = 
+        List<javax.xml.crypto.dsig.Reference> referenceList =
             sign.addReferencesToSign(parts, reqData.getSecHeader());
 
         try {

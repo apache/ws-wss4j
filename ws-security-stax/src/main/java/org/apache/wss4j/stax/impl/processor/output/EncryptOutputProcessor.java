@@ -67,7 +67,7 @@ import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
  */
 public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
 
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(EncryptOutputProcessor.class);
 
     public EncryptOutputProcessor() throws XMLSecurityException {
@@ -101,8 +101,8 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                     encryptionPartDef.setSecurePart(securePart);
                     encryptionPartDef.setModifier(securePart.getModifier());
                     encryptionPartDef.setEncRefId(IDGenerator.generateID(null));
-                    
-                    Map<Object, SecurePart> dynamicSecureParts = 
+
+                    Map<Object, SecurePart> dynamicSecureParts =
                         outputProcessorChain.getSecurityContext().getAsMap(WSSConstants.SIGNATURE_PARTS);
                     if (dynamicSecureParts != null && securePart.getName() != null
                         && securePart.equals(dynamicSecureParts.get(securePart.getName()))) {
@@ -113,7 +113,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                             securePart
                         );
                     }
-                    
+
                     encryptionPartDef.setKeyId(securityTokenProvider.getId());
                     encryptionPartDef.setSymmetricKey(securityToken.getSecretKey(getSecurityProperties().getEncryptionSymAlgorithm()));
                     outputProcessorChain.getSecurityContext().putAsList(EncryptionPartDef.class, encryptionPartDef);
@@ -143,10 +143,10 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
 
         outputProcessorChain.processEvent(xmlSecEvent);
     }
-    
+
     @Override
     protected SecurePart securePartMatches(XMLSecStartElement xmlSecStartElement, Map<Object, SecurePart> secureParts) {
-    
+
         if (!xmlSecStartElement.getOnElementDeclaredAttributes().isEmpty()) {
             Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_wsu_Id);
             if (attribute != null) {
@@ -177,7 +177,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                 }
             }
         }
-        
+
         return secureParts.get(xmlSecStartElement.getName());
     }
 
@@ -226,13 +226,13 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                     WSSecurityException.ErrorCode.FAILURE, e
             );
         }
-        
+
         List<Attachment> attachments = attachmentRequestCallback.getAttachments();
         if (attachments != null) {
             for (int i = 0; i < attachments.size(); i++) {
                 final Attachment attachment = attachments.get(i);
                 final String attachmentId = attachment.getId();
-    
+
                 String tokenId = outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION);
                 SecurityTokenProvider<OutboundSecurityToken> securityTokenProvider =
                         outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
@@ -246,11 +246,11 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                 encryptionPartDef.setKeyId(securityTokenProvider.getId());
                 encryptionPartDef.setSymmetricKey(securityToken.getSecretKey(getSecurityProperties().getEncryptionSymAlgorithm()));
                 outputProcessorChain.getSecurityContext().putAsList(EncryptionPartDef.class, encryptionPartDef);
-    
+
                 final Attachment resultAttachment = new Attachment();
                 resultAttachment.setId(attachmentId);
                 resultAttachment.setMimeType("application/octet-stream");
-    
+
                 String encryptionSymAlgorithm = getSecurityProperties().getEncryptionSymAlgorithm();
                 String jceAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(encryptionSymAlgorithm);
                 if (jceAlgorithm == null) {
@@ -260,7 +260,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                 Cipher cipher = null;
                 try {
                     cipher = Cipher.getInstance(jceAlgorithm);
-    
+
                     // The Spec mandates a 96-bit IV for GCM algorithms
                     if ("AES/GCM/NoPadding".equals(cipher.getAlgorithm())) {
                         byte[] temp = XMLSecurityConstants.generateBytes(12);
@@ -272,7 +272,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                 } catch (Exception e) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
                 }
-    
+
                 final Map<String, String> headers = new HashMap<>();
                 headers.putAll(attachment.getHeaders());
                 resultAttachment.setSourceStream(
@@ -282,7 +282,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                                 attachment, headers
                         ));
                 resultAttachment.addHeaders(headers);
-    
+
                 final AttachmentResultCallback attachmentResultCallback = new AttachmentResultCallback();
                 attachmentResultCallback.setAttachmentId(attachmentId);
                 attachmentResultCallback.setAttachment(resultAttachment);
@@ -303,7 +303,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
         private boolean doEncryptedHeader = false;
         private final OutboundSecurityToken securityToken;
 
-        InternalEncryptionOutputProcessor(EncryptionPartDef encryptionPartDef, XMLSecStartElement xmlSecStartElement, 
+        InternalEncryptionOutputProcessor(EncryptionPartDef encryptionPartDef, XMLSecStartElement xmlSecStartElement,
                                           String encoding, OutboundSecurityToken securityToken)
                 throws XMLSecurityException, XMLStreamException {
 
@@ -390,14 +390,14 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                 outputDOMElement(securityToken.getCustomTokenReference(), outputProcessorChain);
                 createEndElementAndOutputAsEvent(outputProcessorChain, XMLSecurityConstants.TAG_dsig_KeyInfo);
                 return;
-            } 
-            
+            }
+
             KeyIdentifier keyIdentifier = ((WSSSecurityProperties) getSecurityProperties()).getEncryptionKeyIdentifier();
             if (WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier.equals(keyIdentifier)) {
                 List<XMLSecAttribute> attributes = new ArrayList<>(1);
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
                 createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
-                
+
                 if (securityToken.getSha1Identifier() != null) {
                     WSSUtils.createEncryptedKeySha1IdentifierStructure(this, outputProcessorChain, securityToken.getSha1Identifier());
                 } else {
@@ -407,7 +407,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                 List<XMLSecAttribute> attributes = new ArrayList<>(1);
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_Kerberos5_AP_REQ));
                 createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
-                
+
                 WSSUtils.createKerberosSha1IdentifierStructure(this, outputProcessorChain, securityToken.getSha1Identifier());
             } else {
                 boolean isSAMLToken = false;
@@ -437,7 +437,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                 } else {
                     createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, true, null);
                 }
-                
+
                 if (isSAMLToken) {
                     // Always use KeyIdentifier regardless of the configured KeyIdentifier value
                     WSSUtils.createSAMLKeyIdentifierStructure(this, outputProcessorChain, securityToken.getTokenType(), getEncryptionPartDef().getKeyId());

@@ -33,9 +33,9 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.IOException;
 
 public final class X509Util {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(X509Util.class);
-    
+
     private X509Util() {
         // Complete
     }
@@ -51,7 +51,7 @@ public final class X509Util {
     }
 
     public static String getEncAlgo(Node encBodyData) throws WSSecurityException {
-        Element tmpE = 
+        Element tmpE =
             XMLUtils.getDirectChildElement(
                 encBodyData, "EncryptionMethod", WSConstants.ENC_NS
             );
@@ -77,7 +77,7 @@ public final class X509Util {
         byte[] encryptedKey
     ) throws WSSecurityException {
         String keyName = null;
-        Element keyNmElem = 
+        Element keyNmElem =
             XMLUtils.getDirectChildElement(
                 keyInfoElem, "KeyName", WSConstants.SIG_NS
             );

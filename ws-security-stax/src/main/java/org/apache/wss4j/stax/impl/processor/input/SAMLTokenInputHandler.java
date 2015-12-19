@@ -167,7 +167,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         }
 
         final InboundSecurityToken subjectSecurityToken;
-        
+
         List<String> methods = samlAssertionWrapper.getConfirmationMethods();
         boolean holderOfKey = false;
         if (methods != null) {
@@ -419,16 +419,16 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                 keyInfoType.getContent().add(securityTokenReferenceTypeJAXBElement);
             } else if (object instanceof EncryptedKeyType) {
                 EncryptedKeyType encryptedKeyType = (EncryptedKeyType) object;
-                
+
                 WSSEncryptedKeyInputHandler encryptedKeyInputHandler = new WSSEncryptedKeyInputHandler();
                 encryptedKeyInputHandler.handle(inputProcessorChain, encryptedKeyType, xmlSecStartElement, securityProperties);
-                
+
                 SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider =
                     inputProcessorChain.getSecurityContext().getSecurityTokenProvider(encryptedKeyType.getId());
                 if (securityTokenProvider != null) {
                     return securityTokenProvider.getSecurityToken();
                 }
-              
+
             } else if (object instanceof SecurityTokenReferenceType) {
                 JAXBElement<SecurityTokenReferenceType> securityTokenReferenceTypeJAXBElement =
                         new ObjectFactory().createSecurityTokenReference((SecurityTokenReferenceType) object);
@@ -684,7 +684,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                                 return;
                             }
                         }
-                        
+
                         // Now try message signatures
                         for (int j = 0; j < securityTokenProviders.size(); j++) {
                             SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider = securityTokenProviders.get(j);
@@ -757,7 +757,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             }
             if (methodNotSatisfied) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION,
-                    "empty", 
+                    "empty",
                     new Object[] {"SAML proof-of-possession of the private/secret key failed"});
             }
         }

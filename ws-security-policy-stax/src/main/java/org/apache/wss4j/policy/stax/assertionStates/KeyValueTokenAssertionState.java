@@ -42,7 +42,7 @@ public class KeyValueTokenAssertionState extends TokenAssertionState {
     public KeyValueTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted,
                                        PolicyAsserter policyAsserter, boolean initiator) {
         super(assertion, asserted, policyAsserter, initiator);
-        
+
         if (asserted) {
             KeyValueToken token = (KeyValueToken) getAssertion();
             String namespace = token.getName().getNamespaceURI();
@@ -68,7 +68,7 @@ public class KeyValueTokenAssertionState extends TokenAssertionState {
 
         KeyValueTokenSecurityEvent keyValueTokenSecurityEvent = (KeyValueTokenSecurityEvent) tokenSecurityEvent;
         KeyValueToken keyValueToken = (KeyValueToken) abstractToken;
-        
+
         String namespace = getAssertion().getName().getNamespaceURI();
         if (keyValueToken.isRsaKeyValue()) {
             if (!(keyValueTokenSecurityEvent.getSecurityToken() instanceof RsaKeyValueSecurityToken)) {

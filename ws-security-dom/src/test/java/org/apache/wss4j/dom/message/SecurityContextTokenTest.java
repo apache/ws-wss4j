@@ -40,12 +40,12 @@ import org.w3c.dom.Document;
  * A set of tests for SecurityContextTokens.
  */
 public class SecurityContextTokenTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SecurityContextTokenTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private SecretKeyCallbackHandler callbackHandler = new SecretKeyCallbackHandler();
     private Crypto crypto = null;
-    
+
     public SecurityContextTokenTest() throws Exception {
         crypto = CryptoFactory.getInstance("wss40.properties");
     }
@@ -54,7 +54,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     @org.junit.Test
     public void testBuild() {
         try {
@@ -64,12 +64,12 @@ public class SecurityContextTokenTest extends org.junit.Assert {
 
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
             sctBuilder.prepare(doc, crypto);
-            
+
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
-            String out = 
+            String out =
                 XMLUtils.PrettyDocumentToString(doc);
-            
+
             if (LOG.isDebugEnabled()) {
                 LOG.debug(out);
             }
@@ -79,7 +79,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
                 out.indexOf(ConversationConstants.SECURITY_CONTEXT_TOKEN_LN) > 0
             );
             assertTrue(
-                "wsc:Identifier missing", 
+                "wsc:Identifier missing",
                 out.indexOf(ConversationConstants.IDENTIFIER_LN) > 0
             );
 
@@ -124,18 +124,18 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             }
 
             WSHandlerResult results = verify(doc);
-            
+
             WSSecurityEngineResult actionResult =
                 results.getActionResults().get(WSConstants.SCT).get(0);
-            SecurityContextToken receivedToken = 
+            SecurityContextToken receivedToken =
                 (SecurityContextToken) actionResult.get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
             assertTrue(receivedToken != null);
             assertTrue(WSConstants.WSC_SCT_05_12.equals(receivedToken.getTokenType()));
-            
+
             SecurityContextToken clone = new SecurityContextToken(receivedToken.getElement());
             assertTrue(clone.equals(receivedToken));
             assertTrue(clone.hashCode() == receivedToken.hashCode());
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             fail(e.getMessage());
@@ -165,7 +165,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             sigBuilder.setExternalKey(tempSecret, tokenId);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
             sigBuilder.build(doc, secHeader);
-            
+
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
             if (LOG.isDebugEnabled()) {
@@ -174,20 +174,20 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             }
 
             WSHandlerResult results = verify(doc);
-            
+
             WSSecurityEngineResult actionResult =
                 results.getActionResults().get(WSConstants.SCT).get(0);
-            SecurityContextToken receivedToken = 
+            SecurityContextToken receivedToken =
                 (SecurityContextToken) actionResult.get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
             assertTrue(receivedToken != null);
             assertTrue(WSConstants.WSC_SCT_05_12.equals(receivedToken.getTokenType()));
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             fail(e.getMessage());
         }
     }
-    
+
     /**
      * Test for WSS-217:
      * "Add ability to specify a reference to an absolute URI in the derived key functionality".
@@ -213,12 +213,12 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             sigBuilder.setTokenIdDirectId(true);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
             sigBuilder.build(doc, secHeader);
-            
+
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("DKT Absolute");
-                String outputString = 
+                String outputString =
                     XMLUtils.PrettyDocumentToString(doc);
                 LOG.debug(outputString);
             }
@@ -315,7 +315,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             fail(e.getMessage());
         }
     }
-    
+
     /**
      * Test signature and verification using a SecurityContextToken directly,
      * rather than using a DerivedKeyToken to point to a SecurityContextToken.
@@ -345,12 +345,12 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             builder.setCustomTokenId(tokenId);
             builder.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
             builder.build(doc, crypto, secHeader);
-            
+
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
-            
+
             if (LOG.isDebugEnabled()) {
                 LOG.debug("SCT sign");
-                String outputString = 
+                String outputString =
                     XMLUtils.PrettyDocumentToString(doc);
                 LOG.debug(outputString);
             }
@@ -361,18 +361,18 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             fail(e.getMessage());
         }
     }
-    
+
     /**
      * Verifies the soap envelope <p/>
-     * 
+     *
      * @param envelope
      * @throws Exception
      *             Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc) throws Exception {
-        WSHandlerResult results = 
+        WSHandlerResult results =
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         return results;

@@ -40,7 +40,7 @@ public class AttributeBean {
 
     /**
      * Constructor SamlAttribute creates a new SamlAttribute instance.
-     * 
+     *
      * @param simpleName of type String
      * @param qualifiedName of type String
      * @param attributeValues of type List<Object>
@@ -68,16 +68,16 @@ public class AttributeBean {
     public void setSimpleName(String simpleName) {
         this.simpleName = simpleName;
     }
-    
+
     /**
      * Method getNameFormat returns the nameFormat of this SamlAttribute object
-     * 
+     *
      * @return he nameFormat of this SamlAttribute object
      */
     public String getNameFormat() {
         return nameFormat;
     }
-    
+
     /**
      * Method setNameFormat sets the nameFormat of this SamlAttribute object.
      *
@@ -122,14 +122,14 @@ public class AttributeBean {
     public void setAttributeValues(List<Object> attributeValues) {
         this.attributeValues = attributeValues;
     }
-    
+
     public void addAttributeValue(Object attributeValue) {
         if (attributeValues == null) {
             attributeValues = new ArrayList<>();
         }
         attributeValues.add(attributeValue);
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -146,19 +146,19 @@ public class AttributeBean {
         } else if (attributeValues != null && !attributeValues.equals(that.attributeValues)) {
             return false;
         }
-        
+
         if (qualifiedName == null && that.qualifiedName != null) {
             return false;
         } else if (qualifiedName != null && !qualifiedName.equals(that.qualifiedName)) {
             return false;
         }
-        
+
         if (nameFormat == null && that.nameFormat != null) {
             return false;
         } else if (nameFormat != null && !nameFormat.equals(that.nameFormat)) {
             return false;
         }
-        
+
         if (simpleName == null && that.simpleName != null) {
             return false;
         } else if (simpleName != null && !simpleName.equals(that.simpleName)) {

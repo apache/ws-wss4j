@@ -32,11 +32,11 @@ import org.apache.wss4j.dom.validate.Validator;
 import org.w3c.dom.Element;
 
 public class TimestampProcessor implements Processor {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(TimestampProcessor.class);
 
     public List<WSSecurityEngineResult> handleToken(
-        Element elem, 
+        Element elem,
         RequestData data,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
@@ -49,21 +49,21 @@ public class TimestampProcessor implements Processor {
         Timestamp timestamp = new Timestamp(elem, data.getBSPEnforcer());
         Credential credential = new Credential();
         credential.setTimestamp(timestamp);
-        
-        WSSecurityEngineResult result = 
+
+        WSSecurityEngineResult result =
             new WSSecurityEngineResult(WSConstants.TS, timestamp);
         String tokenId = timestamp.getID();
         if (!"".equals(tokenId)) {
             result.put(WSSecurityEngineResult.TAG_ID, tokenId);
         }
-        
+
         Validator validator = data.getValidator(WSConstants.TIMESTAMP);
         if (validator != null) {
             validator.validate(credential, data);
-            
+
             result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
         }
-        
+
         wsDocInfo.addTokenElement(elem);
         wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);

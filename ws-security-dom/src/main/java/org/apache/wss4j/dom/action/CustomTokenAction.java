@@ -31,7 +31,7 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
 
 public class CustomTokenAction implements Action {
-    
+
     public void execute(WSHandler handler, SecurityActionToken actionToken,
                         Document doc, RequestData reqData)
         throws WSSecurityException {
@@ -39,30 +39,30 @@ public class CustomTokenAction implements Action {
         if (callbackHandler == null) {
             callbackHandler = handler.getPasswordCallbackHandler(reqData);
         }
-        
+
         if (callbackHandler == null) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, "noCallback"
             );
         }
-        
-        WSPasswordCallback wsPasswordCallback = 
+
+        WSPasswordCallback wsPasswordCallback =
             new WSPasswordCallback(reqData.getUsername(), WSPasswordCallback.CUSTOM_TOKEN);
-        
+
         try {
             callbackHandler.handle(new Callback[]{wsPasswordCallback});
         } catch (Exception e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
                     "empty", new Object[] {"WSHandler: password callback failed"});
         }
-        
+
         Element customToken = wsPasswordCallback.getCustomToken();
         if (customToken == null) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, "resourceNotFound", new Object[] {"CustomToken"}
             );
         }
-        
+
         Element securityHeader = reqData.getSecHeader().getSecurityHeader();
         securityHeader.appendChild(securityHeader.getOwnerDocument().adoptNode(customToken));
     }

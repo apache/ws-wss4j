@@ -61,7 +61,7 @@ import org.w3c.dom.Element;
 
 public class WSSecSignatureSAML extends WSSecSignature {
 
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSecSignatureSAML.class);
     private boolean senderVouches;
     private SecurityTokenReference secRefSaml;
@@ -72,7 +72,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
     private String issuerKeyName;
     private String issuerKeyPW;
     private boolean useDirectReferenceToAssertion;
-    
+
     /**
      * Constructor.
      */
@@ -83,11 +83,11 @@ public class WSSecSignatureSAML extends WSSecSignature {
 
     /**
      * Builds a signed soap envelope with SAML token.
-     * 
+     *
      * The method first gets an appropriate security header. According to the
      * defined parameters for certificate handling the signature elements are
      * constructed and inserted into the <code>wsse:Signature</code>
-     * 
+     *
      * @param doc
      *            The unsigned SOAP envelope as <code>Document</code>
      * @param uCrypto
@@ -122,21 +122,21 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 }
             }
         }
-        
+
         //
         // Add the STRTransform for the SecurityTokenReference to the SAML assertion
         // if it exists
         //
         if (secRefID != null) {
-            String soapNamespace = 
+            String soapNamespace =
                 WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
             WSEncryptionPart encP =
                 new WSEncryptionPart("STRTransform", soapNamespace, "Content");
             encP.setId(secRefID);
             getParts().add(encP);
         }
-        
-        List<javax.xml.crypto.dsig.Reference> referenceList = 
+
+        List<javax.xml.crypto.dsig.Reference> referenceList =
             addReferencesToSign(getParts(), secHeader);
 
         prependSAMLElementsToHeader(secHeader);
@@ -146,7 +146,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         } else {
             computeSignature(referenceList, secHeader, samlToken);
         }
-        
+
         //
         // if we have a BST prepend it in front of the Signature according to
         // strict layout rules.
@@ -160,15 +160,15 @@ public class WSSecSignatureSAML extends WSSecSignature {
 
     /**
      * Initialize a WSSec SAML Signature.
-     * 
+     *
      * The method sets up and initializes a WSSec SAML Signature structure after
      * the relevant information was set. After setup of the references to
      * elements to sign may be added. After all references are added they can be
      * signed.
-     * 
+     *
      * This method does not add the Signature element to the security header.
      * See <code>prependSignatureElementToHeader()</code> method.
-     * 
+     *
      * @param doc
      *            The SOAP envelope as <code>Document</code>
      * @param uCrypto
@@ -200,7 +200,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         document = doc;
         issuerKeyName = iKeyName;
         issuerKeyPW = iKeyPW;
-        
+
         samlToken = samlAssertion.toDOM(doc);
 
         //
@@ -222,7 +222,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         // retrieval
         //
         wsDocInfo = new WSDocInfo(doc);
-        
+
 
         X509Certificate[] certs = null;
         PublicKey publicKey = null;
@@ -250,7 +250,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 SignatureActionToken actionToken = new SignatureActionToken();
                 data.setSignatureToken(actionToken);
                 actionToken.setCrypto(userCrypto);
-                SAMLKeyInfo samlKeyInfo = 
+                SAMLKeyInfo samlKeyInfo =
                     SAMLUtil.getCredentialFromSubject(
                             samlAssertion, new WSSSAMLKeyInfoProcessor(data, wsDocInfo),
                             userCrypto, data.getCallbackHandler()
@@ -262,14 +262,14 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 }
             }
         }
-        if ((certs == null || certs.length == 0 || certs[0] == null) 
+        if ((certs == null || certs.length == 0 || certs[0] == null)
             && publicKey == null && secretKey == null) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE,
                 "noCertsFound",
                 new Object[] {"SAML signature"});
         }
-        
+
         if (getSignatureAlgorithm() == null) {
             PublicKey key = null;
             if (certs != null && certs[0] != null) {
@@ -281,7 +281,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                     WSSecurityException.ErrorCode.FAILURE, "unknownSignatureAlgorithm"
                 );
             }
-            
+
             String pubKeyAlgo = key.getAlgorithm();
             if (doDebug) {
                 LOG.debug("automatic sig algo detection: " + pubKeyAlgo);
@@ -298,16 +298,16 @@ public class WSSecSignatureSAML extends WSSecSignature {
             }
         }
         sig = null;
-        
+
         try {
             C14NMethodParameterSpec c14nSpec = null;
             if (isAddInclusivePrefixes() && getSigCanonicalization().equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
-                List<String> prefixes = 
+                List<String> prefixes =
                     getInclusivePrefixes(secHeader.getSecurityHeader(), false);
                 c14nSpec = new ExcC14NParameterSpec(prefixes);
             }
-            
-           c14nMethod = 
+
+           c14nMethod =
                signatureFactory.newCanonicalizationMethod(getSigCanonicalization(), c14nSpec);
         } catch (Exception ex) {
             LOG.error("", ex);
@@ -321,11 +321,11 @@ public class WSSecSignatureSAML extends WSSecSignature {
         strUri = getIdAllocator().createSecureId("STRId-", secRef);
         secRef.setID(strUri);
         setSecurityTokenReference(secRef);
-        
+
         if (certs != null && certs.length != 0) {
             certUri = getIdAllocator().createSecureId("CertId-", certs[0]);
         }
-        
+
         //
         // If the sender vouches, then we must sign the SAML token _and_ at
         // least one part of the message (usually the SOAP body). To do so we
@@ -374,7 +374,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 WSSecurityException.ErrorCode.FAILED_SIGNATURE, ex, "noXMLSig"
             );
         }
-        
+
         if (senderVouches) {
             switch (keyIdentifierType) {
             case WSConstants.BST_DIRECT_REFERENCE:
@@ -388,11 +388,11 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 ref.setValueType(binarySecurity.getValueType());
                 secRef.setReference(ref);
                 break;
-                
+
             case WSConstants.X509_KEY_IDENTIFIER :
                 secRef.setKeyIdentifier(certs[0]);
                 break;
-                
+
             case WSConstants.SKI_KEY_IDENTIFIER:
                 secRef.setKeyIdentifierSKI(certs[0], iCrypto != null ? iCrypto : uCrypto);
                 break;
@@ -446,7 +446,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         wsDocInfo.addTokenElement(secRef.getElement(), false);
 
         KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
-        keyInfo = 
+        keyInfo =
             keyInfoFactory.newKeyInfo(
                 java.util.Collections.singletonList(structure), keyInfoUri
             );
@@ -456,14 +456,14 @@ public class WSSecSignatureSAML extends WSSecSignature {
 
     /**
      * Prepend the SAML elements to the elements already in the Security header.
-     * 
+     *
      * The method can be called any time after <code>prepare()</code>. This
      * allows to insert the SAML elements at any position in the Security
      * header.
-     * 
+     *
      * This methods first prepends the SAML security reference if mode is
      * <code>senderVouches</code>, then the SAML token itself,
-     * 
+     *
      * @param secHeader
      *            The security header that holds the BST element.
      */
@@ -477,19 +477,19 @@ public class WSSecSignatureSAML extends WSSecSignature {
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), samlToken);
     }
 
-    
+
     /**
      * Compute the Signature over the references.
-     * 
+     *
      * After references are set this method computes the Signature for them.
      * This method can be called any time after the references were set. See
      * <code>addReferencesToSign()</code>.
-     * 
+     *
      * @throws WSSecurityException
      */
     public void computeSignature(
-        List<javax.xml.crypto.dsig.Reference> referenceList, 
-        WSSecHeader secHeader, 
+        List<javax.xml.crypto.dsig.Reference> referenceList,
+        WSSecHeader secHeader,
         Element siblingElement
     ) throws WSSecurityException {
         try {
@@ -501,25 +501,25 @@ public class WSSecSignatureSAML extends WSSecSignature {
             } else {
                 key = userCrypto.getPrivateKey(user, password);
             }
-            SignatureMethod signatureMethod = 
+            SignatureMethod signatureMethod =
                 signatureFactory.newSignatureMethod(getSignatureAlgorithm(), null);
-            SignedInfo signedInfo = 
+            SignedInfo signedInfo =
                 signatureFactory.newSignedInfo(c14nMethod, signatureMethod, referenceList);
-            
+
             sig = signatureFactory.newXMLSignature(
-                    signedInfo, 
+                    signedInfo,
                     keyInfo,
                     null,
                     getIdAllocator().createId("SIG-", null),
                     null);
-            
+
             Element securityHeaderElement = secHeader.getSecurityHeader();
             //
             // Prepend the signature element to the security header (after the assertion)
             //
             XMLSignContext signContext = null;
             if (siblingElement != null && siblingElement.getNextSibling() != null) {
-                signContext = 
+                signContext =
                     new DOMSignContext(key, securityHeaderElement, siblingElement.getNextSibling());
             } else {
                 signContext = new DOMSignContext(key, securityHeaderElement);
@@ -527,18 +527,18 @@ public class WSSecSignatureSAML extends WSSecSignature {
             signContext.putNamespacePrefix(WSConstants.SIG_NS, WSConstants.SIG_PREFIX);
             if (WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(getSigCanonicalization())) {
                 signContext.putNamespacePrefix(
-                    WSConstants.C14N_EXCL_OMIT_COMMENTS, 
+                    WSConstants.C14N_EXCL_OMIT_COMMENTS,
                     WSConstants.C14N_EXCL_OMIT_COMMENTS_PREFIX
                 );
             }
             signContext.setProperty(STRTransform.TRANSFORM_WS_DOC_INFO, wsDocInfo);
             wsDocInfo.setCallbackLookup(callbackLookup);
-            
+
             // Add the elements to sign to the Signature Context
             wsDocInfo.setTokensOnContext((DOMSignContext)signContext);
 
             sig.sign(signContext);
-            
+
             signatureValue = sig.getSignatureValue().getValue();
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
@@ -556,7 +556,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
     public boolean isUseDirectReferenceToAssertion() {
         return useDirectReferenceToAssertion;
     }
-    
+
     /**
      * Set whether a Direct Reference is to be used to reference the assertion. The
      * default is false.
@@ -566,5 +566,5 @@ public class WSSecSignatureSAML extends WSSecSignature {
     public void setUseDirectReferenceToAssertion(boolean useDirectReferenceToAssertion) {
         this.useDirectReferenceToAssertion = useDirectReferenceToAssertion;
     }
-    
+
 }

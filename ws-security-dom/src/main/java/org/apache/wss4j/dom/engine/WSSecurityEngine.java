@@ -47,7 +47,7 @@ import org.w3c.dom.Node;
  * WS-Security Engine.
  */
 public class WSSecurityEngine {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSecurityEngine.class);
 
     /**
@@ -57,7 +57,7 @@ public class WSSecurityEngine {
     private WSSConfig wssConfig;
     private boolean doDebug;
     private CallbackLookup callbackLookup;
-    
+
     /**
      * @return      the WSSConfig object set on this instance
      */
@@ -68,11 +68,11 @@ public class WSSecurityEngine {
         }
         return wssConfig;
     }
-    
+
     /**
      * @param cfg   the WSSConfig instance for this WSSecurityEngine to use
      *
-     * @return      the WSSConfig instance previously set on this 
+     * @return      the WSSConfig instance previously set on this
      *              WSSecurityEngine instance
      */
     public final WSSConfig
@@ -81,7 +81,7 @@ public class WSSecurityEngine {
         wssConfig = cfg;
         return ret;
     }
-    
+
     /**
      * Set the CallbackLookup object to use to locate elements
      * @param callbackLookup the CallbackLookup object to use to locate elements
@@ -89,7 +89,7 @@ public class WSSecurityEngine {
     public void setCallbackLookup(CallbackLookup callbackLookup) {
         this.callbackLookup = callbackLookup;
     }
-    
+
     /**
      * Get the CallbackLookup object to use to locate elements
      * @return the CallbackLookup object to use to locate elements
@@ -97,7 +97,7 @@ public class WSSecurityEngine {
     public CallbackLookup getCallbackLookup() {
         return callbackLookup;
     }
-    
+
     /**
      * Process the security header given the soap envelope as W3C document.
      * <p/>
@@ -177,17 +177,17 @@ public class WSSecurityEngine {
 
     /**
      * Process the security header given the <code>wsse:Security</code> DOM
-     * Element. 
-     * 
+     * Element.
+     *
      * This function loops over all direct child elements of the
      * <code>wsse:Security</code> header. If it finds a known element, it
      * transfers control to the appropriate handling function. The method
      * processes the known child elements in the same order as they appear in
      * the <code>wsse:Security</code> element. This is in accordance to the WS
      * Security specification. <p/>
-     * 
+     *
      * Currently the functions can handle the following child elements:
-     * 
+     *
      * <ul>
      * <li>{@link #SIGNATURE <code>ds:Signature</code>}</li>
      * <li>{@link #ENCRYPTED_KEY <code>xenc:EncryptedKey</code>}</li>
@@ -216,7 +216,7 @@ public class WSSecurityEngine {
         CallbackHandler cb,
         Crypto sigVerCrypto,
         Crypto decCrypto
-    ) throws WSSecurityException { 
+    ) throws WSSecurityException {
         RequestData data = new RequestData();
         data.setActor(actor);
         data.setWssConfig(getWssConfig());
@@ -225,7 +225,7 @@ public class WSSecurityEngine {
         data.setCallbackHandler(cb);
         return processSecurityHeader(securityHeader, data);
     }
-    
+
     /**
      * Process the security header given the soap envelope as W3C document.
      * <p/>
@@ -257,20 +257,20 @@ public class WSSecurityEngine {
         }
         return wsResult;
     }
-    
+
     /**
      * Process the security header given the <code>wsse:Security</code> DOM
-     * Element. 
-     * 
+     * Element.
+     *
      * This function loops over all direct child elements of the
      * <code>wsse:Security</code> header. If it finds a known element, it
      * transfers control to the appropriate handling function. The method
      * processes the known child elements in the same order as they appear in
      * the <code>wsse:Security</code> element. This is in accordance to the WS
      * Security specification. <p/>
-     * 
+     *
      * Currently the functions can handle the following child elements:
-     * 
+     *
      * <ul>
      * <li>{@link #SIGNATURE <code>ds:Signature</code>}</li>
      * <li>{@link #ENCRYPTED_KEY <code>xenc:EncryptedKey</code>}</li>
@@ -299,11 +299,11 @@ public class WSSecurityEngine {
             Map<Integer, List<WSSecurityEngineResult>> actionResults = Collections.emptyMap();
             return new WSHandlerResult(null, results, actionResults);
         }
-    
+
         if (requestData.getWssConfig() == null) {
             requestData.setWssConfig(getWssConfig());
         }
-        
+
         //
         // Gather some info about the document to process and store
         // it for retrieval. Store the implementation of signature crypto
@@ -320,14 +320,14 @@ public class WSSecurityEngine {
 
         final WSSConfig cfg = getWssConfig();
         Node node = securityHeader.getFirstChild();
-        
+
         List<WSSecurityEngineResult> returnResults = new LinkedList<>();
         boolean foundTimestamp = false;
         while (node != null) {
             Node nextSibling = node.getNextSibling();
             if (Node.ELEMENT_NODE == node.getNodeType()) {
                 QName el = new QName(node.getNamespaceURI(), node.getLocalName());
-                
+
                 // Check for multiple timestamps
                 if (foundTimestamp && el.equals(WSConstants.TIMESTAMP)) {
                     requestData.getBSPEnforcer().handleBSPRule(BSPRule.R3227);
@@ -335,13 +335,13 @@ public class WSSecurityEngine {
                     foundTimestamp = true;
                 }
                 //
-                // Call the processor for this token. After the processor returns, 
+                // Call the processor for this token. After the processor returns,
                 // store it for later retrieval. The token processor may store some
                 // information about the processed token
                 //
                 Processor p = cfg.getProcessor(el);
                 if (p != null) {
-                    List<WSSecurityEngineResult> results = 
+                    List<WSSecurityEngineResult> results =
                         p.handleToken((Element) node, requestData, wsDocInfo);
                     if (!results.isEmpty()) {
                         returnResults.addAll(0, results);
@@ -360,25 +360,25 @@ public class WSSecurityEngine {
             // of the current node is null. In that case, go on to the previously stored next
             // sibling
             //
-            if (node.getNextSibling() == null && nextSibling != null 
+            if (node.getNextSibling() == null && nextSibling != null
                 && nextSibling.getParentNode() != null) {
                 node = nextSibling;
             } else {
                 node = node.getNextSibling();
             }
         }
-        
-        WSHandlerResult handlerResult = 
+
+        WSHandlerResult handlerResult =
             new WSHandlerResult(requestData.getActor(), returnResults, wsDocInfo.getActionResults());
-        
+
         // Validate SAML Subject Confirmation requirements
         if (requestData.isValidateSamlSubjectConfirmation()) {
             Element bodyElement = callbackLookupToUse.getSOAPBody();
             DOMSAMLUtil.validateSAMLResults(handlerResult, requestData.getTlsCerts(), bodyElement);
         }
-        
+
         wsDocInfo.clear();
-        
+
         return handlerResult;
     }
 }

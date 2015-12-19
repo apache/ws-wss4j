@@ -39,7 +39,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 public class EncryptionDerivedAction extends AbstractDerivedAction implements Action {
-    
+
     public void execute(WSHandler handler, SecurityActionToken actionToken,
                         Document doc, RequestData reqData)
             throws WSSecurityException {
@@ -47,7 +47,7 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
         if (callbackHandler == null) {
             callbackHandler = handler.getPasswordCallbackHandler(reqData);
         }
-        
+
         EncryptionActionToken encryptionToken = null;
         if (actionToken instanceof EncryptionActionToken) {
             encryptionToken = (EncryptionActionToken)actionToken;
@@ -55,8 +55,8 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
         if (encryptionToken == null) {
             encryptionToken = reqData.getEncryptionToken();
         }
-        
-        WSPasswordCallback passwordCallback = 
+
+        WSPasswordCallback passwordCallback =
             handler.getPasswordCB(encryptionToken.getUser(), WSConstants.DKT_ENCR, callbackHandler, reqData);
         WSSecDKEncrypt wsEncrypt = new WSSecDKEncrypt();
         wsEncrypt.setIdAllocator(reqData.getWssConfig().getIdAllocator());
@@ -69,18 +69,18 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
             wsEncrypt.setSymmetricEncAlgorithm(encryptionToken.getSymmetricAlgorithm());
         }
         wsEncrypt.setUserInfo(encryptionToken.getUser(), passwordCallback.getPassword());
-        
+
         if (reqData.isUse200512Namespace()) {
             wsEncrypt.setWscVersion(ConversationConstants.VERSION_05_12);
         } else {
             wsEncrypt.setWscVersion(ConversationConstants.VERSION_05_02);
         }
-        
+
         if (encryptionToken.getDerivedKeyLength() > 0) {
             wsEncrypt.setDerivedKeyLength(encryptionToken.getDerivedKeyLength());
         }
-        
-        Element tokenElement = 
+
+        Element tokenElement =
             setupTokenReference(reqData, encryptionToken, wsEncrypt, passwordCallback, doc);
         wsEncrypt.setAttachmentCallbackHandler(reqData.getAttachmentCallbackHandler());
         wsEncrypt.setStoreBytesInAttachment(reqData.isStoreBytesInAttachment());
@@ -92,17 +92,17 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
             } else {
                 wsEncrypt.getParts().add(WSSecurityUtil.getDefaultEncryptionPart(doc));
             }
-            
+
             wsEncrypt.prepare(doc);
-            
+
             Element externRefList = wsEncrypt.encrypt();
-            
+
             // Put the DerivedKeyToken Element in the right place in the security header
             Node nextSibling = null;
-            if (tokenElement == null 
+            if (tokenElement == null
                 && "EncryptedKey".equals(encryptionToken.getDerivedKeyTokenReference())) {
                 nextSibling = findEncryptedKeySibling(reqData);
-            } else if (tokenElement == null 
+            } else if (tokenElement == null
                 && "SecurityContextToken".equals(encryptionToken.getDerivedKeyTokenReference())) {
                 nextSibling = findSCTSibling(reqData);
             }
@@ -112,27 +112,27 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
                 reqData.getSecHeader().getSecurityHeader().insertBefore(
                     wsEncrypt.getdktElement(), nextSibling);
             }
-            
+
             // Add the ReferenceList to the security header
             wsEncrypt.addExternalRefElement(externRefList, reqData.getSecHeader());
-            
+
             if (tokenElement != null) {
                 WSSecurityUtil.prependChildElement(reqData.getSecHeader().getSecurityHeader(), tokenElement);
             }
-            
+
         } catch (WSSecurityException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
                                           "empty", new Object[] {"Error during Encryption: "});
         }
     }
-    
+
     private Element setupTokenReference(
         RequestData reqData, EncryptionActionToken encryptionToken,
         WSSecDKEncrypt wsEncrypt, WSPasswordCallback passwordCallback,
         Document doc
     ) throws WSSecurityException {
         String derivedKeyTokenReference = encryptionToken.getDerivedKeyTokenReference();
-        
+
         if ("SecurityContextToken".equals(derivedKeyTokenReference)) {
             return setupSCTReference(wsEncrypt, passwordCallback, encryptionToken, reqData.getSignatureToken(),
                                      reqData.isUse200512Namespace(), doc);

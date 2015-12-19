@@ -53,7 +53,7 @@ public class KeyValueTokenBuilder implements AssertionBuilder<Element> {
         } else {
             nestedPolicy = factory.getPolicyEngine().getPolicy(nestedPolicyElement);
         }
-        
+
         KeyValueToken keyValueToken = new KeyValueToken(
                 spVersion,
                 spVersion.getSPConstants().getInclusionFromAttributeValue(includeTokenValue),

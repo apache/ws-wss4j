@@ -33,17 +33,17 @@ import org.apache.wss4j.dom.handler.RequestData;
  * from the Credential passed to the validate method.
  */
 public class SignatureTrustValidator implements Validator {
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureTrustValidator.class);
-    
+
     /**
      * Validate the credential argument. It must contain a non-null X509Certificate chain
      * or a PublicKey. A Crypto implementation is also required to be set.
-     * 
+     *
      * This implementation first attempts to verify trust on the certificate (chain). If
      * this is not successful, then it will attempt to verify trust on the Public Key.
-     * 
+     *
      * @param credential the Credential to be validated
      * @param data the RequestData associated with the request
      * @throws WSSecurityException on a failed validation
@@ -58,7 +58,7 @@ public class SignatureTrustValidator implements Validator {
         if (crypto == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noSigCryptoFile");
         }
-        
+
         if (certs != null && certs.length > 0) {
             validateCertificates(certs);
             verifyTrustInCerts(certs, crypto, data, data.isRevocationEnabled());
@@ -80,14 +80,14 @@ public class SignatureTrustValidator implements Validator {
      * Validate the certificates by checking the validity of each cert
      * @throws WSSecurityException
      */
-    protected void validateCertificates(X509Certificate[] certificates) 
+    protected void validateCertificates(X509Certificate[] certificates)
         throws WSSecurityException {
         // Nothing
     }
-    
+
     /**
      * Evaluate whether the given certificate chain should be trusted.
-     * 
+     *
      * @param certificates the certificate chain that should be validated against the keystore
      * @param crypto A Crypto instance
      * @param data A RequestData instance
@@ -95,13 +95,13 @@ public class SignatureTrustValidator implements Validator {
      * @throws WSSecurityException if the certificate chain is not trusted
      */
     protected void verifyTrustInCerts(
-        X509Certificate[] certificates, 
+        X509Certificate[] certificates,
         Crypto crypto,
         RequestData data,
         boolean enableRevocation
     ) throws WSSecurityException {
         //
-        // Use the validation method from the crypto to check whether the subjects' 
+        // Use the validation method from the crypto to check whether the subjects'
         // certificate was really signed by the issuer stated in the certificate
         //
         Collection<Pattern> subjectCertConstraints = data.getSubjectCertConstraints();
@@ -113,14 +113,14 @@ public class SignatureTrustValidator implements Validator {
             );
         }
     }
-    
+
     /**
      * Validate a public key
      * @throws WSSecurityException
      */
-    protected void validatePublicKey(PublicKey publicKey, Crypto crypto) 
+    protected void validatePublicKey(PublicKey publicKey, Crypto crypto)
         throws WSSecurityException {
         crypto.verifyTrust(publicKey);
     }
-    
+
 }

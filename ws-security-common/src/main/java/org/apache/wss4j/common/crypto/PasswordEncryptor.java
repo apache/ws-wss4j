@@ -33,12 +33,12 @@ public interface PasswordEncryptor {
      * @return the encrypted password
      */
     String encrypt(String password);
-    
+
     /**
      * Decrypt the given encrypted password
      * @param encryptedPassword the encrypted password to decrypt
      * @return the decrypted password
      */
     String decrypt(String encryptedPassword);
-    
+
 }

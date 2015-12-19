@@ -27,56 +27,56 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-public class NamePasswordCallbackHandler implements CallbackHandler {  
+public class NamePasswordCallbackHandler implements CallbackHandler {
 
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(NamePasswordCallbackHandler.class);
-    
+
     private static final String PASSWORD_CALLBACK_NAME = "setObject";
-    private static final Class<?>[] PASSWORD_CALLBACK_TYPES = 
+    private static final Class<?>[] PASSWORD_CALLBACK_TYPES =
         new Class<?>[]{Object.class, char[].class, String.class};
-    
-    private String username;  
-    private String password;  
-    
+
+    private String username;
+    private String password;
+
     private String passwordCallbackName;
-    
-    public NamePasswordCallbackHandler(String username, String password) {  
-        this(username, password, null);  
-    }  
-     
-    public NamePasswordCallbackHandler(String username, String password, String passwordCallbackName) {  
-        this.username = username;  
+
+    public NamePasswordCallbackHandler(String username, String password) {
+        this(username, password, null);
+    }
+
+    public NamePasswordCallbackHandler(String username, String password, String passwordCallbackName) {
+        this.username = username;
         this.password = password;
         this.passwordCallbackName = passwordCallbackName;
-    }  
+    }
 
-    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {  
-        for (int i = 0; i < callbacks.length; i++) {  
+    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+        for (int i = 0; i < callbacks.length; i++) {
             Callback callback = callbacks[i];
             if (handleCallback(callback)) {
                 continue;
-            } else if (callback instanceof NameCallback) {  
-                ((NameCallback) callback).setName(username);  
-            } else if (callback instanceof PasswordCallback) {  
-                PasswordCallback pwCallback = (PasswordCallback) callback;  
+            } else if (callback instanceof NameCallback) {
+                ((NameCallback) callback).setName(username);
+            } else if (callback instanceof PasswordCallback) {
+                PasswordCallback pwCallback = (PasswordCallback) callback;
                 pwCallback.setPassword(password.toCharArray());
             } else if (!invokePasswordCallback(callback)) {
                 LOG.error("Unsupported callback type " + callbacks[i].getClass().getName());
-                throw new UnsupportedCallbackException(callbacks[i], "Unsupported callback type " + callbacks[i].getClass().getName());  
-            }  
-        }  
-    }      
-    
+                throw new UnsupportedCallbackException(callbacks[i], "Unsupported callback type " + callbacks[i].getClass().getName());
+            }
+        }
+    }
+
     protected boolean handleCallback(Callback callback) {
         return false;
     }
-    
+
     /*
-     * This method is called from the handle(Callback[]) method when the specified callback 
-     * did not match any of the known callback classes. It looks for the callback method 
+     * This method is called from the handle(Callback[]) method when the specified callback
+     * did not match any of the known callback classes. It looks for the callback method
      * having the specified method name with one of the supported parameter types.
-     * If found, it invokes the callback method on the object and returns true. 
+     * If found, it invokes the callback method on the object and returns true.
      * If not, it returns false.
      */
     private boolean invokePasswordCallback(Callback callback) {
@@ -94,6 +94,6 @@ public class NamePasswordCallbackHandler implements CallbackHandler {
         }
         return false;
     }
- 
+
 }
 

@@ -59,7 +59,7 @@ public class SamlAuthnTest extends AbstractTestBase {
 
         createDOMMessageAndVerifyStAX(callbackHandler, true);
     }
-    
+
     @Test
     public void testSAML2AuthnAssertion() throws Exception {
 
@@ -70,7 +70,7 @@ public class SamlAuthnTest extends AbstractTestBase {
 
         createDOMMessageAndVerifyStAX(callbackHandler, true);
     }
-    
+
     @Test
     public void testSAML1FutureAuthnInstant() throws Exception {
 
@@ -78,12 +78,12 @@ public class SamlAuthnTest extends AbstractTestBase {
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
-        
+
         callbackHandler.setAuthenticationInstant(new DateTime().plusMinutes(70));
 
         createDOMMessageAndVerifyStAX(callbackHandler, false);
     }
-    
+
     @Test
     public void testSAML2FutureAuthnInstant() throws Exception {
 
@@ -91,12 +91,12 @@ public class SamlAuthnTest extends AbstractTestBase {
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
-        
+
         callbackHandler.setAuthenticationInstant(new DateTime().plusMinutes(70));
 
         createDOMMessageAndVerifyStAX(callbackHandler, false);
     }
-    
+
     @Test
     public void testSAML2StaleSessionNotOnOrAfter() throws Exception {
 
@@ -104,12 +104,12 @@ public class SamlAuthnTest extends AbstractTestBase {
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
-        
+
         callbackHandler.setSessionNotOnOrAfter(new DateTime().minusMinutes(70));
-        
+
         createDOMMessageAndVerifyStAX(callbackHandler, false);
     }
-    
+
     @Test
     public void testSAML1ValidSubjectLocality() throws Exception {
 
@@ -117,12 +117,12 @@ public class SamlAuthnTest extends AbstractTestBase {
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
-        
+
         callbackHandler.setSubjectLocality("127.0.0.1", "xyz.ws.apache.org");
 
         createDOMMessageAndVerifyStAX(callbackHandler, true);
     }
-    
+
     @Test
     public void testSAML2ValidSubjectLocality() throws Exception {
 
@@ -130,12 +130,12 @@ public class SamlAuthnTest extends AbstractTestBase {
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
-        
+
         callbackHandler.setSubjectLocality("127.0.0.1", "xyz.ws.apache.org");
 
         createDOMMessageAndVerifyStAX(callbackHandler, true);
     }
-    
+
     @Test
     public void testSAML1InvalidSubjectLocality() throws Exception {
 
@@ -143,12 +143,12 @@ public class SamlAuthnTest extends AbstractTestBase {
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
-        
+
         callbackHandler.setSubjectLocality("xyz.ws.apache.org", "xyz.ws.apache.org");
 
         createDOMMessageAndVerifyStAX(callbackHandler, false);
     }
-    
+
     @Test
     public void testSAML2InvalidSubjectLocality() throws Exception {
 
@@ -156,12 +156,12 @@ public class SamlAuthnTest extends AbstractTestBase {
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
-        
+
         callbackHandler.setSubjectLocality("xyz.ws.apache.org", "xyz.ws.apache.org");
 
         createDOMMessageAndVerifyStAX(callbackHandler, false);
     }
-    
+
     private void createDOMMessageAndVerifyStAX(
         CallbackHandler samlCallbackHandler, boolean success
     ) throws Exception {
@@ -172,26 +172,26 @@ public class SamlAuthnTest extends AbstractTestBase {
             Properties properties = new Properties();
             properties.put(WSHandlerConstants.SAML_CALLBACK_REF, samlCallbackHandler);
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
-    
+
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 2);
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_saml_Assertion.getLocalPart());
             Assert.assertEquals(nodeList.item(1).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
-    
+
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
-    
+
         //done signature; now test sig-verification:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
-    
+
             try {
-                Document document = 
+                Document document =
                     StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 if (!success) {
                     Assert.fail("XMLStreamException expected");

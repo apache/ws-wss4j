@@ -47,14 +47,14 @@ import org.w3c.dom.Element;
  * A test to add a Custom Token to an outbound message
  */
 public class CustomTokenTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(CustomTokenTest.class);
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     // Add a Timestamp via a "Custom Token"
     @org.junit.Test
     public void testCustomTokenTimestamp() throws Exception {
@@ -62,12 +62,12 @@ public class CustomTokenTest extends org.junit.Assert {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         Document timestampDoc = dbf.newDocumentBuilder().newDocument();
-        
+
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);
         timestamp.prepare(timestampDoc);
         Element timestampElement = timestamp.getElement();
-        
+
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
@@ -76,44 +76,44 @@ public class CustomTokenTest extends org.junit.Assert {
             WSHandlerConstants.PW_CALLBACK_REF, new CustomCallbackHandler(timestampElement)
         );
         reqData.setMsgContext(messageContext);
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.CUSTOM_TOKEN, null));
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             actions,
             true
         );
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         WSSecurityEngine secEngine = new WSSecurityEngine();
-        WSHandlerResult wsResults = 
+        WSHandlerResult wsResults =
             secEngine.processSecurityHeader(doc, null, null, null);
-        WSSecurityEngineResult actionResult = 
+        WSSecurityEngineResult actionResult =
             wsResults.getActionResults().get(WSConstants.TS).get(0);
         assertTrue(actionResult != null);
-        
-        Timestamp receivedTimestamp = 
+
+        Timestamp receivedTimestamp =
             (Timestamp)actionResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
         assertTrue(receivedTimestamp != null);
     }
-    
+
     private static class CustomCallbackHandler implements CallbackHandler {
-        
+
         private final Element customElement;
 
         public CustomCallbackHandler(Element customElement) {
             this.customElement = customElement;
         }
-        
+
         @Override
         public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
             for (Callback callback : callbacks) {
@@ -125,9 +125,9 @@ public class CustomTokenTest extends org.junit.Assert {
                     }
                 }
             }
-            
+
         }
-        
+
     }
-    
+
 }

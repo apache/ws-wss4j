@@ -145,7 +145,7 @@ public class OutboundWSSec {
         outboundSecurityContext.addSecurityEventListener(securityEventListener);
         return processOutMessage((Object) xmlStreamWriter, encoding, outboundSecurityContext);
     }
-    
+
     /**
      * This method is the entry point for the incoming security-engine.
      * Hand over the original XMLStreamWriter and use the returned one for further processing
@@ -181,7 +181,7 @@ public class OutboundWSSec {
             boolean encryptionKerberos = false;
             boolean derivedSignature = false;
             boolean derivedEncryption = false;
-            
+
             // Check to see whether we have a derived key signature, but not encryption, using
             // an encrypted key reference (as we only want one encrypted key here...)
             boolean derivedSignatureButNotDerivedEncryption = false;
@@ -195,7 +195,7 @@ public class OutboundWSSec {
                     }
                 }
             }
-            
+
             for (XMLSecurityConstants.Action action : securityProperties.getActions()) {
                 if (WSSConstants.TIMESTAMP.equals(action)) {
                     final TimestampOutputProcessor timestampOutputProcessor = new TimestampOutputProcessor();
@@ -266,7 +266,7 @@ public class OutboundWSSec {
                         signatureAction = true;
                         derivedSignature = true;
                     }
-                    
+
                     final DerivedKeyTokenOutputProcessor derivedKeyTokenOutputProcessor = new DerivedKeyTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, derivedKeyTokenOutputProcessor, action);
 
@@ -305,7 +305,7 @@ public class OutboundWSSec {
                     final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
                         new BinarySecurityTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
-                        
+
                     final SAMLTokenOutputProcessor samlTokenOutputProcessor = new SAMLTokenOutputProcessor();
                     initializeOutputProcessor(outputProcessorChain, samlTokenOutputProcessor, action);
 
@@ -344,7 +344,7 @@ public class OutboundWSSec {
                     initializeOutputProcessor(outputProcessorChain, unknownTokenOutputProcessor, action);
                 }
             }
-            
+
             // Set up appropriate keys
             if (signatureAction) {
                 setupSignatureKey(outputProcessorChain, securityProperties, signedSAML);
@@ -353,16 +353,16 @@ public class OutboundWSSec {
                 setupEncryptionKey(outputProcessorChain, securityProperties);
             }
             if (kerberos) {
-                setupKerberosKey(outputProcessorChain, securityProperties, 
+                setupKerberosKey(outputProcessorChain, securityProperties,
                                  signatureKerberos, encryptionKerberos);
             }
             if (derivedSignature) {
-                String id = 
+                String id =
                     outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE);
                 setDerivedIdentifier(outputProcessorChain, id);
             }
             if (derivedEncryption) {
-                String id = 
+                String id =
                     outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTED_KEY);
                 if (id == null) {
                     // Maybe not encrypting the key here...
@@ -370,10 +370,10 @@ public class OutboundWSSec {
                 }
                 setDerivedIdentifier(outputProcessorChain, id);
             }
-            
+
             final SecurityHeaderReorderProcessor securityHeaderReorderProcessor = new SecurityHeaderReorderProcessor();
             initializeOutputProcessor(outputProcessorChain, securityHeaderReorderProcessor, null);
-            
+
             if (output instanceof OutputStream) {
                 final FinalOutputProcessor finalOutputProcessor = new FinalOutputProcessor((OutputStream) output, encoding);
                 initializeOutputProcessor(outputProcessorChain, finalOutputProcessor, null);
@@ -398,17 +398,17 @@ public class OutboundWSSec {
         outputProcessor.setAction(action);
         outputProcessor.init(outputProcessorChain);
     }
-    
+
     private void setupSignatureKey(
         OutputProcessorChainImpl outputProcessorChain,
         WSSSecurityProperties securityProperties,
         boolean signedSAML
     ) throws XMLSecurityException {
         final String signatureAlgorithm = securityProperties.getSignatureAlgorithm();
-        
-        GenericOutboundSecurityToken securityToken = 
+
+        GenericOutboundSecurityToken securityToken =
             getOutboundSecurityToken(outputProcessorChain, WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE);
-        // First off, see if we have a supplied token with the correct keys for 
+        // First off, see if we have a supplied token with the correct keys for
         // (a)symmetric signature
         if (securityToken != null && signatureAlgorithm != null) {
             if (signatureAlgorithm.contains("hmac-sha")
@@ -419,7 +419,7 @@ public class OutboundWSSec {
                     return;
                 } else {
                     // We have certs but no private key set. Use the CallbackHandler
-                    Key key = 
+                    Key key =
                         securityProperties.getSignatureCrypto().getPrivateKey(
                             securityToken.getX509Certificates()[0], securityProperties.getCallbackHandler()
                         );
@@ -428,12 +428,12 @@ public class OutboundWSSec {
                 }
             }
         }
-        
+
         // We have no supplied key. So use the PasswordCallback to get a secret key or password
         String alias = securityProperties.getSignatureUser();
         WSPasswordCallback pwCb = new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE);
             WSSUtils.doPasswordCallback(securityProperties.getCallbackHandler(), pwCb);
-      
+
         String password = pwCb.getPassword();
         byte[] secretKey = pwCb.getKey();
         Key key = null;
@@ -445,7 +445,7 @@ public class OutboundWSSec {
                 cryptoType.setAlias(alias);
                 x509Certificates = securityProperties.getSignatureCrypto().getX509Certificates(cryptoType);
                 if (x509Certificates == null || x509Certificates.length == 0) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noUserCertsFound", 
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noUserCertsFound",
                                                   new Object[] {alias});
                 }
             } else if (secretKey != null) {
@@ -453,7 +453,7 @@ public class OutboundWSSec {
                 String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(signatureAlgorithm);
                 key = new SecretKeySpec(secretKey, algoFamily);
             } else {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noPassword", 
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "noPassword",
                                               new Object[] {alias});
             }
         } catch (WSSecurityException ex) {
@@ -468,7 +468,7 @@ public class OutboundWSSec {
         final String id = IDGenerator.generateID(null);
         final GenericOutboundSecurityToken binarySecurityToken =
                 new GenericOutboundSecurityToken(id, WSSecurityTokenConstants.X509V3Token, key, x509Certificates);
-          
+
         // binarySecurityToken.setSha1Identifier(reference);
         final SecurityTokenProvider<OutboundSecurityToken> binarySecurityTokenProvider =
                 new SecurityTokenProvider<OutboundSecurityToken>() {
@@ -483,19 +483,19 @@ public class OutboundWSSec {
                 return id;
             }
         };
-        
+
         outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(id, binarySecurityTokenProvider);
         outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, id);
     }
-    
+
     private void setupEncryptionKey(
         OutputProcessorChainImpl outputProcessorChain,
         WSSSecurityProperties securityProperties
     ) throws XMLSecurityException {
         final String symmetricEncryptionAlgorithm = securityProperties.getEncryptionSymAlgorithm();
-        
+
         // First check to see if a Symmetric key is available
-        GenericOutboundSecurityToken securityToken = 
+        GenericOutboundSecurityToken securityToken =
             getOutboundSecurityToken(outputProcessorChain, WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION);
         if (securityToken == null || securityToken.getSecretKey(symmetricEncryptionAlgorithm) == null) {
             //prepare the symmetric session key for all encryption parts
@@ -516,7 +516,7 @@ public class OutboundWSSec {
             final Key symmetricKey = keyGen.generateKey();
             final String symmId = IDGenerator.generateID(null);
 
-            final GenericOutboundSecurityToken symmetricSecurityToken = 
+            final GenericOutboundSecurityToken symmetricSecurityToken =
                 new GenericOutboundSecurityToken(symmId, WSSecurityTokenConstants.EncryptedKeyToken, symmetricKey);
             securityToken = symmetricSecurityToken;
             final SecurityTokenProvider<OutboundSecurityToken> securityTokenProvider =
@@ -536,7 +536,7 @@ public class OutboundWSSec {
             outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(symmId, securityTokenProvider);
             outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, symmId);
         }
-        
+
         if (!securityProperties.isEncryptSymmetricEncryptionKey()) {
             // No EncryptedKey Token required here, so return
             return;
@@ -565,7 +565,7 @@ public class OutboundWSSec {
                                               new Object[] {securityProperties.getEncryptionUser(), "encryption"});
             }
         }
-        
+
         // Check for Revocation
         if (securityProperties.isEnableRevocation()) {
             Crypto crypto = securityProperties.getEncryptionCrypto();
@@ -576,10 +576,10 @@ public class OutboundWSSec {
         final String id = IDGenerator.generateID(null);
         final GenericOutboundSecurityToken encryptedKeyToken =
             new GenericOutboundSecurityToken(id, WSSecurityTokenConstants.X509V3Token, null, x509Certificates);
-   
+
         encryptedKeyToken.addWrappedToken(securityToken);
         securityToken.setKeyWrappingToken(encryptedKeyToken);
-        
+
         // binarySecurityToken.setSha1Identifier(reference);
         final SecurityTokenProvider<OutboundSecurityToken> encryptedKeyTokenProvider =
             new SecurityTokenProvider<OutboundSecurityToken>() {
@@ -598,14 +598,14 @@ public class OutboundWSSec {
         outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(id, encryptedKeyTokenProvider);
         outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTED_KEY, id);
     }
-    
+
     private void setupKerberosKey(
         OutputProcessorChainImpl outputProcessorChain,
         WSSSecurityProperties securityProperties,
         boolean signature,
         boolean encryption
     ) throws XMLSecurityException {
-        GenericOutboundSecurityToken securityToken = 
+        GenericOutboundSecurityToken securityToken =
             getOutboundSecurityToken(outputProcessorChain, WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_KERBEROS);
         String kerberosId = null;
         // First off, see if we have a supplied token
@@ -617,54 +617,54 @@ public class OutboundWSSec {
                     new KerberosClientSecurityToken(
                         securityProperties.getCallbackHandler(), id
                     );
-    
+
             final SecurityTokenProvider<OutboundSecurityToken> kerberosSecurityTokenProvider =
                     new SecurityTokenProvider<OutboundSecurityToken>() {
-    
+
                 @Override
                 public OutboundSecurityToken getSecurityToken() throws WSSecurityException {
                     return kerberosClientSecurityToken;
                 }
-    
+
                 @Override
                 public String getId() {
                     return id;
                 }
             };
-            
+
             outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(id, kerberosSecurityTokenProvider);
             outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_KERBEROS, id);
         } else {
             kerberosId = securityToken.getId();
         }
-        
+
         if (signature) {
             outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, kerberosId);
         }
         if (encryption) {
             outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, kerberosId);
         }
-        
+
     }
-    
+
     // Return an outbound SecurityToken object for a given id (encryption/signature)
     private GenericOutboundSecurityToken getOutboundSecurityToken(
         OutputProcessorChainImpl outputProcessorChain, String id
     ) throws XMLSecurityException {
-        String tokenId = 
+        String tokenId =
             outputProcessorChain.getSecurityContext().get(id);
         SecurityTokenProvider<OutboundSecurityToken> signatureTokenProvider = null;
         if (tokenId != null) {
-            signatureTokenProvider = 
+            signatureTokenProvider =
                 outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
             if (signatureTokenProvider != null) {
                 return (GenericOutboundSecurityToken)signatureTokenProvider.getSecurityToken();
             }
         }
-        
+
         return null;
     }
-    
+
     private X509Certificate getReqSigCert(SecurityContext securityContext) throws XMLSecurityException {
         List<SecurityEvent> securityEventList = securityContext.getAsList(SecurityEvent.class);
         if (securityEventList != null) {
@@ -672,7 +672,7 @@ public class OutboundWSSec {
                 SecurityEvent securityEvent = securityEventList.get(i);
                 if (securityEvent instanceof TokenSecurityEvent) {
                     @SuppressWarnings("unchecked")
-                    TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent 
+                    TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent
                         = (TokenSecurityEvent<? extends SecurityToken>) securityEvent;
                     if (!tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_MainSignature)) {
                         continue;
@@ -686,7 +686,7 @@ public class OutboundWSSec {
         }
         return null;
     }
-    
+
     private void setDerivedIdentifier(OutputProcessorChainImpl outputProcessorChain, String id) {
         WSSConstants.DerivedKeyTokenReference derivedKeyTokenReference = securityProperties.getDerivedKeyTokenReference();
             switch (derivedKeyTokenReference) {

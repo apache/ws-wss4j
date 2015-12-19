@@ -55,20 +55,20 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public final class EncryptionUtils {
-    
+
     private EncryptionUtils() {
         // complete
     }
 
     /**
-     * Look up the encrypted data. First try Id="someURI". If no such Id then try 
+     * Look up the encrypted data. First try Id="someURI". If no such Id then try
      * wsu:Id="someURI".
-     * 
+     *
      * @param doc The document in which to find EncryptedData
      * @param wsDocInfo The WSDocInfo object to use
      * @param dataRefURI The URI of EncryptedData
      * @return The EncryptedData element
-     * @throws WSSecurityException if the EncryptedData element referenced by dataRefURI is 
+     * @throws WSSecurityException if the EncryptedData element referenced by dataRefURI is
      * not found
      */
     public static Element
@@ -78,11 +78,11 @@ public final class EncryptionUtils {
         String dataRefURI
     ) throws WSSecurityException {
         CallbackLookup callbackLookup = wsDocInfo.getCallbackLookup();
-        Element encryptedDataElement = 
+        Element encryptedDataElement =
             callbackLookup.getElement(dataRefURI, null, true);
         if (encryptedDataElement == null) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY, "dataRef", 
+                WSSecurityException.ErrorCode.INVALID_SECURITY, "dataRef",
                 new Object[] {dataRefURI});
         }
         if (encryptedDataElement.getLocalName().equals(WSConstants.ENCRYPTED_HEADER)
@@ -96,7 +96,7 @@ public final class EncryptionUtils {
         return encryptedDataElement;
     }
 
-    
+
     /**
      * Decrypt the EncryptedData argument using a SecretKey.
      * @param doc The (document) owner of EncryptedData
@@ -133,10 +133,10 @@ public final class EncryptionUtils {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
             }
             String uri = cipherReference.getAttributeNS(null, "URI");
-            
+
             return decryptAttachment(dataRefURI, uri, encData, symmetricKey, symEncAlgo, attachmentCallbackHandler);
         }
-        
+
         WSDataRef dataRef = new WSDataRef();
         dataRef.setEncryptedElement(encData);
         dataRef.setWsuId(dataRefURI);
@@ -144,7 +144,7 @@ public final class EncryptionUtils {
 
         boolean content = X509Util.isContent(encData);
         dataRef.setContent(content);
-        
+
         Element encDataOrig = encData;
         Node parent = encData.getParentNode();
         Node previousSibling = encData.getPreviousSibling();
@@ -176,7 +176,7 @@ public final class EncryptionUtils {
                 } else {
                     tempEncData = encData;
                 }
-                decryptedNode = decryptXopAttachment(symmetricKey, symEncAlgo, attachmentCallbackHandler, 
+                decryptedNode = decryptXopAttachment(symmetricKey, symEncAlgo, attachmentCallbackHandler,
                                                      xopURI, tempEncData);
             } else {
                 //in this case, the XMLCipher knows how to handle encData when it's the parent node
@@ -191,7 +191,7 @@ public final class EncryptionUtils {
             && parent.getNamespaceURI().equals(WSConstants.WSSE11_NS)
             || parent.getLocalName().equals(WSConstants.ENCRYPED_ASSERTION_LN)
             && parent.getNamespaceURI().equals(WSConstants.SAML2_NS)) {
-                
+
             Node decryptedHeader = parent.getFirstChild();
             Node soapHeader = parent.getParentNode();
             soapHeader.replaceChild(decryptedHeader, parent);
@@ -214,7 +214,7 @@ public final class EncryptionUtils {
             }
             dataRef.setXpath(getXPath(decryptedNode));
         }
-        
+
         return dataRef;
     }
 
@@ -223,19 +223,19 @@ public final class EncryptionUtils {
         if (cipherValue != null) {
             return getXOPURIFromCipherValue(cipherValue);
         }
-        
+
         return null;
     }
-    
+
     public static Element getCipherValueFromEncryptedData(Element encData) {
         Element cipherData = XMLUtils.getDirectChildElement(encData, "CipherData", WSConstants.ENC_NS);
         if (cipherData != null) {
             return XMLUtils.getDirectChildElement(cipherData, "CipherValue", WSConstants.ENC_NS);
         }
-        
+
         return null;
     }
-    
+
     public static String getXOPURIFromCipherValue(Element cipherValue) {
         if (cipherValue != null) {
             Element cipherValueChild =
@@ -247,8 +247,8 @@ public final class EncryptionUtils {
 
         return null;
     }
-    
-    
+
+
     private static WSDataRef
     decryptAttachment(
         String dataRefURI,
@@ -261,7 +261,7 @@ public final class EncryptionUtils {
         WSDataRef dataRef = new WSDataRef();
         dataRef.setWsuId(dataRefURI);
         dataRef.setAlgorithm(symEncAlgo);
-        
+
         try {
             if (uri == null || uri.length() < 5 || !uri.startsWith("cid:")) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
@@ -296,7 +296,7 @@ public final class EncryptionUtils {
             InputStream attachmentInputStream =
                     AttachmentUtils.setupAttachmentDecryptionStream(
                             encAlgo, cipher, symmetricKey, attachment.getSourceStream());
-            
+
             Attachment resultAttachment = new Attachment();
             resultAttachment.setId(attachment.getId());
             resultAttachment.setMimeType(encData.getAttributeNS(null, "MimeType"));
@@ -323,10 +323,10 @@ public final class EncryptionUtils {
         dataRef.setContent(true);
         // Remove this EncryptedData from the security header to avoid processing it again
         encData.getParentNode().removeChild(encData);
-        
+
         return dataRef;
     }
-    
+
 
     private static Node decryptXopAttachment(SecretKey symmetricKey, String symEncAlgo, CallbackHandler attachmentCallbackHandler,
                                              String xopURI, Element encData) throws WSSecurityException, IOException,
@@ -363,7 +363,7 @@ public final class EncryptionUtils {
         DocumentBuilder db =
                 org.apache.xml.security.utils.XMLUtils.createDocumentBuilder(false);
         Document document = db.parse(attachmentInputStream);
-        Node decryptedNode = 
+        Node decryptedNode =
             encData.getOwnerDocument().importNode(document.getDocumentElement(), true);
         encData.getParentNode().appendChild(decryptedNode);
         org.apache.xml.security.utils.XMLUtils.repoolDocumentBuilder(db);
@@ -371,10 +371,10 @@ public final class EncryptionUtils {
         return decryptedNode;
     }
 
-    
+
     /**
      * @param decryptedNode the decrypted node
-     * @return a fully built xpath 
+     * @return a fully built xpath
      *        (eg. &quot;/soapenv:Envelope/soapenv:Body/ns:decryptedElement&quot;)
      *        if the decryptedNode is an Element or an Attr node and is not detached
      *        from the document. <code>null</code> otherwise
@@ -383,7 +383,7 @@ public final class EncryptionUtils {
         if (decryptedNode == null) {
             return null;
         }
-        
+
         String result = "";
         if (Node.ELEMENT_NODE == decryptedNode.getNodeType()) {
             result = decryptedNode.getNodeName();
@@ -394,14 +394,14 @@ public final class EncryptionUtils {
         } else {
             return null;
         }
-        
+
         return result;
     }
 
 
     /**
      * Recursively build an absolute xpath (starting with the root &quot;/&quot;)
-     * 
+     *
      * @param xpath the xpath expression built so far
      * @param node the current node whose name is to be prepended
      * @return a fully built xpath
@@ -421,12 +421,12 @@ public final class EncryptionUtils {
     }
 
     public static String getDigestAlgorithm(Node encBodyData) throws WSSecurityException {
-        Element tmpE = 
+        Element tmpE =
             XMLUtils.getDirectChildElement(
                 encBodyData, "EncryptionMethod", WSConstants.ENC_NS
             );
         if (tmpE != null) {
-            Element digestElement = 
+            Element digestElement =
                 XMLUtils.getDirectChildElement(tmpE, "DigestMethod", WSConstants.SIG_NS);
             if (digestElement != null) {
                 return digestElement.getAttributeNS(null, "Algorithm");
@@ -464,7 +464,7 @@ public final class EncryptionUtils {
         }
         return null;
     }
-    
+
     /**
      * Method getDecodedBase64EncodedData
      *

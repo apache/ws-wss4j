@@ -69,7 +69,7 @@ public class FaultTest extends AbstractTestBase {
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
         }
     }
-    
+
     @Test
     public void testEncryptedFaultInbound() throws Exception {
 
@@ -94,7 +94,7 @@ public class FaultTest extends AbstractTestBase {
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
         }
     }
-    
+
     @Test
     public void testUnsecuredFaultInbound() throws Exception {
 
@@ -120,5 +120,5 @@ public class FaultTest extends AbstractTestBase {
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
         }
     }
-    
+
 }

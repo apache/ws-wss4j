@@ -30,33 +30,33 @@ import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 
 
 /**
- * An implementation of PasswordEncryptor that relies on Jasypt's StandardPBEStringEncryptor to 
+ * An implementation of PasswordEncryptor that relies on Jasypt's StandardPBEStringEncryptor to
  * encrypt and decrypt passwords. The default algorithm that is used is "PBEWithMD5AndTripleDES".
  */
 public class JasyptPasswordEncryptor implements PasswordEncryptor {
-    
+
     public static final String DEFAULT_ALGORITHM = "PBEWithMD5AndTripleDES";
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(JasyptPasswordEncryptor.class);
-    
+
     private final StandardPBEStringEncryptor passwordEncryptor;
     private CallbackHandler callbackHandler;
-    
+
     public JasyptPasswordEncryptor(String masterPassword) {
         this(masterPassword, DEFAULT_ALGORITHM);
     }
-    
+
     public JasyptPasswordEncryptor(String masterPassword, String algorithm) {
         passwordEncryptor = new StandardPBEStringEncryptor();
         passwordEncryptor.setPassword(masterPassword);
         passwordEncryptor.setAlgorithm(algorithm);
     }
-    
+
     public JasyptPasswordEncryptor(CallbackHandler callbackHandler) {
         this(callbackHandler, DEFAULT_ALGORITHM);
     }
-    
+
     public JasyptPasswordEncryptor(CallbackHandler callbackHandler, String algorithm) {
         passwordEncryptor = new StandardPBEStringEncryptor();
         passwordEncryptor.setAlgorithm(algorithm);
@@ -70,7 +70,7 @@ public class JasyptPasswordEncryptor implements PasswordEncryptor {
      */
     public String encrypt(String password) {
         if (callbackHandler != null) {
-            WSPasswordCallback pwCb = 
+            WSPasswordCallback pwCb =
                 new WSPasswordCallback("", WSPasswordCallback.PASSWORD_ENCRYPTOR_PASSWORD);
             try {
                 callbackHandler.handle(new Callback[]{pwCb});
@@ -83,7 +83,7 @@ public class JasyptPasswordEncryptor implements PasswordEncryptor {
         }
         return passwordEncryptor.encrypt(password);
     }
-    
+
     /**
      * Decrypt the given encrypted password
      * @param encryptedPassword the encrypted password to decrypt
@@ -91,7 +91,7 @@ public class JasyptPasswordEncryptor implements PasswordEncryptor {
      */
     public String decrypt(String encryptedPassword) {
         if (callbackHandler != null) {
-            WSPasswordCallback pwCb = 
+            WSPasswordCallback pwCb =
                 new WSPasswordCallback("", WSPasswordCallback.PASSWORD_ENCRYPTOR_PASSWORD);
             try {
                 callbackHandler.handle(new Callback[]{pwCb});
@@ -104,5 +104,5 @@ public class JasyptPasswordEncryptor implements PasswordEncryptor {
         }
         return passwordEncryptor.decrypt(encryptedPassword);
     }
-    
+
 }

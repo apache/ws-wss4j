@@ -87,7 +87,7 @@ public class MultipleActionTest extends AbstractTestBase {
             Assert.assertEquals(((Element) nodeList.item(1)).getAttributeNS(null, WSSConstants.ATT_NULL_PrefixList.getLocalPart()), "");
         }
     }
-    
+
     @Test
     @org.junit.Ignore
     public void testTwoEncryptionActions() throws Exception {
@@ -110,7 +110,7 @@ public class MultipleActionTest extends AbstractTestBase {
             xmlStreamWriter.close();
         }
     }
-    
+
     @Test
     public void testDuplicateActions() throws Exception {
         WSSSecurityProperties properties = new WSSSecurityProperties();
@@ -120,14 +120,14 @@ public class MultipleActionTest extends AbstractTestBase {
         properties.setSignatureUser("transmitter");
         properties.setCallbackHandler(new CallbackHandlerImpl());
         properties.setActions(actions);
-        
+
         // Should work
         WSSec.getOutboundWSSec(properties);
-        
+
         // Should throw an error on a duplicate Action
         actions.add(XMLSecurityConstants.SIGNATURE);
         properties.setActions(actions);
-        
+
         try {
             WSSec.getOutboundWSSec(properties);
             Assert.fail();

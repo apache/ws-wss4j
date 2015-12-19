@@ -64,7 +64,7 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
     private SAMLKeyInfo subjectKeyInfo;
     private byte[] secret;
     private Key key;
-    
+
     public SamlSecurityTokenImpl(WSInboundSecurityContext wsInboundSecurityContext, String id,
                                  WSSecurityTokenConstants.KeyIdentifier keyIdentifier,
                                  WSSSecurityProperties securityProperties) throws WSSecurityException {
@@ -72,22 +72,22 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
         this.securityProperties = securityProperties;
         if (securityProperties.getCallbackHandler() != null) {
             // Try to get the Assertion from a CallbackHandler
-            WSPasswordCallback pwcb = 
+            WSPasswordCallback pwcb =
                 new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
             try {
                 securityProperties.getCallbackHandler().handle(new Callback[]{pwcb});
             } catch (IOException | UnsupportedCallbackException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "noPassword");
             }
-            
+
             Element assertionElem = pwcb.getCustomToken();
             if (assertionElem != null && "Assertion".equals(assertionElem.getLocalName())
                 && (WSSConstants.NS_SAML.equals(assertionElem.getNamespaceURI())
                 || WSSConstants.NS_SAML2.equals(assertionElem.getNamespaceURI()))) {
                 this.samlAssertionWrapper = new SamlAssertionWrapper(assertionElem);
-                
-                subjectKeyInfo = 
-                    SAMLUtil.getCredentialFromSubject(samlAssertionWrapper, null, 
+
+                subjectKeyInfo =
+                    SAMLUtil.getCredentialFromSubject(samlAssertionWrapper, null,
                                                       securityProperties.getSignatureVerificationCrypto(),
                                                       securityProperties.getCallbackHandler());
             } else {
@@ -99,16 +99,16 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
                     super.setAsymmetric(true);
                 }
             }
-            
+
             if (this.samlAssertionWrapper == null && secret == null && key == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", 
+                    WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken",
                     new Object[] {id}
                 );
             }
         } else {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", 
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken",
                 new Object[] {id}
             );
         }
@@ -218,10 +218,10 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
 
     @Override
     public WSSecurityTokenConstants.TokenType getTokenType() {
-        if (samlAssertionWrapper != null 
+        if (samlAssertionWrapper != null
             && samlAssertionWrapper.getSamlVersion() == SAMLVersion.VERSION_10) {
             return WSSecurityTokenConstants.Saml10Token;
-        } else if (samlAssertionWrapper != null 
+        } else if (samlAssertionWrapper != null
             && samlAssertionWrapper.getSamlVersion() == SAMLVersion.VERSION_11) {
             return WSSecurityTokenConstants.Saml11Token;
         }
@@ -255,7 +255,7 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
         }
         return this.principal;
     }
-    
+
     @Override
     public SamlAssertionWrapper getSamlAssertionWrapper() {
         return samlAssertionWrapper;

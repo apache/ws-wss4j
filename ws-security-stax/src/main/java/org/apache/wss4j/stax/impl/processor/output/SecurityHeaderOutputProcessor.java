@@ -73,7 +73,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                                 securePart = convertedPart;
                                 encryptionParts.set(i, securePart);
                             }
-                            
+
                             if (securePart.getIdToSign() == null) {
                                 outputProcessorChain.getSecurityContext().putAsMap(
                                         WSSConstants.ENCRYPTION_PARTS,
@@ -99,7 +99,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                                 securePart = convertedPart;
                                 signatureParts.set(i, securePart);
                             }
-                            
+
                             if (securePart.getIdToSign() == null) {
                                 outputProcessorChain.getSecurityContext().putAsMap(
                                         WSSConstants.SIGNATURE_PARTS,
@@ -117,7 +117,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                     }
                 } else if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
                         //remove this processor. its no longer needed.
-                        outputProcessorChain.removeProcessor(this);                    
+                        outputProcessorChain.removeProcessor(this);
                 } else if (level == 2
                         && WSSConstants.TAG_soap_Body_LocalName.equals(xmlSecStartElement.getName().getLocalPart())
                         && xmlSecStartElement.getName().getNamespaceURI().equals(soapMessageVersion)) {
@@ -163,7 +163,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
             outputProcessorChain.processEvent(xmlSecEvent);
         }
     }
-    
+
     private SecurePart convertSecurePart(SecurePart securePart, String soapVersion) {
         final QName secureName = securePart.getName();
         if (secureName == null) {
@@ -171,7 +171,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
         }
 
         QName newName = secureName;
-        
+
         if (WSSConstants.NS_SOAP11.equals(secureName.getNamespaceURI())
             && WSSConstants.NS_SOAP12.equals(soapVersion)) {
             newName = new QName(soapVersion, secureName.getLocalPart(), secureName.getPrefix());
@@ -179,9 +179,9 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
             && WSSConstants.NS_SOAP11.equals(soapVersion)) {
             newName = new QName(soapVersion, secureName.getLocalPart(), secureName.getPrefix());
         }
-        
+
         if (!secureName.equals(newName)) {
-            SecurePart newPart = 
+            SecurePart newPart =
                 new SecurePart(newName, securePart.isGenerateXPointer(), securePart.getModifier(),
                                securePart.getTransforms(), securePart.getDigestMethod());
             newPart.setExternalReference(securePart.getExternalReference());
@@ -189,12 +189,12 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
             newPart.setIdToSign(securePart.getIdToSign());
             return newPart;
         }
-        
+
         return securePart;
     }
 
     private void buildSecurityHeader(
-        String soapMessageVersion, 
+        String soapMessageVersion,
         OutputProcessorChain subOutputProcessorChain,
         boolean mustUnderstand
     ) throws XMLStreamException, XMLSecurityException {

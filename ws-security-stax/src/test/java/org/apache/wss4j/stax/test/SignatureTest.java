@@ -154,7 +154,7 @@ public class SignatureTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
         }
     }
-    
+
     @Test
     public void testSignatureCryptoPropertiesOutbound() throws Exception {
 
@@ -164,7 +164,7 @@ public class SignatureTest extends AbstractTestBase {
             List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
             actions.add(WSSConstants.SIGNATURE);
             securityProperties.setActions(actions);
-            Properties properties = 
+            Properties properties =
                 CryptoFactory.getProperties("transmitter-crypto.properties", this.getClass().getClassLoader());
             securityProperties.setSignatureCryptoProperties(properties);
             securityProperties.setSignatureUser("transmitter");
@@ -221,7 +221,7 @@ public class SignatureTest extends AbstractTestBase {
         //done signature; now test sig-verification:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            Properties properties = 
+            Properties properties =
                 CryptoFactory.getProperties("receiver-crypto.properties", this.getClass().getClassLoader());
             securityProperties.setSignatureVerificationCryptoProperties(properties);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
@@ -481,7 +481,7 @@ public class SignatureTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
         }
     }
-    
+
     /**
      * Since WSS4J hardcoded the C14N algo for References, we test against our framework
      *
@@ -610,7 +610,7 @@ public class SignatureTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
         }
     }
-    
+
     @Test
     public void testSignatureKeyIdentifierIssuerSerialIncludeTokenOutbound() throws Exception {
 
@@ -1035,7 +1035,7 @@ public class SignatureTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
         }
     }
-    
+
 
     @Test
     public void testSignatureKeyIdentifierThumbprintIncludeTokenOutbound() throws Exception {
@@ -1202,7 +1202,7 @@ public class SignatureTest extends AbstractTestBase {
 
     @Test
     public void testSignatureUsePKIPathOutbound() throws Exception {
-        
+
         // Needs BouncyCastle to work properly...
         if (Security.getProvider("BC") == null) {
             return;
@@ -1433,7 +1433,7 @@ public class SignatureTest extends AbstractTestBase {
 
     @Test
     public void testSignatureECKeyValue() throws Exception {
-        
+
         //
         // This test fails with the IBM JDK and with JDK 1.8
         // TODO - Re-enable with JDK 1.8 when we fix Santuario
@@ -1444,7 +1444,7 @@ public class SignatureTest extends AbstractTestBase {
                     || System.getProperty("java.version").startsWith("1.6"))) {
             return;
         }
-        
+
         if (Security.getProvider("BC") == null) {
             return;
         }
@@ -1534,7 +1534,7 @@ public class SignatureTest extends AbstractTestBase {
             }
         }
     }
-    
+
     @Test
     public void testInboundRequiredAlgorithm() throws Exception {
 
@@ -1567,7 +1567,7 @@ public class SignatureTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 1);
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
         }
-        
+
         // This should fail as we require another signature algorithm
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -1584,7 +1584,7 @@ public class SignatureTest extends AbstractTestBase {
             }
         }
     }
-    
+
     @Test
     public void testSignaturePropertiesOutbound() throws Exception {
 
@@ -1666,7 +1666,7 @@ public class SignatureTest extends AbstractTestBase {
 
     @Test
     public void testElementToSignNotFound() throws Exception {
-        
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();

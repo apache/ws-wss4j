@@ -94,11 +94,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 public class SignatureProcessor implements Processor {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureProcessor.class);
-    
+
     private XMLSignatureFactory signatureFactory;
-    
+
     public SignatureProcessor() {
         // Try to install the Santuario Provider - fall back to the JDK provider if this does
         // not work
@@ -108,16 +108,16 @@ public class SignatureProcessor implements Processor {
             signatureFactory = XMLSignatureFactory.getInstance("DOM");
         }
     }
-    
+
     public List<WSSecurityEngineResult> handleToken(
         Element elem,
         RequestData data,
-        WSDocInfo wsDocInfo 
+        WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Found signature element");
         }
-        Element keyInfoElement = 
+        Element keyInfoElement =
             XMLUtils.getDirectChildElement(
                 elem,
                 "KeyInfo",
@@ -149,11 +149,11 @@ public class SignatureProcessor implements Processor {
             if (result != 1) {
                 data.getBSPEnforcer().handleBSPRule(BSPRule.R5402);
             }
-            
-            if (!(SecurityTokenReference.SECURITY_TOKEN_REFERENCE.equals(child.getLocalName()) 
+
+            if (!(SecurityTokenReference.SECURITY_TOKEN_REFERENCE.equals(child.getLocalName())
                 && WSConstants.WSSE_NS.equals(child.getNamespaceURI()))) {
                 data.getBSPEnforcer().handleBSPRule(BSPRule.R5417);
-                
+
                 publicKey = parseKeyValue(keyInfoElement);
                 if (validator != null) {
                     credential.setPublicKey(publicKey);
@@ -169,7 +169,7 @@ public class SignatureProcessor implements Processor {
                 if (signatureMethod != null) {
                     parameters.setDerivationKeyLength(KeyUtils.getKeyLength(signatureMethod));
                 }
-                
+
                 STRParser strParser = new SignatureSTRParser();
                 STRParserResult parserResult = strParser.parseSecurityTokenReference(parameters);
                 principal = parserResult.getPrincipal();
@@ -177,7 +177,7 @@ public class SignatureProcessor implements Processor {
                 publicKey = parserResult.getPublicKey();
                 secretKey = parserResult.getSecretKey();
                 referenceType = parserResult.getCertificatesReferenceType();
-                
+
                 boolean trusted = parserResult.isTrustedCredential();
                 if (trusted && LOG.isDebugEnabled()) {
                     LOG.debug("Direct Trust for SAML/BST credential");
@@ -190,17 +190,17 @@ public class SignatureProcessor implements Processor {
                 }
             }
         }
-        
+
         //
         // Check that we have a certificate, a public key or a secret key with which to
         // perform signature verification
         //
-        if ((certs == null || certs.length == 0 || certs[0] == null) 
+        if ((certs == null || certs.length == 0 || certs[0] == null)
             && secretKey == null
             && publicKey == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
         }
-        
+
         // Check for compliance against the defined AlgorithmSuite
         AlgorithmSuite algorithmSuite = data.getAlgorithmSuite();
         if (algorithmSuite != null) {
@@ -224,20 +224,20 @@ public class SignatureProcessor implements Processor {
                 }
             }
         }
-        
-        XMLSignature xmlSignature = 
+
+        XMLSignature xmlSignature =
             verifyXMLSignature(elem, certs, publicKey, secretKey, signatureMethod, data, wsDocInfo);
         byte[] signatureValue = xmlSignature.getSignatureValue().getValue();
         String c14nMethod = xmlSignature.getSignedInfo().getCanonicalizationMethod().getAlgorithm();
 
-        List<WSDataRef> dataRefs =  
+        List<WSDataRef> dataRefs =
             buildProtectedRefs(
                 elem.getOwnerDocument(), xmlSignature.getSignedInfo(), data, wsDocInfo
             );
         if (dataRefs.isEmpty()) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
         }
-        
+
         int actionPerformed = WSConstants.SIGN;
         if (principal instanceof UsernameTokenPrincipal) {
             actionPerformed = WSConstants.UT_SIGN;
@@ -266,7 +266,7 @@ public class SignatureProcessor implements Processor {
         wsDocInfo.addTokenElement(elem);
         return java.util.Collections.singletonList(result);
     }
-    
+
     /**
      * Get the default certificates from the KeyStore
      * @param crypto The Crypto object containing the default alias
@@ -289,7 +289,7 @@ public class SignatureProcessor implements Processor {
             );
         }
     }
-    
+
     private PublicKey parseKeyValue(
         Element keyInfoElement
     ) throws WSSecurityException {
@@ -301,7 +301,7 @@ public class SignatureProcessor implements Processor {
             keyValue = getKeyValue(keyInfoElement);
         } catch (MarshalException ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
-        } 
+        }
 
         if (keyValue != null) {
             try {
@@ -312,14 +312,14 @@ public class SignatureProcessor implements Processor {
             } catch (java.security.KeyException ex) {
                 LOG.error(ex.getMessage(), ex);
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
-            }     
+            }
         } else {
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY, "unsupportedKeyInfo"
             );
         }
     }
-    
+
     /**
      * Get the KeyValue object from the KeyInfo DOM element if it exists
      */
@@ -339,15 +339,15 @@ public class SignatureProcessor implements Processor {
         }
         return null;
     }
-    
+
 
     /**
      * Verify the WS-Security signature.
-     * 
+     *
      * The functions at first checks if then <code>KeyInfo</code> that is
      * contained in the signature contains standard X509 data. If yes then
      * get the certificate data via the standard <code>KeyInfo</code> methods.
-     * 
+     *
      * Otherwise, if the <code>KeyInfo</code> info does not contain X509 data, check
      * if we can find a <code>wsse:SecurityTokenReference</code> element. If yes, the next
      * step is to check how to get the certificate. Two methods are currently supported
@@ -361,7 +361,7 @@ public class SignatureProcessor implements Processor {
      * looks up the certificate in the keystore via the <code>crypto</code> parameter.
      * </li>
      * </ul>
-     * 
+     *
      * @param elem        the XMLSignature DOM Element.
      * @return the subject principal of the validated X509 certificate (the
      *         authenticated subject). The calling function may use this
@@ -380,7 +380,7 @@ public class SignatureProcessor implements Processor {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verify XML Signature");
         }
-        
+
         //
         // Perform the signature verification and build up a List of elements that the
         // signature refers to
@@ -393,20 +393,20 @@ public class SignatureProcessor implements Processor {
         } else {
             key = KeyUtils.prepareSecretKey(signatureMethod, secretKey);
         }
-        
+
         XMLValidateContext context = new DOMValidateContext(key, elem);
         context.setProperty("javax.xml.crypto.dsig.cacheReference", Boolean.TRUE);
         context.setProperty("org.apache.jcp.xml.dsig.secureValidation", Boolean.TRUE);
         context.setProperty("org.jcp.xml.dsig.secureValidation", Boolean.TRUE);
         context.setProperty(STRTransform.TRANSFORM_WS_DOC_INFO, wsDocInfo);
-        
-        context.setProperty(AttachmentContentSignatureTransform.ATTACHMENT_CALLBACKHANDLER, 
+
+        context.setProperty(AttachmentContentSignatureTransform.ATTACHMENT_CALLBACKHANDLER,
                             data.getAttachmentCallbackHandler());
-        
+
         try {
             XMLSignature xmlSignature = signatureFactory.unmarshalXMLSignature(context);
             checkBSPCompliance(xmlSignature, data.getBSPEnforcer());
-            
+
             // Check for compliance against the defined AlgorithmSuite
             AlgorithmSuite algorithmSuite = data.getAlgorithmSuite();
             if (algorithmSuite != null) {
@@ -414,10 +414,10 @@ public class SignatureProcessor implements Processor {
                     AlgorithmSuiteValidator(algorithmSuite);
                 algorithmSuiteValidator.checkSignatureAlgorithms(xmlSignature);
             }
-            
+
             // Test for replay attacks
             testMessageReplay(elem, xmlSignature.getSignatureValue().getValue(), key, data, wsDocInfo);
-            
+
             setElementsOnContext(xmlSignature, (DOMValidateContext)context, data, wsDocInfo);
             boolean signatureOk = xmlSignature.validate(context);
             if (signatureOk) {
@@ -428,10 +428,10 @@ public class SignatureProcessor implements Processor {
             //
             if (LOG.isDebugEnabled()) {
                 LOG.debug("XML Signature verification has failed");
-                boolean signatureValidationCheck = 
+                boolean signatureValidationCheck =
                     xmlSignature.getSignatureValue().validate(context);
                 LOG.debug("Signature Validation check: " + signatureValidationCheck);
-                java.util.Iterator<?> referenceIterator = 
+                java.util.Iterator<?> referenceIterator =
                     xmlSignature.getSignedInfo().getReferences().iterator();
                 while (referenceIterator.hasNext()) {
                     Reference reference = (Reference)referenceIterator.next();
@@ -452,7 +452,7 @@ public class SignatureProcessor implements Processor {
         }
         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
     }
-    
+
     /**
      * Retrieve the Reference elements and set them on the ValidateContext
      * @param xmlSignature the XMLSignature object to get the references from
@@ -462,12 +462,12 @@ public class SignatureProcessor implements Processor {
      * @throws WSSecurityException
      */
     private void setElementsOnContext(
-        XMLSignature xmlSignature, 
+        XMLSignature xmlSignature,
         DOMValidateContext context,
         RequestData data,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
-        java.util.Iterator<?> referenceIterator = 
+        java.util.Iterator<?> referenceIterator =
             xmlSignature.getSignedInfo().getReferences().iterator();
         CallbackLookup callbackLookup = wsDocInfo.getCallbackLookup();
         while (referenceIterator.hasNext()) {
@@ -484,7 +484,7 @@ public class SignatureProcessor implements Processor {
                 handleXopInclude(element, wsDocInfo);
             } else if (data.isExpandXopIncludeForSignature() && element.getFirstChild() != null) {
                 // Look for xop:Include Nodes
-                List<Element> includeElements = 
+                List<Element> includeElements =
                     XMLUtils.findElements(element.getFirstChild(), "Include", WSConstants.XOP_NS);
                 for (Element includeElement : includeElements) {
                     String xopURI = includeElement.getAttributeNS(null, "href");
@@ -493,7 +493,7 @@ public class SignatureProcessor implements Processor {
                         byte[] attachmentBytes = WSSecurityUtil.getBytesFromAttachment(xopURI, data);
                         String encodedBytes = Base64.encode(attachmentBytes);
 
-                        Node newCipherValueChild = 
+                        Node newCipherValueChild =
                             includeElement.getOwnerDocument().createTextNode(encodedBytes);
                         includeElement.getParentNode().replaceChild(newCipherValueChild, includeElement);
                     }
@@ -501,7 +501,7 @@ public class SignatureProcessor implements Processor {
             }
         }
     }
-    
+
     private boolean isXopInclude(Element element) {
         Element elementChild =
             XMLUtils.getDirectChildElement(element, "Include", WSConstants.XOP_NS);
@@ -513,14 +513,14 @@ public class SignatureProcessor implements Processor {
         }
         return false;
     }
-    
+
     private void handleXopInclude(Element element, WSDocInfo wsDocInfo) {
         Map<Integer, List<WSSecurityEngineResult>> actionResults = wsDocInfo.getActionResults();
         if (actionResults != null && actionResults.containsKey(WSConstants.BST)) {
             for (WSSecurityEngineResult result : actionResults.get(WSConstants.BST)) {
                 Element token = (Element)result.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
                 if (element.equals(token)) {
-                    BinarySecurity binarySecurity = 
+                    BinarySecurity binarySecurity =
                         (BinarySecurity)result.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
                     binarySecurity.encodeRawToken();
                     return;
@@ -528,7 +528,7 @@ public class SignatureProcessor implements Processor {
             }
         }
     }
-    
+
     /**
      * Get the signature method algorithm URI from the associated signature element.
      * @param signatureElement The signature element
@@ -537,14 +537,14 @@ public class SignatureProcessor implements Processor {
     private static String getSignatureMethod(
         Element signatureElement
     ) {
-        Element signedInfoElement = 
+        Element signedInfoElement =
             XMLUtils.getDirectChildElement(
                 signatureElement,
                 "SignedInfo",
                 WSConstants.SIG_NS
             );
         if (signedInfoElement != null) {
-            Element signatureMethodElement = 
+            Element signatureMethodElement =
                 XMLUtils.getDirectChildElement(
                     signedInfoElement,
                     "SignatureMethod",
@@ -556,8 +556,8 @@ public class SignatureProcessor implements Processor {
         }
         return null;
     }
-    
-    
+
+
     /**
      * This method digs into the Signature element to get the elements that
      * this Signature covers. Build the QName of these Elements and return them
@@ -578,7 +578,7 @@ public class SignatureProcessor implements Processor {
         for (Object reference : signedInfo.getReferences()) {
             Reference siRef = (Reference)reference;
             String uri = siRef.getURI();
-            
+
             if (!"".equals(uri)) {
                 Element se = dereferenceSTR(doc, siRef, requestData, wsDocInfo);
                 // If an STR Transform is not used then just find the cached element
@@ -604,7 +604,7 @@ public class SignatureProcessor implements Processor {
                 if (se == null) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
                 }
-                
+
                 WSDataRef ref = new WSDataRef();
                 ref.setWsuId(uri);
                 ref.setProtectedElement(se);
@@ -612,7 +612,7 @@ public class SignatureProcessor implements Processor {
                 ref.setDigestAlgorithm(siRef.getDigestMethod().getAlgorithm());
                 ref.setDigestValue(siRef.getDigestValue());
                 ref.setAttachment(attachment);
-                
+
                 // Set the Transform algorithms as well
                 @SuppressWarnings("unchecked")
                 List<Transform> transforms = (List<Transform>)siRef.getTransforms();
@@ -621,34 +621,34 @@ public class SignatureProcessor implements Processor {
                     transformAlgorithms.add(transform.getAlgorithm());
                 }
                 ref.setTransformAlgorithms(transformAlgorithms);
-                
+
                 ref.setXpath(EncryptionUtils.getXPath(se));
                 protectedRefs.add(ref);
             }
         }
         return protectedRefs;
     }
-    
+
     /**
      * Check to see if a SecurityTokenReference transform was used, if so then return the
      * dereferenced element.
      */
     private Element dereferenceSTR(
         Document doc,
-        Reference siRef, 
+        Reference siRef,
         RequestData requestData,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
-        
+
         for (Object transformObject : siRef.getTransforms()) {
-            
+
             Transform transform = (Transform)transformObject;
-            
+
             if (STRTransform.TRANSFORM_URI.equals(transform.getAlgorithm())) {
                 NodeSetData data = (NodeSetData)siRef.getDereferencedData();
                 if (data != null) {
                     java.util.Iterator<?> iter = data.iterator();
-                    
+
                     Node securityTokenReference = null;
                     while (iter.hasNext()) {
                         Node node = (Node)iter.next();
@@ -657,9 +657,9 @@ public class SignatureProcessor implements Processor {
                             break;
                         }
                     }
-                    
+
                     if (securityTokenReference != null) {
-                        SecurityTokenReference secTokenRef = 
+                        SecurityTokenReference secTokenRef =
                             new SecurityTokenReference(
                                 (Element)securityTokenReference,
                                 requestData.getBSPEnforcer()
@@ -674,9 +674,9 @@ public class SignatureProcessor implements Processor {
         }
         return null;
     }
-    
+
     /**
-     * Test for a replayed message. The cache key is the Timestamp Created String, the signature 
+     * Test for a replayed message. The cache key is the Timestamp Created String, the signature
      * value, and the encoded value of the signing key.
      * @param signatureElement
      * @param signatureValue
@@ -696,7 +696,7 @@ public class SignatureProcessor implements Processor {
         if (replayCache == null) {
             return;
         }
-        
+
         // Find the Timestamp
         List<WSSecurityEngineResult> foundResults = wsDocInfo.getResultsByTag(WSConstants.TS);
         Timestamp timeStamp = null;
@@ -704,7 +704,7 @@ public class SignatureProcessor implements Processor {
             // Search for a Timestamp below the Signature
             Node sibling = signatureElement.getNextSibling();
             while (sibling != null) {
-                if (sibling instanceof Element 
+                if (sibling instanceof Element
                     && WSConstants.TIMESTAMP_TOKEN_LN.equals(sibling.getLocalName())
                     && WSConstants.WSU_NS.equals(sibling.getNamespaceURI())) {
                     timeStamp = new Timestamp((Element)sibling, requestData.getBSPEnforcer());
@@ -718,7 +718,7 @@ public class SignatureProcessor implements Processor {
         if (timeStamp == null) {
             return;
         }
-        
+
         // Test for replay attacks
         Date created = timeStamp.getCreated();
         DateFormat zulu = new XmlSchemaDateFormat();
@@ -742,9 +742,9 @@ public class SignatureProcessor implements Processor {
         } else {
             replayCache.add(identifier);
         }
-        
+
     }
-    
+
     /**
      * Check BSP compliance (Note some other checks are done elsewhere in this class)
      * @throws WSSecurityException
@@ -764,28 +764,28 @@ public class SignatureProcessor implements Processor {
                 }
             }
         }
-        
+
         // Check the c14n algorithm
-        String c14nMethod = 
+        String c14nMethod =
             xmlSignature.getSignedInfo().getCanonicalizationMethod().getAlgorithm();
         if (!WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(c14nMethod)) {
             bspEnforcer.handleBSPRule(BSPRule.R5404);
         }
 
         // Not allowed HMAC OutputLength
-        AlgorithmParameterSpec parameterSpec = 
+        AlgorithmParameterSpec parameterSpec =
             xmlSignature.getSignedInfo().getSignatureMethod().getParameterSpec();
         if (parameterSpec instanceof HMACParameterSpec) {
             bspEnforcer.handleBSPRule(BSPRule.R5401);
         }
-        
+
         // Must have exclusive C14N without comments
-        parameterSpec = 
+        parameterSpec =
             xmlSignature.getSignedInfo().getCanonicalizationMethod().getParameterSpec();
         if (parameterSpec != null && !(parameterSpec instanceof ExcC14NParameterSpec)) {
             bspEnforcer.handleBSPRule(BSPRule.R5404);
         }
-        
+
         // Check References
         for (Object refObject : xmlSignature.getSignedInfo().getReferences()) {
             Reference reference = (Reference)refObject;
@@ -810,7 +810,7 @@ public class SignatureProcessor implements Processor {
                         || WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(algorithm))) {
                     bspEnforcer.handleBSPRule(BSPRule.R5412);
                 }
-                
+
                 if (WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(algorithm)) {
                     parameterSpec = transform.getParameterSpec();
                     if (parameterSpec != null && !(parameterSpec instanceof ExcC14NParameterSpec)) {

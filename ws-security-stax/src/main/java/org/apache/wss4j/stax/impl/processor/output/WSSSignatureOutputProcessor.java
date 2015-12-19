@@ -56,7 +56,7 @@ import org.apache.xml.security.utils.Base64;
 
 public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcessor {
 
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSSignatureOutputProcessor.class);
 
     public WSSSignatureOutputProcessor() throws XMLSecurityException {
@@ -155,7 +155,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
             if (attachmentCallbackHandler == null) {
                 throw new WSSecurityException(
                         WSSecurityException.ErrorCode.FAILED_SIGNATURE,
-                        "empty", 
+                        "empty",
                         new Object[] {"no attachment callbackhandler supplied"}
                 );
             }
@@ -174,7 +174,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
             if (attachments != null) {
                 for (int i = 0; i < attachments.size(); i++) {
                     final Attachment attachment = attachments.get(i);
-    
+
                     SignaturePartDef signaturePartDef = new SignaturePartDef();
                     signaturePartDef.setSecurePart(securePart);
                     signaturePartDef.setSigRefId("cid:" + attachment.getId());
@@ -192,46 +192,46 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                     if (signaturePartDef.getDigestAlgo() == null) {
                         signaturePartDef.setDigestAlgo(getSecurityProperties().getSignatureDigestAlgorithm());
                     }
-    
+
                     DigestOutputStream digestOutputStream = createMessageDigestOutputStream(signaturePartDef.getDigestAlgo());
                     InputStream inputStream = attachment.getSourceStream();
                     if (!inputStream.markSupported()) {
                         inputStream = new BufferedInputStream(inputStream);
                     }
                     inputStream.mark(Integer.MAX_VALUE); //we can process at maximum 2G with the standard jdk streams
-    
+
                     try {
                         Transformer transformer = buildTransformerChain(digestOutputStream, signaturePartDef, null);
-    
+
                         Map<String, Object> transformerProperties = new HashMap<>(2);
                         transformerProperties.put(
                                 AttachmentContentSignatureTransform.ATTACHMENT, attachment);
                         transformer.setProperties(transformerProperties);
                         transformer.transform(inputStream);
                         transformer.doFinal();
-    
+
                         digestOutputStream.close();
-    
+
                         //reset the inputStream to be able to reuse it
                         inputStream.reset();
                     } catch (IOException | XMLStreamException e) {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
                     }
-    
+
                     String calculatedDigest = Base64.encode(digestOutputStream.getDigestValue());
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Calculated Digest: " + calculatedDigest);
                     }
-    
+
                     signaturePartDef.setDigestValue(calculatedDigest);
-    
+
                     //create a new attachment and do the result callback
                     Attachment resultAttachment = new Attachment();
                     resultAttachment.setId(attachment.getId());
                     resultAttachment.setMimeType(attachment.getMimeType());
                     resultAttachment.addHeaders(attachment.getHeaders());
                     resultAttachment.setSourceStream(inputStream);
-    
+
                     AttachmentResultCallback attachmentResultCallback = new AttachmentResultCallback();
                     attachmentResultCallback.setAttachmentId(resultAttachment.getId());
                     attachmentResultCallback.setAttachment(resultAttachment);
@@ -240,7 +240,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                     } catch (Exception e) {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, e);
                     }
-    
+
                     getSignaturePartDefList().add(signaturePartDef);
                 }
             }
@@ -251,7 +251,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
 
     @Override
     protected SecurePart securePartMatches(XMLSecStartElement xmlSecStartElement, Map<Object, SecurePart> secureParts) {
-    
+
         if (!xmlSecStartElement.getOnElementDeclaredAttributes().isEmpty()) {
             Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_wsu_Id);
             if (attribute != null) {
@@ -282,7 +282,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                 }
             }
         }
-        
+
         return secureParts.get(xmlSecStartElement.getName());
     }
 

@@ -55,16 +55,16 @@ public class HttpsTokenBuilder implements AssertionBuilder<Element> {
         } else {
             nestedPolicy = factory.getPolicyEngine().getPolicy(nestedPolicyElement);
         }
-        
+
         boolean requireClientCert = false;
         if (spVersion == SPConstants.SPVersion.SP11) {
-            String attr = 
+            String attr =
                 SPUtils.getAttribute(element, new QName(null, SPConstants.REQUIRE_CLIENT_CERTIFICATE));
             if ("true".equals(attr)) {
                 requireClientCert = true;
             }
         }
-        
+
         HttpsToken httpsToken = new HttpsToken(
                 spVersion,
                 spVersion.getSPConstants().getInclusionFromAttributeValue(includeTokenValue),
@@ -74,7 +74,7 @@ public class HttpsTokenBuilder implements AssertionBuilder<Element> {
                 nestedPolicy,
                 requireClientCert
         );
-        
+
         httpsToken.setOptional(SPUtils.isOptional(element));
         httpsToken.setIgnorable(SPUtils.isIgnorable(element));
         return httpsToken;

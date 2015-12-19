@@ -27,32 +27,32 @@ import javax.xml.namespace.QName;
 public final class ConversationConstants {
 
     public static final int VERSION_05_02 = 1;
-    
+
     public static final int VERSION_05_12 = 2;
-    
-    public static final int DEFAULT_VERSION = VERSION_05_12; 
-    
+
+    public static final int DEFAULT_VERSION = VERSION_05_12;
+
     /**
      * WS-SecConv Feb 2005 version
      */
-    public static final String WSC_NS_05_02 = "http://schemas.xmlsoap.org/ws/2005/02/sc"; 
-    
+    public static final String WSC_NS_05_02 = "http://schemas.xmlsoap.org/ws/2005/02/sc";
+
     /**
      * WS-Sx version
      */
-    public static final String WSC_NS_05_12 = 
+    public static final String WSC_NS_05_12 =
         "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512";
-    
+
     /**
      * Token type of DerivedKeyToken
      */
     public static final String TOKEN_TYPE_DERIVED_KEY_TOKEN =  "/dk";
-    
+
     /**
      * Token type of SecurityContextToken
      */
     public static final String TOKEN_TYPE_SECURITY_CONTEXT_TOKEN = "/sct";
-    
+
     /**
      * Field WSC_PREFIX
      */
@@ -68,7 +68,7 @@ public final class ConversationConstants {
      * Field IDENTIFIER_LN
      */
     public static final String IDENTIFIER_LN = "Identifier";
-    
+
     /**
      * Field INSTANCE_LN
      */
@@ -134,52 +134,52 @@ public final class ConversationConstants {
 
     public static final int DK_SIGN = 1;
     public static final int DK_ENCRYPT = 2;
-    
+
     public static final String DEFAULT_LABEL = "WS-SecureConversation";
-    
+
     public static final QName SECURITY_CTX_TOKEN_QNAME_05_02 =
         new QName(
-            ConversationConstants.WSC_NS_05_02, 
+            ConversationConstants.WSC_NS_05_02,
             ConversationConstants.SECURITY_CONTEXT_TOKEN_LN
         );
-    
+
     public static final QName SECURITY_CTX_TOKEN_QNAME_05_12 =
         new QName(
-            ConversationConstants.WSC_NS_05_12, 
+            ConversationConstants.WSC_NS_05_12,
             ConversationConstants.SECURITY_CONTEXT_TOKEN_LN
         );
 
     public static final QName DERIVED_KEY_TOKEN_QNAME_05_02 =
         new QName(
-            ConversationConstants.WSC_NS_05_02, 
+            ConversationConstants.WSC_NS_05_02,
             ConversationConstants.DERIVED_KEY_TOKEN_LN
         );
-    
+
     public static final QName DERIVED_KEY_TOKEN_QNAME_05_12 =
         new QName(
-            ConversationConstants.WSC_NS_05_12, 
+            ConversationConstants.WSC_NS_05_12,
             ConversationConstants.DERIVED_KEY_TOKEN_LN
         );
-    
+
     /**
-     * Key to hold the map of security context identifiers against the 
-     * service epr addresses (service scope) or wsa:Action values (operation 
+     * Key to hold the map of security context identifiers against the
+     * service epr addresses (service scope) or wsa:Action values (operation
      * scope).
      */
     public static final String KEY_CONTEXT_MAP = "contextMap";
-    
+
     private ConversationConstants() {
         // Complete
     }
-    
+
     public interface DerivationAlgorithm {
-        String P_SHA_1 = 
+        String P_SHA_1 =
             "http://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1";
-        
-        String P_SHA_1_2005_12 = 
+
+        String P_SHA_1_2005_12 =
             "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512/dk/p_sha1";
     }
-    
+
     public static String getWSCNs(int version) {
         if (VERSION_05_02 == version) {
             return WSC_NS_05_02;
@@ -187,7 +187,7 @@ public final class ConversationConstants {
             return WSC_NS_05_12;
         }
     }
-    
+
     public static int getWSTVersion(String ns) {
         if (WSC_NS_05_02.equals(ns)) {
             return VERSION_05_02;

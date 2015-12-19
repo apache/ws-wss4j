@@ -28,30 +28,30 @@ import org.apache.wss4j.common.ext.WSSecurityException;
  * An class that enforces Basic Security Profile Rules
  */
 public class BSPEnforcer {
-    
+
     private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(BSPEnforcer.class);
-    
+
     private List<BSPRule> ignoredBSPRules = Collections.emptyList();
-    
+
     private boolean disableBSPRules;
-    
+
     public BSPEnforcer() {
         // Complete
     }
-    
+
     public BSPEnforcer(List<BSPRule> bspRules) {
         ignoredBSPRules = new ArrayList<>(bspRules);
     }
-    
+
     public BSPEnforcer(boolean disableBSPRules) {
         this.disableBSPRules = disableBSPRules;
     }
-    
+
     public void handleBSPRule(BSPRule bspRule) throws WSSecurityException {
         if (disableBSPRules) {
             return;
         }
-        
+
         if (!ignoredBSPRules.contains(bspRule)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "empty",
                                           new Object[] {"BSP:" + bspRule.name() + ": " + bspRule.getMsg()}
@@ -64,9 +64,9 @@ public class BSPEnforcer {
     public void setIgnoredBSPRules(List<BSPRule> bspRules) {
         ignoredBSPRules = new ArrayList<>(bspRules);
     }
-    
+
     public void setDisableBSPRules(boolean disableBSPRules) {
         this.disableBSPRules = disableBSPRules;
     }
-    
+
 }

@@ -35,18 +35,18 @@ import org.apache.wss4j.common.ext.WSSecurityException;
  * Validate signature/encryption/etc. algorithms against an AlgorithmSuite policy.
  */
 public class AlgorithmSuiteValidator {
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(AlgorithmSuiteValidator.class);
-    
+
     private final AlgorithmSuite algorithmSuite;
-    
+
     public AlgorithmSuiteValidator(
         AlgorithmSuite algorithmSuite
     ) {
         this.algorithmSuite = algorithmSuite;
     }
-    
+
     /**
      * Check the Signature Method
      */
@@ -62,7 +62,7 @@ public class AlgorithmSuiteValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
     }
-    
+
     /**
      * Check the C14n Algorithm
      */
@@ -77,7 +77,7 @@ public class AlgorithmSuiteValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
     }
-    
+
     /**
      * Check the Signature Algorithms
      */
@@ -85,15 +85,15 @@ public class AlgorithmSuiteValidator {
         XMLSignature xmlSignature
     ) throws WSSecurityException {
         // Signature Algorithm
-        String signatureMethod = 
+        String signatureMethod =
             xmlSignature.getSignedInfo().getSignatureMethod().getAlgorithm();
         checkSignatureMethod(signatureMethod);
-            
+
         // C14n Algorithm
-        String c14nMethod = 
+        String c14nMethod =
             xmlSignature.getSignedInfo().getCanonicalizationMethod().getAlgorithm();
         checkC14nAlgorithm(c14nMethod);
-        
+
         for (Object refObject : xmlSignature.getSignedInfo().getReferences()) {
             Reference reference = (Reference)refObject;
             // Digest Algorithm
@@ -106,14 +106,14 @@ public class AlgorithmSuiteValidator {
                 );
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
             }
-            
+
             // Transform Algorithms
             for (int i = 0; i < reference.getTransforms().size(); i++) {
                 Transform transform = (Transform)reference.getTransforms().get(i);
                 String algorithm = transform.getAlgorithm();
-                Set<String> allowedTransformAlgorithms = 
+                Set<String> allowedTransformAlgorithms =
                         algorithmSuite.getTransformAlgorithms();
-                if (!allowedTransformAlgorithms.isEmpty() 
+                if (!allowedTransformAlgorithms.isEmpty()
                         && !allowedTransformAlgorithms.contains(algorithm)) {
                     LOG.debug(
                         "Transform method " + algorithm + " does not match required value"
@@ -123,7 +123,7 @@ public class AlgorithmSuiteValidator {
             }
         }
     }
-    
+
     public void checkEncryptionKeyWrapAlgorithm(
         String keyWrapAlgorithm
     ) throws WSSecurityException {
@@ -136,7 +136,7 @@ public class AlgorithmSuiteValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
     }
-    
+
     public void checkSymmetricEncryptionAlgorithm(
         String symmetricAlgorithm
     ) throws WSSecurityException {
@@ -149,7 +149,7 @@ public class AlgorithmSuiteValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
     }
-    
+
     /**
      * Check the asymmetric key length
      */
@@ -159,7 +159,7 @@ public class AlgorithmSuiteValidator {
         if (x509Certificates == null) {
             return;
         }
-        
+
         for (X509Certificate cert : x509Certificates) {
             checkAsymmetricKeyLength(cert.getPublicKey());
         }
@@ -174,10 +174,10 @@ public class AlgorithmSuiteValidator {
         if (x509Certificate == null) {
             return;
         }
-        
+
         checkAsymmetricKeyLength(x509Certificate.getPublicKey());
     }
-    
+
     /**
      * Check the asymmetric key length
      */
@@ -212,7 +212,7 @@ public class AlgorithmSuiteValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
     }
-    
+
     /**
      * Check the symmetric key length
      */
@@ -227,7 +227,7 @@ public class AlgorithmSuiteValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
     }
-    
+
     /**
      * Check Signature Derived Key length (in bytes)
      */
@@ -242,7 +242,7 @@ public class AlgorithmSuiteValidator {
             );
         }
     }
-    
+
     /**
      * Check Encryption Derived Key length (in bytes)
      */
@@ -257,7 +257,7 @@ public class AlgorithmSuiteValidator {
             );
         }
     }
-    
+
     /**
      * Check Derived Key algorithm
      */
@@ -273,5 +273,5 @@ public class AlgorithmSuiteValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
     }
-        
+
 }

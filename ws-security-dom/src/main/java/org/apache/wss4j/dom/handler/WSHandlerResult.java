@@ -33,7 +33,7 @@ public class WSHandlerResult {
      * constructor
      * @param actor
      * @param results
-     */ 
+     */
     public WSHandlerResult(String actor, List<WSSecurityEngineResult> results,
                            Map<Integer, List<WSSecurityEngineResult>> actionResults) {
         this.actor = actor;
@@ -56,7 +56,7 @@ public class WSHandlerResult {
     public List<WSSecurityEngineResult> getResults() {
         return wsSecurityResults;
     }
-    
+
     public Map<Integer, List<WSSecurityEngineResult>> getActionResults() {
         return actionResults;
     }

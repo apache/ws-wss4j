@@ -31,51 +31,51 @@ import javax.security.auth.callback.CallbackHandler;
 import org.apache.wss4j.common.ext.WSSecurityException;
 
 public interface Crypto {
-    
+
     //
     // Accessor methods
     //
-    
+
     /**
      * Get the crypto provider associated with this implementation
      * @return the crypto provider
      */
     String getCryptoProvider();
-    
+
     /**
      * Set the crypto provider associated with this implementation
      * @param provider the crypto provider to set
      */
     void setCryptoProvider(String provider);
-    
+
     /**
-     * Retrieves the identifier name of the default certificate. This should be the certificate 
-     * that is used for signature and encryption. This identifier corresponds to the certificate 
-     * that should be used whenever KeyInfo is not present in a signed or an encrypted 
+     * Retrieves the identifier name of the default certificate. This should be the certificate
+     * that is used for signature and encryption. This identifier corresponds to the certificate
+     * that should be used whenever KeyInfo is not present in a signed or an encrypted
      * message. May return null. The identifier is implementation specific, e.g. it could be the
      * KeyStore alias.
      *
      * @return name of the default X509 certificate.
      */
     String getDefaultX509Identifier() throws WSSecurityException;
-    
+
     /**
-     * Sets the identifier name of the default certificate. This should be the certificate 
-     * that is used for signature and encryption. This identifier corresponds to the certificate 
-     * that should be used whenever KeyInfo is not present in a signed or an encrypted 
+     * Sets the identifier name of the default certificate. This should be the certificate
+     * that is used for signature and encryption. This identifier corresponds to the certificate
+     * that should be used whenever KeyInfo is not present in a signed or an encrypted
      * message. The identifier is implementation specific, e.g. it could be the KeyStore alias.
      *
      * @param identifier name of the default X509 certificate.
      */
     void setDefaultX509Identifier(String identifier);
-    
+
     /**
      * Sets the CertificateFactory instance on this Crypto instance
      *
      * @param certFactory the CertificateFactory the CertificateFactory instance to set
      */
     void setCertificateFactory(CertificateFactory certFactory);
-    
+
     /**
      * Get the CertificateFactory instance on this Crypto instance
      *
@@ -84,11 +84,11 @@ public interface Crypto {
      * @throws WSSecurityException
      */
     CertificateFactory getCertificateFactory() throws WSSecurityException;
-    
+
     //
     // Base Crypto functionality methods
     //
-    
+
     /**
      * Load a X509Certificate from the input stream.
      *
@@ -97,7 +97,7 @@ public interface Crypto {
      * @throws WSSecurityException
      */
     X509Certificate loadCertificate(InputStream in) throws WSSecurityException;
-    
+
     /**
      * Reads the SubjectKeyIdentifier information from the certificate.
      * <p/>
@@ -111,7 +111,7 @@ public interface Crypto {
      * @return The byte array containing the binary SKI data
      */
     byte[] getSKIBytesFromCert(X509Certificate cert) throws WSSecurityException;
-    
+
     /**
      * Get a byte array given an array of X509 certificates.
      * <p/>
@@ -130,15 +130,15 @@ public interface Crypto {
      * @throws WSSecurityException
      */
     X509Certificate[] getCertificatesFromBytes(byte[] data) throws WSSecurityException;
-    
+
     //
     // Implementation-specific Crypto functionality methods
     //
-    
+
     /**
      * Get an X509Certificate (chain) corresponding to the CryptoType argument. The supported
      * types are as follows:
-     * 
+     *
      * TYPE.ISSUER_SERIAL - A certificate (chain) is located by the issuer name and serial number
      * TYPE.THUMBPRINT_SHA1 - A certificate (chain) is located by the SHA1 of the (root) cert
      * TYPE.SKI_BYTES - A certificate (chain) is located by the SKI bytes of the (root) cert
@@ -147,7 +147,7 @@ public interface Crypto {
      * specific, for example - it could be a java KeyStore alias.
      */
     X509Certificate[] getX509Certificates(CryptoType cryptoType) throws WSSecurityException;
-    
+
     /**
      * Get the implementation-specific identifier corresponding to the cert parameter, e.g. the
      * identifier could be a KeyStore alias.
@@ -156,7 +156,7 @@ public interface Crypto {
      * @throws WSSecurityException
      */
     String getX509Identifier(X509Certificate cert) throws WSSecurityException;
-    
+
     /**
      * Gets the private key corresponding to the certificate.
      *
@@ -167,7 +167,7 @@ public interface Crypto {
     PrivateKey getPrivateKey(
         X509Certificate certificate, CallbackHandler callbackHandler
     ) throws WSSecurityException;
-       
+
     /**
      * Gets the private key corresponding to the identifier.
      *
@@ -178,7 +178,7 @@ public interface Crypto {
     PrivateKey getPrivateKey(
         String identifier, String password
     ) throws WSSecurityException;
-    
+
     /**
      * Evaluate whether a given certificate chain should be trusted.
      *
@@ -191,10 +191,10 @@ public interface Crypto {
         X509Certificate[] certs, boolean enableRevocation,
         Collection<Pattern> subjectCertConstraints
     ) throws WSSecurityException;
-    
+
     /**
-     * Evaluate whether a given public key should be trusted directly (located 
-     * 
+     * Evaluate whether a given public key should be trusted directly (located
+     *
      * @param certs Certificate chain to validate
      * @throws WSSecurityException if the certificate chain is invalid
      */
@@ -202,7 +202,7 @@ public interface Crypto {
 
     /**
      * Evaluate whether a given public key should be trusted.
-     * 
+     *
      * @param publicKey The PublicKey to be evaluated
      * @throws WSSecurityException if the PublicKey is invalid
      */

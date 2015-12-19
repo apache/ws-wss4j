@@ -27,12 +27,12 @@ import javax.security.auth.callback.Callback;
  * This class is a callback to obtain a DOM Element representing a security token.
  */
 public class TokenElementCallback implements Callback {
-    
+
     /**
      * A DOM Element representing a security token
      */
     private Element element;
-    
+
     /**
      * Get the token element
      * @return the token element
@@ -48,5 +48,5 @@ public class TokenElementCallback implements Callback {
     public void setTokenElement(Element element) {
         this.element = element;
     }
-    
+
 }

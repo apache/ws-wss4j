@@ -41,7 +41,7 @@ import javax.security.auth.callback.CallbackHandler;
  * password type. See WSS-255.
  */
 public class PasswordTypeTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(PasswordTypeTest.class);
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 
@@ -49,7 +49,7 @@ public class PasswordTypeTest extends org.junit.Assert {
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     /**
      * Test that adds a UserNameToken with password Digest to a WS-Security envelope
      */
@@ -64,12 +64,12 @@ public class PasswordTypeTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Digest:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         WSSecurityEngine secEngine = new WSSecurityEngine();
-        
+
         //
         // It should pass with PASSWORD_DIGEST
         //
@@ -77,7 +77,7 @@ public class PasswordTypeTest extends org.junit.Assert {
         requestData.setCallbackHandler(callbackHandler);
         requestData.setRequiredPasswordType(WSConstants.PASSWORD_DIGEST);
         secEngine.processSecurityHeader(doc, requestData);
-        
+
         //
         // It should pass with null
         //
@@ -85,7 +85,7 @@ public class PasswordTypeTest extends org.junit.Assert {
         requestData.setCallbackHandler(callbackHandler);
         requestData.setRequiredPasswordType(null);
         secEngine.processSecurityHeader(doc, requestData);
-        
+
         //
         // It should fail with PASSWORD_TEXT
         //
@@ -100,7 +100,7 @@ public class PasswordTypeTest extends org.junit.Assert {
             // expected
         }
     }
-    
+
     /**
      * Test that adds a UserNameToken with password text to a WS-Security envelope
      */
@@ -113,15 +113,15 @@ public class PasswordTypeTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Text:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         WSSecurityEngine secEngine = new WSSecurityEngine();
-        
+
         //
         // It should pass with PASSWORD_TEXT
         //
@@ -129,7 +129,7 @@ public class PasswordTypeTest extends org.junit.Assert {
         requestData.setCallbackHandler(callbackHandler);
         requestData.setRequiredPasswordType(WSConstants.PASSWORD_TEXT);
         secEngine.processSecurityHeader(doc, requestData);
-        
+
         //
         // It should pass with null
         //
@@ -137,7 +137,7 @@ public class PasswordTypeTest extends org.junit.Assert {
         requestData.setCallbackHandler(callbackHandler);
         requestData.setRequiredPasswordType(null);
         secEngine.processSecurityHeader(doc, requestData);
-        
+
         //
         // It should fail with PASSWORD_DIGEST
         //
@@ -151,9 +151,9 @@ public class PasswordTypeTest extends org.junit.Assert {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             // expected
         }
-        
+
     }
-    
+
     /**
      * Test that adds a UserNameToken via WSHandler
      */
@@ -161,29 +161,29 @@ public class PasswordTypeTest extends org.junit.Assert {
     public void testUsernameTokenWSHandler() throws Exception {
         CustomHandler handler = new CustomHandler();
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         RequestData reqData = new RequestData();
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put("password", "verySecret");
         config.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         reqData.setUsername("wernerd");
         reqData.setMsgContext(config);
-        
+
         HandlerAction action = new HandlerAction(WSConstants.UT);
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             Collections.singletonList(action),
             true
         );
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("Username Token via WSHandler");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         //
         // It should fail on a different password type
         //
@@ -192,7 +192,7 @@ public class PasswordTypeTest extends org.junit.Assert {
         handler.receive(Collections.singletonList(WSConstants.UT), reqData);
         WSSecurityEngine secEngine = new WSSecurityEngine();
         reqData.setCallbackHandler(callbackHandler);
-        
+
         try {
             secEngine.processSecurityHeader(doc, reqData);
             fail("Expected failure on the wrong password type");

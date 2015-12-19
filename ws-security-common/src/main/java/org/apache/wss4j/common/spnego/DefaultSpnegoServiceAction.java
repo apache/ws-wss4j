@@ -26,32 +26,32 @@ import org.ietf.jgss.GSSName;
 import org.ietf.jgss.Oid;
 
 /**
- * This class represents a PrivilegedAction implementation to validate a received (SPNEGO) ticket 
+ * This class represents a PrivilegedAction implementation to validate a received (SPNEGO) ticket
  * to a KDC.
  */
 public class DefaultSpnegoServiceAction implements SpnegoServiceAction {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(DefaultSpnegoServiceAction.class);
-    
+
     private byte[] ticket;
     private String serviceName;
     private boolean isUsernameServiceNameForm;
     private GSSContext secContext;
-    
+
     /**
      * Set the ticket to validate
      */
     public void setTicket(byte[] ticket) {
         this.ticket = ticket;
     }
-    
+
     /**
      * The Service Name
      */
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
     }
-    
+
     /**
      * Validate a service ticket
      */
@@ -72,7 +72,7 @@ public class DefaultSpnegoServiceAction implements SpnegoServiceAction {
 
         return null;
     }
-    
+
     /**
      * Get the GSSContext that was created after a service ticket was obtained
      */

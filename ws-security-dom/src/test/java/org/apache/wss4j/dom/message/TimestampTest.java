@@ -49,15 +49,15 @@ import org.w3c.dom.Element;
  * WS-Security Test Case for Timestamps.
  */
 public class TimestampTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(TimestampTest.class);
 
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     /**
      * This is a test for processing a valid Timestamp.
      */
@@ -67,35 +67,35 @@ public class TimestampTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
-        
+
         //
         // Do some processing
         //
         WSHandlerResult wsResult = verify(createdDoc);
-        WSSecurityEngineResult actionResult = 
+        WSSecurityEngineResult actionResult =
             wsResult.getActionResults().get(WSConstants.TS).get(0);
         assertTrue(actionResult != null);
-        
-        Timestamp receivedTimestamp = 
+
+        Timestamp receivedTimestamp =
             (Timestamp)actionResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
         assertTrue(receivedTimestamp != null);
-        
+
         Timestamp clone = new Timestamp(receivedTimestamp.getElement(), new BSPEnforcer(true));
         assertTrue(clone.equals(receivedTimestamp));
         assertTrue(clone.hashCode() == receivedTimestamp.hashCode());
     }
-    
-    
+
+
     /**
      * This is a test for processing a valid Timestamp with no expires element
      */
@@ -105,47 +105,47 @@ public class TimestampTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(0);
         Document createdDoc = timestamp.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
-        
+
         //
         // Do some processing
         //
         WSHandlerResult wsResult = verify(createdDoc);
-        WSSecurityEngineResult actionResult = 
+        WSSecurityEngineResult actionResult =
             wsResult.getActionResults().get(WSConstants.TS).get(0);
         assertTrue(actionResult != null);
-        
-        Timestamp receivedTimestamp = 
+
+        Timestamp receivedTimestamp =
             (Timestamp)actionResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
         assertTrue(receivedTimestamp != null);
     }
-    
+
     @org.junit.Test
     public void testInvalidTimestampNoExpires() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(0);
         Document createdDoc = timestamp.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
-        
+
         //
         // Do some processing
         //
@@ -157,22 +157,22 @@ public class TimestampTest extends org.junit.Assert {
             secEngine.processSecurityHeader(doc, requestData);
             fail("Failure expected on no Expires Element");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.SECURITY_ERROR); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.SECURITY_ERROR);
         }
 
         requestData.setWssConfig(WSSConfig.getNewInstance());
         requestData.setRequireTimestampExpires(false);
         WSHandlerResult wsResult = secEngine.processSecurityHeader(doc, requestData);
-        WSSecurityEngineResult actionResult = 
+        WSSecurityEngineResult actionResult =
             wsResult.getActionResults().get(WSConstants.TS).get(0);
         assertTrue(actionResult != null);
-        
-        Timestamp receivedTimestamp = 
+
+        Timestamp receivedTimestamp =
             (Timestamp)actionResult.get(WSSecurityEngineResult.TAG_TIMESTAMP);
         assertTrue(receivedTimestamp != null);
     }
-    
-    
+
+
     /**
      * This is a test for processing an expired Timestamp.
      */
@@ -182,46 +182,46 @@ public class TimestampTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(-1);
         Document createdDoc = timestamp.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
-        
+
         try {
             verify(createdDoc);
             fail("Expected failure on an expired timestamp");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
-        }        
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
+        }
     }
-    
-    
+
+
     /**
      * This is a test for processing an "old" Timestamp, i.e. one with a "Created" element that is
      * out of date
      */
     @org.junit.Test
     public void testOldTimestamp() throws Exception {
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecTimestamp timestamp = new WSSecTimestamp();
         Document createdDoc = timestamp.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
-        
+
         //
         // Do some processing
         //
@@ -232,24 +232,24 @@ public class TimestampTest extends org.junit.Assert {
             verify(createdDoc, requestData);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
-        }  
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
+        }
     }
-    
-    
+
+
     /**
      * This is a test for processing an Timestamp where the "Created" element is in the (near)
-     * future. It should be accepted by default when it is created 30 seconds in the future, 
+     * future. It should be accepted by default when it is created 30 seconds in the future,
      * and then rejected once we configure "0 seconds" for future-time-to-live.
      */
     @org.junit.Test
     public void testNearFutureCreated() throws Exception {
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
-        Element timestampElement = 
+
+        Element timestampElement =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
             );
@@ -266,9 +266,9 @@ public class TimestampTest extends org.junit.Assert {
         timestampElement.appendChild(elementCreated);
 
         secHeader.getSecurityHeader().appendChild(timestampElement);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
@@ -282,22 +282,22 @@ public class TimestampTest extends org.junit.Assert {
             verify(doc, requestData);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
         }
     }
-    
+
     /**
      * This is a test for processing an Timestamp where the "Created" element is in the future.
      * A Timestamp that is 120 seconds in the future should be rejected by default.
      */
     @org.junit.Test
     public void testFutureCreated() throws Exception {
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
-        Element timestampElement = 
+
+        Element timestampElement =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
             );
@@ -314,9 +314,9 @@ public class TimestampTest extends org.junit.Assert {
         timestampElement.appendChild(elementCreated);
 
         secHeader.getSecurityHeader().appendChild(timestampElement);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
@@ -327,23 +327,23 @@ public class TimestampTest extends org.junit.Assert {
             verify(doc);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
         }
     }
-    
-    
+
+
     /**
      * This is a test for processing an Timestamp where the "Created" element is greater than
      * the expiration time.
      */
     @org.junit.Test
     public void testExpiresBeforeCreated() throws Exception {
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
-        Element timestampElement = 
+
+        Element timestampElement =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
             );
@@ -358,7 +358,7 @@ public class TimestampTest extends org.junit.Assert {
         createdDate.setTime(currentTime);
         elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
         timestampElement.appendChild(elementCreated);
-        
+
         Date expiresDate = new Date();
         expiresDate.setTime(expiresDate.getTime() - 300000);
 
@@ -370,9 +370,9 @@ public class TimestampTest extends org.junit.Assert {
         timestampElement.appendChild(elementExpires);
 
         secHeader.getSecurityHeader().appendChild(timestampElement);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
@@ -383,10 +383,10 @@ public class TimestampTest extends org.junit.Assert {
             verify(doc);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
         }
     }
-    
+
     /**
      * This is a test for processing multiple Timestamps in the security header
      */
@@ -396,21 +396,21 @@ public class TimestampTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
-        
+
         timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(60);
         createdDoc = timestamp.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
-        
+
         //
         // Do some processing
         //
@@ -418,24 +418,24 @@ public class TimestampTest extends org.junit.Assert {
             verify(createdDoc);
             fail("Expected failure on multiple timestamps");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         verify(createdDoc, Collections.singletonList(BSPRule.R3227));
     }
-    
+
     /**
      * This is a test for processing an Timestamp where it contains multiple "Created" elements.
      * This Timestamp should be rejected.
      */
     @org.junit.Test
     public void testMultipleCreated() throws Exception {
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
-        Element timestampElement = 
+
+        Element timestampElement =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
             );
@@ -451,9 +451,9 @@ public class TimestampTest extends org.junit.Assert {
         timestampElement.appendChild(elementCreated.cloneNode(true));
 
         secHeader.getSecurityHeader().appendChild(timestampElement);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
@@ -464,24 +464,24 @@ public class TimestampTest extends org.junit.Assert {
             verify(doc);
             fail("The timestamp validation should have failed on multiple Created elements");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         verify(doc, Collections.singletonList(BSPRule.R3203));
     }
-    
+
     /**
      * This is a test for processing an Timestamp where it contains no "Created" element.
      * This Timestamp should be rejected.
      */
     @org.junit.Test
     public void testNoCreated() throws Exception {
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
-        Element timestampElement = 
+
+        Element timestampElement =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
             );
@@ -498,9 +498,9 @@ public class TimestampTest extends org.junit.Assert {
         timestampElement.appendChild(elementCreated);
 
         secHeader.getSecurityHeader().appendChild(timestampElement);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
@@ -511,31 +511,31 @@ public class TimestampTest extends org.junit.Assert {
             verify(doc);
             fail("The timestamp validation should have failed on no Created element");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         List<BSPRule> rules = new ArrayList<>();
         rules.add(BSPRule.R3203);
         rules.add(BSPRule.R3221);
         verify(doc, rules);
     }
-    
+
     /**
      * This is a test for processing an Timestamp where it contains multiple "Expires" elements.
      * This Timestamp should be rejected.
      */
     @org.junit.Test
     public void testMultipleExpires() throws Exception {
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
-        Element timestampElement = 
+
+        Element timestampElement =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
             );
-        
+
         DateFormat zulu = new XmlSchemaDateFormat();
         Element elementCreated =
             doc.createElementNS(
@@ -558,9 +558,9 @@ public class TimestampTest extends org.junit.Assert {
         timestampElement.appendChild(elementExpires.cloneNode(true));
 
         secHeader.getSecurityHeader().appendChild(timestampElement);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
@@ -571,24 +571,24 @@ public class TimestampTest extends org.junit.Assert {
             verify(doc);
             fail("The timestamp validation should have failed on multiple Expires elements");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         verify(doc, Collections.singletonList(BSPRule.R3224));
     }
-    
+
     /**
      * This is a test for processing an Timestamp where it contains an "Expires" element before
      * the Created element. This Timestamp should be rejected as per the BSP spec.
      */
     @org.junit.Test
     public void testExpiresInFrontOfCreated() throws Exception {
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
-        Element timestampElement = 
+
+        Element timestampElement =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
             );
@@ -603,7 +603,7 @@ public class TimestampTest extends org.junit.Assert {
         expiresDate.setTime(currentTime);
         elementCreated.appendChild(doc.createTextNode(zulu.format(expiresDate)));
         timestampElement.appendChild(elementCreated);
-        
+
         Element elementExpires =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.CREATED_LN
@@ -612,9 +612,9 @@ public class TimestampTest extends org.junit.Assert {
         timestampElement.appendChild(elementExpires);
 
         secHeader.getSecurityHeader().appendChild(timestampElement);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
@@ -625,25 +625,25 @@ public class TimestampTest extends org.junit.Assert {
             verify(doc);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         verify(doc, Collections.singletonList(BSPRule.R3221));
     }
-    
-    
+
+
     /**
      * This is a test for processing an Timestamp where it contains a Created element with
      * seconds > 60. This should be rejected as per the BSP spec.
      */
     @org.junit.Test
     public void testCreatedSeconds() throws Exception {
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
-        Element timestampElement = 
+
+        Element timestampElement =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
             );
@@ -656,9 +656,9 @@ public class TimestampTest extends org.junit.Assert {
         timestampElement.appendChild(elementCreated);
 
         secHeader.getSecurityHeader().appendChild(timestampElement);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
@@ -672,23 +672,23 @@ public class TimestampTest extends org.junit.Assert {
             verify(doc, wssConfig, new ArrayList<BSPRule>());
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
     }
-    
-    
+
+
     /**
      * This is a test for processing an Timestamp where it contains a Created element with
      * a ValueType. This should be rejected as per the BSP spec.
      */
     @org.junit.Test
     public void testCreatedValueType() throws Exception {
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
-        Element timestampElement = 
+
+        Element timestampElement =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
             );
@@ -706,9 +706,9 @@ public class TimestampTest extends org.junit.Assert {
         timestampElement.appendChild(elementCreated);
 
         secHeader.getSecurityHeader().appendChild(timestampElement);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
@@ -719,15 +719,15 @@ public class TimestampTest extends org.junit.Assert {
             verify(doc);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         // Now it should pass...
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         wssConfig.setValidator(WSConstants.TIMESTAMP, new NoOpValidator());
         verify(doc, wssConfig, Collections.singletonList(BSPRule.R3225));
     }
-    
+
 
 
     /**
@@ -736,12 +736,12 @@ public class TimestampTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testCustomElement() throws Exception {
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
-        Element timestampElement = 
+
+        Element timestampElement =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.TIMESTAMP_TOKEN_LN
             );
@@ -754,7 +754,7 @@ public class TimestampTest extends org.junit.Assert {
         Date createdDate = new Date();
         elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
         timestampElement.appendChild(elementCreated);
-        
+
         Element elementExpires =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + WSConstants.EXPIRES_LN
@@ -762,7 +762,7 @@ public class TimestampTest extends org.junit.Assert {
         createdDate.setTime(createdDate.getTime() + 300000);
         elementExpires.appendChild(doc.createTextNode(zulu.format(createdDate)));
         timestampElement.appendChild(elementExpires);
-        
+
         Element elementCustom =
             doc.createElementNS(
                 WSConstants.WSU_NS, WSConstants.WSU_PREFIX + ":" + "Custom"
@@ -770,9 +770,9 @@ public class TimestampTest extends org.junit.Assert {
         timestampElement.appendChild(elementCustom);
 
         secHeader.getSecurityHeader().appendChild(timestampElement);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
@@ -783,13 +783,13 @@ public class TimestampTest extends org.junit.Assert {
             verify(doc);
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         // Now it should pass...
         verify(doc, Collections.singletonList(BSPRule.R3222));
     }
-    
+
     /**
      * This is a test to create a "Spoofed" Timestamp (see WSS-441)
      */
@@ -799,10 +799,10 @@ public class TimestampTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);
-        
+
         WSTimeSource spoofedTimeSource = new WSTimeSource() {
 
             public Date now() {
@@ -810,18 +810,18 @@ public class TimestampTest extends org.junit.Assert {
                 currentTime.setTime(currentTime.getTime() - (500L * 1000L));
                 return currentTime;
             }
-            
+
         };
         timestamp.setWsTimeSource(spoofedTimeSource);
-        
+
         Document createdDoc = timestamp.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
-        
+
         //
         // Do some processing
         //
@@ -829,64 +829,64 @@ public class TimestampTest extends org.junit.Assert {
             verify(createdDoc);
             fail("Expected failure on an expired timestamp");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
         }
     }
-    
+
     @org.junit.Test
     public void testTimestampNoMilliseconds() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setPrecisionInMilliSeconds(false);
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
-        
+
         //
         // Do some processing
         //
         WSHandlerResult wsResult = verify(createdDoc);
-        WSSecurityEngineResult actionResult = 
+        WSSecurityEngineResult actionResult =
             wsResult.getActionResults().get(WSConstants.TS).get(0);
         assertTrue(actionResult != null);
     }
-    
+
     @org.junit.Test
     public void testThaiLocaleVerification() throws Exception {
-        
+
         Locale defaultLocale = Locale.getDefault();
         try {
             Locale.setDefault(new Locale("th", "TH"));
-        
+
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
-            
+
             WSSecTimestamp timestamp = new WSSecTimestamp();
             timestamp.setTimeToLive(300);
             Document createdDoc = timestamp.build(doc, secHeader);
-            
+
             //
             // Do some processing
             //
             WSHandlerResult wsResult = verify(createdDoc);
-            WSSecurityEngineResult actionResult = 
+            WSSecurityEngineResult actionResult =
                 wsResult.getActionResults().get(WSConstants.TS).get(0);
             assertTrue(actionResult != null);
         } finally {
             Locale.setDefault(defaultLocale);
         }
     }
-    
+
     /**
      * Verifies the soap envelope
      */
@@ -898,14 +898,14 @@ public class TimestampTest extends org.junit.Assert {
         requestData.setWssConfig(WSSConfig.getNewInstance());
         return secEngine.processSecurityHeader(doc, requestData);
     }
-    
+
     private WSHandlerResult verify(
         Document doc, RequestData requestData
     ) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
         return secEngine.processSecurityHeader(doc, requestData);
     }
-    
+
     /**
      * Verifies the soap envelope
      */
@@ -917,7 +917,7 @@ public class TimestampTest extends org.junit.Assert {
         requestData.setIgnoredBSPRules(ignoredRules);
         return secEngine.processSecurityHeader(doc, requestData);
     }
-    
+
     /**
      * Verifies the soap envelope
      */
@@ -930,6 +930,6 @@ public class TimestampTest extends org.junit.Assert {
         requestData.setIgnoredBSPRules(ignoredRules);
         return secEngine.processSecurityHeader(doc, requestData);
     }
-    
-    
+
+
 }

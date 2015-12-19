@@ -36,27 +36,27 @@ public final class DOMX509IssuerSerial {
     private final Element element;
     private final String issuer;
     private final BigInteger serialNumber;
-    
+
     /**
      * Constructor.
      */
     public DOMX509IssuerSerial(Element issuerSerialElement) {
         element = issuerSerialElement;
-        
-        Element issuerNameElement = 
+
+        Element issuerNameElement =
             XMLUtils.getDirectChildElement(element, "X509IssuerName", WSS4JConstants.SIG_NS);
         issuer = XMLUtils.getElementText(issuerNameElement);
-        
-        Element serialNumberElement = 
+
+        Element serialNumberElement =
             XMLUtils.getDirectChildElement(element, "X509SerialNumber", WSS4JConstants.SIG_NS);
-        
+
         String serialNumberStr = XMLUtils.getElementText(serialNumberElement);
         if (serialNumberStr != null) {
             serialNumber = new BigInteger(serialNumberStr);
         } else {
             serialNumber = null;
         }
-        
+
     }
 
     /**
@@ -71,38 +71,38 @@ public final class DOMX509IssuerSerial {
         }
         this.issuer = new X500Principal(issuer).getName();
         this.serialNumber = serialNumber;
-        
-        element = 
+
+        element =
             doc.createElementNS(WSS4JConstants.SIG_NS, "ds:X509IssuerSerial");
-        
-        Element issuerNameElement = 
+
+        Element issuerNameElement =
             doc.createElementNS(WSS4JConstants.SIG_NS, "ds:X509IssuerName");
         issuerNameElement.appendChild(doc.createTextNode(this.issuer));
         element.appendChild(issuerNameElement);
-        
-        Element serialNumberElement = 
+
+        Element serialNumberElement =
             doc.createElementNS(WSS4JConstants.SIG_NS, "ds:X509SerialNumber");
         serialNumberElement.appendChild(doc.createTextNode(serialNumber.toString()));
         element.appendChild(serialNumberElement);
     }
-    
+
 
     /**
      * return the dom element.
-     * 
+     *
      * @return the dom element.
      */
     public Element getElement() {
         return element;
     }
-    
+
     /**
      * Return the issuer name.
      */
     public String getIssuer() {
         return issuer;
     }
-    
+
     /**
      * Return the Serial Number.
      */
@@ -112,11 +112,11 @@ public final class DOMX509IssuerSerial {
 
     /**
      * return the string representation of the token.
-     * 
+     *
      * @return the string representation of the token.
      */
     public String toString() {
         return DOM2Writer.nodeToString(element);
     }
-    
+
 }

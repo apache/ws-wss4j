@@ -38,9 +38,9 @@ import java.security.cert.X509Certificate;
  * X509 Security Token.
  */
 public class X509Security extends BinarySecurity {
-    
+
     public static final String X509_V3_TYPE = WSS4JConstants.X509TOKEN_NS + "#X509v3";
-    
+
     /*
      * Stores the associated X.509 Certificate. This saves numerous
      * crypto loadCertificate operations

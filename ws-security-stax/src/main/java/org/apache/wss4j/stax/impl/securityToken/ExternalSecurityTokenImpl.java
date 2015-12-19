@@ -41,7 +41,7 @@ public class ExternalSecurityTokenImpl extends AbstractInboundSecurityToken {
 
     private Element tokenElement;
     private byte[] key;
-    
+
     public ExternalSecurityTokenImpl(WSInboundSecurityContext wsInboundSecurityContext, String id,
                                  WSSecurityTokenConstants.KeyIdentifier keyIdentifier,
                                  WSSSecurityProperties securityProperties,
@@ -49,21 +49,21 @@ public class ExternalSecurityTokenImpl extends AbstractInboundSecurityToken {
         super(wsInboundSecurityContext, id, keyIdentifier, included);
         if (securityProperties.getCallbackHandler() != null) {
             // Try to get the token from a CallbackHandler
-            WSPasswordCallback pwcb = 
+            WSPasswordCallback pwcb =
                 new WSPasswordCallback(id, WSPasswordCallback.CUSTOM_TOKEN);
             try {
                 securityProperties.getCallbackHandler().handle(new Callback[]{pwcb});
             } catch (IOException | UnsupportedCallbackException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "noPassword");
             }
-            
+
             this.tokenElement = pwcb.getCustomToken();
             this.key = pwcb.getKey();
         }
-        
+
         if (this.tokenElement == null) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken", 
+                WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, "noToken",
                 new Object[] {id}
             );
         }

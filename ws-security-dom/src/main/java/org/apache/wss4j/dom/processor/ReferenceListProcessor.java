@@ -53,19 +53,19 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.X509Util;
 
 public class ReferenceListProcessor implements Processor {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(ReferenceListProcessor.class);
-    
+
     public List<WSSecurityEngineResult> handleToken(
-        Element elem, 
-        RequestData data, 
-        WSDocInfo wsDocInfo 
+        Element elem,
+        RequestData data,
+        WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Found reference list element");
         }
         List<WSDataRef> dataRefs = handleReferenceList(elem, data, wsDocInfo);
-        WSSecurityEngineResult result = 
+        WSSecurityEngineResult result =
             new WSSecurityEngineResult(WSConstants.ENCR, dataRefs);
         String tokenId = elem.getAttributeNS(null, "Id");
         if (!"".equals(tokenId)) {
@@ -78,18 +78,18 @@ public class ReferenceListProcessor implements Processor {
 
     /**
      * Dereferences and decodes encrypted data elements.
-     * 
+     *
      * @param elem contains the <code>ReferenceList</code> to the encrypted
      *             data elements
      */
     private List<WSDataRef> handleReferenceList(
-        Element elem, 
+        Element elem,
         RequestData data,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         List<WSDataRef> dataRefs = new ArrayList<>();
-        for (Node node = elem.getFirstChild(); 
-            node != null; 
+        for (Node node = elem.getFirstChild();
+            node != null;
             node = node.getNextSibling()
         ) {
             if (Node.ELEMENT_NODE == node.getNodeType()
@@ -97,27 +97,27 @@ public class ReferenceListProcessor implements Processor {
                 && "DataReference".equals(node.getLocalName())) {
                 String dataRefURI = ((Element) node).getAttributeNS(null, "URI");
                 dataRefURI = XMLUtils.getIDFromReference(dataRefURI);
-                
-                // See whether we have already processed the encrypted node 
+
+                // See whether we have already processed the encrypted node
                 if (!wsDocInfo.hasResult(WSConstants.ENCR, dataRefURI)) {
-                    WSDataRef dataRef = 
+                    WSDataRef dataRef =
                         decryptDataRefEmbedded(
                             elem.getOwnerDocument(), dataRefURI, data, wsDocInfo);
                     dataRefs.add(dataRef);
                 }
             }
         }
-        
+
         return dataRefs;
     }
 
-    
+
     /**
      * Decrypt an (embedded) EncryptedData element referenced by dataRefURI.
      */
     private WSDataRef decryptDataRefEmbedded(
-        Document doc, 
-        String dataRefURI, 
+        Document doc,
+        String dataRefURI,
         RequestData data,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
@@ -127,11 +127,11 @@ public class ReferenceListProcessor implements Processor {
         //
         // Find the encrypted data element referenced by dataRefURI
         //
-        Element encryptedDataElement = 
+        Element encryptedDataElement =
             EncryptionUtils.findEncryptedDataElement(doc, wsDocInfo, dataRefURI);
-        
+
         if (encryptedDataElement != null && data.isRequireSignedEncryptedDataElements()) {
-            List<WSSecurityEngineResult> signedResults = 
+            List<WSSecurityEngineResult> signedResults =
                 wsDocInfo.getResultsByTag(WSConstants.SIGN);
             WSSecurityUtil.verifySignedElement(encryptedDataElement, signedResults);
         }
@@ -149,19 +149,19 @@ public class ReferenceListProcessor implements Processor {
         }
         // Check BSP compliance
         checkBSPCompliance(keyInfoElement, symEncAlgo, data.getBSPEnforcer());
-        
+
         //
         // Try to get a security reference token, if none found try to get a
         // shared key using a KeyName.
         //
-        Element secRefToken = 
+        Element secRefToken =
             XMLUtils.getDirectChildElement(
                 keyInfoElement, "SecurityTokenReference", WSConstants.WSSE_NS
             );
         SecretKey symmetricKey = null;
         Principal principal = null;
         if (secRefToken == null) {
-            byte[] decryptedData = 
+            byte[] decryptedData =
                 X509Util.getSecretKey(keyInfoElement, symEncAlgo, data.getCallbackHandler(), null);
             symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, decryptedData);
         } else {
@@ -172,14 +172,14 @@ public class ReferenceListProcessor implements Processor {
             if (symEncAlgo != null) {
                 parameters.setDerivationKeyLength(KeyUtils.getKeyLength(symEncAlgo));
             }
-            
+
             STRParser strParser = new SecurityTokenRefSTRParser();
             STRParserResult parserResult = strParser.parseSecurityTokenReference(parameters);
             byte[] secretKey = parserResult.getSecretKey();
             principal = parserResult.getPrincipal();
             symmetricKey = KeyUtils.prepareSecretKey(symEncAlgo, secretKey);
         }
-        
+
         // Check for compliance against the defined AlgorithmSuite
         AlgorithmSuite algorithmSuite = data.getAlgorithmSuite();
         if (algorithmSuite != null) {
@@ -199,12 +199,12 @@ public class ReferenceListProcessor implements Processor {
             algorithmSuiteValidator.checkSymmetricEncryptionAlgorithm(symEncAlgo);
         }
 
-        return 
+        return
             EncryptionUtils.decryptEncryptedData(
                 doc, dataRefURI, encryptedDataElement, symmetricKey, symEncAlgo, data.getAttachmentCallbackHandler()
             );
     }
-    
+
     /**
      * Check for BSP compliance
      * @param keyInfoElement The KeyInfo element child
@@ -212,7 +212,7 @@ public class ReferenceListProcessor implements Processor {
      * @throws WSSecurityException
      */
     private static void checkBSPCompliance(
-        Element keyInfoElement, 
+        Element keyInfoElement,
         String encAlgo,
         BSPEnforcer bspEnforcer
     ) throws WSSecurityException {
@@ -230,12 +230,12 @@ public class ReferenceListProcessor implements Processor {
         if (result != 1) {
             bspEnforcer.handleBSPRule(BSPRule.R5424);
         }
-        
-        if (child == null || !WSConstants.WSSE_NS.equals(child.getNamespaceURI()) || 
+
+        if (child == null || !WSConstants.WSSE_NS.equals(child.getNamespaceURI()) ||
             !SecurityTokenReference.SECURITY_TOKEN_REFERENCE.equals(child.getLocalName())) {
             bspEnforcer.handleBSPRule(BSPRule.R5426);
         }
-        
+
         // EncryptionAlgorithm cannot be null
         if (encAlgo == null) {
             bspEnforcer.handleBSPRule(BSPRule.R5601);

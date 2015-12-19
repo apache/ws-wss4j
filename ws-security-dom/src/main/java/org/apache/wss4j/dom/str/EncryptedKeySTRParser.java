@@ -45,10 +45,10 @@ import org.w3c.dom.Element;
  * KeyInfo element associated with an EncryptedKey element
  */
 public class EncryptedKeySTRParser implements STRParser {
-    
+
     /**
      * Parse a SecurityTokenReference element and extract credentials.
-     * 
+     *
      * @param parameters The parameters to parse
      * @return the STRParserResult Object containing the parsing results
      * @throws WSSecurityException
@@ -60,10 +60,10 @@ public class EncryptedKeySTRParser implements STRParser {
                 WSSecurityException.ErrorCode.FAILURE, "invalidSTRParserParameter"
             );
         }
-        
-        SecurityTokenReference secRef = 
+
+        SecurityTokenReference secRef =
             new SecurityTokenReference(parameters.getStrElement(), parameters.getData().getBSPEnforcer());
-        
+
         String uri = null;
         if (secRef.getReference() != null) {
             uri = secRef.getReference().getURI();
@@ -71,15 +71,15 @@ public class EncryptedKeySTRParser implements STRParser {
         } else if (secRef.containsKeyIdentifier()) {
             uri = secRef.getKeyIdentifierValue();
         }
-        
+
         WSSecurityEngineResult result = parameters.getWsDocInfo().getResult(uri);
         if (result != null) {
             return processPreviousResult(result, secRef, parameters);
         }
-        
+
         return processSTR(secRef, parameters);
     }
-    
+
     /**
      * Process a previous security result
      */
@@ -90,28 +90,28 @@ public class EncryptedKeySTRParser implements STRParser {
     ) throws WSSecurityException {
         STRParserResult parserResult = new STRParserResult();
         RequestData data = parameters.getData();
-        
+
         Integer action = (Integer) result.get(WSSecurityEngineResult.TAG_ACTION);
         if (action != null && WSConstants.BST == action.intValue()) {
-            BinarySecurity token = 
+            BinarySecurity token =
                 (BinarySecurity)result.get(
                     WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN
                 );
             STRParserUtil.checkBinarySecurityBSPCompliance(secRef, token, data.getBSPEnforcer());
-            X509Certificate[] certs = 
+            X509Certificate[] certs =
                 (X509Certificate[])result.get(
                     WSSecurityEngineResult.TAG_X509_CERTIFICATES
                 );
             parserResult.setCerts(certs);
-        } else if (action != null 
+        } else if (action != null
             && (WSConstants.ST_UNSIGNED == action.intValue() || WSConstants.ST_SIGNED == action.intValue())) {
             SamlAssertionWrapper samlAssertion =
                 (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
             STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion, data.getBSPEnforcer());
-          
-            SAMLKeyInfo keyInfo = 
+
+            SAMLKeyInfo keyInfo =
                 SAMLUtil.getCredentialFromSubject(samlAssertion,
-                        new WSSSAMLKeyInfoProcessor(data, parameters.getWsDocInfo()), 
+                        new WSSSAMLKeyInfoProcessor(data, parameters.getWsDocInfo()),
                         data.getSigVerCrypto(), data.getCallbackHandler());
             parserResult.setCerts(keyInfo.getCerts());
         } else {
@@ -120,14 +120,14 @@ public class EncryptedKeySTRParser implements STRParser {
                 "unsupportedBinaryTokenType"
             );
         }
-        
+
         REFERENCE_TYPE referenceType = getReferenceType(secRef);
         if (referenceType != null) {
             parserResult.setReferenceType(referenceType);
         }
         return parserResult;
     }
-    
+
     private STRParserResult processSTR(
         SecurityTokenReference secRef, STRParserParameters parameters
     ) throws WSSecurityException {
@@ -136,7 +136,7 @@ public class EncryptedKeySTRParser implements STRParser {
         Element strElement = parameters.getStrElement();
         WSDocInfo wsDocInfo = parameters.getWsDocInfo();
         Crypto crypto = data.getDecCrypto();
-        
+
         if (secRef.containsKeyIdentifier()) {
             if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
@@ -145,10 +145,10 @@ public class EncryptedKeySTRParser implements STRParser {
                         secRef, strElement, data, wsDocInfo
                     );
                 STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion, data.getBSPEnforcer());
-                
-                SAMLKeyInfo samlKi = 
+
+                SAMLKeyInfo samlKi =
                     SAMLUtil.getCredentialFromSubject(samlAssertion,
-                            new WSSSAMLKeyInfoProcessor(data, wsDocInfo), 
+                            new WSSSAMLKeyInfoProcessor(data, wsDocInfo),
                             data.getSigVerCrypto(), data.getCallbackHandler());
                 parserResult.setCerts(samlKi.getCerts());
             } else {
@@ -160,7 +160,7 @@ public class EncryptedKeySTRParser implements STRParser {
             parserResult.setCerts(secRef.getX509IssuerSerial(crypto));
         } else if (secRef.containsReference()) {
             Reference reference = secRef.getReference();
-            Element bstElement = 
+            Element bstElement =
                 STRParserUtil.getTokenElement(strElement.getOwnerDocument(), wsDocInfo, data.getCallbackHandler(),
                                               reference.getURI(), reference.getValueType());
 
@@ -176,16 +176,16 @@ public class EncryptedKeySTRParser implements STRParser {
                     "unsupportedBinaryTokenType"
                 );
             }
-        } 
+        }
 
         REFERENCE_TYPE referenceType = getReferenceType(secRef);
         if (referenceType != null) {
             parserResult.setReferenceType(referenceType);
         }
-        
+
         return parserResult;
     }
-    
+
     private REFERENCE_TYPE getReferenceType(SecurityTokenReference secRef) {
         if (secRef.containsReference()) {
             return REFERENCE_TYPE.DIRECT_REF;
@@ -196,7 +196,7 @@ public class EncryptedKeySTRParser implements STRParser {
                 return REFERENCE_TYPE.KEY_IDENTIFIER;
             }
         }
-        
+
         return null;
     }
 }

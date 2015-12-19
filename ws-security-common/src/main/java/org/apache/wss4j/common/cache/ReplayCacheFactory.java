@@ -29,11 +29,11 @@ import org.apache.wss4j.common.util.Loader;
  * if EH-Cache is available. Otherwise it returns a MemoryReplayCacheFactory.
  */
 public abstract class ReplayCacheFactory {
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(ReplayCacheFactory.class);
     private static boolean ehCacheInstalled;
-    
+
     static {
         try {
             Class<?> cacheManagerClass = Class.forName("net.sf.ehcache.CacheManager");
@@ -45,21 +45,21 @@ public abstract class ReplayCacheFactory {
             LOG.debug(e.getMessage());
         }
     }
-    
+
     public static synchronized boolean isEhCacheInstalled() {
         return ehCacheInstalled;
     }
-    
+
     public static ReplayCacheFactory newInstance() {
         if (isEhCacheInstalled()) {
             return new EHCacheReplayCacheFactory();
         }
-        
+
         return new MemoryReplayCacheFactory();
     }
-    
+
     public abstract ReplayCache newReplayCache(String key, Object configuration);
-    
+
     protected URL getConfigFileURL(Object o) {
         if (o instanceof String) {
             try {
@@ -73,9 +73,9 @@ public abstract class ReplayCacheFactory {
                 LOG.debug(e.getMessage());
             }
         } else if (o instanceof URL) {
-            return (URL)o;        
+            return (URL)o;
         }
         return null;
     }
-    
+
 }

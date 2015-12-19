@@ -24,11 +24,11 @@ import java.io.File;
  * A utility class for security tests
  */
 public final class SecurityTestUtil {
-    
+
     private SecurityTestUtil() {
         // complete
     }
-    
+
     public static void cleanup() {
         String tmpDir = System.getProperty("java.io.tmpdir");
         if (tmpDir != null) {
@@ -42,5 +42,5 @@ public final class SecurityTestUtil {
             }
         }
     }
-    
+
 }

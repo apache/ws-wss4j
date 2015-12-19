@@ -52,17 +52,17 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
     public TokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, boolean initiator) {
         this(assertion, asserted, null, initiator);
     }
-    
-    public TokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, 
+
+    public TokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted,
                                PolicyAsserter policyAsserter, boolean initiator) {
         super(assertion, asserted);
         this.initiator = initiator;
-        
+
         this.policyAsserter = policyAsserter;
         if (this.policyAsserter == null) {
             this.policyAsserter = new DummyPolicyAsserter();
         }
-        
+
         if (asserted) {
             AbstractToken token = (AbstractToken)getAssertion();
             getPolicyAsserter().assertPolicy(token);
@@ -144,7 +144,7 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
                 if (parentAssertion instanceof TransportToken) {
                     continue loop;
                 }
-                
+
                 if (!(parentAssertion instanceof SupportingTokens)) {
                     ignoreToken++;
                     continue loop;
@@ -180,7 +180,7 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
         //WSP1.3, 5.1 Token Inclusion
         //todo do we need a global token cache to fullfill ".../IncludeToken/Once" ?
         SPConstants.IncludeTokenType includeTokenType = abstractToken.getIncludeTokenType();
-        boolean isIncludedInMessage = 
+        boolean isIncludedInMessage =
             ((InboundSecurityToken)tokenSecurityEvent.getSecurityToken()).isIncludedInMessage();
         switch (includeTokenType) {
             case INCLUDE_TOKEN_NEVER:
@@ -281,11 +281,11 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
         }
         return hasDerivedKeys;
     }
-    
+
     protected PolicyAsserter getPolicyAsserter() {
         return policyAsserter;
     }
-    
+
     protected boolean isInitiator() {
         return initiator;
     }

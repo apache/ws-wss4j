@@ -30,11 +30,11 @@ import java.util.Map;
  * data of the WS handler.
  */
 public final class WSHandlerConstants extends ConfigurationConstants {
-    
+
     private WSHandlerConstants() {
         super();
     }
-    
+
     /**
      * Perform no action.
      */
@@ -43,19 +43,19 @@ public final class WSHandlerConstants extends ConfigurationConstants {
     /**
      * This is an alternative to specifying an "action" String. This Object should be a
      * list of HandlerAction objects, which associate an "action" Integer with a corresponding
-     * SecurityActionToken object. This allows for more control over keys etc. used for 
+     * SecurityActionToken object. This allows for more control over keys etc. used for
      * different actions.
      */
     public static final String HANDLER_ACTIONS = "handlerActions";
-    
+
     /**
      * Set the value of this parameter to true to treat passwords as binary values
      * for Username Tokens. The default value is "false".
-     * 
+     *
      * This is needed to properly handle password equivalence for UsernameToken
-     * passwords.  Binary passwords are Base64 encoded so they can be treated as 
+     * passwords.  Binary passwords are Base64 encoded so they can be treated as
      * strings in most places, but when the password digest is calculated or a key
-     * is derived from the password, the password will be Base64 decoded before 
+     * is derived from the password, the password will be Base64 decoded before
      * being used. This is most useful for hashed passwords as password equivalents.
      */
     public static final String USE_ENCODED_PASSWORDS = "useEncodedPasswords";
@@ -63,20 +63,20 @@ public final class WSHandlerConstants extends ConfigurationConstants {
     //
     // Internal storage constants
     //
-    
+
     /**
      * The WSHandler stores a result <code>List</code> in this property.
      */
     public static final String RECV_RESULTS = "RECV_RESULTS";
-    
+
     /**
      * internally used property names to store values inside the message context
      * that must have the same lifetime as a message (request/response model).
      */
     public static final String SEND_SIGV = "_sendSignatureValues_";
-    
+
     /**
-     * 
+     *
      */
     public static final String SIG_CONF_DONE = "_sigConfDone_";
 
@@ -109,7 +109,7 @@ public final class WSHandlerConstants extends ConfigurationConstants {
         keyIdentifier.put("EncryptedKeySHA1", WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
         keyIdentifier.put("KeyValue", WSConstants.KEY_VALUE);
     }
-    
+
     /**
      * Get the key identifier type corresponding to the parameter. This is intended for internal
      * use only. Valid values for "parameter" are:
@@ -121,7 +121,7 @@ public final class WSHandlerConstants extends ConfigurationConstants {
      *  - "KeyValue"
      *  - "EmbeddedKeyName"
      *  - "EncryptedKeySHA1"
-     * 
+     *
      * @param parameter
      * @return the key identifier type corresponding to the parameter
      */

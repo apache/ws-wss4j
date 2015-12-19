@@ -50,13 +50,13 @@ public class ConditionsBean {
      * @param notAfter The notAfter instance
      */
     public ConditionsBean(
-        DateTime notBefore, 
+        DateTime notBefore,
         DateTime notAfter
     ) {
         this.notBefore = notBefore;
         this.notAfter = notAfter;
     }
-    
+
     /**
      * Constructor ConditionsBean creates a new ConditionsBean instance.
      *
@@ -67,7 +67,7 @@ public class ConditionsBean {
     ) {
         this.tokenPeriodSeconds = tokenPeriodMinutes * 60;
     }
-    
+
     /**
      * Get the notBefore instance
      *
@@ -85,7 +85,7 @@ public class ConditionsBean {
     public void setNotBefore(DateTime notBefore) {
         this.notBefore = notBefore;
     }
-    
+
     /**
      * Get the notAfter instance
      *
@@ -103,7 +103,7 @@ public class ConditionsBean {
     public void setNotAfter(DateTime notAfter) {
         this.notAfter = notAfter;
     }
-    
+
     /**
      * Get the tokenPeriodMinutes of this object.
      *
@@ -121,7 +121,7 @@ public class ConditionsBean {
     public void setTokenPeriodMinutes(int tokenPeriodMinutes) {
         this.tokenPeriodSeconds = tokenPeriodMinutes * 60;
     }
-    
+
     /**
      * Get the tokenPeriodSeconds of this object.
      *
@@ -139,7 +139,7 @@ public class ConditionsBean {
     public void setTokenPeriodSeconds(long tokenPeriodSeconds) {
         this.tokenPeriodSeconds = tokenPeriodSeconds;
     }
-    
+
     /**
      * Get the audienceRestrictions instances
      *
@@ -173,7 +173,7 @@ public class ConditionsBean {
     public void setOneTimeUse(boolean oneTimeUse) {
         this.oneTimeUse = oneTimeUse;
     }
-    
+
     public ProxyRestrictionBean getProxyRestriction() {
         return proxyRestriction;
     }
@@ -181,7 +181,7 @@ public class ConditionsBean {
     public void setProxyRestriction(ProxyRestrictionBean proxyRestriction) {
         this.proxyRestriction = proxyRestriction;
     }
-    
+
     public List<DelegateBean> getDelegates() {
         return delegates;
     }
@@ -189,7 +189,7 @@ public class ConditionsBean {
     public void setDelegates(List<DelegateBean> delegates) {
         this.delegates = delegates;
     }
-    
+
     /**
      * Method equals ...
      *
@@ -210,41 +210,41 @@ public class ConditionsBean {
         if (tokenPeriodSeconds != that.tokenPeriodSeconds) {
             return false;
         }
-        
+
         if (notBefore == null && that.notBefore != null) {
             return false;
         } else if (notBefore != null && !notBefore.equals(that.notBefore)) {
             return false;
         }
-        
+
         if (notAfter == null && that.notAfter != null) {
             return false;
         } else if (notAfter != null && !notAfter.equals(that.notAfter)) {
-            return false; 
+            return false;
         }
-        
+
         if (audienceRestrictions == null && that.audienceRestrictions != null) {
             return false;
-        } else if (audienceRestrictions != null 
+        } else if (audienceRestrictions != null
                 && !audienceRestrictions.equals(that.audienceRestrictions)) {
-            return false; 
+            return false;
         }
-        
+
         if (oneTimeUse != that.oneTimeUse) {
             return false;
         }
-        
+
         if (proxyRestriction == null && that.proxyRestriction != null) {
             return false;
-        } else if (proxyRestriction != null 
+        } else if (proxyRestriction != null
             && !proxyRestriction.equals(that.proxyRestriction)) {
-            return false; 
+            return false;
         }
-        
+
         if (delegates == null && that.delegates != null) {
             return false;
         } else if (delegates != null && !delegates.equals(that.delegates)) {
-            return false; 
+            return false;
         }
 
         return true;

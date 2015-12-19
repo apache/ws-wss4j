@@ -43,37 +43,37 @@ import java.util.List;
  * Assertion.
  */
 public class SAMLCallback implements Callback {
-    
+
     /**
      * The SAML Version of the Assertion to create
      */
     private SAMLVersion samlVersion;
-    
+
     /**
      * SAML subject representation
      */
     private SubjectBean subject;
-    
+
     /**
      * The issuer of the Assertion
      */
     private String issuer;
-    
+
     /**
      * The issuer format of the Assertion
      */
     private String issuerFormat;
-    
+
     /**
      * The issuer qualifier of the Assertion
      */
     private String issuerQualifier;
-    
+
     /**
      * SAML Conditions representation
      */
     private ConditionsBean conditions;
-    
+
     /**
      * SAML Advice representation
      */
@@ -93,12 +93,12 @@ public class SAMLCallback implements Callback {
      * A list of <code>AuthDecisionStatementBean</code> values
      */
     private List<AuthDecisionStatementBean> authDecisionStatementData;
-    
+
     /**
      * A DOM Element representation of this SAML Assertion
      */
     private Element assertionElement;
-    
+
     private boolean signAssertion;
 
     private String issuerKeyName;
@@ -112,7 +112,7 @@ public class SAMLCallback implements Callback {
     private String canonicalizationAlgorithm;
 
     private String signatureAlgorithm;
-    
+
     private String signatureDigestAlgorithm;
 
     /**
@@ -125,10 +125,10 @@ public class SAMLCallback implements Callback {
     }
 
     /**
-     * Method getAuthenticationStatementData returns the authenticationStatementData of this 
+     * Method getAuthenticationStatementData returns the authenticationStatementData of this
      * SAMLCallback object.
      *
-     * @return the authenticationStatementData (type List<AuthenticationStatementBean>) of 
+     * @return the authenticationStatementData (type List<AuthenticationStatementBean>) of
      *         this SAMLCallback object.
      */
     public List<AuthenticationStatementBean> getAuthenticationStatementData() {
@@ -136,10 +136,10 @@ public class SAMLCallback implements Callback {
     }
 
     /**
-     * Method setAuthenticationStatementData sets the authenticationStatementData of this 
+     * Method setAuthenticationStatementData sets the authenticationStatementData of this
      * SAMLCallback object.
      *
-     * @param authenticationStatementData the authenticationStatementData of this 
+     * @param authenticationStatementData the authenticationStatementData of this
      *        SAMLCallback object.
      */
     public void setAuthenticationStatementData(
@@ -149,10 +149,10 @@ public class SAMLCallback implements Callback {
     }
 
     /**
-     * Method getAttributeStatementData returns the attributeStatementData of this 
+     * Method getAttributeStatementData returns the attributeStatementData of this
      * SAMLCallback object.
      *
-     * @return the attributeStatementData (type List<AttributeStatementBean>) of this 
+     * @return the attributeStatementData (type List<AttributeStatementBean>) of this
      *         SAMLCallback object.
      */
     public List<AttributeStatementBean> getAttributeStatementData() {
@@ -169,10 +169,10 @@ public class SAMLCallback implements Callback {
     }
 
     /**
-     * Method getAuthDecisionStatementData returns the authDecisionStatementData of this 
+     * Method getAuthDecisionStatementData returns the authDecisionStatementData of this
      * SAMLCallback object.
      *
-     * @return the authDecisionStatementData (type List<AuthDecisionStatementBean>) of this 
+     * @return the authDecisionStatementData (type List<AuthDecisionStatementBean>) of this
      *         SAMLCallback object.
      */
     public List<AuthDecisionStatementBean> getAuthDecisionStatementData() {
@@ -180,10 +180,10 @@ public class SAMLCallback implements Callback {
     }
 
     /**
-     * Method setAuthDecisionStatementData sets the authDecisionStatementData of this 
+     * Method setAuthDecisionStatementData sets the authDecisionStatementData of this
      * SAMLCallback object.
      *
-     * @param authDecisionStatementData the authDecisionStatementData of this 
+     * @param authDecisionStatementData the authDecisionStatementData of this
      *        SAMLCallback object.
      */
     public void setAuthDecisionStatementData(
@@ -201,7 +201,7 @@ public class SAMLCallback implements Callback {
         if (subject != null) {
             return subject;
         }
-        
+
         // SAML 1.1 case
         if (authenticationStatementData != null) {
             for (AuthenticationStatementBean bean : authenticationStatementData) {
@@ -210,7 +210,7 @@ public class SAMLCallback implements Callback {
                 }
             }
         }
-        
+
         if (attributeStatementData != null) {
             for (AttributeStatementBean bean : attributeStatementData) {
                 if (bean.getSubject() != null) {
@@ -218,7 +218,7 @@ public class SAMLCallback implements Callback {
                 }
             }
         }
-        
+
         if (authDecisionStatementData != null) {
             for (AuthDecisionStatementBean bean : authDecisionStatementData) {
                 if (bean.getSubject() != null) {
@@ -226,7 +226,7 @@ public class SAMLCallback implements Callback {
                 }
             }
         }
-        
+
         return null;
     }
 
@@ -238,7 +238,7 @@ public class SAMLCallback implements Callback {
     public void setSubject(SubjectBean subject) {
         this.subject = subject;
     }
-    
+
     /**
      * Method getIssuer returns the issuer of this SAMLCallback object.
      *
@@ -256,7 +256,7 @@ public class SAMLCallback implements Callback {
     public void setIssuer(String issuer) {
         this.issuer = issuer;
     }
-    
+
     /**
      * Method getConditions returns the conditions of this SAMLCallback object.
      *
@@ -274,7 +274,7 @@ public class SAMLCallback implements Callback {
     public void setConditions(ConditionsBean conditions) {
         this.conditions = conditions;
     }
-    
+
     /**
      * Set the SAMLVersion of the assertion to create
      * @param samlVersion the SAMLVersion of the assertion to create
@@ -283,7 +283,7 @@ public class SAMLCallback implements Callback {
     public void setSamlVersion(SAMLVersion samlVersion) {
         this.samlVersion = samlVersion;
     }
-    
+
     /**
      * Get the SAMLVersion of the assertion to create
      * @return the SAMLVersion of the assertion to create
@@ -291,7 +291,7 @@ public class SAMLCallback implements Callback {
     public SAMLVersion getSamlVersion() {
         return samlVersion;
     }
-    
+
     /**
      * Set the SAML Version of the assertion to create
      * @param samlVersion the SAML Version of the assertion to create
@@ -305,7 +305,7 @@ public class SAMLCallback implements Callback {
             this.samlVersion = SAMLVersion.VERSION_10;
         }
     }
-    
+
     /**
      * Set the DOM representation of this SAML Assertion
      * @param assertionElement the DOM representation of this SAML Assertion
@@ -313,7 +313,7 @@ public class SAMLCallback implements Callback {
     public void setAssertionElement(Element assertionElement) {
         this.assertionElement = assertionElement;
     }
-    
+
     /**
      * Get the DOM representation of this SAML Assertion
      * @return the DOM representation of this SAML Assertion
@@ -321,7 +321,7 @@ public class SAMLCallback implements Callback {
     public Element getAssertionElement() {
         return assertionElement;
     }
-    
+
     public boolean isSignAssertion() {
         return signAssertion;
     }

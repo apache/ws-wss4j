@@ -47,7 +47,7 @@ public class HttpsSecurityTokenImpl extends AbstractInboundSecurityToken impleme
         super(null, IDGenerator.generateID(null), WSSecurityTokenConstants.KeyIdentifier_NoKeyInfo, true);
         this.authenticationType = AuthenticationType.noAuthentication;
     }
-    
+
     public HttpsSecurityTokenImpl(X509Certificate x509Certificate) {
         super(null, IDGenerator.generateID(null), WSSecurityTokenConstants.KeyIdentifier_NoKeyInfo, true);
         setX509Certificates(new X509Certificate[]{x509Certificate});

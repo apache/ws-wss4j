@@ -30,17 +30,17 @@ public class DummyPolicyAsserter implements PolicyAsserter {
     public void assertPolicy(Assertion assertion) {
         // Do nothing
     }
-    
+
     public void unassertPolicy(Assertion assertion, String reason) {
         // Do nothing
     }
-    
+
     public void assertPolicy(QName qName) {
         // Do nothing
     }
-    
+
     public void unassertPolicy(QName qName, String reason) {
         // Do nothing
     }
-    
+
 }

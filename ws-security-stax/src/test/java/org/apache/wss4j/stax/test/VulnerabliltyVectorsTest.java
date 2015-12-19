@@ -224,7 +224,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         Element headerElement = (Element) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
         Element newElement = securedDocument.createElement("test");
         headerElement.appendChild(newElement);
-        
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         InputStream dtd = this.getClass().getClassLoader().getResourceAsStream("testdata/recursiveDTD.txt");
@@ -339,12 +339,12 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
     @Test
     public void testMaximumAllowedTransformsPerReference() throws Exception {
-        
+
         if (getJavaSpecificationVersion() > 1.7) {
             System.out.println("testMaximumAllowedTransformsPerReference skipped");
             return;
         }
-        
+
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
 
         String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;

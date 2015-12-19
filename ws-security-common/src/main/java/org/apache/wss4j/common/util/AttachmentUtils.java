@@ -78,7 +78,7 @@ public final class AttachmentUtils {
         ALL_PARAMS.add(PARAM_SIZE);
         ALL_PARAMS.add(PARAM_TYPE);
     }
-    
+
     private AttachmentUtils() {
         // complete
     }

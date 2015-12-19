@@ -760,7 +760,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             conditions.setNotBefore(newNotBefore);
             conditions.setNotOnOrAfter(newNotBefore.plusMinutes(5));
 
-            XMLObjectBuilder<XSAny> xsAnyBuilder = 
+            XMLObjectBuilder<XSAny> xsAnyBuilder =
                 (XMLObjectBuilder<XSAny>)builderFactory.getBuilder(XSAny.TYPE_NAME);
             XSAny attributeValue = xsAnyBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             attributeValue.getUnknownXMLObjects().add(conditions);
@@ -768,7 +768,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             List<Object> attributeValues = new ArrayList<Object>();
             attributeValues.add(attributeValue);
             callbackHandler.setCustomAttributeValues(attributeValues);
-            
+
             securityProperties.setSamlCallbackHandler(callbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
@@ -864,7 +864,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 1);
         }
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion, which
      * is encrypted in a saml2:EncryptedAssertion Element in the security header
@@ -876,11 +876,11 @@ public class SAMLTokenTest extends AbstractTestBase {
         Crypto crypto = CryptoFactory.getInstance("wss40.properties");
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            
+
             SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
             callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
             callbackHandler.setIssuer("www.example.com");
-            
+
             SAMLCallback samlCallback = new SAMLCallback();
             SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
             SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
@@ -890,16 +890,16 @@ public class SAMLTokenTest extends AbstractTestBase {
             Document doc = SOAPUtil.toSOAPPart(sourceDocument);
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
-            
+
             wsSign.prepare(doc, samlAssertion);
-            
+
             // Get the Element + add it to the security header as an EncryptedAssertion
             Element assertionElement = wsSign.getElement();
-            Element encryptedAssertionElement = 
+            Element encryptedAssertionElement =
                 doc.createElementNS(WSConstants.SAML2_NS, WSConstants.ENCRYPED_ASSERTION_LN);
             encryptedAssertionElement.appendChild(assertionElement);
             secHeader.getSecurityHeader().appendChild(encryptedAssertionElement);
-            
+
             // Encrypt the Assertion
             KeyGenerator keygen = KeyGenerator.getInstance("AES");
             keygen.init(128);
@@ -908,10 +908,10 @@ public class SAMLTokenTest extends AbstractTestBase {
             cryptoType.setAlias("wss40");
             X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
             assertTrue(certs != null && certs.length > 0 && certs[0] != null);
-            
+
             encryptElement(doc, assertionElement, WSConstants.AES_128, secretKey,
                     WSConstants.KEYTRANSPORT_RSAOEP, certs[0], false);
-            
+
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
         }
@@ -926,12 +926,12 @@ public class SAMLTokenTest extends AbstractTestBase {
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
             // Decrypted Assertion element must be there
-            NodeList nodeList = 
+            NodeList nodeList =
                 document.getElementsByTagNameNS(WSSConstants.TAG_saml2_Assertion.getNamespaceURI(), WSSConstants.TAG_saml2_Assertion.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
         }
     }
-    
+
     @Test
     public void testRequiredSubjectConfirmationMethod() throws Exception {
 
@@ -962,12 +962,12 @@ public class SAMLTokenTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setSamlCallbackHandler(new SAMLCallbackHandlerImpl());
-            
+
             SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
             validator.setRequiredSubjectConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
             securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
             securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
-            
+
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -977,7 +977,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
         }
-        
+
         baos = new ByteArrayOutputStream();
         // Now create a Bearer assertion
         {
@@ -1007,12 +1007,12 @@ public class SAMLTokenTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setSamlCallbackHandler(new SAMLCallbackHandlerImpl());
-            
+
             SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
             validator.setRequiredSubjectConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
             securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
             securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
-            
+
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -1024,7 +1024,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             }
         }
     }
-    
+
     @Test
     public void testStandardSubjectConfirmationMethod() throws Exception {
 
@@ -1056,7 +1056,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setSamlCallbackHandler(new SAMLCallbackHandlerImpl());
-            
+
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -1067,25 +1067,25 @@ public class SAMLTokenTest extends AbstractTestBase {
                 // expected
             }
         }
-        
+
         // Validate again - disable the standard subject confirmation method check
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setSamlCallbackHandler(new SAMLCallbackHandlerImpl());
-            
+
             SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
             validator.setRequireStandardSubjectConfirmationMethod(false);
             securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
             securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
-            
+
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
         }
     }
-    
+
     @Test
     public void testUnsignedBearer() throws Exception {
 
@@ -1117,7 +1117,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setSamlCallbackHandler(new SAMLCallbackHandlerImpl());
-            
+
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -1128,25 +1128,25 @@ public class SAMLTokenTest extends AbstractTestBase {
                 // expected
             }
         }
-        
+
         // Validate again - disable the signed Bearer check
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setSamlCallbackHandler(new SAMLCallbackHandlerImpl());
-            
+
             SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
             validator.setRequireBearerSignature(false);
             securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
             securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
-            
+
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
         }
     }
-    
+
     @Test
     public void testSAML2IssuerFormatOutbound() throws Exception {
 
@@ -1180,7 +1180,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
-    
+
     private void encryptElement(
         Document document,
         Element elementToEncrypt,

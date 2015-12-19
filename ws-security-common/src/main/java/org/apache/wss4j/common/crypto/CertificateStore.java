@@ -47,23 +47,23 @@ import org.apache.wss4j.common.ext.WSSecurityException;
  * supported, so this cannot be used for signature creation, or decryption.
  */
 public class CertificateStore extends CryptoBase {
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(CertificateStore.class);
-    
+
     private X509Certificate[] trustedCerts;
-    
+
     /**
      * Constructor
      */
     public CertificateStore(X509Certificate[] trustedCerts) {
         this.trustedCerts = trustedCerts;
     }
-   
+
     /**
      * Get an X509Certificate (chain) corresponding to the CryptoType argument. The supported
      * types are as follows:
-     * 
+     *
      * TYPE.ISSUER_SERIAL - A certificate (chain) is located by the issuer name and serial number
      * TYPE.THUMBPRINT_SHA1 - A certificate (chain) is located by the SHA1 of the (root) cert
      * TYPE.SKI_BYTES - A certificate (chain) is located by the SKI bytes of the (root) cert
@@ -101,7 +101,7 @@ public class CertificateStore extends CryptoBase {
         }
         return certs;
     }
-    
+
     /**
      * Get the implementation-specific identifier corresponding to the cert parameter. In this
      * case, the identifier refers to the subject DN.
@@ -112,7 +112,7 @@ public class CertificateStore extends CryptoBase {
     public String getX509Identifier(X509Certificate cert) throws WSSecurityException {
         return cert.getSubjectDN().toString();
     }
-    
+
     /**
      * Gets the private key corresponding to the certificate. Not supported.
      *
@@ -125,7 +125,7 @@ public class CertificateStore extends CryptoBase {
     ) throws WSSecurityException {
         return null;
     }
-   
+
     /**
      * Gets the private key corresponding to the identifier. Not supported.
      *
@@ -139,7 +139,7 @@ public class CertificateStore extends CryptoBase {
     ) throws WSSecurityException {
         return null;
     }
-    
+
     /**
      * Evaluate whether a given certificate chain should be trusted.
      *
@@ -149,7 +149,7 @@ public class CertificateStore extends CryptoBase {
      * @throws WSSecurityException if the certificate chain is invalid
      */
     public void verifyTrust(
-        X509Certificate[] certs, 
+        X509Certificate[] certs,
         boolean enableRevocation,
         Collection<Pattern> subjectCertConstraints
     ) throws WSSecurityException {
@@ -159,11 +159,11 @@ public class CertificateStore extends CryptoBase {
         if (!enableRevocation) {
             String issuerString = certs[0].getIssuerX500Principal().getName();
             BigInteger issuerSerial = certs[0].getSerialNumber();
-            
+
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
             cryptoType.setIssuerSerial(issuerString, issuerSerial);
             X509Certificate[] foundCerts = getX509Certificates(cryptoType);
-    
+
             //
             // If a certificate has been found, the certificates must be compared
             // to ensure against phony DNs (compare encoded form including signature)
@@ -177,10 +177,10 @@ public class CertificateStore extends CryptoBase {
                 return;
             }
         }
-        
-        
+
+
         //
-        // SECOND step - Search for the issuer cert (chain) of the transmitted certificate in the 
+        // SECOND step - Search for the issuer cert (chain) of the transmitted certificate in the
         // keystore or the truststore
         //
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.SUBJECT_DN);
@@ -194,16 +194,16 @@ public class CertificateStore extends CryptoBase {
             String subjectString = certs[0].getSubjectX500Principal().getName();
             if (LOG.isDebugEnabled()) {
                 LOG.debug(
-                    "No certs found in keystore for issuer " + issuerString 
+                    "No certs found in keystore for issuer " + issuerString
                     + " of certificate for " + subjectString
                 );
             }
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, "certpath", 
+                WSSecurityException.ErrorCode.FAILURE, "certpath",
                 new Object[] {"No trusted certs found"}
             );
         }
-        
+
         //
         // THIRD step
         // Check the certificate trust path for the issuer cert chain
@@ -213,7 +213,7 @@ public class CertificateStore extends CryptoBase {
                 "Preparing to validate certificate path for issuer " + issuerString
             );
         }
-        
+
         //
         // Form a certificate chain from the transmitted certificate
         // and the certificate(s) of the issuer from the keystore/truststore
@@ -221,7 +221,7 @@ public class CertificateStore extends CryptoBase {
         X509Certificate[] x509certs = new X509Certificate[foundCerts.length + 1];
         x509certs[0] = certs[0];
         System.arraycopy(foundCerts, 0, x509certs, 1, foundCerts.length);
-        
+
         try {
             // Generate cert path
             List<X509Certificate> certList = Arrays.asList(x509certs);
@@ -230,7 +230,7 @@ public class CertificateStore extends CryptoBase {
             Set<TrustAnchor> set = new HashSet<>();
             if (trustedCerts != null) {
                 for (X509Certificate cert : trustedCerts) {
-                    TrustAnchor anchor = 
+                    TrustAnchor anchor =
                         new TrustAnchor(cert, cert.getExtensionValue(NAME_CONSTRAINTS_OID));
                     set.add(anchor);
                 }
@@ -248,7 +248,7 @@ public class CertificateStore extends CryptoBase {
                 validator = CertPathValidator.getInstance("PKIX", provider);
             }
             validator.validate(path, param);
-        } catch (java.security.NoSuchProviderException | NoSuchAlgorithmException 
+        } catch (java.security.NoSuchProviderException | NoSuchAlgorithmException
             | java.security.cert.CertificateException
             | java.security.InvalidAlgorithmParameterException
             | java.security.cert.CertPathValidatorException e) {
@@ -257,16 +257,16 @@ public class CertificateStore extends CryptoBase {
                     new Object[] {e.getMessage()}
                 );
         }
-        
+
         // Finally check Cert Constraints
         if (!matches(certs[0], subjectCertConstraints)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
     }
-    
+
     /**
      * Evaluate whether a given public key should be trusted.
-     * 
+     *
      * @param publicKey The PublicKey to be evaluated
      * @throws WSSecurityException if the PublicKey is invalid
      */
@@ -277,7 +277,7 @@ public class CertificateStore extends CryptoBase {
         if (publicKey == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
-        
+
         //
         // Search the trusted certs for the transmitted public key (direct trust)
         //
@@ -288,7 +288,7 @@ public class CertificateStore extends CryptoBase {
         }
         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
     }
-    
+
     /**
      * Get an X509 Certificate (chain) according to a given serial number and issuer string.
      *
@@ -298,7 +298,7 @@ public class CertificateStore extends CryptoBase {
      * @throws WSSecurityException
      */
     private X509Certificate[] getX509Certificates(
-        String issuer, 
+        String issuer,
         BigInteger serialNumber
     ) throws WSSecurityException {
         //
@@ -316,20 +316,20 @@ public class CertificateStore extends CryptoBase {
         } catch (java.lang.IllegalArgumentException ex) {
             issuerName = createBCX509Name(issuer);
         }
-        
+
         for (X509Certificate trustedCert : trustedCerts) {
             if (trustedCert.getSerialNumber().compareTo(serialNumber) == 0) {
-                Object certName = 
+                Object certName =
                     createBCX509Name(trustedCert.getIssuerX500Principal().getName());
                 if (certName.equals(issuerName)) {
                     return new X509Certificate[]{trustedCert};
                 }
             }
         }
-        
+
         return null;
     }
-    
+
     /**
      * Get an X509 Certificate (chain) according to a given Thumbprint.
      *
@@ -339,11 +339,11 @@ public class CertificateStore extends CryptoBase {
      */
     private X509Certificate[] getX509Certificates(byte[] thumb) throws WSSecurityException {
         MessageDigest sha = null;
-        
+
         if (trustedCerts == null) {
             return null;
         }
-        
+
         try {
             sha = MessageDigest.getInstance("SHA1");
         } catch (NoSuchAlgorithmException e) {
@@ -367,7 +367,7 @@ public class CertificateStore extends CryptoBase {
         }
         return null;
     }
-    
+
     /**
      * Get an X509 Certificate (chain) according to a given SubjectKeyIdentifier.
      *
@@ -383,10 +383,10 @@ public class CertificateStore extends CryptoBase {
             if (data.length == skiBytes.length && Arrays.equals(data, skiBytes)) {
                 return new X509Certificate[]{trustedCert};
             }
-        } 
+        }
         return null;
     }
-    
+
     /**
      * Get an X509 Certificate (chain) according to a given DN of the subject of the certificate
      *
@@ -394,7 +394,7 @@ public class CertificateStore extends CryptoBase {
      * @return An X509 Certificate (chain) with the same DN as given in the parameters
      * @throws WSSecurityException
      */
-    private X509Certificate[] getX509CertificatesSubjectDN(String subjectDN) 
+    private X509Certificate[] getX509CertificatesSubjectDN(String subjectDN)
         throws WSSecurityException {
         //
         // Convert the subject DN to a java X500Principal object first. This is to ensure
@@ -411,19 +411,19 @@ public class CertificateStore extends CryptoBase {
         } catch (java.lang.IllegalArgumentException ex) {
             subject = createBCX509Name(subjectDN);
         }
-        
+
         if (trustedCerts != null) {
             for (X509Certificate trustedCert : trustedCerts) {
                 X500Principal foundRDN = trustedCert.getSubjectX500Principal();
                 Object certName = createBCX509Name(foundRDN.getName());
-    
+
                 if (subject.equals(certName)) {
                     return new X509Certificate[]{trustedCert};
                 }
             }
         }
-        
+
         return null;
     }
-    
+
 }

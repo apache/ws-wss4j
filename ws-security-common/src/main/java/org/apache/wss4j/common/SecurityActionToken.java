@@ -28,17 +28,17 @@ import org.apache.wss4j.common.ext.WSSecurityException;
  * This interface encapsulates configuration for Actions. This allows a user to use specific keys
  * for different actions, rather than to use the generic keys etc. configured on the request.
  */
-public interface SecurityActionToken {  
+public interface SecurityActionToken {
 
     String getUser();
-    
+
     byte[] getKey();
-    
+
     X509Certificate getCertificate();
-    
+
     Crypto getCrypto() throws WSSecurityException;
-    
+
     String getCryptoProperties();
-    
+
 }
 

@@ -29,12 +29,12 @@ import org.apache.xml.security.utils.Base64;
 /**
  * This is a test for WSS-300 - "SubjectKeyIdentifier (SKI) incorrectly calculated for 2048-bit RSA key".
  * The SKI value WSS4J generates for various key sizes is tested against the output from openssl, e.g.:
- * 
- * openssl x509 -inform der -ocspid -in wss40_server.crt | grep 'Public key OCSP hash' 
+ *
+ * openssl x509 -inform der -ocspid -in wss40_server.crt | grep 'Public key OCSP hash'
  * | perl -ne 'split; print pack("H*",$_[4])' | base64
  */
 public class SKITest extends org.junit.Assert {
-    
+
     @org.junit.Test
     public void testRSA1024() throws Exception {
         // Load the keystore
@@ -44,17 +44,17 @@ public class SKITest extends org.junit.Assert {
         InputStream input = Merlin.loadInputStream(loader, "keys/wss40_server.jks");
         keyStore.load(input, "security".toCharArray());
         ((Merlin)crypto).setKeyStore(keyStore);
-        
+
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("wss40_server");
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         assertTrue(certs != null && certs.length > 0);
-        
+
         byte[] skiBytes = crypto.getSKIBytesFromCert(certs[0]);
         String knownBase64Encoding = "VPWiTCLlm0OwNWTwrnRTUF3qcIk=";
         assertTrue(knownBase64Encoding.equals(Base64.encode(skiBytes)));
     }
-    
+
     @org.junit.Test
     public void testRSA2048() throws Exception {
         // Load the keystore
@@ -64,17 +64,17 @@ public class SKITest extends org.junit.Assert {
         InputStream input = Merlin.loadInputStream(loader, "keys/rsa2048.jks");
         keyStore.load(input, "password".toCharArray());
         ((Merlin)crypto).setKeyStore(keyStore);
-        
+
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("test");
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         assertTrue(certs != null && certs.length > 0);
-        
+
         byte[] skiBytes = crypto.getSKIBytesFromCert(certs[0]);
         String knownBase64Encoding = "tgkZUMZ461ZSA1nZkBu6E5GDxLM=";
         assertTrue(knownBase64Encoding.equals(Base64.encode(skiBytes)));
     }
-    
+
     @org.junit.Test
     public void testBouncyCastlePKCS12() throws Exception {
         // Load the keystore

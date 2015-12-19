@@ -27,10 +27,10 @@ import org.apache.wss4j.dom.handler.RequestData;
  * This class does not do any Validation at all.
  */
 public class NoOpValidator implements Validator {
-    
+
     /**
-     * Validate the credential argument. 
-     * 
+     * Validate the credential argument.
+     *
      * @param credential the Credential to be validated
      * @param data the RequestData associated with the request
      * @throws WSSecurityException on a failed validation
@@ -38,5 +38,5 @@ public class NoOpValidator implements Validator {
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         return credential;
     }
-    
+
 }

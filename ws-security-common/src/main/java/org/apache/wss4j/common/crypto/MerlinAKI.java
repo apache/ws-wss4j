@@ -54,35 +54,35 @@ import org.apache.wss4j.common.ext.WSSecurityException;
  * issuer DN.
  */
 public class MerlinAKI extends Merlin {
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(MerlinAKI.class);
-    
+
     public MerlinAKI() {
         super();
     }
-    
+
     public MerlinAKI(boolean loadCACerts, String cacertsPasswd) {
         super(loadCACerts, cacertsPasswd);
     }
-    
-    public MerlinAKI(Properties properties, ClassLoader loader, PasswordEncryptor passwordEncryptor) 
+
+    public MerlinAKI(Properties properties, ClassLoader loader, PasswordEncryptor passwordEncryptor)
         throws WSSecurityException, IOException {
         super(properties, loader, passwordEncryptor);
     }
-    
+
     /**
      * Evaluate whether a given certificate chain should be trusted.
      *
      * @param certs Certificate chain to validate
      * @param enableRevocation whether to enable CRL verification or not
      * @param subjectCertConstraints A set of constraints on the Subject DN of the certificates
-     * 
+     *
      * @throws WSSecurityException if the certificate chain is invalid
      */
     @Override
     public void verifyTrust(
-        X509Certificate[] certs, 
+        X509Certificate[] certs,
         boolean enableRevocation,
         Collection<Pattern> subjectCertConstraints
     ) throws WSSecurityException {
@@ -92,11 +92,11 @@ public class MerlinAKI extends Merlin {
         if (certs.length == 1 && !enableRevocation) {
             String issuerString = certs[0].getIssuerX500Principal().getName();
             BigInteger issuerSerial = certs[0].getSerialNumber();
-            
+
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ISSUER_SERIAL);
             cryptoType.setIssuerSerial(issuerString, issuerSerial);
             X509Certificate[] foundCerts = getX509Certificates(cryptoType);
-    
+
             //
             // If a certificate has been found, the certificates must be compared
             // to ensure against phony DNs (compare encoded form including signature)
@@ -117,26 +117,26 @@ public class MerlinAKI extends Merlin {
                 return;
             }
         }
-        
+
         //
-        // SECOND step - Search for the issuer cert (chain) of the transmitted certificate in the 
+        // SECOND step - Search for the issuer cert (chain) of the transmitted certificate in the
         // keystore or the truststore
         //
         X509Certificate[] x509certs = certs;
         String issuerString = certs[0].getIssuerX500Principal().getName();
         try {
             if (certs.length == 1) {
-                byte[] keyIdentifierBytes = 
+                byte[] keyIdentifierBytes =
                     BouncyCastleUtils.getAuthorityKeyIdentifierBytes(certs[0]);
                 X509Certificate[] foundCerts = getX509CertificatesFromKeyIdentifier(keyIdentifierBytes);
-        
+
                 // If the certs have not been found, the issuer is not in the keystore/truststore
                 // As a direct result, do not trust the transmitted certificate
                 if (foundCerts == null || foundCerts.length < 1) {
                     String subjectString = certs[0].getSubjectX500Principal().getName();
                     if (LOG.isDebugEnabled()) {
                         LOG.debug(
-                            "No certs found in keystore for issuer " + issuerString 
+                            "No certs found in keystore for issuer " + issuerString
                             + " of certificate for " + subjectString
                         );
                     }
@@ -144,7 +144,7 @@ public class MerlinAKI extends Merlin {
                         WSSecurityException.ErrorCode.FAILURE, "certpath", new Object[] {"No trusted certs found"}
                     );
                 }
-                
+
                 //
                 // Form a certificate chain from the transmitted certificate
                 // and the certificate(s) of the issuer from the keystore/truststore
@@ -156,7 +156,7 @@ public class MerlinAKI extends Merlin {
         } catch (NoSuchAlgorithmException | CertificateException ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex, "certpath");
         }
-        
+
         //
         // THIRD step
         // Check the certificate trust path for the issuer cert chain
@@ -166,7 +166,7 @@ public class MerlinAKI extends Merlin {
                 "Preparing to validate certificate path for issuer " + issuerString
             );
         }
-        
+
         try {
             // Generate cert path
             List<X509Certificate> certList = Arrays.asList(x509certs);
@@ -177,10 +177,10 @@ public class MerlinAKI extends Merlin {
                 Enumeration<String> truststoreAliases = truststore.aliases();
                 while (truststoreAliases.hasMoreElements()) {
                     String alias = truststoreAliases.nextElement();
-                    X509Certificate cert = 
+                    X509Certificate cert =
                         (X509Certificate) truststore.getCertificate(alias);
                     if (cert != null) {
-                        TrustAnchor anchor = 
+                        TrustAnchor anchor =
                             new TrustAnchor(cert, cert.getExtensionValue(NAME_CONSTRAINTS_OID));
                         set.add(anchor);
                     }
@@ -196,10 +196,10 @@ public class MerlinAKI extends Merlin {
                 Enumeration<String> aliases = keystore.aliases();
                 while (aliases.hasMoreElements()) {
                     String alias = aliases.nextElement();
-                    X509Certificate cert = 
+                    X509Certificate cert =
                         (X509Certificate) keystore.getCertificate(alias);
                     if (cert != null) {
-                        TrustAnchor anchor = 
+                        TrustAnchor anchor =
                             new TrustAnchor(cert, cert.getExtensionValue(NAME_CONSTRAINTS_OID));
                         set.add(anchor);
                     }
@@ -214,31 +214,31 @@ public class MerlinAKI extends Merlin {
             } else {
                 validator = CertPathValidator.getInstance("PKIX", provider);
             }
-            
+
             PKIXParameters param = createPKIXParameters(set, enableRevocation);
             validator.validate(path, param);
-        } catch (NoSuchProviderException | NoSuchAlgorithmException 
+        } catch (NoSuchProviderException | NoSuchAlgorithmException
             | CertificateException | InvalidAlgorithmParameterException
-            | java.security.cert.CertPathValidatorException 
+            | java.security.cert.CertPathValidatorException
             | KeyStoreException e) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE, e, "certpath"
                 );
         }
-        
+
         // Finally check Cert Constraints
         if (!matches(certs[0], subjectCertConstraints)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
     }
-    
+
     private X509Certificate[] getX509CertificatesFromKeyIdentifier(
         byte[] keyIdentifierBytes
     ) throws WSSecurityException, NoSuchAlgorithmException, CertificateEncodingException {
         if (keyIdentifierBytes == null) {
             return null;
         }
-        
+
         Certificate[] certs = null;
         if (keystore != null) {
             certs = getCertificates(keyIdentifierBytes, keystore);
@@ -248,16 +248,16 @@ public class MerlinAKI extends Merlin {
         if ((certs == null || certs.length == 0) && truststore != null) {
             certs = getCertificates(keyIdentifierBytes, truststore);
         }
-        
+
         if (certs == null || certs.length == 0) {
             return null;
         }
-        
+
         return Arrays.copyOf(certs, certs.length, X509Certificate[].class);
     }
 
     private Certificate[] getCertificates(
-        byte[] keyIdentifier, 
+        byte[] keyIdentifier,
         KeyStore store
     ) throws WSSecurityException, NoSuchAlgorithmException, CertificateEncodingException {
         try {
@@ -271,11 +271,11 @@ public class MerlinAKI extends Merlin {
                         certs = new Certificate[]{cert};
                     }
                 }
-                
+
                 if (certs != null && certs.length > 0 && certs[0] instanceof X509Certificate) {
-                    byte[] subjectKeyIdentifier = 
+                    byte[] subjectKeyIdentifier =
                         BouncyCastleUtils.getSubjectKeyIdentifierBytes((X509Certificate)certs[0]);
-                    if (subjectKeyIdentifier != null 
+                    if (subjectKeyIdentifier != null
                         && Arrays.equals(subjectKeyIdentifier, keyIdentifier)) {
                         return certs;
                     }
@@ -288,5 +288,5 @@ public class MerlinAKI extends Merlin {
         }
         return new Certificate[]{};
     }
-    
+
 }

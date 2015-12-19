@@ -73,7 +73,7 @@ public class TimestampValidatorImpl implements TimestampValidator {
             int ttl = tokenContext.getWssSecurityProperties().getTimestampTTL();
             int futureTTL = tokenContext.getWssSecurityProperties().getTimeStampFutureTTL();
 
-            if (expiresDate != null && tokenContext.getWssSecurityProperties().isStrictTimestampCheck() 
+            if (expiresDate != null && tokenContext.getWssSecurityProperties().isStrictTimestampCheck()
                 && expiresDate.before(rightNow)) {
                 log.debug("Time now: " + WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED, "invalidTimestamp",
@@ -90,5 +90,5 @@ public class TimestampValidatorImpl implements TimestampValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
         }
     }
-    
+
 }

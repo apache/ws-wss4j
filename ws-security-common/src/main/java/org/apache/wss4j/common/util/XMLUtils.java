@@ -44,15 +44,15 @@ import org.w3c.dom.Text;
 import org.xml.sax.InputSource;
 
 public final class XMLUtils {
-    
+
     public static final String XMLNS_NS = "http://www.w3.org/2000/xmlns/";
     public static final String XML_NS = "http://www.w3.org/XML/1998/namespace";
-    public static final String WSU_NS = 
+    public static final String WSU_NS =
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(XMLUtils.class);
-    
+
     private XMLUtils() {
         // complete
     }
@@ -81,7 +81,7 @@ public final class XMLUtils {
         }
         return null;
     }
-    
+
     /**
      * Return the text content of an Element, or null if no such text content exists
      */
@@ -100,7 +100,7 @@ public final class XMLUtils {
                 }
                 node = node.getNextSibling();
             }
-            
+
             if (!found) {
                 return null;
             }
@@ -108,7 +108,7 @@ public final class XMLUtils {
         }
         return null;
     }
-    
+
     public static String getNamespace(String prefix, Node e) {
         while (e != null && e.getNodeType() == Node.ELEMENT_NODE) {
             Attr attr = null;
@@ -124,7 +124,7 @@ public final class XMLUtils {
         }
         return null;
     }
-    
+
     public static String PrettyDocumentToString(Document doc) throws IOException, TransformerException {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             ElementToStream(doc.getDocumentElement(), baos);
@@ -132,7 +132,7 @@ public final class XMLUtils {
         }
     }
 
-    public static void ElementToStream(Element element, OutputStream out) 
+    public static void ElementToStream(Element element, OutputStream out)
         throws TransformerException {
         DOMSource source = new DOMSource(element);
         StreamResult result = new StreamResult(out);
@@ -183,13 +183,13 @@ public final class XMLUtils {
     public static InputSource getInputSourceFromURI(String uri) {
         return new InputSource(uri);
     }
-    
+
     /**
      * Set a namespace/prefix on an element if it is not set already. First off, it
      * searches for the element for the prefix associated with the specified
      * namespace. If the prefix isn't null, then this is returned. Otherwise, it
      * creates a new attribute using the namespace/prefix passed as parameters.
-     * 
+     *
      * @param element
      * @param namespace
      * @param prefix
@@ -218,10 +218,10 @@ public final class XMLUtils {
         }
         return null;
     }
-    
+
     /**
      * Turn a reference (eg "#5") into an ID (eg "5").
-     * 
+     *
      * @param ref
      * @return ref trimmed and with the leading "#" removed, or null if not
      *         correctly formed
@@ -239,20 +239,20 @@ public final class XMLUtils {
         }
         return id;
     }
-    
+
     /**
      * Returns the single element that contains an Id with value
      * <code>uri</code> and <code>namespace</code>. The Id can be either a wsu:Id or an Id
-     * with no namespace. This is a replacement for a XPath Id lookup with the given namespace. 
+     * with no namespace. This is a replacement for a XPath Id lookup with the given namespace.
      * It's somewhat faster than XPath, and we do not deal with prefixes, just with the real
      * namespace URI
-     * 
-     * If checkMultipleElements is true and there are multiple elements, we LOG.a 
+     *
+     * If checkMultipleElements is true and there are multiple elements, we LOG.a
      * warning and return null as this can be used to get around the signature checking.
-     * 
+     *
      * @param startNode Where to start the search
      * @param value Value of the Id attribute
-     * @param checkMultipleElements If true then go through the entire tree and return 
+     * @param checkMultipleElements If true then go through the entire tree and return
      *        null if there are multiple elements with the same Id
      * @return The found element if there was exactly one match, or
      *         <code>null</code> otherwise
@@ -314,13 +314,13 @@ public final class XMLUtils {
         return foundElement;
     }
 
-    
+
     /**
      * Returns the first element that matches <code>name</code> and
      * <code>namespace</code>. <p/> This is a replacement for a XPath lookup
      * <code>//name</code> with the given namespace. It's somewhat faster than
      * XPath, and we do not deal with prefixes, just with the real namespace URI
-     * 
+     *
      * @param startNode Where to start the search
      * @param name Local name of the element
      * @param namespace Namespace URI of the element
@@ -372,13 +372,13 @@ public final class XMLUtils {
         }
         return null;
     }
-    
+
     /**
-     * Returns all elements that match <code>name</code> and <code>namespace</code>. 
+     * Returns all elements that match <code>name</code> and <code>namespace</code>.
      * <p/> This is a replacement for a XPath lookup
      * <code>//name</code> with the given namespace. It's somewhat faster than
      * XPath, and we do not deal with prefixes, just with the real namespace URI
-     * 
+     *
      * @param startNode Where to start the search
      * @param name Local name of the element
      * @param namespace Namespace URI of the element
@@ -431,11 +431,11 @@ public final class XMLUtils {
         }
         return foundNodes;
     }
-    
+
     /**
      * Returns the single SAMLAssertion element that contains an AssertionID/ID that
      * matches the supplied parameter.
-     * 
+     *
      * @param startNode Where to start the search
      * @param value Value of the AssertionID/ID attribute
      * @return The found element if there was exactly one match, or
@@ -459,7 +459,7 @@ public final class XMLUtils {
             if (startNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element se = (Element) startNode;
                 if (se.hasAttributeNS(null, "ID") && value.equals(se.getAttributeNS(null, "ID"))
-                    || se.hasAttributeNS(null, "AssertionID") 
+                    || se.hasAttributeNS(null, "AssertionID")
                         && value.equals(se.getAttributeNS(null, "AssertionID"))) {
                     if (foundElement == null) {
                         foundElement = se; // Continue searching to find duplicates
@@ -491,5 +491,5 @@ public final class XMLUtils {
         }
         return foundElement;
     }
-    
+
 }

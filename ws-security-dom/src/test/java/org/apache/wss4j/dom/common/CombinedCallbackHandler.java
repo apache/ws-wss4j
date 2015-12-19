@@ -28,21 +28,21 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 
 /**
- * A combined Callback Handler implementation which wraps the SecretKeyCallbackHandler and the 
+ * A combined Callback Handler implementation which wraps the SecretKeyCallbackHandler and the
  * KeystoreCallbackHandler.
  */
 public class CombinedCallbackHandler implements CallbackHandler {
-    
+
     private final CallbackHandler secretCallbackHandler;
     private final CallbackHandler keystoreCallbackHandler;
-    
+
     public CombinedCallbackHandler(
         CallbackHandler secretCallbackHandler, CallbackHandler keystoreCallbackHandler
     ) {
         this.secretCallbackHandler = secretCallbackHandler;
         this.keystoreCallbackHandler = keystoreCallbackHandler;
     }
-    
+
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {

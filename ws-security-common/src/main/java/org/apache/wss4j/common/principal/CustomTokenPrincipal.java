@@ -27,13 +27,13 @@ import java.security.Principal;
 public class CustomTokenPrincipal implements Principal, Serializable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -7439821246832337774L;
     private Element tokenElement;
     private String name;
     private Object tokenObject;
-    
+
     public Object getTokenObject() {
         return tokenObject;
     }
@@ -45,7 +45,7 @@ public class CustomTokenPrincipal implements Principal, Serializable {
     public CustomTokenPrincipal(String name) {
         this.name = name;
     }
-    
+
     public String getName() {
         return this.name;
     }
@@ -57,5 +57,5 @@ public class CustomTokenPrincipal implements Principal, Serializable {
     public void setTokenElement(Element tokenElement) {
         this.tokenElement = tokenElement;
     }
-    
+
 }

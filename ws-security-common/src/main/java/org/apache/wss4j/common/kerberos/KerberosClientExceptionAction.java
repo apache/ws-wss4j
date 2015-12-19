@@ -53,7 +53,7 @@ public class KerberosClientExceptionAction implements PrivilegedExceptionAction<
 
     private static final String JGSS_KERBEROS_TICKET_OID = "1.2.840.113554.1.2.2";
     private static final String JGSS_SPNEGO_TICKET_OID = "1.3.6.1.5.5.2";
-    
+
     private Principal clientPrincipal;
     private String serviceName;
     private boolean isUsernameServiceNameForm;
@@ -62,13 +62,13 @@ public class KerberosClientExceptionAction implements PrivilegedExceptionAction<
     private boolean spnego;
     private boolean mutualAuth;
 
-    public KerberosClientExceptionAction(Principal clientPrincipal, String serviceName, 
+    public KerberosClientExceptionAction(Principal clientPrincipal, String serviceName,
                                          boolean isUsernameServiceNameForm, boolean requestCredDeleg) {
-        this(clientPrincipal, serviceName, isUsernameServiceNameForm, 
+        this(clientPrincipal, serviceName, isUsernameServiceNameForm,
              requestCredDeleg, null, false, false);
     }
-    
-    public KerberosClientExceptionAction(Principal clientPrincipal, String serviceName, 
+
+    public KerberosClientExceptionAction(Principal clientPrincipal, String serviceName,
                                          boolean isUsernameServiceNameForm, boolean requestCredDeleg,
                                          GSSCredential delegatedCredential,
                                          boolean spnego, boolean mutualAuth) {
@@ -80,11 +80,11 @@ public class KerberosClientExceptionAction implements PrivilegedExceptionAction<
         this.spnego = spnego;
         this.mutualAuth = mutualAuth;
     }
-    
+
     public KerberosContext run() throws GSSException, WSSecurityException {
         GSSManager gssManager = GSSManager.getInstance();
 
-        GSSName gssService = gssManager.createName(serviceName, isUsernameServiceNameForm 
+        GSSName gssService = gssManager.createName(serviceName, isUsernameServiceNameForm
                                                    ? GSSName.NT_USER_NAME : GSSName.NT_HOSTBASED_SERVICE);
         Oid oid = null;
         GSSCredential credentials = delegatedCredential;
@@ -92,10 +92,10 @@ public class KerberosClientExceptionAction implements PrivilegedExceptionAction<
             oid = new Oid(JGSS_SPNEGO_TICKET_OID);
         } else {
             oid = new Oid(JGSS_KERBEROS_TICKET_OID);
-            
+
             if (credentials == null) {
                 GSSName gssClient = gssManager.createName(clientPrincipal.getName(), GSSName.NT_USER_NAME);
-                credentials = 
+                credentials =
                     gssManager.createCredential(
                         gssClient, GSSCredential.DEFAULT_LIFETIME, oid, GSSCredential.INITIATE_ONLY
                     );

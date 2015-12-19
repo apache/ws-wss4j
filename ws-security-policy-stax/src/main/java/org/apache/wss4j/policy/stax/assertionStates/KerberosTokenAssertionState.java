@@ -43,7 +43,7 @@ public class KerberosTokenAssertionState extends TokenAssertionState {
     public KerberosTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted,
                                        PolicyAsserter policyAsserter, boolean initiator) {
         super(assertion, asserted, policyAsserter, initiator);
-        
+
         if (asserted) {
             KerberosToken token = (KerberosToken) getAssertion();
             String namespace = token.getName().getNamespaceURI();
@@ -80,7 +80,7 @@ public class KerberosTokenAssertionState extends TokenAssertionState {
             getPolicyAsserter().unassertPolicy(getAssertion(), getErrorMessage());
             return false;
         }
-        
+
         String namespace = getAssertion().getName().getNamespaceURI();
         if (kerberosToken.isRequireKeyIdentifierReference()) {
             if (!WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef.equals(kerberosServiceSecurityToken.getKeyIdentifier())) {

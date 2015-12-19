@@ -39,12 +39,12 @@ import org.w3c.dom.Text;
  * Utility class exposing the dereferencing LOG.c of the {@link STRTransform} implementation.
  */
 public final class STRTransformUtil {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(STRTransformUtil.class);
-    
+
     /**
      * Retrieves the element representing the referenced content of a STR.
-     * 
+     *
      * @return the element representing the referenced content. The element is either
      *         extracted from {@code doc} or a new element is created in the
      *         case of a key identifier or issuer serial STR.  {@code null} if
@@ -68,7 +68,7 @@ public final class STRTransformUtil {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("STR: Reference");
             }
-            
+
             Reference reference = secRef.getReference();
             return STRParserUtil.getTokenElement(doc, wsDocInfo, null, reference.getURI(), reference.getValueType());
         }
@@ -80,7 +80,7 @@ public final class STRTransformUtil {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("STR: IssuerSerial");
             }
-            X509Certificate[] certs = 
+            X509Certificate[] certs =
                 secRef.getX509IssuerSerial(wsDocInfo.getCrypto());
             if (certs == null || certs.length == 0 || certs[0] == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
@@ -98,7 +98,7 @@ public final class STRTransformUtil {
             }
             if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
-                return STRParserUtil.getTokenElement(doc, wsDocInfo, null, secRef.getKeyIdentifierValue(), 
+                return STRParserUtil.getTokenElement(doc, wsDocInfo, null, secRef.getKeyIdentifierValue(),
                                                      secRef.getKeyIdentifierValueType());
             } else {
                 X509Certificate[] certs = secRef.getKeyIdentifier(wsDocInfo.getCrypto());
@@ -110,14 +110,14 @@ public final class STRTransformUtil {
         }
         return null;
     }
-    
-    public static Element createBSTX509(Document doc, X509Certificate cert, Element secRefE) 
+
+    public static Element createBSTX509(Document doc, X509Certificate cert, Element secRefE)
         throws WSSecurityException {
         return createBSTX509(doc, cert, secRefE, null);
     }
-    
-    public static Element createBSTX509(Document doc, X509Certificate cert, Element secRefE, 
-                                        String secRefEncType) 
+
+    public static Element createBSTX509(Document doc, X509Certificate cert, Element secRefE,
+                                        String secRefEncType)
         throws WSSecurityException {
         byte data[];
         try {
@@ -142,11 +142,11 @@ public final class STRTransformUtil {
         elem.appendChild(certText);
         return elem;
     }
-    
+
     /**
      * Hidden in utility class.
      */
-    private STRTransformUtil() {   
+    private STRTransformUtil() {
     }
-    
+
 }

@@ -49,9 +49,9 @@ import javax.xml.namespace.QName;
 public class BinarySecurity {
     public static final QName TOKEN_BST = new QName(WSS4JConstants.WSSE_NS, "BinarySecurityToken");
     public static final QName TOKEN_KI = new QName(WSS4JConstants.WSSE_NS, "KeyIdentifier");
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(BinarySecurity.class);
-    
+
     private Element element;
     private byte[] data;
     private boolean storeBytesInAttachment;
@@ -76,18 +76,18 @@ public class BinarySecurity {
         QName el = new QName(element.getNamespaceURI(), element.getLocalName());
         if (!(el.equals(TOKEN_BST) || el.equals(TOKEN_KI))) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
+                WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
                 "unhandledToken", new Object[] {el});
         }
         String encoding = getEncodingType();
         if (encoding == null || "".equals(encoding)) {
             bspEnforcer.handleBSPRule(BSPRule.R3029);
         }
-        
+
         if (!WSS4JConstants.BASE64_ENCODING.equals(encoding)) {
             bspEnforcer.handleBSPRule(BSPRule.R3030);
         }
-        
+
         String valueType = getValueType();
         if (valueType == null || "".equals(valueType)) {
             bspEnforcer.handleBSPRule(BSPRule.R3031);
@@ -96,14 +96,14 @@ public class BinarySecurity {
 
     /**
      * Constructor.
-     * 
-     * @param doc 
+     *
+     * @param doc
      */
     public BinarySecurity(Document doc) {
         element = doc.createElementNS(WSS4JConstants.WSSE_NS, "wsse:BinarySecurityToken");
         setEncodingType(WSS4JConstants.BASE64_ENCODING);
     }
-    
+
     /**
      * Create a BinarySecurityToken via a CallbackHandler
      * @param callbackHandler
@@ -129,7 +129,7 @@ public class BinarySecurity {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
         }
     }
-    
+
     /**
      * Add the WSSE Namespace to this BST. The namespace is not added by default for
      * efficiency purposes.
@@ -137,7 +137,7 @@ public class BinarySecurity {
     public void addWSSENamespace() {
         XMLUtils.setNamespace(element, WSS4JConstants.WSSE_NS, WSS4JConstants.WSSE_PREFIX);
     }
-    
+
     /**
      * Add the WSU Namespace to this BST. The namespace is not added by default for
      * efficiency purposes.
@@ -148,7 +148,7 @@ public class BinarySecurity {
 
     /**
      * get the value type.
-     * 
+     *
      * @return the value type
      */
     public String getValueType() {
@@ -157,8 +157,8 @@ public class BinarySecurity {
 
     /**
      * set the value type.
-     * 
-     * @param type 
+     *
+     * @param type
      */
     public void setValueType(String type) {
         if (type != null) {
@@ -168,7 +168,7 @@ public class BinarySecurity {
 
     /**
      * get the encoding type.
-     * 
+     *
      * @return the encoding type.
      */
     public String getEncodingType() {
@@ -177,8 +177,8 @@ public class BinarySecurity {
 
     /**
      * set the encoding type.
-     * 
-     * @param encoding 
+     *
+     * @param encoding
      */
     public void setEncodingType(String encoding) {
         if (encoding != null) {
@@ -188,7 +188,7 @@ public class BinarySecurity {
 
     /**
      * get the byte array containing token information.
-     * 
+     *
      * @return the byte array containing token information
      */
     public byte[] getToken() {
@@ -200,7 +200,7 @@ public class BinarySecurity {
             if (text == null) {
                 return null;
             }
-            
+
             return Base64.decode(text);
         } catch (Exception ex) {
             if (LOG.isDebugEnabled()) {
@@ -212,8 +212,8 @@ public class BinarySecurity {
 
     /**
      * set the token information.
-     * 
-     * @param data 
+     *
+     * @param data
      */
     public void setToken(byte[] data) throws WSSecurityException {
         if (data == null) {
@@ -222,18 +222,18 @@ public class BinarySecurity {
         if (storeBytesInAttachment && attachmentCallbackHandler != null) {
             Document document = element.getOwnerDocument();
             final String attachmentId = "_" + UUID.randomUUID().toString();
-            
+
             element.setAttributeNS(XMLUtils.XMLNS_NS, "xmlns:xop", WSS4JConstants.XOP_NS);
             Element xopInclude =
                 document.createElementNS(WSS4JConstants.XOP_NS, "xop:Include");
             xopInclude.setAttributeNS(null, "href", "cid:" + attachmentId);
             element.appendChild(xopInclude);
-            
+
             Attachment resultAttachment = new Attachment();
             resultAttachment.setId(attachmentId);
             resultAttachment.setMimeType("application/ciphervalue");
             resultAttachment.setSourceStream(new ByteArrayInputStream(data));
-            
+
             AttachmentResultCallback attachmentResultCallback = new AttachmentResultCallback();
             attachmentResultCallback.setAttachmentId(attachmentId);
             attachmentResultCallback.setAttachment(resultAttachment);
@@ -248,14 +248,14 @@ public class BinarySecurity {
             setRawToken(data);
         }
     }
-    
+
     /**
      * Set the raw token data, without Base-64 encoding it into the Element.
      */
     public void setRawToken(byte[] data) {
         this.data = Arrays.copyOf(data, data.length);
     }
-    
+
     /**
      * BASE64-Encode the raw token bytes + store them in a text child node.
      */
@@ -269,7 +269,7 @@ public class BinarySecurity {
 
     /**
      * return the first text node.
-     * 
+     *
      * @return the first text node.
      */
     private Text getFirstNode() {
@@ -280,7 +280,7 @@ public class BinarySecurity {
         if (node instanceof Text) {
             return (Text)node;
         }
-        
+
         // Otherwise we have no Text child. Just remove the child nodes + add a new text node
         node = element.getFirstChild();
         while (node != null) {
@@ -288,14 +288,14 @@ public class BinarySecurity {
             element.removeChild(node);
             node = nextNode;
         }
-        
+
         Node textNode = element.getOwnerDocument().createTextNode("");
         return (Text)element.appendChild(textNode);
     }
 
     /**
      * return the dom element.
-     * 
+     *
      * @return the dom element.
      */
     public Element getElement() {
@@ -304,7 +304,7 @@ public class BinarySecurity {
 
     /**
      * get the id.
-     * 
+     *
      * @return the WSU ID of this element
      */
     public String getID() {
@@ -313,8 +313,8 @@ public class BinarySecurity {
 
     /**
      * set the id.
-     * 
-     * @param id 
+     *
+     * @param id
      */
     public void setID(String id) {
         element.setAttributeNS(WSS4JConstants.WSU_NS, WSS4JConstants.WSU_PREFIX + ":Id", id);
@@ -322,13 +322,13 @@ public class BinarySecurity {
 
     /**
      * return the string representation of the token.
-     * 
+     *
      * @return the string representation of the token.
      */
     public String toString() {
         return DOM2Writer.nodeToString(element);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -338,17 +338,17 @@ public class BinarySecurity {
         }
         result = 31 * result + getValueType().hashCode();
         result = 31 * result + getEncodingType().hashCode();
-        
+
         return result;
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (!(object instanceof BinarySecurity)) {
             return false;
         }
         BinarySecurity binarySecurity = (BinarySecurity)object;
-        
+
         byte[] token = binarySecurity.getToken();
         if (!Arrays.equals(token, getToken())) {
             return false;

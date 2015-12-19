@@ -32,28 +32,28 @@ import org.w3c.dom.Element;
  */
 public class WSSecSAMLToken extends WSSecBase {
 
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSecSAMLToken.class);
-    
+
     private Document document;
-    
+
     private SamlAssertionWrapper saml;
-    
+
     private Element samlElement;
 
     public WSSecSAMLToken() {
         super();
     }
-    
+
     /**
      * Creates a SAML token.
-     * 
+     *
      * The method prepares and initializes a WSSec UsernameToken structure after
      * the relevant information was set. A Before calling
      * <code>prepare()</code> all parameters such as user, password,
      * passwordType etc. must be set. A complete <code>UsernameToken</code> is
      * constructed.
-     * 
+     *
      * @param doc
      *            The SOAP envelope as W3C document
      */
@@ -65,11 +65,11 @@ public class WSSecSAMLToken extends WSSecBase {
     /**
      * Prepends the SAML Assertion to the elements already in the
      * Security header.
-     * 
+     *
      * The method can be called any time after <code>prepare()</code>.
      * This allows to insert the SAML assertion at any position in the
      * Security header.
-     * 
+     *
      * @param secHeader
      *            The security header that holds the Signature element.
      */
@@ -83,7 +83,7 @@ public class WSSecSAMLToken extends WSSecBase {
             throw new RuntimeException(ex.toString(), ex);
         }
     }
-    
+
     public Element getElement() throws WSSecurityException {
         if (samlElement != null) {
             return samlElement;
@@ -94,12 +94,12 @@ public class WSSecSAMLToken extends WSSecBase {
         samlElement = saml.toDOM(document);
         return samlElement;
     }
-    
+
     /**
      * Get the id generated during <code>prepare()</code>.
-     * 
-     * Returns the the value of wsu:Id attribute of this Timestamp. 
-     * 
+     *
+     * Returns the the value of wsu:Id attribute of this Timestamp.
+     *
      * @return Return the wsu:Id of this token or null if <code>prepareToken()</code>
      * was not called before.
      */
@@ -109,7 +109,7 @@ public class WSSecSAMLToken extends WSSecBase {
         }
         return saml.getId();
     }
-    
+
     /**
      * Adds a new <code>SAMLAssertion</code> to a soap envelope.
      * <p/>
@@ -122,10 +122,10 @@ public class WSSecSAMLToken extends WSSecBase {
      */
     public Document build(Document doc, SamlAssertionWrapper samlAssertion, WSSecHeader secHeader) {
         LOG.debug("Begin add SAMLAssertion token...");
-        
+
         prepare(doc, samlAssertion);
         prependToHeader(secHeader);
-        
+
         return doc;
     }
 }

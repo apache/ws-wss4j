@@ -60,16 +60,16 @@ import org.w3c.dom.Element;
 /**
  */
 public class SamlTokenCustomSignatureTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SamlTokenCustomSignatureTest.class);
-    
+
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public SamlTokenCustomSignatureTest() throws Exception {
         WSSConfig.init();
         crypto = CryptoFactory.getInstance("crypto.properties");
@@ -84,38 +84,38 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_BEARER);
         callbackHandler.setIssuer("www.example.com");
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         Element assertionElement = samlAssertion.toDOM(doc);
-        
+
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         secHeader.getSecurityHeader().appendChild(assertionElement);
-        
+
         // Sign
         signAssertion(doc, assertionElement);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authn Assertion (Bearer):");
             String outputString = XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         try {
             verify(doc);
             fail("Failure expected on a signature that doesn't conform with the signature profile");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
-        
+
         // This should pass as we are disabling signature profile validation in the Validator
         verifyWithoutProfile(doc);
     }
-    
+
     /**
      * Test that creates, sends and processes a signed SAML 2.0 authentication assertion.
      */
@@ -125,56 +125,56 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
         callbackHandler.setIssuer("www.example.com");
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         Element assertionElement = samlAssertion.toDOM(doc);
-        
+
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         secHeader.getSecurityHeader().appendChild(assertionElement);
-        
+
         // Sign
         signAssertion(doc, assertionElement);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2.0 Authn Assertion (Bearer):");
             String outputString = XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         try {
             verify(doc);
             fail("Failure expected on a signature that doesn't conform with the signature profile");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
-        
+
         // This should pass as we are disabling signature profile validation in the Validator
         verifyWithoutProfile(doc);
     }
-    
+
     @org.junit.Test
     public void testAddSAML1AndSign() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_SENDER_VOUCHES);
         callbackHandler.setIssuer("www.example.com");
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         Element assertionElement = samlAssertion.toDOM(doc);
-        
+
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         secHeader.getSecurityHeader().appendChild(assertionElement);
-        
+
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
@@ -186,67 +186,67 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
                 "Element");
         encP.setRequired(false);
         sign.getParts().add(encP);
-        
+
         Document signedDoc = sign.build(doc, crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         verify(signedDoc);
     }
-    
+
     @org.junit.Test
     public void testAddSAML1AndSignAction() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_SENDER_VOUCHES);
         callbackHandler.setIssuer("www.example.com");
-        
+
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("16c73ab6-b892-458f-abf5-2f875f74882e");
-        
+
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "crypto.properties");
         config.put("password", "security");
         config.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
         config.put(
-            WSHandlerConstants.SIGNATURE_PARTS, 
+            WSHandlerConstants.SIGNATURE_PARTS,
             "{Element}{urn:oasis:names:tc:SAML:1.0:assertion}Assertion"
         );
         config.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
         reqData.setMsgContext(config);
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
-        
+
         List<HandlerAction> actions = new ArrayList<>();
         HandlerAction action = new HandlerAction(WSConstants.ST_UNSIGNED);
         actions.add(action);
         action = new HandlerAction(WSConstants.SIGN);
         actions.add(action);
-        
+
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             actions,
             true
         );
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message:");
             LOG.debug(outputString);
         }
-        
+
         verify(doc);
     }
-    
+
     private void signAssertion(Document doc, Element assertionElement) throws Exception {
-        XMLSignature sig = 
+        XMLSignature sig =
             new XMLSignature(doc, null, XMLSignature.ALGO_ID_SIGNATURE_RSA);
         assertionElement.appendChild(sig.getElement());
 
@@ -254,7 +254,7 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
         String filter = "here()/ancestor::ds.Signature/parent::node()/descendant-or-self::*";
         XPath2FilterContainer xpathC = XPath2FilterContainer.newInstanceIntersect(doc, filter);
         xpathC.setXPathNamespaceContext("dsig-xpath", Transforms.TRANSFORM_XPATH2FILTER);
-        
+
         Element node = xpathC.getElement();
         transforms.addTransform(Transforms.TRANSFORM_XPATH2FILTER, node);
         sig.addDocument("", transforms, Constants.ALGO_ID_DIGEST_SHA1);
@@ -262,17 +262,17 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
         PrivateKey privateKey = crypto.getPrivateKey("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
         sig.sign(privateKey);
-        
+
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("16c73ab6-b892-458f-abf5-2f875f74882e");
         X509Certificate cert = crypto.getX509Certificates(cryptoType)[0];
         sig.addKeyInfo(cert);
         sig.checkSignatureValue(cert);
     }
-    
+
     /**
      * Verifies the soap envelope
-     * 
+     *
      * @param doc
      * @throws Exception Thrown when there is a problem in verification
      */
@@ -282,7 +282,7 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
         requestData.setDecCrypto(crypto);
         requestData.setSigVerCrypto(crypto);
         requestData.setValidateSamlSubjectConfirmation(false);
-        
+
         WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
         String outputString = XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
@@ -292,13 +292,13 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
     private WSHandlerResult verifyWithoutProfile(Document doc) throws Exception {
         SamlAssertionValidator validator = new SamlAssertionValidator();
         validator.setValidateSignatureAgainstProfile(false);
-        
+
         WSSecurityEngine secEngine = new WSSecurityEngine();
         WSSConfig config = secEngine.getWssConfig();
         config.setValidator(WSConstants.SAML_TOKEN, validator);
         config.setValidator(WSConstants.SAML2_TOKEN, validator);
-        
-        WSHandlerResult results = 
+
+        WSHandlerResult results =
             secEngine.processSecurityHeader(
                 doc, null, null, crypto
             );

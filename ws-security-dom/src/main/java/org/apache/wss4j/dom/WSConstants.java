@@ -28,147 +28,147 @@ import org.apache.wss4j.common.derivedKey.ConversationConstants;
  * Constants in WS-Security spec.
  */
 public final class WSConstants extends WSS4JConstants {
-    
+
     //
     // QNames for the security header elements
     //
-    
+
     /**
      * <code>wsse:BinarySecurityToken</code> as defined by WS Security specification
      */
-    public static final QName BINARY_TOKEN = 
+    public static final QName BINARY_TOKEN =
         new QName(WSConstants.WSSE_NS, WSConstants.BINARY_TOKEN_LN);
     /**
      * <code>wsse:UsernameToken</code> as defined by WS Security specification
      */
-    public static final QName USERNAME_TOKEN = 
+    public static final QName USERNAME_TOKEN =
         new QName(WSConstants.WSSE_NS, WSConstants.USERNAME_TOKEN_LN);
     /**
      * <code>wsu:Timestamp</code> as defined by OASIS WS Security specification,
      */
-    public static final QName TIMESTAMP = 
+    public static final QName TIMESTAMP =
         new QName(WSConstants.WSU_NS, WSConstants.TIMESTAMP_TOKEN_LN);
     /**
      * <code>wsse11:signatureConfirmation</code> as defined by OASIS WS Security specification,
      */
-    public static final QName SIGNATURE_CONFIRMATION = 
+    public static final QName SIGNATURE_CONFIRMATION =
         new QName(WSConstants.WSSE11_NS, WSConstants.SIGNATURE_CONFIRMATION_LN);
     /**
      * <code>ds:Signature</code> as defined by XML Signature specification,
      * enhanced by WS Security specification
      */
-    public static final QName SIGNATURE = 
+    public static final QName SIGNATURE =
         new QName(WSConstants.SIG_NS, WSConstants.SIG_LN);
     /**
      * <code>xenc:EncryptedKey</code> as defined by XML Encryption specification,
      * enhanced by WS Security specification
      */
-    public static final QName ENCRYPTED_KEY = 
+    public static final QName ENCRYPTED_KEY =
         new QName(WSConstants.ENC_NS, WSConstants.ENC_KEY_LN);
     /**
      * <code>xenc:EncryptedData</code> as defined by XML Encryption specification,
      * enhanced by WS Security specification
      */
-    public static final QName ENCRYPTED_DATA = 
+    public static final QName ENCRYPTED_DATA =
         new QName(WSConstants.ENC_NS, WSConstants.ENC_DATA_LN);
     /**
      * <code>xenc:ReferenceList</code> as defined by XML Encryption specification,
      */
-    public static final QName REFERENCE_LIST = 
+    public static final QName REFERENCE_LIST =
         new QName(WSConstants.ENC_NS, WSConstants.REF_LIST_LN);
     /**
      * <code>saml:Assertion</code> as defined by SAML v1.1 specification
      */
-    public static final QName SAML_TOKEN = 
+    public static final QName SAML_TOKEN =
         new QName(WSConstants.SAML_NS, WSConstants.ASSERTION_LN);
-    
+
     /**
      * <code>saml:Assertion</code> as defined by SAML v2.0 specification
      */
-    public static final QName SAML2_TOKEN = 
+    public static final QName SAML2_TOKEN =
         new QName(WSConstants.SAML2_NS, WSConstants.ASSERTION_LN);
-    
+
     /**
      * <code>saml:EncryptedAssertion</code> as defined by SAML v2.0 specification
      */
-    public static final QName ENCRYPTED_ASSERTION = 
+    public static final QName ENCRYPTED_ASSERTION =
         new QName(WSConstants.SAML2_NS, WSConstants.ENCRYPED_ASSERTION_LN);
 
     /**
      * <code>wsc:DerivedKeyToken</code> as defined by WS-SecureConversation specification
      */
-    public static final QName DERIVED_KEY_TOKEN_05_02 = 
+    public static final QName DERIVED_KEY_TOKEN_05_02 =
         new QName(ConversationConstants.WSC_NS_05_02, ConversationConstants.DERIVED_KEY_TOKEN_LN);
 
     /**
      * <code>wsc:SecurityContextToken</code> as defined by WS-SecureConversation specification
      */
-    public static final QName SECURITY_CONTEXT_TOKEN_05_02 = 
+    public static final QName SECURITY_CONTEXT_TOKEN_05_02 =
         new QName(ConversationConstants.WSC_NS_05_02, ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
 
     /**
      * <code>wsc:DerivedKeyToken</code> as defined by WS-SecureConversation specification in WS-SX
      */
-    public static final QName DERIVED_KEY_TOKEN_05_12 = 
+    public static final QName DERIVED_KEY_TOKEN_05_12 =
         new QName(ConversationConstants.WSC_NS_05_12, ConversationConstants.DERIVED_KEY_TOKEN_LN);
 
     /**
-     * <code>wsc:SecurityContextToken</code> as defined by WS-SecureConversation specification in 
+     * <code>wsc:SecurityContextToken</code> as defined by WS-SecureConversation specification in
      * WS-SX
      */
-    public static final QName SECURITY_CONTEXT_TOKEN_05_12 = 
+    public static final QName SECURITY_CONTEXT_TOKEN_05_12 =
         new QName(ConversationConstants.WSC_NS_05_12, ConversationConstants.SECURITY_CONTEXT_TOKEN_LN);
-    
+
     //
     // Fault codes defined in the WSS 1.1 spec under section 12, Error handling
     //
-    
+
     /**
      * An unsupported token was provided
      */
-    public static final QName UNSUPPORTED_SECURITY_TOKEN = 
+    public static final QName UNSUPPORTED_SECURITY_TOKEN =
         new QName(WSSE_NS, "UnsupportedSecurityToken");
-    
+
     /**
      * An unsupported signature or encryption algorithm was used
      */
-    public static final QName UNSUPPORTED_ALGORITHM  = 
+    public static final QName UNSUPPORTED_ALGORITHM  =
         new QName(WSSE_NS, "UnsupportedAlgorithm");
-    
+
     /**
      * An error was discovered processing the <Security> header
      */
-    public static final QName INVALID_SECURITY = 
+    public static final QName INVALID_SECURITY =
         new QName (WSSE_NS, "InvalidSecurity");
-    
+
     /**
      * An invalid security token was provided
      */
-    public static final QName INVALID_SECURITY_TOKEN = 
+    public static final QName INVALID_SECURITY_TOKEN =
         new QName (WSSE_NS, "InvalidSecurityToken");
-    
+
     /**
      * The security token could not be authenticated or authorized
      */
-    public static final QName FAILED_AUTHENTICATION = 
+    public static final QName FAILED_AUTHENTICATION =
         new QName (WSSE_NS, "FailedAuthentication");
-    
+
     /**
      * The signature or decryption was invalid
      */
-    public static final QName FAILED_CHECK = 
+    public static final QName FAILED_CHECK =
         new QName (WSSE_NS, "FailedCheck");
-    
-    /** 
+
+    /**
      * Referenced security token could not be retrieved
      */
-    public static final QName SECURITY_TOKEN_UNAVAILABLE = 
+    public static final QName SECURITY_TOKEN_UNAVAILABLE =
         new QName (WSSE_NS, "SecurityTokenUnavailable");
-    
-    /** 
+
+    /**
      * The message has expired
      */
-    public static final QName MESSAGE_EXPIRED = 
+    public static final QName MESSAGE_EXPIRED =
         new QName (WSSE_NS, "MessageExpired");
 
     /*
@@ -176,8 +176,8 @@ public final class WSConstants extends WSS4JConstants {
      */
 
     /**
-     * Sets the {@link 
-     * org.apache.wss4j.dom.message.WSSecSignature#build(Document, Crypto, WSSecHeader) 
+     * Sets the {@link
+     * org.apache.wss4j.dom.message.WSSecSignature#build(Document, Crypto, WSSecHeader)
      * } method to send the signing certificate as a <code>BinarySecurityToken</code>.
      * <p/>
      * The signing method takes the signing certificate, converts it to a
@@ -196,9 +196,9 @@ public final class WSConstants extends WSS4JConstants {
     public static final int BST_DIRECT_REFERENCE = 1;
 
     /**
-     * Sets the {@link 
+     * Sets the {@link
      * org.apache.wss4j.dom.message.WSSecSignature#build(Document, Crypto, WSSecHeader)
-     * } or the {@link 
+     * } or the {@link
      * org.apache.wss4j.dom.message.WSSecEncrypt#build(Document, Crypto, WSSecHeader)
      * } method to send the issuer name and the serial number of a certificate to
      * the receiver.
@@ -214,9 +214,9 @@ public final class WSConstants extends WSS4JConstants {
     public static final int ISSUER_SERIAL = 2;
 
     /**
-     * Sets the {@link 
+     * Sets the {@link
      * org.apache.wss4j.dom.message.WSSecSignature#build(Document, Crypto, WSSecHeader)
-     * } or the {@link 
+     * } or the {@link
      * org.apache.wss4j.dom.message.WSSecEncrypt#build(Document, Crypto, WSSecHeader)
      * }method to send the certificate used to encrypt the symmetric key.
      * <p/>
@@ -227,14 +227,14 @@ public final class WSConstants extends WSS4JConstants {
      * The X509 profile recommends to use {@link #ISSUER_SERIAL} instead
      * of sending the whole certificate.
      * <p/>
-     * Please refer to WS Security SOAP Message security 1.1 specification, 
+     * Please refer to WS Security SOAP Message security 1.1 specification,
      * chapter 7.3. Note that this is a NON-STANDARD method. The standard way to refer to
      * an X.509 Certificate via a KeyIdentifier is to use {@link #SKI_KEY_IDENTIFIER}
      */
     public static final int X509_KEY_IDENTIFIER = 3;
-    
+
     /**
-     * Sets the {@link 
+     * Sets the {@link
      * org.apache.wss4j.dom.message.WSSecSignature#build(Document, Crypto, WSSecHeader)
      * } method to send a <code>SubjectKeyIdentifier</code> to identify
      * the signing certificate.
@@ -249,79 +249,79 @@ public final class WSConstants extends WSS4JConstants {
      */
     @Deprecated
     public static final int EMBEDDED_KEYNAME = 5;
-    
+
     /**
      * Embeds a keyinfo/wsse:SecurityTokenReference into EncryptedData element.
      */
     @Deprecated
     public static final int EMBED_SECURITY_TOKEN_REF = 6;
-    
+
     /**
      * <code>UT_SIGNING</code> is used internally only to set a specific Signature
      * behavior.
-     * 
+     *
      * The signing token is constructed from values in the UsernameToken according
      * to WS-Trust specification.
      */
     public static final int UT_SIGNING = 7;
-    
+
     /**
      * <code>THUMPRINT_IDENTIFIER</code> is used to set the specific key identifier
      * ThumbprintSHA1.
-     * 
+     *
      * This identifier uses the SHA-1 digest of a security token to
      * identify the security token. Please refer to chapter 7.2 of the OASIS WSS 1.1
      * specification.
-     * 
+     *
      */
     public static final int THUMBPRINT_IDENTIFIER = 8;
-    
+
     /**
-     * <code>CUSTOM_SYMM_SIGNING</code> is used internally only to set a 
+     * <code>CUSTOM_SYMM_SIGNING</code> is used internally only to set a
      * specific Signature behavior.
-     * 
-     * The signing key, reference id and value type are set externally. 
+     *
+     * The signing key, reference id and value type are set externally.
      */
     public static final int CUSTOM_SYMM_SIGNING = 9;
-    
+
     /**
      * <code>ENCRYPTED_KEY_SHA1_IDENTIFIER</code> is used to set the specific key identifier
      * EncryptedKeySHA1.
-     * 
+     *
      * This identifier uses the SHA-1 digest of a security token to
      * identify the security token. Please refer to chapter 7.3 of the OASIS WSS 1.1
      * specification.
      */
     public static final int ENCRYPTED_KEY_SHA1_IDENTIFIER = 10;
-    
+
     /**
-     * <code>CUSTOM_SYMM_SIGNING_DIRECT</code> is used internally only to set a 
+     * <code>CUSTOM_SYMM_SIGNING_DIRECT</code> is used internally only to set a
      * specific Signature behavior.
-     * 
-     * The signing key, reference id and value type are set externally. 
+     *
+     * The signing key, reference id and value type are set externally.
      */
     public static final int CUSTOM_SYMM_SIGNING_DIRECT = 11;
-    
+
     /**
      * <code>CUSTOM_KEY_IDENTIFIER</code> is used to set a KeyIdentifier to
      * a particular ID
-     * 
-     * The reference id and value type are set externally. 
+     *
+     * The reference id and value type are set externally.
      */
     public static final int CUSTOM_KEY_IDENTIFIER = 12;
-    
+
     /**
      * <code>KEY_VALUE</code> is used to set a ds:KeyInfo/ds:KeyValue element to refer to
      * either an RSA or DSA public key.
      */
     public static final int KEY_VALUE = 13;
-    
+
     /**
-     * <code>ENDPOINT_KEY_IDENTIFIER</code> is used to specify service endpoint as public key 
+     * <code>ENDPOINT_KEY_IDENTIFIER</code> is used to specify service endpoint as public key
      * identifier.
-     * 
-     * Constant is useful in case of symmetric holder of key, where token service can determine 
-     * target service public key to encrypt shared secret. 
+     *
+     * Constant is useful in case of symmetric holder of key, where token service can determine
+     * target service public key to encrypt shared secret.
      */
     public static final int ENDPOINT_KEY_IDENTIFIER = 14;
 
@@ -354,5 +354,5 @@ public final class WSConstants extends WSS4JConstants {
     private WSConstants() {
         super();
     }
-    
+
 }

@@ -26,7 +26,7 @@ import javax.xml.namespace.QName;
  */
 public class SOAP11Constants implements SOAPConstants {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 3809268485386395322L;
     private static final QName headerQName = new QName(WSConstants.URI_SOAP11_ENV,
@@ -68,5 +68,5 @@ public class SOAP11Constants implements SOAPConstants {
     public String getMustUnderstand() {
         return "1";
     }
-    
+
 }

@@ -24,15 +24,15 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import java.io.Serializable;
 
 /**
- * A principal that represents a SAML Token. It parses the Subject and returns the Subject 
+ * A principal that represents a SAML Token. It parses the Subject and returns the Subject
  * name value as the Principal name.
  */
 public class SAMLTokenPrincipalImpl implements Serializable, SAMLTokenPrincipal {
     private static final long serialVersionUID = 1L;
-    
+
     private String name;
     private SamlAssertionWrapper samlAssertion;
-    
+
     public SAMLTokenPrincipalImpl(SamlAssertionWrapper samlAssertion) {
         this.samlAssertion = samlAssertion;
         this.name = samlAssertion.getSubjectName();
@@ -55,5 +55,5 @@ public class SAMLTokenPrincipalImpl implements Serializable, SAMLTokenPrincipal 
         }
         return null;
     }
-    
+
 }

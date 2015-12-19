@@ -51,17 +51,17 @@ public class WSSecBase {
     private WsuIdAllocator idAllocator;
     private final List<WSEncryptionPart> parts = new ArrayList<>();
 
-    
+
     public WSSecBase() {
     }
-    
+
     /**
      * @param callbackLookup The CallbackLookup object to retrieve elements
      */
     public void setCallbackLookup(CallbackLookup callbackLookup) {
         this.callbackLookup = callbackLookup;
     }
-    
+
     /**
      * Get which parts of the message to encrypt/sign.
      */
@@ -70,15 +70,15 @@ public class WSSecBase {
     }
 
     /**
-     * Sets which key identifier to use. 
-     * 
-     * <p/> 
-     * 
+     * Sets which key identifier to use.
+     *
+     * <p/>
+     *
      * Defines the key identifier type to
      * use in the {@link WSSecSignature#prepare(Document, Crypto, WSSecHeader) method} or
      * the {@link WSSecEncrypt#prepare(Document, Crypto) method} function to
      * set up the key identification elements.
-     * 
+     *
      * @param keyIdType
      * @see WSConstants#ISSUER_SERIAL
      * @see WSConstants#BST_DIRECT_REFERENCE
@@ -93,7 +93,7 @@ public class WSSecBase {
 
     /**
      * Gets the value of the <code>keyIdentifierType</code>.
-     * 
+     *
      * @return The <code>keyIdentifyerType</code>.
      * @see WSConstants#ISSUER_SERIAL
      * @see WSConstants#BST_DIRECT_REFERENCE
@@ -107,7 +107,7 @@ public class WSSecBase {
     public void setAttachmentCallbackHandler(CallbackHandler attachmentCallbackHandler) {
         this.attachmentCallbackHandler = attachmentCallbackHandler;
     }
-    
+
     public void setStoreBytesInAttachment(boolean storeBytesInAttachment) {
         this.storeBytesInAttachment = storeBytesInAttachment;
     }
@@ -117,7 +117,7 @@ public class WSSecBase {
      * <code>wsu:Id</code> in the SOAP body element. If one is found, the
      * value of the <code>wsu:Id</code> attribute is returned. Otherwise the
      * method generates a new <code>wsu:Id</code> and an appropriate value.
-     * 
+     *
      * @param doc The SOAP envelope as <code>Document</code>
      * @return The value of the <code>wsu:Id</code> attribute of the SOAP body
      * @throws Exception
@@ -157,7 +157,7 @@ public class WSSecBase {
                 id = bodyElement.getAttributeNS(null, "ID");
             }
         }
-        
+
         if (id == null || id.length() == 0) {
             id = getIdAllocator().createId("id-", bodyElement);
             String prefix = XMLUtils.setNamespace(bodyElement, newAttrNs, newAttrPrefix);
@@ -165,12 +165,12 @@ public class WSSecBase {
         }
         return id;
     }
-    
+
     /**
-     * Set the user and password info. 
-     * 
+     * Set the user and password info.
+     *
      * Both information is used to get the user's private signing key.
-     * 
+     *
      * @param user
      *            This is the user's alias name in the keystore that identifies
      *            the private key to sign the document
@@ -193,5 +193,5 @@ public class WSSecBase {
     public void setIdAllocator(WsuIdAllocator idAllocator) {
         this.idAllocator = idAllocator;
     }
-    
+
 }

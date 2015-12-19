@@ -23,7 +23,7 @@ import java.nio.charset.StandardCharsets;
 import org.apache.wss4j.common.ext.WSSecurityException;
 
 public final class DerivedKeyUtils {
-    
+
     private DerivedKeyUtils() {
         // complete
     }
@@ -36,7 +36,7 @@ public final class DerivedKeyUtils {
      * @throws org.apache.wss4j.stax.wss.ext.WSSecurityException
      *
      */
-    public static byte[] deriveKey(String algorithm, String label, int length, byte[] secret, byte[] nonce, int offset) 
+    public static byte[] deriveKey(String algorithm, String label, int length, byte[] secret, byte[] nonce, int offset)
         throws WSSecurityException {
         DerivationAlgorithm algo = AlgoFactory.getInstance(algorithm);
         byte[] labelBytes;

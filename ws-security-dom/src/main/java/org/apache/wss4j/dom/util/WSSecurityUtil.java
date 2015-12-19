@@ -64,25 +64,25 @@ import javax.security.auth.callback.UnsupportedCallbackException;
  * WS-Security Utility methods. <p/>
  */
 public final class WSSecurityUtil {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSecurityUtil.class);
 
     private WSSecurityUtil() {
         // Complete
     }
-    
+
     public static Element getSOAPHeader(Document doc) {
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
-        return 
+        return
             XMLUtils.getDirectChildElement(
                 doc.getDocumentElement(), WSConstants.ELEM_HEADER, soapNamespace
             );
     }
-    
+
     /**
      * Returns the first WS-Security header element for a given actor. Only one
      * WS-Security header is allowed for an actor.
-     * 
+     *
      * @param doc
      * @param actor
      * @return the <code>wsse:Security</code> element or <code>null</code>
@@ -93,37 +93,37 @@ public final class WSSecurityUtil {
         if (soapHeaderElement == null) { // no SOAP header at all
             return null;
         }
-        
+
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         return getSecurityHeader(soapHeaderElement, actor, WSConstants.URI_SOAP12_ENV.equals(soapNamespace));
     }
-    
+
     /**
      * Returns the first WS-Security header element for a given actor. Only one
      * WS-Security header is allowed for an actor.
      */
     public static Element getSecurityHeader(Element soapHeader, String actor, boolean soap12) throws WSSecurityException {
-        
+
         String actorLocal = WSConstants.ATTR_ACTOR;
         String soapNamespace = WSConstants.URI_SOAP11_ENV;
         if (soap12) {
             actorLocal = WSConstants.ATTR_ROLE;
             soapNamespace = WSConstants.URI_SOAP12_ENV;
         }
-        
+
         //
         // Iterate through the security headers
         //
         Element foundSecurityHeader = null;
         for (
-            Node currentChild = soapHeader.getFirstChild(); 
-            currentChild != null; 
+            Node currentChild = soapHeader.getFirstChild();
+            currentChild != null;
             currentChild = currentChild.getNextSibling()
         ) {
             if (Node.ELEMENT_NODE == currentChild.getNodeType()
                 && WSConstants.WSSE_LN.equals(currentChild.getLocalName())
                 && WSConstants.WSSE_NS.equals(currentChild.getNamespaceURI())) {
-                
+
                 Element elem = (Element)currentChild;
                 Attr attr = elem.getAttributeNodeNS(soapNamespace, actorLocal);
                 String hActor = (attr != null) ? attr.getValue() : null;
@@ -148,41 +148,41 @@ public final class WSSecurityUtil {
     /**
      * Compares two actor strings and returns true if these are equal. Takes
      * care of the null length strings and uses ignore case.
-     * 
+     *
      * @param actor
      * @param hActor
      * @return true is the actor arguments are equal
      */
     public static boolean isActorEqual(String actor, String hActor) {
-        if ((hActor == null || hActor.length() == 0) 
+        if ((hActor == null || hActor.length() == 0)
             && (actor == null || actor.length() == 0)) {
             return true;
         }
-        
+
         if (hActor != null && actor != null && hActor.equalsIgnoreCase(actor)) {
             return true;
         }
-        
+
         return false;
     }
 
     /**
      * Gets all direct children with specified localname and namespace. <p/>
-     * 
+     *
      * @param fNode the node where to start the search
      * @param localName local name of the children to get
      * @param namespace the namespace of the children to get
      * @return the list of nodes or <code>null</code> if not such nodes are found
      */
     public static List<Element> getDirectChildElements(
-        Node fNode, 
+        Node fNode,
         String localName,
         String namespace
     ) {
         List<Element> children = new ArrayList<>();
         for (
-            Node currentChild = fNode.getFirstChild(); 
-            currentChild != null; 
+            Node currentChild = fNode.getFirstChild();
+            currentChild != null;
             currentChild = currentChild.getNextSibling()
         ) {
             if (Node.ELEMENT_NODE == currentChild.getNodeType()
@@ -193,11 +193,11 @@ public final class WSSecurityUtil {
         }
         return children;
     }
-    
+
 
     /**
      * return the first soap "Body" element. <p/>
-     * 
+     *
      * @param doc
      * @return the body element or <code>null</code> if document does not
      *         contain a SOAP body
@@ -207,12 +207,12 @@ public final class WSSecurityUtil {
         String ns = docElement.getNamespaceURI();
         return XMLUtils.getDirectChildElement(docElement, WSConstants.ELEM_BODY, ns);
     }
-    
-    
+
+
     /**
-     * Find the DOM Element in the SOAP Envelope that is referenced by the 
+     * Find the DOM Element in the SOAP Envelope that is referenced by the
      * WSEncryptionPart argument. The "Id" is used before the Element localname/namespace.
-     * 
+     *
      * @param part The WSEncryptionPart object corresponding to the DOM Element(s) we want
      * @param callbackLookup The CallbackLookup object used to find Elements
      * @param doc The owning document
@@ -225,7 +225,7 @@ public final class WSSecurityUtil {
         if (part.getElement() != null) {
             return Collections.singletonList(part.getElement());
         }
-        
+
         // Next try to find the Element via its wsu:Id
         String id = part.getId();
         if (id != null) {
@@ -235,21 +235,21 @@ public final class WSSecurityUtil {
         // Otherwise just lookup all elements with the localname/namespace
         return callbackLookup.getElements(part.getName(), part.getNamespace());
     }
-    
-    
+
+
 
     /**
      * Get the default encryption part - the SOAP Body of type "Content".
      */
     public static WSEncryptionPart getDefaultEncryptionPart(Document doc) {
-        String soapNamespace = 
+        String soapNamespace =
             WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         return new WSEncryptionPart(WSConstants.ELEM_BODY, soapNamespace, "Content");
     }
 
     /**
      * create a new element in the same namespace <p/>
-     * 
+     *
      * @param parent for the new element
      * @param localName of the new element
      * @return the new element
@@ -260,7 +260,7 @@ public final class WSSecurityUtil {
         if (prefix != null && prefix.length() > 0) {
             qName = prefix + ":" + localName;
         }
-         
+
         String nsUri = parent.getNamespaceURI();
         return parent.getOwnerDocument().createElementNS(nsUri, qName);
     }
@@ -268,7 +268,7 @@ public final class WSSecurityUtil {
 
     /**
      * prepend a child element <p/>
-     * 
+     *
      * @param parent element of this child element
      * @param child the element to append
      * @return the child element
@@ -288,7 +288,7 @@ public final class WSSecurityUtil {
 
     /**
      * find the first ws-security header block <p/>
-     * 
+     *
      * @param doc the DOM document (SOAP request)
      * @param envelope the SOAP envelope
      * @param doCreate if true create a new WSS header block if none exists
@@ -296,7 +296,7 @@ public final class WSSecurityUtil {
      */
     public static Element findWsseSecurityHeaderBlock(
         Document doc,
-        Element envelope, 
+        Element envelope,
         boolean doCreate
     ) throws WSSecurityException {
         return findWsseSecurityHeaderBlock(doc, envelope, null, doCreate);
@@ -304,7 +304,7 @@ public final class WSSecurityUtil {
 
     /**
      * find a WS-Security header block for a given actor <p/>
-     * 
+     *
      * @param doc the DOM document (SOAP request)
      * @param envelope the SOAP envelope
      * @param actor the actor (role) name of the WSS header
@@ -314,14 +314,14 @@ public final class WSSecurityUtil {
     public static Element findWsseSecurityHeaderBlock(
         Document doc,
         Element envelope,
-        String actor, 
+        String actor,
         boolean doCreate
     ) throws WSSecurityException {
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
-        Element header = 
+        Element header =
             XMLUtils.getDirectChildElement(
-                doc.getDocumentElement(), 
-                WSConstants.ELEM_HEADER, 
+                doc.getDocumentElement(),
+                WSConstants.ELEM_HEADER,
                 soapNamespace
             );
         if (header == null) { // no SOAP header at all
@@ -332,25 +332,25 @@ public final class WSSecurityUtil {
                 return null;
             }
         }
-        
+
         String actorLocal = WSConstants.ATTR_ACTOR;
         if (WSConstants.URI_SOAP12_ENV.equals(soapNamespace)) {
             actorLocal = WSConstants.ATTR_ROLE;
         }
-        
+
         //
         // Iterate through the security headers
         //
         Element foundSecurityHeader = null;
         for (
-            Node currentChild = header.getFirstChild(); 
-            currentChild != null; 
+            Node currentChild = header.getFirstChild();
+            currentChild != null;
             currentChild = currentChild.getNextSibling()
         ) {
             if (Node.ELEMENT_NODE == currentChild.getNodeType()
                 && WSConstants.WSSE_LN.equals(currentChild.getLocalName())
                 && WSConstants.WSSE_NS.equals(currentChild.getNamespaceURI())) {
-                
+
                 Element elem = (Element)currentChild;
                 Attr attr = elem.getAttributeNodeNS(soapNamespace, actorLocal);
                 String hActor = (attr != null) ? attr.getValue() : null;
@@ -380,7 +380,7 @@ public final class WSSecurityUtil {
 
     /**
      * create a base64 test node <p/>
-     * 
+     *
      * @param doc the DOM document (SOAP request)
      * @param data to encode
      * @return a Text node containing the base64 encoded data
@@ -397,11 +397,11 @@ public final class WSSecurityUtil {
         }
         return new SOAP11Constants();
     }
-    
+
     public static String getSOAPNamespace(Element startElement) {
         return getSOAPConstants(startElement).getEnvelopeURI();
     }
-    
+
     public static List<Integer> decodeAction(String action) throws WSSecurityException {
         String actionToParse = action;
         if (actionToParse == null) {
@@ -411,7 +411,7 @@ public final class WSSecurityUtil {
         if ("".equals(actionToParse)) {
             return Collections.emptyList();
         }
-        
+
         List<Integer> actions = new ArrayList<>();
         String single[] = actionToParse.split("\\s");
         for (int i = 0; i < single.length; i++) {
@@ -449,8 +449,8 @@ public final class WSSecurityUtil {
         }
         return actions;
     }
-    
-    
+
+
     /**
      * Decode an action String. This method should only be called on the outbound side.
      * @param action The initial String of actions to perform
@@ -459,13 +459,13 @@ public final class WSSecurityUtil {
      * @throws WSSecurityException
      */
     public static List<HandlerAction> decodeHandlerAction(
-        String action, 
+        String action,
         WSSConfig wssConfig
     ) throws WSSecurityException {
         if (action == null) {
             return Collections.emptyList();
         }
-        
+
         List<HandlerAction> actions = new ArrayList<>();
         String single[] = action.split(" ");
         for (int i = 0; i < single.length; i++) {
@@ -513,7 +513,7 @@ public final class WSSecurityUtil {
     /**
      * Generate a nonce of the given length using the SHA1PRNG algorithm. The SecureRandom
      * instance that backs this method is cached for efficiency.
-     * 
+     *
      * @return a nonce of the given length
      * @throws WSSecurityException
      */
@@ -526,18 +526,18 @@ public final class WSSecurityUtil {
             );
         }
     }
-    
+
     public static void verifySignedElement(Element elem, WSDocInfo wsDocInfo)
         throws WSSecurityException {
         verifySignedElement(elem, wsDocInfo.getResultsByTag(WSConstants.SIGN));
     }
-    
+
     public static void verifySignedElement(Element elem, List<WSSecurityEngineResult> signedResults)
         throws WSSecurityException {
         if (signedResults != null) {
             for (WSSecurityEngineResult signedResult : signedResults) {
                 @SuppressWarnings("unchecked")
-                List<WSDataRef> dataRefs = 
+                List<WSDataRef> dataRefs =
                     (List<WSDataRef>)signedResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
                 if (dataRefs != null) {
                     for (WSDataRef dataRef : dataRefs) {
@@ -548,16 +548,16 @@ public final class WSSecurityUtil {
                 }
             }
         }
-        
+
         throw new WSSecurityException(
-            WSSecurityException.ErrorCode.FAILED_CHECK, "elementNotSigned", 
+            WSSecurityException.ErrorCode.FAILED_CHECK, "elementNotSigned",
             new Object[] {elem});
     }
-    
+
     /**
-     * Does the current element or some ancestor of it correspond to the known "signedElement"? 
+     * Does the current element or some ancestor of it correspond to the known "signedElement"?
      */
-    private static boolean isElementOrAncestorSigned(Element elem, Element signedElement) 
+    private static boolean isElementOrAncestorSigned(Element elem, Element signedElement)
         throws WSSecurityException {
         final Element envelope = elem.getOwnerDocument().getDocumentElement();
         Node cur = elem;
@@ -567,10 +567,10 @@ public final class WSSecurityUtil {
             }
             cur = cur.getParentNode();
         }
-        
+
         return false;
     }
-    
+
     public static byte[] getBytesFromAttachment(
         String xopUri, RequestData data
     ) throws WSSecurityException {
@@ -596,7 +596,7 @@ public final class WSSecurityUtil {
             attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
 
             List<Attachment> attachments = attachmentRequestCallback.getAttachments();
-            if (attachments == null || attachments.isEmpty() 
+            if (attachments == null || attachments.isEmpty()
                 || !attachmentId.equals(attachments.get(0).getId())) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.INVALID_SECURITY,
@@ -624,12 +624,12 @@ public final class WSSecurityUtil {
             doc.createElementNS(WSConstants.XOP_NS, "xop:Include");
         xopInclude.setAttributeNS(null, "href", "cid:" + attachmentId);
         parentElement.appendChild(xopInclude);
-        
+
         Attachment resultAttachment = new Attachment();
         resultAttachment.setId(attachmentId);
         resultAttachment.setMimeType("application/ciphervalue");
         resultAttachment.setSourceStream(new ByteArrayInputStream(bytes));
-        
+
         AttachmentResultCallback attachmentResultCallback = new AttachmentResultCallback();
         attachmentResultCallback.setAttachmentId(attachmentId);
         attachmentResultCallback.setAttachment(resultAttachment);
@@ -638,6 +638,6 @@ public final class WSSecurityUtil {
         } catch (Exception e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
-        
+
     }
 }

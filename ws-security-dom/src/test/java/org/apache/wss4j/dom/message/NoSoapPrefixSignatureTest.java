@@ -34,16 +34,16 @@ import org.w3c.dom.Document;
  * http://issues.apache.org/jira/browse/WSS-60
  */
 public class NoSoapPrefixSignatureTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(NoSoapPrefixSignatureTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public NoSoapPrefixSignatureTest() throws Exception {
         WSSConfig.init();
         crypto = CryptoFactory.getInstance();
@@ -64,27 +64,27 @@ public class NoSoapPrefixSignatureTest extends org.junit.Assert {
         secHeader.setActor("bob");
         secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         verify(signedDoc);
     }
-    
+
     /**
      * Verifies the soap envelope
      * <p/>
-     * 
-     * @param doc 
+     *
+     * @param doc
      * @throws Exception Thrown when there is a problem in verification
      */
     private void verify(Document doc) throws Exception {
         secEngine.processSecurityHeader(doc, null, null, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }

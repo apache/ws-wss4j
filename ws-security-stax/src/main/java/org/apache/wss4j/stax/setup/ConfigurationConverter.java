@@ -49,37 +49,37 @@ import org.apache.xml.security.stax.ext.XMLSecurityConstants.Action;
  * This utility class converts between a Map<String, Object> and a WSSSecurityProperties class
  */
 public final class ConfigurationConverter {
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(ConfigurationConverter.class);
-                                          
+
     private ConfigurationConverter() {
         // complete
     }
-    
+
     public static WSSSecurityProperties convert(Map<String, Object> config) {
         WSSSecurityProperties properties = new WSSSecurityProperties();
-        
+
         if (config == null) {
             return properties;
         }
-        
+
         parseActions(config, properties);
         parseUserProperties(config, properties);
         parseCallback(config, properties);
         parseCrypto(config, properties);
         parseBooleanProperties(config, properties);
         parseNonBooleanProperties(config, properties);
-        
+
         return properties;
     }
-    
+
     public static void parseActions(
-        Map<String, Object> config, 
+        Map<String, Object> config,
         WSSSecurityProperties properties
     ) {
         String action = getString(ConfigurationConstants.ACTION, config);
-        
+
         String actionToParse = action;
         if (actionToParse == null) {
             return;
@@ -127,20 +127,20 @@ public final class ConfigurationConverter {
         if (sigConf) {
             actions.add(WSSConstants.SIGNATURE_CONFIRMATION);
         }
-        
+
         properties.setActions(actions);
     }
-    
+
     public static void parseUserProperties(
-        Map<String, Object> config, 
+        Map<String, Object> config,
         WSSSecurityProperties properties
     ) {
         String user = getString(ConfigurationConstants.USER, config);
         properties.setTokenUser(user);
-        
+
         String actor = getString(ConfigurationConstants.ACTOR, config);
         properties.setActor(actor);
-        
+
         String encUser = getString(ConfigurationConstants.ENCRYPTION_USER, config);
         if (encUser == null) {
             encUser = user;
@@ -149,19 +149,19 @@ public final class ConfigurationConverter {
         if (ConfigurationConstants.USE_REQ_SIG_CERT.equals(encUser)) {
             properties.setUseReqSigCertForEncryption(true);
         }
-        
+
         String sigUser = getString(ConfigurationConstants.SIGNATURE_USER, config);
         if (sigUser == null) {
             sigUser = user;
         }
         properties.setSignatureUser(sigUser);
     }
-    
+
     public static void parseCrypto(
-        Map<String, Object> config, 
+        Map<String, Object> config,
         WSSSecurityProperties properties
     ) {
-        Object passwordEncryptorObj = 
+        Object passwordEncryptorObj =
             config.get(ConfigurationConstants.PASSWORD_ENCRYPTOR_INSTANCE);
         PasswordEncryptor passwordEncryptor = null;
         if (passwordEncryptorObj instanceof PasswordEncryptor) {
@@ -173,7 +173,7 @@ public final class ConfigurationConverter {
                 passwordEncryptor = new JasyptPasswordEncryptor(callbackHandler);
             }
         }
-        
+
         String sigPropRef = getString(ConfigurationConstants.SIG_PROP_REF_ID, config);
         boolean foundSigRef = false;
         if (sigPropRef != null) {
@@ -189,12 +189,12 @@ public final class ConfigurationConverter {
                 properties.setSignatureUser(getDefaultX509Identifier(properties, true));
             }
         }
-        
+
         if (!foundSigRef) {
             String sigPropFile = getString(ConfigurationConstants.SIG_PROP_FILE, config);
             if (sigPropFile != null) {
                 try {
-                    Properties sigProperties = 
+                    Properties sigProperties =
                         CryptoFactory.getProperties(sigPropFile, getClassLoader());
                     properties.setSignatureCryptoProperties(sigProperties, passwordEncryptor);
                     if (properties.getSignatureUser() == null) {
@@ -205,7 +205,7 @@ public final class ConfigurationConverter {
                 }
             }
         }
-        
+
         String sigVerPropRef = getString(ConfigurationConstants.SIG_VER_PROP_REF_ID, config);
         boolean foundSigVerRef = false;
         if (sigVerPropRef != null) {
@@ -216,14 +216,14 @@ public final class ConfigurationConverter {
             } else if (sigVerRef instanceof Properties) {
                 foundSigVerRef = true;
                 properties.setSignatureVerificationCryptoProperties((Properties)sigVerRef, passwordEncryptor);
-            } 
+            }
         }
-        
+
         if (!foundSigVerRef) {
             String sigPropFile = getString(ConfigurationConstants.SIG_VER_PROP_FILE, config);
             if (sigPropFile != null) {
                 try {
-                    Properties sigProperties = 
+                    Properties sigProperties =
                         CryptoFactory.getProperties(sigPropFile, getClassLoader());
                     properties.setSignatureVerificationCryptoProperties(sigProperties, passwordEncryptor);
                 } catch (WSSecurityException e) {
@@ -231,7 +231,7 @@ public final class ConfigurationConverter {
                 }
             }
         }
-        
+
         String encPropRef = getString(ConfigurationConstants.ENC_PROP_REF_ID, config);
         boolean foundEncRef = false;
         if (encPropRef != null) {
@@ -242,14 +242,14 @@ public final class ConfigurationConverter {
             } else if (encRef instanceof Properties) {
                 foundEncRef = true;
                 properties.setEncryptionCryptoProperties((Properties)encRef, passwordEncryptor);
-            } 
+            }
         }
-        
+
         if (!foundEncRef) {
             String encPropFile = getString(ConfigurationConstants.ENC_PROP_FILE, config);
             if (encPropFile != null) {
                 try {
-                    Properties encProperties = 
+                    Properties encProperties =
                         CryptoFactory.getProperties(encPropFile, getClassLoader());
                     properties.setEncryptionCryptoProperties(encProperties, passwordEncryptor);
                 } catch (WSSecurityException e) {
@@ -257,7 +257,7 @@ public final class ConfigurationConverter {
                 }
             }
         }
-        
+
         String decPropRef = getString(ConfigurationConstants.DEC_PROP_REF_ID, config);
         boolean foundDecRef = false;
         if (decPropRef != null) {
@@ -268,14 +268,14 @@ public final class ConfigurationConverter {
             } else if (decRef instanceof Properties) {
                 foundDecRef = true;
                 properties.setDecryptionCryptoProperties((Properties)decRef, passwordEncryptor);
-            } 
+            }
         }
-        
+
         if (!foundDecRef) {
             String encPropFile = getString(ConfigurationConstants.DEC_PROP_FILE, config);
             if (encPropFile != null) {
                 try {
-                    Properties encProperties = 
+                    Properties encProperties =
                         CryptoFactory.getProperties(encPropFile, getClassLoader());
                     properties.setDecryptionCryptoProperties(encProperties, passwordEncryptor);
                 } catch (WSSecurityException e) {
@@ -284,7 +284,7 @@ public final class ConfigurationConverter {
             }
         }
     }
-    
+
     public static String getDefaultX509Identifier(
         WSSSecurityProperties properties, boolean signature
     ) {
@@ -303,9 +303,9 @@ public final class ConfigurationConverter {
         }
         return null;
     }
-    
+
     public static void parseCallback(
-        Map<String, Object> config, 
+        Map<String, Object> config,
         WSSSecurityProperties properties
     ) {
         Object pwPropRef = config.get(ConfigurationConstants.PW_CALLBACK_REF);
@@ -322,7 +322,7 @@ public final class ConfigurationConverter {
                 }
             }
         }
-        
+
         Object samlPropRef = config.get(ConfigurationConstants.SAML_CALLBACK_REF);
         if (samlPropRef instanceof CallbackHandler) {
             properties.setSamlCallbackHandler((CallbackHandler)samlPropRef);
@@ -338,7 +338,7 @@ public final class ConfigurationConverter {
             }
         }
     }
-    
+
     /**
      * Load a CallbackHandler instance.
      * @param callbackHandlerClass The class name of the CallbackHandler instance
@@ -352,14 +352,14 @@ public final class ConfigurationConverter {
         Class<? extends CallbackHandler> cbClass = null;
         CallbackHandler cbHandler = null;
         try {
-            cbClass = 
-                Loader.loadClass(getClassLoader(), 
+            cbClass =
+                Loader.loadClass(getClassLoader(),
                                  callbackHandlerClass,
                                  CallbackHandler.class);
         } catch (ClassNotFoundException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
                     "empty",
-                    new Object[] {"WSHandler: cannot load callback handler class: " 
+                    new Object[] {"WSHandler: cannot load callback handler class: "
                     + callbackHandlerClass}
             );
         }
@@ -368,13 +368,13 @@ public final class ConfigurationConverter {
         } catch (Exception e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
                     "empty",
-                    new Object[] {"WSHandler: cannot create instance of callback handler: " 
+                    new Object[] {"WSHandler: cannot create instance of callback handler: "
                     + callbackHandlerClass}
             );
         }
         return cbHandler;
     }
-    
+
     private static ClassLoader getClassLoader() {
         try {
             return Loader.getTCL();
@@ -382,103 +382,103 @@ public final class ConfigurationConverter {
             return null;
         }
     }
-    
+
     public static void parseBooleanProperties(
-        Map<String, Object> config, 
+        Map<String, Object> config,
         WSSSecurityProperties properties
     ) {
         //outbound sigConf is configured as an Action, see parseActions()
-        boolean sigConf = 
+        boolean sigConf =
             decodeBooleanConfigValue(ConfigurationConstants.ENABLE_SIGNATURE_CONFIRMATION, false, config);
         properties.setEnableSignatureConfirmationVerification(sigConf);
-        
-        boolean mustUnderstand = 
+
+        boolean mustUnderstand =
             decodeBooleanConfigValue(ConfigurationConstants.MUST_UNDERSTAND, true, config);
         properties.setMustUnderstand(mustUnderstand);
-        
-        boolean bspCompliant = 
+
+        boolean bspCompliant =
             decodeBooleanConfigValue(ConfigurationConstants.IS_BSP_COMPLIANT, true, config);
         properties.setDisableBSPEnforcement(!bspCompliant);
-        
-        boolean inclPrefixes = 
+
+        boolean inclPrefixes =
             decodeBooleanConfigValue(ConfigurationConstants.ADD_INCLUSIVE_PREFIXES, true, config);
         properties.setAddExcC14NInclusivePrefixes(inclPrefixes);
-        
-        boolean nonce = 
+
+        boolean nonce =
             decodeBooleanConfigValue(ConfigurationConstants.ADD_USERNAMETOKEN_NONCE, false, config);
         properties.setAddUsernameTokenNonce(nonce);
-        
-        boolean created = 
+
+        boolean created =
             decodeBooleanConfigValue(ConfigurationConstants.ADD_USERNAMETOKEN_CREATED, false, config);
         properties.setAddUsernameTokenCreated(created);
-        
-        boolean customPasswordTypes = 
+
+        boolean customPasswordTypes =
             decodeBooleanConfigValue(ConfigurationConstants.HANDLE_CUSTOM_PASSWORD_TYPES, false, config);
         properties.setHandleCustomPasswordTypes(customPasswordTypes);
-        
-        boolean allowNoPassword = 
+
+        boolean allowNoPassword =
             decodeBooleanConfigValue(ConfigurationConstants.ALLOW_USERNAMETOKEN_NOPASSWORD, false, config);
         properties.setAllowUsernameTokenNoPassword(allowNoPassword);
-        
-        boolean enableRevocation = 
+
+        boolean enableRevocation =
             decodeBooleanConfigValue(ConfigurationConstants.ENABLE_REVOCATION, false, config);
         properties.setEnableRevocation(enableRevocation);
-        
-        boolean singleCert = 
+
+        boolean singleCert =
             decodeBooleanConfigValue(ConfigurationConstants.USE_SINGLE_CERTIFICATE, true, config);
         properties.setUseSingleCert(singleCert);
-        
-        boolean derivedKeyMAC = 
+
+        boolean derivedKeyMAC =
             decodeBooleanConfigValue(ConfigurationConstants.USE_DERIVED_KEY_FOR_MAC, true, config);
         properties.setUseDerivedKeyForMAC(derivedKeyMAC);
-        
-        boolean timestampStrict = 
+
+        boolean timestampStrict =
             decodeBooleanConfigValue(ConfigurationConstants.TIMESTAMP_STRICT, true, config);
         properties.setStrictTimestampCheck(timestampStrict);
-        
-        boolean allowRSA15 = 
+
+        boolean allowRSA15 =
             decodeBooleanConfigValue(ConfigurationConstants.ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM, false, config);
         properties.setAllowRSA15KeyTransportAlgorithm(allowRSA15);
-        
-        boolean validateSamlSubjectConf = 
+
+        boolean validateSamlSubjectConf =
             decodeBooleanConfigValue(ConfigurationConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, true, config);
         properties.setValidateSamlSubjectConfirmation(validateSamlSubjectConf);
-        
-        boolean includeSignatureToken = 
+
+        boolean includeSignatureToken =
             decodeBooleanConfigValue(ConfigurationConstants.INCLUDE_SIGNATURE_TOKEN, false, config);
         properties.setIncludeSignatureToken(includeSignatureToken);
-        
-        boolean includeEncryptionToken = 
+
+        boolean includeEncryptionToken =
             decodeBooleanConfigValue(ConfigurationConstants.INCLUDE_ENCRYPTION_TOKEN, false, config);
         properties.setIncludeEncryptionToken(includeEncryptionToken);
-        
-        boolean enableTimestampCache = 
+
+        boolean enableTimestampCache =
             decodeBooleanConfigValue(ConfigurationConstants.ENABLE_TIMESTAMP_CACHE, true, config);
         properties.setEnableTimestampReplayCache(enableTimestampCache);
-        
-        boolean enableNonceCache = 
+
+        boolean enableNonceCache =
             decodeBooleanConfigValue(ConfigurationConstants.ENABLE_NONCE_CACHE, true, config);
         properties.setEnableNonceReplayCache(enableNonceCache);
-        
-        boolean enableSamlOneTimeUseCache = 
+
+        boolean enableSamlOneTimeUseCache =
             decodeBooleanConfigValue(ConfigurationConstants.ENABLE_SAML_ONE_TIME_USE_CACHE, true, config);
         properties.setEnableSamlOneTimeUseReplayCache(enableSamlOneTimeUseCache);
-        
-        boolean encryptSymmetricEncryptionKey = 
+
+        boolean encryptSymmetricEncryptionKey =
             decodeBooleanConfigValue(ConfigurationConstants.ENC_SYM_ENC_KEY, true, config);
         properties.setEncryptSymmetricEncryptionKey(encryptSymmetricEncryptionKey);
-        
-        boolean use200512Namespace = 
+
+        boolean use200512Namespace =
             decodeBooleanConfigValue(ConfigurationConstants.USE_2005_12_NAMESPACE, true, config);
         properties.setUse200512Namespace(use200512Namespace);
-        
-        boolean requireTimestampExpires = 
+
+        boolean requireTimestampExpires =
             decodeBooleanConfigValue(ConfigurationConstants.REQUIRE_TIMESTAMP_EXPIRES, false, config);
         properties.setRequireTimestampExpires(requireTimestampExpires);
     }
-    
+
     public static void parseNonBooleanProperties(
-        Map<String, Object> config, 
+        Map<String, Object> config,
         WSSSecurityProperties properties
     ) {
         String pwType = getString(ConfigurationConstants.PASSWORD_TYPE, config);
@@ -489,23 +489,23 @@ public final class ConfigurationConverter {
         } else if ("PasswordNone".equals(pwType)) {
             properties.setUsernameTokenPasswordType(UsernameTokenPasswordType.PASSWORD_NONE);
         }
-        
+
         String signatureKeyIdentifier = getString(ConfigurationConstants.SIG_KEY_ID, config);
-        WSSecurityTokenConstants.KeyIdentifier convSigKeyIdentifier = 
+        WSSecurityTokenConstants.KeyIdentifier convSigKeyIdentifier =
             convertKeyIdentifier(signatureKeyIdentifier);
         if (convSigKeyIdentifier != null) {
             properties.setSignatureKeyIdentifier(convSigKeyIdentifier);
         }
-        
+
         String sigAlgo = getString(ConfigurationConstants.SIG_ALGO, config);
         properties.setSignatureAlgorithm(sigAlgo);
-        
+
         String sigDigestAlgo = getString(ConfigurationConstants.SIG_DIGEST_ALGO, config);
         properties.setSignatureDigestAlgorithm(sigDigestAlgo);
-        
+
         String sigC14nAlgo = getString(ConfigurationConstants.SIG_C14N_ALGO, config);
         properties.setSignatureCanonicalizationAlgorithm(sigC14nAlgo);
-        
+
         Object sigParts = config.get(ConfigurationConstants.SIGNATURE_PARTS);
         if (sigParts != null) {
             if (sigParts instanceof String) {
@@ -526,7 +526,7 @@ public final class ConfigurationConverter {
                 }
             }
         }
-        
+
         sigParts = config.get(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS);
         if (sigParts != null) {
             if (sigParts instanceof String) {
@@ -549,20 +549,20 @@ public final class ConfigurationConverter {
                 }
             }
         }
-        
+
         String iterations = getString(ConfigurationConstants.DERIVED_KEY_ITERATIONS, config);
         if (iterations != null) {
             int iIterations = Integer.parseInt(iterations);
             properties.setDerivedKeyIterations(iIterations);
         }
-        
+
         String encKeyIdentifier = getString(ConfigurationConstants.ENC_KEY_ID, config);
-        WSSecurityTokenConstants.KeyIdentifier convEncKeyIdentifier = 
+        WSSecurityTokenConstants.KeyIdentifier convEncKeyIdentifier =
             convertKeyIdentifier(encKeyIdentifier);
         if (convEncKeyIdentifier != null) {
             properties.setEncryptionKeyIdentifier(convEncKeyIdentifier);
         }
-        
+
         Object encParts = config.get(ConfigurationConstants.ENCRYPTION_PARTS);
         if (encParts != null) {
             if (encParts instanceof String) {
@@ -581,7 +581,7 @@ public final class ConfigurationConverter {
                 }
             }
         }
-        
+
         encParts = config.get(ConfigurationConstants.OPTIONAL_ENCRYPTION_PARTS);
         if (encParts != null) {
             if (encParts instanceof String) {
@@ -602,26 +602,26 @@ public final class ConfigurationConverter {
                 }
             }
         }
-        
+
         String encSymcAlgo = getString(ConfigurationConstants.ENC_SYM_ALGO, config);
         properties.setEncryptionSymAlgorithm(encSymcAlgo);
-        
+
         String encKeyTransport = getString(ConfigurationConstants.ENC_KEY_TRANSPORT, config);
         properties.setEncryptionKeyTransportAlgorithm(encKeyTransport);
-        
+
         String encDigestAlgo = getString(ConfigurationConstants.ENC_DIGEST_ALGO, config);
         properties.setEncryptionKeyTransportDigestAlgorithm(encDigestAlgo);
-        
+
         String encMGFAlgo = getString(ConfigurationConstants.ENC_MGF_ALGO, config);
         properties.setEncryptionKeyTransportMGFAlgorithm(encMGFAlgo);
-        
+
         // Subject Cert Constraints
-        String certConstraints = 
+        String certConstraints =
             getString(ConfigurationConstants.SIG_SUBJECT_CERT_CONSTRAINTS, config);
         if (certConstraints != null) {
             String[] certConstraintsList = certConstraints.split(",");
             if (certConstraintsList != null) {
-                Collection<Pattern> subjectCertConstraints = 
+                Collection<Pattern> subjectCertConstraints =
                     new ArrayList<>(certConstraintsList.length);
                 for (String certConstraint : certConstraintsList) {
                     try {
@@ -633,66 +633,66 @@ public final class ConfigurationConverter {
                 properties.setSubjectCertConstraints(subjectCertConstraints);
             }
         }
-        
+
         properties.setUtTTL(decodeTimeToLive(config, false));
         properties.setUtFutureTTL(decodeFutureTimeToLive(config, false));
         properties.setTimestampTTL(decodeTimeToLive(config, true));
         properties.setTimeStampFutureTTL(decodeFutureTimeToLive(config, true));
-        
+
         @SuppressWarnings("unchecked")
-        final Map<QName, Validator> validatorMap = 
+        final Map<QName, Validator> validatorMap =
             (Map<QName, Validator>)config.get(ConfigurationConstants.VALIDATOR_MAP);
         if (validatorMap != null) {
             for (Map.Entry<QName, Validator> entry : validatorMap.entrySet()) {
                 properties.addValidator(entry.getKey(), entry.getValue());
             }
         }
-        
-        ReplayCache nonceCache = 
+
+        ReplayCache nonceCache =
             (ReplayCache)config.get(ConfigurationConstants.NONCE_CACHE_INSTANCE);
         if (nonceCache != null) {
             properties.setNonceReplayCache(nonceCache);
         }
-        
-        ReplayCache timestampCache = 
+
+        ReplayCache timestampCache =
             (ReplayCache)config.get(ConfigurationConstants.TIMESTAMP_CACHE_INSTANCE);
         if (timestampCache != null) {
             properties.setTimestampReplayCache(timestampCache);
         }
-        
-        ReplayCache samlOneTimeUseCache = 
+
+        ReplayCache samlOneTimeUseCache =
             (ReplayCache)config.get(ConfigurationConstants.SAML_ONE_TIME_USE_CACHE_INSTANCE);
         if (samlOneTimeUseCache != null) {
             properties.setSamlOneTimeUseReplayCache(samlOneTimeUseCache);
         }
-        
+
         String derivedSignatureKeyLength = getString(ConfigurationConstants.DERIVED_SIGNATURE_KEY_LENGTH, config);
         if (derivedSignatureKeyLength != null) {
             int sigLength = Integer.parseInt(derivedSignatureKeyLength);
             properties.setDerivedSignatureKeyLength(sigLength);
         }
-        
+
         String derivedEncryptionKeyLength = getString(ConfigurationConstants.DERIVED_ENCRYPTION_KEY_LENGTH, config);
         if (derivedEncryptionKeyLength != null) {
             int encLength = Integer.parseInt(derivedEncryptionKeyLength);
             properties.setDerivedEncryptionKeyLength(encLength);
         }
-        
+
         String derivedTokenReference = getString(ConfigurationConstants.DERIVED_TOKEN_REFERENCE, config);
-        WSSConstants.DerivedKeyTokenReference convertedDerivedTokenReference = 
+        WSSConstants.DerivedKeyTokenReference convertedDerivedTokenReference =
             convertDerivedReference(derivedTokenReference);
         if (convertedDerivedTokenReference != null) {
             properties.setDerivedKeyTokenReference(convertedDerivedTokenReference);
         }
-        
+
         String derivedKeyIdentifier = getString(ConfigurationConstants.DERIVED_TOKEN_KEY_ID, config);
-        WSSecurityTokenConstants.KeyIdentifier convertedDerivedKeyIdentifier = 
+        WSSecurityTokenConstants.KeyIdentifier convertedDerivedKeyIdentifier =
             convertKeyIdentifier(derivedKeyIdentifier);
         if (convertedDerivedKeyIdentifier != null) {
             properties.setDerivedKeyKeyIdentifier(convertedDerivedKeyIdentifier);
         }
     }
-    
+
     public static WSSConstants.DerivedKeyTokenReference convertDerivedReference(String derivedTokenReference) {
         if ("EncryptedKey".equals(derivedTokenReference)) {
            return WSSConstants.DerivedKeyTokenReference.EncryptedKey;
@@ -703,7 +703,7 @@ public final class ConfigurationConverter {
         }
         return null;
     }
-    
+
     public static WSSecurityTokenConstants.KeyIdentifier convertKeyIdentifier(String keyIdentifier) {
         if ("IssuerSerial".equals(keyIdentifier)) {
            return WSSecurityTokenConstants.KeyIdentifier_IssuerSerial;
@@ -726,7 +726,7 @@ public final class ConfigurationConverter {
         }
         return null;
     }
-    
+
     private static int decodeTimeToLive(Map<String, Object> config, boolean timestamp) {
         String tag = ConfigurationConstants.TTL_TIMESTAMP;
         if (!timestamp) {
@@ -747,7 +747,7 @@ public final class ConfigurationConverter {
         }
         return defaultTimeToLive;
     }
-    
+
     private static int decodeFutureTimeToLive(Map<String, Object> config, boolean timestamp) {
         String tag = ConfigurationConstants.TTL_FUTURE_TIMESTAMP;
         if (!timestamp) {
@@ -776,7 +776,7 @@ public final class ConfigurationConverter {
         }
         return null;
     }
-    
+
     private static boolean decodeBooleanConfigValue(
         String tag, boolean defaultToTrue, Map<String, Object> config
     ) {
@@ -784,14 +784,14 @@ public final class ConfigurationConverter {
 
         if ("0".equals(value) || "false".equals(value)) {
             return false;
-        } 
+        }
         if ("1".equals(value) || "true".equals(value)) {
             return true;
         }
-        
+
         return defaultToTrue;
     }
-    
+
     private static void splitEncParts(String tmpS, List<SecurePart> parts, String soapNS) {
         SecurePart encPart = null;
         String[] rawParts = tmpS.split(";");
@@ -805,7 +805,7 @@ public final class ConfigurationConverter {
             } else if (partDef.length == 2) {
                 String mode = partDef[0].trim().substring(1);
                 String element = partDef[1].trim();
-                
+
                 if ("Content".equals(mode)) {
                     encPart = new SecurePart(element, SecurePart.Modifier.Content);
                 } else {
@@ -828,7 +828,7 @@ public final class ConfigurationConverter {
                     }
                 }
                 String element = partDef[2].trim();
-                
+
                 QName qname = new QName(nmSpace, element);
                 if ("Content".equals(mode)) {
                     encPart = new SecurePart(qname, SecurePart.Modifier.Content);
@@ -836,7 +836,7 @@ public final class ConfigurationConverter {
                     encPart = new SecurePart(qname, SecurePart.Modifier.Element);
                 }
             }
-        
+
             parts.add(encPart);
         }
     }

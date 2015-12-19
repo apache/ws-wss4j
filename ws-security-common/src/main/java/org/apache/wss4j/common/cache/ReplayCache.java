@@ -26,24 +26,24 @@ import java.io.Closeable;
  * is a UsernameToken nonce.
  */
 public interface ReplayCache extends Closeable {
-    
+
     /**
      * Add the given identifier to the cache. It will be cached for a default amount of time.
      * @param identifier The identifier to be added
      */
     void add(String identifier);
-    
+
     /**
      * Add the given identifier to the cache to be cached for the given time
      * @param identifier The identifier to be added
      * @param timeToLive The length of time to cache the Identifier in seconds
      */
     void add(String identifier, long timeToLive);
-    
+
     /**
      * Return true if the given identifier is contained in the cache
      * @param identifier The identifier to check
      */
     boolean contains(String identifier);
-    
+
 }

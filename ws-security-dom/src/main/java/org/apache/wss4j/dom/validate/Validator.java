@@ -28,7 +28,7 @@ import org.apache.wss4j.dom.handler.RequestData;
  * by the processors.
  */
 public interface Validator {
-    
+
     /**
      * Validate the credential argument. This method returns a Credential instance that
      * represents the validated credential. This instance can be the same as the instance
@@ -40,6 +40,6 @@ public interface Validator {
      * @throws WSSecurityException on a failed validation
      */
     Credential validate(Credential credential, RequestData data) throws WSSecurityException;
-    
-    
+
+
 }

@@ -22,12 +22,12 @@ package org.apache.wss4j.common;
 /**
  * This class encapsulates configuration for Signature Actions.
  */
-public class SignatureActionToken extends SignatureEncryptionActionToken {  
+public class SignatureActionToken extends SignatureEncryptionActionToken {
 
     private String c14nAlgorithm;
     private boolean useSingleCert = true;
     private String signatureAlgorithm;
-    
+
     public String getC14nAlgorithm() {
         return c14nAlgorithm;
     }
@@ -46,6 +46,6 @@ public class SignatureActionToken extends SignatureEncryptionActionToken {
     public void setSignatureAlgorithm(String signatureAlgorithm) {
         this.signatureAlgorithm = signatureAlgorithm;
     }
- 
+
 }
 

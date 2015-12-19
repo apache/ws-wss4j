@@ -40,15 +40,15 @@ import org.apache.wss4j.dom.str.STRParserResult;
  * The processor to process <code>wsc:DerivedKeyToken</code>.
  */
 public class DerivedKeyTokenProcessor implements Processor {
-    
+
     public List<WSSecurityEngineResult> handleToken(
-        Element elem, 
-        RequestData data, 
+        Element elem,
+        RequestData data,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         // Deserialize the DKT
         DerivedKeyToken dkt = new DerivedKeyToken(elem, data.getBSPEnforcer());
-        
+
         // Check for compliance against the defined AlgorithmSuite
         AlgorithmSuite algorithmSuite = data.getAlgorithmSuite();
         if (algorithmSuite != null) {
@@ -58,7 +58,7 @@ public class DerivedKeyTokenProcessor implements Processor {
                 dkt.getAlgorithm()
             );
         }
-        
+
         byte[] secret = null;
         Element secRefElement = dkt.getSecurityTokenReferenceElement();
         if (secRefElement != null) {
@@ -66,17 +66,17 @@ public class DerivedKeyTokenProcessor implements Processor {
             parameters.setData(data);
             parameters.setWsDocInfo(wsDocInfo);
             parameters.setStrElement(secRefElement);
-            
+
             STRParser strParser = new DerivedKeyTokenSTRParser();
             STRParserResult parserResult = strParser.parseSecurityTokenReference(parameters);
             secret = parserResult.getSecretKey();
         } else {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, "noReference");
         }
-        
+
         String tempNonce = dkt.getNonce();
         if (tempNonce == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", 
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                                           new Object[] {"Missing wsc:Nonce value"});
         }
         int length = dkt.getLength();

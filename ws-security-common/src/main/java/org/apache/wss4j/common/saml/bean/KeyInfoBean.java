@@ -29,11 +29,11 @@ import org.w3c.dom.Element;
  * Class KeyInfoBean represents a KeyInfo structure that will be embedded in a SAML Subject.
  */
 public class KeyInfoBean {
-    
+
     public enum CERT_IDENTIFIER {
         X509_CERT, X509_ISSUER_SERIAL, KEY_VALUE
     }
-    
+
     private X509Certificate cert;
     private CERT_IDENTIFIER certIdentifier = CERT_IDENTIFIER.X509_CERT;
     private PublicKey publicKey;
@@ -63,7 +63,7 @@ public class KeyInfoBean {
     public void setCertificate(X509Certificate cert) {
         this.cert = cert;
     }
-    
+
     /**
      * Method getPublicKey returns the public key of this KeyInfoBean object.
      *
@@ -81,7 +81,7 @@ public class KeyInfoBean {
     public void setPublicKey(PublicKey publicKey) {
         this.publicKey = publicKey;
     }
-    
+
     /**
      * Method getCertIdentifer returns the cert identifer of this KeyInfoBean object.
      *
@@ -125,7 +125,7 @@ public class KeyInfoBean {
     public void setElement(Element keyInfoElement) {
         this.keyInfoElement = keyInfoElement;
     }
-    
+
     /**
      * Method equals ...
      *
@@ -151,13 +151,13 @@ public class KeyInfoBean {
         } else if (cert != null && !cert.equals(that.cert)) {
             return false;
         }
-        
+
         if (publicKey == null && that.publicKey != null) {
             return false;
         } else if (publicKey != null && !publicKey.equals(that.publicKey)) {
             return false;
         }
-        
+
         if (keyInfoElement == null && that.keyInfoElement != null) {
             return false;
         } else if (keyInfoElement != null && !keyInfoElement.equals(that.keyInfoElement)) {

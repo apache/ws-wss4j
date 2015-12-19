@@ -58,10 +58,10 @@ import org.w3c.dom.Document;
  * Validator implementations.
  */
 public class ValidatorTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(ValidatorTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -76,31 +76,31 @@ public class ValidatorTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(-1);
         Document createdDoc = timestamp.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
-        
+
         // The default behaviour is that the Timestamp validation will fail
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         try {
             verify(createdDoc, wssConfig, null, null);
             fail("Expected failure on an expired timestamp");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
         }
 
         // Now switch out the default Timestamp validator
         wssConfig.setValidator(WSConstants.TIMESTAMP, NoOpValidator.class);
         verify(createdDoc, wssConfig, null, null);
     }
-    
+
     /**
      * Test for processing an untrusted signature
      */
@@ -116,13 +116,13 @@ public class ValidatorTest extends org.junit.Assert {
         secHeader.insertSecurityHeader();
         Crypto crypto = CryptoFactory.getInstance("wss40.properties");
         Document signedDoc = sign.build(doc, crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         // The default behaviour is that trust verification will fail
         Crypto cryptoCA = CryptoFactory.getInstance("crypto.properties");
         // Turn off BSP spec compliance
@@ -134,9 +134,9 @@ public class ValidatorTest extends org.junit.Assert {
             newEngine.processSecurityHeader(signedDoc, data);
             fail("Failure expected on issuer serial");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
-        
+
         // Now switch out the default signature validator
         WSSConfig config = WSSConfig.getNewInstance();
         config.setValidator(WSConstants.SIGNATURE, NoOpValidator.class);
@@ -144,7 +144,7 @@ public class ValidatorTest extends org.junit.Assert {
         data.setWssConfig(config);
         newEngine.processSecurityHeader(signedDoc, data);
     }
-    
+
     /**
      * Test that adds a UserNameToken with (bad) password text to a WS-Security envelope
      */
@@ -153,18 +153,18 @@ public class ValidatorTest extends org.junit.Assert {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
         builder.setUserInfo("wernerd", "verySecre");
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         // The default behaviour is that password verification will fail
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         try {
@@ -173,12 +173,12 @@ public class ValidatorTest extends org.junit.Assert {
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
-        
+
         // Now switch out the default UsernameToken validator
         wssConfig.setValidator(WSConstants.USERNAME_TOKEN, NoOpValidator.class);
         verify(signedDoc, wssConfig, new UsernamePasswordCallbackHandler(), null);
     }
-    
+
     /**
      * In this test, a BinarySecurityToken is added to the SOAP header. A custom processor
      * validates the BST and transforms it into a SAML Assertion.
@@ -189,48 +189,48 @@ public class ValidatorTest extends org.junit.Assert {
 
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         X509Security bst = new X509Security(doc);
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("wss40");
         Crypto crypto = CryptoFactory.getInstance("wss40.properties");
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         bst.setX509Certificate(certs[0]);
-        
+
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("BST output");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         WSSConfig config = WSSConfig.getNewInstance();
         config.setValidator(WSConstants.BINARY_TOKEN, new BSTValidator());
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.setWssConfig(config);
-        WSHandlerResult results = 
+        WSHandlerResult results =
             secEngine.processSecurityHeader(doc, null, null, crypto);
-        
-        List<WSSecurityEngineResult> bstResults = 
+
+        List<WSSecurityEngineResult> bstResults =
             results.getActionResults().get(WSConstants.BST);
         WSSecurityEngineResult actionResult = bstResults.get(0);
 
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         assertTrue(token != null);
-        
+
         SamlAssertionWrapper samlAssertion =
             (SamlAssertionWrapper)actionResult.get(WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN);
         assertTrue(samlAssertion != null);
     }
-    
+
     /**
-     * In this test, a SOAP request is constructed where the SOAP body is signed via a 
+     * In this test, a SOAP request is constructed where the SOAP body is signed via a
      * BinarySecurityToken. The receiving side does not trust the BST, and so the test fails.
      * The second time, a custom Validator (NoOpValidator for this case) is installed for the
-     * BST, and so trust verification passes on the Signature. 
+     * BST, and so trust verification passes on the Signature.
      */
     @org.junit.Test
     public void testValidatedBSTSignature() throws Exception {
@@ -243,11 +243,11 @@ public class ValidatorTest extends org.junit.Assert {
         Document signedDoc = builder.build(doc, CryptoFactory.getInstance(), secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         Crypto crypto = CryptoFactory.getInstance("wss40.properties");
         WSSConfig config = WSSConfig.getNewInstance();
         WSSecurityEngine secEngine = new WSSecurityEngine();
@@ -256,17 +256,17 @@ public class ValidatorTest extends org.junit.Assert {
             secEngine.processSecurityHeader(doc, null, null, crypto);
             fail("Expected failure on untrusted signature");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
-        
+
         config.setValidator(WSConstants.BINARY_TOKEN, new BSTValidator());
-        WSHandlerResult results = 
+        WSHandlerResult results =
             secEngine.processSecurityHeader(doc, null, null, crypto);
-        
-        List<WSSecurityEngineResult> bstResults = 
+
+        List<WSSecurityEngineResult> bstResults =
             results.getActionResults().get(WSConstants.BST);
         WSSecurityEngineResult actionResult = bstResults.get(0);
-        
+
         BinarySecurity token =
             (BinarySecurity)actionResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         assertTrue(token != null);
@@ -275,7 +275,7 @@ public class ValidatorTest extends org.junit.Assert {
 
     /**
      * Verifies the soap envelope
-     * 
+     *
      * @param env soap envelope
      * @param wssConfig
      * @throws java.lang.Exception Thrown when there is a problem in verification
@@ -286,8 +286,8 @@ public class ValidatorTest extends org.junit.Assert {
         secEngine.setWssConfig(wssConfig);
         return secEngine.processSecurityHeader(doc, null, cb, crypto);
     }
-    
-    
+
+
     /**
      * A validator for a BST token.
      */
@@ -303,19 +303,19 @@ public class ValidatorTest extends org.junit.Assert {
                 SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
                 callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
                 callbackHandler.setIssuer("www.example.com");
-                
+
                 SAMLCallback samlCallback = new SAMLCallback();
                 SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
                 SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-    
+
                 credential.setTransformedToken(samlAssertion);
                 return credential;
             } catch (Exception ex) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
         }
-        
+
     }
-    
-    
+
+
 }

@@ -35,14 +35,14 @@ public class ResultsOrderTest extends org.junit.Assert {
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     /**
      */
     @org.junit.Test
-    public void 
+    public void
     testOrder() throws Exception {
         CustomHandler handler = new CustomHandler();
-        
+
         java.util.List<WSSecurityEngineResult> results = new java.util.ArrayList<WSSecurityEngineResult>();
         results.add(
             new WSSecurityEngineResult(WSConstants.UT)
@@ -56,12 +56,12 @@ public class ResultsOrderTest extends org.junit.Assert {
         results.add(
             new WSSecurityEngineResult(WSConstants.SIGN)
         );
-        
+
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(WSConstants.UT);
         actions.add(WSConstants.TS);
         actions.add(WSConstants.SIGN);
-        
+
         assertTrue (handler.checkResults(results, actions));
         assertTrue (handler.checkResultsAnyOrder(results, actions));
     }
@@ -69,10 +69,10 @@ public class ResultsOrderTest extends org.junit.Assert {
     /**
      */
     @org.junit.Test
-    public void 
+    public void
     testReverseOrder() throws Exception {
         CustomHandler handler = new CustomHandler();
-        
+
         java.util.List<WSSecurityEngineResult> results = new java.util.ArrayList<WSSecurityEngineResult>();
         results.add(
             new WSSecurityEngineResult(WSConstants.SIGN)
@@ -86,25 +86,25 @@ public class ResultsOrderTest extends org.junit.Assert {
         results.add(
             new WSSecurityEngineResult(WSConstants.UT)
         );
-        
+
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(WSConstants.UT);
         actions.add(WSConstants.TS);
         actions.add(WSConstants.SIGN);
-        
+
         assertFalse (handler.checkResults(results, actions));
         assertTrue (handler.checkResultsAnyOrder(results, actions));
         assertTrue (results.size() == 4 && actions.size() == 3);
     }
-    
+
     /**
      */
     @org.junit.Test
-    public void 
+    public void
     testMixedOrder() throws Exception {
         CustomHandler handler = new CustomHandler();
-        
-        java.util.List<WSSecurityEngineResult> results = 
+
+        java.util.List<WSSecurityEngineResult> results =
             new java.util.ArrayList<WSSecurityEngineResult>();
         results.add(
             new WSSecurityEngineResult(WSConstants.TS)
@@ -118,25 +118,25 @@ public class ResultsOrderTest extends org.junit.Assert {
         results.add(
             new WSSecurityEngineResult(WSConstants.UT)
         );
-        
+
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(WSConstants.UT);
         actions.add(WSConstants.TS);
         actions.add(WSConstants.SIGN);
-        
+
         assertFalse (handler.checkResults(results, actions));
         assertTrue (handler.checkResultsAnyOrder(results, actions));
         assertFalse (actions.isEmpty());
     }
-    
+
     /**
      */
     @org.junit.Test
-    public void 
+    public void
     testMixedOrder2() throws Exception {
         CustomHandler handler = new CustomHandler();
-        
-        java.util.List<WSSecurityEngineResult> results = 
+
+        java.util.List<WSSecurityEngineResult> results =
             new java.util.ArrayList<WSSecurityEngineResult>();
         results.add(
             new WSSecurityEngineResult(WSConstants.TS)
@@ -150,24 +150,24 @@ public class ResultsOrderTest extends org.junit.Assert {
         results.add(
             new WSSecurityEngineResult(WSConstants.UT)
         );
-        
+
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(WSConstants.SIGN);
         actions.add(WSConstants.UT);
         actions.add(WSConstants.TS);
-        
+
         assertFalse (handler.checkResults(results, actions));
         assertTrue (handler.checkResultsAnyOrder(results, actions));
     }
-    
+
     /**
      */
     @org.junit.Test
-    public void 
+    public void
     testMissingResult() throws Exception {
         CustomHandler handler = new CustomHandler();
-        
-        java.util.List<WSSecurityEngineResult> results = 
+
+        java.util.List<WSSecurityEngineResult> results =
             new java.util.ArrayList<WSSecurityEngineResult>();
         results.add(
             new WSSecurityEngineResult(WSConstants.UT)
@@ -178,24 +178,24 @@ public class ResultsOrderTest extends org.junit.Assert {
         results.add(
             new WSSecurityEngineResult(WSConstants.SC)
         );
-        
+
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(WSConstants.TS);
         actions.add(WSConstants.UT);
         actions.add(WSConstants.SIGN);
-        
+
         assertFalse (handler.checkResults(results, actions));
         assertFalse (handler.checkResultsAnyOrder(results, actions));
     }
-    
+
     /**
      */
     @org.junit.Test
-    public void 
+    public void
     testMissingAction() throws Exception {
         CustomHandler handler = new CustomHandler();
-        
-        java.util.List<WSSecurityEngineResult> results = 
+
+        java.util.List<WSSecurityEngineResult> results =
             new java.util.ArrayList<WSSecurityEngineResult>();
         results.add(
             new WSSecurityEngineResult(WSConstants.UT)
@@ -209,59 +209,59 @@ public class ResultsOrderTest extends org.junit.Assert {
         results.add(
             new WSSecurityEngineResult(WSConstants.SC)
         );
-        
+
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(WSConstants.TS);
         actions.add(WSConstants.UT);
-        
+
         assertFalse (handler.checkResults(results, actions));
         assertFalse (handler.checkResultsAnyOrder(results, actions));
     }
-    
+
     /**
      */
     @org.junit.Test
-    public void 
+    public void
     testNoResult() throws Exception {
         CustomHandler handler = new CustomHandler();
-        
-        java.util.List<WSSecurityEngineResult> results = 
+
+        java.util.List<WSSecurityEngineResult> results =
             new java.util.ArrayList<WSSecurityEngineResult>();
-        
+
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(WSConstants.TS);
-        
+
         assertFalse (handler.checkResults(results, actions));
         assertFalse (handler.checkResultsAnyOrder(results, actions));
     }
-    
+
     /**
      */
     @org.junit.Test
-    public void 
+    public void
     testNoAction() throws Exception {
         CustomHandler handler = new CustomHandler();
-        
-        java.util.List<WSSecurityEngineResult> results = 
+
+        java.util.List<WSSecurityEngineResult> results =
             new java.util.ArrayList<WSSecurityEngineResult>();
         results.add(
             new WSSecurityEngineResult(WSConstants.TS)
         );
-        
+
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
-        
+
         assertFalse (handler.checkResults(results, actions));
         assertFalse (handler.checkResultsAnyOrder(results, actions));
     }
-    
+
     /**
      */
     @org.junit.Test
-    public void 
+    public void
     testMultipleIdenticalResults() throws Exception {
         CustomHandler handler = new CustomHandler();
-        
-        java.util.List<WSSecurityEngineResult> results = 
+
+        java.util.List<WSSecurityEngineResult> results =
             new java.util.ArrayList<WSSecurityEngineResult>();
         results.add(
             new WSSecurityEngineResult(WSConstants.ENCR)
@@ -272,14 +272,14 @@ public class ResultsOrderTest extends org.junit.Assert {
         results.add(
             new WSSecurityEngineResult(WSConstants.ENCR)
         );
-        
+
         java.util.List<Integer> actions = new java.util.ArrayList<Integer>();
         actions.add(WSConstants.ENCR);
         actions.add(WSConstants.UT);
         actions.add(WSConstants.UT);
-        
+
         assertFalse (handler.checkResults(results, actions));
         assertFalse (handler.checkResultsAnyOrder(results, actions));
     }
-    
+
 }

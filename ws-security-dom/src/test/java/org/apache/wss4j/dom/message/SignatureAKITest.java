@@ -42,16 +42,16 @@ import org.w3c.dom.Document;
  * A set of test-cases for signing and verifying SOAP requests using the Merlin AKI Crypto implementation.
  */
 public class SignatureAKITest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureAKITest.class);
-    
+
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public SignatureAKITest() throws Exception {
         WSSConfig.init();
     }
@@ -68,19 +68,19 @@ public class SignatureAKITest extends org.junit.Assert {
         Document signedDoc = builder.build(doc, signingCrypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         Crypto caCrypto = CryptoFactory.getInstance("wss40CAAKI.properties");
         WSHandlerResult results = verify(signedDoc, caCrypto);
-        
+
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
     }
-    
+
     // Here, the CA keystore contains two keys with the same Distinguished Name
     @org.junit.Test
     public void testSignatureAKIDuplicate() throws Exception {
@@ -94,7 +94,7 @@ public class SignatureAKITest extends org.junit.Assert {
         Document signedDoc = builder.build(doc, signingCrypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
@@ -104,19 +104,19 @@ public class SignatureAKITest extends org.junit.Assert {
         InputStream input = Merlin.loadInputStream(loader, "keys/wss40CADupl.jks");
         keyStore.load(input, "security".toCharArray());
         caCrypto.setKeyStore(keyStore);
-        
+
         WSHandlerResult results = verify(signedDoc, caCrypto);
-        
+
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.SIGN).get(0);
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE));
         assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE));
     }
-    
+
     /**
      * Verifies the soap envelope.
-     * This method verifies all the signature generated. 
-     * 
+     * This method verifies all the signature generated.
+     *
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */

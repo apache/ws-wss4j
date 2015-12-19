@@ -27,7 +27,7 @@ import java.security.Provider;
 public class STRTransformProvider extends Provider {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -9148982936620100249L;
 

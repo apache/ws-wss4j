@@ -37,16 +37,16 @@ import org.apache.wss4j.dom.saml.WSSecSignatureSAML;
 import org.w3c.dom.Document;
 
 public class SAMLTokenSignedAction implements Action {
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SAMLTokenSignedAction.class);
 
     public void execute(WSHandler handler, SecurityActionToken actionToken,
                         Document doc, RequestData reqData)
             throws WSSecurityException {
         Crypto crypto = null;
-        
-        // it is possible and legal that we do not have a signature crypto here - thus ignore the exception. 
+
+        // it is possible and legal that we do not have a signature crypto here - thus ignore the exception.
         // This is usually the case for the SAML option "sender vouches". In this case no user crypto is
         // required.
         try {
@@ -57,26 +57,26 @@ public class SAMLTokenSignedAction implements Action {
             }
         }
 
-        CallbackHandler samlCallbackHandler = 
+        CallbackHandler samlCallbackHandler =
                 handler.getCallbackHandler(
                     WSHandlerConstants.SAML_CALLBACK_CLASS,
-                    WSHandlerConstants.SAML_CALLBACK_REF, 
+                    WSHandlerConstants.SAML_CALLBACK_REF,
                     reqData
                 );
         if (samlCallbackHandler == null) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, 
+                WSSecurityException.ErrorCode.FAILURE,
                 "noSAMLCallbackHandler"
             );
         }
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(samlCallbackHandler, samlCallback);
-        
+
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         if (samlCallback.isSignAssertion()) {
             samlAssertion.signAssertion(
                 samlCallback.getIssuerKeyName(),
-                samlCallback.getIssuerKeyPassword(), 
+                samlCallback.getIssuerKeyPassword(),
                 samlCallback.getIssuerCrypto(),
                 samlCallback.isSendKeyValue(),
                 samlCallback.getCanonicalizationAlgorithm(),
@@ -88,12 +88,12 @@ public class SAMLTokenSignedAction implements Action {
         wsSign.setIdAllocator(reqData.getWssConfig().getIdAllocator());
         wsSign.setAddInclusivePrefixes(reqData.isAddInclusivePrefixes());
 
-        CallbackHandler callbackHandler = 
+        CallbackHandler callbackHandler =
             handler.getPasswordCallbackHandler(reqData);
-        WSPasswordCallback passwordCallback = 
+        WSPasswordCallback passwordCallback =
             handler.getPasswordCB(reqData.getUsername(), WSConstants.ST_SIGNED, callbackHandler, reqData);
         wsSign.setUserInfo(reqData.getUsername(), passwordCallback.getPassword());
-        
+
         SignatureActionToken signatureToken = null;
         if (actionToken instanceof SignatureActionToken) {
             signatureToken = (SignatureActionToken)actionToken;
@@ -101,7 +101,7 @@ public class SAMLTokenSignedAction implements Action {
         if (signatureToken == null) {
             signatureToken = reqData.getSignatureToken();
         }
-        
+
         if (signatureToken.getKeyIdentifierId() != 0) {
             wsSign.setKeyIdentifierType(signatureToken.getKeyIdentifierId());
         }
@@ -130,7 +130,7 @@ public class SAMLTokenSignedAction implements Action {
                     reqData.getSecHeader());
             reqData.getSignatureValues().add(wsSign.getSignatureValue());
         } catch (WSSecurityException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "empty", 
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "empty",
                                           new Object[] {"Error when signing the SAML token: "});
         }
     }

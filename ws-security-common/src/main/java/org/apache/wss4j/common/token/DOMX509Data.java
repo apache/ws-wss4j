@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 public final class DOMX509Data {
     private final Element element;
     private DOMX509IssuerSerial x509IssuerSerial;
-    
+
     /**
      * Constructor.
      */
@@ -41,7 +41,7 @@ public final class DOMX509Data {
         //
         // Parse X509IssuerSerial child
         //
-        Element issuerSerialElement = 
+        Element issuerSerialElement =
             XMLUtils.getDirectChildElement(
                 element, "X509IssuerSerial", WSS4JConstants.SIG_NS
             );
@@ -52,12 +52,12 @@ public final class DOMX509Data {
      * Constructor.
      */
     public DOMX509Data(Document doc, DOMX509IssuerSerial domIssuerSerial) {
-        element = 
+        element =
             doc.createElementNS(WSS4JConstants.SIG_NS, "ds:X509Data");
-        
+
         element.appendChild(domIssuerSerial.getElement());
     }
-    
+
     /**
      * Return true if this X509Data element contains a X509IssuerSerial element
      */
@@ -67,7 +67,7 @@ public final class DOMX509Data {
         }
         return true;
     }
-    
+
     /**
      * Return a DOMX509IssuerSerial object in this X509Data structure
      */
@@ -77,7 +77,7 @@ public final class DOMX509Data {
 
     /**
      * return the dom element.
-     * 
+     *
      * @return the dom element.
      */
     public Element getElement() {
@@ -86,11 +86,11 @@ public final class DOMX509Data {
 
     /**
      * return the string representation of the token.
-     * 
+     *
      * @return the string representation of the token.
      */
     public String toString() {
         return DOM2Writer.nodeToString(element);
     }
-    
+
 }

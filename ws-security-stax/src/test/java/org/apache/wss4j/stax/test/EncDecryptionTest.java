@@ -228,7 +228,7 @@ public class EncDecryptionTest extends AbstractTestBase {
                     operationSecurityEvents.size() + encryptedPartSecurityEvents.size());
         }
     }
-    
+
     @Test
     public void testEncDecryptionCryptoPropertiesOutbound() throws Exception {
 
@@ -238,7 +238,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
             actions.add(WSSConstants.ENCRYPT);
             securityProperties.setActions(actions);
-            Properties properties = 
+            Properties properties =
                 CryptoFactory.getProperties("transmitter-crypto.properties", this.getClass().getClassLoader());
             securityProperties.setEncryptionCryptoProperties(properties);
             securityProperties.setEncryptionUser("receiver");
@@ -306,7 +306,7 @@ public class EncDecryptionTest extends AbstractTestBase {
         //test streaming decryption
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            Properties properties = 
+            Properties properties =
                 CryptoFactory.getProperties("receiver-crypto.properties", this.getClass().getClassLoader());
             securityProperties.setDecryptionCryptoProperties(properties);
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
@@ -2285,7 +2285,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 0);
         }
     }
-    
+
     @Test
     public void testInboundRequiredAlgorithms() throws Exception {
 
@@ -2343,7 +2343,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             }
         }
     }
-    
+
     @Test
     public void testEncDecryptionPropertiesOutbound() throws Exception {
 
@@ -2432,10 +2432,10 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             WSSSecurityProperties securityProperties = ConfigurationConverter.convert(config);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            XMLStreamReader outXmlStreamReader = 
+            XMLStreamReader outXmlStreamReader =
                 wsSecIn.processInMessage(
-                    xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), 
-                    new ArrayList<SecurityEvent>(), 
+                    xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())),
+                    new ArrayList<SecurityEvent>(),
                     securityEventListener);
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), outXmlStreamReader);
 
@@ -2494,7 +2494,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
     @Test
     public void testElementoEncryptNotFound() throws Exception {
-        
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();

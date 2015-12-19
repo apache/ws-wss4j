@@ -83,7 +83,7 @@ public class ReplayTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 1);
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
         }
-        
+
         //done signature; now test sig-verification:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -101,7 +101,7 @@ public class ReplayTest extends AbstractTestBase {
             }
         }
     }
-    
+
     @Test
     public void testUsernameToken() throws Exception {
 
@@ -115,7 +115,7 @@ public class ReplayTest extends AbstractTestBase {
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_wsse_UsernameToken.getNamespaceURI(), WSSConstants.TAG_wsse_UsernameToken.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
-            
+
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
@@ -136,7 +136,7 @@ public class ReplayTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 1);
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
         }
-        
+
         //done UsernameToken; now test verification:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -153,7 +153,7 @@ public class ReplayTest extends AbstractTestBase {
             }
         }
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion. This
      * is just a sanity test to make sure that it is possible to send the SAML token twice, as
@@ -188,12 +188,12 @@ public class ReplayTest extends AbstractTestBase {
         ReplayCache replayCache = null;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            
+
             SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
             validator.setRequireBearerSignature(false);
             securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
             securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
-            
+
             replayCache = securityProperties.getSamlOneTimeUseReplayCache();
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
@@ -201,16 +201,16 @@ public class ReplayTest extends AbstractTestBase {
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
             Assert.assertNotNull(document);
         }
-        
+
         // now process SAML Token again
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            
+
             SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
             validator.setRequireBearerSignature(false);
             securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
             securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
-            
+
             securityProperties.setSamlOneTimeUseReplayCache(replayCache);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
@@ -219,7 +219,7 @@ public class ReplayTest extends AbstractTestBase {
             Assert.assertNotNull(document);
         }
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with a OneTimeUse Element
@@ -253,12 +253,12 @@ public class ReplayTest extends AbstractTestBase {
         ReplayCache replayCache = null;
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            
+
             SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
             validator.setRequireBearerSignature(false);
             securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
             securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
-            
+
             replayCache = securityProperties.getSamlOneTimeUseReplayCache();
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
@@ -266,16 +266,16 @@ public class ReplayTest extends AbstractTestBase {
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
             Assert.assertNotNull(document);
         }
-        
+
         // now process SAML Token again
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            
+
             SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
             validator.setRequireBearerSignature(false);
             securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
             securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
-            
+
             securityProperties.setSamlOneTimeUseReplayCache(replayCache);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
@@ -288,5 +288,5 @@ public class ReplayTest extends AbstractTestBase {
             }
         }
     }
-    
+
 }

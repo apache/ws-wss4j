@@ -45,12 +45,12 @@ import org.w3c.dom.Element;
  * Processor implementation to handle wsse:BinarySecurityToken elements
  */
 public class BinarySecurityTokenProcessor implements Processor {
-    
+
     /**
      * {@inheritDoc}
      */
     public List<WSSecurityEngineResult> handleToken(
-        Element elem, 
+        Element elem,
         RequestData data,
         WSDocInfo wsDocInfo
     ) throws WSSecurityException {
@@ -67,38 +67,38 @@ public class BinarySecurityTokenProcessor implements Processor {
                 );
             }
         }
-        
+
         BinarySecurity token = createSecurityToken(elem, data);
         X509Certificate[] certs = null;
         Validator validator = data.getValidator(new QName(elem.getNamespaceURI(),
                                                           elem.getLocalName()));
-        
+
         if (data.getSigVerCrypto() == null) {
             certs = getCertificatesTokenReference(token, data.getDecCrypto());
         } else {
             certs = getCertificatesTokenReference(token, data.getSigVerCrypto());
         }
-        
-        WSSecurityEngineResult result = 
+
+        WSSecurityEngineResult result =
             new WSSecurityEngineResult(WSConstants.BST, token, certs);
         wsDocInfo.addTokenElement(elem);
         if (!"".equals(id)) {
             result.put(WSSecurityEngineResult.TAG_ID, id);
         }
-        
+
         if (validator != null) {
             // Hook to allow the user to validate the BinarySecurityToken
             Credential credential = new Credential();
             credential.setBinarySecurityToken(token);
             credential.setCertificates(certs);
-            
+
             Credential returnedCredential = validator.validate(credential, data);
             result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
             result.put(WSSecurityEngineResult.TAG_SECRET, returnedCredential.getSecretKey());
-            
+
             if (returnedCredential.getTransformedToken() != null) {
                 result.put(
-                    WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN, 
+                    WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN,
                     returnedCredential.getTransformedToken()
                 );
                 if (credential.getPrincipal() != null) {
@@ -114,21 +114,21 @@ public class BinarySecurityTokenProcessor implements Processor {
                 result.put(WSSecurityEngineResult.TAG_PRINCIPAL, certs[0].getSubjectX500Principal());
             }
             result.put(WSSecurityEngineResult.TAG_SUBJECT, credential.getSubject());
-            
+
             if (credential.getDelegationCredential() != null) {
-                result.put(WSSecurityEngineResult.TAG_DELEGATION_CREDENTIAL, 
+                result.put(WSSecurityEngineResult.TAG_DELEGATION_CREDENTIAL,
                            credential.getDelegationCredential());
             }
         }
-        
+
         wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);
     }
-    
+
     /**
      * Extracts the certificate(s) from the Binary Security token reference.
      *
-     * @param token The BinarySecurity instance corresponding to either X509Security or 
+     * @param token The BinarySecurity instance corresponding to either X509Security or
      *              PKIPathSecurity
      * @return The X509Certificates associated with this reference
      * @throws WSSecurityException
@@ -168,7 +168,7 @@ public class BinarySecurityTokenProcessor implements Processor {
         } else {
             token = new BinarySecurity(element, data.getBSPEnforcer());
         }
-        
+
         // Now see if the Element content is actually referenced via xop:Include
         Element elementChild =
             XMLUtils.getDirectChildElement(element, "Include", WSConstants.XOP_NS);
@@ -179,8 +179,8 @@ public class BinarySecurityTokenProcessor implements Processor {
                 token.setRawToken(content);
             }
         }
-        
+
         return token;
     }
-    
+
 }

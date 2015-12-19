@@ -180,7 +180,7 @@ public class UsernameTokenTest extends AbstractTestBase {
                     if (securityEvent instanceof UsernameTokenSecurityEvent) {
                         UsernameTokenSecurityEvent usernameTokenSecurityEvent = (UsernameTokenSecurityEvent) securityEvent;
                         if (!"username".equals(usernameTokenSecurityEvent.getSecurityToken().getPrincipal().getName())) {
-                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", 
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                                                           new Object[] {"Wrong username"});
                         }
                     }
@@ -237,15 +237,15 @@ public class UsernameTokenTest extends AbstractTestBase {
 
     @Test
     public void testReusedNonce() throws Exception {
-        
-        XMLGregorianCalendar created = 
+
+        XMLGregorianCalendar created =
             WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar());
         String createdString = created.toXMLFormat();
-        String digest = 
+        String digest =
             org.apache.wss4j.dom.message.token.UsernameToken.doPasswordDigest(
                 "Ex2YESUvsa1qne1m6TM8XA==", createdString, "default"
             );
-        
+
         String req = "<?xml version=\"1.0\" encoding=\"UTF_8\"?>" +
                 "<env:Envelope xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
                 "    <env:Header>" +
@@ -276,25 +276,25 @@ public class UsernameTokenTest extends AbstractTestBase {
             Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_AUTHENTICATION);
         }
     }
-    
+
     /**
      * This is a test for processing an "old" UsernameToken, i.e. one with a "Created" element that is
      * out of date
      */
     @Test
     public void testOldUsernameToken() throws Exception {
-        
+
         GregorianCalendar createdCalendar = new GregorianCalendar();
         createdCalendar.add(Calendar.SECOND, -301);
-        XMLGregorianCalendar created = 
+        XMLGregorianCalendar created =
             WSSConstants.datatypeFactory.newXMLGregorianCalendar(createdCalendar);
         String createdString = created.toXMLFormat();
-        
-        String digest = 
+
+        String digest =
             org.apache.wss4j.dom.message.token.UsernameToken.doPasswordDigest(
                 "Ex2YEKVvsa1qne1m6TM8XA==", createdString, "default"
             );
-        
+
         String req = "<?xml version=\"1.0\" encoding=\"UTF_8\"?>" +
                 "<env:Envelope xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
                 "    <env:Header>" +
@@ -316,7 +316,7 @@ public class UsernameTokenTest extends AbstractTestBase {
         InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
 
         try {
-            XMLStreamReader xmlStreamReader = 
+            XMLStreamReader xmlStreamReader =
                 wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(req.getBytes())));
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
             Assert.fail("Expected XMLStreamException");
@@ -325,7 +325,7 @@ public class UsernameTokenTest extends AbstractTestBase {
         }
     }
 
-    /** 
+    /**
      * This is a test for processing a UsernameToken where the "Created" element is in the (near)
      * future. It should be accepted by default when it is created 30 seconds in the future.
      */
@@ -333,15 +333,15 @@ public class UsernameTokenTest extends AbstractTestBase {
     public void testNearFutureCreated() throws Exception {
         GregorianCalendar createdCalendar = new GregorianCalendar();
         createdCalendar.add(Calendar.SECOND, 30);
-        XMLGregorianCalendar created = 
+        XMLGregorianCalendar created =
             WSSConstants.datatypeFactory.newXMLGregorianCalendar(createdCalendar);
         String createdString = created.toXMLFormat();
-        
-        String digest = 
+
+        String digest =
             org.apache.wss4j.dom.message.token.UsernameToken.doPasswordDigest(
                 "Ex2YEKVvSa1qne1m6TM8XA==", createdString, "default"
             );
-        
+
         String req = "<?xml version=\"1.0\" encoding=\"UTF_8\"?>" +
                 "<env:Envelope xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
                 "    <env:Header>" +
@@ -364,8 +364,8 @@ public class UsernameTokenTest extends AbstractTestBase {
         XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(req.getBytes())));
         StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
     }
-    
-    /** 
+
+    /**
      * This is a test for processing a UsernameToken where the "Created" element is in the future.
      * A UsernameToken that is 120 seconds in the future should be rejected by default.
      */
@@ -373,15 +373,15 @@ public class UsernameTokenTest extends AbstractTestBase {
     public void testFutureCreated() throws Exception {
         GregorianCalendar createdCalendar = new GregorianCalendar();
         createdCalendar.add(Calendar.SECOND, 120);
-        XMLGregorianCalendar created = 
+        XMLGregorianCalendar created =
             WSSConstants.datatypeFactory.newXMLGregorianCalendar(createdCalendar);
         String createdString = created.toXMLFormat();
-        
-        String digest = 
+
+        String digest =
             org.apache.wss4j.dom.message.token.UsernameToken.doPasswordDigest(
                 "Ex2YEKVvsa1Qne1m6TM8XA==", createdString, "default"
             );
-        
+
         String req = "<?xml version=\"1.0\" encoding=\"UTF_8\"?>" +
                 "<env:Envelope xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
                 "    <env:Header>" +
@@ -403,7 +403,7 @@ public class UsernameTokenTest extends AbstractTestBase {
         InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
 
         try {
-            XMLStreamReader xmlStreamReader = 
+            XMLStreamReader xmlStreamReader =
                 wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(req.getBytes())));
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
             Assert.fail("Expected XMLStreamException");
@@ -411,7 +411,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.MESSAGE_EXPIRED);
         }
     }
-    
+
     @Test
     public void testDefaultConfigurationOutbound() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -478,7 +478,7 @@ public class UsernameTokenTest extends AbstractTestBase {
         //done UsernameToken; now verification:
         {
             String action = WSHandlerConstants.USERNAME_TOKEN;
-            
+
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             Properties properties = new Properties();
             properties.put(WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD, "true");
@@ -567,7 +567,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
-    
+
     @Test
     public void testInboundSign() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -596,7 +596,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             securityProperties.setAllowUsernameTokenNoPassword(true);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
-            XMLStreamReader xmlStreamReader = 
+            XMLStreamReader xmlStreamReader =
                 wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null);
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
@@ -638,21 +638,21 @@ public class UsernameTokenTest extends AbstractTestBase {
         }
 
         //done UsernameToken; now verification:
-        
+
         // Failure expected on no password
         try {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
-            
+
             xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
             Assert.fail("Expected XMLStreamException");
         } catch (XMLStreamException e) {
             Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_AUTHENTICATION);
         }
-        
+
         // Now set the appropriate boolean and it should pass
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -669,7 +669,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
         }
     }
-    
+
     @Test
     public void testInboundTextNonceCreated() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -710,7 +710,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
         }
     }
-    
+
     @Test
     public void testOutboundTextNonceCreated() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -781,7 +781,7 @@ public class UsernameTokenTest extends AbstractTestBase {
             doInboundSecurityWithWSS4J(documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray())), action);
         }
     }
-    
+
     @Test
     public void testPropertiesInbound() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

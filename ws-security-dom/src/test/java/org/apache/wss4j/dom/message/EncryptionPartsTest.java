@@ -48,13 +48,13 @@ import java.util.List;
  * has a custom header added.
  */
 public class EncryptionPartsTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(EncryptionPartsTest.class);
     private static final String SOAPMSG = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<soapenv:Envelope xmlns:foo=\"urn:foo.bar\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
             "   <soapenv:Header>" +
-            "       <foo:bar1>baz1</foo:bar1>" + 
-            "       <foo:foobar>baz</foo:foobar>" + 
+            "       <foo:bar1>baz1</foo:bar1>" +
+            "       <foo:foobar>baz</foo:foobar>" +
             "       <foo:bar2>baz2</foo:bar2>" +
             "       <foo:with-attributes some-attribute=\"3\">baz</foo:with-attributes>" +
             "   </soapenv:Header>" +
@@ -65,7 +65,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
     private static final String SOAPMSG_MULTIPLE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
         "<soapenv:Envelope xmlns:foo=\"urn:foo.bar\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
         "   <soapenv:Header>" +
-        "       <foo:foobar>baz</foo:foobar>" + 
+        "       <foo:foobar>baz</foo:foobar>" +
         "   </soapenv:Header>" +
         "   <soapenv:Body>" +
         "      <ns1:testMethod xmlns:ns1=\"http://axis/service/security/test6/LogTestService8\">asf1</ns1:testMethod>" +
@@ -76,12 +76,12 @@ public class EncryptionPartsTest extends org.junit.Assert {
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public EncryptionPartsTest() throws Exception {
         crypto = CryptoFactory.getInstance();
         WSSConfig.init();
@@ -100,46 +100,46 @@ public class EncryptionPartsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
                 "urn:foo.bar",
                 "");
         encrypt.getParts().add(encP);
-        
+
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
-        
+
         WSHandlerResult results = verify(encryptedDoc);
-        
-        WSSecurityEngineResult actionResult = 
+
+        WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.ENCR).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
-        
-        assertEquals(WSConstants.KEYTRANSPORT_RSAOEP, 
+
+        assertEquals(WSConstants.KEYTRANSPORT_RSAOEP,
                 actionResult.get(WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD));
-        
+
         WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/soapenv:Envelope/soapenv:Header/foo:foobar", xpath);
         assertEquals(WSConstants.AES_128, wsDataRef.getAlgorithm());
         QName expectedQName = new QName("urn:foo.bar", "foobar");
         assertEquals(expectedQName, wsDataRef.getName());
-        
+
         Element encryptedElement = wsDataRef.getEncryptedElement();
         assertNotNull(encryptedElement);
         assertEquals(WSConstants.ENC_NS, encryptedElement.getNamespaceURI());
     }
-    
+
     @org.junit.Test
     public void testOptionalSOAPHeaderPresent() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
@@ -149,7 +149,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
@@ -158,25 +158,25 @@ public class EncryptionPartsTest extends org.junit.Assert {
         encP.setRequired(false);
         encrypt.getParts().add(encP);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
-        encP = 
+        encP =
             new WSEncryptionPart(
-                WSConstants.ELEM_BODY, 
-                soapNamespace, 
+                WSConstants.ELEM_BODY,
+                soapNamespace,
                 "Content"
             );
         encrypt.getParts().add(encP);
-        
+
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
-        
+
         verify(encryptedDoc);
     }
-    
+
     @org.junit.Test
     public void testOptionalSOAPHeaderNotPresent() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
@@ -186,7 +186,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
@@ -195,25 +195,25 @@ public class EncryptionPartsTest extends org.junit.Assert {
         encP.setRequired(false);
         encrypt.getParts().add(encP);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
-        encP = 
+        encP =
             new WSEncryptionPart(
-                WSConstants.ELEM_BODY, 
-                soapNamespace, 
+                WSConstants.ELEM_BODY,
+                soapNamespace,
                 "Content"
             );
         encrypt.getParts().add(encP);
-        
+
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
-        
+
         verify(encryptedDoc);
     }
-    
+
     @org.junit.Test
     public void testRequiredSOAPHeaderNotPresent() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
@@ -223,7 +223,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
@@ -231,23 +231,23 @@ public class EncryptionPartsTest extends org.junit.Assert {
                 "");
         encrypt.getParts().add(encP);
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
-        encP = 
+        encP =
             new WSEncryptionPart(
-                WSConstants.ELEM_BODY, 
-                soapNamespace, 
+                WSConstants.ELEM_BODY,
+                soapNamespace,
                 "Content"
             );
         encrypt.getParts().add(encP);
-        
+
         try {
             encrypt.build(doc, crypto, secHeader);
             fail("Failure expected on not encrypting a required element");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
     }
-    
-    
+
+
     /**
      * Test encrypting a custom SOAP header using wsse11:EncryptedHeader
      */
@@ -261,41 +261,41 @@ public class EncryptionPartsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
                 "urn:foo.bar",
                 "Header");
         encrypt.getParts().add(encP);
-        
+
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
-        
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
         assertTrue(outputString.contains("wsse11:EncryptedHeader"));
         assertFalse(outputString.contains("foo:foobar"));
-        
+
         WSHandlerResult results = verify(encryptedDoc);
-        
+
         WSSecurityEngineResult actionResult =
                 results.getActionResults().get(WSConstants.ENCR).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
-        
-        assertEquals(WSConstants.KEYTRANSPORT_RSAOEP, 
+
+        assertEquals(WSConstants.KEYTRANSPORT_RSAOEP,
                 actionResult.get(WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD));
-        
+
         WSDataRef wsDataRef = refs.get(0);
         String xpath = wsDataRef.getXpath();
         assertEquals("/soapenv:Envelope/soapenv:Header/foo:foobar", xpath);
     }
-    
+
     /**
      * Test encrypting a custom SOAP header using wsse11:EncryptedHeader
      */
@@ -357,23 +357,23 @@ public class EncryptionPartsTest extends org.junit.Assert {
 
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar2",
                 "urn:foo.bar",
                 "");
         encrypt.getParts().add(encP);
-        
+
         try {
             encrypt.build(doc, crypto, secHeader);
             fail("Failure expected on a bad localname");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
     }
-    
-    
+
+
     /**
      * Test encrypting a custom SOAP header with a bad namespace
      */
@@ -387,30 +387,30 @@ public class EncryptionPartsTest extends org.junit.Assert {
 
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "foobar",
                 "urn:foo.bar2",
                 "");
         encrypt.getParts().add(encP);
-        
+
         try {
             encrypt.build(doc, crypto, secHeader);
             fail("Failure expected on a bad namespace");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
     }
-    
-    
+
+
     /**
      * Test encrypting a custom SOAP header and the SOAP body
      */
     @org.junit.Test
     public void testSOAPHeaderAndBody() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        SOAPConstants soapConstants = 
+        SOAPConstants soapConstants =
             WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -418,7 +418,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
 
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 soapConstants.getBodyQName().getLocalPart(),    // define the body
@@ -431,31 +431,31 @@ public class EncryptionPartsTest extends org.junit.Assert {
                 "urn:foo.bar",
                 "");
         encrypt.getParts().add(encP2);
-        
+
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
-        
+
         WSHandlerResult results = verify(encryptedDoc);
-        
+
         QName fooName = new QName("urn:foo.bar", "foobar");
         QName bodyName = new QName(soapConstants.getEnvelopeURI(), "Body");
         QName headerName = new QName(soapConstants.getEnvelopeURI(), "Header");
-        
-        WSSecurityEngineResult actionResult = 
+
+        WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.ENCR).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
-        
+
         @SuppressWarnings("unchecked")
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertTrue(refs != null && !refs.isEmpty());
-        
+
         boolean foundFoo = false;
         boolean foundBody = false;
         boolean foundHeader = false;
@@ -471,15 +471,15 @@ public class EncryptionPartsTest extends org.junit.Assert {
         assertTrue(foundFoo && foundBody);
         assertFalse(foundHeader);
     }
-    
-    
+
+
     /**
      * Test getting a DOM Element from WSEncryptionPart directly
      */
     @org.junit.Test
     public void testEncryptionPartDOMElement() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        SOAPConstants soapConstants = 
+        SOAPConstants soapConstants =
             WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -487,7 +487,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
 
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         // Give wrong names to make sure it's picking up the element
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -498,30 +498,30 @@ public class EncryptionPartsTest extends org.junit.Assert {
         assertTrue(bodyElement != null && "Body".equals(bodyElement.getLocalName()));
         encP.setElement(bodyElement);
         encrypt.getParts().add(encP);
-        
+
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
-        
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
         assertTrue (!outputString.contains("testMethod"));
         WSHandlerResult results = verify(encryptedDoc);
-        
-        WSSecurityEngineResult actionResult = 
+
+        WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.ENCR).get(0);
         assertTrue(actionResult != null);
         assertFalse(actionResult.isEmpty());
         @SuppressWarnings("unchecked")
         final List<WSDataRef> refs =
             (List<WSDataRef>) actionResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
-        
+
         WSDataRef wsDataRef = refs.get(0);
         QName bodyName = new QName(soapConstants.getEnvelopeURI(), "Body");
         assertEquals(bodyName, wsDataRef.getName());
     }
-    
+
     /**
      * Test encrypting two SOAP Body elements with the same QName.
      */
@@ -534,45 +534,45 @@ public class EncryptionPartsTest extends org.junit.Assert {
 
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "testMethod",
                 "http://axis/service/security/test6/LogTestService8",
                 "");
         encrypt.getParts().add(encP);
-        
+
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
-        
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
         assertFalse(outputString.contains("testMethod"));
-        
+
         verify(encryptedDoc);
-        
-        outputString = 
+
+        outputString =
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         assertTrue(outputString.contains("asf1"));
         assertTrue(outputString.contains("asf2"));
     }
-    
+
 
     /**
      * Verifies the soap envelope
      * <p/>
-     * 
-     * @param doc 
+     *
+     * @param doc
      * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc) throws Exception {
-        WSHandlerResult results = 
+        WSHandlerResult results =
             secEngine.processSecurityHeader(doc, null, callbackHandler, null, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verified and decrypted message:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }

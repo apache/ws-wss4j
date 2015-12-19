@@ -49,20 +49,20 @@ import org.w3c.dom.Element;
  * mentioned option is on.
  */
 public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(RequireSignedEncryptedDataElementsTest.class);
     private static ResourceBundle resources = ResourceBundle.getBundle("messages.wss4j_errors");
-    private static final String SOAPMSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+    private static final String SOAPMSG =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
         + "<SOAP-ENV:Envelope "
         +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
         +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
-        +   "<SOAP-ENV:Body>" 
-        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
-        +           "<value xmlns=\"http://blah.com\">15</value>" 
-        +       "</add>" 
-        +   "</SOAP-ENV:Body>" 
+        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
+        +   "<SOAP-ENV:Body>"
+        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">"
+        +           "<value xmlns=\"http://blah.com\">15</value>"
+        +       "</add>"
+        +   "</SOAP-ENV:Body>"
         + "</SOAP-ENV:Envelope>";
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
@@ -72,7 +72,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public RequireSignedEncryptedDataElementsTest() throws Exception {
         crypto = CryptoFactory.getInstance();
         WSSConfig.init();
@@ -83,12 +83,12 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         Document encryptedSignedDoc = getRequestDocument();
         RequestData reqData = getRequestData(true);
         verify(encryptedSignedDoc, reqData);
-        
+
         encryptedSignedDoc = getRequestDocument();
         reqData = getRequestData(false);
         TestMessageTransformer.duplicateEncryptedDataInWsseHeader(encryptedSignedDoc.getDocumentElement(), false);
         verify(encryptedSignedDoc, reqData);
-        
+
         encryptedSignedDoc = getRequestDocument();
         reqData = getRequestData(true);
         Element newEncData = TestMessageTransformer.duplicateEncryptedDataInWsseHeader(encryptedSignedDoc.getDocumentElement(), false);
@@ -99,18 +99,18 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
             checkFailure(newEncData, e);
         }
     }
-    
+
     @org.junit.Test
     public void testEncryptedKeyRefAndDuplicatedEncDataInWsseWrapperHeader() throws Exception {
         Document encryptedSignedDoc = getRequestDocument();
         RequestData reqData = getRequestData(true);
         verify(encryptedSignedDoc, reqData);
-        
+
         encryptedSignedDoc = getRequestDocument();
         reqData = getRequestData(false);
         TestMessageTransformer.duplicateEncryptedDataInWsseWrapperHeader(encryptedSignedDoc.getDocumentElement(), false);
         verify(encryptedSignedDoc, reqData);
-        
+
         encryptedSignedDoc = getRequestDocument();
         reqData = getRequestData(true);
         Element newEncData = TestMessageTransformer.duplicateEncryptedDataInWsseWrapperHeader(encryptedSignedDoc.getDocumentElement(), false);
@@ -121,18 +121,18 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
             checkFailure(newEncData, e);
         }
     }
-    
+
     @org.junit.Test
     public void testEncryptedKeyRefAndDuplicatedEncDataInExternalWrapperElement() throws Exception {
         Document encryptedSignedDoc = getRequestDocument();
         RequestData reqData = getRequestData(true);
         verify(encryptedSignedDoc, reqData);
-        
+
         encryptedSignedDoc = getRequestDocument();
         reqData = getRequestData(false);
         TestMessageTransformer.duplicateEncryptedDataInExternalWrapperElement(encryptedSignedDoc.getDocumentElement(), false);
         verify(encryptedSignedDoc, reqData);
-        
+
         encryptedSignedDoc = getRequestDocument();
         reqData = getRequestData(true);
         Element newEncData = TestMessageTransformer.duplicateEncryptedDataInExternalWrapperElement(encryptedSignedDoc.getDocumentElement(), false);
@@ -143,18 +143,18 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
             checkFailure(newEncData, e);
         }
     }
-    
+
     @org.junit.Test
     public void testReferenceListAndDuplicatedEncDataInWsseHeader() throws Exception {
         Document encryptedSignedDoc = getRequestDocument();
         RequestData reqData = getRequestData(true);
         verify(encryptedSignedDoc, reqData);
-        
+
         encryptedSignedDoc = getRequestDocument();
         reqData = getRequestData(false);
         TestMessageTransformer.duplicateEncryptedDataInWsseHeader(encryptedSignedDoc.getDocumentElement(), true);
         verify(encryptedSignedDoc, reqData);
-        
+
         encryptedSignedDoc = getRequestDocument();
         reqData = getRequestData(true);
         Element newEncData = TestMessageTransformer.duplicateEncryptedDataInWsseHeader(encryptedSignedDoc.getDocumentElement(), true);
@@ -165,18 +165,18 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
             checkFailure(newEncData, e);
         }
     }
-    
+
     @org.junit.Test
     public void testReferenceListAndDuplicatedEncDataInWsseWrapperHeader() throws Exception {
         Document encryptedSignedDoc = getRequestDocument();
         RequestData reqData = getRequestData(true);
         verify(encryptedSignedDoc, reqData);
-        
+
         encryptedSignedDoc = getRequestDocument();
         reqData = getRequestData(false);
         TestMessageTransformer.duplicateEncryptedDataInWsseWrapperHeader(encryptedSignedDoc.getDocumentElement(), true);
         verify(encryptedSignedDoc, reqData);
-        
+
         encryptedSignedDoc = getRequestDocument();
         reqData = getRequestData(true);
         Element newEncData = TestMessageTransformer.duplicateEncryptedDataInWsseWrapperHeader(encryptedSignedDoc.getDocumentElement(), true);
@@ -187,18 +187,18 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
             checkFailure(newEncData, e);
         }
     }
-    
+
     @org.junit.Test
     public void testReferenceListAndDuplicatedEncDataInExternalWrapperElement() throws Exception {
         Document encryptedSignedDoc = getRequestDocument();
         RequestData reqData = getRequestData(true);
         verify(encryptedSignedDoc, reqData);
-        
+
         encryptedSignedDoc = getRequestDocument();
         reqData = getRequestData(false);
         TestMessageTransformer.duplicateEncryptedDataInExternalWrapperElement(encryptedSignedDoc.getDocumentElement(), true);
         verify(encryptedSignedDoc, reqData);
-        
+
         encryptedSignedDoc = getRequestDocument();
         reqData = getRequestData(true);
         Element newEncData = TestMessageTransformer.duplicateEncryptedDataInExternalWrapperElement(encryptedSignedDoc.getDocumentElement(), true);
@@ -209,13 +209,13 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
             checkFailure(newEncData, e);
         }
     }
-    
+
     @org.junit.Test
     public void testAdditionalEncryptedDataWithEmbeddedEncryptedKeyInWsseHeader() throws Exception {
         Document encryptedSignedDoc = getRequestDocument();
         RequestData reqData = getRequestData(true);
         verify(encryptedSignedDoc, reqData);
-        
+
         encryptedSignedDoc = getRequestDocument();
         reqData = getRequestData(true);
         Element newEncData = TestMessageTransformer.addEncryptedDataWithEmbeddedEncryptedKeyInWsseHeader(encryptedSignedDoc.getDocumentElement());
@@ -226,7 +226,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
             checkFailure(newEncData, e);
         }
     }
-    
+
     @org.junit.Test
     public void testEncryptedKeyRefAndDuplicatedEncDataInWsseWrapperBody() throws Exception {
         Document encryptedSignedDoc = getRequestDocumentEncryptionFirst();
@@ -238,11 +238,11 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         } catch (WSSecurityException e) {
             assertTrue(e.getMessage().contains("The signature or decryption was invalid"));
         }
-        
+
         encryptedSignedDoc = getRequestDocumentEncryptionFirst();
         TestMessageTransformer.duplicateEncryptedDataInWrapperBody(encryptedSignedDoc.getDocumentElement());
         reqData = getRequestData(true);
-        
+
         try {
             verify(encryptedSignedDoc, reqData);
             fail("WSSecurityException expected");
@@ -250,12 +250,12 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
             assertTrue(e.getMessage().contains("is not signed"));
         }
     }
-    
+
     @org.junit.Test
     public void testEncryptedKeyRefAndDuplicatedEncDataAfterWsseWrapperBody() throws Exception {
         Document encryptedSignedDoc = getRequestDocumentEncryptionFirst();
         TestMessageTransformer.duplicateEncryptedDataAfterWrapperBody(encryptedSignedDoc.getDocumentElement());
-        
+
         RequestData reqData = getRequestData(true);
         try {
             verify(encryptedSignedDoc, reqData);
@@ -264,13 +264,13 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
             assertTrue(e.getMessage().contains("is not signed"));
         }
     }
-    
+
     private static void checkFailure(Element attackElement, WSSecurityException e) {
         final String mex = MessageFormat.format(resources.getString("elementNotSigned"), attackElement);
         assertTrue(e.getMessage().contains(mex));
         assertEquals(WSSecurityException.ErrorCode.FAILED_CHECK, e.getErrorCode());
     }
-    
+
     private RequestData getRequestData(boolean reqSignedEncData) throws WSSecurityException {
         RequestData reqData = new RequestData();
         Map<String, Object> messageContext = new TreeMap<>();
@@ -284,7 +284,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         reqData.setDecCrypto(crypto);
         return reqData;
     }
-    
+
     private Document getRequestDocument() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         WSSecSignature sign = new WSSecSignature();
@@ -297,25 +297,25 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         secHeader.insertSecurityHeader();
 
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Encryption....");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
-        
+
         Document encryptedSignedDoc = sign.build(encryptedDoc, crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
             LOG.debug(outputString);
         }
         return encryptedSignedDoc;
     }
-    
+
     private Document getRequestDocumentEncryptionFirst() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         WSSecSignature sign = new WSSecSignature();
@@ -328,37 +328,37 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         secHeader.insertSecurityHeader();
 
         Document signedDoc = sign.build(doc, crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         Document encryptedDoc = encrypt.build(signedDoc, crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Encryption....");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
-        
+
         return encryptedDoc;
     }
 
-    
+
     private WSHandlerResult verify(Document doc, RequestData reqData) throws Exception {
         Element elem = WSSecurityUtil.getSecurityHeader(doc, null);
-        WSHandlerResult resultList = 
+        WSHandlerResult resultList =
             secEngine.processSecurityHeader(elem, reqData);
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         return resultList;
     }
 

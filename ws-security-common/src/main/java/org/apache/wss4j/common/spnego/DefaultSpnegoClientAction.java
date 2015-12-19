@@ -26,32 +26,32 @@ import org.ietf.jgss.GSSName;
 import org.ietf.jgss.Oid;
 
 /**
- * This class represents a PrivilegedAction implementation to obtain a (SPNEGO) service ticket from a 
+ * This class represents a PrivilegedAction implementation to obtain a (SPNEGO) service ticket from a
  * Kerberos Key Distribution Center.
  */
 public class DefaultSpnegoClientAction implements SpnegoClientAction {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(DefaultSpnegoClientAction.class);
-    
+
     private String serviceName;
     private GSSContext secContext;
     private boolean mutualAuth;
     private boolean isUsernameServiceNameForm;
-    
+
     /**
      * Whether to enable mutual authentication or not.
      */
     public void setMutualAuth(boolean mutualAuthentication) {
         mutualAuth = mutualAuthentication;
     }
-    
+
     /**
      * The Service Name
      */
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
     }
-    
+
     /**
      * Obtain a service ticket
      */
@@ -65,7 +65,7 @@ public class DefaultSpnegoClientAction implements SpnegoClientAction {
 
             secContext.requestMutualAuth(mutualAuth);
             secContext.requestCredDeleg(Boolean.FALSE);
-        
+
             byte[] token = new byte[0];
             return secContext.initSecContext(token, 0, token.length);
         } catch (GSSException e) {
@@ -76,7 +76,7 @@ public class DefaultSpnegoClientAction implements SpnegoClientAction {
 
         return null;
     }
-    
+
     /**
      * Get the GSSContext that was created after a service ticket was obtained
      */

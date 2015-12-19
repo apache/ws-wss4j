@@ -56,19 +56,19 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
  */
 public class WSSecDKSign extends WSSecDerivedKeyBase {
 
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSecDKSign.class);
 
     private String sigAlgo = WSConstants.HMAC_SHA1;
     private String digestAlgo = WSConstants.SHA1;
     private String canonAlgo = WSConstants.C14N_EXCL_OMIT_COMMENTS;
     private byte[] signatureValue;
-    
+
     private String keyInfoUri;
     private SecurityTokenReference secRef;
     private String strUri;
     private WSDocInfo wsDocInfo;
-    
+
     private XMLSignatureFactory signatureFactory;
     private XMLSignature sig;
     private KeyInfo keyInfo;
@@ -81,7 +81,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         super();
         init();
     }
-    
+
     private void init() {
         // Try to install the Santuario Provider - fall back to the JDK provider if this does
         // not work
@@ -91,9 +91,9 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
             signatureFactory = XMLSignatureFactory.getInstance("DOM");
         }
     }
-    
+
     public Document build(Document doc, WSSecHeader secHeader) throws WSSecurityException {
-        
+
         prepare(doc, secHeader);
         if (getParts().isEmpty()) {
             getParts().add(WSSecurityUtil.getDefaultEncryptionPart(document));
@@ -104,11 +104,11 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                 }
             }
         }
-        
-        List<javax.xml.crypto.dsig.Reference> referenceList = 
+
+        List<javax.xml.crypto.dsig.Reference> referenceList =
             addReferencesToSign(getParts(), secHeader);
         computeSignature(referenceList);
-        
+
         //
         // prepend elements in the right order to the security header
         //
@@ -116,21 +116,21 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
 
         return doc;
     }
-    
+
     public void prepare(Document doc, WSSecHeader secHeader) throws WSSecurityException {
         super.prepare(doc);
         wsDocInfo = new WSDocInfo(doc);
         securityHeader = secHeader.getSecurityHeader();
         sig = null;
-        
+
         try {
             C14NMethodParameterSpec c14nSpec = null;
             if (addInclusivePrefixes && canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
-                List<String> prefixes = 
+                List<String> prefixes =
                     getInclusivePrefixes(secHeader.getSecurityHeader(), false);
                 c14nSpec = new ExcC14NParameterSpec(prefixes);
             }
-            
+
            c14nMethod = signatureFactory.newCanonicalizationMethod(canonAlgo, c14nSpec);
         } catch (Exception ex) {
             LOG.error("", ex);
@@ -140,29 +140,29 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         }
 
         keyInfoUri = getIdAllocator().createSecureId("KI-", keyInfo);
-        
+
         secRef = new SecurityTokenReference(doc);
         strUri = getIdAllocator().createSecureId("STR-", secRef);
         secRef.setID(strUri);
-        
+
         Reference ref = new Reference(document);
         ref.setURI("#" + getId());
-        String ns = 
-            ConversationConstants.getWSCNs(getWscVersion()) 
+        String ns =
+            ConversationConstants.getWSCNs(getWscVersion())
             + ConversationConstants.TOKEN_TYPE_DERIVED_KEY_TOKEN;
         ref.setValueType(ns);
         secRef.setReference(ref);
-        
+
         XMLStructure structure = new DOMStructure(secRef.getElement());
         wsDocInfo.addTokenElement(secRef.getElement(), false);
         KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
-        keyInfo = 
+        keyInfo =
             keyInfoFactory.newKeyInfo(
                 java.util.Collections.singletonList(structure), keyInfoUri
             );
-        
+
     }
-    
+
     /**
      * Returns the SignatureElement.
      * The method can be called any time after <code>prepare()</code>.
@@ -174,37 +174,37 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                 securityHeader, WSConstants.SIG_LN, WSConstants.SIG_NS
             );
     }
-    
+
     /**
      * This method adds references to the Signature.
-     * 
+     *
      * @param references The list of references to sign
      * @param secHeader The Security Header
      * @throws WSSecurityException
      */
     public List<javax.xml.crypto.dsig.Reference> addReferencesToSign(
-        List<WSEncryptionPart> references, 
+        List<WSEncryptionPart> references,
         WSSecHeader secHeader
     ) throws WSSecurityException {
-        return 
+        return
             addReferencesToSign(
-                document, 
+                document,
                 references,
                 wsDocInfo,
-                signatureFactory, 
-                secHeader, 
-                addInclusivePrefixes, 
+                signatureFactory,
+                secHeader,
+                addInclusivePrefixes,
                 digestAlgo
             );
     }
-    
+
     /**
      * Compute the Signature over the references.
-     * 
+     *
      * After references are set this method computes the Signature for them.
      * This method can be called any time after the references were set. See
      * <code>addReferencesToSign()</code>.
-     * 
+     *
      * @throws WSSecurityException
      */
     public void computeSignature(
@@ -212,35 +212,35 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     ) throws WSSecurityException {
         computeSignature(referenceList, true, null);
     }
-    
+
     /**
      * Compute the Signature over the references.
-     * 
+     *
      * After references are set this method computes the Signature for them.
      * This method can be called any time after the references were set. See
      * <code>addReferencesToSign()</code>.
-     * 
+     *
      * @throws WSSecurityException
      */
     public void computeSignature(
-        List<javax.xml.crypto.dsig.Reference> referenceList, 
+        List<javax.xml.crypto.dsig.Reference> referenceList,
         boolean prepend,
         Element siblingElement
     ) throws WSSecurityException {
         try {
             java.security.Key key = getDerivedKey(sigAlgo);
-            SignatureMethod signatureMethod = 
+            SignatureMethod signatureMethod =
                 signatureFactory.newSignatureMethod(sigAlgo, null);
-            SignedInfo signedInfo = 
+            SignedInfo signedInfo =
                 signatureFactory.newSignedInfo(c14nMethod, signatureMethod, referenceList);
-            
+
             sig = signatureFactory.newXMLSignature(
-                    signedInfo, 
+                    signedInfo,
                     keyInfo,
                     null,
                     getIdAllocator().createId("SIG-", null),
                     null);
-            
+
             //
             // Figure out where to insert the signature element
             //
@@ -257,22 +257,22 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
             } else {
                 signContext = new DOMSignContext(key, securityHeader);
             }
-            
+
             signContext.putNamespacePrefix(WSConstants.SIG_NS, WSConstants.SIG_PREFIX);
             if (WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(canonAlgo)) {
                 signContext.putNamespacePrefix(
-                    WSConstants.C14N_EXCL_OMIT_COMMENTS, 
+                    WSConstants.C14N_EXCL_OMIT_COMMENTS,
                     WSConstants.C14N_EXCL_OMIT_COMMENTS_PREFIX
                 );
             }
             signContext.setProperty(STRTransform.TRANSFORM_WS_DOC_INFO, wsDocInfo);
             wsDocInfo.setCallbackLookup(callbackLookup);
-            
+
             // Add the elements to sign to the Signature Context
             wsDocInfo.setTokensOnContext((DOMSignContext)signContext);
-            
+
             sig.sign(signContext);
-            
+
             signatureValue = sig.getSignatureValue().getValue();
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
@@ -281,16 +281,16 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
             );
         }
     }
-    
+
     protected int getDerivedKeyLength() throws WSSecurityException {
-        return derivedKeyLength > 0 ? derivedKeyLength : 
+        return derivedKeyLength > 0 ? derivedKeyLength :
             KeyUtils.getKeyLength(sigAlgo);
     }
-    
+
     public void setDerivedKeyLength(int keyLength) {
         derivedKeyLength = keyLength;
     }
-    
+
     /**
      * Set the signature algorithm to use. The default is WSConstants.SHA1.
      * @param algorithm the signature algorithm to use.
@@ -298,17 +298,17 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     public void setSignatureAlgorithm(String algorithm) {
         sigAlgo = algorithm;
     }
-    
+
     /**
      * @return the signature algorithm to use
      */
     public String getSignatureAlgorithm() {
         return sigAlgo;
     }
-    
+
     /**
      * Returns the the value of wsu:Id attribute of the Signature element.
-     * 
+     *
      * @return Return the wsu:Id of this token or null if the signature has not been generated.
      */
     public String getSignatureId() {
@@ -317,7 +317,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         }
         return sig.getId();
     }
-    
+
     /**
      * Set the digest algorithm to use. The default is WSConstants.SHA1.
      * @param algorithm the digest algorithm to use.
@@ -325,7 +325,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     public void setDigestAlgorithm(String algorithm) {
         digestAlgo = algorithm;
     }
-    
+
     /**
      * @return the digest algorithm to use
      */
@@ -339,14 +339,14 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     public byte[] getSignatureValue() {
         return signatureValue;
     }
-    
+
     /**
      * Set the canonicalization method to use.
-     * 
+     *
      * If the canonicalization method is not set then the recommended Exclusive
      * XML Canonicalization is used by default Refer to WSConstants which
      * algorithms are supported.
-     * 
+     *
      * @param algo Is the name of the signature algorithm
      * @see WSConstants#C14N_OMIT_COMMENTS
      * @see WSConstants#C14N_WITH_COMMENTS
@@ -359,16 +359,16 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
 
     /**
      * Get the canonicalization method.
-     * 
+     *
      * If the canonicalization method was not set then Exclusive XML
      * Canonicalization is used by default.
-     * 
+     *
      * @return The string describing the canonicalization algorithm.
      */
     public String getSigCanonicalization() {
         return canonAlgo;
     }
-    
+
     public boolean isAddInclusivePrefixes() {
         return addInclusivePrefixes;
     }

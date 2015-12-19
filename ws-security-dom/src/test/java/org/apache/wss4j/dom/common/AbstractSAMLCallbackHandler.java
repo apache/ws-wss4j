@@ -52,11 +52,11 @@ import java.util.List;
  * authentication assertion.
  */
 public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
-    
+
     public enum Statement {
         AUTHN, ATTR, AUTHZ
     }
-    
+
     protected String subjectName = null;
     protected String subjectQualifier = null;
     protected String confirmationMethod = null;
@@ -87,64 +87,64 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
     private String issuerName;
     private String issuerPassword;
     private Element assertionAdviceElement;
-    
+
     public void setSubjectConfirmationData(SubjectConfirmationDataBean subjectConfirmationData) {
         this.subjectConfirmationData = subjectConfirmationData;
     }
-    
+
     public void setConditions(ConditionsBean conditionsBean) {
         this.conditions = conditionsBean;
     }
-    
+
     public void setConfirmationMethod(String confMethod) {
         confirmationMethod = confMethod;
     }
-    
+
     public void setSessionNotOnOrAfter(DateTime sessionNotOnOrAfter) {
         this.sessionNotOnOrAfter = sessionNotOnOrAfter;
     }
-    
+
     public void setStatement(Statement statement) {
         this.statement = statement;
     }
-    
+
     public void setCertIdentifier(CERT_IDENTIFIER certIdentifier) {
         this.certIdentifier = certIdentifier;
     }
-    
+
     public void setCerts(X509Certificate[] certs) {
         this.certs = certs;
     }
-    
+
     public byte[] getEphemeralKey() {
         return ephemeralKey;
     }
-    
+
     public void setIssuer(String issuer) {
         this.issuer = issuer;
     }
-    
+
     public void setIssuerFormat(String issuerFormat) {
         this.issuerFormat = issuerFormat;
     }
-    
+
     public void setSubjectNameIDFormat(String subjectNameIDFormat) {
         this.subjectNameIDFormat = subjectNameIDFormat;
     }
-    
+
     public void setSubjectLocality(String ipAddress, String dnsAddress) {
         this.subjectLocalityIpAddress = ipAddress;
         this.subjectLocalityDnsAddress = dnsAddress;
     }
-    
+
     public void setResource(String resource) {
         this.resource = resource;
     }
-    
+
     public void setCustomAttributeValues(List<Object> customAttributeValues) {
         this.customAttributeValues = customAttributeValues;
     }
-    
+
     /**
      * Note that the SubjectBean parameter should be null for SAML2.0
      */
@@ -175,7 +175,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
                 attributeBean.setQualifiedName("role");
             }
             if (customAttributeValues != null) {
-                attributeBean.setAttributeValues(customAttributeValues);   
+                attributeBean.setAttributeValues(customAttributeValues);
             } else {
                 List<Object> attributes = new ArrayList<>();
                 attributes.add("user");
@@ -197,7 +197,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
             callback.setAuthDecisionStatementData(Collections.singletonList(authzBean));
         }
     }
-    
+
     protected KeyInfoBean createKeyInfo() throws Exception {
         KeyInfoBean keyInfo = new KeyInfoBean();
         if (statement == Statement.AUTHN) {
@@ -205,12 +205,12 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
             keyInfo.setCertIdentifer(certIdentifier);
         } else if (statement == Statement.ATTR) {
             // Build a new Document
-            DocumentBuilderFactory docBuilderFactory = 
+            DocumentBuilderFactory docBuilderFactory =
                 DocumentBuilderFactory.newInstance();
             docBuilderFactory.setNamespaceAware(true);
             DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
             Document doc = docBuilder.newDocument();
-                  
+
             // Create an Encrypted Key
             WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
             encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
@@ -218,9 +218,9 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
             encrKey.prepare(doc, null);
             ephemeralKey = encrKey.getEphemeralKey();
             Element encryptedKeyElement = encrKey.getEncryptedKeyElement();
-            
+
             // Append the EncryptedKey to a KeyInfo element
-            Element keyInfoElement = 
+            Element keyInfoElement =
                 doc.createElementNS(
                     WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
                 );
@@ -228,7 +228,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
                 WSConstants.XMLNS_NS, "xmlns:" + WSConstants.SIG_PREFIX, WSConstants.SIG_NS
             );
             keyInfoElement.appendChild(encryptedKeyElement);
-            
+
             keyInfo.setElement(keyInfoElement);
         }
         return keyInfo;

@@ -32,23 +32,23 @@ import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
  * This class intializes the Opensaml library.
  */
 public final class OpenSAMLBootstrap {
-    
+
     /** List of default configuration files. */
-    private static final String[] xmlConfigs = { 
+    private static final String[] xmlConfigs = {
         "/default-config.xml",
         "/schema-config.xml",
-        "/saml1-assertion-config.xml", 
-        "/saml1-metadata-config.xml", 
+        "/saml1-assertion-config.xml",
+        "/saml1-metadata-config.xml",
         "/saml1-protocol-config.xml",
-        "/saml2-assertion-config.xml", 
-        "/saml2-assertion-delegation-restriction-config.xml",    
+        "/saml2-assertion-config.xml",
+        "/saml2-assertion-delegation-restriction-config.xml",
         "/saml2-ecp-config.xml",
         "/saml2-metadata-algorithm-config.xml",
         "/saml2-metadata-attr-config.xml",
         "/saml2-metadata-config.xml",
         "/saml2-metadata-idp-discovery-config.xml",
-        "/saml2-metadata-query-config.xml", 
-        "/saml2-metadata-reqinit-config.xml", 
+        "/saml2-metadata-query-config.xml",
+        "/saml2-metadata-reqinit-config.xml",
         "/saml2-metadata-ui-config.xml",
         "/saml2-metadata-rpi-config.xml",
         "/saml2-protocol-config.xml",
@@ -57,7 +57,7 @@ public final class OpenSAMLBootstrap {
         "/saml2-channel-binding-config.xml",
         "/saml-ec-gss-config.xml",
         "/signature-config.xml",
-        "/encryption-config.xml", 
+        "/encryption-config.xml",
         "/xacml20-context-config.xml",
         "/xacml20-policy-config.xml",
         "/xacml10-saml2-profile-config.xml",
@@ -66,23 +66,23 @@ public final class OpenSAMLBootstrap {
         "/xacml3-saml2-profile-config.xml",
         "/saml2-xacml2-profile.xml",
     };
-    
+
     private OpenSAMLBootstrap() {
         // complete
     }
-    
+
     /**
      * Initializes the OpenSAML library, loading default configurations.
-     * 
+     *
      * @throws ConfigurationException thrown if there is a problem initializing the OpenSAML library
      */
     public static synchronized void bootstrap() throws XMLConfigurationException {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         try {
             XMLConfigurator configurator = new XMLConfigurator();
-            
+
             Thread.currentThread().setContextClassLoader(XMLObjectProviderRegistrySupport.class.getClassLoader());
-            
+
             for (String config : xmlConfigs) {
                 //most are found in the Configuration.class classloader
                 InputStream ins = Configuration.class.getResourceAsStream(config);
@@ -98,5 +98,5 @@ public final class OpenSAMLBootstrap {
             Thread.currentThread().setContextClassLoader(loader);
         }
     }
-    
+
 }

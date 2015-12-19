@@ -75,7 +75,7 @@ public class SignatureCertConstaintsTest extends AbstractTestBase {
             String certConstraint = ".*CN=Colm.*O=Apache.*";
             Pattern subjectDNPattern = Pattern.compile(certConstraint.trim());
             securityProperties.setSubjectCertConstraints(Collections.singletonList(subjectDNPattern));
-            
+
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -86,7 +86,7 @@ public class SignatureCertConstaintsTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 1);
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
         }
-        
+
         //done signature; now test sig-verification: This should fail with an incorrect cert constraint check
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -94,7 +94,7 @@ public class SignatureCertConstaintsTest extends AbstractTestBase {
             String certConstraint = ".*CN=Colm2.*O=Apache.*";
             Pattern subjectDNPattern = Pattern.compile(certConstraint.trim());
             securityProperties.setSubjectCertConstraints(Collections.singletonList(subjectDNPattern));
-            
+
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -107,7 +107,7 @@ public class SignatureCertConstaintsTest extends AbstractTestBase {
             }
         }
     }
-    
+
     @Test
     public void testBSTSignaturePKIPath() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -117,7 +117,7 @@ public class SignatureCertConstaintsTest extends AbstractTestBase {
             Properties properties = new Properties();
             properties.put(WSHandlerConstants.USE_SINGLE_CERTIFICATE, "false");
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
-            
+
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
@@ -133,7 +133,7 @@ public class SignatureCertConstaintsTest extends AbstractTestBase {
             String certConstraint = ".*CN=Colm.*O=Apache.*";
             Pattern subjectDNPattern = Pattern.compile(certConstraint.trim());
             securityProperties.setSubjectCertConstraints(Collections.singletonList(subjectDNPattern));
-            
+
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -144,7 +144,7 @@ public class SignatureCertConstaintsTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 1);
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
         }
-        
+
         //done signature; now test sig-verification: This should fail with an incorrect cert constraint check
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -152,7 +152,7 @@ public class SignatureCertConstaintsTest extends AbstractTestBase {
             String certConstraint = ".*CN=Colm2.*O=Apache.*";
             Pattern subjectDNPattern = Pattern.compile(certConstraint.trim());
             securityProperties.setSubjectCertConstraints(Collections.singletonList(subjectDNPattern));
-            
+
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 

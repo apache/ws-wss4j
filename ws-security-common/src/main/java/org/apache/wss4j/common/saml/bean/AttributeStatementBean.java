@@ -36,7 +36,7 @@ public class AttributeStatementBean {
     public AttributeStatementBean() {
         attributeBeans = new ArrayList<AttributeBean>();
     }
-    
+
     /**
      * Constructor SamlAttributeStatement creates a new SamlAttributeStatement instance.
      * @param subject A new SubjectBean instance
@@ -101,7 +101,7 @@ public class AttributeStatementBean {
         } else if (attributeBeans != null && !attributeBeans.equals(that.attributeBeans)) {
             return false;
         }
-        
+
         if (subject == null && that.subject != null) {
             return false;
         } else if (subject != null && !subject.equals(that.subject)) {

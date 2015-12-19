@@ -48,11 +48,11 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
  * Test-case for sending SAML Assertions using the "action" approach.
  */
 public class SamlTokenActionTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SamlTokenActionTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -65,32 +65,32 @@ public class SamlTokenActionTest extends org.junit.Assert {
         config.setValidator(WSConstants.SAML2_TOKEN, new CustomSamlAssertionValidator());
         secEngine.setWssConfig(config);
     }
-    
+
     @org.junit.Test
     public void testAssertionAction() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
-        
+
         CallbackHandler callbackHandler = new KeystoreCallbackHandler();
-        
+
         SAML1CallbackHandler samlCallbackHandler = new SAML1CallbackHandler();
         samlCallbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         samlCallbackHandler.setIssuer("www.example.com");
-        
+
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         config.put(WSHandlerConstants.SAML_CALLBACK_REF, samlCallbackHandler);
         reqData.setMsgContext(config);
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         HandlerAction action = new HandlerAction(WSConstants.ST_UNSIGNED);
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             Collections.singletonList(action),
             true
         );
@@ -98,36 +98,36 @@ public class SamlTokenActionTest extends org.junit.Assert {
             String outputString = XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         verify(doc, callbackHandler);
     }
-    
+
     @org.junit.Test
     public void testSignedAssertionAction() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
-        
+
         CallbackHandler callbackHandler = new KeystoreCallbackHandler();
-        
+
         SAML1CallbackHandler samlCallbackHandler = new SAML1CallbackHandler();
         samlCallbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         samlCallbackHandler.setIssuer("www.example.com");
         samlCallbackHandler.setIssuerCrypto(crypto);
         samlCallbackHandler.setIssuerName("wss40");
         samlCallbackHandler.setIssuerPassword("security");
-        
+
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         config.put(WSHandlerConstants.SAML_CALLBACK_REF, samlCallbackHandler);
         reqData.setMsgContext(config);
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         HandlerAction action = new HandlerAction(WSConstants.ST_SIGNED);
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             Collections.singletonList(action),
             true
         );
@@ -135,38 +135,38 @@ public class SamlTokenActionTest extends org.junit.Assert {
             String outputString = XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         verify(doc, callbackHandler);
     }
-    
+
     @org.junit.Test
     public void testAssertionWithSignatureAction() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
         reqData.setWssConfig(cfg);
         reqData.setUsername("wss40");
-        
+
         CallbackHandler callbackHandler = new KeystoreCallbackHandler();
-        
+
         SAML1CallbackHandler samlCallbackHandler = new SAML1CallbackHandler();
         samlCallbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         samlCallbackHandler.setIssuer("www.example.com");
-        
+
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put(WSHandlerConstants.SIG_PROP_FILE, "wss40.properties");
         config.put(WSHandlerConstants.PW_CALLBACK_REF, callbackHandler);
         config.put(WSHandlerConstants.SAML_CALLBACK_REF, samlCallbackHandler);
         config.put(WSHandlerConstants.SIGNATURE_PARTS, "{}{" + WSConstants.SAML_NS + "}Assertion;");
         reqData.setMsgContext(config);
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         List<HandlerAction> actions = new ArrayList<>();
         actions.add(new HandlerAction(WSConstants.ST_UNSIGNED));
         actions.add(new HandlerAction(WSConstants.SIGN));
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             actions,
             true
         );
@@ -174,10 +174,10 @@ public class SamlTokenActionTest extends org.junit.Assert {
             String outputString = XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         verify(doc, callbackHandler);
     }
-    
+
     private WSHandlerResult verify(
         Document doc, CallbackHandler callbackHandler
     ) throws Exception {
@@ -186,12 +186,12 @@ public class SamlTokenActionTest extends org.junit.Assert {
         requestData.setDecCrypto(crypto);
         requestData.setSigVerCrypto(crypto);
         requestData.setValidateSamlSubjectConfirmation(false);
-        
+
         WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         return results;
     }
-    
+
 }

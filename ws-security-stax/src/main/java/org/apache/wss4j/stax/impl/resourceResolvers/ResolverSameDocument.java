@@ -45,12 +45,12 @@ public class ResolverSameDocument extends org.apache.xml.security.stax.impl.reso
         if (attribute != null && attribute.getValue().equals(getId())) {
             return true;
         }
-        
+
         attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_NULL_AssertionID);
         if (attribute != null && attribute.getValue().equals(getId())) {
             return true;
         }
-        
+
         attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_NULL_ID);
         if (attribute != null && attribute.getValue().equals(getId())) {
             return true;

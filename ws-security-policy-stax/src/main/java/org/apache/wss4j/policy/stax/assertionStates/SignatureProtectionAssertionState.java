@@ -54,7 +54,7 @@ public class SignatureProtectionAssertionState extends AssertionState implements
     private final List<List<QName>> elementPaths = new ArrayList<>();
     private PolicyAsserter policyAsserter;
 
-    public SignatureProtectionAssertionState(AbstractSecurityAssertion assertion, 
+    public SignatureProtectionAssertionState(AbstractSecurityAssertion assertion,
                                              PolicyAsserter policyAsserter,
                                              boolean asserted) {
         super(assertion, asserted);
@@ -69,12 +69,12 @@ public class SignatureProtectionAssertionState extends AssertionState implements
         signatureConfirmation11Path.add(WSSConstants.TAG_wsse_Security);
         signatureConfirmation11Path.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
         elementPaths.add(signatureConfirmation11Path);
-        
+
         this.policyAsserter = policyAsserter;
         if (this.policyAsserter == null) {
             this.policyAsserter = new DummyPolicyAsserter();
         }
-        
+
         if (asserted) {
             String namespace = getAssertion().getName().getNamespaceURI();
             policyAsserter.assertPolicy(new QName(namespace, SPConstants.ENCRYPT_SIGNATURE));
@@ -97,11 +97,11 @@ public class SignatureProtectionAssertionState extends AssertionState implements
                 WSSecurityEventConstants.Operation,
         };
     }
-    
+
     @Override
     public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
         if (securityEvent instanceof EncryptedElementSecurityEvent) {
-            EncryptedElementSecurityEvent encryptedElementSecurityEvent = 
+            EncryptedElementSecurityEvent encryptedElementSecurityEvent =
                 (EncryptedElementSecurityEvent) securityEvent;
             // Store all matching Signature/SignatureConfirmation Elements
             Iterator<List<QName>> pathElementsIterator = elementPaths.iterator();
@@ -113,18 +113,18 @@ public class SignatureProtectionAssertionState extends AssertionState implements
             }
         } else if (securityEvent instanceof TokenSecurityEvent) {
             @SuppressWarnings("unchecked")
-            TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent 
+            TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent
                 = (TokenSecurityEvent<? extends SecurityToken>) securityEvent;
             tokenSecurityEvents.add(tokenSecurityEvent);
         }
-        
+
         return true;
     }
-    
+
     @Override
     public boolean isAsserted() {
         clearErrorMessage();
-        
+
         // If we only have one (main) Signature, then check that it matches the policy
         if (encryptedElementEvents.size() == 1) {
             return testEncryptedSignature(encryptedElementEvents.get(0));
@@ -145,12 +145,12 @@ public class SignatureProtectionAssertionState extends AssertionState implements
 
         return true;
     }
-    
+
     private String findEndorsingSignatureId() {
         for (int i = 0; i < tokenSecurityEvents.size(); i++) {
             TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent = tokenSecurityEvents.get(i);
             try {
-                SecurityToken securityToken = 
+                SecurityToken securityToken =
                     getEffectiveSignatureToken(tokenSecurityEvent.getSecurityToken());
                 if (isSignatureToken(securityToken) && !isMainSignatureToken(securityToken)) {
                     return tokenSecurityEvent.getCorrelationID();
@@ -162,7 +162,7 @@ public class SignatureProtectionAssertionState extends AssertionState implements
         }
         return null;
     }
-    
+
     private boolean isSignatureToken(SecurityToken securityToken) {
         List<WSSecurityTokenConstants.TokenUsage> tokenUsages = securityToken.getTokenUsages();
         for (int i = 0; i < tokenUsages.size(); i++) {
@@ -175,13 +175,13 @@ public class SignatureProtectionAssertionState extends AssertionState implements
         }
         return false;
     }
-    
+
     private boolean isMainSignatureToken(SecurityToken securityToken) throws XMLSecurityException {
         SecurityToken rootToken = WSSUtils.getRootToken(securityToken);
         List<WSSecurityTokenConstants.TokenUsage> tokenUsages = rootToken.getTokenUsages();
         return tokenUsages.contains(WSSecurityTokenConstants.TokenUsage_MainSignature);
     }
-    
+
     private SecurityToken getEffectiveSignatureToken(SecurityToken securityToken) throws XMLSecurityException {
         SecurityToken tmp = WSSUtils.getRootToken(securityToken);
         List<? extends SecurityToken> wrappedTokens = tmp.getWrappedTokens();
@@ -200,11 +200,11 @@ public class SignatureProtectionAssertionState extends AssertionState implements
     }
 
     private boolean testEncryptedSignature(EncryptedElementSecurityEvent encryptedElementSecurityEvent) {
-        AbstractSymmetricAsymmetricBinding abstractSymmetricAsymmetricBinding = 
+        AbstractSymmetricAsymmetricBinding abstractSymmetricAsymmetricBinding =
             (AbstractSymmetricAsymmetricBinding) getAssertion();
-        
+
         String namespace = getAssertion().getName().getNamespaceURI();
-        
+
         if (encryptedElementSecurityEvent.isEncrypted()) {
             if (abstractSymmetricAsymmetricBinding.isEncryptSignature()) {
                 setAsserted(true);

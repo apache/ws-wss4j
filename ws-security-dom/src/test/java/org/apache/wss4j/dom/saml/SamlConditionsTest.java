@@ -55,10 +55,10 @@ import org.w3c.dom.Document;
  * Test-case for sending and processing an a SAML Token with a custom Conditions element.
  */
 public class SamlConditionsTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SamlConditionsTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -70,7 +70,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         config.setValidator(WSConstants.SAML2_TOKEN, new CustomSamlAssertionValidator());
         secEngine.setWssConfig(config);
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 1.1 authentication assertion
      * with a custom Conditions statement.
@@ -80,16 +80,16 @@ public class SamlConditionsTest extends org.junit.Assert {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         ConditionsBean conditions = new ConditionsBean();
         DateTime notBefore = new DateTime();
         conditions.setNotBefore(notBefore);
         conditions.setNotAfter(notBefore.plusMinutes(20));
         callbackHandler.setConditions(conditions);
-        
+
         createAndVerifyMessage(callbackHandler, true);
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with an (invalid) custom Conditions statement.
@@ -99,56 +99,56 @@ public class SamlConditionsTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         ConditionsBean conditions = new ConditionsBean();
         DateTime notBefore = new DateTime();
         conditions.setNotBefore(notBefore.minusMinutes(5));
         conditions.setNotAfter(notBefore.minusMinutes(3));
         callbackHandler.setConditions(conditions);
-        
+
         createAndVerifyMessage(callbackHandler, false);
     }
-    
+
     @org.junit.Test
     public void testSAML2StaleNotOnOrAfter() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         ConditionsBean conditions = new ConditionsBean();
         DateTime notBefore = new DateTime();
         conditions.setNotAfter(notBefore.minusMinutes(60));
         conditions.setNotBefore(notBefore.minusMinutes(70));
         callbackHandler.setConditions(conditions);
-        
+
         createAndVerifyMessage(callbackHandler, false);
     }
-    
+
     @org.junit.Test
     public void testSAML2FutureNotBefore() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         ConditionsBean conditions = new ConditionsBean();
         DateTime notBefore = new DateTime();
         conditions.setNotAfter(new DateTime().plusMinutes(70));
         conditions.setNotBefore(notBefore.plusMinutes(60));
         callbackHandler.setConditions(conditions);
-        
+
         createAndVerifyMessage(callbackHandler, false);
     }
-    
+
     @org.junit.Test
     public void testSAML2FutureIssueInstant() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-        
+
         DateTime issueInstant = new DateTime();
         issueInstant = issueInstant.plusMinutes(60);
         samlAssertion.getSaml2().setIssueInstant(issueInstant);
@@ -158,16 +158,16 @@ public class SamlConditionsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion (sender vouches):");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
-        
+
         try {
             verify(unsignedDoc);
             fail("Failure expected in processing the SAML Conditions element");
@@ -175,17 +175,17 @@ public class SamlConditionsTest extends org.junit.Assert {
             assertTrue(ex.getMessage().contains("SAML token security failure"));
         }
     }
-    
+
     @org.junit.Test
     public void testSAML2StaleIssueInstant() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-        
+
         DateTime issueInstant = new DateTime();
         issueInstant = issueInstant.minusMinutes(31);
         samlAssertion.getSaml2().setIssueInstant(issueInstant);
@@ -196,16 +196,16 @@ public class SamlConditionsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion (sender vouches):");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
-        
+
         try {
             verify(unsignedDoc);
             fail("Failure expected in processing a stale SAML Assertion");
@@ -213,21 +213,21 @@ public class SamlConditionsTest extends org.junit.Assert {
             assertTrue(ex.getMessage().contains("SAML token security failure"));
         }
     }
-    
+
     @org.junit.Test
     public void testSAML2StaleIssueInstantButWithNotOnOrAfter() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-        
+
         ConditionsBean conditions = new ConditionsBean();
         conditions.setNotBefore(new DateTime());
         conditions.setNotAfter(new DateTime().plusMinutes(35));
-        
+
         DateTime issueInstant = new DateTime();
         issueInstant = issueInstant.minusMinutes(31);
         samlAssertion.getSaml2().setIssueInstant(issueInstant);
@@ -237,29 +237,29 @@ public class SamlConditionsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion (sender vouches):");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
-        
+
         verify(unsignedDoc);
     }
-    
+
     @org.junit.Test
     public void testSAML1StaleIssueInstant() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-        
+
         DateTime issueInstant = new DateTime();
         issueInstant = issueInstant.minusMinutes(31);
         samlAssertion.getSaml1().setIssueInstant(issueInstant);
@@ -270,16 +270,16 @@ public class SamlConditionsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1 Authn Assertion (sender vouches):");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
-        
+
         try {
             verify(unsignedDoc);
             fail("Failure expected in processing a stale SAML Assertion");
@@ -287,7 +287,7 @@ public class SamlConditionsTest extends org.junit.Assert {
             assertTrue(ex.getMessage().contains("SAML token security failure"));
         }
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with an (invalid) custom Conditions statement.
@@ -297,16 +297,16 @@ public class SamlConditionsTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         ConditionsBean conditions = new ConditionsBean();
         DateTime notBefore = new DateTime();
         conditions.setNotBefore(notBefore.plusMinutes(2));
         conditions.setNotAfter(notBefore.plusMinutes(5));
         callbackHandler.setConditions(conditions);
-        
+
         createAndVerifyMessage(callbackHandler, false);
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with a Conditions statement that has a NotBefore "in the future".
@@ -316,16 +316,16 @@ public class SamlConditionsTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         ConditionsBean conditions = new ConditionsBean();
         DateTime notBefore = new DateTime();
         conditions.setNotBefore(notBefore.plusSeconds(30));
         conditions.setNotAfter(notBefore.plusMinutes(5));
         callbackHandler.setConditions(conditions);
-        
+
         createAndVerifyMessage(callbackHandler, true);
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with a OneTimeUse Element
@@ -335,13 +335,13 @@ public class SamlConditionsTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
         conditions.setOneTimeUse(true);
-            
+
         callbackHandler.setConditions(conditions);
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
@@ -351,19 +351,19 @@ public class SamlConditionsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(unsignedDoc);
         assertTrue(outputString.contains("OneTimeUse"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
+
         verify(unsignedDoc);
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with a ProxyRestriction Element
@@ -373,7 +373,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
         ProxyRestrictionBean proxyRestriction = new ProxyRestrictionBean();
@@ -383,9 +383,9 @@ public class SamlConditionsTest extends org.junit.Assert {
         proxyRestriction.getAudienceURIs().addAll(audiences);
         proxyRestriction.setCount(5);
         conditions.setProxyRestriction(proxyRestriction);
-        
+
         callbackHandler.setConditions(conditions);
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
@@ -395,19 +395,19 @@ public class SamlConditionsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(unsignedDoc);
         assertTrue(outputString.contains("ProxyRestriction"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
+
         verify(unsignedDoc);
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with an AudienceRestriction Element
@@ -417,7 +417,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
         List<String> audiences = new ArrayList<>();
@@ -426,9 +426,9 @@ public class SamlConditionsTest extends org.junit.Assert {
         AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
         audienceRestrictionBean.setAudienceURIs(audiences);
         conditions.setAudienceRestrictions(Collections.singletonList(audienceRestrictionBean));
-        
+
         callbackHandler.setConditions(conditions);
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
@@ -438,26 +438,26 @@ public class SamlConditionsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(unsignedDoc);
         assertTrue(outputString.contains("AudienceRestriction"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
+
         verify(unsignedDoc);
     }
-    
+
     // Now test AudienceRestrictions with supplied restrictions
     @org.junit.Test
     public void testSAML2AudienceRestrictionVerification() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
         List<String> audiences = new ArrayList<>();
@@ -466,9 +466,9 @@ public class SamlConditionsTest extends org.junit.Assert {
         AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
         audienceRestrictionBean.setAudienceURIs(audiences);
         conditions.setAudienceRestrictions(Collections.singletonList(audienceRestrictionBean));
-        
+
         callbackHandler.setConditions(conditions);
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
@@ -478,46 +478,46 @@ public class SamlConditionsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(unsignedDoc);
         assertTrue(outputString.contains("AudienceRestriction"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
+
         // This should fail as the expected audience isn't in the assertion
         audiences.clear();
         audiences.add("http://apache.org/three");
-     
+
         WSSecurityEngine newEngine = new WSSecurityEngine();
         RequestData data = new RequestData();
         data.setAudienceRestrictions(audiences);
         data.setValidateSamlSubjectConfirmation(false);
-        
+
         try {
             newEngine.processSecurityHeader(doc, data);
             fail("Failure expected on a bad audience restriction");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getMessage().contains("SAML token security failure"));
         }
-        
+
         // Now add the correct audience back in...
         audiences.add("http://apache.org/one");
         data.setAudienceRestrictions(audiences);
-        
+
         newEngine.processSecurityHeader(doc, data);
     }
-    
+
     // Now test AudienceRestrictions with supplied restrictions
     @org.junit.Test
     public void testSAML1AudienceRestrictionVerification() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
         List<String> audiences = new ArrayList<>();
@@ -526,9 +526,9 @@ public class SamlConditionsTest extends org.junit.Assert {
         AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
         audienceRestrictionBean.setAudienceURIs(audiences);
         conditions.setAudienceRestrictions(Collections.singletonList(audienceRestrictionBean));
-        
+
         callbackHandler.setConditions(conditions);
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
@@ -538,39 +538,39 @@ public class SamlConditionsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(unsignedDoc);
         assertTrue(outputString.contains("AudienceRestriction"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
+
         // This should fail as the expected audience isn't in the assertion
         audiences.clear();
         audiences.add("http://apache.org/three");
-     
+
         WSSecurityEngine newEngine = new WSSecurityEngine();
         RequestData data = new RequestData();
         data.setAudienceRestrictions(audiences);
         data.setValidateSamlSubjectConfirmation(false);
-        
+
         try {
             newEngine.processSecurityHeader(doc, data);
             fail("Failure expected on a bad audience restriction");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getMessage().contains("SAML token security failure"));
         }
-        
+
         // Now add the correct audience back in...
         audiences.add("http://apache.org/one");
         data.setAudienceRestrictions(audiences);
-        
+
         newEngine.processSecurityHeader(doc, data);
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with two AudienceRestriction Elements
@@ -580,23 +580,23 @@ public class SamlConditionsTest extends org.junit.Assert {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
-        
+
         List<AudienceRestrictionBean> audiencesRestrictions = new ArrayList<>();
         AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
         audienceRestrictionBean.setAudienceURIs(Collections.singletonList("http://apache.org/one"));
         audiencesRestrictions.add(audienceRestrictionBean);
-        
+
         audienceRestrictionBean = new AudienceRestrictionBean();
         audienceRestrictionBean.setAudienceURIs(Collections.singletonList("http://apache.org/two"));
         audiencesRestrictions.add(audienceRestrictionBean);
-        
+
         conditions.setAudienceRestrictions(audiencesRestrictions);
-        
+
         callbackHandler.setConditions(conditions);
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
@@ -606,42 +606,42 @@ public class SamlConditionsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(unsignedDoc);
         assertTrue(outputString.contains("AudienceRestriction"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
+
         verify(unsignedDoc);
     }
-    
+
     // Now test AudienceRestrictions with supplied restrictions
     @org.junit.Test
     public void testSAML2AudienceRestrictionSeparateRestrictionsValidation() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
-        
+
         List<AudienceRestrictionBean> audiencesRestrictions = new ArrayList<>();
         AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
         audienceRestrictionBean.setAudienceURIs(Collections.singletonList("http://apache.org/one"));
         audiencesRestrictions.add(audienceRestrictionBean);
-        
+
         audienceRestrictionBean = new AudienceRestrictionBean();
         audienceRestrictionBean.setAudienceURIs(Collections.singletonList("http://apache.org/two"));
         audiencesRestrictions.add(audienceRestrictionBean);
-        
+
         conditions.setAudienceRestrictions(audiencesRestrictions);
-        
+
         callbackHandler.setConditions(conditions);
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
@@ -651,66 +651,66 @@ public class SamlConditionsTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(unsignedDoc);
         assertTrue(outputString.contains("AudienceRestriction"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
+
         // This should fail as the expected audience isn't in the assertion
         List<String> audiences = new ArrayList<>();
         audiences.add("http://apache.org/three");
-     
+
         WSSecurityEngine newEngine = new WSSecurityEngine();
         RequestData data = new RequestData();
         data.setAudienceRestrictions(audiences);
         data.setValidateSamlSubjectConfirmation(false);
-        
+
         try {
             newEngine.processSecurityHeader(doc, data);
             fail("Failure expected on a bad audience restriction");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getMessage().contains("SAML token security failure"));
         }
-        
+
         // Now add the correct audience back in...
         audiences.add("http://apache.org/one");
         data.setAudienceRestrictions(audiences);
-        
+
         newEngine.processSecurityHeader(doc, data);
     }
-    
+
     @org.junit.Test
     public void testSAML2Delegate() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
-        
+
         ConditionsBean conditions = new ConditionsBean();
         DateTime notBefore = new DateTime();
         conditions.setNotBefore(notBefore);
         conditions.setNotAfter(notBefore.plusMinutes(20));
-        
+
         DelegateBean delegate = new DelegateBean();
         delegate.setDelegationInstant(DateTime.now());
         delegate.setConfirmationMethod(SAML2Constants.CONF_BEARER);
-        
+
         NameIDBean nameID = new NameIDBean();
         nameID.setNameValue("bob");
         nameID.setNameQualifier("www.example.com");
         delegate.setNameIDBean(nameID);
-        
+
         conditions.setDelegates(Collections.singletonList(delegate));
-        
+
         callbackHandler.setConditions(conditions);
-        
+
         createAndVerifyMessage(callbackHandler, true);
     }
-    
+
     private void createAndVerifyMessage(
         CallbackHandler samlCallbackHandler, boolean success
     ) throws Exception {
@@ -727,7 +727,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
@@ -742,23 +742,23 @@ public class SamlConditionsTest extends org.junit.Assert {
             assertTrue(ex.getMessage().contains("SAML token security failure"));
         }
     }
-    
+
     /**
      * Verifies the soap envelope
      * <p/>
-     * 
-     * @param envelope 
+     *
+     * @param envelope
      * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc) throws Exception {
         RequestData requestData = new RequestData();
         requestData.setValidateSamlSubjectConfirmation(false);
-        
+
         WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         return results;
     }
-    
+
 }

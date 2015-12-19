@@ -24,9 +24,9 @@ package org.apache.wss4j.common.cache;
  * A factory to return a MemoryReplayCache instance.
  */
 public class MemoryReplayCacheFactory extends ReplayCacheFactory {
-    
+
     public ReplayCache newReplayCache(String key, Object configuration) {
         return new MemoryReplayCache();
     }
-    
+
 }

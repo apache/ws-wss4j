@@ -47,7 +47,7 @@ public class EncryptedElementsAssertionState extends AssertionState implements A
     private final List<List<QName>> pathElements = new ArrayList<>();
     private PolicyAsserter policyAsserter;
 
-    public EncryptedElementsAssertionState(AbstractSecurityAssertion assertion, 
+    public EncryptedElementsAssertionState(AbstractSecurityAssertion assertion,
                                            PolicyAsserter policyAsserter,
                                            boolean asserted) {
         super(assertion, asserted);
@@ -58,12 +58,12 @@ public class EncryptedElementsAssertionState extends AssertionState implements A
             List<QName> elements = PolicyUtils.getElementPath(xPath);
             pathElements.add(elements);
         }
-        
+
         this.policyAsserter = policyAsserter;
         if (this.policyAsserter == null) {
             this.policyAsserter = new DummyPolicyAsserter();
         }
-        
+
         if (asserted) {
             policyAsserter.assertPolicy(getAssertion());
         }
@@ -79,7 +79,7 @@ public class EncryptedElementsAssertionState extends AssertionState implements A
 
     @Override
     public boolean assertEvent(SecurityEvent securityEvent) throws WSSPolicyException {
-        AbstractSecuredElementSecurityEvent encryptedElementSecurityEvent = 
+        AbstractSecuredElementSecurityEvent encryptedElementSecurityEvent =
             (AbstractSecuredElementSecurityEvent) securityEvent;
 
         Iterator<List<QName>> pathElementIterator = pathElements.iterator();

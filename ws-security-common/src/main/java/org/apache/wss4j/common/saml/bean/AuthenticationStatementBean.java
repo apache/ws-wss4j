@@ -42,14 +42,14 @@ public class AuthenticationStatementBean {
 
     /**
      * Construct a new AuthenticationStatementBean
-     * 
-     * @param subject the Subject to set 
+     *
+     * @param subject the Subject to set
      * @param authenticationMethod the Authentication Method to set
      * @param authenticationInstant the Authentication Instant to set
      * @param sessionNotOnOrAfter the Session NotOnOrAfter time to set
      */
     public AuthenticationStatementBean(
-        SubjectBean subject, 
+        SubjectBean subject,
         String authenticationMethod,
         DateTime authenticationInstant,
         DateTime sessionNotOnOrAfter
@@ -107,7 +107,7 @@ public class AuthenticationStatementBean {
     public void setAuthenticationInstant(DateTime authenticationInstant) {
         this.authenticationInstant = authenticationInstant;
     }
-    
+
     /**
      * Get the sessionNotOnOrAfter
      * @return the sessionNotOnOrAfter
@@ -123,10 +123,10 @@ public class AuthenticationStatementBean {
     public void setSessionNotOnOrAfter(DateTime sessionNotOnOrAfter) {
         this.sessionNotOnOrAfter = sessionNotOnOrAfter;
     }
-    
+
     /**
      * Get Subject Locality.
-     * 
+     *
      * @return the subjectLocality
      */
     public final SubjectLocalityBean getSubjectLocality() {
@@ -135,16 +135,16 @@ public class AuthenticationStatementBean {
 
     /**
      * Set Subject Locality.
-     * 
+     *
      * @param subjectLocality the subjectLocality to set
      */
     public final void setSubjectLocality(final SubjectLocalityBean subjectLocality) {
         this.subjectLocality = subjectLocality;
     }
-    
+
     /**
      * Get the session index.
-     * 
+     *
      * @return the sessionIndex
      */
     public final String getSessionIndex() {
@@ -153,7 +153,7 @@ public class AuthenticationStatementBean {
 
     /**
      * Set the session index.
-     * 
+     *
      * @param sessionIndex the sessionIndex to set
      */
     public final void setSessionIndex(final String sessionIndex) {
@@ -173,32 +173,32 @@ public class AuthenticationStatementBean {
 
         if (authenticationInstant == null && that.authenticationInstant != null) {
             return false;
-        } else if (authenticationInstant != null 
+        } else if (authenticationInstant != null
             && !authenticationInstant.equals(that.authenticationInstant)) {
             return false;
         }
-        
+
         if (sessionNotOnOrAfter == null && that.sessionNotOnOrAfter != null) {
             return false;
-        } else if (sessionNotOnOrAfter != null 
+        } else if (sessionNotOnOrAfter != null
             && !sessionNotOnOrAfter.equals(that.sessionNotOnOrAfter)) {
             return false;
         }
-        
+
         if (authenticationMethod == null && that.authenticationMethod != null) {
             return false;
-        } else if (authenticationMethod != null 
+        } else if (authenticationMethod != null
             && !authenticationMethod.equals(that.authenticationMethod)) {
             return false;
         }
-        
+
         if (subject == null && that.subject != null) {
             return false;
-        } else if (subject != null 
+        } else if (subject != null
             && !subject.equals(that.subject)) {
             return false;
         }
-        
+
         if (subjectLocality == null && that.subjectLocality != null) {
             return false;
         } else if (subjectLocality != null && !subjectLocality.equals(that.subjectLocality)) {

@@ -34,12 +34,12 @@ import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 
 public abstract class AbstractDerivedAction {
-    
+
     protected Node findEncryptedKeySibling(RequestData reqData) {
         Element secHeader = reqData.getSecHeader().getSecurityHeader();
         return findSibling(secHeader, WSConstants.ENC_NS, "EncryptedKey");
     }
-    
+
     protected Node findSCTSibling(RequestData reqData) {
         String namespace = ConversationConstants.WSC_NS_05_12;
         if (!reqData.isUse200512Namespace()) {
@@ -48,14 +48,14 @@ public abstract class AbstractDerivedAction {
         Element secHeader = reqData.getSecHeader().getSecurityHeader();
         return findSibling(secHeader, namespace, "SecurityContextToken");
     }
-    
+
     protected Node findSibling(Element secHeader, String namespace, String localName) {
         if (secHeader == null) {
             return null;
         }
         Node firstChild = secHeader.getFirstChild();
         while (firstChild != null) {
-            if (firstChild instanceof Element && 
+            if (firstChild instanceof Element &&
                 namespace.equals(((Element)firstChild).getNamespaceURI())
                 && localName.equals(((Element)firstChild).getLocalName())
                 && firstChild.getNextSibling() != null) {
@@ -101,7 +101,7 @@ public abstract class AbstractDerivedAction {
             return sct.getElement();
         }
     }
-    
+
     protected Element setupEKReference(WSSecDerivedKeyBase derivedKeyBase,
                                         WSPasswordCallback passwordCallback,
                                         SignatureEncryptionActionToken actionToken,
@@ -111,7 +111,7 @@ public abstract class AbstractDerivedAction {
                                         String keyTransportAlgorithm,
                                         String mgfAlgorithm) throws WSSecurityException {
         derivedKeyBase.setCustomValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
-        
+
         // See if a previous derived action has already set up an EncryptedKey
         if (previousActionToken != null && previousActionToken.getKey() != null
             && previousActionToken.getKeyIdentifier() != null) {
@@ -127,7 +127,7 @@ public abstract class AbstractDerivedAction {
             } else {
                 encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
             }
-            
+
             if (actionToken.getDigestAlgorithm() != null) {
                 encrKeyBuilder.setDigestAlgorithm(actionToken.getDigestAlgorithm());
             }
@@ -137,7 +137,7 @@ public abstract class AbstractDerivedAction {
             if (mgfAlgorithm != null) {
                 encrKeyBuilder.setMGFAlgorithm(mgfAlgorithm);
             }
-            
+
             encrKeyBuilder.prepare(doc, actionToken.getCrypto());
 
             byte[] ek = encrKeyBuilder.getEphemeralKey();
@@ -145,7 +145,7 @@ public abstract class AbstractDerivedAction {
 
             actionToken.setKey(ek);
             actionToken.setKeyIdentifier(tokenIdentifier);
-           
+
             derivedKeyBase.setExternalKey(ek, tokenIdentifier);
             return encrKeyBuilder.getEncryptedKeyElement();
         }

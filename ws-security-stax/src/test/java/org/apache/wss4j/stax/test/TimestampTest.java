@@ -303,7 +303,7 @@ public class TimestampTest extends AbstractTestBase {
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
         }
     }
-    
+
     @Test
     public void testTimestampInFutureInbound() throws Exception {
 
@@ -354,7 +354,7 @@ public class TimestampTest extends AbstractTestBase {
                 Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.MESSAGE_EXPIRED);
             }
         }
-        
+
         // now allow future TTL of 2 hours +
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -556,7 +556,7 @@ public class TimestampTest extends AbstractTestBase {
                 // expected
             }
         }
-        
+
         // No Timestamp Expires Element required - should pass
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -571,7 +571,7 @@ public class TimestampTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
         }
     }
-    
+
     @Test
     public void testTimestampNoChildsInbound() throws Exception {
 
@@ -660,7 +660,7 @@ public class TimestampTest extends AbstractTestBase {
             }
         }
     }
-    
+
     @Test
     public void testTimestampPropertiesOutbound() throws Exception {
 
@@ -668,7 +668,7 @@ public class TimestampTest extends AbstractTestBase {
         {
             Map<String, Object> config = new HashMap<String, Object>();
             config.put(ConfigurationConstants.ACTION, ConfigurationConstants.TIMESTAMP);
-            
+
             WSSSecurityProperties securityProperties = ConfigurationConverter.convert(config);
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
@@ -727,7 +727,7 @@ public class TimestampTest extends AbstractTestBase {
             config.put(ConfigurationConstants.ACTION, ConfigurationConstants.TIMESTAMP);
             WSSSecurityProperties securityProperties = ConfigurationConverter.convert(config);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
-            
+
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);

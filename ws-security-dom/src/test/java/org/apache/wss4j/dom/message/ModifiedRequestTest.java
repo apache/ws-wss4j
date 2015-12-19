@@ -56,30 +56,30 @@ import org.w3c.dom.Node;
  * This class tests the modification of requests.
  */
 public class ModifiedRequestTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(ModifiedRequestTest.class);
-    private static final String SOAPMSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+    private static final String SOAPMSG =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
         + "<SOAP-ENV:Envelope "
         +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
         +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
-        +   "<SOAP-ENV:Body>" 
-        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
-        +           "<value xmlns=\"http://blah.com\">15</value>" 
-        +       "</add>" 
-        +   "</SOAP-ENV:Body>" 
+        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
+        +   "<SOAP-ENV:Body>"
+        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">"
+        +           "<value xmlns=\"http://blah.com\">15</value>"
+        +       "</add>"
+        +   "</SOAP-ENV:Body>"
         + "</SOAP-ENV:Envelope>";
-    
+
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public ModifiedRequestTest() throws Exception {
         WSSConfig.init();
         crypto = CryptoFactory.getInstance();
@@ -99,35 +99,35 @@ public class ModifiedRequestTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "value",
                 "http://blah.com",
                 "");
         builder.getParts().add(encP);
-        
+
         Document signedDoc = builder.build(doc, crypto, secHeader);
-        
+
         //
         // Replace the signed element with a modified element, and move the original
         // signed element into the SOAP header
         //
         Element secHeaderElement = secHeader.getSecurityHeader();
         Element envelopeElement = signedDoc.getDocumentElement();
-        Node valueNode = 
+        Node valueNode =
             envelopeElement.getElementsByTagNameNS("http://blah.com", "value").item(0);
         Node clonedValueNode = valueNode.cloneNode(true);
         secHeaderElement.appendChild(clonedValueNode);
         valueNode.getFirstChild().setNodeValue("250");
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         try {
             verify(signedDoc);
             fail("Failure expected on multiple elements with the same wsu:Id");
@@ -137,8 +137,8 @@ public class ModifiedRequestTest extends org.junit.Assert {
                     "org.apache.xml.security.utils.resolver.ResourceResolverException: "));
         }
     }
-    
-    
+
+
     /**
      * Test that signs a SOAP body element "value". The SOAP request is then modified
      * so that the signed "value" element is put in the header, and the value of the
@@ -153,23 +153,23 @@ public class ModifiedRequestTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "value",
                 "http://blah.com",
                 "");
         builder.getParts().add(encP);
-        
+
         Document signedDoc = builder.build(doc, crypto, secHeader);
-        
+
         //
         // Replace the signed element with a modified element, and move the original
         // signed element into the SOAP header
         //
         Element secHeaderElement = secHeader.getSecurityHeader();
         Element envelopeElement = signedDoc.getDocumentElement();
-        Node valueNode = 
+        Node valueNode =
             envelopeElement.getElementsByTagNameNS("http://blah.com", "value").item(0);
         Node clonedValueNode = valueNode.cloneNode(true);
         secHeaderElement.appendChild(clonedValueNode);
@@ -177,33 +177,33 @@ public class ModifiedRequestTest extends org.junit.Assert {
         ((Element)valueNode).setAttributeNS(
              WSConstants.WSU_NS, "wsu:Id", "id-250"
         );
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         //
         // Check the signature...this should pass
         //
         WSHandlerResult results = verify(signedDoc);
-        
+
         //
         // Finally we need to check that the Element that was signed is what we expect to be signed
         //
         envelopeElement = signedDoc.getDocumentElement();
-        Node bodyNode = 
+        Node bodyNode =
             envelopeElement.getElementsByTagNameNS(
                 WSConstants.URI_SOAP11_ENV, "Body"
             ).item(0);
-        valueNode = 
+        valueNode =
             ((Element)bodyNode).getElementsByTagNameNS(
                 "http://blah.com", "value"
             ).item(0);
-        
-        List<WSSecurityEngineResult> signedResults = 
+
+        List<WSSecurityEngineResult> signedResults =
             results.getActionResults().get(WSConstants.SIGN);
         try {
             WSSecurityUtil.verifySignedElement((Element)valueNode, signedResults);
@@ -212,7 +212,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
         }
     }
-    
+
     /**
      * Test a duplicated signed SAML Assertion.
      */
@@ -222,19 +222,19 @@ public class ModifiedRequestTest extends org.junit.Assert {
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_SENDER_VOUCHES);
         callbackHandler.setIssuer("www.example.com");
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-        
+
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
-        Document signedDoc = 
+
+        Document signedDoc =
             wsSign.build(
                 doc, null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
                 "security", secHeader
@@ -245,11 +245,11 @@ public class ModifiedRequestTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authn Assertion (sender vouches):");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         try {
             verify(signedDoc);
             fail("Failure expected on duplicate tokens");
@@ -259,7 +259,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
             ));
         }
     }
-    
+
     /**
      * Test a duplicated signed UsernameToken
      */
@@ -268,39 +268,39 @@ public class ModifiedRequestTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecUsernameToken usernameToken = new WSSecUsernameToken();
         usernameToken.setUserInfo("wss86", "security");
         Document createdDoc = usernameToken.build(doc, secHeader);
-        
+
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        
+
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "UsernameToken",
                 WSConstants.WSSE_NS,
                 "");
         builder.getParts().add(encP);
-        
+
         builder.prepare(createdDoc, crypto, secHeader);
-        
-        List<javax.xml.crypto.dsig.Reference> referenceList = 
+
+        List<javax.xml.crypto.dsig.Reference> referenceList =
             builder.addReferencesToSign(builder.getParts(), secHeader);
 
         builder.computeSignature(referenceList, false, null);
-        
+
         secHeader.getSecurityHeader().appendChild(
             usernameToken.getUsernameTokenElement().cloneNode(true)
         );
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed Timestamp");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         try {
             verify(doc);
             fail("Failure expected on duplicate tokens");
@@ -310,7 +310,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
             ));
         }
     }
-    
+
     /**
      * Test for when an EncryptedData structure is modified
      */
@@ -327,25 +327,25 @@ public class ModifiedRequestTest extends org.junit.Assert {
         Document encryptedDoc = builder.build(doc, wssCrypto, secHeader);
 
         Element body = WSSecurityUtil.findBodyElement(doc);
-        Element encryptionMethod = 
+        Element encryptionMethod =
             XMLUtils.findElement(body, "EncryptionMethod", WSConstants.ENC_NS);
         encryptionMethod.setAttributeNS(null, "Algorithm", "http://new-algorithm");
-        
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
+
         WSSecurityEngine newEngine = new WSSecurityEngine();
         try {
             newEngine.processSecurityHeader(doc, null, new KeystoreCallbackHandler(), wssCrypto);
             fail("Failure expected on a modified EncryptedData structure");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
     }
-    
+
     /**
      * Test for when some EncryptedData CipherValue data is modified.
      */
@@ -362,10 +362,10 @@ public class ModifiedRequestTest extends org.junit.Assert {
         Document encryptedDoc = builder.build(doc, wssCrypto, secHeader);
 
         Element body = WSSecurityUtil.findBodyElement(doc);
-        Element cipherValue = 
+        Element cipherValue =
             XMLUtils.findElement(body, "CipherValue", WSConstants.ENC_NS);
         String cipherText = cipherValue.getTextContent();
-        
+
         StringBuilder stringBuilder = new StringBuilder(cipherText);
         int index = stringBuilder.length() / 2;
         char ch = stringBuilder.charAt(index);
@@ -376,13 +376,13 @@ public class ModifiedRequestTest extends org.junit.Assert {
         }
         stringBuilder.setCharAt(index, ch);
         cipherValue.setTextContent(stringBuilder.toString());
-        
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
+
         WSSecurityEngine newEngine = new WSSecurityEngine();
         try {
             newEngine.processSecurityHeader(doc, null, new KeystoreCallbackHandler(), wssCrypto);
@@ -391,9 +391,9 @@ public class ModifiedRequestTest extends org.junit.Assert {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
         }
     }
-    
+
     /**
-     * Test for when some EncryptedData CipherValue data is modified 
+     * Test for when some EncryptedData CipherValue data is modified
      * (in the security header)
      */
     @org.junit.Test
@@ -402,33 +402,33 @@ public class ModifiedRequestTest extends org.junit.Assert {
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
-        
+
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);
         timestamp.build(doc, secHeader);
-        
+
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp",
                 WSConstants.WSU_NS,
                 "");
         builder.getParts().add(encP);
-        
+
         Document encryptedDoc = builder.build(doc, wssCrypto, secHeader);
 
-        Element securityHeader = 
+        Element securityHeader =
             WSSecurityUtil.getSecurityHeader(encryptedDoc, "");
-        Element encryptedTimestamp = 
+        Element encryptedTimestamp =
             XMLUtils.findElement(securityHeader, "EncryptedData", WSConstants.ENC_NS);
-        Element cipherValue = 
+        Element cipherValue =
             XMLUtils.findElement(encryptedTimestamp, "CipherValue", WSConstants.ENC_NS);
         String cipherText = cipherValue.getTextContent();
-        
+
         StringBuilder stringBuilder = new StringBuilder(cipherText);
         int index = stringBuilder.length() / 2;
         char ch = stringBuilder.charAt(index);
@@ -439,13 +439,13 @@ public class ModifiedRequestTest extends org.junit.Assert {
         }
         stringBuilder.setCharAt(index, ch);
         cipherValue.setTextContent(stringBuilder.toString());
-        
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
+
         WSSecurityEngine newEngine = new WSSecurityEngine();
         try {
             newEngine.processSecurityHeader(doc, null, new KeystoreCallbackHandler(), wssCrypto);
@@ -454,7 +454,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
         }
     }
-    
+
     /**
      * Test for when some EncryptedKey CipherValue data is modified.
      */
@@ -470,12 +470,12 @@ public class ModifiedRequestTest extends org.junit.Assert {
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
         Document encryptedDoc = builder.build(doc, wssCrypto, secHeader);
 
-        Element encryptedKey = 
+        Element encryptedKey =
             XMLUtils.findElement(doc.getDocumentElement(), "EncryptedKey", WSConstants.ENC_NS);
-        Element cipherValue = 
+        Element cipherValue =
             XMLUtils.findElement(encryptedKey, "CipherValue", WSConstants.ENC_NS);
         String cipherText = cipherValue.getTextContent();
-        
+
         StringBuilder stringBuilder = new StringBuilder(cipherText);
         int index = stringBuilder.length() / 2;
         char ch = stringBuilder.charAt(index);
@@ -486,13 +486,13 @@ public class ModifiedRequestTest extends org.junit.Assert {
         }
         stringBuilder.setCharAt(index, ch);
         cipherValue.setTextContent(stringBuilder.toString());
-        
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
+
         WSSecurityEngine newEngine = new WSSecurityEngine();
         try {
             newEngine.processSecurityHeader(doc, null, new KeystoreCallbackHandler(), wssCrypto);
@@ -503,7 +503,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
     }
 
 
-    
+
     /**
      * Test for when an element that a Signature Reference points to is modified
      */
@@ -514,40 +514,40 @@ public class ModifiedRequestTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
-        
+
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp",
                 WSConstants.WSU_NS,
                 "");
         builder.getParts().add(encP);
-        
+
         Document signedDoc = builder.build(createdDoc, crypto, secHeader);
-        
+
         // Modify the Created text of the Timestamp element
         Element timestampElement = timestamp.getElement();
-        Element createdValue = 
+        Element createdValue =
             XMLUtils.findElement(timestampElement, "Created", WSConstants.WSU_NS);
         DateFormat zulu = new XmlSchemaDateFormat();
-        
-        XMLGregorianCalendar createdCalendar = 
+
+        XMLGregorianCalendar createdCalendar =
             WSSConfig.datatypeFactory.newXMLGregorianCalendar(createdValue.getTextContent());
         // Add 5 seconds
         Duration duration = WSSConfig.datatypeFactory.newDuration(5000L);
         createdCalendar.add(duration);
         Date createdDate = createdCalendar.toGregorianCalendar().getTime();
         createdValue.setTextContent(zulu.format(createdDate));
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         try {
             verify(signedDoc);
             fail("Failure expected on a modified Signature Reference");
@@ -555,7 +555,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
         }
     }
-    
+
     /**
      * Test for when a Signature is received with a certificate that is not trusted
      */
@@ -566,16 +566,16 @@ public class ModifiedRequestTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Crypto wss40Crypto = CryptoFactory.getInstance("wss40.properties");
         Document signedDoc = builder.build(doc, wss40Crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         try {
             verify(signedDoc);
             fail("Failure expected on an untrusted Certificate");
@@ -583,7 +583,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);
         }
     }
-    
+
     /**
      * Test for when the Signature element is modified
      */
@@ -594,9 +594,9 @@ public class ModifiedRequestTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Document signedDoc = builder.build(doc, crypto, secHeader);
-        
+
         // Modify the Signature element
         Element signatureElement = builder.getSignatureElement();
         Node firstChild = signatureElement.getFirstChild();
@@ -604,13 +604,13 @@ public class ModifiedRequestTest extends org.junit.Assert {
             firstChild = signatureElement.getNextSibling();
         }
         ((Element)firstChild).setAttributeNS(null, "Id", "xyz");
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         try {
             verify(signedDoc);
             fail("Failure expected on a modified Signature element");
@@ -622,7 +622,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
     /**
      * Verifies the soap envelope
      * <p/>
-     * 
+     *
      * @param doc soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */

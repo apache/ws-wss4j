@@ -117,7 +117,7 @@ public class AttachmentTest extends AbstractTestBase {
             securityProperties.addSignaturePart(new SecurePart("cid:Attachments", SecurePart.Modifier.Content));
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
-            AttachmentCallbackHandler attachmentCallbackHandler = 
+            AttachmentCallbackHandler attachmentCallbackHandler =
                 new AttachmentCallbackHandler(Collections.singletonList(attachment));
             securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
@@ -129,7 +129,7 @@ public class AttachmentTest extends AbstractTestBase {
         }
 
         //done signature; now test sig-verification:
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -145,7 +145,7 @@ public class AttachmentTest extends AbstractTestBase {
         }
         Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
-        
+
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
         Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         Assert.assertEquals("text/xml", responseAttachment.getMimeType());
@@ -173,7 +173,7 @@ public class AttachmentTest extends AbstractTestBase {
             securityProperties.addSignaturePart(new SecurePart("cid:Attachments", SecurePart.Modifier.Content));
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
-            AttachmentCallbackHandler attachmentCallbackHandler = 
+            AttachmentCallbackHandler attachmentCallbackHandler =
                 new AttachmentCallbackHandler(Collections.singletonList(attachment));
             securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
@@ -241,7 +241,7 @@ public class AttachmentTest extends AbstractTestBase {
             securityProperties.addSignaturePart(new SecurePart("cid:Attachments", SecurePart.Modifier.Element));
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
-            AttachmentCallbackHandler attachmentCallbackHandler = 
+            AttachmentCallbackHandler attachmentCallbackHandler =
                 new AttachmentCallbackHandler(Collections.singletonList(attachment));
             securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
@@ -253,7 +253,7 @@ public class AttachmentTest extends AbstractTestBase {
         }
 
         //done signature; now test sig-verification:
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -270,7 +270,7 @@ public class AttachmentTest extends AbstractTestBase {
 
         Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
-        
+
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
         Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         Assert.assertEquals("text/xml", responseAttachment.getMimeType());
@@ -298,7 +298,7 @@ public class AttachmentTest extends AbstractTestBase {
             securityProperties.addSignaturePart(new SecurePart("cid:Attachments", SecurePart.Modifier.Element));
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
-            AttachmentCallbackHandler attachmentCallbackHandler = 
+            AttachmentCallbackHandler attachmentCallbackHandler =
                 new AttachmentCallbackHandler(Collections.singletonList(attachment));
             securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
@@ -374,7 +374,7 @@ public class AttachmentTest extends AbstractTestBase {
             securityProperties.addSignaturePart(new SecurePart("cid:Attachments", SecurePart.Modifier.Element));
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
 
-            AttachmentCallbackHandler attachmentCallbackHandler = 
+            AttachmentCallbackHandler attachmentCallbackHandler =
                 new AttachmentCallbackHandler(Arrays.asList(attachment));
             securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
@@ -386,7 +386,7 @@ public class AttachmentTest extends AbstractTestBase {
         }
 
         //done signature; now test sig-verification:
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Arrays.asList(attachment));
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -403,7 +403,7 @@ public class AttachmentTest extends AbstractTestBase {
 
         Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
-        
+
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
         Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         Assert.assertEquals("text/xml", responseAttachment.getMimeType());
@@ -418,7 +418,7 @@ public class AttachmentTest extends AbstractTestBase {
         attachment.addHeaders(getHeaders(attachmentId));
         attachment.setId(attachmentId);
         attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
@@ -471,7 +471,7 @@ public class AttachmentTest extends AbstractTestBase {
 
         Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
-        
+
         byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
         Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         Assert.assertEquals("text/xml", responseAttachment.getMimeType());
@@ -488,7 +488,7 @@ public class AttachmentTest extends AbstractTestBase {
         attachment.addHeaders(getHeaders(attachmentId));
         attachment.setId(attachmentId);
         attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
@@ -526,7 +526,7 @@ public class AttachmentTest extends AbstractTestBase {
             Assert.assertEquals(childs.item(0).getLocalName(), "EncryptedKey");
             Assert.assertEquals(childs.item(1).getLocalName(), "EncryptedData");
         }
-        
+
         final PushbackInputStream pis = new PushbackInputStream(encryptedAttachments.get(0).getSourceStream(), 1);
         pis.unread('K');
         encryptedAttachments.get(0).setSourceStream(pis);
@@ -536,7 +536,7 @@ public class AttachmentTest extends AbstractTestBase {
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
-            
+
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
@@ -544,13 +544,13 @@ public class AttachmentTest extends AbstractTestBase {
 
         Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
-        
+
         // Different behaviour here for different JDKs...
         try {
             byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
             Assert.assertFalse(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
             Assert.assertEquals("text/xml", responseAttachment.getMimeType());
-    
+
             Map<String, String> attHeaders = responseAttachment.getHeaders();
             Assert.assertEquals(6, attHeaders.size());
         } catch (IOException ex) {
@@ -578,7 +578,7 @@ public class AttachmentTest extends AbstractTestBase {
         attachment.addHeaders(getHeaders(attachmentId));
         attachment.setId(attachmentId);
         attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
@@ -640,8 +640,8 @@ public class AttachmentTest extends AbstractTestBase {
         attachment.addHeaders(getHeaders(attachmentId));
         attachment.setId(attachmentId);
         attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
@@ -714,10 +714,10 @@ public class AttachmentTest extends AbstractTestBase {
         attachment.setId(attachmentId);
         attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
 
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
-        
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -729,7 +729,7 @@ public class AttachmentTest extends AbstractTestBase {
             securityProperties.addEncryptionPart(new SecurePart(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"), SecurePart.Modifier.Content));
             securityProperties.addEncryptionPart(new SecurePart("cid:Attachments", SecurePart.Modifier.Element));
             securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
-            
+
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
             XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
@@ -764,7 +764,7 @@ public class AttachmentTest extends AbstractTestBase {
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
-            
+
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
             try {
@@ -774,7 +774,7 @@ public class AttachmentTest extends AbstractTestBase {
                 // Assert.assertEquals(e.getCause().getMessage(), "The signature or decryption was invalid");
                 return;
             }
-            
+
             Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
             Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
             byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
@@ -801,8 +801,8 @@ public class AttachmentTest extends AbstractTestBase {
         attachment[1].addHeaders(getHeaders(attachment2Id));
         attachment[1].setId(attachment2Id);
         attachment[1].setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
-        
-        AttachmentCallbackHandler attachmentCallbackHandler = 
+
+        AttachmentCallbackHandler attachmentCallbackHandler =
             new AttachmentCallbackHandler(Arrays.asList(attachment));
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
@@ -839,7 +839,7 @@ public class AttachmentTest extends AbstractTestBase {
 
         Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
         Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
-        
+
         byte[] attachment1Bytes = readInputStream(responseAttachment.getSourceStream());
         Assert.assertTrue(Arrays.equals(attachment1Bytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         Assert.assertEquals("text/xml", responseAttachment.getMimeType());
@@ -847,7 +847,7 @@ public class AttachmentTest extends AbstractTestBase {
         Assert.assertEquals(6, att1Headers.size());
 
         responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(1);
-        
+
         byte[] attachment2Bytes = readInputStream(responseAttachment.getSourceStream());
         Assert.assertTrue(Arrays.equals(attachment2Bytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes(StandardCharsets.UTF_8)));
         Assert.assertEquals("text/plain", responseAttachment.getMimeType());

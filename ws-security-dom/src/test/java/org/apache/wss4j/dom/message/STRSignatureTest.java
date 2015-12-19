@@ -37,16 +37,16 @@ import org.w3c.dom.Document;
  * SecurityTokenReference transform.
  */
 public class STRSignatureTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(STRSignatureTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public STRSignatureTest() throws Exception {
         WSSConfig.init();
         crypto = CryptoFactory.getInstance("wss40.properties");
@@ -58,7 +58,7 @@ public class STRSignatureTest extends org.junit.Assert {
      * as a BinarySecurityToken (BST) in the message). The test signs the message
      * body (SOAP Body) and uses the STRTransform to sign the embedded certificate
      * <p/>
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     @org.junit.Test
@@ -67,7 +67,7 @@ public class STRSignatureTest extends org.junit.Assert {
         builder.setUserInfo("wss40", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        
+
         //
         // Set up to sign body and use STRTransform to sign
         // the signature token (e.g. X.509 certificate)
@@ -96,14 +96,14 @@ public class STRSignatureTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with STR DirectReference key identifier:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After Signing STR DirectReference....");
         verify(signedDoc);
     }
-    
+
     /**
      * This is a test for WSS-96:
      * "Error when making a signature when containing a WSSecTimestamp"
@@ -115,10 +115,10 @@ public class STRSignatureTest extends org.junit.Assert {
         builder.setUserInfo("wss40", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        
+
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         //
         // Set up to sign body and use STRTransform to sign
         // the signature token (e.g. X.509 certificate)
@@ -135,7 +135,7 @@ public class STRSignatureTest extends org.junit.Assert {
                 soapConstants.getEnvelopeURI(),
                 "Content");
         builder.getParts().add(encP);
-        
+
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(600);
         timestamp.build(doc, secHeader);
@@ -148,7 +148,7 @@ public class STRSignatureTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with STR DirectReference key identifier:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
@@ -163,17 +163,17 @@ public class STRSignatureTest extends org.junit.Assert {
      * in the message)and reads the certificate from a keystore using IssuerSerialNumber
      * to identify it.
      * <p/>
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     @org.junit.Test
     public void testX509SignatureISSTR() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        
+
         //
         // Set up to sign body and use STRTransform to sign
         // the signature token (e.g. X.509 certificate)
@@ -194,7 +194,7 @@ public class STRSignatureTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         LOG.info("Before Signing STR IS....");
-        
+
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
@@ -202,21 +202,21 @@ public class STRSignatureTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with STR IssuerSerial key identifier:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After Signing STR IS....");
         verify(signedDoc);
     }
-    
+
     /**
      * Test that signs and verifies a WS-Security envelope.
      * This test uses the SubjectKeyIdentifier key identifier (certificate not included
      * in the message) and reads the certificate from a keystore using SKI
      * to identify it.
      * <p/>
-     * 
+     *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
     @org.junit.Test
@@ -225,7 +225,7 @@ public class STRSignatureTest extends org.junit.Assert {
         builder.setUserInfo("wss40", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-        
+
         //
         // Set up to sign body and use STRTransform to sign
         // the signature token (e.g. X.509 certificate)
@@ -246,7 +246,7 @@ public class STRSignatureTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
 
         LOG.info("Before Signing STR SKI....");
-        
+
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
@@ -254,7 +254,7 @@ public class STRSignatureTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with STR SKI key identifier:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
@@ -265,7 +265,7 @@ public class STRSignatureTest extends org.junit.Assert {
 
     /**
      * Verifies the soap envelope
-     * 
+     *
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */

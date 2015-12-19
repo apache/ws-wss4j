@@ -68,7 +68,7 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
         WSProviderConfig.init();
         Init.init(WSSec.class.getClassLoader().getResource("wss/wss-config.xml").toURI(), WSSec.class);
     }
-    
+
     @AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -126,7 +126,7 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
             protected String getAlias() throws XMLSecurityException {
                 return keyAlias;
             }
-            
+
             @Override
             public List<QName> getElementPath() {
                 List<QName> elementPath = super.getElementPath();

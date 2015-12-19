@@ -43,15 +43,15 @@ import java.io.IOException;
  * The processor to process <code>wsc:SecurityContextToken</code>.
  */
 public class SecurityContextTokenProcessor implements Processor {
-    
+
     public List<WSSecurityEngineResult> handleToken(
-        Element elem, 
+        Element elem,
         RequestData data,
-        WSDocInfo wsDocInfo 
+        WSDocInfo wsDocInfo
     ) throws WSSecurityException {
         SecurityContextToken sct = new SecurityContextToken(elem);
-        
-        Validator validator = 
+
+        Validator validator =
             data.getValidator(new QName(elem.getNamespaceURI(), elem.getLocalName()));
 
         WSSecurityEngineResult result =
@@ -60,7 +60,7 @@ public class SecurityContextTokenProcessor implements Processor {
             // Hook to allow the user to validate the SecurityContextToken
             Credential credential = new Credential();
             credential.setSecurityContextToken(sct);
-            
+
             Credential returnedCredential = validator.validate(credential, data);
             result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
             String tokenId = sct.getID();
@@ -84,7 +84,7 @@ public class SecurityContextTokenProcessor implements Processor {
             result.put(WSSecurityEngineResult.TAG_ID, sct.getID());
             result.put(WSSecurityEngineResult.TAG_SECRET, secret);
         }
-        
+
         wsDocInfo.addTokenElement(elem);
         wsDocInfo.addResult(result);
         return java.util.Collections.singletonList(result);
@@ -92,7 +92,7 @@ public class SecurityContextTokenProcessor implements Processor {
 
     /**
      * Get the secret from the provided callback handler and return it.
-     * 
+     *
      * @param cb
      * @param sct
      * @return The key collected using the callback handler
@@ -104,7 +104,7 @@ public class SecurityContextTokenProcessor implements Processor {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
         }
 
-        WSPasswordCallback callback = 
+        WSPasswordCallback callback =
             new WSPasswordCallback(identifier, WSPasswordCallback.SECURITY_CONTEXT_TOKEN);
         try {
             Callback[] callbacks = new Callback[]{callback};

@@ -490,7 +490,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             secHeader.insertSecurityHeader();
 
             Document securedDocument = wsSign.build(doc, samlAssertion, secHeader);
-            
+
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
@@ -506,7 +506,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
-        
+
         //done signature; now test sig-verification:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -1023,5 +1023,5 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_saml_Assertion.getLocalPart());
         }
     }
-    
+
 }

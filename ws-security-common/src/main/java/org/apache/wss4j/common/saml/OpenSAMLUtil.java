@@ -53,14 +53,14 @@ import org.w3c.dom.Element;
  * Class OpenSAMLUtil provides static helper methods for the OpenSaml library
  */
 public final class OpenSAMLUtil {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(OpenSAMLUtil.class);
 
     private static XMLObjectBuilderFactory builderFactory;
     private static MarshallerFactory marshallerFactory;
     private static UnmarshallerFactory unmarshallerFactory;
     private static boolean samlEngineInitialized = false;
-    
+
     private OpenSAMLUtil() {
         // Complete
     }
@@ -83,21 +83,21 @@ public final class OpenSAMLUtil {
 
             try {
                 OpenSAMLBootstrap.bootstrap();
-                
+
                 SAMLConfiguration samlConfiguration = new SAMLConfiguration();
 
                 configuration.register(SAMLConfiguration.class, samlConfiguration, ConfigurationService.DEFAULT_PARTITION_NAME);
-                
+
                 builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
                 marshallerFactory = XMLObjectProviderRegistrySupport.getMarshallerFactory();
                 unmarshallerFactory = XMLObjectProviderRegistrySupport.getUnmarshallerFactory();
-                
+
                 try {
                     configureParserPool(providerRegistry);
                 } catch (Throwable t) {
                     LOG.warn("Unable to bootstrap the parser pool part of the opensaml library - some SAML operations may fail", t);
                 }
-                
+
                 samlEngineInitialized = true;
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("opensaml3 library bootstrap complete");
@@ -107,12 +107,12 @@ public final class OpenSAMLUtil {
             }
         }
     }
-    
+
     private static void configureParserPool(XMLObjectProviderRegistry reg) throws Throwable {
         BasicParserPool pp = new BasicParserPool();
         pp.setMaxPoolSize(50);
         pp.initialize();
-        reg.setParserPool(pp);        
+        reg.setParserPool(pp);
     }
 
     /**
@@ -125,19 +125,19 @@ public final class OpenSAMLUtil {
     public static XMLObject fromDom(Element root) throws WSSecurityException {
         if (root == null) {
             LOG.debug("Attempting to unmarshal a null element!");
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", 
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                                           new Object[] {"Error unmarshalling a SAML assertion"});
         }
         Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(root);
         if (unmarshaller == null) {
             LOG.debug("Unable to find an unmarshaller for element: " + root.getLocalName());
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty", 
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                                           new Object[] {"Error unmarshalling a SAML assertion"});
         }
         try {
             return unmarshaller.unmarshall(root);
         } catch (UnmarshallingException ex) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex, "empty", 
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex, "empty",
                                           new Object[] {"Error unmarshalling a SAML assertion"});
         }
     }
@@ -151,12 +151,12 @@ public final class OpenSAMLUtil {
      * @throws MarshallingException
      */
     public static Element toDom(
-        XMLObject xmlObject, 
+        XMLObject xmlObject,
         Document doc
     ) throws WSSecurityException {
         return toDom(xmlObject, doc, true);
     }
-    
+
     /**
      * Convert a SAML Assertion from a XMLObject to a DOM Element
      *
@@ -167,7 +167,7 @@ public final class OpenSAMLUtil {
      * @throws MarshallingException
      */
     public static Element toDom(
-        XMLObject xmlObject, 
+        XMLObject xmlObject,
         Document doc,
         boolean signObject
     ) throws WSSecurityException {
@@ -185,12 +185,12 @@ public final class OpenSAMLUtil {
                     element = marshaller.marshall(xmlObject);
                 } else {
                     element = marshaller.marshall(xmlObject, doc);
-                } 
+                }
             } catch (MarshallingException ex) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex, "empty", 
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex, "empty",
                                               new Object[] {"Error marshalling a SAML assertion"});
             }
-    
+
             if (signObject) {
                 signXMLObject(xmlObject);
             }
@@ -204,56 +204,56 @@ public final class OpenSAMLUtil {
         }
         return element;
     }
-    
+
     private static void signXMLObject(XMLObject xmlObject) throws WSSecurityException {
         if (xmlObject instanceof org.opensaml.saml.saml1.core.Response) {
-            org.opensaml.saml.saml1.core.Response response = 
+            org.opensaml.saml.saml1.core.Response response =
                     (org.opensaml.saml.saml1.core.Response)xmlObject;
-            
+
             // Sign any Assertions
             if (response.getAssertions() != null) {
                 for (org.opensaml.saml.saml1.core.Assertion assertion : response.getAssertions()) {
                     signObject(assertion.getSignature());
                 }
             }
-            
+
             signObject(response.getSignature());
         } else if (xmlObject instanceof org.opensaml.saml.saml2.core.Response) {
-            org.opensaml.saml.saml2.core.Response response = 
+            org.opensaml.saml.saml2.core.Response response =
                     (org.opensaml.saml.saml2.core.Response)xmlObject;
-            
+
             // Sign any Assertions
             if (response.getAssertions() != null) {
                 for (org.opensaml.saml.saml2.core.Assertion assertion : response.getAssertions()) {
                     signObject(assertion.getSignature());
                 }
             }
-            
+
             signObject(response.getSignature());
         } else if (xmlObject instanceof org.opensaml.saml.saml2.core.Assertion) {
-            org.opensaml.saml.saml2.core.Assertion saml2 = 
+            org.opensaml.saml.saml2.core.Assertion saml2 =
                     (org.opensaml.saml.saml2.core.Assertion) xmlObject;
-            
+
             signObject(saml2.getSignature());
         } else if (xmlObject instanceof org.opensaml.saml.saml1.core.Assertion) {
-            org.opensaml.saml.saml1.core.Assertion saml1 = 
+            org.opensaml.saml.saml1.core.Assertion saml1 =
                     (org.opensaml.saml.saml1.core.Assertion) xmlObject;
-            
+
             signObject(saml1.getSignature());
         } else if (xmlObject instanceof org.opensaml.saml.saml2.core.RequestAbstractType) {
-            org.opensaml.saml.saml2.core.RequestAbstractType request = 
+            org.opensaml.saml.saml2.core.RequestAbstractType request =
                     (org.opensaml.saml.saml2.core.RequestAbstractType) xmlObject;
-            
-            
+
+
             signObject(request.getSignature());
         } else if (xmlObject instanceof org.opensaml.saml.saml1.core.Request) {
-            org.opensaml.saml.saml1.core.Request request = 
+            org.opensaml.saml.saml1.core.Request request =
                     (org.opensaml.saml.saml1.core.Request) xmlObject;
-            
+
             signObject(request.getSignature());
         }
     }
-    
+
     private static void signObject(Signature signature) throws WSSecurityException {
         if (signature != null) {
             ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -261,14 +261,14 @@ public final class OpenSAMLUtil {
                 Thread.currentThread().setContextClassLoader(SignerProvider.class.getClassLoader());
                 Signer.signObject(signature);
             } catch (SignatureException ex) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex, "empty", 
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex, "empty",
                                               new Object[] {"Error signing a SAML assertion"});
             } finally {
                 Thread.currentThread().setContextClassLoader(loader);
             }
         }
     }
-    
+
     /**
      * Method buildSignature ...
      *
@@ -277,21 +277,21 @@ public final class OpenSAMLUtil {
     @SuppressWarnings("unchecked")
     public static Signature buildSignature() {
         QName qName = Signature.DEFAULT_ELEMENT_NAME;
-        XMLObjectBuilder<Signature> builder = 
+        XMLObjectBuilder<Signature> builder =
             (XMLObjectBuilder<Signature>)builderFactory.getBuilder(qName);
         if (builder == null) {
             LOG.error(
-                "Unable to retrieve builder for object QName " 
+                "Unable to retrieve builder for object QName "
                 + qName
             );
             return null;
         }
-        return 
+        return
             builder.buildObject(
                  qName.getNamespaceURI(), qName.getLocalPart(), qName.getPrefix()
              );
     }
-    
+
     /**
      * Method isMethodSenderVouches ...
      *
@@ -299,11 +299,11 @@ public final class OpenSAMLUtil {
      * @return boolean
      */
     public static boolean isMethodSenderVouches(String confirmMethod) {
-        return 
-            confirmMethod != null && confirmMethod.startsWith("urn:oasis:names:tc:SAML:") 
+        return
+            confirmMethod != null && confirmMethod.startsWith("urn:oasis:names:tc:SAML:")
                 && confirmMethod.endsWith(":cm:sender-vouches");
     }
-    
+
     /**
      * Method isMethodHolderOfKey ...
      *
@@ -311,8 +311,8 @@ public final class OpenSAMLUtil {
      * @return boolean
      */
     public static boolean isMethodHolderOfKey(String confirmMethod) {
-        return 
-            confirmMethod != null && confirmMethod.startsWith("urn:oasis:names:tc:SAML:") 
+        return
+            confirmMethod != null && confirmMethod.startsWith("urn:oasis:names:tc:SAML:")
                 && confirmMethod.endsWith(":cm:holder-of-key");
     }
 

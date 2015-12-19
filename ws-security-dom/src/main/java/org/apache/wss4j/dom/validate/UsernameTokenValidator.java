@@ -37,20 +37,20 @@ import org.apache.xml.security.utils.Base64;
  * the validate method.
  */
 public class UsernameTokenValidator implements Validator {
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(UsernameTokenValidator.class);
-    
+
     /**
-     * Validate the credential argument. It must contain a non-null UsernameToken. A 
+     * Validate the credential argument. It must contain a non-null UsernameToken. A
      * CallbackHandler implementation is also required to be set.
-     * 
-     * If the password type is either digest or plaintext, it extracts a password from the 
+     *
+     * If the password type is either digest or plaintext, it extracts a password from the
      * CallbackHandler and then compares the passwords appropriately.
-     * 
+     *
      * If the password is null it queries a hook to allow the user to validate UsernameTokens
-     * of this type. 
-     * 
+     * of this type.
+     *
      * @param credential the Credential to be validated
      * @param data the RequestData associated with the request
      * @throws WSSecurityException on a failed validation
@@ -59,28 +59,28 @@ public class UsernameTokenValidator implements Validator {
         if (credential == null || credential.getUsernametoken() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCredential");
         }
-        
+
         boolean handleCustomPasswordTypes = data.isHandleCustomPasswordTypes();
         boolean passwordsAreEncoded = data.isEncodePasswords();
         String requiredPasswordType = data.getRequiredPasswordType();
-        
+
         UsernameToken usernameToken = credential.getUsernametoken();
         usernameToken.setPasswordsAreEncoded(passwordsAreEncoded);
-        
+
         String pwType = usernameToken.getPasswordType();
         if (LOG.isDebugEnabled()) {
             LOG.debug("UsernameToken user " + usernameToken.getName());
             LOG.debug("UsernameToken password type " + pwType);
         }
-        
+
         if (requiredPasswordType != null && !requiredPasswordType.equals(pwType)) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Authentication failed as the received password type does not " 
+                LOG.debug("Authentication failed as the received password type does not "
                     + "match the required password type of: " + requiredPasswordType);
             }
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
-        
+
         //
         // If the UsernameToken is hashed or plaintext, then retrieve the password from the
         // callback handler and compare directly. If the UsernameToken is of some unknown type,
@@ -105,13 +105,13 @@ public class UsernameTokenValidator implements Validator {
         }
         return credential;
     }
-    
+
     /**
      * Verify a UsernameToken containing a password of some unknown (but specified) password
      * type. It does this by querying a CallbackHandler instance to obtain a password for the
      * given username, and then comparing it against the received password.
      * This method currently uses the same LOG.c as the verifyPlaintextPassword case, but it in
-     * a separate protected method to allow users to override the validation of the custom 
+     * a separate protected method to allow users to override the validation of the custom
      * password type specific case.
      * @param usernameToken The UsernameToken instance to verify
      * @throws WSSecurityException on a failed authentication.
@@ -120,13 +120,13 @@ public class UsernameTokenValidator implements Validator {
                                         RequestData data) throws WSSecurityException {
         verifyPlaintextPassword(usernameToken, data);
     }
-    
+
     /**
-     * Verify a UsernameToken containing a plaintext password. It does this by querying a 
+     * Verify a UsernameToken containing a plaintext password. It does this by querying a
      * CallbackHandler instance to obtain a password for the given username, and then comparing
      * it against the received password.
      * This method currently uses the same LOG.c as the verifyDigestPassword case, but it in
-     * a separate protected method to allow users to override the validation of the plaintext 
+     * a separate protected method to allow users to override the validation of the plaintext
      * password specific case.
      * @param usernameToken The UsernameToken instance to verify
      * @throws WSSecurityException on a failed authentication.
@@ -135,9 +135,9 @@ public class UsernameTokenValidator implements Validator {
                                            RequestData data) throws WSSecurityException {
         verifyDigestPassword(usernameToken, data);
     }
-    
+
     /**
-     * Verify a UsernameToken containing a password digest. It does this by querying a 
+     * Verify a UsernameToken containing a password digest. It does this by querying a
      * CallbackHandler instance to obtain a password for the given username, and then comparing
      * it against the received password.
      * @param usernameToken The UsernameToken instance to verify
@@ -148,15 +148,15 @@ public class UsernameTokenValidator implements Validator {
         if (data.getCallbackHandler() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
         }
-        
+
         String user = usernameToken.getName();
         String password = usernameToken.getPassword();
         String nonce = usernameToken.getNonce();
         String createdTime = usernameToken.getCreated();
         String pwType = usernameToken.getPasswordType();
         boolean passwordsAreEncoded = usernameToken.getPasswordsAreEncoded();
-        
-        WSPasswordCallback pwCb = 
+
+        WSPasswordCallback pwCb =
             new WSPasswordCallback(user, null, pwType, WSPasswordCallback.USERNAME_TOKEN);
         try {
             data.getCallbackHandler().handle(new Callback[]{pwCb});
@@ -197,7 +197,7 @@ public class UsernameTokenValidator implements Validator {
             }
         }
     }
-    
+
     /**
      * Verify a UsernameToken containing no password. An exception is thrown unless the user
      * has explicitly allowed this use-case via WSHandlerConstants.ALLOW_USERNAMETOKEN_NOPASSWORD
@@ -206,7 +206,7 @@ public class UsernameTokenValidator implements Validator {
      */
     protected void verifyUnknownPassword(UsernameToken usernameToken,
                                          RequestData data) throws WSSecurityException {
-        
+
         boolean allowUsernameTokenDerivedKeys = data.isAllowUsernameTokenNoPassword();
         if (!allowUsernameTokenDerivedKeys) {
             if (LOG.isDebugEnabled()) {
@@ -216,5 +216,5 @@ public class UsernameTokenValidator implements Validator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
     }
-   
+
 }

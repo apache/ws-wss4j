@@ -38,9 +38,9 @@ import org.apache.wss4j.common.util.Loader;
  * We need to reference count the EHCacheManager things
  */
 public final class EHCacheManagerHolder {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(EHCacheManagerHolder.class);
-    private static final ConcurrentHashMap<String, AtomicInteger> COUNTS 
+    private static final ConcurrentHashMap<String, AtomicInteger> COUNTS
         = new ConcurrentHashMap<String, AtomicInteger>(8, 0.75f, 2);
 
     private static Method cacheManagerCreateMethodNoArg;
@@ -65,12 +65,12 @@ public final class EHCacheManagerHolder {
             }
         }
     }
-    
+
     private EHCacheManagerHolder() {
         //utility
     }
-    
-    
+
+
     public static CacheConfiguration getCacheConfiguration(String key,
                                                            CacheManager cacheManager) {
         CacheConfiguration cc = cacheManager.getConfiguration().getCacheConfigurations().get(key);
@@ -89,7 +89,7 @@ public final class EHCacheManagerHolder {
         cc.setName(key);
         return cc;
     }
-    
+
     public static CacheManager getCacheManager(String confName, URL configFileURL) {
         CacheManager cacheManager = null;
         if (configFileURL == null) {
@@ -114,7 +114,7 @@ public final class EHCacheManagerHolder {
         // }
         return cacheManager;
     }
-    
+
     private static CacheManager findDefaultCacheManager(String confName) {
 
         String defaultConfigFile = "/wss4j-ehcache.xml";
@@ -130,7 +130,7 @@ public final class EHCacheManagerHolder {
         }
         return findDefaultCacheManager(confName, configFileURL);
     }
-    
+
     private static CacheManager findDefaultCacheManager(String confName, URL configFileURL) {
         try {
             Configuration conf = ConfigurationFactory.parseConfiguration(configFileURL);
@@ -180,5 +180,5 @@ public final class EHCacheManagerHolder {
         } catch (Exception e) {
             throw new CacheException(e);
         }
-    }    
+    }
 }

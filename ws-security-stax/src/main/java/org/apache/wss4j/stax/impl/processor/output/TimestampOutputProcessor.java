@@ -42,7 +42,7 @@ public class TimestampOutputProcessor extends AbstractOutputProcessor {
         addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
         addBeforeProcessor(EncryptOutputProcessor.class.getName());
     }
-    
+
     /*
     <wsu:Timestamp wsu:Id="Timestamp-1247751600"
         xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
@@ -56,13 +56,13 @@ public class TimestampOutputProcessor extends AbstractOutputProcessor {
      */
 
     @Override
-    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) 
+    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
             throws XMLStreamException, XMLSecurityException {
-        
+
         outputProcessorChain.processEvent(xmlSecEvent);
 
         if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
-            
+
             final QName headerElementName = WSSConstants.TAG_wsu_Timestamp;
             OutputProcessorUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
 

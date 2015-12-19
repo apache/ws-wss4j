@@ -98,7 +98,7 @@ import org.w3c.dom.NodeList;
  */
 public class PolicyEnforcerFactory {
 
-    protected static final transient org.slf4j.Logger log = 
+    protected static final transient org.slf4j.Logger log =
         org.slf4j.LoggerFactory.getLogger(PolicyEnforcerFactory.class);
 
     private final List<AssertionBuilder<Element>> assertionBuilders;
@@ -233,7 +233,7 @@ public class PolicyEnforcerFactory {
 
                     Operation operation = bindingOperation.getOperation();
 
-                    OperationPolicy operationPolicy = 
+                    OperationPolicy operationPolicy =
                         new OperationPolicy(new QName(null, operation.getName()));
                     operationPolicyList.add(operationPolicy);
 
@@ -427,7 +427,7 @@ public class PolicyEnforcerFactory {
      * @return the newly created PolicyEnforcer instance
      * @throws WSSPolicyException
      */
-    public PolicyEnforcer newPolicyEnforcer(String soapAction, boolean initiator, 
+    public PolicyEnforcer newPolicyEnforcer(String soapAction, boolean initiator,
                                             String roleOrActor, int attachmentCount) throws WSSPolicyException {
         return new PolicyEnforcer(this.operationPolicies, soapAction, initiator, roleOrActor, attachmentCount);
     }

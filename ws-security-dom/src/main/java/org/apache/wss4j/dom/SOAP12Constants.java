@@ -26,7 +26,7 @@ import javax.xml.namespace.QName;
  */
 public class SOAP12Constants implements SOAPConstants {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 3784866613259361834L;
     private static final QName headerQName = new QName(WSConstants.URI_SOAP12_ENV,
@@ -35,9 +35,9 @@ public class SOAP12Constants implements SOAPConstants {
             WSConstants.ELEM_BODY);
     private static final QName roleQName = new QName(WSConstants.URI_SOAP12_ENV,
             WSConstants.ATTR_ROLE);
-    
+
     // Public constants for SOAP 1.2
-    
+
     /**
      * MessageContext property name for webmethod
      */
@@ -75,5 +75,5 @@ public class SOAP12Constants implements SOAPConstants {
     public String getMustUnderstand() {
         return "true";
     }
-    
+
 }

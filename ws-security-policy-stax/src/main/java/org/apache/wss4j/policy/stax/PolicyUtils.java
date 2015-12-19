@@ -25,7 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public final class PolicyUtils {
-    
+
     private PolicyUtils() {
         // complete
     }

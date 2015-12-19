@@ -146,7 +146,7 @@ public class KerberosSecurity extends BinarySecurity {
      * @throws WSSecurityException
      */
     public void retrieveServiceTicket(
-        String jaasLoginModuleName, 
+        String jaasLoginModuleName,
         CallbackHandler callbackHandler,
         String serviceName
     ) throws WSSecurityException {
@@ -154,28 +154,28 @@ public class KerberosSecurity extends BinarySecurity {
     }
 
     public void retrieveServiceTicket(
-        String jaasLoginModuleName, 
+        String jaasLoginModuleName,
         CallbackHandler callbackHandler,
         String serviceName,
         boolean isUsernameServiceNameForm
     ) throws WSSecurityException {
-        retrieveServiceTicket(jaasLoginModuleName, callbackHandler, serviceName, 
+        retrieveServiceTicket(jaasLoginModuleName, callbackHandler, serviceName,
                               isUsernameServiceNameForm, false);
     }
-    
+
     public void retrieveServiceTicket(
-         String jaasLoginModuleName, 
+         String jaasLoginModuleName,
          CallbackHandler callbackHandler,
          String serviceName,
          boolean isUsernameServiceNameForm,
          boolean requestCredDeleg
     ) throws WSSecurityException {
-        retrieveServiceTicket(jaasLoginModuleName, callbackHandler, serviceName, 
+        retrieveServiceTicket(jaasLoginModuleName, callbackHandler, serviceName,
                               isUsernameServiceNameForm, requestCredDeleg, null);
     }
-    
+
     public void retrieveServiceTicket(
-        String jaasLoginModuleName, 
+        String jaasLoginModuleName,
         CallbackHandler callbackHandler,
         String serviceName,
         boolean isUsernameServiceNameForm,
@@ -197,7 +197,7 @@ public class KerberosSecurity extends BinarySecurity {
             }
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, ex,
-                "kerberosLoginError", 
+                "kerberosLoginError",
                 new Object[] {ex.getMessage()}
             );
         }
@@ -209,7 +209,7 @@ public class KerberosSecurity extends BinarySecurity {
         Set<Principal> clientPrincipals = clientSubject.getPrincipals();
         if (clientPrincipals.isEmpty()) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, 
+                WSSecurityException.ErrorCode.FAILURE,
                 "kerberosLoginError",
                 new Object[] {"No Client principals found after login"});
         }
@@ -217,8 +217,8 @@ public class KerberosSecurity extends BinarySecurity {
         KerberosTicket tgt = getKerberosTicket(clientSubject, null);
 
         // Get the service ticket
-        KerberosClientExceptionAction action = 
-            new KerberosClientExceptionAction(clientPrincipals.iterator().next(), serviceName, 
+        KerberosClientExceptionAction action =
+            new KerberosClientExceptionAction(clientPrincipals.iterator().next(), serviceName,
                                               isUsernameServiceNameForm, requestCredDeleg,
                                               delegatedCredential, false, false);
         KerberosContext krbCtx = null;
@@ -243,7 +243,7 @@ public class KerberosSecurity extends BinarySecurity {
                     LOG.debug("Successfully retrieved a secret key for kerberos");
                 }
             }
-            
+
             setToken(krbCtx.getKerberosToken());
         }
         catch (PrivilegedActionException e) {

@@ -46,7 +46,7 @@ import java.util.List;
 public class ProtectionOrderAssertionState extends AssertionState implements Assertable {
 
     private PolicyAsserter policyAsserter;
-    
+
     public ProtectionOrderAssertionState(AbstractSecurityAssertion assertion,
                                          PolicyAsserter policyAsserter,
                                          boolean asserted) {
@@ -55,7 +55,7 @@ public class ProtectionOrderAssertionState extends AssertionState implements Ass
         if (this.policyAsserter == null) {
             this.policyAsserter = new DummyPolicyAsserter();
         }
-        
+
         if (asserted) {
             String namespace = getAssertion().getName().getNamespaceURI();
             AbstractSymmetricAsymmetricBinding.ProtectionOrder protectionOrder = ((AbstractSymmetricAsymmetricBinding) getAssertion()).getProtectionOrder();
@@ -128,7 +128,7 @@ public class ProtectionOrderAssertionState extends AssertionState implements Ass
 
     private void testProtectionOrder(AbstractSymmetricAsymmetricBinding.ProtectionOrder protectionOrder, List<XMLSecurityConstants.ContentType> contentTypes, List<QName> elementPath) {
         String namespace = getAssertion().getName().getNamespaceURI();
-        
+
         switch (protectionOrder) {
             case SignBeforeEncrypting: {
                 int lastSignature = contentTypes.lastIndexOf(XMLSecurityConstants.ContentType.SIGNATURE);

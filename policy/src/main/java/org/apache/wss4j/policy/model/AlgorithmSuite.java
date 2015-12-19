@@ -36,7 +36,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
     private static final int MAX_SKL = 256;
     private static final int MIN_AKL = 1024;
     private static final int MAX_AKL = 4096;
-    
+
     static {
         algorithmSuiteTypes.put("Basic256", new AlgorithmSuiteType(
                 "Basic256",
@@ -46,7 +46,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L256,
                 SPConstants.P_SHA1_L192,
-                256, 192, 256, 
+                256, 192, 256,
                 MAX_SKL, MIN_AKL, MAX_AKL));
         algorithmSuiteTypes.put("Basic192", new AlgorithmSuiteType(
                 "Basic192",
@@ -56,7 +56,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 
+                192, 192, 192,
                 MAX_SKL, MIN_AKL, MAX_AKL));
         algorithmSuiteTypes.put("Basic128", new AlgorithmSuiteType(
                 "Basic128",
@@ -66,7 +66,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L128,
                 SPConstants.P_SHA1_L128,
-                128, 128, 128, 
+                128, 128, 128,
                 MAX_SKL, MIN_AKL, MAX_AKL));
         algorithmSuiteTypes.put("TripleDes", new AlgorithmSuiteType(
                 "TripleDes",
@@ -76,7 +76,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 
+                192, 192, 192,
                 MAX_SKL, MIN_AKL, MAX_AKL));
         algorithmSuiteTypes.put("Basic256Rsa15", new AlgorithmSuiteType(
                 "Basic256Rsa15",
@@ -86,7 +86,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L256,
                 SPConstants.P_SHA1_L192,
-                256, 192, 256, 
+                256, 192, 256,
                 MAX_SKL, MIN_AKL, MAX_AKL));
         algorithmSuiteTypes.put("Basic192Rsa15", new AlgorithmSuiteType(
                 "Basic192Rsa15",
@@ -96,7 +96,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 
+                192, 192, 192,
                 MAX_SKL, MIN_AKL, MAX_AKL));
         algorithmSuiteTypes.put("Basic128Rsa15", new AlgorithmSuiteType(
                 "Basic128Rsa15",
@@ -106,7 +106,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L128,
                 SPConstants.P_SHA1_L128,
-                128, 128, 128, 
+                128, 128, 128,
                 MAX_SKL, MIN_AKL, MAX_AKL));
         algorithmSuiteTypes.put("TripleDesRsa15", new AlgorithmSuiteType(
                 "TripleDesRsa15",
@@ -116,7 +116,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 
+                192, 192, 192,
                 MAX_SKL, MIN_AKL, MAX_AKL));
         algorithmSuiteTypes.put("Basic256Sha256", new AlgorithmSuiteType(
                 "Basic256Sha256",
@@ -126,7 +126,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L256,
                 SPConstants.P_SHA1_L192,
-                256, 192, 256, 
+                256, 192, 256,
                 MAX_SKL, MIN_AKL, MAX_AKL));
         algorithmSuiteTypes.put("Basic192Sha256", new AlgorithmSuiteType(
                 "Basic192Sha256",
@@ -136,7 +136,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 
+                192, 192, 192,
                 MAX_SKL, MIN_AKL, MAX_AKL));
         algorithmSuiteTypes.put("Basic128Sha256", new AlgorithmSuiteType(
                 "Basic128Sha256",
@@ -146,7 +146,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L128,
                 SPConstants.P_SHA1_L128,
-                128, 128, 128, 
+                128, 128, 128,
                 MAX_SKL, MIN_AKL, MAX_AKL));
         algorithmSuiteTypes.put("TripleDesSha256", new AlgorithmSuiteType(
                 "TripleDesSha256",
@@ -156,7 +156,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA_OAEP,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 
+                192, 192, 192,
                 MAX_SKL, MIN_AKL, MAX_AKL));
         algorithmSuiteTypes.put("Basic256Sha256Rsa15", new AlgorithmSuiteType(
                 "Basic256Sha256Rsa15",
@@ -166,7 +166,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L256,
                 SPConstants.P_SHA1_L192,
-                256, 192, 256, 
+                256, 192, 256,
                 MAX_SKL, MIN_AKL, MAX_AKL));
         algorithmSuiteTypes.put("Basic192Sha256Rsa15", new AlgorithmSuiteType(
                 "Basic192Sha256Rsa15",
@@ -176,7 +176,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 
+                192, 192, 192,
                 MAX_SKL, MIN_AKL, MAX_AKL));
         algorithmSuiteTypes.put("Basic128Sha256Rsa15", new AlgorithmSuiteType(
                 "Basic128Sha256Rsa15",
@@ -186,7 +186,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L128,
                 SPConstants.P_SHA1_L128,
-                128, 128, 128, 
+                128, 128, 128,
                 MAX_SKL, MIN_AKL, MAX_AKL));
         algorithmSuiteTypes.put("TripleDesSha256Rsa15", new AlgorithmSuiteType(
                 "TripleDesSha256Rsa15",
@@ -196,7 +196,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                 SPConstants.KW_RSA15,
                 SPConstants.P_SHA1_L192,
                 SPConstants.P_SHA1_L192,
-                192, 192, 192, 
+                192, 192, 192,
                 MAX_SKL, MIN_AKL, MAX_AKL));
     }
 
@@ -236,7 +236,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
             this.minimumAsymmetricKeyLength = minimumAsymmetricKeyLength;
             this.maximumAsymmetricKeyLength = maximumAsymmetricKeyLength;
         }
-        
+
         public AlgorithmSuiteType(AlgorithmSuiteType algorithmSuiteType) {
             this.name = algorithmSuiteType.name;
             this.digest = algorithmSuiteType.digest;
@@ -253,7 +253,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
             this.maximumAsymmetricKeyLength = algorithmSuiteType.maximumAsymmetricKeyLength;
             this.mgfAlgo = algorithmSuiteType.mgfAlgo;
         }
-        
+
         public String getName() {
             return name;
         }
@@ -305,19 +305,19 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         public int getMaximumAsymmetricKeyLength() {
             return maximumAsymmetricKeyLength;
         }
-        
+
         public void setNamespace(String ns) {
             this.ns = ns;
         }
-        
+
         public String getNamespace() {
             return ns;
         }
-        
+
         public void setMGFAlgo(String mgfAlgo) {
             this.mgfAlgo = mgfAlgo;
         }
-        
+
         public String getMGFAlgo() {
             return mgfAlgo;
         }
@@ -493,7 +493,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                     if (algorithmSuite.getAlgorithmSuiteType() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
-                    
+
                     // Clone so as not to change the namespace for other AlgorithmSuiteTypes...
                     AlgorithmSuiteType newAlgorithmSuiteType = new AlgorithmSuiteType(algorithmSuiteType);
                     newAlgorithmSuiteType.setNamespace(getVersion().getNamespace());
@@ -587,7 +587,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
     public String getComputedKey() {
         return computedKey;
     }
-    
+
     public static Collection<String> getSupportedAlgorithmSuiteNames() {
         return algorithmSuiteTypes.keySet();
     }

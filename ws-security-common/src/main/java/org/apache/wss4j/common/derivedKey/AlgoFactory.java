@@ -22,7 +22,7 @@ package org.apache.wss4j.common.derivedKey;
 import org.apache.wss4j.common.ext.WSSecurityException;
 
 public final class AlgoFactory {
-    
+
     private AlgoFactory() {
         // Complete
     }
@@ -40,7 +40,7 @@ public final class AlgoFactory {
             || ConversationConstants.DerivationAlgorithm.P_SHA_1.equals(algorithm)) {
             return new P_SHA1();
         } else {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                           "unknownAlgorithm", new Object[] {algorithm});
         }
     }

@@ -24,7 +24,7 @@ import org.joda.time.DateTime;
 /**
  * Class DelegateBean represents a SAML 2.0 Delegate object. Only NameIDs are supported for now, not
  * BaseID or EncryptedIDs.
- * 
+ *
  * See:
  * http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-delegation-cs-01.pdf
  */
@@ -48,7 +48,7 @@ public class DelegateBean {
     public void setConfirmationMethod(String confirmationMethod) {
         this.confirmationMethod = confirmationMethod;
     }
-    
+
     public NameIDBean getNameIDBean() {
         return nameIDBean;
     }
@@ -56,7 +56,7 @@ public class DelegateBean {
     public void setNameIDBean(NameIDBean nameIDBean) {
         this.nameIDBean = nameIDBean;
     }
-    
+
     /**
      * Method equals ...
      *
@@ -79,19 +79,19 @@ public class DelegateBean {
         } else if (delegationInstant != null && !delegationInstant.equals(that.delegationInstant)) {
             return false;
         }
-        
+
         if (confirmationMethod == null && that.confirmationMethod != null) {
             return false;
         } else if (confirmationMethod != null && !confirmationMethod.equals(that.confirmationMethod)) {
             return false;
         }
-        
+
         if (nameIDBean == null && that.nameIDBean != null) {
             return false;
         } else if (nameIDBean != null && !nameIDBean.equals(that.nameIDBean)) {
             return false;
         }
-        
+
         return true;
     }
 

@@ -148,7 +148,7 @@ public abstract class SPConstants {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // X509 Token types 
+    // X509 Token types
 
     public final static String X509_TOKEN = "X509Token";
 

@@ -24,16 +24,16 @@ import java.security.PrivilegedAction;
 import org.ietf.jgss.GSSContext;
 
 /**
- * This interface represents a PrivilegedAction implementation to obtain a (SPNEGO) service ticket 
+ * This interface represents a PrivilegedAction implementation to obtain a (SPNEGO) service ticket
  * from a Kerberos Key Distribution Center.
  */
 public interface SpnegoClientAction extends PrivilegedAction<byte[]> {
-    
+
     /**
      * Whether to enable mutual authentication or not.
      */
     void setMutualAuth(boolean mutualAuthentication);
-    
+
     /**
      * The Service Name
      */
@@ -42,7 +42,7 @@ public interface SpnegoClientAction extends PrivilegedAction<byte[]> {
     /**
      * If true - sets the SPN form to "username"
      * <br/>If false<b>(default)</b> - the SPN form is "hostbased"
-     * 
+     *
      * @param isUsernameServiceNameForm the isUsernameServiceNameForm to set
      */
     void setUserNameServiceForm(boolean isUsernameServiceNameForm);
@@ -51,10 +51,10 @@ public interface SpnegoClientAction extends PrivilegedAction<byte[]> {
      * Obtain a service ticket
      */
     byte[] run();
-    
+
     /**
      * Get the GSSContext that was created after a service ticket was obtained
      */
     GSSContext getContext();
-    
+
 }

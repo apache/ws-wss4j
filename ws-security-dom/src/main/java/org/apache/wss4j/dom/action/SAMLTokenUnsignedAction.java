@@ -40,15 +40,15 @@ public class SAMLTokenUnsignedAction implements Action {
         WSSecSAMLToken builder = new WSSecSAMLToken();
         builder.setIdAllocator(reqData.getWssConfig().getIdAllocator());
 
-        CallbackHandler samlCallbackHandler = 
+        CallbackHandler samlCallbackHandler =
                 handler.getCallbackHandler(
                     WSHandlerConstants.SAML_CALLBACK_CLASS,
-                    WSHandlerConstants.SAML_CALLBACK_REF, 
+                    WSHandlerConstants.SAML_CALLBACK_REF,
                     reqData
                 );
         if (samlCallbackHandler == null) {
             throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, 
+                WSSecurityException.ErrorCode.FAILURE,
                 "noSAMLCallbackHandler"
             );
         }
@@ -59,7 +59,7 @@ public class SAMLTokenUnsignedAction implements Action {
         if (samlCallback.isSignAssertion()) {
             samlAssertion.signAssertion(
                 samlCallback.getIssuerKeyName(),
-                samlCallback.getIssuerKeyPassword(), 
+                samlCallback.getIssuerKeyPassword(),
                 samlCallback.getIssuerCrypto(),
                 samlCallback.isSendKeyValue(),
                 samlCallback.getCanonicalizationAlgorithm(),

@@ -44,7 +44,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * This is a test for processing a Username Token to enforce either a plaintext or digest
- * password type. 
+ * password type.
  */
 public class PasswordTypeTest extends AbstractTestBase {
 
@@ -80,7 +80,7 @@ public class PasswordTypeTest extends AbstractTestBase {
 
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
         }
-        
+
         // It should pass with null
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -92,7 +92,7 @@ public class PasswordTypeTest extends AbstractTestBase {
 
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
         }
-        
+
         // It should fail with PASSWORD_TEXT
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -113,7 +113,7 @@ public class PasswordTypeTest extends AbstractTestBase {
             }
         }
     }
-    
+
     @Test
     public void testPasswordText() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -147,7 +147,7 @@ public class PasswordTypeTest extends AbstractTestBase {
 
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
         }
-        
+
         // It should pass with null
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -159,7 +159,7 @@ public class PasswordTypeTest extends AbstractTestBase {
 
             StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
         }
-        
+
         // It should fail with PASSWORD_DIGEST
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -181,5 +181,5 @@ public class PasswordTypeTest extends AbstractTestBase {
         }
     }
 
-    
+
 }

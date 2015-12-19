@@ -53,17 +53,17 @@ import org.w3c.dom.Element;
  * Some test-cases for replay attacks.
  */
 public class ReplayTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(ReplayTest.class);
-    
+
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public ReplayTest() throws Exception {
         crypto = CryptoFactory.getInstance();
     }
@@ -74,360 +74,360 @@ public class ReplayTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
-        
+
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        
+
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp", WSConstants.WSU_NS, "");
         builder.getParts().add(encP);
-        
+
         builder.prepare(createdDoc, crypto, secHeader);
-        
-        List<javax.xml.crypto.dsig.Reference> referenceList = 
+
+        List<javax.xml.crypto.dsig.Reference> referenceList =
             builder.addReferencesToSign(builder.getParts(), secHeader);
 
         builder.computeSignature(referenceList, false, null);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
-        
+
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);
         data.setCallbackHandler(callbackHandler);
         data.setTimestampReplayCache(new MemoryReplayCache());
-        
+
         // Successfully verify timestamp
         verify(createdDoc, wssConfig, data);
-        
+
         // Now try again - a replay attack should be detected
         try {
             verify(createdDoc, wssConfig, data);
             fail("Expected failure on a replay attack");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
-        }   
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
     }
-    
+
     @org.junit.Test
     public void testEhCacheReplayedTimestamp() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
-        
+
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        
+
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp", WSConstants.WSU_NS, "");
         builder.getParts().add(encP);
-        
+
         builder.prepare(createdDoc, crypto, secHeader);
-        
-        List<javax.xml.crypto.dsig.Reference> referenceList = 
+
+        List<javax.xml.crypto.dsig.Reference> referenceList =
             builder.addReferencesToSign(builder.getParts(), secHeader);
 
         builder.computeSignature(referenceList, false, null);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
-        
+
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);
         data.setCallbackHandler(callbackHandler);
-        
+
         // Successfully verify timestamp
         verify(createdDoc, wssConfig, data);
-        
+
         // Now try again - a replay attack should be detected
         try {
             verify(createdDoc, wssConfig, data);
             fail("Expected failure on a replay attack");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
-        }   
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
     }
-    
+
     @org.junit.Test
     public void testReplayedTimestampBelowSignature() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
-        
+
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        
+
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp", WSConstants.WSU_NS, "");
         builder.getParts().add(encP);
-        
+
         builder.build(createdDoc, crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
-        
+
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);
         data.setCallbackHandler(callbackHandler);
         data.setTimestampReplayCache(new MemoryReplayCache());
-        
+
         // Successfully verify timestamp
         verify(createdDoc, wssConfig, data);
-        
+
         // Now try again - a replay attack should be detected
         try {
             verify(createdDoc, wssConfig, data);
             fail("Expected failure on a replay attack");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
-        }   
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
     }
-    
+
     @org.junit.Test
     public void testEhCacheReplayedTimestampBelowSignature() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(300);
         Document createdDoc = timestamp.build(doc, secHeader);
-        
+
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        
+
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp", WSConstants.WSU_NS, "");
         builder.getParts().add(encP);
-        
+
         builder.build(createdDoc, crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
-        
+
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);
         data.setCallbackHandler(callbackHandler);
-        
+
         // Successfully verify timestamp
         verify(createdDoc, wssConfig, data);
-        
+
         // Now try again - a replay attack should be detected
         try {
             verify(createdDoc, wssConfig, data);
             fail("Expected failure on a replay attack");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
-        }   
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
     }
-    
+
     @org.junit.Test
     public void testReplayedTimestampNoExpires() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(0);
         Document createdDoc = timestamp.build(doc, secHeader);
-        
+
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        
+
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp", WSConstants.WSU_NS, "");
         builder.getParts().add(encP);
-        
+
         builder.prepare(createdDoc, crypto, secHeader);
-        
-        List<javax.xml.crypto.dsig.Reference> referenceList = 
+
+        List<javax.xml.crypto.dsig.Reference> referenceList =
             builder.addReferencesToSign(builder.getParts(), secHeader);
 
         builder.computeSignature(referenceList, false, null);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
-        
+
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);
         data.setCallbackHandler(callbackHandler);
         data.setTimestampReplayCache(new MemoryReplayCache());
-        
+
         // Successfully verify timestamp
         verify(createdDoc, wssConfig, data);
-        
+
         // Now try again - a replay attack should be detected
         try {
             verify(createdDoc, wssConfig, data);
             fail("Expected failure on a replay attack");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
-        }   
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
     }
-    
+
     @org.junit.Test
     public void testEhCacheReplayedTimestampNoExpires() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSSecTimestamp timestamp = new WSSecTimestamp();
         timestamp.setTimeToLive(0);
         Document createdDoc = timestamp.build(doc, secHeader);
-        
+
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        
+
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "Timestamp", WSConstants.WSU_NS, "");
         builder.getParts().add(encP);
-        
+
         builder.prepare(createdDoc, crypto, secHeader);
-        
-        List<javax.xml.crypto.dsig.Reference> referenceList = 
+
+        List<javax.xml.crypto.dsig.Reference> referenceList =
             builder.addReferencesToSign(builder.getParts(), secHeader);
 
         builder.computeSignature(referenceList, false, null);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
-        
+
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);
         data.setCallbackHandler(callbackHandler);
-        
+
         // Successfully verify timestamp
         verify(createdDoc, wssConfig, data);
-        
+
         // Now try again - a replay attack should be detected
         try {
             verify(createdDoc, wssConfig, data);
             fail("Expected failure on a replay attack");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
-        }   
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
     }
-    
+
     @org.junit.Test
     public void testReplayedUsernameToken() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecret");
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         RequestData data = new RequestData();
         data.setCallbackHandler(new UsernamePasswordCallbackHandler());
         data.setWssConfig(wssConfig);
         data.setNonceReplayCache(new MemoryReplayCache());
-        
+
         // Successfully verify UsernameToken
         verify(signedDoc, wssConfig, data);
-        
+
         // Now try again - a replay attack should be detected
         try {
             verify(signedDoc, wssConfig, data);
             fail("Expected failure on a replay attack");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
-        }   
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
     }
-    
+
     @org.junit.Test
     public void testEhCacheReplayedUsernameToken() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecret");
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         RequestData data = new RequestData();
         data.setCallbackHandler(new UsernamePasswordCallbackHandler());
         data.setWssConfig(wssConfig);
-        
+
         // Successfully verify UsernameToken
         verify(signedDoc, wssConfig, data);
-        
+
         // Now try again - a replay attack should be detected
         try {
             verify(signedDoc, wssConfig, data);
             fail("Expected failure on a replay attack");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
-        }   
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
+        }
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion. This
      * is just a sanity test to make sure that it is possible to send the SAML token twice, as
@@ -440,12 +440,12 @@ public class ReplayTest extends org.junit.Assert {
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
-        
+
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
-            
+
         callbackHandler.setConditions(conditions);
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
@@ -455,31 +455,31 @@ public class ReplayTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.PrettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
-        
+
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         SamlAssertionValidator assertionValidator = new SamlAssertionValidator();
         assertionValidator.setRequireBearerSignature(false);
         wssConfig.setValidator(WSConstants.SAML_TOKEN, assertionValidator);
         wssConfig.setValidator(WSConstants.SAML2_TOKEN, assertionValidator);
-        
+
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);
         data.setCallbackHandler(callbackHandler);
-        
+
         // Successfully verify SAML Token
         verify(unsignedDoc, wssConfig, data);
-        
+
         // Now try again - this should work fine as well
         verify(unsignedDoc, wssConfig, data);
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with a OneTimeUse Element
@@ -490,13 +490,13 @@ public class ReplayTest extends org.junit.Assert {
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("www.example.com");
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
-        
+
         ConditionsBean conditions = new ConditionsBean();
         conditions.setTokenPeriodMinutes(5);
         conditions.setOneTimeUse(true);
-            
+
         callbackHandler.setConditions(conditions);
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
@@ -506,41 +506,41 @@ public class ReplayTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(unsignedDoc);
         assertTrue(outputString.contains("OneTimeUse"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
+
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         SamlAssertionValidator assertionValidator = new SamlAssertionValidator();
         assertionValidator.setRequireBearerSignature(false);
         wssConfig.setValidator(WSConstants.SAML_TOKEN, assertionValidator);
         wssConfig.setValidator(WSConstants.SAML2_TOKEN, assertionValidator);
-        
+
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);
         data.setCallbackHandler(callbackHandler);
-        
+
         // Successfully verify SAML Token
         verify(unsignedDoc, wssConfig, data);
-        
+
         // Now try again - a replay attack should be detected
         try {
             verify(unsignedDoc, wssConfig, data);
             fail("Expected failure on a replay attack");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
     }
-    
+
     /**
      * Verifies the soap envelope
-     * 
+     *
      * @param env soap envelope
      * @param wssConfig
      * @throws java.lang.Exception Thrown when there is a problem in verification
@@ -554,6 +554,6 @@ public class ReplayTest extends org.junit.Assert {
         data.setSigVerCrypto(crypto);
         return secEngine.processSecurityHeader(elem, data);
     }
-    
-    
+
+
 }

@@ -123,7 +123,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                         }
                         byte[] nonce = derivedKeyTokenType.getNonce();
                         if (nonce == null || nonce.length == 0) {
-                            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "empty", 
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "empty",
                                                           new Object[] {"Missing wsc:Nonce value"});
                         }
                         String derivedKeyAlgorithm = derivedKeyTokenType.getAlgorithm();

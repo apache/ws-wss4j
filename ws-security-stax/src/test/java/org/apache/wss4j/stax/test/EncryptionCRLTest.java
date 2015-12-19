@@ -37,8 +37,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * This is a test for Certificate Revocation List checking before encryption. 
- * 
+ * This is a test for Certificate Revocation List checking before encryption.
+ *
  * This test reuses the revoked certificate from SignatureCRLTest
  */
 public class EncryptionCRLTest extends AbstractTestBase {
@@ -91,7 +91,7 @@ public class EncryptionCRLTest extends AbstractTestBase {
             }
         }
     }
-    
+
     /**
      * TODO Re-enable once CRL issue fixed
      */
@@ -110,7 +110,7 @@ public class EncryptionCRLTest extends AbstractTestBase {
             securityProperties.loadCRLCertStore(this.getClass().getClassLoader().getResource("wss40CACRL.pem"));
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            
+
             try {
                 doOutboundSecurity(securityProperties, sourceDocument);
                 Assert.fail("Expected failure on a revocation check");
@@ -119,5 +119,5 @@ public class EncryptionCRLTest extends AbstractTestBase {
             }
         }
     }
-    
+
 }

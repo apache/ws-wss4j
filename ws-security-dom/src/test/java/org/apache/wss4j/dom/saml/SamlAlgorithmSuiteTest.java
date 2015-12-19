@@ -47,15 +47,15 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
  * SAML (HOK) assertion when specifying an AlgorithmSuite policy.
  */
 public class SamlAlgorithmSuiteTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SamlAlgorithmSuiteTest.class);
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public SamlAlgorithmSuiteTest() throws Exception {
         WSSConfig.init();
         crypto = CryptoFactory.getInstance("crypto.properties");
@@ -67,11 +67,11 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-        
+
         samlAssertion.signAssertion("16c73ab6-b892-458f-abf5-2f875f74882e", "security", crypto, false);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
@@ -79,43 +79,43 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Document signedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         Element securityHeader = WSSecurityUtil.getSecurityHeader(signedDoc, null);
         AlgorithmSuite algorithmSuite = createAlgorithmSuite();
-        
+
         verify(securityHeader, algorithmSuite, crypto);
-        
+
         algorithmSuite.setMinimumAsymmetricKeyLength(1024);
-        
+
         try {
             verify(securityHeader, algorithmSuite, crypto);
             fail("Expected failure as 512-bit keys are not allowed");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
     }
-    
+
     @org.junit.Test
     public void testDSASignedSAML11Assertion() throws Exception {
         Crypto dsaCrypto = CryptoFactory.getInstance("wss40.properties");
-        
+
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-        
+
         samlAssertion.signAssertion("wss40DSA", "security", dsaCrypto, false);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
@@ -123,40 +123,40 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Document signedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         Element securityHeader = WSSecurityUtil.getSecurityHeader(signedDoc, null);
         AlgorithmSuite algorithmSuite = createAlgorithmSuite();
-        
+
         try {
             verify(securityHeader, algorithmSuite, dsaCrypto);
             fail("Expected failure as DSA is not allowed");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         algorithmSuite.addSignatureMethod(WSConstants.DSA);
         verify(securityHeader, algorithmSuite, dsaCrypto);
     }
-    
+
     @org.junit.Test
     public void testC14nMethod() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-        
+
         samlAssertion.signAssertion(
             "16c73ab6-b892-458f-abf5-2f875f74882e", "security", crypto, false,
             WSConstants.C14N_EXCL_WITH_COMMENTS, WSConstants.RSA_SHA1);
@@ -166,25 +166,25 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Document signedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         Element securityHeader = WSSecurityUtil.getSecurityHeader(signedDoc, null);
         AlgorithmSuite algorithmSuite = createAlgorithmSuite();
-        
+
         try {
             verify(securityHeader, algorithmSuite, crypto);
             fail("Expected failure as C14n algorithm is not allowed");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         algorithmSuite.addC14nAlgorithm(WSConstants.C14N_EXCL_WITH_COMMENTS);
         verify(securityHeader, algorithmSuite, crypto);
     }
@@ -195,7 +195,7 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         algorithmSuite.setMinimumAsymmetricKeyLength(512);
         algorithmSuite.addC14nAlgorithm(WSConstants.C14N_EXCL_OMIT_COMMENTS);
         algorithmSuite.addDigestAlgorithm(WSConstants.SHA1);
-        
+
         return algorithmSuite;
     }
 
@@ -207,7 +207,7 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         data.setSigVerCrypto(sigVerCrypto);
         data.setSamlAlgorithmSuite(algorithmSuite);
         data.setValidateSamlSubjectConfirmation(false);
-        
+
         return secEngine.processSecurityHeader(securityHeader, data);
     }
 

@@ -37,7 +37,7 @@ public class PKIPathSecurity extends BinarySecurity {
 
     /**
      * Constructor.
-     * 
+     *
      * @param elem The PKIPath element to process
      * @param bspEnforcer a BSPEnforcer instance to enforce BSP rules
      * @throws WSSecurityException
@@ -61,7 +61,7 @@ public class PKIPathSecurity extends BinarySecurity {
      * get the X509Certificate array.
      *
      * @param crypto
-     * @return array of certificates 
+     * @return array of certificates
      * @throws WSSecurityException
      */
     public X509Certificate[] getX509Certificates(Crypto crypto)

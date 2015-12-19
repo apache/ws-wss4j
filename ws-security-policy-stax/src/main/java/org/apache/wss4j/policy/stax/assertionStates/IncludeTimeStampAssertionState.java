@@ -35,10 +35,10 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
  * WSP1.3, 6.2 Timestamp Property
  */
 public class IncludeTimeStampAssertionState extends AssertionState implements Assertable {
-    
+
     private PolicyAsserter policyAsserter;
 
-    public IncludeTimeStampAssertionState(AbstractSecurityAssertion assertion, 
+    public IncludeTimeStampAssertionState(AbstractSecurityAssertion assertion,
                                           PolicyAsserter policyAsserter,
                                           boolean asserted) {
         super(assertion, asserted);
@@ -46,7 +46,7 @@ public class IncludeTimeStampAssertionState extends AssertionState implements As
         if (this.policyAsserter == null) {
             this.policyAsserter = new DummyPolicyAsserter();
         }
-        
+
         if (asserted) {
             String namespace = getAssertion().getName().getNamespaceURI();
             policyAsserter.assertPolicy(new QName(namespace, SPConstants.INCLUDE_TIMESTAMP));
@@ -72,7 +72,7 @@ public class IncludeTimeStampAssertionState extends AssertionState implements As
         } else {
             setAsserted(false);
             setErrorMessage("Timestamp must not be present");
-            policyAsserter.unassertPolicy(new QName(namespace, SPConstants.INCLUDE_TIMESTAMP), 
+            policyAsserter.unassertPolicy(new QName(namespace, SPConstants.INCLUDE_TIMESTAMP),
                 getErrorMessage());
         }
         return isAsserted();

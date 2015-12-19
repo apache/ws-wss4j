@@ -45,7 +45,7 @@ public class UsernameTokenAssertionState extends TokenAssertionState {
     public UsernameTokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted,
                                        PolicyAsserter policyAsserter, boolean initiator) {
         super(assertion, asserted, policyAsserter, initiator);
-        
+
         if (asserted) {
             UsernameToken usernameToken = (UsernameToken) getAssertion();
             String namespace = usernameToken.getName().getNamespaceURI();
@@ -55,11 +55,11 @@ public class UsernameTokenAssertionState extends TokenAssertionState {
             if (usernameToken.isCreated()) {
                 getPolicyAsserter().assertPolicy(SP13Constants.CREATED);
             }
-            
+
             if (usernameToken.isNonce()) {
                 getPolicyAsserter().assertPolicy(SP13Constants.NONCE);
             }
-            
+
             if (usernameToken.getUsernameTokenType() != null) {
                 getPolicyAsserter().assertPolicy(new QName(namespace, usernameToken.getUsernameTokenType().name()));
             }
@@ -125,7 +125,7 @@ public class UsernameTokenAssertionState extends TokenAssertionState {
                 getPolicyAsserter().assertPolicy(SP13Constants.CREATED);
             }
         }
-        
+
         if (usernameToken.isNonce()) {
             if (usernameSecurityToken.getNonce() == null || usernameTokenSecurityEvent.getUsernameTokenPasswordType() != WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT) {
                 setErrorMessage("UsernameToken does not contain a nonce or password is not plain text");
@@ -135,11 +135,11 @@ public class UsernameTokenAssertionState extends TokenAssertionState {
                 getPolicyAsserter().assertPolicy(SP13Constants.NONCE);
             }
         }
-        
+
         if (usernameToken.getUsernameTokenType() != null) {
             switch (usernameToken.getUsernameTokenType()) {
                 case WssUsernameToken10:
-                    if (usernameTokenSecurityEvent.getUsernameTokenProfile() != null 
+                    if (usernameTokenSecurityEvent.getUsernameTokenProfile() != null
                         && usernameTokenSecurityEvent.getUsernameTokenProfile().equals(WSSConstants.NS_USERNAMETOKEN_PROFILE11)) {
                         setErrorMessage("Policy enforces UsernameToken profile 1.0 but we got 1.1");
                         getPolicyAsserter().unassertPolicy(new QName(namespace, SPConstants.USERNAME_TOKEN10),

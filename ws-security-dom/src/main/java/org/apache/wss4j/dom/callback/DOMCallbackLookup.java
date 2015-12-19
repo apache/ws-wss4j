@@ -35,21 +35,21 @@ import org.w3c.dom.Element;
  * This class uses a DOM-based approach to locate Elements that are referenced via an Id.
  */
 public class DOMCallbackLookup implements CallbackLookup {
-    
+
     private Document doc;
-    
+
     public DOMCallbackLookup(Document doc) {
         this.doc = doc;
     }
 
     /**
-     * Get the DOM element that corresponds to the given id and ValueType reference. The Id can 
+     * Get the DOM element that corresponds to the given id and ValueType reference. The Id can
      * be a wsu:Id or else an Id attribute, or a SAML Id when the ValueType refers to a SAML
-     * Assertion. 
-     * 
+     * Assertion.
+     *
      * @param id The id of the element to locate
      * @param valueType The ValueType attribute of the element to locate (can be null)
-     * @param checkMultipleElements If true then go through the entire tree and return 
+     * @param checkMultipleElements If true then go through the entire tree and return
      *        null if there are multiple elements with the same Id
      * @return the located element
      * @throws WSSecurityException
@@ -59,16 +59,16 @@ public class DOMCallbackLookup implements CallbackLookup {
     ) throws WSSecurityException {
         return getAndRegisterElement(id, valueType, checkMultipleElements, null);
     }
-    
+
     /**
-     * Get the DOM element that corresponds to the given id and ValueType reference. The Id can 
+     * Get the DOM element that corresponds to the given id and ValueType reference. The Id can
      * be a wsu:Id or else an Id attribute, or a SAML Id when the ValueType refers to a SAML
      * Assertion. The implementation is also responsible to register the retrieved Element on the
      * DOMCryptoContext argument, so that the XML Signature implementation can find the Element.
-     * 
+     *
      * @param id The id of the element to locate
      * @param valueType The ValueType attribute of the element to locate (can be null)
-     * @param checkMultipleElements If true then go through the entire tree and return 
+     * @param checkMultipleElements If true then go through the entire tree and return
      *        null if there are multiple elements with the same Id
      * @param context The DOMCryptoContext to store the Element in
      * @return the located element
@@ -78,7 +78,7 @@ public class DOMCallbackLookup implements CallbackLookup {
         String id, String valueType, boolean checkMultipleElements, DOMCryptoContext context
     ) throws WSSecurityException {
         String idToMatch = XMLUtils.getIDFromReference(id);
-        
+
         //
         // Try the SOAP Body first
         //
@@ -93,7 +93,7 @@ public class DOMCallbackLookup implements CallbackLookup {
             }
         }
         // Otherwise do a general search
-        Element foundElement = 
+        Element foundElement =
             XMLUtils.findElementById(doc.getDocumentElement(), idToMatch, checkMultipleElements);
         if (foundElement != null) {
             if (context != null) {
@@ -108,16 +108,16 @@ public class DOMCallbackLookup implements CallbackLookup {
             }
             return foundElement;
         }
-        
+
         //
         // Try to find a SAML Assertion Element if the ValueType corresponds to a SAML Assertion
         // (or is empty)
         //
-        if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(valueType) 
+        if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(valueType)
             || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(valueType)
             || "".equals(valueType)
             || valueType == null) {
-            foundElement = 
+            foundElement =
                 XMLUtils.findSAMLAssertionElementById(
                     doc.getDocumentElement(), idToMatch
                 );
@@ -135,12 +135,12 @@ public class DOMCallbackLookup implements CallbackLookup {
                 return foundElement;
             }
         }
-        
+
         return null;
     }
-    
+
     /**
-     * Get the DOM element(s) that correspond to the given localname/namespace. 
+     * Get the DOM element(s) that correspond to the given localname/namespace.
      * @param localname The localname of the Element(s)
      * @param namespace The namespace of the Element(s)
      * @return the located element(s)
@@ -160,7 +160,7 @@ public class DOMCallbackLookup implements CallbackLookup {
         return XMLUtils.findElements(doc.getDocumentElement(), localname, namespace);
     }
 
-    
+
     /**
      * Get the SOAP Body
      */

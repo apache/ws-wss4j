@@ -32,12 +32,12 @@ import org.w3c.dom.Document;
  * "username" is used for encryption or signature. See WSS-137.
  */
 public class CertErrorTest extends org.junit.Assert {
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public CertErrorTest() {
         WSSConfig.init();
     }
@@ -60,7 +60,7 @@ public class CertErrorTest extends org.junit.Assert {
             assertTrue(ex.getMessage().contains(expectedError));
         }
     }
-    
+
     /**
      * Test for when a bad certificate is used for Encryption
      */

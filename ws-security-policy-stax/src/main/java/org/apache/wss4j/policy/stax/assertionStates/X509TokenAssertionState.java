@@ -41,10 +41,10 @@ import javax.xml.namespace.QName;
 
 public class X509TokenAssertionState extends TokenAssertionState {
 
-    public X509TokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted, 
+    public X509TokenAssertionState(AbstractSecurityAssertion assertion, boolean asserted,
                                    PolicyAsserter policyAsserter, boolean initiator) {
         super(assertion, asserted, policyAsserter, initiator);
-        
+
         if (asserted) {
             X509Token token = (X509Token) getAssertion();
             String namespace = token.getName().getNamespaceURI();
@@ -90,7 +90,7 @@ public class X509TokenAssertionState extends TokenAssertionState {
 
         try {
             String namespace = getAssertion().getName().getNamespaceURI();
-            
+
             X509Certificate x509Certificate = securityToken.getX509Certificates()[0];
             if (x509Token.getIssuerName() != null) {
                 final String certificateIssuerName = x509Certificate.getIssuerX500Principal().getName();

@@ -40,7 +40,7 @@ public class NameIDBean {
      * @param nameQualifier of type String
      */
     public NameIDBean(
-        String nameValue, 
+        String nameValue,
         String nameQualifier,
         String nameIDFormat
     ) {
@@ -48,7 +48,7 @@ public class NameIDBean {
         this.setNameQualifier(nameQualifier);
         this.setNameIDFormat(nameIDFormat);
     }
-    
+
     public String getNameValue() {
         return nameValue;
     }
@@ -72,7 +72,7 @@ public class NameIDBean {
     public void setNameQualifier(String nameQualifier) {
         this.nameQualifier = nameQualifier;
     }
-    
+
     /**
      * Method equals ...
      *
@@ -95,19 +95,19 @@ public class NameIDBean {
         } else if (nameValue != null && !nameValue.equals(that.nameValue)) {
             return false;
         }
-        
+
         if (nameIDFormat == null && that.nameIDFormat != null) {
             return false;
         } else if (nameIDFormat != null && !nameIDFormat.equals(that.nameIDFormat)) {
             return false;
         }
-        
+
         if (nameQualifier == null && that.nameQualifier != null) {
             return false;
         } else if (nameQualifier != null && !nameQualifier.equals(that.nameQualifier)) {
             return false;
         }
-        
+
         return true;
     }
 

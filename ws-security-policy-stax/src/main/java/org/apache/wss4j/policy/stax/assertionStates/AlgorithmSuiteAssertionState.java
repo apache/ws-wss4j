@@ -39,17 +39,17 @@ import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 public class AlgorithmSuiteAssertionState extends AssertionState implements Assertable {
 
     private PolicyAsserter policyAsserter;
-    
-    public AlgorithmSuiteAssertionState(AbstractSecurityAssertion assertion, 
+
+    public AlgorithmSuiteAssertionState(AbstractSecurityAssertion assertion,
                                         PolicyAsserter policyAsserter,
                                         boolean asserted) {
         super(assertion, asserted);
-        
+
         this.policyAsserter = policyAsserter;
         if (this.policyAsserter == null) {
             this.policyAsserter = new DummyPolicyAsserter();
         }
-        
+
         if (asserted) {
             AlgorithmSuite algorithmSuite = (AlgorithmSuite) getAssertion();
             policyAsserter.assertPolicy(getAssertion());
@@ -217,13 +217,13 @@ public class AlgorithmSuiteAssertionState extends AssertionState implements Asse
                 policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
             }
         } else if (WSSConstants.XPath.equals(keyUsage) &&
-            algorithmSuite.getXPathType() != null && 
+            algorithmSuite.getXPathType() != null &&
             !algorithmSuite.getXPathType().getValue().equals(algorithmSuiteSecurityEvent.getAlgorithmURI())) {
             setAsserted(false);
             setErrorMessage("XPath algorithm " + algorithmSuiteSecurityEvent.getAlgorithmURI() + " does not meet policy");
             policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
         }
-        
+
         if (isAsserted()) {
             policyAsserter.assertPolicy(getAssertion());
             String namespace = algorithmSuite.getAlgorithmSuiteType().getNamespace();
@@ -233,7 +233,7 @@ public class AlgorithmSuiteAssertionState extends AssertionState implements Asse
                 policyAsserter.assertPolicy(new QName(namespace, algorithmSuite.getC14n().name()));
             }
         }
-        
+
         return isAsserted();
     }
 }

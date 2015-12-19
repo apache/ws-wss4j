@@ -39,7 +39,7 @@ import java.io.IOException;
  * authentication assertion using Sender Vouches.
  */
 public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
-    
+
     public SAML1CallbackHandler() throws Exception {
         if (certs == null) {
             Crypto crypto = CryptoFactory.getInstance("wss40.properties");
@@ -47,13 +47,13 @@ public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
             cryptoType.setAlias("wss40");
             certs = crypto.getX509Certificates(cryptoType);
         }
-        
+
         subjectName = "uid=joe,ou=people,ou=saml-demo,o=example.com";
         subjectQualifier = "www.example.com";
         confirmationMethod = SAML1Constants.CONF_SENDER_VOUCHES;
         issuer = "www.example.com";
     }
-    
+
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
@@ -67,14 +67,14 @@ public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
                 callback.setIssuerCrypto(getIssuerCrypto());
                 callback.setIssuerKeyName(getIssuerName());
                 callback.setIssuerKeyPassword(getIssuerPassword());
-                
+
                 if (getAssertionAdviceElement() != null) {
                     AdviceBean advice = new AdviceBean();
                     advice.getAssertions().add(getAssertionAdviceElement());
                     callback.setAdvice(advice);
                 }
-                
-                SubjectBean subjectBean = 
+
+                SubjectBean subjectBean =
                     new SubjectBean(
                         subjectName, subjectQualifier, confirmationMethod
                     );
@@ -95,5 +95,5 @@ public class SAML1CallbackHandler extends AbstractSAMLCallbackHandler {
             }
         }
     }
-    
+
 }

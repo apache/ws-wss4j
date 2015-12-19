@@ -48,31 +48,31 @@ import java.util.ArrayList;
  * A set of tests for combined signature/encryption, verification/decryption.
  */
 public class SignatureEncryptionTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureEncryptionTest.class);
-    private static final String SOAPMSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+    private static final String SOAPMSG =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
         + "<SOAP-ENV:Envelope "
         +   "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
         +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" 
-        +   "<SOAP-ENV:Body>" 
-        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
-        +           "<value xmlns=\"http://blah.com\">15</value>" 
-        +       "</add>" 
-        +   "</SOAP-ENV:Body>" 
+        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
+        +   "<SOAP-ENV:Body>"
+        +       "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">"
+        +           "<value xmlns=\"http://blah.com\">15</value>"
+        +       "</add>"
+        +   "</SOAP-ENV:Body>"
         + "</SOAP-ENV:Envelope>";
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
-    
+
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public SignatureEncryptionTest() throws Exception {
         crypto = CryptoFactory.getInstance("wss40.properties");
         WSSConfig.init();
@@ -81,7 +81,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
     /**
      * Test that encrypts and then signs a WS-Security envelope, then performs
      * verification and decryption <p/>
-     * 
+     *
      * @throws Exception
      *             Thrown when there is any problem in signing, encryption,
      *             decryption, or verification
@@ -99,30 +99,30 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         secHeader.insertSecurityHeader();
 
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Encryption....");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
-        
+
         Document encryptedSignedDoc = sign.build(encryptedDoc, crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
             LOG.debug(outputString);
         }
         verify(encryptedSignedDoc);
     }
-    
-    
+
+
     /**
-     * Test that encrypts and then signs a WS-Security envelope (including the 
+     * Test that encrypts and then signs a WS-Security envelope (including the
      * encrypted element), then performs verification and decryption <p/>
-     * 
+     *
      * @throws Exception
      *             Thrown when there is any problem in signing, encryption,
      *             decryption, or verification
@@ -140,76 +140,76 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSEncryptionPart part = 
+        WSEncryptionPart part =
             new WSEncryptionPart(
                     "add",
                     "http://ws.apache.org/counter/counter_port_type",
                     "Element");
         encrypt.getParts().add(part);
-        
+
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Encryption....");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
-        
-        WSEncryptionPart signPart = 
+
+        WSEncryptionPart signPart =
             new WSEncryptionPart(
                     WSConstants.ENC_DATA_LN,
                     WSConstants.ENC_NS,
                     "Element");
         sign.getParts().add(signPart);
-        
+
         Document encryptedSignedDoc = sign.build(encryptedDoc, crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
             LOG.debug(outputString);
         }
-        
+
         WSHandlerResult results = verify(encryptedSignedDoc);
-        
-        List<WSSecurityEngineResult> sigSecEngResults = 
+
+        List<WSSecurityEngineResult> sigSecEngResults =
             results.getActionResults().get(WSConstants.SIGN);
-        
-        List<WSSecurityEngineResult> encSecEngResults = 
+
+        List<WSSecurityEngineResult> encSecEngResults =
             results.getActionResults().get(WSConstants.ENCR);
-        
+
         assertEquals(1, sigSecEngResults.size());
         assertEquals(1, encSecEngResults.size());
-        
-        List<WSDataRef> sigDataRefs = 
+
+        List<WSDataRef> sigDataRefs =
             (List<WSDataRef>)(sigSecEngResults.get(0)).get(
                 WSSecurityEngineResult.TAG_DATA_REF_URIS
             );
-        
-        List<WSDataRef> encDataRefs = 
+
+        List<WSDataRef> encDataRefs =
             (List<WSDataRef>)(encSecEngResults.get(0)).get(
                 WSSecurityEngineResult.TAG_DATA_REF_URIS
             );
-        
+
         assertNotNull(sigDataRefs);
         assertNotNull(encDataRefs);
         assertEquals(1, sigDataRefs.size());
         assertEquals(1, encDataRefs.size());
-        
+
         assertNull(sigDataRefs.get(0)
                 .getProtectedElement().getAttributeNodeNS(WSConstants.WSU_NS, "Id"));
-        
+
         assertTrue(sigDataRefs.get(0).getWsuId().contains(
                 encDataRefs.get(0).getWsuId()));
     }
-    
-    
+
+
     /**
      * Test that signs and then encrypts a WS-Security envelope, then performs
      * decryption and verification <p/>
-     * 
+     *
      * @throws Exception
      *             Thrown when there is any problem in signing, encryption,
      *             decryption, or verification
@@ -231,8 +231,8 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         LOG.info("After Encryption....");
         verify(encryptedSignedDoc);
     }
-    
-    
+
+
     /**
      * Test that signs a SOAP Body, and then encrypts some data inside the SOAP Body.
      * As the encryption adds a wsu:Id to the encrypted element, this test checks that
@@ -246,7 +246,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         sign.setUserInfo("wss40", "security");
         LOG.info("Before Encryption....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-        
+
         WSEncryptionPart encP =
             new WSEncryptionPart(
                 "add",
@@ -261,19 +261,19 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         Document encryptedSignedDoc = encrypt.build(signedDoc, crypto, secHeader);
         LOG.info("WSS198");
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
             LOG.debug(outputString);
         }
         verify(encryptedSignedDoc);
     }
-    
+
     /**
      * Test that first signs, then encrypts a WS-Security envelope.
      * The test uses the IssuerSerial key identifier to get the keys for
      * signature and encryption. Encryption uses 3DES.
      * <p/>
-     * 
+     *
      * @throws Exception Thrown when there is any problem in signing, encryption,
      *                   decryption, or verification
      */
@@ -293,25 +293,25 @@ public class SignatureEncryptionTest extends org.junit.Assert {
 
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Document signedDoc = sign.build(doc, crypto, secHeader);
         Document encryptedSignedDoc = encrypt.build(signedDoc, crypto, secHeader);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed and encrypted message with IssuerSerial key identifier (both), 3DES:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
             LOG.debug(outputString);
         }
-        
+
         LOG.info("After Sign/Encryption....");
         verify(encryptedSignedDoc);
     }
-    
+
     /**
      * Test signature created using an encrypted key
-     * SOAP Body is signed and encrypted. In the encryption, The ReferenceList element is 
-     * put into the Encrypted Key, as a child of the EncryptedKey. Signature is created 
-     * using the encrypted key. 
+     * SOAP Body is signed and encrypted. In the encryption, The ReferenceList element is
+     * put into the Encrypted Key, as a child of the EncryptedKey. Signature is created
+     * using the encrypted key.
      */
     @org.junit.Test
     public void testEncryptedKeySignature() throws Exception {
@@ -325,7 +325,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         encrKey.setUserInfo("wss40", "security");
         encrKey.setSymmetricEncAlgorithm(WSConstants.AES_192);
-        encrKey.prepare(doc, crypto);   
+        encrKey.prepare(doc, crypto);
 
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setEncKeyId(encrKey.getId());
@@ -346,7 +346,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed and encrypted message with IssuerSerial key identifier (both), 3DES:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
             LOG.debug(outputString);
         }
@@ -367,7 +367,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         messageContext.put("" + crypto.hashCode(), crypto);
         reqData.setMsgContext(messageContext);
         reqData.setUsername("wss40");
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         List<HandlerAction> handlerActions = new ArrayList<>();
@@ -375,31 +375,31 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         handlerActions.add(action);
         action = new HandlerAction(WSConstants.SIGN);
         handlerActions.add(action);
-        
+
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             handlerActions,
             true
         );
-        
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
+
         List<Integer> receivingActions = new ArrayList<>();
         receivingActions.add(WSConstants.ENCR);
         receivingActions.add(WSConstants.SIGN);
         messageContext.put(WSHandlerConstants.DEC_PROP_REF_ID, "" + crypto.hashCode());
         messageContext.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "" + crypto.hashCode());
         handler.receive(receivingActions, reqData);
-        
+
         WSSecurityEngine newEngine = new WSSecurityEngine();
         newEngine.processSecurityHeader(doc, reqData);
     }
-    
+
     @org.junit.Test
     public void testSigningEncryptionHandler() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
@@ -412,7 +412,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         messageContext.put("" + crypto.hashCode(), crypto);
         reqData.setMsgContext(messageContext);
         reqData.setUsername("wss40");
-        
+
         final Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         CustomHandler handler = new CustomHandler();
         List<HandlerAction> handlerActions = new ArrayList<>();
@@ -420,34 +420,34 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         handlerActions.add(action);
         action = new HandlerAction(WSConstants.ENCR);
         handlerActions.add(action);
-        
+
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             handlerActions,
             true
         );
-        
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        
+
         List<Integer> receivingActions = new ArrayList<>();
         receivingActions.add(WSConstants.SIGN);
         receivingActions.add(WSConstants.ENCR);
         messageContext.put(WSHandlerConstants.DEC_PROP_REF_ID, "" + crypto.hashCode());
         messageContext.put(WSHandlerConstants.SIG_VER_PROP_REF_ID, "" + crypto.hashCode());
         handler.receive(receivingActions, reqData);
-        
+
         WSSecurityEngine newEngine = new WSSecurityEngine();
         newEngine.processSecurityHeader(doc, reqData);
     }
 
     /**
      * Verifies the soap envelope <p/>
-     * 
+     *
      * @param envelope
      *
      * @return the <code>WSSecurityEngineResult</code>s from processing
@@ -456,14 +456,14 @@ public class SignatureEncryptionTest extends org.junit.Assert {
      *             Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc) throws Exception {
-        WSHandlerResult resultList = 
+        WSHandlerResult resultList =
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         return resultList;
     }
 

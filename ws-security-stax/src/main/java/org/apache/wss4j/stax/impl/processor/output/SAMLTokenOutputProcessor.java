@@ -65,8 +65,8 @@ import org.opensaml.saml.common.SAMLVersion;
 import org.w3c.dom.Element;
 
 public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
-    
-    private static final org.slf4j.Logger LOG = 
+
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SAMLTokenOutputProcessor.class);
 
     public SAMLTokenOutputProcessor() throws XMLSecurityException {
@@ -111,21 +111,21 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             final String tokenId = samlAssertionWrapper.getId();
 
             final FinalSAMLTokenOutputProcessor finalSAMLTokenOutputProcessor;
-            
+
             XMLSecurityConstants.Action action = getAction();
             boolean includeSTR = false;
-            
+
             GenericOutboundSecurityToken securityToken = null;
-            
+
             // See if a token is already available
-            String sigTokenId = 
+            String sigTokenId =
                 outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE);
             SecurityTokenProvider<OutboundSecurityToken> signatureTokenProvider = null;
             if (sigTokenId != null) {
-                signatureTokenProvider = 
+                signatureTokenProvider =
                     outputProcessorChain.getSecurityContext().getSecurityTokenProvider(sigTokenId);
                 if (signatureTokenProvider != null) {
-                    securityToken = 
+                    securityToken =
                         (GenericOutboundSecurityToken)signatureTokenProvider.getSecurityToken();
                 }
             }
@@ -141,12 +141,12 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                     }
                     if (certificates == null) {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
-                                "empty", 
+                                "empty",
                                 new Object[] {"No issuer certs were found to sign the SAML Assertion using issuer name: "
                                 + samlCallback.getIssuerKeyName()}
                         );
                     }
-    
+
                     PrivateKey privateKey;
                     try {
                         privateKey = samlCallback.getIssuerCrypto().getPrivateKey(
@@ -154,13 +154,13 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                     } catch (Exception ex) {
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
                     }
-    
+
                     final String binarySecurityTokenId = IDGenerator.generateID(null);
-    
+
                     final GenericOutboundSecurityToken bstSecurityToken =
                             new GenericOutboundSecurityToken(binarySecurityTokenId, WSSecurityTokenConstants.X509V3Token,
                                     privateKey, certificates);
-                    
+
                     SecurityTokenProvider<OutboundSecurityToken> securityTokenProvider =
                         new SecurityTokenProvider<OutboundSecurityToken>() {
 
@@ -177,7 +177,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
                     outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(binarySecurityTokenId, securityTokenProvider);
                     outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, binarySecurityTokenId);
-                    
+
                     securityToken = bstSecurityToken;
                 }
 
@@ -200,7 +200,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                             if (alias == null) {
                                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "aliasIsNull");
                             }
-                            WSPasswordCallback wsPasswordCallback = 
+                            WSPasswordCallback wsPasswordCallback =
                                 new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE);
                             WSSUtils.doPasswordCallback(
                                     ((WSSSecurityProperties) getSecurityProperties()).getCallbackHandler(),
@@ -222,7 +222,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                         }
                     }
                 }
-                
+
                 final Element ref;
                 if (securityToken != null) {
                     ref = securityToken.getCustomTokenReference();
@@ -291,11 +291,11 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                         return tokenId;
                     }
                 };
-                
+
                 //fire a tokenSecurityEvent
-                TokenSecurityEvent<OutboundSecurityToken> tokenSecurityEvent = 
+                TokenSecurityEvent<OutboundSecurityToken> tokenSecurityEvent =
                     new TokenSecurityEvent<OutboundSecurityToken>(WSSecurityEventConstants.SamlToken) {
-                    
+
                     public OutboundSecurityToken getSecurityToken() {
                         try {
                             return securityTokenProvider.getSecurityToken();
@@ -317,8 +317,8 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 if (samlAssertionWrapper.getSamlVersion() == SAMLVersion.VERSION_11) {
                     assertionName = new QName(WSSConstants.NS_SAML, "Assertion");
                 }
-                
-                Iterator<SecurePart> signaturePartsIterator = 
+
+                Iterator<SecurePart> signaturePartsIterator =
                     securityProperties.getSignatureSecureParts().iterator();
                 while (signaturePartsIterator.hasNext()) {
                     SecurePart securePart = signaturePartsIterator.next();
@@ -329,7 +329,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                         break;
                     }
                 }
-                
+
                 finalSAMLTokenOutputProcessor = new FinalSAMLTokenOutputProcessor(null, samlAssertionWrapper,
                                                                                   securityTokenReferenceId, senderVouches,
                                                                                   includeSTR);
@@ -416,26 +416,26 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 }
                 if (includeSTR) {
                     OutputProcessorUtils.updateSecurityHeaderOrder(
-                            outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, getAction(), false);                    
+                            outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, getAction(), false);
                     outputSecurityTokenReference(subOutputProcessorChain, samlAssertionWrapper,
                             securityTokenReferenceId, samlAssertionWrapper.getId());
                 }
                 outputProcessorChain.removeProcessor(this);
             }
         }
-        
+
         private boolean includeBST() {
             if (senderVouches && getSecurityProperties().getSignatureKeyIdentifier() ==
                 WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
                 && securityToken != null
-                && !(WSSConstants.SAML_TOKEN_SIGNED.equals(action) 
+                && !(WSSConstants.SAML_TOKEN_SIGNED.equals(action)
                     && ((WSSSecurityProperties)getSecurityProperties()).isIncludeSignatureToken())) {
                 return true;
-            } 
+            }
             return false;
         }
     }
-    
+
     private void outputSecurityTokenReference(
             OutputProcessorChain outputProcessorChain, SamlAssertionWrapper samlAssertionWrapper,
             String referenceId, String tokenId) throws XMLStreamException, XMLSecurityException {

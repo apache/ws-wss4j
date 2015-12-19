@@ -40,7 +40,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 public class SignatureDerivedAction extends AbstractDerivedAction implements Action {
-    
+
     public void execute(WSHandler handler, SecurityActionToken actionToken,
                         Document doc, RequestData reqData)
             throws WSSecurityException {
@@ -48,7 +48,7 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
         if (callbackHandler == null) {
             callbackHandler = handler.getPasswordCallbackHandler(reqData);
         }
-        
+
         SignatureActionToken signatureToken = null;
         if (actionToken instanceof SignatureActionToken) {
             signatureToken = (SignatureActionToken)actionToken;
@@ -56,8 +56,8 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
         if (signatureToken == null) {
             signatureToken = reqData.getSignatureToken();
         }
-        
-        WSPasswordCallback passwordCallback = 
+
+        WSPasswordCallback passwordCallback =
             handler.getPasswordCB(signatureToken.getUser(), WSConstants.DKT_SIGN, callbackHandler, reqData);
         WSSecDKSign wsSign = new WSSecDKSign();
         wsSign.setIdAllocator(reqData.getWssConfig().getIdAllocator());
@@ -73,18 +73,18 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
             wsSign.setSigCanonicalization(signatureToken.getC14nAlgorithm());
         }
         wsSign.setUserInfo(signatureToken.getUser(), passwordCallback.getPassword());
-        
+
         if (reqData.isUse200512Namespace()) {
             wsSign.setWscVersion(ConversationConstants.VERSION_05_12);
         } else {
             wsSign.setWscVersion(ConversationConstants.VERSION_05_02);
         }
-        
+
         if (signatureToken.getDerivedKeyLength() > 0) {
             wsSign.setDerivedKeyLength(signatureToken.getDerivedKeyLength());
         }
-        
-        Element tokenElement = 
+
+        Element tokenElement =
             setupTokenReference(reqData, signatureToken, wsSign, passwordCallback, doc);
         wsSign.setAttachmentCallbackHandler(reqData.getAttachmentCallbackHandler());
         wsSign.setStoreBytesInAttachment(reqData.isStoreBytesInAttachment());
@@ -96,46 +96,46 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
             } else {
                 wsSign.getParts().add(WSSecurityUtil.getDefaultEncryptionPart(doc));
             }
-            
+
             wsSign.prepare(doc, reqData.getSecHeader());
-            
-            List<javax.xml.crypto.dsig.Reference> referenceList = 
+
+            List<javax.xml.crypto.dsig.Reference> referenceList =
                 wsSign.addReferencesToSign(parts, reqData.getSecHeader());
-            
+
             // Put the DerivedKeyToken Element in the right place in the security header
             Node nextSibling = null;
-            if (tokenElement == null 
+            if (tokenElement == null
                 && "EncryptedKey".equals(signatureToken.getDerivedKeyTokenReference())) {
                 nextSibling = findEncryptedKeySibling(reqData);
-            } else if (tokenElement == null 
+            } else if (tokenElement == null
                 && "SecurityContextToken".equals(signatureToken.getDerivedKeyTokenReference())) {
                 nextSibling = findSCTSibling(reqData);
             }
-            
+
             if (nextSibling == null) {
                 wsSign.computeSignature(referenceList);
             } else {
                 wsSign.computeSignature(referenceList, true, (Element)nextSibling);
             }
-            
+
             if (nextSibling == null) {
                 wsSign.prependDKElementToHeader(reqData.getSecHeader());
             } else {
                 reqData.getSecHeader().getSecurityHeader().insertBefore(
                     wsSign.getdktElement(), wsSign.getSignatureElement());
             }
-            
+
             if (tokenElement != null) {
                 WSSecurityUtil.prependChildElement(reqData.getSecHeader().getSecurityHeader(), tokenElement);
             }
-            
+
             reqData.getSignatureValues().add(wsSign.getSignatureValue());
         } catch (WSSecurityException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "empty", 
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "empty",
                                           new Object[] {"Error during Signature: "});
         }
     }
-    
+
     private Element setupTokenReference(
         RequestData reqData, SignatureActionToken signatureToken,
         WSSecDKSign wsSign, WSPasswordCallback passwordCallback,
@@ -169,7 +169,7 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
             }
             wsSign.setCrypto(signatureToken.getCrypto());
             wsSign.setExternalKey(key, (String)null);
-            
+
             return null;
         }
     }

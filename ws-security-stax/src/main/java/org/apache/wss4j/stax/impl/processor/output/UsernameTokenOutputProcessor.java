@@ -59,15 +59,15 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
         try {
             CallbackHandler callbackHandler = ((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler();
             WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType = ((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType();
-            
-            if (callbackHandler == null 
+
+            if (callbackHandler == null
                 && WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE != usernameTokenPasswordType) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCallback");
             }
-            
+
             String password = null;
             if (callbackHandler != null) {
-                WSPasswordCallback pwCb = 
+                WSPasswordCallback pwCb =
                     new WSPasswordCallback(((WSSSecurityProperties) getSecurityProperties()).getTokenUser(), WSPasswordCallback.USERNAME_TOKEN);
                 WSSUtils.doPasswordCallback(callbackHandler, pwCb);
                 password = pwCb.getPassword();
@@ -76,24 +76,24 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
             if (password == null && WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE != usernameTokenPasswordType) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
-            
+
             final String wsuId = IDGenerator.generateID(null);
-            
-            boolean useDerivedKeyForMAC = 
+
+            boolean useDerivedKeyForMAC =
                 ((WSSSecurityProperties)getSecurityProperties()).isUseDerivedKeyForMAC();
-            int derivedIterations = 
+            int derivedIterations =
                 ((WSSSecurityProperties)getSecurityProperties()).getDerivedKeyIterations();
             byte[] salt = null;
             if (WSSConstants.USERNAMETOKEN_SIGNED.equals(getAction())) {
                 salt = UsernameTokenUtil.generateSalt(useDerivedKeyForMAC);
             }
-            
+
             byte[] nonceValue = null;
             if (usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
                 || ((WSSSecurityProperties) getSecurityProperties()).isAddUsernameTokenNonce()) {
                 nonceValue = WSSConstants.generateBytes(16);
             }
-            
+
             XMLGregorianCalendar created = null;
             String createdStr = "";
             if (usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
@@ -132,7 +132,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                 outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(wsuId, securityTokenProvider);
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, wsuId);
             }
-            final FinalUsernameTokenOutputProcessor finalUsernameTokenOutputProcessor = 
+            final FinalUsernameTokenOutputProcessor finalUsernameTokenOutputProcessor =
                 new FinalUsernameTokenOutputProcessor(wsuId, nonceValue, password, created, salt, derivedIterations, getAction());
             finalUsernameTokenOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
             finalUsernameTokenOutputProcessor.setAction(getAction());
@@ -154,7 +154,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
         private int iterations;
         private XMLSecurityConstants.Action action;
 
-        FinalUsernameTokenOutputProcessor(String wsuId, byte[] nonceValue, String password, 
+        FinalUsernameTokenOutputProcessor(String wsuId, byte[] nonceValue, String password,
                                           XMLGregorianCalendar created, byte[] salt,
                                           int iterations, XMLSecurityConstants.Action action)
                 throws XMLSecurityException {

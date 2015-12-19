@@ -48,7 +48,7 @@ public class RequiredElementsAssertionState extends AssertionState implements As
     private final Map<List<QName>, Boolean> pathElements = new HashMap<>();
     private PolicyAsserter policyAsserter;
 
-    public RequiredElementsAssertionState(AbstractSecurityAssertion assertion, 
+    public RequiredElementsAssertionState(AbstractSecurityAssertion assertion,
                                           PolicyAsserter policyAsserter,
                                           boolean asserted) {
         super(assertion, asserted);
@@ -61,12 +61,12 @@ public class RequiredElementsAssertionState extends AssertionState implements As
                 pathElements.put(elements, Boolean.FALSE);
             }
         }
-        
+
         this.policyAsserter = policyAsserter;
         if (this.policyAsserter == null) {
             this.policyAsserter = new DummyPolicyAsserter();
         }
-        
+
         if (asserted) {
             policyAsserter.assertPolicy(getAssertion());
         }

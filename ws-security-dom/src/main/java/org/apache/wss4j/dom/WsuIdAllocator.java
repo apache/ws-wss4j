@@ -24,9 +24,9 @@ package org.apache.wss4j.dom;
  * to be addressed by their wsu:Id attribute
  */
 public interface WsuIdAllocator {
-    
+
     String createId(String prefix, Object o);
-    
+
     String createSecureId(String prefix, Object o);
 
 }

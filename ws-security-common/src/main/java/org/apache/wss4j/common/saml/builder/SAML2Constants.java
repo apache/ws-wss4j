@@ -28,136 +28,136 @@ public final class SAML2Constants {
     //
     // NAME ID FORMAT
     //
-    
-    public static final String NAMEID_FORMAT_UNSPECIFIED = 
+
+    public static final String NAMEID_FORMAT_UNSPECIFIED =
         "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified";
-    
-    public static final String NAMEID_FORMAT_EMAIL_ADDRESS = 
+
+    public static final String NAMEID_FORMAT_EMAIL_ADDRESS =
         "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress";
-    
-    public static final String NAMEID_FORMAT_X509_SUBJECT_NAME = 
+
+    public static final String NAMEID_FORMAT_X509_SUBJECT_NAME =
         "urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName";
-    
-    public static final String NAMEID_FORMAT_WINDOWS_DQN = 
+
+    public static final String NAMEID_FORMAT_WINDOWS_DQN =
         "urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName";
-    
-    public static final String NAMEID_FORMAT_KERBEROS = 
+
+    public static final String NAMEID_FORMAT_KERBEROS =
         "urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos";
-    
-    public static final String NAMEID_FORMAT_ENTITY = 
+
+    public static final String NAMEID_FORMAT_ENTITY =
         "urn:oasis:names:tc:SAML:2.0:nameid-format:entity";
-    
-    public static final String NAMEID_FORMAT_PERSISTENT = 
+
+    public static final String NAMEID_FORMAT_PERSISTENT =
         "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent";
-    
-    public static final String NAMEID_FORMAT_TRANSIENT = 
+
+    public static final String NAMEID_FORMAT_TRANSIENT =
         "urn:oasis:names:tc:SAML:2.0:nameid-format:transient";
 
     //
     // SUBJECT CONFIRMATION
     //
-    
-    public static final String CONF_BEARER = 
+
+    public static final String CONF_BEARER =
         "urn:oasis:names:tc:SAML:2.0:cm:bearer";
-    
-    public static final String CONF_HOLDER_KEY = 
+
+    public static final String CONF_HOLDER_KEY =
         "urn:oasis:names:tc:SAML:2.0:cm:holder-of-key";
-    
-    public static final String CONF_SENDER_VOUCHES = 
+
+    public static final String CONF_SENDER_VOUCHES =
         "urn:oasis:names:tc:SAML:2.0:cm:sender-vouches";
-    
+
     //
     // AUTH CONTEXT CLASS REF
     //
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_INTERNET_PROTOCOL = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_INTERNET_PROTOCOL =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:InternetProtocol";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_INTERNET_PROTOCOL_PASSWORD = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_INTERNET_PROTOCOL_PASSWORD =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:InternetProtocolPassword";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_KERBEROS = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_KERBEROS =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:Kerberos";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_MOBILE_ONE_FACTOR_UNREGISTERED = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_MOBILE_ONE_FACTOR_UNREGISTERED =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:MobileOneFactorUnregistered";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_MOBILE_TWO_FACTOR_UNREGISTERED = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_MOBILE_TWO_FACTOR_UNREGISTERED =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:MobileTwoFactorUnregistered";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_MOBILE_ONE_FACTOR_CONTRACT = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_MOBILE_ONE_FACTOR_CONTRACT =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:MobileOneFactorContract";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_MOBILE_TWO_FACTOR_CONTRACT = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_MOBILE_TWO_FACTOR_CONTRACT =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:MobileTwoFactorContract";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_PASSWORD = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_PASSWORD =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:Password";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_PASSWORD_PROTECTED_TRANSPORT = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_PASSWORD_PROTECTED_TRANSPORT =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_PREVIOUS_SESSION = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_PREVIOUS_SESSION =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:PreviousSession";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_X509 = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_X509 =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:X509";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_PGP = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_PGP =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:PGP";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_SPKI = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_SPKI =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:SPKI";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_XMLDSIG = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_XMLDSIG =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:XMLDSig";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_SMARTCARD = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_SMARTCARD =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:Smartcard";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_SMARTCARD_PKI = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_SMARTCARD_PKI =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:SmartcardPKI";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_SOFTWARE_PKI = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_SOFTWARE_PKI =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:SoftwarePKI";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_TELEPHONY = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_TELEPHONY =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:Telephony";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_NOMAD_TELEPHONY = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_NOMAD_TELEPHONY =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:NomadTelephony";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_PERSONAL_TELEPHONY = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_PERSONAL_TELEPHONY =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:PersonalTelephony";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_AUTHENTICATED_TELEPHONY = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_AUTHENTICATED_TELEPHONY =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:AuthenticatedTelephony";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_SECURED_REMOTE_PASSWORD = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_SECURED_REMOTE_PASSWORD =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:SecureRemotePassword";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_TLS_CLIENT = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_TLS_CLIENT =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:TLSClient";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_TIME_SYNC_TOKEN = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_TIME_SYNC_TOKEN =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:TimeSyncToken";
-    
-    public static final String AUTH_CONTEXT_CLASS_REF_UNSPECIFIED = 
+
+    public static final String AUTH_CONTEXT_CLASS_REF_UNSPECIFIED =
         "urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified";
 
     //
     // ATTRIBUTE NAME FORMAT
     //
-    
-    public static final String ATTRNAME_FORMAT_UNSPECIFIED = 
+
+    public static final String ATTRNAME_FORMAT_UNSPECIFIED =
         "urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified";
-    
-    public static final String ATTRNAME_FORMAT_URI = 
+
+    public static final String ATTRNAME_FORMAT_URI =
         "urn:oasis:names:tc:SAML:2.0:attrname-format:uri";
-    
-    public static final String ATTRNAME_FORMAT_BASIC = 
+
+    public static final String ATTRNAME_FORMAT_BASIC =
         "urn:oasis:names:tc:SAML:2.0:attrname-format:basic";
-    
+
     private SAML2Constants() {
         // Complete
     }

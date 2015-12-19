@@ -50,7 +50,7 @@ public class EncryptionAction implements Action {
         if (encryptionToken == null) {
             encryptionToken = reqData.getEncryptionToken();
         }
-        
+
         if (encryptionToken.getKeyIdentifierId() != 0) {
             wsEncrypt.setKeyIdentifierType(encryptionToken.getKeyIdentifierId());
         }
@@ -68,9 +68,9 @@ public class EncryptionAction implements Action {
         if (encryptionToken.getMgfAlgorithm() != null) {
             wsEncrypt.setMGFAlgorithm(encryptionToken.getMgfAlgorithm());
         }
-        
+
         wsEncrypt.setIncludeEncryptionToken(encryptionToken.isIncludeToken());
-        
+
         wsEncrypt.setUserInfo(encryptionToken.getUser());
         wsEncrypt.setUseThisCert(encryptionToken.getCertificate());
         Crypto crypto = encryptionToken.getCrypto();
@@ -86,16 +86,16 @@ public class EncryptionAction implements Action {
         if (encryptionToken.getParts().size() > 0) {
             wsEncrypt.getParts().addAll(encryptionToken.getParts());
         }
-        
+
         wsEncrypt.setEncryptSymmKey(encryptionToken.isEncSymmetricEncryptionKey());
-        
+
         byte[] ephemeralKey = encryptionToken.getKey();
         if (encryptionToken.isGetSymmetricKeyFromCallbackHandler()
             || !encryptionToken.isEncSymmetricEncryptionKey() && ephemeralKey == null) {
-            CallbackHandler callbackHandler = 
+            CallbackHandler callbackHandler =
                 handler.getPasswordCallbackHandler(reqData);
             // Get secret key for encryption from a CallbackHandler
-            WSPasswordCallback pwcb = 
+            WSPasswordCallback pwcb =
                 new WSPasswordCallback(encryptionToken.getUser(), WSPasswordCallback.SECRET_KEY);
             pwcb.setAlgorithm(wsEncrypt.getSymmetricEncAlgorithm());
             try {
@@ -104,28 +104,28 @@ public class EncryptionAction implements Action {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
                         "empty", new Object[] {"WSHandler: password callback failed"});
             }
-            
+
             ephemeralKey = pwcb.getKey();
             byte[] encryptedKey = pwcb.getEncryptedSecret();
             wsEncrypt.setEncryptedEphemeralKey(encryptedKey);
             wsEncrypt.setCustomEKKeyInfoElement(pwcb.getKeyInfoReference());
         }
         wsEncrypt.setEphemeralKey(ephemeralKey);
-        
+
         if (encryptionToken.getTokenId() != null) {
             wsEncrypt.setEncKeyId(encryptionToken.getTokenId());
         }
         if (encryptionToken.getTokenType() != null) {
             wsEncrypt.setCustomReferenceValue(encryptionToken.getTokenType());
         }
-        
+
         wsEncrypt.setAttachmentCallbackHandler(reqData.getAttachmentCallbackHandler());
         wsEncrypt.setStoreBytesInAttachment(reqData.isStoreBytesInAttachment());
-        
+
         try {
             wsEncrypt.build(doc, encryptionToken.getCrypto(), reqData.getSecHeader());
         } catch (WSSecurityException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "empty", 
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "empty",
                                           new Object[] {"Error during encryption: "});
         }
     }

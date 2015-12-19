@@ -34,12 +34,12 @@ import org.w3c.dom.Element;
 public class Reference {
     public static final QName TOKEN = new QName(WSS4JConstants.WSSE_NS, "Reference");
     private Element element;
-    
+
     /**
      * Constructor.
-     * 
+     *
      * @param elem The Reference element
-     * @throws WSSecurityException 
+     * @throws WSSecurityException
      */
     public Reference(Element elem) throws WSSecurityException {
         if (elem == null) {
@@ -64,13 +64,13 @@ public class Reference {
 
     /**
      * Constructor.
-     * 
-     * @param doc 
+     *
+     * @param doc
      */
     public Reference(Document doc) {
         element = doc.createElementNS(WSS4JConstants.WSSE_NS, "wsse:Reference");
     }
-    
+
     /**
      * Add the WSSE Namespace to this reference. The namespace is not added by default for
      * efficiency purposes, as the reference is embedded in a wsse:SecurityTokenReference.
@@ -81,7 +81,7 @@ public class Reference {
 
     /**
      * Get the DOM element.
-     * 
+     *
      * @return the DOM element
      */
     public Element getElement() {
@@ -90,7 +90,7 @@ public class Reference {
 
     /**
      * Get the ValueType attribute.
-     * 
+     *
      * @return the ValueType attribute
      */
     public String getValueType() {
@@ -99,7 +99,7 @@ public class Reference {
 
     /**
      * Get the URI.
-     * 
+     *
      * @return the URI
      */
     public String getURI() {
@@ -108,7 +108,7 @@ public class Reference {
 
     /**
      * Set the Value type.
-     * 
+     *
      * @param valueType the ValueType attribute to set
      */
     public void setValueType(String valueType) {
@@ -119,7 +119,7 @@ public class Reference {
 
     /**
      * Set the URI.
-     * 
+     *
      * @param uri the URI to set
      */
     public void setURI(String uri) {
@@ -128,13 +128,13 @@ public class Reference {
 
     /**
      * Return the string representation.
-     * 
+     *
      * @return the string representation.
      */
     public String toString() {
         return DOM2Writer.nodeToString(element);
     }
-    
+
     @Override
     public int hashCode() {
         int result = 17;
@@ -148,7 +148,7 @@ public class Reference {
         }
         return result;
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if (!(object instanceof Reference)) {
@@ -163,9 +163,9 @@ public class Reference {
         }
         return true;
     }
-    
+
     private boolean compare(String item1, String item2) {
-        if (item1 == null && item2 != null) { 
+        if (item1 == null && item2 != null) {
             return false;
         } else if (item1 != null && !item1.equals(item2)) {
             return false;

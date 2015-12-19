@@ -149,7 +149,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
             } catch (IllegalArgumentException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
-            if (createdCalendar.getFractionalSecond() != null 
+            if (createdCalendar.getFractionalSecond() != null
                 && createdCalendar.getFractionalSecond().scale() > 3) {
                 securityContext.handleBSPRule(BSPRule.R3220);
             }

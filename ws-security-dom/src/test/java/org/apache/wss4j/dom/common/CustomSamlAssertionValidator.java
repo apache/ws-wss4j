@@ -26,11 +26,11 @@ import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
 
 public class CustomSamlAssertionValidator extends SamlAssertionValidator {
-    
+
     @Override
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         Credential returnedCredential = super.validate(credential, data);
-        
+
         //
         // Do some custom validation on the assertion
         //
@@ -44,12 +44,12 @@ public class CustomSamlAssertionValidator extends SamlAssertionValidator {
             org.opensaml.saml.saml1.core.Subject samlSubject = null;
             for (org.opensaml.saml.saml1.core.Statement stmt : saml1Assertion.getStatements()) {
                 if (stmt instanceof org.opensaml.saml.saml1.core.AttributeStatement) {
-                    org.opensaml.saml.saml1.core.AttributeStatement attrStmt = 
+                    org.opensaml.saml.saml1.core.AttributeStatement attrStmt =
                         (org.opensaml.saml.saml1.core.AttributeStatement) stmt;
                     samlSubject = attrStmt.getSubject();
                     break;
                 } else if (stmt instanceof org.opensaml.saml.saml1.core.AuthenticationStatement) {
-                    org.opensaml.saml.saml1.core.AuthenticationStatement authStmt = 
+                    org.opensaml.saml.saml1.core.AuthenticationStatement authStmt =
                         (org.opensaml.saml.saml1.core.AuthenticationStatement) stmt;
                     samlSubject = authStmt.getSubject();
                     break;
@@ -59,10 +59,10 @@ public class CustomSamlAssertionValidator extends SamlAssertionValidator {
                     samlSubject = authzStmt.getSubject();
                 }
             }
-                
+
             if (samlSubject == null) {
                 throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLToken", 
+                    WSSecurityException.ErrorCode.FAILURE, "invalidSAMLToken",
                     new Object[] {"for Signature (no Subject)"}
                 );
             }
@@ -78,8 +78,8 @@ public class CustomSamlAssertionValidator extends SamlAssertionValidator {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
             }
         }
-        
+
         return returnedCredential;
     }
-    
+
 }

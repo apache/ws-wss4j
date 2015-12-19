@@ -40,7 +40,7 @@ public class SubjectLocalityBean {
 
     /**
      * Constructor for creating a SubjectLocalityBean with ip and dns addresses.
-     * 
+     *
      * @param ipAddress ip address
      * @param dnsAddress dns address
      */
@@ -51,7 +51,7 @@ public class SubjectLocalityBean {
 
     /**
      * Get the ip address.
-     * 
+     *
      * @return the ipAddress
      */
     public final String getIpAddress() {
@@ -60,7 +60,7 @@ public class SubjectLocalityBean {
 
     /**
      * Set the ip address.
-     * 
+     *
      * @param ipAddress the ipAddress to set
      */
     public final void setIpAddress(final String ipAddress) {
@@ -69,7 +69,7 @@ public class SubjectLocalityBean {
 
     /**
      * Get the dns address.
-     * 
+     *
      * @return the dnsAddress
      */
     public final String getDnsAddress() {
@@ -78,7 +78,7 @@ public class SubjectLocalityBean {
 
     /**
      * Set the dns address.
-     * 
+     *
      * @param dnsAddress the dnsAddress to set
      */
     public final void setDnsAddress(final String dnsAddress) {
@@ -87,7 +87,7 @@ public class SubjectLocalityBean {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -119,7 +119,7 @@ public class SubjectLocalityBean {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override

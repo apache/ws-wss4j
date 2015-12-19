@@ -74,9 +74,9 @@ import org.w3c.dom.NodeList;
 
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class DerivedKeyTokenTest extends AbstractTestBase {
-    
+
     final int version;
-    
+
     public DerivedKeyTokenTest(int version) {
         this.version = version;
     }
@@ -88,7 +88,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
     @Parameters(name = "{0}")
     public static Collection<Object[]> data() {
-       
+
         return Arrays.asList(new Object[][] {{ConversationConstants.VERSION_05_02},
                                              {ConversationConstants.VERSION_05_12}
         });
@@ -217,7 +217,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(), operationSecurityEvents.size() + encryptedPartSecurityEvents.size());
         }
     }
-    
+
     @Test
     public void testEncryptionDecryptionTRIPLEDESInboundAction() throws Exception {
 
@@ -225,14 +225,14 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.ENCRYPT_DERIVED;
-            
+
             Properties properties = new Properties();
             properties.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "EncryptedKey");
             if (version == ConversationConstants.VERSION_05_02) {
                 properties.put(WSHandlerConstants.USE_2005_12_NAMESPACE, "false");
             }
             properties.put(WSHandlerConstants.USER, "receiver");
-            properties.put(WSHandlerConstants.ENC_SYM_ALGO, 
+            properties.put(WSHandlerConstants.ENC_SYM_ALGO,
                            "http://www.w3.org/2001/04/xmlenc#tripledes-cbc");
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
@@ -243,7 +243,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
-        
+
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
@@ -380,7 +380,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 0);
         }
     }
-    
+
     @Test
     public void testEncryptionDecryptionAES128InboundAction() throws Exception {
 
@@ -388,17 +388,17 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.ENCRYPT_DERIVED;
-            
+
             Properties properties = new Properties();
             properties.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "EncryptedKey");
             if (version == ConversationConstants.VERSION_05_02) {
                 properties.put(WSHandlerConstants.USE_2005_12_NAMESPACE, "false");
             }
             properties.put(WSHandlerConstants.USER, "receiver");
-            properties.put(WSHandlerConstants.ENC_SYM_ALGO, 
+            properties.put(WSHandlerConstants.ENC_SYM_ALGO,
                            "http://www.w3.org/2001/04/xmlenc#aes128-cbc");
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
-            
+
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_soap11_Body.getLocalPart());
@@ -406,7 +406,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
-        
+
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
@@ -501,12 +501,12 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-            
+
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
         }
     }
-    
+
     @Test
     public void testSignatureInboundAction() throws Exception {
 
@@ -514,7 +514,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SIGNATURE_DERIVED;
-            
+
             Properties properties = new Properties();
             properties.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "EncryptedKey");
             if (version == ConversationConstants.VERSION_05_02) {
@@ -530,7 +530,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
-        
+
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
@@ -540,7 +540,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-            
+
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
         }
@@ -637,8 +637,8 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 1);
         }
     }
-    
-    
+
+
     @Test
     public void testSignatureThumbprintSHA1InboundAction() throws Exception {
 
@@ -646,7 +646,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SIGNATURE_DERIVED;
-            
+
             Properties properties = new Properties();
             properties.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "DirectReference");
             if (version == ConversationConstants.VERSION_05_02) {
@@ -661,7 +661,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
-        
+
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
@@ -768,7 +768,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 1);
         }
     }
-    
+
     @Test
     public void testSignatureSKIInboundAction() throws Exception {
 
@@ -776,7 +776,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SIGNATURE_DERIVED;
-            
+
             Properties properties = new Properties();
             properties.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "DirectReference");
             properties.put(WSHandlerConstants.DERIVED_TOKEN_KEY_ID, "SKIKeyIdentifier");
@@ -792,7 +792,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
-        
+
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
@@ -1040,7 +1040,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 0);
         }
     }
-    
+
     @Test
     public void testEncryptSignatureInboundAction() throws Exception {
 
@@ -1049,14 +1049,14 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
         {
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
             String action = WSHandlerConstants.SIGNATURE_DERIVED + " " + WSHandlerConstants.ENCRYPT_DERIVED;
-            
+
             Properties properties = new Properties();
             properties.put(WSHandlerConstants.DERIVED_TOKEN_REFERENCE, "EncryptedKey");
             if (version == ConversationConstants.VERSION_05_02) {
                 properties.put(WSHandlerConstants.USE_2005_12_NAMESPACE, "false");
             }
             properties.put(WSHandlerConstants.USER, "receiver");
-            properties.put(WSHandlerConstants.SIG_ALGO, 
+            properties.put(WSHandlerConstants.SIG_ALGO,
                            "http://www.w3.org/2000/09/xmldsig#hmac-sha1");
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
@@ -1067,7 +1067,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
-    
+
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());

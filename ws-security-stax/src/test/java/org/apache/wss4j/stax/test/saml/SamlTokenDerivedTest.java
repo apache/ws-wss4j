@@ -185,7 +185,7 @@ public class SamlTokenDerivedTest extends AbstractTestBase {
                 crypto.getPrivateKey("transmitter", "default");
         sigBuilder.setExternalKey(key.getEncoded(), secToken.getElement());
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-        
+
         String soapNamespace = WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
         WSEncryptionPart encP =
                 new WSEncryptionPart(

@@ -27,10 +27,10 @@ import org.ietf.jgss.GSSException;
 /**
  * Encapsulates Kerberos token (service ticket) and secret key returned by
  * {@link KerberosClientExceptionAction}.
- * 
- * The secret key might be null, in which case it must be obtained from the current subject's 
- * {@link javax.security.auth.kerberos.KerberosTicket} private credential. 
- * 
+ *
+ * The secret key might be null, in which case it must be obtained from the current subject's
+ * {@link javax.security.auth.kerberos.KerberosTicket} private credential.
+ *
  * @author bgde
  */
 public class KerberosContext {
@@ -61,7 +61,7 @@ public class KerberosContext {
     /**
      * @return The secret session key, or null if it is not available.
      * In this case it must be obtained from the current subject's {@link javax.security.auth.kerberos.KerberosTicket KerberosTicket} private credential.
-     * 
+     *
      * @see {@link javax.security.auth.kerberos.KerberosTicket#getSessionKey()}
      * @throws IllegalStateException If this context was already disposed.
      */
@@ -69,7 +69,7 @@ public class KerberosContext {
         if (disposed) {
             throw new IllegalStateException("Kerberos context is disposed.");
         }
-        return secretKey; 
+        return secretKey;
     }
 
     public void setSecretKey(Key secretKey) {
@@ -92,7 +92,7 @@ public class KerberosContext {
     }
 
     /**
-     * Destroys all data held in this context instance. After calling this method, 
+     * Destroys all data held in this context instance. After calling this method,
      * an attempt to retrieve any field of this context instance will throw an IllegalArgumentException.
      */
     public void dispose() {

@@ -29,8 +29,8 @@ import org.w3c.dom.Document;
  * This tests how security headers are parsed and processed.
  */
 public class SecurityHeaderTest extends org.junit.Assert {
-    private static final String DUPLICATE_NULL_ACTOR_MSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+    private static final String DUPLICATE_NULL_ACTOR_MSG =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
         + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
         + "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
         + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
@@ -42,12 +42,12 @@ public class SecurityHeaderTest extends org.junit.Assert {
         + "xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">"
         + "</wsse:Security>"
         + "</SOAP-ENV:Header>"
-        + "<SOAP-ENV:Body>" 
-        + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
-        + "<value xmlns=\"\">15</value>" + "</add>" 
+        + "<SOAP-ENV:Body>"
+        + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">"
+        + "<value xmlns=\"\">15</value>" + "</add>"
         + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
-    private static final String DUPLICATE_ACTOR_MSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+    private static final String DUPLICATE_ACTOR_MSG =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
         + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
         + "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
         + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
@@ -59,12 +59,12 @@ public class SecurityHeaderTest extends org.junit.Assert {
         + "xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">"
         + "</wsse:Security>"
         + "</SOAP-ENV:Header>"
-        + "<SOAP-ENV:Body>" 
-        + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
-        + "<value xmlns=\"\">15</value>" + "</add>" 
+        + "<SOAP-ENV:Body>"
+        + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">"
+        + "<value xmlns=\"\">15</value>" + "</add>"
         + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
-    private static final String TWO_ACTOR_MSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+    private static final String TWO_ACTOR_MSG =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
         + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
         + "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
         + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
@@ -76,18 +76,18 @@ public class SecurityHeaderTest extends org.junit.Assert {
         + "xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">"
         + "</wsse:Security>"
         + "</SOAP-ENV:Header>"
-        + "<SOAP-ENV:Body>" 
-        + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
-        + "<value xmlns=\"\">15</value>" + "</add>" 
+        + "<SOAP-ENV:Body>"
+        + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">"
+        + "<value xmlns=\"\">15</value>" + "</add>"
         + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
-    
+
     private WSSecurityEngine secEngine = new WSSecurityEngine();
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     /**
      * Test for processing multiple security headers with the same (null) actor
      */
@@ -98,10 +98,10 @@ public class SecurityHeaderTest extends org.junit.Assert {
             secEngine.processSecurityHeader(doc, null, null, null);
             fail("Failure expected on a null actor");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
     }
-    
+
     /**
      * Test for processing multiple security headers with the same actor
      */
@@ -112,10 +112,10 @@ public class SecurityHeaderTest extends org.junit.Assert {
             secEngine.processSecurityHeader(doc, "user", null, null);
             fail("Failure expected on a duplicate actor");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
     }
-    
+
     /**
      * Test for processing multiple security headers with different actors
      */
@@ -123,7 +123,7 @@ public class SecurityHeaderTest extends org.junit.Assert {
     public void testTwoActors() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(TWO_ACTOR_MSG);
         secEngine.processSecurityHeader(doc, null, null, null);
-        
+
         secEngine.processSecurityHeader(doc, "user", null, null);
     }
 }

@@ -20,48 +20,48 @@ package org.apache.wss4j.common;
 
 /**
  */
-public class WSS4JConstants {  
+public class WSS4JConstants {
 
     protected WSS4JConstants() {
         // complete
     }
-    
+
     //
     // Namespaces
     //
-    public static final String WSSE_NS = 
+    public static final String WSSE_NS =
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
-    public static final String WSSE11_NS = 
+    public static final String WSSE11_NS =
         "http://docs.oasis-open.org/wss/oasis-wss-wssecurity-secext-1.1.xsd";
-    public static final String WSU_NS = 
+    public static final String WSU_NS =
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
-    
-    public static final String SOAPMESSAGE_NS = 
+
+    public static final String SOAPMESSAGE_NS =
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0";
-    public static final String SOAPMESSAGE_NS11 = 
+    public static final String SOAPMESSAGE_NS11 =
         "http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1";
-    public static final String USERNAMETOKEN_NS = 
+    public static final String USERNAMETOKEN_NS =
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0";
-    public static final String X509TOKEN_NS = 
+    public static final String X509TOKEN_NS =
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0";
-    public static final String SAMLTOKEN_NS = 
+    public static final String SAMLTOKEN_NS =
         "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0";
-    public static final String SAMLTOKEN_NS11 = 
+    public static final String SAMLTOKEN_NS11 =
         "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1";
     public static final String KERBEROS_NS11 =
-        "http://docs.oasis-open.org/wss/oasis-wss-kerberos-token-profile-1.1"; 
+        "http://docs.oasis-open.org/wss/oasis-wss-kerberos-token-profile-1.1";
 
     public static final String SIG_NS = "http://www.w3.org/2000/09/xmldsig#";
     public static final String ENC_NS = "http://www.w3.org/2001/04/xmlenc#";
     public static final String ENC11_NS = "http://www.w3.org/2009/xmlenc11#";
     public static final String XMLNS_NS = "http://www.w3.org/2000/xmlns/";
     public static final String XML_NS = "http://www.w3.org/XML/1998/namespace";
-    
+
     public static final String SAML_NS = "urn:oasis:names:tc:SAML:1.0:assertion";
     public static final String SAMLP_NS = "urn:oasis:names:tc:SAML:1.0:protocol";
     public static final String SAML2_NS = "urn:oasis:names:tc:SAML:2.0:assertion";
     public static final String SAMLP2_NS = "urn:oasis:names:tc:SAML:2.0:protocol";
-    
+
     public static final String URI_SOAP11_ENV =
         "http://schemas.xmlsoap.org/soap/envelope/";
     public static final String URI_SOAP12_ENV =
@@ -74,23 +74,23 @@ public class WSS4JConstants {
         "http://www.w3.org/2003/05/soap-envelope/role/none";
     public static final String URI_SOAP12_ULTIMATE_ROLE =
         "http://www.w3.org/2003/05/soap-envelope/role/ultimateReceiver";
-    
-    public static final String C14N_OMIT_COMMENTS = 
+
+    public static final String C14N_OMIT_COMMENTS =
         "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
-    public static final String C14N_WITH_COMMENTS = 
+    public static final String C14N_WITH_COMMENTS =
         "http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments";
-    public static final String C14N_EXCL_OMIT_COMMENTS = 
+    public static final String C14N_EXCL_OMIT_COMMENTS =
         "http://www.w3.org/2001/10/xml-exc-c14n#";
-    public static final String C14N_EXCL_WITH_COMMENTS = 
+    public static final String C14N_EXCL_WITH_COMMENTS =
         "http://www.w3.org/2001/10/xml-exc-c14n#WithComments";
-    
-    public static final String NS_XMLDSIG_FILTER2 = 
+
+    public static final String NS_XMLDSIG_FILTER2 =
         "http://www.w3.org/2002/06/xmldsig-filter2";
-    public static final String NS_XMLDSIG_ENVELOPED_SIGNATURE = 
+    public static final String NS_XMLDSIG_ENVELOPED_SIGNATURE =
         SIG_NS + "enveloped-signature";
-    public static final String SWA_ATTACHMENT_CONTENT_SIG_TRANS = 
+    public static final String SWA_ATTACHMENT_CONTENT_SIG_TRANS =
         "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Content-Signature-Transform";
-    public static final String SWA_ATTACHMENT_COMPLETE_SIG_TRANS = 
+    public static final String SWA_ATTACHMENT_COMPLETE_SIG_TRANS =
         "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Complete-Signature-Transform";
     public static final String SWA_ATTACHMENT_CIPHERTEXT_TRANS =
         "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Ciphertext-Transform";
@@ -99,34 +99,34 @@ public class WSS4JConstants {
     public static final String SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE =
         "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Complete";
     public static final String XOP_NS = "http://www.w3.org/2004/08/xop/include";
-    
-    public static final String KEYTRANSPORT_RSA15 = 
+
+    public static final String KEYTRANSPORT_RSA15 =
         "http://www.w3.org/2001/04/xmlenc#rsa-1_5";
-    public static final String KEYTRANSPORT_RSAOEP = 
+    public static final String KEYTRANSPORT_RSAOEP =
         "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p";
     public static final String KEYTRANSPORT_RSAOEP_XENC11 =
         "http://www.w3.org/2009/xmlenc11#rsa-oaep";
-    public static final String TRIPLE_DES = 
+    public static final String TRIPLE_DES =
         "http://www.w3.org/2001/04/xmlenc#tripledes-cbc";
-    public static final String AES_128 = 
+    public static final String AES_128 =
         "http://www.w3.org/2001/04/xmlenc#aes128-cbc";
-    public static final String AES_256 = 
+    public static final String AES_256 =
         "http://www.w3.org/2001/04/xmlenc#aes256-cbc";
-    public static final String AES_192 = 
+    public static final String AES_192 =
         "http://www.w3.org/2001/04/xmlenc#aes192-cbc";
-    public static final String AES_128_GCM = 
+    public static final String AES_128_GCM =
         "http://www.w3.org/2009/xmlenc11#aes128-gcm";
-    public static final String AES_192_GCM = 
+    public static final String AES_192_GCM =
         "http://www.w3.org/2009/xmlenc11#aes192-gcm";
-    public static final String AES_256_GCM = 
+    public static final String AES_256_GCM =
         "http://www.w3.org/2009/xmlenc11#aes256-gcm";
-    public static final String DSA = 
+    public static final String DSA =
         "http://www.w3.org/2000/09/xmldsig#dsa-sha1";
-    public static final String RSA = 
+    public static final String RSA =
         "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
-    public static final String RSA_SHA1 = 
+    public static final String RSA_SHA1 =
         "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
-    public static final String SHA1 = 
+    public static final String SHA1 =
         "http://www.w3.org/2000/09/xmldsig#sha1";
     public static final String SHA256 =
         "http://www.w3.org/2001/04/xmlenc#sha256";
@@ -134,15 +134,15 @@ public class WSS4JConstants {
         "http://www.w3.org/2001/04/xmldsig-more#sha384";
     public static final String SHA512 =
             "http://www.w3.org/2001/04/xmlenc#sha512";
-    public static final String HMAC_SHA1 = 
+    public static final String HMAC_SHA1 =
         "http://www.w3.org/2000/09/xmldsig#hmac-sha1";
-    public static final String HMAC_SHA256 = 
+    public static final String HMAC_SHA256 =
         "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256";
-    public static final String HMAC_SHA384 = 
+    public static final String HMAC_SHA384 =
         "http://www.w3.org/2001/04/xmldsig-more#hmac-sha384";
-    public static final String HMAC_SHA512 = 
+    public static final String HMAC_SHA512 =
         "http://www.w3.org/2001/04/xmldsig-more#hmac-sha512";
-    public static final String HMAC_MD5 = 
+    public static final String HMAC_MD5 =
         "http://www.w3.org/2001/04/xmldsig-more#hmac-md5";
 
     public static final String MGF_SHA1 = "http://www.w3.org/2009/xmlenc11#mgf1sha1";
@@ -160,10 +160,10 @@ public class WSS4JConstants {
      * WS-Trust 1.4 namespace
      */
     public static final String WST_NS_08_02 = "http://docs.oasis-open.org/ws-sx/ws-trust/200802";
-    
+
     public static final String WSC_SCT = "http://schemas.xmlsoap.org/ws/2005/02/sc/sct";
-    
-    public static final String WSC_SCT_05_12 = 
+
+    public static final String WSC_SCT_05_12 =
         "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512/sct";
 
     //
@@ -190,7 +190,7 @@ public class WSS4JConstants {
     public static final String NONCE_LN = "Nonce";
     public static final String CREATED_LN = "Created";
     public static final String EXPIRES_LN = "Expires";
-    public static final String SIGNATURE_CONFIRMATION_LN = "SignatureConfirmation"; 
+    public static final String SIGNATURE_CONFIRMATION_LN = "SignatureConfirmation";
     public static final String SALT_LN = "Salt";
     public static final String ITERATION_LN = "Iteration";
     public static final String ASSERTION_LN = "Assertion";
@@ -207,7 +207,7 @@ public class WSS4JConstants {
     public static final String KEYINFO_LN = "KeyInfo";
     public static final String KEYVALUE_LN = "KeyValue";
     public static final String TOKEN_TYPE = "TokenType";
-    
+
     public static final String ELEM_ENVELOPE = "Envelope";
     public static final String ELEM_HEADER = "Header";
     public static final String ELEM_BODY = "Body";
@@ -215,7 +215,7 @@ public class WSS4JConstants {
     public static final String ATTR_ACTOR = "actor";
     public static final String ATTR_ROLE = "role";
     public static final String NULL_NS = "Null";
-    
+
     //
     // Prefixes
     //
@@ -227,20 +227,20 @@ public class WSS4JConstants {
     public static final String ENC_PREFIX = "xenc";
     public static final String ENC11_PREFIX = "xenc11";
     public static final String C14N_EXCL_OMIT_COMMENTS_PREFIX = "ec";
-    
+
     //
     // Kerberos ValueTypes
     //
     public static final String WSS_KRB_V5_AP_REQ = KERBEROS_NS11 + "#Kerberosv5_AP_REQ";
     public static final String WSS_GSS_KRB_V5_AP_REQ = KERBEROS_NS11 + "#GSS_Kerberosv5_AP_REQ";
     public static final String WSS_KRB_V5_AP_REQ1510 = KERBEROS_NS11 + "#Kerberosv5_AP_REQ1510";
-    public static final String WSS_GSS_KRB_V5_AP_REQ1510 = 
+    public static final String WSS_GSS_KRB_V5_AP_REQ1510 =
         KERBEROS_NS11 + "#GSS_Kerberosv5_AP_REQ1510";
     public static final String WSS_KRB_V5_AP_REQ4120 = KERBEROS_NS11 + "#Kerberosv5_AP_REQ4120";
-    public static final String WSS_GSS_KRB_V5_AP_REQ4120 = 
+    public static final String WSS_GSS_KRB_V5_AP_REQ4120 =
         KERBEROS_NS11 + "#GSS_Kerberosv5_AP_REQ4120";
     public static final String WSS_KRB_KI_VALUE_TYPE = KERBEROS_NS11 + "#Kerberosv5APREQSHA1";
-    
+
     //
     // Misc
     //
@@ -251,7 +251,7 @@ public class WSS4JConstants {
     public static final String WSS_ENC_KEY_VALUE_TYPE = SOAPMESSAGE_NS11 + "#" + ENC_KEY_VALUE_TYPE;
     public static final String PASSWORD_DIGEST = USERNAMETOKEN_NS + "#PasswordDigest";
     public static final String PASSWORD_TEXT = USERNAMETOKEN_NS + "#PasswordText";
-    public static final String WSS_USERNAME_TOKEN_VALUE_TYPE = 
+    public static final String WSS_USERNAME_TOKEN_VALUE_TYPE =
         USERNAMETOKEN_NS + "#" + USERNAME_TOKEN_LN;
     public static final String BASE64_ENCODING = SOAPMESSAGE_NS + "#Base64Binary";
 

@@ -47,28 +47,28 @@ import org.w3c.dom.NodeList;
 /**
  * This is a test for Certificate Revocation List checking. A message is signed and sent to the
  * receiver. If Certificate Revocation is enabled, then signature trust verification should
- * fail as the message has been signed by the private key corresponding to a revoked signature. 
- * 
+ * fail as the message has been signed by the private key corresponding to a revoked signature.
+ *
  * Generate the client keypair, make a csr, sign it with the CA key
- * 
- * keytool -genkey -validity 3650 -alias wss40rev -keyalg RSA -keystore wss40rev.jks 
+ *
+ * keytool -genkey -validity 3650 -alias wss40rev -keyalg RSA -keystore wss40rev.jks
  * -dname "CN=Colm,OU=WSS4J,O=Apache,L=Dublin,ST=Leinster,C=IE"
  * keytool -certreq -alias wss40rev -keystore wss40rev.jks -file wss40rev.cer
- * openssl ca -config ca.config -policy policy_anything -days 3650 -out wss40rev.pem 
+ * openssl ca -config ca.config -policy policy_anything -days 3650 -out wss40rev.pem
  * -infiles wss40rev.cer
  * openssl x509 -outform DER -in wss40rev.pem -out wss40rev.crt
- * 
+ *
  * Import the CA cert into wss40.jks and import the new signed certificate
- * 
+ *
  * keytool -import -file wss40CA.crt -alias wss40CA -keystore wss40rev.jks
  * keytool -import -file wss40rev.crt -alias wss40rev -keystore wss40rev.jks
- * 
+ *
  * Generate a Revocation list
- * 
- * openssl ca -gencrl -keyfile wss40CAKey.pem -cert wss40CA.pem -out wss40CACRL.pem 
+ *
+ * openssl ca -gencrl -keyfile wss40CAKey.pem -cert wss40CA.pem -out wss40CACRL.pem
  * -config ca.config -crldays 3650
  * openssl ca -revoke wss40rev.pem -keyfile wss40CAKey.pem -cert wss40CA.pem -config ca.config
- * openssl ca -gencrl -keyfile wss40CAKey.pem -cert wss40CA.pem -out wss40CACRL.pem 
+ * openssl ca -gencrl -keyfile wss40CAKey.pem -cert wss40CA.pem -out wss40CACRL.pem
  * -config ca.config -crldays 3650
  */
 public class SignatureCRLTest extends AbstractTestBase {
@@ -109,7 +109,7 @@ public class SignatureCRLTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 1);
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
         }
-        
+
         //done signature; now test sig-verification: This should fail as revocation is enabled
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();

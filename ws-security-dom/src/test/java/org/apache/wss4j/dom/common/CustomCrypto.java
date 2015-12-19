@@ -22,9 +22,9 @@ package org.apache.wss4j.dom.common;
 import org.apache.wss4j.common.crypto.Merlin;
 
 public class CustomCrypto extends Merlin {
-    
+
     private java.util.Map<String, Object> config = null;
-    
+
     public
     CustomCrypto(
         java.util.Map<String, Object> config,
@@ -33,7 +33,7 @@ public class CustomCrypto extends Merlin {
         this.config = config;
     }
 
-    public String 
+    public String
     getDefaultX509Alias() {
         return null;
     }
@@ -41,7 +41,7 @@ public class CustomCrypto extends Merlin {
     public String getCryptoProvider() {
         return null;
     }
-    
+
     public java.util.Map<String, Object> getConfig() {
         return config;
     }

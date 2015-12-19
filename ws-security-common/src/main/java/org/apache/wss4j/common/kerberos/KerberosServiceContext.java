@@ -26,34 +26,34 @@ import org.ietf.jgss.GSSCredential;
 
 
 public class KerberosServiceContext {
-    
+
     private Principal principal;
     private Key sessionKey;
     private GSSCredential delegationCredential;
     private GSSContext gssContext;
     private byte[] kerberosToken;
-    
+
     /**
      * @return the principal
      */
     public Principal getPrincipal() {
         return principal;
     }
-    
+
     /**
      * @param principal the principal to set
      */
     public void setPrincipal(Principal principal) {
         this.principal = principal;
     }
-    
+
     /**
      * @return the sessionKey
      */
     public Key getSessionKey() {
         return sessionKey;
     }
-    
+
     /**
      * @param sessionKey the sessionKey to set
      */
@@ -84,5 +84,5 @@ public class KerberosServiceContext {
     public void setKerberosToken(byte[] kerberosToken) {
         this.kerberosToken = kerberosToken;
     }
-    
+
 }

@@ -44,24 +44,24 @@ import org.w3c.dom.Document;
 
 /**
  * Test-case for sending and processing a signed (holder-of-key) SAML Assertion. These tests
- * just cover the case of creating and signing the Assertion, and not using the credential 
+ * just cover the case of creating and signing the Assertion, and not using the credential
  * information in the SAML Subject to sign the SOAP body.
  */
 public class SamlTokenHOKTest extends org.junit.Assert {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SamlTokenHOKTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto crypto = null;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public SamlTokenHOKTest() throws Exception {
         WSSConfig config = WSSConfig.getNewInstance();
         secEngine.setWssConfig(config);
-        
+
         crypto = CryptoFactory.getInstance("crypto.properties");
     }
 
@@ -74,11 +74,11 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-        
+
         samlAssertion.signAssertion("16c73ab6-b892-458f-abf5-2f875f74882e", "security", crypto, false);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
@@ -86,16 +86,16 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Document signedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authn Assertion (holder-of-key):");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         WSHandlerResult results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
@@ -105,7 +105,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         assertTrue(receivedSamlAssertion.isSigned());
         assertNotNull(receivedSamlAssertion.assertionToString());
     }
-    
+
     /**
      * Test that creates, sends and processes a signed SAML 1.1 attribute assertion.
      */
@@ -115,11 +115,11 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.ATTR);
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-        
+
         samlAssertion.signAssertion("16c73ab6-b892-458f-abf5-2f875f74882e", "security", crypto, false);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
@@ -127,28 +127,28 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Document signedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Attr Assertion (holder-of-key):");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         RequestData requestData = new RequestData();
         requestData.setValidateSamlSubjectConfirmation(false);
         requestData.setCallbackHandler(new KeystoreCallbackHandler());
         Crypto decCrypto = CryptoFactory.getInstance("wss40.properties");
         requestData.setDecCrypto(decCrypto);
         requestData.setSigVerCrypto(crypto);
-        
+
         WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
-        
+
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
@@ -156,7 +156,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         assertTrue(receivedSamlAssertion != null);
         assertTrue(receivedSamlAssertion.isSigned());
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion.
      */
@@ -166,11 +166,11 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-        
+
         samlAssertion.signAssertion("16c73ab6-b892-458f-abf5-2f875f74882e", "security", crypto, false);
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken();
@@ -178,16 +178,16 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion (holder-of-key):");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
-        
+
         WSHandlerResult results = verify(unsignedDoc);
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
@@ -196,7 +196,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         assertTrue(receivedSamlAssertion != null);
         assertTrue(receivedSamlAssertion.isSigned());
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 2 attribute assertion.
      */
@@ -206,11 +206,11 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.ATTR);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         callbackHandler.setIssuer("www.example.com");
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-        
+
         samlAssertion.signAssertion("16c73ab6-b892-458f-abf5-2f875f74882e", "security", crypto, false);
 
 
@@ -219,16 +219,16 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Attr Assertion (holder-of-key):");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
-        
+
         RequestData requestData = new RequestData();
         requestData.setValidateSamlSubjectConfirmation(false);
         requestData.setCallbackHandler(new KeystoreCallbackHandler());
@@ -236,11 +236,11 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         requestData.setDecCrypto(decCrypto);
         requestData.setSigVerCrypto(crypto);
         WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
-        
-        String outputString = 
+
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
-        
+
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.ST_SIGNED).get(0);
         SamlAssertionWrapper receivedSamlAssertion =
@@ -251,8 +251,8 @@ public class SamlTokenHOKTest extends org.junit.Assert {
     /**
      * Verifies the soap envelope
      * <p/>
-     * 
-     * @param envelope 
+     *
+     * @param envelope
      * @throws Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc) throws Exception {
@@ -260,10 +260,10 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         requestData.setDecCrypto(crypto);
         requestData.setSigVerCrypto(crypto);
         requestData.setValidateSamlSubjectConfirmation(false);
-        
+
         WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
 
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         return results;

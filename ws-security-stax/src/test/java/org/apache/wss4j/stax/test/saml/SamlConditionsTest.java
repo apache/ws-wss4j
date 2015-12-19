@@ -252,7 +252,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             }
         }
     }
-    
+
     @Test
     public void testSAML2FutureNotBefore() throws Exception {
 
@@ -293,7 +293,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             }
         }
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with an (invalid) custom Conditions statement.
@@ -378,7 +378,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             Assert.assertNotNull(document);
         }
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with a OneTimeUse Element
@@ -394,7 +394,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             ConditionsBean conditions = new ConditionsBean();
             conditions.setTokenPeriodMinutes(5);
             conditions.setOneTimeUse(true);
-            
+
             callbackHandler.setConditions(conditions);
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -418,7 +418,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             Assert.assertNotNull(document);
         }
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with a ProxyRestriction Element
@@ -440,7 +440,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             proxyRestriction.getAudienceURIs().addAll(audiences);
             proxyRestriction.setCount(5);
             conditions.setProxyRestriction(proxyRestriction);
-            
+
             callbackHandler.setConditions(conditions);
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -464,7 +464,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             Assert.assertNotNull(document);
         }
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with an AudienceRestriction Element
@@ -485,7 +485,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
             audienceRestrictionBean.setAudienceURIs(audiences);
             conditions.setAudienceRestrictions(Collections.singletonList(audienceRestrictionBean));
-            
+
             callbackHandler.setConditions(conditions);
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -509,7 +509,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             Assert.assertNotNull(document);
         }
     }
-    
+
     // Now test AudienceRestrictions with supplied restrictions
     @org.junit.Test
     public void testSAML2AudienceRestrictionValidation() throws Exception {
@@ -527,7 +527,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
             audienceRestrictionBean.setAudienceURIs(audiences);
             conditions.setAudienceRestrictions(Collections.singletonList(audienceRestrictionBean));
-            
+
             callbackHandler.setConditions(conditions);
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -557,7 +557,7 @@ public class SamlConditionsTest extends AbstractTestBase {
                 Assert.assertNotNull(e.getCause());
             }
         }
-        
+
         // Now add the correct audience back in...
         audiences.add("http://apache.org/one");
         {
@@ -571,7 +571,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             Assert.assertNotNull(document);
         }
     }
-    
+
     // Now test AudienceRestrictions with supplied restrictions
     @org.junit.Test
     public void testSAML1AudienceRestrictionValidation() throws Exception {
@@ -589,7 +589,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
             audienceRestrictionBean.setAudienceURIs(audiences);
             conditions.setAudienceRestrictions(Collections.singletonList(audienceRestrictionBean));
-            
+
             callbackHandler.setConditions(conditions);
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -619,7 +619,7 @@ public class SamlConditionsTest extends AbstractTestBase {
                 Assert.assertNotNull(e.getCause());
             }
         }
-        
+
         // Now add the correct audience back in...
         audiences.add("http://apache.org/one");
         {
@@ -633,7 +633,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             Assert.assertNotNull(document);
         }
     }
-    
+
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with two AudienceRestriction Elements
@@ -648,8 +648,8 @@ public class SamlConditionsTest extends AbstractTestBase {
 
             ConditionsBean conditions = new ConditionsBean();
             conditions.setTokenPeriodMinutes(5);
-            
-            List<AudienceRestrictionBean> audiencesRestrictions = 
+
+            List<AudienceRestrictionBean> audiencesRestrictions =
                 new ArrayList<AudienceRestrictionBean>();
             AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
             audienceRestrictionBean.setAudienceURIs(Collections.singletonList("http://apache.org/one"));
@@ -660,7 +660,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             audiencesRestrictions.add(audienceRestrictionBean);
 
             conditions.setAudienceRestrictions(audiencesRestrictions);
-            
+
             callbackHandler.setConditions(conditions);
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -684,7 +684,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             Assert.assertNotNull(document);
         }
     }
-    
+
     // Now test AudienceRestrictions with supplied restrictions
     @org.junit.Test
     public void testSAML1AudienceRestrictionSeparateRestrictionsValidation() throws Exception {
@@ -696,8 +696,8 @@ public class SamlConditionsTest extends AbstractTestBase {
 
             ConditionsBean conditions = new ConditionsBean();
             conditions.setTokenPeriodMinutes(5);
-            
-            List<AudienceRestrictionBean> audiencesRestrictions = 
+
+            List<AudienceRestrictionBean> audiencesRestrictions =
                 new ArrayList<AudienceRestrictionBean>();
             AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
             audienceRestrictionBean.setAudienceURIs(Collections.singletonList("http://apache.org/one"));
@@ -708,7 +708,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             audiencesRestrictions.add(audienceRestrictionBean);
 
             conditions.setAudienceRestrictions(audiencesRestrictions);
-            
+
             callbackHandler.setConditions(conditions);
 
             InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -738,7 +738,7 @@ public class SamlConditionsTest extends AbstractTestBase {
                 Assert.assertNotNull(e.getCause());
             }
         }
-        
+
         // Now add the correct audience back in...
         audiences.add("http://apache.org/one");
         {

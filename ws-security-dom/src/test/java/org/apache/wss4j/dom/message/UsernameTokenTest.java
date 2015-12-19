@@ -60,10 +60,10 @@ import org.w3c.dom.NodeList;
  * WS-Security Test Case for UsernameTokens.
  */
 public class UsernameTokenTest extends org.junit.Assert implements CallbackHandler {
-    private static final org.slf4j.Logger LOG = 
+    private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(UsernameTokenTest.class);
-    private static final String SOAPUTMSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+    private static final String SOAPUTMSG =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
         + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
         + "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
         + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
@@ -74,12 +74,12 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         + "<wsse:Username>wernerd</wsse:Username>"
         + "<wsse:Password>verySecret</wsse:Password>"
         + "</wsse:UsernameToken></wsse:Security></SOAP-ENV:Header>"
-        + "<SOAP-ENV:Body>" 
-        + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
-        + "<value xmlns=\"\">15</value>" + "</add>" 
+        + "<SOAP-ENV:Body>"
+        + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">"
+        + "<value xmlns=\"\">15</value>" + "</add>"
         + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
-    private static final String SOAPUTNOUSERMSG = 
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+    private static final String SOAPUTNOUSERMSG =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
         + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
         + "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
         + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
@@ -90,12 +90,12 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         + "<wsse:Username></wsse:Username>"
         + "<wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\"></wsse:Password>"
         + "</wsse:UsernameToken></wsse:Security></SOAP-ENV:Header>"
-        + "<SOAP-ENV:Body>" 
-        + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
-        + "<value xmlns=\"\">15</value>" + "</add>" 
+        + "<SOAP-ENV:Body>"
+        + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">"
+        + "<value xmlns=\"\">15</value>" + "</add>"
         + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
     private static final String EMPTY_PASSWORD_MSG =
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
         + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "
         + "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
         + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
@@ -108,18 +108,18 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         + "<wsse:Username>emptyuser</wsse:Username>"
         + "<wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\"/>"
         + "</wsse:UsernameToken></wsse:Security></SOAP-ENV:Header>"
-        + "<SOAP-ENV:Body>" 
-        + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">" 
-        + "<value xmlns=\"\">15</value>" + "</add>" 
+        + "<SOAP-ENV:Body>"
+        + "<add xmlns=\"http://ws.apache.org/counter/counter_port_type\">"
+        + "<value xmlns=\"\">15</value>" + "</add>"
         + "</SOAP-ENV:Body>\r\n       \r\n" + "</SOAP-ENV:Envelope>";
-    
+
     private CallbackHandler callbackHandler = new UsernamePasswordCallbackHandler();
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     /**
      * Test that adds a UserNameToken with password Digest to a WS-Security envelope
      */
@@ -135,25 +135,25 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Digest:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After adding UsernameToken PW Digest....");
-        
+
         WSHandlerResult results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.UT).get(0);
-        UsernameToken receivedToken = 
+        UsernameToken receivedToken =
             (UsernameToken) actionResult.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
         assertTrue(receivedToken != null);
-        
-        UsernameToken clone = 
+
+        UsernameToken clone =
             new UsernameToken(receivedToken.getElement(), false, new BSPEnforcer());
         assertTrue(clone.equals(receivedToken));
         assertTrue(clone.hashCode() == receivedToken.hashCode());
     }
-    
+
     /**
      * Test for encoded passwords.
      */
@@ -169,7 +169,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         String actualPasswordDigest = UsernameToken.doPasswordDigest(nonce, created, passwordHash);
         assertEquals("the password digest is not as expected", expectedPasswordDigest, actualPasswordDigest);
     }
-    
+
     /**
      * Test that adds a UserNameToken with password Digest to a WS-Security envelope
      */
@@ -186,7 +186,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Digest:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
@@ -198,7 +198,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         requestData.setCallbackHandler(new EncodedPasswordCallbackHandler());
         newEngine.processSecurityHeader(signedDoc, requestData);
     }
-    
+
     /**
      * Test that a bad username with password digest does not leak whether the username
      * is valid or not - see WSS-141.
@@ -215,7 +215,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Digest:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
@@ -230,7 +230,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             // expected
         }
     }
-    
+
     /**
      * Test that adds a UserNameToken with a bad password Digest to a WS-Security envelope
      */
@@ -246,7 +246,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Digest:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
@@ -259,7 +259,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             // expected
         }
     }
-    
+
     /**
      * This is a test for processing an "old" UsernameToken, i.e. one with a "Created" element that is
      * out of date
@@ -274,27 +274,27 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document signedDoc = builder.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         RequestData requestData = new RequestData();
         requestData.setUtTTL(-1);
         requestData.setCallbackHandler(callbackHandler);
-        
+
         try {
             WSSecurityEngine secEngine = new WSSecurityEngine();
             secEngine.processSecurityHeader(doc, requestData);
             fail("The UsernameToken validation should have failed");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
-        }  
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
+        }
     }
 
-    /** 
+    /**
      * This is a test for processing a UsernameToken where the "Created" element is in the (near)
-     * future. It should be accepted by default when it is created 30 seconds in the future, 
+     * future. It should be accepted by default when it is created 30 seconds in the future,
      * and then rejected once we configure "0 seconds" for future-time-to-live.
      */
     @org.junit.Test
@@ -302,19 +302,19 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
-        Element usernameTokenElement = 
+
+        Element usernameTokenElement =
             doc.createElementNS(
                 WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX + ":" + WSConstants.USERNAME_TOKEN_LN
             );
-        Element usernameElement = 
+        Element usernameElement =
             doc.createElementNS(
                 WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX + ":" + WSConstants.USERNAME_LN
             );
         usernameElement.appendChild(doc.createTextNode("wernerd"));
         usernameTokenElement.appendChild(usernameElement);
-        
-        Element passwordElement = 
+
+        Element passwordElement =
             doc.createElementNS(
                 WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX + ":" + WSConstants.PASSWORD_LN
             );
@@ -334,31 +334,31 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         usernameTokenElement.appendChild(elementCreated);
 
         secHeader.getSecurityHeader().appendChild(usernameTokenElement);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         // This should work
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.processSecurityHeader(doc, null, callbackHandler, null);
-        
+
         // This should not
         try {
             RequestData requestData = new RequestData();
             requestData.setUtFutureTTL(0);
             requestData.setCallbackHandler(callbackHandler);
-            
+
             secEngine.processSecurityHeader(doc, requestData);
             fail("The UsernameToken validation should have failed");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
-        }  
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
+        }
     }
-    
-    /** 
+
+    /**
      * This is a test for processing a UsernameToken where the "Created" element is in the future.
      * A UsernameToken that is 120 seconds in the future should be rejected by default.
      */
@@ -367,19 +367,19 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
-        Element usernameTokenElement = 
+
+        Element usernameTokenElement =
             doc.createElementNS(
                 WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX + ":" + WSConstants.USERNAME_TOKEN_LN
             );
-        Element usernameElement = 
+        Element usernameElement =
             doc.createElementNS(
                 WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX + ":" + WSConstants.USERNAME_LN
             );
         usernameElement.appendChild(doc.createTextNode("wernerd"));
         usernameTokenElement.appendChild(usernameElement);
-        
-        Element passwordElement = 
+
+        Element passwordElement =
             doc.createElementNS(
                 WSConstants.WSSE_NS, WSConstants.WSSE_PREFIX + ":" + WSConstants.PASSWORD_LN
             );
@@ -399,22 +399,22 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         usernameTokenElement.appendChild(elementCreated);
 
         secHeader.getSecurityHeader().appendChild(usernameTokenElement);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         try {
             WSSecurityEngine secEngine = new WSSecurityEngine();
             secEngine.processSecurityHeader(doc, null, callbackHandler, null);
             fail("The UsernameToken validation should have failed");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
-        }  
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
+        }
     }
-    
+
     /**
      * Test that adds a UserNameToken with password text to a WS-Security envelope
      */
@@ -430,7 +430,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document signedDoc = builder.build(doc, secHeader);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Text:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
@@ -439,16 +439,16 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         WSHandlerResult results = verify(signedDoc);
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.UT).get(0);
-        UsernameToken receivedToken = 
+        UsernameToken receivedToken =
             (UsernameToken) actionResult.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
         assertTrue(receivedToken != null);
-        
-        UsernameToken clone = 
+
+        UsernameToken clone =
             new UsernameToken(receivedToken.getElement(), false, new BSPEnforcer());
         assertTrue(clone.equals(receivedToken));
         assertTrue(clone.hashCode() == receivedToken.hashCode());
     }
-    
+
     /**
      * Test that adds a UserNameToken with a digested password but with type of
      * password test.
@@ -462,7 +462,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         sha.reset();
         sha.update(password);
         String passwdDigest = Base64.encode(sha.digest());
-        
+
         builder.setUserInfo("wernerd", passwdDigest);
         LOG.info("Before adding UsernameToken PW Text....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -471,12 +471,12 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document signedDoc = builder.build(doc, secHeader);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Text:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
     }
-    
+
     /**
      * Test that adds a UserNameToken with (bad) password text to a WS-Security envelope
      */
@@ -492,12 +492,12 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document signedDoc = builder.build(doc, secHeader);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Text:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After adding UsernameToken PW Text....");
-        
+
         try {
             verify(signedDoc);
             fail("Failure expected on a bad password text");
@@ -506,36 +506,36 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             // expected
         }
     }
-    
+
     /**
      * Test that adds a UserNameToken with no password type to a WS-Security envelope
      * See WSS-152 - https://issues.apache.org/jira/browse/WSS-152
      * "Problem with processing Username Tokens with no password type"
-     * The 1.1 spec states that the password type is optional and defaults to password text, 
+     * The 1.1 spec states that the password type is optional and defaults to password text,
      * and so we should handle an incoming Username Token accordingly.
      */
     @org.junit.Test
     public void testUsernameTokenNoPasswordType() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUTMSG);
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         WSSecurityEngine newEngine = new WSSecurityEngine();
         try {
             newEngine.processSecurityHeader(doc, null, callbackHandler, null);
             fail("Expected failure as it is not BSP compliant");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
         RequestData data = new RequestData();
         data.setCallbackHandler(callbackHandler);
         data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R4201));
         newEngine.processSecurityHeader(doc, data);
     }
-    
+
     /**
      * Test that adds a UserNameToken with no user (or password) to a WS-Security envelope
      * See WSS-185 - https://issues.apache.org/jira/browse/WSS-185
@@ -545,7 +545,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     public void testUsernameTokenNoUser() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUTNOUSERMSG);
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
@@ -557,7 +557,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             // expected
         }
     }
-    
+
     /**
      * Test that adds a UserNameToken with no password
      */
@@ -572,19 +572,19 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         WSHandlerResult results = verify(signedDoc, true);
         WSSecurityEngineResult actionResult =
             results.getActionResults().get(WSConstants.UT_NOPASSWORD).get(0);
-        UsernameToken receivedToken = 
+        UsernameToken receivedToken =
             (UsernameToken) actionResult.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
         assertTrue(receivedToken != null);
     }
-    
+
     /**
      * Test that adds a UserNameToken with an empty password
      */
@@ -599,14 +599,14 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.processSecurityHeader(doc, null, this, null);
     }
-    
+
     /**
      * Test that processes a UserNameToken with an empty password
      */
@@ -615,15 +615,15 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(EMPTY_PASSWORD_MSG);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Empty password message: ");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
-        
+
         WSSecurityEngine secEngine = new WSSecurityEngine();
         secEngine.processSecurityHeader(doc, null, this, null);
     }
-    
+
     /**
      * Test with a non-standard token type. This will fail as the default is to reject custom
      * token types.
@@ -633,15 +633,15 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType("RandomType");
         builder.setUserInfo("wernerd", "verySecret");
-        
+
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Text:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
@@ -654,9 +654,9 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             // expected
         }
     }
-    
+
     /**
-     * Test with a non-standard password type. This will pass as the WSSConfig is configured to 
+     * Test with a non-standard password type. This will pass as the WSSConfig is configured to
      * handle custom token types.
      */
     @org.junit.Test
@@ -669,27 +669,27 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW custom type:");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         //
         // Configure so that custom token types are accepted
         //
         WSSecurityEngine secEngine = new WSSecurityEngine();
-        
+
         RequestData requestData = new RequestData();
         requestData.setHandleCustomPasswordTypes(true);
         requestData.setCallbackHandler(callbackHandler);
-        
+
         secEngine.processSecurityHeader(doc, requestData);
     }
-    
-    
+
+
     /**
      * A test for WSS-66 - the nonce string is null
      * http://issues.apache.org/jira/browse/WSS-66
@@ -705,7 +705,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document utDoc = builder.build(doc, secHeader);
-        
+
         //
         // Manually find the Nonce node and set the content to null
         //
@@ -714,13 +714,13 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Node nonceNode = list.item(0);
         Node childNode = nonceNode.getFirstChild();
         childNode.setNodeValue("");
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(utDoc);
             LOG.debug(outputString);
         }
-        
+
         try {
             //
             // Verification should fail as the password is bad
@@ -732,7 +732,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             // expected
         }
     }
-    
+
     /**
      * A test for WSS-66 - the created string is null
      * http://issues.apache.org/jira/browse/WSS-66
@@ -748,7 +748,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document utDoc = builder.build(doc, secHeader);
-        
+
         //
         // Manually find the Created node and set the content to null
         //
@@ -757,13 +757,13 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Node nonceNode = list.item(0);
         Node childNode = nonceNode.getFirstChild();
         childNode.setNodeValue("");
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(utDoc);
             LOG.debug(outputString);
         }
-        
+
         try {
             //
             // Verification should fail as the password is bad
@@ -775,7 +775,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
             // expected
         }
     }
-    
+
     /**
      * Test that verifies an EncodingType is set for the nonce. See WSS-169.
      */
@@ -788,11 +788,11 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document signedDoc = builder.build(doc, secHeader);
-        String outputString = 
+        String outputString =
             XMLUtils.PrettyDocumentToString(signedDoc);
         assertTrue(outputString.contains("EncodingType"));
     }
-    
+
     /**
      * Test that adds a UserNameToken via WSHandler
      */
@@ -800,30 +800,30 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     public void testUsernameTokenWSHandler() throws Exception {
         CustomHandler handler = new CustomHandler();
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         RequestData reqData = new RequestData();
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put("password", "verySecret");
         config.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         reqData.setUsername("wernerd");
         reqData.setMsgContext(config);
-        
+
         HandlerAction action = new HandlerAction(WSConstants.UT);
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             Collections.singletonList(action),
             true
         );
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("Username Token via WSHandler");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
     }
-    
+
     /**
      * Test that adds a UserNameToken with no password via WSHandler
      */
@@ -831,29 +831,29 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     public void testUsernameTokenWSHandlerNoPassword() throws Exception {
         CustomHandler handler = new CustomHandler();
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         RequestData reqData = new RequestData();
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_NONE);
         reqData.setUsername("wernerd");
         reqData.setMsgContext(config);
-        
+
         HandlerAction action = new HandlerAction(WSConstants.UT);
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             Collections.singletonList(action),
             true
         );
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("Username Token via WSHandler");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
     }
-    
+
     /**
      * Test that adds a UserNameToken with an empty password via WSHandler
      */
@@ -861,30 +861,30 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     public void testUsernameTokenWSHandlerEmptyPassword() throws Exception {
         CustomHandler handler = new CustomHandler();
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         RequestData reqData = new RequestData();
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         config.put(WSHandlerConstants.PW_CALLBACK_REF, this);
         reqData.setUsername("emptyuser");
         reqData.setMsgContext(config);
-        
+
         HandlerAction action = new HandlerAction(WSConstants.UT);
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             Collections.singletonList(action),
             true
         );
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("Username Token with an empty password via WSHandler");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
     }
-    
+
     /**
      * A test for sending multiple nonces in the UsernameToken
      */
@@ -898,7 +898,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document utDoc = builder.build(doc, secHeader);
-        
+
         //
         // Manually find the Nonce node and duplicate it
         //
@@ -907,19 +907,19 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Node nonceNode = list.item(0);
         Node nonceCopy = nonceNode.cloneNode(true);
         nonceNode.getParentNode().insertBefore(nonceCopy, nonceNode);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(utDoc);
             LOG.debug(outputString);
         }
-        
+
         WSSecurityEngine newEngine = new WSSecurityEngine();
         try {
             newEngine.processSecurityHeader(doc, null, callbackHandler, null);
             fail("Expected failure as it is not BSP compliant");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY      ); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY      );
         }
 
         RequestData data = new RequestData();
@@ -927,7 +927,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R4225));
         newEngine.processSecurityHeader(doc, data);
     }
-    
+
     /**
      * A test for sending multiple Created elements in the UsernameToken
      */
@@ -941,7 +941,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document utDoc = builder.build(doc, secHeader);
-        
+
         //
         // Manually find the Created node and duplicate it
         //
@@ -950,27 +950,27 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Node createdNode = list.item(0);
         Node createdCopy = createdNode.cloneNode(true);
         createdNode.getParentNode().insertBefore(createdCopy, createdNode);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(utDoc);
             LOG.debug(outputString);
         }
-        
+
         WSSecurityEngine newEngine = new WSSecurityEngine();
         try {
             newEngine.processSecurityHeader(doc, null, callbackHandler, null);
             fail("Expected failure as it is not BSP compliant");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         RequestData data = new RequestData();
         data.setCallbackHandler(callbackHandler);
         data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R4223));
         newEngine.processSecurityHeader(doc, data);
     }
-    
+
     /**
      * A test for sending multiple passwords in the UsernameToken
      */
@@ -984,7 +984,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document utDoc = builder.build(doc, secHeader);
-        
+
         //
         // Manually find the Nonce node and duplicate it
         //
@@ -993,27 +993,27 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Node passwordNode = list.item(0);
         Node passwordCopy = passwordNode.cloneNode(true);
         passwordNode.getParentNode().insertBefore(passwordCopy, passwordNode);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(utDoc);
             LOG.debug(outputString);
         }
-        
+
         WSSecurityEngine newEngine = new WSSecurityEngine();
         try {
             newEngine.processSecurityHeader(doc, null, callbackHandler, null);
             fail("Expected failure as it is not BSP compliant");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         RequestData data = new RequestData();
         data.setCallbackHandler(callbackHandler);
         data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R4222));
         newEngine.processSecurityHeader(doc, data);
     }
-    
+
     /**
      * A test for sending a nonce with a bad encoding type in the UsernameToken
      */
@@ -1027,7 +1027,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document utDoc = builder.build(doc, secHeader);
-        
+
         //
         // Manually find the Nonce node and duplicate it
         //
@@ -1037,32 +1037,32 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         ((Element)nonceNode).setAttributeNS(
             null, "EncodingType", "http://bad_encoding_type"
         );
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(utDoc);
             LOG.debug(outputString);
         }
-        
+
         WSSecurityEngine newEngine = new WSSecurityEngine();
         try {
             newEngine.processSecurityHeader(doc, null, callbackHandler, null);
             fail("Expected failure as it is not BSP compliant");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
-        
+
         RequestData data = new RequestData();
         data.setCallbackHandler(callbackHandler);
         data.setIgnoredBSPRules(Collections.singletonList(BSPRule.R4221));
         newEngine.processSecurityHeader(doc, data);
     }
-    
+
     @org.junit.Test
     public void testUsernameTokenWSHandlerNonceCreated() throws Exception {
         CustomHandler handler = new CustomHandler();
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        
+
         RequestData reqData = new RequestData();
         java.util.Map<String, Object> config = new java.util.TreeMap<String, Object>();
         config.put("password", "verySecret");
@@ -1071,23 +1071,23 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         config.put(WSHandlerConstants.ADD_USERNAMETOKEN_CREATED, "true");
         reqData.setUsername("wernerd");
         reqData.setMsgContext(config);
-        
+
         HandlerAction action = new HandlerAction(WSConstants.UT);
         handler.send(
-            doc, 
-            reqData, 
+            doc,
+            reqData,
             Collections.singletonList(action),
             true
         );
-        
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("Username Token via WSHandler");
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(doc);
             LOG.debug(outputString);
         }
     }
-    
+
     /**
      * This is a test to create a "Spoofed" UsernameToken (see WSS-441)
      */
@@ -1098,7 +1098,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        
+
         WSTimeSource spoofedTimeSource = new WSTimeSource() {
 
             public Date now() {
@@ -1106,48 +1106,48 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
                 currentTime.setTime(currentTime.getTime() - (500L * 1000L));
                 return currentTime;
             }
-            
+
         };
-        
+
         builder.setWsTimeSource(spoofedTimeSource);
         Document signedDoc = builder.build(doc, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
-        
+
         try {
             WSSecurityEngine secEngine = new WSSecurityEngine();
             secEngine.processSecurityHeader(doc, null, callbackHandler, null);
             fail("The UsernameToken validation should have failed");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED); 
-        }  
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.MESSAGE_EXPIRED);
+        }
     }
 
-    
+
     private WSHandlerResult verify(Document doc) throws Exception {
         return verify(doc, false);
     }
-    
+
     /**
      * Verifies the soap envelope
-     * 
+     *
      * @param env soap envelope
      * @throws java.lang.Exception Thrown when there is a problem in verification
      */
     private WSHandlerResult verify(Document doc, boolean allowUsernameTokenDerivedKeys) throws Exception {
         WSSecurityEngine secEngine = new WSSecurityEngine();
-        
+
         RequestData requestData = new RequestData();
         requestData.setAllowUsernameTokenNoPassword(allowUsernameTokenDerivedKeys);
         requestData.setCallbackHandler(callbackHandler);
-        
+
         return secEngine.processSecurityHeader(doc, requestData);
     }
-    
+
     /**
      * A CallbackHandler for some (mostly insecure) scenarios.
      */

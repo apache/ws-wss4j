@@ -48,12 +48,12 @@ public class DerivedKeyTokenTest extends org.junit.Assert {
     private DerivedKeyToken token;
     private DerivedKeyToken tokenEqual;
     private DerivedKeyToken tokenNotEqual;
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
     }
-    
+
     public DerivedKeyTokenTest() throws Exception {
         token = new DerivedKeyToken(createReferenceDocument(
                 TEST_TOKEN_TEMPLATE,
@@ -75,9 +75,9 @@ public class DerivedKeyTokenTest extends org.junit.Assert {
         assertTrue(tokenEqual.equals(token));
         assertFalse(token.equals(tokenNotEqual));
         assertFalse(token.equals(null));
-        assertFalse(token.equals("string"));        
+        assertFalse(token.equals("string"));
     }
-    
+
     @org.junit.Test
     public void testHashcode() throws Exception{
         assertEquals(token.hashCode(), tokenEqual.hashCode());
