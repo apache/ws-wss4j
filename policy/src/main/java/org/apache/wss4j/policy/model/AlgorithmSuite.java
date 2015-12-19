@@ -332,8 +332,9 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         private static final Map<String, XPathType> lookup = new HashMap<>();
 
         static {
-            for (XPathType u : EnumSet.allOf(XPathType.class))
+            for (XPathType u : EnumSet.allOf(XPathType.class)) {
                 lookup.put(u.name(), u);
+            }
         }
 
         public static XPathType lookUp(String name) {
@@ -359,8 +360,9 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         private static final Map<String, C14NType> lookup = new HashMap<>();
 
         static {
-            for (C14NType u : EnumSet.allOf(C14NType.class))
+            for (C14NType u : EnumSet.allOf(C14NType.class)) {
                 lookup.put(u.name(), u);
+            }
         }
 
         private String value;
@@ -385,8 +387,9 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         private static final Map<String, SOAPNormType> lookup = new HashMap<>();
 
         static {
-            for (SOAPNormType u : EnumSet.allOf(SOAPNormType.class))
+            for (SOAPNormType u : EnumSet.allOf(SOAPNormType.class)) {
                 lookup.put(u.name(), u);
+            }
         }
 
         public static SOAPNormType lookUp(String name) {
@@ -411,8 +414,9 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         private static final Map<String, STRType> lookup = new HashMap<>();
 
         static {
-            for (STRType u : EnumSet.allOf(STRType.class))
+            for (STRType u : EnumSet.allOf(STRType.class)) {
                 lookup.put(u.name(), u);
+            }
         }
 
         public static STRType lookUp(String name) {

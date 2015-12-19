@@ -48,6 +48,7 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.saml.WSSecSignatureSAML;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -91,7 +92,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
      * original element is changed. This test will fail as the request will contain
      * multiple elements with the same wsu:Id.
      */
-    @org.junit.Test
+    @Test
     public void testMovedElement() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -145,7 +146,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
      * original element is changed. The wsu:Id value of the original element is also
      * changed. Signature verification will pass, so we need to check the Elements.
      */
-    @org.junit.Test
+    @Test
     public void testMovedElementChangedId() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -216,7 +217,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
     /**
      * Test a duplicated signed SAML Assertion.
      */
-    @org.junit.Test
+    @Test
     public void testDuplicatedSignedSAMLAssertion() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -263,7 +264,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
     /**
      * Test a duplicated signed UsernameToken
      */
-    @org.junit.Test
+    @Test
     public void testDuplicatedSignedUsernameToken() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -314,7 +315,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
     /**
      * Test for when an EncryptedData structure is modified
      */
-    @org.junit.Test
+    @Test
     public void testModifiedEncryptedDataStructure() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
@@ -349,7 +350,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
     /**
      * Test for when some EncryptedData CipherValue data is modified.
      */
-    @org.junit.Test
+    @Test
     public void testModifiedEncryptedDataCipherValue() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
@@ -396,7 +397,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
      * Test for when some EncryptedData CipherValue data is modified
      * (in the security header)
      */
-    @org.junit.Test
+    @Test
     public void testModifiedSecurityHeaderEncryptedDataCipherValue() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
@@ -458,7 +459,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
     /**
      * Test for when some EncryptedKey CipherValue data is modified.
      */
-    @org.junit.Test
+    @Test
     public void testModifiedEncryptedKeyCipherValue() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
@@ -507,7 +508,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
     /**
      * Test for when an element that a Signature Reference points to is modified
      */
-    @org.junit.Test
+    @Test
     public void testModifiedSignatureReference() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -559,7 +560,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
     /**
      * Test for when a Signature is received with a certificate that is not trusted
      */
-    @org.junit.Test
+    @Test
     public void testUntrustedSignature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");
@@ -587,7 +588,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
     /**
      * Test for when the Signature element is modified
      */
-    @org.junit.Test
+    @Test
     public void testModifiedSignature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");

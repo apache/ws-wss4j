@@ -55,6 +55,7 @@ import org.apache.wss4j.dom.message.WSSecUsernameToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 /**
@@ -74,7 +75,7 @@ public class PrincipalTest extends org.junit.Assert {
     /**
      * Test the principal that is created after processing a Username Token
      */
-    @org.junit.Test
+    @Test
     public void testUsernameToken() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecret");
@@ -106,7 +107,7 @@ public class PrincipalTest extends org.junit.Assert {
      * Test the principal that is created after processing a Username Token, which has been
      * transformed into a SAML Assertion.
      */
-    @org.junit.Test
+    @Test
     public void testTransformedUsernameToken() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecret");
@@ -133,7 +134,7 @@ public class PrincipalTest extends org.junit.Assert {
     /**
      * Test the principal that is created after processing a SAML Token
      */
-    @org.junit.Test
+    @Test
     public void testSAMLToken() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -176,7 +177,7 @@ public class PrincipalTest extends org.junit.Assert {
     /**
      * Test the principal that is created after processing a SAML2 Token
      */
-    @org.junit.Test
+    @Test
     public void testSAML2Token() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -220,7 +221,7 @@ public class PrincipalTest extends org.junit.Assert {
      * Test the principal that is created after processing a SAML Token, which has been
      * transformed into another SAML Token.
      */
-    @org.junit.Test
+    @Test
     public void testTransformedSAMLToken() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -265,7 +266,7 @@ public class PrincipalTest extends org.junit.Assert {
      * Test the principal that is created after processing (and explicitly validating)
      * a BinarySecurityToken.
      */
-    @org.junit.Test
+    @Test
     public void testBinarySecurityToken() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 

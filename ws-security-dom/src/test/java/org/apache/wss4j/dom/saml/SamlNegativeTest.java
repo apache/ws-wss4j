@@ -46,6 +46,7 @@ import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.Callback;
@@ -102,7 +103,7 @@ public class SamlNegativeTest extends org.junit.Assert {
      * authentication assertion. The assertion is altered and so the signature validation
      * should fail.
      */
-    @org.junit.Test
+    @Test
     public void testSAML2AuthnAssertionModified() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -154,7 +155,7 @@ public class SamlNegativeTest extends org.junit.Assert {
      * The signature validation should then fail - the enveloped transform is mandatory for
      * a signed assertion.
      */
-    @org.junit.Test
+    @Test
     public void testSAML1SignedKeyHolderSigModified() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -206,7 +207,7 @@ public class SamlNegativeTest extends org.junit.Assert {
      * Test that creates a signed SAML 2 Assertion using HOK, but then modifies the assertion.
      * The signature verification should then fail.
      */
-    @org.junit.Test
+    @Test
     public void testSAML2SignedKeyHolderKeyModified() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -253,7 +254,7 @@ public class SamlNegativeTest extends org.junit.Assert {
      * Test that creates a signed SAML 1.1 authentication assertion that uses holder-of-key, but
      * does not include a KeyInfo in the Subject, and hence will fail processing.
      */
-    @org.junit.Test
+    @Test
     public void testHOKNoKeyInfo() throws Exception {
         SAML1HOKNoKeyInfoCallbackHandler callbackHandler =
             new SAML1HOKNoKeyInfoCallbackHandler();
@@ -292,7 +293,7 @@ public class SamlNegativeTest extends org.junit.Assert {
      * Test that creates a SAML 1.1 authentication assertion that uses holder-of-key, but is
      * not signed, and hence will fail processing.
      */
-    @org.junit.Test
+    @Test
     public void testHOKNotSigned() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -335,7 +336,7 @@ public class SamlNegativeTest extends org.junit.Assert {
      * Test that creates, sends and processes a signed SAML 2 authentication assertion, but it
      * is rejected in processing as the signature on the assertion is not trusted.
      */
-    @org.junit.Test
+    @Test
     public void testSAML2TrustFailure() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);

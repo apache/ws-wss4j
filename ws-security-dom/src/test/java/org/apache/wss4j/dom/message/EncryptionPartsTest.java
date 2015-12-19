@@ -35,6 +35,7 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -91,7 +92,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
      * Test encrypting a custom SOAP header
      */
     @SuppressWarnings("unchecked")
-    @org.junit.Test
+    @Test
     public void testSOAPHeader() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -140,7 +141,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         assertEquals(WSConstants.ENC_NS, encryptedElement.getNamespaceURI());
     }
 
-    @org.junit.Test
+    @Test
     public void testOptionalSOAPHeaderPresent() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -177,7 +178,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         verify(encryptedDoc);
     }
 
-    @org.junit.Test
+    @Test
     public void testOptionalSOAPHeaderNotPresent() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -214,7 +215,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         verify(encryptedDoc);
     }
 
-    @org.junit.Test
+    @Test
     public void testRequiredSOAPHeaderNotPresent() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -252,7 +253,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
      * Test encrypting a custom SOAP header using wsse11:EncryptedHeader
      */
     @SuppressWarnings("unchecked")
-    @org.junit.Test
+    @Test
     public void testSOAPEncryptedHeader() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -300,7 +301,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
      * Test encrypting a custom SOAP header using wsse11:EncryptedHeader
      */
     @SuppressWarnings("unchecked")
-    @org.junit.Test
+    @Test
     public void testSOAPEncryptedHeaderWithAttributes() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -347,7 +348,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
     /**
      * Test encrypting a custom SOAP header with a bad localname
      */
-    @org.junit.Test
+    @Test
     public void testBadLocalname() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -377,7 +378,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
     /**
      * Test encrypting a custom SOAP header with a bad namespace
      */
-    @org.junit.Test
+    @Test
     public void testBadNamespace() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -407,7 +408,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
     /**
      * Test encrypting a custom SOAP header and the SOAP body
      */
-    @org.junit.Test
+    @Test
     public void testSOAPHeaderAndBody() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         SOAPConstants soapConstants =
@@ -476,7 +477,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
     /**
      * Test getting a DOM Element from WSEncryptionPart directly
      */
-    @org.junit.Test
+    @Test
     public void testEncryptionPartDOMElement() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         SOAPConstants soapConstants =
@@ -525,7 +526,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
     /**
      * Test encrypting two SOAP Body elements with the same QName.
      */
-    @org.junit.Test
+    @Test
     public void testMultipleElements() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG_MULTIPLE);
         WSSecEncrypt encrypt = new WSSecEncrypt();

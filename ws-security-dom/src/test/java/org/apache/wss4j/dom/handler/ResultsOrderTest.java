@@ -23,6 +23,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.CustomHandler;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
+import org.junit.Test;
 
 
 /**
@@ -38,7 +39,7 @@ public class ResultsOrderTest extends org.junit.Assert {
 
     /**
      */
-    @org.junit.Test
+    @Test
     public void
     testOrder() throws Exception {
         CustomHandler handler = new CustomHandler();
@@ -68,7 +69,7 @@ public class ResultsOrderTest extends org.junit.Assert {
 
     /**
      */
-    @org.junit.Test
+    @Test
     public void
     testReverseOrder() throws Exception {
         CustomHandler handler = new CustomHandler();
@@ -99,7 +100,7 @@ public class ResultsOrderTest extends org.junit.Assert {
 
     /**
      */
-    @org.junit.Test
+    @Test
     public void
     testMixedOrder() throws Exception {
         CustomHandler handler = new CustomHandler();
@@ -131,7 +132,7 @@ public class ResultsOrderTest extends org.junit.Assert {
 
     /**
      */
-    @org.junit.Test
+    @Test
     public void
     testMixedOrder2() throws Exception {
         CustomHandler handler = new CustomHandler();
@@ -162,7 +163,7 @@ public class ResultsOrderTest extends org.junit.Assert {
 
     /**
      */
-    @org.junit.Test
+    @Test
     public void
     testMissingResult() throws Exception {
         CustomHandler handler = new CustomHandler();
@@ -190,7 +191,7 @@ public class ResultsOrderTest extends org.junit.Assert {
 
     /**
      */
-    @org.junit.Test
+    @Test
     public void
     testMissingAction() throws Exception {
         CustomHandler handler = new CustomHandler();
@@ -220,7 +221,7 @@ public class ResultsOrderTest extends org.junit.Assert {
 
     /**
      */
-    @org.junit.Test
+    @Test
     public void
     testNoResult() throws Exception {
         CustomHandler handler = new CustomHandler();
@@ -237,7 +238,7 @@ public class ResultsOrderTest extends org.junit.Assert {
 
     /**
      */
-    @org.junit.Test
+    @Test
     public void
     testNoAction() throws Exception {
         CustomHandler handler = new CustomHandler();
@@ -256,7 +257,7 @@ public class ResultsOrderTest extends org.junit.Assert {
 
     /**
      */
-    @org.junit.Test
+    @Test
     public void
     testMultipleIdenticalResults() throws Exception {
         CustomHandler handler = new CustomHandler();

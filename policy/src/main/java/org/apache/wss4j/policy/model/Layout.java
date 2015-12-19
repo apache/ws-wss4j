@@ -40,8 +40,9 @@ public class Layout extends AbstractSecurityAssertion implements PolicyContainin
         private static final Map<String, LayoutType> lookup = new HashMap<>();
 
         static {
-            for (LayoutType u : EnumSet.allOf(LayoutType.class))
+            for (LayoutType u : EnumSet.allOf(LayoutType.class)) {
                 lookup.put(u.name(), u);
+            }
         }
 
         public static LayoutType lookUp(String name) {

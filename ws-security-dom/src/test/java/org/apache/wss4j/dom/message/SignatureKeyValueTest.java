@@ -36,6 +36,7 @@ import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.junit.Test;
 
 /**
  * This class tests signing where the the public key is transmitted in the message via
@@ -60,7 +61,7 @@ public class SignatureKeyValueTest extends org.junit.Assert {
     /**
      * Successful RSAKeyValue test.
      */
-    @org.junit.Test
+    @Test
     public void testRSAKeyValue() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");
@@ -102,7 +103,7 @@ public class SignatureKeyValueTest extends org.junit.Assert {
      * Failed RSAKeyValue test, where a message is signed using a key-pair which doesn't
      * correspond to the public key in the "trust"-store.
      */
-    @org.junit.Test
+    @Test
     public void testBadRSAKeyValue() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss86", "security");
@@ -137,7 +138,7 @@ public class SignatureKeyValueTest extends org.junit.Assert {
     /**
      * Successful DSAKeyValue test.
      */
-    @org.junit.Test
+    @Test
     public void testDSAKeyValue() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40DSA", "security");

@@ -21,6 +21,7 @@ package org.apache.wss4j.dom.message.token;
 
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
+import org.junit.Test;
 
 /**
  * Tests for DerivedKeyToken type.
@@ -69,7 +70,7 @@ public class DerivedKeyTokenTest extends org.junit.Assert {
                 .getDocumentElement(), new BSPEnforcer());
     }
 
-    @org.junit.Test
+    @Test
     public void testEquals() throws Exception{
         assertTrue(token.equals(tokenEqual));
         assertTrue(tokenEqual.equals(token));
@@ -78,7 +79,7 @@ public class DerivedKeyTokenTest extends org.junit.Assert {
         assertFalse(token.equals("string"));
     }
 
-    @org.junit.Test
+    @Test
     public void testHashcode() throws Exception{
         assertEquals(token.hashCode(), tokenEqual.hashCode());
         assertFalse(token.hashCode() == tokenNotEqual.hashCode());

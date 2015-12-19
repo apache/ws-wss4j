@@ -21,12 +21,14 @@ package org.apache.wss4j.policy.tests;
 import org.apache.neethi.*;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.model.Trust10;
+import org.junit.Test;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class Trust10Test extends AbstractTestBase {
 
+    @Test
     public void testTrust10_11() throws Exception {
         String fileName = "Trust10.xml";
         String policyFile = loadPolicyFile("policy/model/sp11/" + fileName);

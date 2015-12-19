@@ -150,9 +150,10 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
 
                             final X509Certificate x509Certificate = x509SecurityToken.getX509Certificates()[0];
                             if (x509Certificate.getSerialNumber().compareTo(x509IssuerSerialType.getX509SerialNumber()) == 0 &&
-                                    x509Certificate.getIssuerX500Principal().equals(new X500Principal(x509IssuerSerialType.getX509IssuerName())))
+                                    x509Certificate.getIssuerX500Principal().equals(new X500Principal(x509IssuerSerialType.getX509IssuerName()))) {
                                 return createSecurityTokenProxy(inboundSecurityToken,
                                         WSSecurityTokenConstants.KeyIdentifier_IssuerSerial);
+                            }
                         }
                     }
                     //...then if none is found create a new SecurityToken instance

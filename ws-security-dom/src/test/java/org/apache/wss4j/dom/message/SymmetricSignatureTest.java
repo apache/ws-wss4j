@@ -46,6 +46,8 @@ import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.xml.security.utils.Base64;
+import org.junit.Before;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 
@@ -79,7 +81,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
      *
      * @throws Exception Thrown when there is a problem in setup
      */
-    @org.junit.Before
+    @Before
     public void setUp() throws Exception {
         KeyGenerator keyGen = KeyGenerator.getInstance("AES");
         keyGen.init(128);
@@ -90,7 +92,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
     /**
      * Test signing a message body using a symmetric key with EncryptedKeySHA1
      */
-    @org.junit.Test
+    @Test
     public void testSymmetricSignatureSHA1() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -123,7 +125,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
      * Test signing a message body using a symmetric key with Direct Reference to an
      * EncryptedKey
      */
-    @org.junit.Test
+    @Test
     public void testSymmetricSignatureDR() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -163,7 +165,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
      * @throws Exception Thrown when there is any problem in signing, encryption,
      *                   decryption, or verification
      */
-    @org.junit.Test
+    @Test
     public void testEncryptedKeySignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         LOG.info("Before Sign/Encryption....");
@@ -209,7 +211,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
      * Test signing a message body using a symmetric key with EncryptedKeySHA1.
      * The request is generated using WSHandler, instead of coding it.
      */
-    @org.junit.Test
+    @Test
     public void testSymmetricSignatureSHA1Handler() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         RequestData reqData = new RequestData();

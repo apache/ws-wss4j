@@ -28,8 +28,6 @@ import java.util.List;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
-import junit.framework.TestCase;
-
 import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyBuilder;
@@ -38,7 +36,7 @@ import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 
-public abstract class AbstractTestBase extends TestCase {
+public abstract class AbstractTestBase extends org.junit.Assert {
     protected XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
 
     protected String serializePolicy(Policy policy) throws Exception {

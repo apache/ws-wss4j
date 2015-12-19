@@ -22,6 +22,7 @@ package org.apache.wss4j.dom.misc;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
+import org.junit.Test;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.w3c.dom.Document;
 
@@ -91,7 +92,7 @@ public class SecurityHeaderTest extends org.junit.Assert {
     /**
      * Test for processing multiple security headers with the same (null) actor
      */
-    @org.junit.Test
+    @Test
     public void testDuplicateNullActor() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(DUPLICATE_NULL_ACTOR_MSG);
         try {
@@ -105,7 +106,7 @@ public class SecurityHeaderTest extends org.junit.Assert {
     /**
      * Test for processing multiple security headers with the same actor
      */
-    @org.junit.Test
+    @Test
     public void testDuplicateActor() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(DUPLICATE_ACTOR_MSG);
         try {
@@ -119,7 +120,7 @@ public class SecurityHeaderTest extends org.junit.Assert {
     /**
      * Test for processing multiple security headers with different actors
      */
-    @org.junit.Test
+    @Test
     public void testTwoActors() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(TWO_ACTOR_MSG);
         secEngine.processSecurityHeader(doc, null, null, null);

@@ -22,12 +22,14 @@ import org.apache.neethi.*;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
+import org.junit.Test;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class AlgorithmSuiteTest extends AbstractTestBase {
 
+    @Test
     public void testAlgorithmSuite() throws Exception {
         String fileName = "AlgorithmSuite.xml";
         String policyFile = loadPolicyFile("policy/model/sp12/" + fileName);

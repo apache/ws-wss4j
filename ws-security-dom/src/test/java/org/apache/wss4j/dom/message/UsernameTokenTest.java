@@ -51,6 +51,7 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.xml.security.utils.Base64;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -123,7 +124,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     /**
      * Test that adds a UserNameToken with password Digest to a WS-Security envelope
      */
-    @org.junit.Test
+    @Test
     public void testUsernameTokenDigest() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecret");
@@ -157,7 +158,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     /**
      * Test for encoded passwords.
      */
-    @org.junit.Test
+    @Test
     public void testUsernameTokenWithEncodedPasswordBaseline() throws Exception {
         String password = "password";
         // The SHA-1 of the password is known as a password equivalent in the UsernameToken specification.
@@ -173,7 +174,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     /**
      * Test that adds a UserNameToken with password Digest to a WS-Security envelope
      */
-    @org.junit.Test
+    @Test
     public void testUsernameTokenWithEncodedPassword() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordsAreEncoded(true);
@@ -203,7 +204,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
      * Test that a bad username with password digest does not leak whether the username
      * is valid or not - see WSS-141.
      */
-    @org.junit.Test
+    @Test
     public void testUsernameTokenBadUsername() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("badusername", "verySecret");
@@ -234,7 +235,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     /**
      * Test that adds a UserNameToken with a bad password Digest to a WS-Security envelope
      */
-    @org.junit.Test
+    @Test
     public void testUsernameTokenBadDigest() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecre");
@@ -264,7 +265,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
      * This is a test for processing an "old" UsernameToken, i.e. one with a "Created" element that is
      * out of date
      */
-    @org.junit.Test
+    @Test
     public void testOldUsernameToken() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecret");
@@ -297,7 +298,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
      * future. It should be accepted by default when it is created 30 seconds in the future,
      * and then rejected once we configure "0 seconds" for future-time-to-live.
      */
-    @org.junit.Test
+    @Test
     public void testNearFutureCreated() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -362,7 +363,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
      * This is a test for processing a UsernameToken where the "Created" element is in the future.
      * A UsernameToken that is 120 seconds in the future should be rejected by default.
      */
-    @org.junit.Test
+    @Test
     public void testFutureCreated() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -418,7 +419,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     /**
      * Test that adds a UserNameToken with password text to a WS-Security envelope
      */
-    @org.junit.Test
+    @Test
     public void testUsernameTokenText() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
@@ -453,7 +454,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
      * Test that adds a UserNameToken with a digested password but with type of
      * password test.
      */
-    @org.junit.Test
+    @Test
     public void testUsernameTokenDigestText() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
@@ -480,7 +481,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     /**
      * Test that adds a UserNameToken with (bad) password text to a WS-Security envelope
      */
-    @org.junit.Test
+    @Test
     public void testUsernameTokenBadText() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
@@ -514,7 +515,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
      * The 1.1 spec states that the password type is optional and defaults to password text,
      * and so we should handle an incoming Username Token accordingly.
      */
-    @org.junit.Test
+    @Test
     public void testUsernameTokenNoPasswordType() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUTMSG);
         if (LOG.isDebugEnabled()) {
@@ -541,7 +542,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
      * See WSS-185 - https://issues.apache.org/jira/browse/WSS-185
      * "NullPointerException on empty UsernameToken"
      */
-    @org.junit.Test
+    @Test
     public void testUsernameTokenNoUser() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUTNOUSERMSG);
         if (LOG.isDebugEnabled()) {
@@ -561,7 +562,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     /**
      * Test that adds a UserNameToken with no password
      */
-    @org.junit.Test
+    @Test
     public void testUsernameTokenNoPassword() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(null);
@@ -588,7 +589,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     /**
      * Test that adds a UserNameToken with an empty password
      */
-    @org.junit.Test
+    @Test
     public void testUsernameTokenEmptyPassword() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
@@ -610,7 +611,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     /**
      * Test that processes a UserNameToken with an empty password
      */
-    @org.junit.Test
+    @Test
     public void testEmptyPasswordProcessing() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(EMPTY_PASSWORD_MSG);
         if (LOG.isDebugEnabled()) {
@@ -628,7 +629,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
      * Test with a non-standard token type. This will fail as the default is to reject custom
      * token types.
      */
-    @org.junit.Test
+    @Test
     public void testUsernameTokenCustomFail() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType("RandomType");
@@ -659,7 +660,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
      * Test with a non-standard password type. This will pass as the WSSConfig is configured to
      * handle custom token types.
      */
-    @org.junit.Test
+    @Test
     public void testUsernameTokenCustomPass() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType("RandomType");
@@ -695,7 +696,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
      * http://issues.apache.org/jira/browse/WSS-66
      * "Possible security hole when PasswordDigest is used by client."
      */
-    @org.junit.Test
+    @Test
     public void testNullNonce() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
@@ -738,7 +739,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
      * http://issues.apache.org/jira/browse/WSS-66
      * "Possible security hole when PasswordDigest is used by client."
      */
-    @org.junit.Test
+    @Test
     public void testNullCreated() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
@@ -779,7 +780,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     /**
      * Test that verifies an EncodingType is set for the nonce. See WSS-169.
      */
-    @org.junit.Test
+    @Test
     public void testUsernameTokenNonceEncodingType() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecret");
@@ -796,7 +797,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     /**
      * Test that adds a UserNameToken via WSHandler
      */
-    @org.junit.Test
+    @Test
     public void testUsernameTokenWSHandler() throws Exception {
         CustomHandler handler = new CustomHandler();
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -827,7 +828,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     /**
      * Test that adds a UserNameToken with no password via WSHandler
      */
-    @org.junit.Test
+    @Test
     public void testUsernameTokenWSHandlerNoPassword() throws Exception {
         CustomHandler handler = new CustomHandler();
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -857,7 +858,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     /**
      * Test that adds a UserNameToken with an empty password via WSHandler
      */
-    @org.junit.Test
+    @Test
     public void testUsernameTokenWSHandlerEmptyPassword() throws Exception {
         CustomHandler handler = new CustomHandler();
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -888,7 +889,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     /**
      * A test for sending multiple nonces in the UsernameToken
      */
-    @org.junit.Test
+    @Test
     public void testMultipleNonce() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
@@ -931,7 +932,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     /**
      * A test for sending multiple Created elements in the UsernameToken
      */
-    @org.junit.Test
+    @Test
     public void testMultipleCreated() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
@@ -974,7 +975,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     /**
      * A test for sending multiple passwords in the UsernameToken
      */
-    @org.junit.Test
+    @Test
     public void testMultiplePassword() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
@@ -1017,7 +1018,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     /**
      * A test for sending a nonce with a bad encoding type in the UsernameToken
      */
-    @org.junit.Test
+    @Test
     public void testNonceBadEncodingType() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
@@ -1058,7 +1059,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         newEngine.processSecurityHeader(doc, data);
     }
 
-    @org.junit.Test
+    @Test
     public void testUsernameTokenWSHandlerNonceCreated() throws Exception {
         CustomHandler handler = new CustomHandler();
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -1091,7 +1092,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     /**
      * This is a test to create a "Spoofed" UsernameToken (see WSS-441)
      */
-    @org.junit.Test
+    @Test
     public void testSpoofedUsernameToken() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecret");

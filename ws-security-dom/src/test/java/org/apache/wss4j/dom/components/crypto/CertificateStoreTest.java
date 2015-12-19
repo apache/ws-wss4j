@@ -37,6 +37,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 import java.security.cert.X509Certificate;
@@ -73,7 +74,7 @@ public class CertificateStoreTest extends org.junit.Assert {
     /**
      * Test signing a SOAP message using a BST.
      */
-    @org.junit.Test
+    @Test
     public void testSignatureDirectReference() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("wss40", "security");
@@ -105,7 +106,7 @@ public class CertificateStoreTest extends org.junit.Assert {
     /**
      * Test signing a SOAP message using an X.509 Key Identifier.
      */
-    @org.junit.Test
+    @Test
     public void testSignatureX509() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("wss40", "security");
@@ -143,7 +144,7 @@ public class CertificateStoreTest extends org.junit.Assert {
     /**
      * Test signing a SOAP message using Issuer Serial.
      */
-    @org.junit.Test
+    @Test
     public void testSignatureIssuerSerial() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("wss40", "security");
@@ -177,7 +178,7 @@ public class CertificateStoreTest extends org.junit.Assert {
     /**
      * Test signing a SOAP message using a Thumbprint
      */
-    @org.junit.Test
+    @Test
     public void testSignatureThumbprint() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("wss40", "security");
@@ -211,7 +212,7 @@ public class CertificateStoreTest extends org.junit.Assert {
     /**
      * Test signing a SOAP message using a SKI Key Identifier
      */
-    @org.junit.Test
+    @Test
     public void testSignatureSKI() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("wss40", "security");
@@ -246,7 +247,7 @@ public class CertificateStoreTest extends org.junit.Assert {
      * Test signing a SOAP message using a BST. The certificate is not known to the
      * CertificateStore and so should throw an exception.
      */
-    @org.junit.Test
+    @Test
     public void testSignatureDirectReferenceUntrusted() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");

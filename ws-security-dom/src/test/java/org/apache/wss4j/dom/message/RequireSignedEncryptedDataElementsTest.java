@@ -40,6 +40,7 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -78,7 +79,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         WSSConfig.init();
     }
 
-    @org.junit.Test
+    @Test
     public void testEncryptedKeyRefAndDuplicatedEncDataInWsseHeader() throws Exception {
         Document encryptedSignedDoc = getRequestDocument();
         RequestData reqData = getRequestData(true);
@@ -100,7 +101,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testEncryptedKeyRefAndDuplicatedEncDataInWsseWrapperHeader() throws Exception {
         Document encryptedSignedDoc = getRequestDocument();
         RequestData reqData = getRequestData(true);
@@ -122,7 +123,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testEncryptedKeyRefAndDuplicatedEncDataInExternalWrapperElement() throws Exception {
         Document encryptedSignedDoc = getRequestDocument();
         RequestData reqData = getRequestData(true);
@@ -144,7 +145,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testReferenceListAndDuplicatedEncDataInWsseHeader() throws Exception {
         Document encryptedSignedDoc = getRequestDocument();
         RequestData reqData = getRequestData(true);
@@ -166,7 +167,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testReferenceListAndDuplicatedEncDataInWsseWrapperHeader() throws Exception {
         Document encryptedSignedDoc = getRequestDocument();
         RequestData reqData = getRequestData(true);
@@ -188,7 +189,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testReferenceListAndDuplicatedEncDataInExternalWrapperElement() throws Exception {
         Document encryptedSignedDoc = getRequestDocument();
         RequestData reqData = getRequestData(true);
@@ -210,7 +211,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testAdditionalEncryptedDataWithEmbeddedEncryptedKeyInWsseHeader() throws Exception {
         Document encryptedSignedDoc = getRequestDocument();
         RequestData reqData = getRequestData(true);
@@ -227,7 +228,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testEncryptedKeyRefAndDuplicatedEncDataInWsseWrapperBody() throws Exception {
         Document encryptedSignedDoc = getRequestDocumentEncryptionFirst();
         RequestData reqData = getRequestData(false);
@@ -251,7 +252,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testEncryptedKeyRefAndDuplicatedEncDataAfterWsseWrapperBody() throws Exception {
         Document encryptedSignedDoc = getRequestDocumentEncryptionFirst();
         TestMessageTransformer.duplicateEncryptedDataAfterWrapperBody(encryptedSignedDoc.getDocumentElement());

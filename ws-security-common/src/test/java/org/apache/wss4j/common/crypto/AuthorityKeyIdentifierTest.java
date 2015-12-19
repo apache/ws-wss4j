@@ -26,6 +26,7 @@ import java.util.Arrays;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
+import org.junit.Test;
 
 /**
  * This is a test for extracting AuthorityKeyIdentifier/SubjectKeyIdentifier information from
@@ -37,7 +38,7 @@ public class AuthorityKeyIdentifierTest extends org.junit.Assert {
         WSProviderConfig.init();
     }
 
-    @org.junit.Test
+    @Test
     public void testExtractKeyIdentifiers() throws Exception {
         // Load the keystore
         KeyStore keyStore = loadKeyStore("keys/wss40.jks", "security");
@@ -65,7 +66,7 @@ public class AuthorityKeyIdentifierTest extends org.junit.Assert {
         assertTrue(Arrays.equals(keyIdentifierBytes, subjectKeyIdentifierBytes));
     }
 
-    @org.junit.Test
+    @Test
     public void testMerlinAKI() throws Exception {
         // Load the keystore
         KeyStore keyStore = loadKeyStore("keys/wss40.jks", "security");

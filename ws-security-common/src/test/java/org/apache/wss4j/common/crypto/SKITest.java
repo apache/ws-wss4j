@@ -25,6 +25,7 @@ import java.security.cert.X509Certificate;
 
 import org.apache.wss4j.common.util.Loader;
 import org.apache.xml.security.utils.Base64;
+import org.junit.Test;
 
 /**
  * This is a test for WSS-300 - "SubjectKeyIdentifier (SKI) incorrectly calculated for 2048-bit RSA key".
@@ -35,7 +36,7 @@ import org.apache.xml.security.utils.Base64;
  */
 public class SKITest extends org.junit.Assert {
 
-    @org.junit.Test
+    @Test
     public void testRSA1024() throws Exception {
         // Load the keystore
         Crypto crypto = new Merlin();
@@ -55,7 +56,7 @@ public class SKITest extends org.junit.Assert {
         assertTrue(knownBase64Encoding.equals(Base64.encode(skiBytes)));
     }
 
-    @org.junit.Test
+    @Test
     public void testRSA2048() throws Exception {
         // Load the keystore
         Crypto crypto = new Merlin();
@@ -75,7 +76,7 @@ public class SKITest extends org.junit.Assert {
         assertTrue(knownBase64Encoding.equals(Base64.encode(skiBytes)));
     }
 
-    @org.junit.Test
+    @Test
     public void testBouncyCastlePKCS12() throws Exception {
         // Load the keystore
         Crypto crypto = CryptoFactory.getInstance("alice_bouncycastle.properties");

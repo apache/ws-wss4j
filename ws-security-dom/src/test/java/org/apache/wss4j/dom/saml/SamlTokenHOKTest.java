@@ -40,6 +40,7 @@ import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 /**
@@ -68,7 +69,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
     /**
      * Test that creates, sends and processes a signed SAML 1.1 authentication assertion.
      */
-    @org.junit.Test
+    @Test
     public void testSAML1AuthnAssertion() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -109,7 +110,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
     /**
      * Test that creates, sends and processes a signed SAML 1.1 attribute assertion.
      */
-    @org.junit.Test
+    @Test
     public void testSAML1AttrAssertion() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.ATTR);
@@ -160,7 +161,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion.
      */
-    @org.junit.Test
+    @Test
     public void testSAML2AuthnAssertion() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -200,7 +201,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
     /**
      * Test that creates, sends and processes an unsigned SAML 2 attribute assertion.
      */
-    @org.junit.Test
+    @Test
     public void testSAML2AttrAssertion() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.ATTR);

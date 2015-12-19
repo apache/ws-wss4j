@@ -40,6 +40,7 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 /**
@@ -64,7 +65,7 @@ public class SignedBSTTest extends org.junit.Assert {
 
     /**
      */
-    @org.junit.Test
+    @Test
     public void testSignedBST() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -121,7 +122,7 @@ public class SignedBSTTest extends org.junit.Assert {
         verify(doc);
     }
 
-    @org.junit.Test
+    @Test
     public void testSignedBSTAction() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();

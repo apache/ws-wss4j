@@ -43,8 +43,9 @@ public class X509Token extends AbstractToken {
         private static final Map<String, TokenType> lookup = new HashMap<String, TokenType>();
 
         static {
-            for (TokenType u : EnumSet.allOf(TokenType.class))
+            for (TokenType u : EnumSet.allOf(TokenType.class)) {
                 lookup.put(u.name(), u);
+            }
         }
 
         public static TokenType lookUp(String name) {

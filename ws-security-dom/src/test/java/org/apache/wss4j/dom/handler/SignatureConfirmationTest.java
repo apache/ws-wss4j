@@ -41,6 +41,7 @@ import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.token.SignatureConfirmation;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -67,7 +68,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
      * Test to see that a signature is saved correctly on the outbound request.
      */
     @SuppressWarnings("unchecked")
-    @org.junit.Test
+    @Test
     public void
     testRequestSavedSignature() throws Exception {
         final RequestData reqData = new RequestData();
@@ -108,7 +109,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
      * enable signature confirmation is false.
      */
     @SuppressWarnings("unchecked")
-    @org.junit.Test
+    @Test
     public void
     testRequestNotSavedSignature() throws Exception {
         final RequestData reqData = new RequestData();
@@ -147,7 +148,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
      * a signed message.
      */
     @SuppressWarnings("unchecked")
-    @org.junit.Test
+    @Test
     public void
     testSignatureConfirmationResponse() throws Exception {
         final RequestData reqData = new RequestData();
@@ -211,7 +212,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
      * Test to see that a signature confirmation response is correctly processed.
      */
     @SuppressWarnings("unchecked")
-    @org.junit.Test
+    @Test
     public void
     testSignatureConfirmationProcessing() throws Exception {
         final RequestData reqData = new RequestData();
@@ -276,7 +277,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
      * Test to see that a signature confirmation response that does not contain a wsu:Id fails
      * the BSP compliance is enabled.
      */
-    @org.junit.Test
+    @Test
     public void testWsuId() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);

@@ -132,7 +132,7 @@ public class DERDecoder {
      * @throws WSSecurityException if the current position is at the end of
      *                             the array.
      */
-    public boolean test(byte val) throws WSSecurityException {
+    public boolean test(byte val) throws WSSecurityException {  //NOPMD
         if (pos >= arr.length) {
             throw new WSSecurityException(
                     WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
@@ -220,5 +220,5 @@ public class DERDecoder {
         pos += length;
         return value;
     }
-    
+
 }

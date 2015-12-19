@@ -38,8 +38,9 @@ public class SamlToken extends AbstractToken {
         private static final Map<String, SamlTokenType> lookup = new HashMap<>();
 
         static {
-            for (SamlTokenType u : EnumSet.allOf(SamlTokenType.class))
+            for (SamlTokenType u : EnumSet.allOf(SamlTokenType.class)) {
                 lookup.put(u.name(), u);
+            }
         }
 
         public static SamlTokenType lookUp(String name) {

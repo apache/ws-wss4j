@@ -43,6 +43,7 @@ import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
 import org.apache.wss4j.dom.message.token.UsernameToken;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 /**
@@ -67,7 +68,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
      * Test for the wsse:FailedCheck faultcode. This will fail due to a bad password in
      * the callback handler.
      */
-    @org.junit.Test
+    @Test
     public void testFailedCheck() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40", "security");
@@ -92,7 +93,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
      * Test for the wsse:UnsupportedAlgorithm faultcode. This will fail due to the argument
      * passed to getCipherInstance.
      */
-    @org.junit.Test
+    @Test
     public void testUnsupportedAlgorithm() throws Exception {
         try {
             secEngine.getWssConfig();
@@ -110,7 +111,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
      * Test for the wsse:MessageExpired faultcode. This will fail due to the argument
      * passed to setTimeToLive.
      */
-    @org.junit.Test
+    @Test
     public void testMessageExpired() throws Exception {
         WSSecTimestamp builder = new WSSecTimestamp();
         builder.setTimeToLive(-1);
@@ -135,7 +136,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
      * Test for the wsse:FailedAuthentication faultcode. This will fail due to a bad password in
      * the callback handler.
      */
-    @org.junit.Test
+    @Test
     public void testFailedAuthentication() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.addCreated();
@@ -162,7 +163,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
      * Test for the wsse:InvalidSecurityToken faultcode. This will fail due to the fact
      * that a null username is used.
      */
-    @org.junit.Test
+    @Test
     public void testInvalidSecurityToken() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.addCreated();
@@ -188,7 +189,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
     /**
      * Test for the wsse:InvalidSecurity faultcode.
      */
-    @org.junit.Test
+    @Test
     public void testInvalidSecurity() throws Exception {
         try {
             new Reference((org.w3c.dom.Element)null);

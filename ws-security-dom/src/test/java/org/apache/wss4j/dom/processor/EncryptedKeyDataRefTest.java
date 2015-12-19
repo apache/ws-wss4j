@@ -37,6 +37,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.dom.message.WSSecHeader;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -77,7 +78,7 @@ public class EncryptedKeyDataRefTest extends org.junit.Assert {
      * @throws Exception
      *             Thrown when there is an error in encryption or decryption
      */
-    @org.junit.Test
+    @Test
     public void testDataRefEncryptedKeyProcessor() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecEncrypt builder = new WSSecEncrypt();

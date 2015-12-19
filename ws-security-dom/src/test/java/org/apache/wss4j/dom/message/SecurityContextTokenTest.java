@@ -34,6 +34,7 @@ import org.apache.wss4j.common.derivedKey.ConversationConstants;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 /**
@@ -55,7 +56,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
         SecurityTestUtil.cleanup();
     }
 
-    @org.junit.Test
+    @Test
     public void testBuild() {
         try {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -93,7 +94,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
      * Test encryption using a derived key which is based on a secret associated
      * with a security context token
      */
-    @org.junit.Test
+    @Test
     public void testSCTDKTEncrypt() {
         try {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -142,7 +143,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testSCTKDKTSign() {
         try {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -192,7 +193,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
      * Test for WSS-217:
      * "Add ability to specify a reference to an absolute URI in the derived key functionality".
      */
-    @org.junit.Test
+    @Test
     public void testSCTKDKTSignAbsolute() {
         try {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -230,7 +231,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testSCTKDKTSignEncrypt() {
         try {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -273,7 +274,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testSCTKDKTEncryptSign() {
         try {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -321,7 +322,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
      * rather than using a DerivedKeyToken to point to a SecurityContextToken.
      * See WSS-216 - https://issues.apache.org/jira/browse/WSS-216
      */
-    @org.junit.Test
+    @Test
     public void testSCTSign() {
         try {
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);

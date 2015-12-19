@@ -33,6 +33,7 @@ import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
+import org.junit.Test;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.util.XMLUtils;
@@ -58,7 +59,7 @@ public class SignatureUTAliasTest extends org.junit.Assert implements CallbackHa
      * private key for signature is extracted from the KeyStore using a different username/alias
      * to the UsernameToken.
      */
-    @org.junit.Test
+    @Test
     public void
     testUsernameTokenSignatureHandler() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();

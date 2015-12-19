@@ -20,13 +20,14 @@ package org.apache.wss4j.common.attachment;
 
 import org.apache.wss4j.common.util.CRLFOutputStream;
 import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Random;
 
 public class CRLFOutputStreamTest {
 
-    @org.junit.Test
+    @Test
     public void testBytePerByte() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         CRLFOutputStream crlfOutputStream = new CRLFOutputStream(baos);
@@ -50,7 +51,7 @@ public class CRLFOutputStreamTest {
         Assert.assertArrayEquals("\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\na\r\n\r\naaa".getBytes(), baos.toByteArray());
     }
 
-    @org.junit.Test
+    @Test
     public void testBytes() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         CRLFOutputStream crlfOutputStream = new CRLFOutputStream(baos);
@@ -59,7 +60,7 @@ public class CRLFOutputStreamTest {
         Assert.assertArrayEquals("\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\na\r\n\r\naaa".getBytes(), baos.toByteArray());
     }
 
-    @org.junit.Test
+    @Test
     public void testBytes1() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         CRLFOutputStream crlfOutputStream = new CRLFOutputStream(baos);
@@ -68,7 +69,7 @@ public class CRLFOutputStreamTest {
         Assert.assertArrayEquals("aaaaaaaaaa".getBytes(), baos.toByteArray());
     }
 
-    @org.junit.Test
+    @Test
     public void testRandom() throws Exception {
         byte[] pool = new byte[] {'\r', '\n', 'a'};
         Random random = new Random();

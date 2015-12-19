@@ -38,6 +38,7 @@ import org.apache.wss4j.dom.common.SAML2CallbackHandler;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.junit.Assert;
+import org.junit.Test;
 import org.opensaml.xmlsec.signature.Signature;
 import org.opensaml.xmlsec.signature.support.SignatureConstants;
 import org.w3c.dom.Document;
@@ -90,7 +91,7 @@ public class AssertionSigningTest extends Assert {
      * signature and canonicalization algorithms. The defaults should match
      * otherwise the test-case fails.
      */
-    @org.junit.Test
+    @Test
     public void testSigningWithDefaultAlgorithms() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -131,7 +132,7 @@ public class AssertionSigningTest extends Assert {
      * Test that creates an SamlAssertionWrapper object and signs using custom
      * signature and canonicalization algorithms.
      */
-    @org.junit.Test
+    @Test
     public void testSigningWithCustomAlgorithms() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);

@@ -20,12 +20,14 @@ package org.apache.wss4j.policy.tests;
 
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
+import org.junit.Test;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class PolicyNormalizationTest extends AbstractTestBase {
 
+    @Test
     public void testWSP15_432Normalization() throws Exception {
         String fileName = "WSP15_432-compact.xml";
         String policyFile = loadPolicyFile("policy/" + fileName);

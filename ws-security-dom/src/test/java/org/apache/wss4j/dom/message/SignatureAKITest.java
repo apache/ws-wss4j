@@ -35,6 +35,7 @@ import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 
@@ -56,7 +57,7 @@ public class SignatureAKITest extends org.junit.Assert {
         WSSConfig.init();
     }
 
-    @org.junit.Test
+    @Test
     public void testSignatureAKI() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");
@@ -82,7 +83,7 @@ public class SignatureAKITest extends org.junit.Assert {
     }
 
     // Here, the CA keystore contains two keys with the same Distinguished Name
-    @org.junit.Test
+    @Test
     public void testSignatureAKIDuplicate() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");

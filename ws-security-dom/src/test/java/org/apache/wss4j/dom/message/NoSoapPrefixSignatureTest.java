@@ -24,6 +24,7 @@ import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
+import org.junit.Test;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.util.XMLUtils;
@@ -52,7 +53,7 @@ public class NoSoapPrefixSignatureTest extends org.junit.Assert {
     /**
      * Test signing a SOAP message that has no SOAP namespace prefix
      */
-    @org.junit.Test
+    @Test
     public void testNoSOAPNamespacePrefix() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");

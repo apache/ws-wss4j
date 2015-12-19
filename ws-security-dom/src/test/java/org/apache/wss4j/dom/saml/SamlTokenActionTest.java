@@ -43,6 +43,7 @@ import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.junit.Test;
 
 /**
  * Test-case for sending SAML Assertions using the "action" approach.
@@ -66,7 +67,7 @@ public class SamlTokenActionTest extends org.junit.Assert {
         secEngine.setWssConfig(config);
     }
 
-    @org.junit.Test
+    @Test
     public void testAssertionAction() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -102,7 +103,7 @@ public class SamlTokenActionTest extends org.junit.Assert {
         verify(doc, callbackHandler);
     }
 
-    @org.junit.Test
+    @Test
     public void testSignedAssertionAction() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -139,7 +140,7 @@ public class SamlTokenActionTest extends org.junit.Assert {
         verify(doc, callbackHandler);
     }
 
-    @org.junit.Test
+    @Test
     public void testAssertionWithSignatureAction() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();

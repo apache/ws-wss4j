@@ -50,6 +50,7 @@ import org.apache.wss4j.stax.setup.InboundWSSec;
 import org.apache.wss4j.stax.setup.WSSec;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.junit.Assert;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -78,7 +79,7 @@ public class XOPAttachmentTest extends AbstractTestBase {
     // Set up a test to encrypt the SOAP Body + an attachment, which is the same content as
     // the SOAP Body. Then replace the encrypted SOAP Body with a xop:Include to the attachment,
     // and modify the request to remove the encryption stuff pointing to the attachment.
-    @org.junit.Test
+    @Test
     public void testEncryptedSOAPBody() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         List<Attachment> attachments = createEncryptedBodyInAttachment(doc);

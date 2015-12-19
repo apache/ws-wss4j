@@ -46,6 +46,7 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 /**
@@ -71,7 +72,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
     /**
      * Unit test for the UsernameToken derived key functionality
      */
-    @org.junit.Test
+    @Test
     public void testUsernameTokenUnit() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -114,7 +115,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
     /**
      * Test for encoded passwords.
      */
-    @org.junit.Test
+    @Test
     public void testDerivedKeyWithEncodedPasswordBaseline() throws Exception {
         String password = "password";
         // The SHA-1 of the password is known as a password equivalent in the UsernameToken specification.
@@ -130,7 +131,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
     /**
      * Test using a UsernameToken derived key for encrypting a SOAP body
      */
-    @org.junit.Test
+    @Test
     public void testDerivedKeyEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -181,7 +182,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
     /**
      * Test using a UsernameToken derived key for encrypting a SOAP body
      */
-    @org.junit.Test
+    @Test
     public void testDerivedKeyEncryptionWithEncodedPassword() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -232,7 +233,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
      * Test using a UsernameToken derived key for encrypting a SOAP body. In this test the
      * derived key is modified before encryption, and so decryption should fail.
      */
-    @org.junit.Test
+    @Test
     public void testDerivedKeyChangedEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -284,7 +285,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
      * Test using a UsernameToken derived key for encrypting a SOAP body. In this test the
      * user is "colm" rather than "bob", and so decryption should fail.
      */
-    @org.junit.Test
+    @Test
     public void testDerivedKeyBadUserEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -333,7 +334,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
     /**
      * Test using a UsernameToken derived key for signing a SOAP body
      */
-    @org.junit.Test
+    @Test
     public void testDerivedKeySignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -382,7 +383,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
     /**
      * Test using a UsernameToken derived key for signing a SOAP body
      */
-    @org.junit.Test
+    @Test
     public void testDerivedKeySignatureWithEncodedPassword() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -441,7 +442,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
      * derived key is modified before signature, and so signature verification should
      * fail.
      */
-    @org.junit.Test
+    @Test
     public void testDerivedKeyChangedSignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -491,7 +492,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
      * Test using a UsernameToken derived key for signing a SOAP body. In this test the
      * user is "colm" rather than "bob", and so signature verification should fail.
      */
-    @org.junit.Test
+    @Test
     public void testDerivedKeyBadUserSignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -536,7 +537,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
      * Unit test for creating a Username Token with no salt element that is used for
      * deriving a key for encryption.
      */
-    @org.junit.Test
+    @Test
     public void testNoSaltEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -587,7 +588,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
      * Unit test for creating a Username Token with no iteration element that is used for
      * deriving a key for encryption.
      */
-    @org.junit.Test
+    @Test
     public void testNoIterationEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -636,7 +637,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
      * Unit test for creating a Username Token with an iteration value < 1000 that is used for
      * deriving a key for encryption.
      */
-    @org.junit.Test
+    @Test
     public void testLowIterationEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -698,7 +699,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
      * UsernameToken contains a non-standard value type, which is rejected when the corresponding
      * BSP rule is turned on.
      */
-    @org.junit.Test
+    @Test
     public void testBadValueType() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -761,7 +762,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
      * Test using a UsernameToken derived key for encrypting a SOAP body. A KeyIdentifier is
      * used to refer to the UsernameToken, which is forbidden by the BSP.
      */
-    @org.junit.Test
+    @Test
     public void testKeyIdentifier() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);

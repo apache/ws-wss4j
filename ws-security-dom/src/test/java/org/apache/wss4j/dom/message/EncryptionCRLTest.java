@@ -34,10 +34,13 @@ import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.common.EncryptionActionToken;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.junit.Before;
+import org.junit.Test;
 
 
 /**
@@ -67,7 +70,7 @@ public class EncryptionCRLTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is a problem in setup
      */
-    @org.junit.Before
+    @Before
     public void setUp() throws Exception {
         secEngine.setWssConfig(WSSConfig.getNewInstance());
     }
@@ -78,7 +81,7 @@ public class EncryptionCRLTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
      */
-    @org.junit.Test
+    @Test
     public void testEncryptionWithOutRevocationCheck() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -119,7 +122,7 @@ public class EncryptionCRLTest extends org.junit.Assert {
      * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
      * TODO Re-enable once CRL issue fixed
      */
-    @org.junit.Test
+    @Test
     @org.junit.Ignore
     public void testEncryptionWithRevocationCheck() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
@@ -146,9 +149,9 @@ public class EncryptionCRLTest extends org.junit.Assert {
                 Collections.singletonList(new HandlerAction(WSConstants.ENCR)),
                 true
             );
-            fail ("Failure expected on a revoked certificate");
-        } catch (Exception ex) { //NOPMD
-            // expected
+            fail("Failure expected on a revoked certificate");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
 
     }

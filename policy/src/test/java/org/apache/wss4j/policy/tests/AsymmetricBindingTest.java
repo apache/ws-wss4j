@@ -22,12 +22,14 @@ import org.apache.neethi.*;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.AbstractSymmetricAsymmetricBinding;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
+import org.junit.Test;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class AsymmetricBindingTest extends AbstractTestBase {
 
+    @Test
     public void testAsymmetricBinding() throws Exception {
         String fileName = "AsymmetricBinding.xml";
         String policyFile = loadPolicyFile("policy/model/sp12/" + fileName);

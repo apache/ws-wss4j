@@ -35,6 +35,7 @@ import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -67,7 +68,7 @@ public class UTSignatureTest extends org.junit.Assert {
     /**
      * Test using a UsernameToken derived key for signing a SOAP body
      */
-    @org.junit.Test
+    @Test
     public void testSignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -118,7 +119,7 @@ public class UTSignatureTest extends org.junit.Assert {
      * Test using a UsernameToken derived key for signing a SOAP body. In this test the
      * user is "colm" rather than "bob", and so signature verification should fail.
      */
-    @org.junit.Test
+    @Test
     public void testBadUserSignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -157,7 +158,7 @@ public class UTSignatureTest extends org.junit.Assert {
     /**
      * Test using a UsernameToken derived key for signing a SOAP body via WSHandler
      */
-    @org.junit.Test
+    @Test
     public void testHandlerSignature() throws Exception {
 
         final WSSConfig cfg = WSSConfig.getNewInstance();
@@ -199,7 +200,7 @@ public class UTSignatureTest extends org.junit.Assert {
     /**
      * Test using a UsernameToken derived key for signing a SOAP body via WSHandler
      */
-    @org.junit.Test
+    @Test
     public void testHandlerSignatureIterations() throws Exception {
 
         final WSSConfig cfg = WSSConfig.getNewInstance();

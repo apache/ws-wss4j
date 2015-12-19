@@ -35,6 +35,7 @@ import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 
@@ -76,7 +77,7 @@ public class WCFUsernameTokenTest extends org.junit.Assert {
      * Test that adds a UserNameToken with a namespace qualified type. This should fail
      * as WSS4J rejects these tokens by default.
      */
-    @org.junit.Test
+    @Test
     public void testNamespaceQualifiedTypeRejected() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUTMSG);
 
@@ -99,7 +100,7 @@ public class WCFUsernameTokenTest extends org.junit.Assert {
      * Test that adds a UserNameToken with a namespace qualified type. This should pass
      * as WSS4J has been configured to accept these tokens.
      */
-    @org.junit.Test
+    @Test
     public void testNamespaceQualifiedTypeAccepted() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUTMSG);
 

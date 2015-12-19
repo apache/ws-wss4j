@@ -21,12 +21,14 @@ package org.apache.wss4j.policy.tests;
 import org.apache.neethi.*;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.RequiredElements;
+import org.junit.Test;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class RequiredElementsTest extends AbstractTestBase {
 
+    @Test
     public void testRequiredElements() throws Exception {
         String fileName = "RequiredElements.xml";
         String policyFile = loadPolicyFile("policy/model/sp12/" + fileName);

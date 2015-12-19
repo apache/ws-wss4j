@@ -53,6 +53,7 @@ import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.junit.Assert;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -92,7 +93,7 @@ public class AttachmentTest extends Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testXMLAttachmentContentSignature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -137,7 +138,7 @@ public class AttachmentTest extends Assert {
         Assert.assertEquals("text/xml", responseAttachment.getMimeType());
     }
 
-    @org.junit.Test
+    @Test
     public void testInvalidXMLAttachmentContentSignature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -193,7 +194,7 @@ public class AttachmentTest extends Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testXMLAttachmentCompleteSignature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -238,7 +239,7 @@ public class AttachmentTest extends Assert {
         Assert.assertEquals("text/xml", responseAttachment.getMimeType());
     }
 
-    @org.junit.Test
+    @Test
     public void testInvalidXMLAttachmentCompleteSignature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -293,7 +294,7 @@ public class AttachmentTest extends Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testMultipleAttachmentCompleteSignature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -350,7 +351,7 @@ public class AttachmentTest extends Assert {
         Assert.assertEquals("text/plain", responseAttachment.getMimeType());
     }
 
-    @org.junit.Test
+    @Test
     public void testXMLAttachmentContentEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecEncrypt encrypt = new WSSecEncrypt();
@@ -409,7 +410,7 @@ public class AttachmentTest extends Assert {
         Assert.assertEquals(6, attHeaders.size());
     }
 
-    @org.junit.Test
+    @Test
     public void testInvalidXMLAttachmentContentEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecEncrypt encrypt = new WSSecEncrypt();
@@ -464,7 +465,7 @@ public class AttachmentTest extends Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testXMLAttachmentContentEncryptionExternalReferenceList() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecEncrypt encrypt = new WSSecEncrypt();
@@ -529,7 +530,7 @@ public class AttachmentTest extends Assert {
         Assert.assertEquals(6, attHeaders.size());
     }
 
-    @org.junit.Test
+    @Test
     public void testXMLAttachmentContentEncryptionNoReference() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecEncrypt encrypt = new WSSecEncrypt();
@@ -593,7 +594,7 @@ public class AttachmentTest extends Assert {
         Assert.assertEquals(6, attHeaders.size());
     }
 
-    @org.junit.Test
+    @Test
     public void testXMLAttachmentCompleteEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecEncrypt encrypt = new WSSecEncrypt();
@@ -641,7 +642,7 @@ public class AttachmentTest extends Assert {
         Assert.assertEquals(6, attHeaders.size());
     }
 
-    @org.junit.Test
+    @Test
     public void testInvalidXMLAttachmentCompleteEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecEncrypt encrypt = new WSSecEncrypt();
@@ -693,7 +694,7 @@ public class AttachmentTest extends Assert {
         Assert.assertEquals("text/xml", responseAttachment.getMimeType());
     }
 
-    @org.junit.Test
+    @Test
     public void testMultipleAttachmentCompleteEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecEncrypt encrypt = new WSSecEncrypt();
@@ -754,7 +755,7 @@ public class AttachmentTest extends Assert {
         Assert.assertEquals(6, att2Headers.size());
     }
 
-    @org.junit.Test
+    @Test
     public void testXMLAttachmentCmplSignCmplEnc() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -819,7 +820,7 @@ public class AttachmentTest extends Assert {
         Assert.assertEquals(6, attHeaders.size());
     }
 
-    @org.junit.Test
+    @Test
     public void testInvalidXMLAttachmentCmplSignCmplEnc() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -918,7 +919,7 @@ public class AttachmentTest extends Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testXMLAttachmentCmplEncCmplSign() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -983,7 +984,7 @@ public class AttachmentTest extends Assert {
         Assert.assertEquals(6, attHeaders.size());
     }
 
-    @org.junit.Test
+    @Test
     public void testInvalidXMLAttachmentCmplEncCmplSign() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 

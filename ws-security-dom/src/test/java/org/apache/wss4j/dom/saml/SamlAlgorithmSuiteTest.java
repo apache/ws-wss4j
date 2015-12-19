@@ -41,6 +41,7 @@ import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.junit.Test;
 
 /**
  * A set of test-cases for signing and verifying SOAP requests containing a signed
@@ -61,7 +62,7 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         crypto = CryptoFactory.getInstance("crypto.properties");
     }
 
-    @org.junit.Test
+    @Test
     public void testSignedSAML11Assertion() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -103,7 +104,7 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testDSASignedSAML11Assertion() throws Exception {
         Crypto dsaCrypto = CryptoFactory.getInstance("wss40.properties");
 
@@ -146,7 +147,7 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         verify(securityHeader, algorithmSuite, dsaCrypto);
     }
 
-    @org.junit.Test
+    @Test
     public void testC14nMethod() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);

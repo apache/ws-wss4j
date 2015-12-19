@@ -37,8 +37,9 @@ public class RelToken extends AbstractToken {
         private static final Map<String, RelTokenType> lookup = new HashMap<>();
 
         static {
-            for (RelTokenType u : EnumSet.allOf(RelTokenType.class))
+            for (RelTokenType u : EnumSet.allOf(RelTokenType.class)) {
                 lookup.put(u.name(), u);
+            }
         }
 
         public static RelTokenType lookUp(String name) {

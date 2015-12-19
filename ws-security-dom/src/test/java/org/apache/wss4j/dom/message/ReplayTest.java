@@ -46,6 +46,7 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -68,7 +69,7 @@ public class ReplayTest extends org.junit.Assert {
         crypto = CryptoFactory.getInstance();
     }
 
-    @org.junit.Test
+    @Test
     public void testReplayedTimestamp() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -119,7 +120,7 @@ public class ReplayTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testEhCacheReplayedTimestamp() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -169,7 +170,7 @@ public class ReplayTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testReplayedTimestampBelowSignature() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -215,7 +216,7 @@ public class ReplayTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testEhCacheReplayedTimestampBelowSignature() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -260,7 +261,7 @@ public class ReplayTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testReplayedTimestampNoExpires() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -311,7 +312,7 @@ public class ReplayTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testEhCacheReplayedTimestampNoExpires() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -361,7 +362,7 @@ public class ReplayTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testReplayedUsernameToken() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecret");
@@ -395,7 +396,7 @@ public class ReplayTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testEhCacheReplayedUsernameToken() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecret");
@@ -434,7 +435,7 @@ public class ReplayTest extends org.junit.Assert {
      * no "OneTimeUse" Element is defined there is no problem with replaying it.
      * with a OneTimeUse Element
      */
-    @org.junit.Test
+    @Test
     public void testEhCacheReplayedSAML2() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -484,7 +485,7 @@ public class ReplayTest extends org.junit.Assert {
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with a OneTimeUse Element
      */
-    @org.junit.Test
+    @Test
     public void testEhCacheReplayedSAML2OneTimeUse() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);

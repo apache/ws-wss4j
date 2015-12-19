@@ -32,6 +32,7 @@ import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 
@@ -52,7 +53,7 @@ public class UseReqSigCertTest extends org.junit.Assert {
         WSSConfig.init();
     }
 
-    @org.junit.Test
+    @Test
     public void testIncludedCertificate() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -97,7 +98,7 @@ public class UseReqSigCertTest extends org.junit.Assert {
         sendResponse(handlerResults);
     }
 
-    @org.junit.Test
+    @Test
     public void testIssuerSerial() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -142,7 +143,7 @@ public class UseReqSigCertTest extends org.junit.Assert {
         sendResponse(handlerResults);
     }
 
-    @org.junit.Test
+    @Test
     public void testSKIKeyIdentifier() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();

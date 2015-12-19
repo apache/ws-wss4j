@@ -44,6 +44,7 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -67,7 +68,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         crypto = CryptoFactory.getInstance();
     }
 
-    @org.junit.Test
+    @Test
     public void testSignature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -100,7 +101,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testSignatureMethodDSA() throws Exception {
         Crypto dsaCrypto = CryptoFactory.getInstance("wss40.properties");
 
@@ -134,7 +135,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         verify(securityHeader, algorithmSuite, dsaCrypto);
     }
 
-    @org.junit.Test
+    @Test
     public void testSymmetricKey() throws Exception {
 
         KeyGenerator keyGen = KeyGenerator.getInstance("AES");
@@ -202,7 +203,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testC14nMethod() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -235,7 +236,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         verify(securityHeader, algorithmSuite, crypto);
     }
 
-    @org.junit.Test
+    @Test
     public void testDigestMethod() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
