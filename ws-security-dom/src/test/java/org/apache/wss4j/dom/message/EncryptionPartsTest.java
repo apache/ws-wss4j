@@ -506,7 +506,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
-        assertTrue (!outputString.contains("testMethod"));
+        assertTrue(!outputString.contains("testMethod"));
         WSHandlerResult results = verify(encryptedDoc);
 
         WSSecurityEngineResult actionResult =

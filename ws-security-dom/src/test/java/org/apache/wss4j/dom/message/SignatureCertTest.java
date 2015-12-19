@@ -115,7 +115,7 @@ public class SignatureCertTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.SIGN).get(0);
         X509Certificate cert =
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-        assertTrue (cert != null);
+        assertTrue(cert != null);
     }
 
     //disabling this test as the certs are expired
@@ -155,10 +155,10 @@ public class SignatureCertTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.SIGN).get(0);
         X509Certificate cert =
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-        assertTrue (cert != null);
+        assertTrue(cert != null);
         X509Certificate[] certs =
             (X509Certificate[])result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
-        assertTrue (certs != null && certs.length == 2);
+        assertTrue(certs != null && certs.length == 2);
     }
 
     /**
@@ -192,10 +192,10 @@ public class SignatureCertTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.SIGN).get(0);
         X509Certificate cert =
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-        assertTrue (cert != null);
+        assertTrue(cert != null);
         X509Certificate[] certs =
             (X509Certificate[])result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
-        assertTrue (certs != null && certs.length == 2);
+        assertTrue(certs != null && certs.length == 2);
     }
 
 
@@ -298,10 +298,10 @@ public class SignatureCertTest extends org.junit.Assert {
             results.getActionResults().get(WSConstants.SIGN).get(0);
         X509Certificate cert =
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-        assertTrue (cert != null);
+        assertTrue(cert != null);
         X509Certificate[] certs =
             (X509Certificate[])result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
-        assertTrue (certs != null && certs.length == 2);
+        assertTrue(certs != null && certs.length == 2);
     }
 
     @org.junit.Test

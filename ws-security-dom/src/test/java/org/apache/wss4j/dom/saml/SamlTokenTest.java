@@ -276,7 +276,7 @@ public class SamlTokenTest extends org.junit.Assert {
             LOG.debug("Unsigned SAML 1.1 authentication assertion via an Action:");
             LOG.debug(outputString);
         }
-        assertFalse (outputString.contains("Signature"));
+        assertFalse(outputString.contains("Signature"));
 
         WSHandlerResult results = verify(doc);
         WSSecurityEngineResult actionResult =
