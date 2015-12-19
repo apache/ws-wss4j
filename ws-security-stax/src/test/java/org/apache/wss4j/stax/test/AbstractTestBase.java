@@ -89,7 +89,7 @@ import org.junit.Assert;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public abstract class AbstractTestBase extends org.junit.Assert {
+public abstract class AbstractTestBase extends Assert {
 
     //javax.xml.transform.Transformer transformer = TransformerFactory.newInstance().newTransformer();
     //transformer.transform(new StreamSource(new ByteArrayInputStream(baos.toByteArray())), new StreamResult(System.out));

@@ -68,6 +68,7 @@ import org.apache.wss4j.stax.validate.SamlTokenValidatorImpl;
 import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.EncryptedKey;
 import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.joda.time.DateTime;
@@ -85,6 +86,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class SAMLTokenTest extends AbstractTestBase {
+
+    private static final String IP_ADDRESS = "12.34.56.78"; //NOPMD
 
     @Test
     public void testSAML1AuthnAssertionOutbound() throws Exception {
@@ -631,7 +634,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             callbackHandler.setStatement(SAMLCallbackHandlerImpl.Statement.AUTHN);
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
-            callbackHandler.setSubjectLocality("12.34.56.78", "test-dns");
+            callbackHandler.setSubjectLocality(IP_ADDRESS, "test-dns");
             securityProperties.setSamlCallbackHandler(callbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
@@ -670,7 +673,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             callbackHandler.setIssuer("www.example.com");
             callbackHandler.setSignAssertion(false);
             callbackHandler.setSamlVersion(Version.SAML_20);
-            callbackHandler.setSubjectLocality("12.34.56.78", "test-dns");
+            callbackHandler.setSubjectLocality(IP_ADDRESS, "test-dns");
             securityProperties.setSamlCallbackHandler(callbackHandler);
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
@@ -869,7 +872,7 @@ public class SAMLTokenTest extends AbstractTestBase {
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion, which
      * is encrypted in a saml2:EncryptedAssertion Element in the security header
      */
-    @org.junit.Test
+    @Test
     public void testSAML2EncryptedAssertion() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -1020,7 +1023,7 @@ public class SAMLTokenTest extends AbstractTestBase {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 fail("Failure expected on a Bearer assertion");
             }  catch (XMLStreamException e) {
-                // expected
+                Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
             }
         }
     }
@@ -1064,7 +1067,7 @@ public class SAMLTokenTest extends AbstractTestBase {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 fail("Failure expected on an unknown subject confirmation method");
             }  catch (XMLStreamException e) {
-                // expected
+                Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
             }
         }
 
@@ -1125,7 +1128,7 @@ public class SAMLTokenTest extends AbstractTestBase {
                 StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
                 fail("Failure expected on an unsigned bearer token");
             }  catch (XMLStreamException e) {
-                // expected
+                Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
             }
         }
 

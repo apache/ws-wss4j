@@ -27,6 +27,7 @@ import java.util.List;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
@@ -115,7 +116,8 @@ public class EncryptionCRLTest extends AbstractTestBase {
                 doOutboundSecurity(securityProperties, sourceDocument);
                 Assert.fail("Expected failure on a revocation check");
             } catch (Exception ex) {
-                // expected
+                Assert.assertNotNull(ex.getCause());
+                Assert.assertTrue(ex.getCause() instanceof WSSecurityException);
             }
         }
     }

@@ -68,7 +68,7 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 2);
 
             NodeList list = securedDocument.getElementsByTagNameNS(WSConstants.SAML2_NS, "Assertion");
-            Element assertionElement = (org.w3c.dom.Element) list.item(0);
+            Element assertionElement = (Element) list.item(0);
             assertionElement.setAttributeNS(null, "MinorVersion", "5");
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
@@ -115,11 +115,11 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
 
             Element envelope = securedDocument.getDocumentElement();
             NodeList list = envelope.getElementsByTagNameNS(WSConstants.SAML_NS, "Assertion");
-            Element assertionElement = (org.w3c.dom.Element) list.item(0);
+            Element assertionElement = (Element) list.item(0);
             list = assertionElement.getElementsByTagNameNS(WSConstants.SIG_NS, "Signature");
-            Element sigElement = (org.w3c.dom.Element) list.item(0);
+            Element sigElement = (Element) list.item(0);
             list = sigElement.getElementsByTagNameNS(WSConstants.SIG_NS, "Transform");
-            Element transformElement = (org.w3c.dom.Element) list.item(0);
+            Element transformElement = (Element) list.item(0);
             transformElement.setAttributeNS(null, "Algorithm", WSConstants.C14N_EXCL_OMIT_COMMENTS);
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
@@ -164,7 +164,7 @@ public class SAMLTokenNegativeTest extends AbstractTestBase {
             Assert.assertEquals(nodeList.getLength(), 2);
 
             NodeList list = securedDocument.getElementsByTagNameNS(WSConstants.SAML2_NS, "Assertion");
-            Element assertionElement = (org.w3c.dom.Element) list.item(0);
+            Element assertionElement = (Element) list.item(0);
             assertionElement.setAttributeNS(null, "MinorVersion", "5");
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();

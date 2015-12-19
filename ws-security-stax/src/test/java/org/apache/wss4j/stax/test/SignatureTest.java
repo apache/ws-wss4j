@@ -306,8 +306,8 @@ public class SignatureTest extends AbstractTestBase {
                 xmlStreamWriter.close();
                 Assert.fail("Exception expected");
             } catch (XMLStreamException e) {
-                org.junit.Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
-                org.junit.Assert.assertEquals("Part to sign not found: {http://www.wrongnamespace.org}complexType", e.getCause().getMessage());
+                Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
+                Assert.assertEquals("Part to sign not found: {http://www.wrongnamespace.org}complexType", e.getCause().getMessage());
             }
         }
     }
@@ -1368,9 +1368,9 @@ public class SignatureTest extends AbstractTestBase {
                 }
             }
 
-            org.junit.Assert.assertEquals(3, signedElementSecurityEvents.size());
-            org.junit.Assert.assertEquals(4, signatureValueSecurityEvents.size());
-            org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+            Assert.assertEquals(3, signedElementSecurityEvents.size());
+            Assert.assertEquals(4, signatureValueSecurityEvents.size());
+            Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                     operationSecurityEvents.size() +
                             signedElementSecurityEvents.size() + signatureValueSecurityEvents.size()
             );
@@ -1693,8 +1693,8 @@ public class SignatureTest extends AbstractTestBase {
                 xmlStreamWriter.close();
                 Assert.fail("Exception expected");
             } catch (XMLStreamException e) {
-                org.junit.Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
-                org.junit.Assert.assertEquals("Part to sign not found: {http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}UsernameToken", e.getCause().getMessage());
+                Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
+                Assert.assertEquals("Part to sign not found: {http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}UsernameToken", e.getCause().getMessage());
             }
         }
     }

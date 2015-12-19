@@ -160,11 +160,11 @@ public class InteroperabilityTest extends AbstractTestBase {
             }
         }
 
-        org.junit.Assert.assertEquals(4, encryptedPartSecurityEvents.size());
-        org.junit.Assert.assertEquals(3, signedElementSecurityEvents1.size());
-        org.junit.Assert.assertEquals(3, signedElementSecurityEvents2.size());
-        org.junit.Assert.assertEquals(4, signatureValueSecurityEvents.size());
-        org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+        Assert.assertEquals(4, encryptedPartSecurityEvents.size());
+        Assert.assertEquals(3, signedElementSecurityEvents1.size());
+        Assert.assertEquals(3, signedElementSecurityEvents2.size());
+        Assert.assertEquals(4, signatureValueSecurityEvents.size());
+        Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                 operationSecurityEvents.size() +
                         encryptedPartSecurityEvents.size() +
                         signedElementSecurityEvents1.size() +
@@ -325,12 +325,12 @@ public class InteroperabilityTest extends AbstractTestBase {
             }
         }
 
-        org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents.size());
-        org.junit.Assert.assertEquals(3, encryptedElementSecurityEvents.size());
-        org.junit.Assert.assertEquals(3, signedElementSecurityEvents1.size());
-        org.junit.Assert.assertEquals(3, signedElementSecurityEvents2.size());
-        org.junit.Assert.assertEquals(4, signatureValueSecurityEvents.size());
-        org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+        Assert.assertEquals(3, encryptedPartSecurityEvents.size());
+        Assert.assertEquals(3, encryptedElementSecurityEvents.size());
+        Assert.assertEquals(3, signedElementSecurityEvents1.size());
+        Assert.assertEquals(3, signedElementSecurityEvents2.size());
+        Assert.assertEquals(4, signatureValueSecurityEvents.size());
+        Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                 operationSecurityEvents.size() +
                         encryptedPartSecurityEvents.size() +
                         encryptedElementSecurityEvents.size() +
@@ -456,10 +456,10 @@ public class InteroperabilityTest extends AbstractTestBase {
             }
         }
 
-        org.junit.Assert.assertEquals(4, encryptedPartSecurityEvents.size());
-        org.junit.Assert.assertEquals(3, signedElementSecurityEvents1.size());
-        org.junit.Assert.assertEquals(4, signatureValueSecurityEvents.size());
-        org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+        Assert.assertEquals(4, encryptedPartSecurityEvents.size());
+        Assert.assertEquals(3, signedElementSecurityEvents1.size());
+        Assert.assertEquals(4, signatureValueSecurityEvents.size());
+        Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                 operationSecurityEvents.size() +
                         encryptedPartSecurityEvents.size() +
                         signedElementSecurityEvents1.size() +
@@ -636,12 +636,12 @@ public class InteroperabilityTest extends AbstractTestBase {
             }
         }
 
-        org.junit.Assert.assertEquals(3, encryptedPartSecurityEvents.size());
-        org.junit.Assert.assertEquals(3, encryptedElementSecurityEvents.size());
-        org.junit.Assert.assertEquals(3, signedElementSecurityEvents1.size());
-        org.junit.Assert.assertEquals(3, signedElementSecurityEvents2.size());
-        org.junit.Assert.assertEquals(4, signatureValueSecurityEvents.size());
-        org.junit.Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
+        Assert.assertEquals(3, encryptedPartSecurityEvents.size());
+        Assert.assertEquals(3, encryptedElementSecurityEvents.size());
+        Assert.assertEquals(3, signedElementSecurityEvents1.size());
+        Assert.assertEquals(3, signedElementSecurityEvents2.size());
+        Assert.assertEquals(4, signatureValueSecurityEvents.size());
+        Assert.assertEquals(securityEventListener.getReceivedSecurityEvents().size(),
                 operationSecurityEvents.size() +
                         encryptedPartSecurityEvents.size() +
                         encryptedElementSecurityEvents.size() +
@@ -1307,7 +1307,7 @@ public class InteroperabilityTest extends AbstractTestBase {
                     StringWriter stringWriter = new StringWriter();
                     PrintWriter pw = new PrintWriter(stringWriter);
                     ex.printStackTrace(pw);
-                    Assert.assertFalse(stringWriter.toString(), (t instanceof NullPointerException));
+                    Assert.assertFalse(stringWriter.toString(), t instanceof NullPointerException);
                     t = t.getCause();
                 }
             }
