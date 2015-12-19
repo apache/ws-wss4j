@@ -43,6 +43,7 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
 import org.apache.xml.security.utils.Base64;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 import javax.crypto.KeyGenerator;
@@ -78,7 +79,7 @@ public class BSTKerberosTest extends org.junit.Assert {
     /**
      * A unit test for creating BinarySecurityTokens
      */
-    @org.junit.Test
+    @Test
     public void testCreateBinarySecurityToken() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -106,7 +107,7 @@ public class BSTKerberosTest extends org.junit.Assert {
     /**
      * A test for signing a Kerberos BST
      */
-    @org.junit.Test
+    @Test
     public void testSignBST() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -142,7 +143,7 @@ public class BSTKerberosTest extends org.junit.Assert {
     /**
      * A test for signing a Kerberos BST as well as a Timestamp
      */
-    @org.junit.Test
+    @Test
     public void testSignBSTTimestamp() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -181,7 +182,7 @@ public class BSTKerberosTest extends org.junit.Assert {
     /**
      * Test Validating a Kerberos BinarySecurityToken
      */
-    @org.junit.Test
+    @Test
     public void testProcessToken() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -215,7 +216,7 @@ public class BSTKerberosTest extends org.junit.Assert {
     /**
      * Test Validating a Kerberos BinarySecurityToken using a custom Validator instance.
      */
-    @org.junit.Test
+    @Test
     public void testProcessTokenCustomValidator() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -252,7 +253,7 @@ public class BSTKerberosTest extends org.junit.Assert {
     /**
      * A test for signing using a direct reference to a Kerberos token
      */
-    @org.junit.Test
+    @Test
     public void testKerberosSignatureDRCreation() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -291,7 +292,7 @@ public class BSTKerberosTest extends org.junit.Assert {
     /**
      * A test for signing using a KeyIdentifier to a Kerberos token
      */
-    @org.junit.Test
+    @Test
     public void testKerberosSignatureKICreation() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -332,7 +333,7 @@ public class BSTKerberosTest extends org.junit.Assert {
     /**
      * A test for encryption using a direct reference to a Kerberos token
      */
-    @org.junit.Test
+    @Test
     public void testKerberosEncryptionDRCreation() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -370,7 +371,7 @@ public class BSTKerberosTest extends org.junit.Assert {
     /**
      * A test for encryption using a Key Identifier to a Kerberos token
      */
-    @org.junit.Test
+    @Test
     public void testKerberosEncryptionKICreation() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 

@@ -43,6 +43,7 @@ import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecHeader;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -93,7 +94,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
     /**
      * Test that creates, sends and processes a signed SAML 1.1 authentication assertion.
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML1AuthnAssertion() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
@@ -164,7 +165,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
     /**
      * Test that creates, sends and processes a signed SAML 1.1 attribute assertion.
      */
-    @org.junit.Test
+    @Test
     public void testSAML1AttrAssertion() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.ATTR);
@@ -226,7 +227,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
     /**
      * Test that creates, sends and processes a signed SAML 2 authentication assertion.
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML2AuthnAssertion() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
@@ -288,7 +289,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
     /**
      * Test that creates, sends and processes a signed SAML 2 attribute assertion.
      */
-    @org.junit.Test
+    @Test
     public void testSAML2AttrAssertion() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.ATTR);
@@ -352,7 +353,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
      * Test that creates, sends and processes a signed SAML 1.1 authentication assertion,
      * where the subject cert is referenced using IssuerSerial
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML1AuthnAssertionIssuerSerial() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
@@ -413,7 +414,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
      * Test that creates, sends and processes a signed SAML 1.1 authentication assertion,
      * where the subject cert is referenced using a Key Value
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML1AuthnAssertionKeyValue() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
@@ -474,7 +475,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
      * Test that creates, sends and processes a signed SAML 2 authentication assertion,
      * where the subject cert is referenced using a Key Value
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML2AuthnAssertionKeyValue() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
@@ -536,7 +537,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
      * The difference is that we don't trust the user signature, but as we trust the
      * signature of the issuer, we have (indirect) trust.
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML1AuthnAssertionTrust() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
@@ -598,7 +599,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         assertEquals("/SOAP-ENV:Envelope/SOAP-ENV:Body", xpath);
     }
 
-    @org.junit.Test
+    @Test
     @org.junit.Ignore
     public void testSAML2Advice() throws Exception {
         // Create a signed "Advice" Element first

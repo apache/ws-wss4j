@@ -44,6 +44,7 @@ import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.dom.message.WSSecHeader;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -97,7 +98,7 @@ public class SamlReferenceTest extends org.junit.Assert {
      * where the SecurityTokenReference that points to the SAML Assertion uses a KeyIdentifier,
      * and not a direct reference.
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML1SVKeyIdentifier() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
@@ -160,7 +161,7 @@ public class SamlReferenceTest extends org.junit.Assert {
      * and not a KeyIdentifier. This method is not spec compliant and is included to make sure
      * we can process third-party Assertions referenced in this way.
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML1SVDirectReference() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
@@ -224,7 +225,7 @@ public class SamlReferenceTest extends org.junit.Assert {
      * and not a direct reference. This tests that we can process a KeyIdentifier to a SAML
      * Assertion in the KeyInfo of a Signature.
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML1HOKKeyIdentifier() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
@@ -287,7 +288,7 @@ public class SamlReferenceTest extends org.junit.Assert {
      * we can process third-party Assertions referenced in this way. This tests that we can
      * process a Direct Reference to a SAML Assertion in the KeyInfo of a Signature.
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML1HOKDirectReference() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
@@ -354,7 +355,7 @@ public class SamlReferenceTest extends org.junit.Assert {
      * the SAML Assertion below the SecurityTokenReference, and this is causing
      * SecurityTokenReference.getTokenElement to fail.
      */
-    @org.junit.Test
+    @Test
     public void testAssertionBelowSTR() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -410,7 +411,7 @@ public class SamlReferenceTest extends org.junit.Assert {
      * This tests that we can process a KeyIdentifier to a SAML Assertion in the KeyInfo of an
      * EncryptedKey.
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML1HOKEKKeyIdentifier() throws Exception {
         // Create a SAML assertion
@@ -487,7 +488,7 @@ public class SamlReferenceTest extends org.junit.Assert {
      * third-party Assertions referenced in this way. This tests that we can process a Direct
      * Reference to a SAML Assertion in the KeyInfo of an EncryptedKey.
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML1HOKEKDirectReference() throws Exception {
         // Create a SAML assertion
@@ -560,7 +561,7 @@ public class SamlReferenceTest extends org.junit.Assert {
      * where the SecurityTokenReference that points to the SAML Assertion uses a KeyIdentifier,
      * and not a direct reference.
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML2SVKeyIdentifier() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
@@ -622,7 +623,7 @@ public class SamlReferenceTest extends org.junit.Assert {
      * where the SecurityTokenReference that points to the SAML Assertion uses a direct reference,
      * and not a KeyIdentifier. Unlike the SAML 1.1 case, this is spec-compliant.
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML2SVDirectReference() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
@@ -686,7 +687,7 @@ public class SamlReferenceTest extends org.junit.Assert {
      * and not a direct reference. This tests that we can process a KeyIdentifier to a SAML
      * Assertion in the KeyInfo of a Signature.
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML2HOKKeyIdentifier() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
@@ -749,7 +750,7 @@ public class SamlReferenceTest extends org.junit.Assert {
      * and not a KeyIdentifier. Unlike the SAML 1.1 case, this is spec-compliant. This tests that
      * we can process a Direct Reference to a SAML Assertion in the KeyInfo of a Signature.
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML2HOKDirectReference() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
@@ -813,7 +814,7 @@ public class SamlReferenceTest extends org.junit.Assert {
      * This tests that we can process a KeyIdentifier to a SAML Assertion in the KeyInfo of an
      * EncryptedKey.
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML2HOKEKKeyIdentifier() throws Exception {
         // Create a SAML assertion
@@ -889,7 +890,7 @@ public class SamlReferenceTest extends org.junit.Assert {
      * Reference. Unlike the SAML 1.1 case, this is spec-compliant. This tests that we can process
      * a Direct Reference to a SAML Assertion in the KeyInfo of an EncryptedKey.
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML2HOKEKDirectReference() throws Exception {
         // Create a SAML assertion

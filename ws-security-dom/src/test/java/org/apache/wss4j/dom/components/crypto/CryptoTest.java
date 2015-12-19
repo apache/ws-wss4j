@@ -36,6 +36,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.Loader;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 public class CryptoTest extends org.junit.Assert {
@@ -49,13 +50,13 @@ public class CryptoTest extends org.junit.Assert {
         SecurityTestUtil.cleanup();
     }
 
-    @org.junit.Test
+    @Test
     public void testCrypto() throws Exception {
         Crypto crypto = CryptoFactory.getInstance();
         assertTrue(crypto != null);
     }
 
-    @org.junit.Test
+    @Test
     public void testMerlinWithNullProperties()
         throws Exception {
         Crypto crypto = new NullPropertiesCrypto();
@@ -65,7 +66,7 @@ public class CryptoTest extends org.junit.Assert {
     /**
      * Ensure that we can load a custom crypto implementation using a Map
      */
-    @org.junit.Test
+    @Test
     public void testCustomCrypto() throws Exception {
         java.util.Map<Object, Object> tmp = new java.util.TreeMap<>();
         Crypto crypto = CryptoFactory.getInstance(
@@ -81,7 +82,7 @@ public class CryptoTest extends org.junit.Assert {
      * Test for WSS-149 - "Merlin requires org.apache.wss4j.crypto.merlin.file
      * to be set and point to an existing file"
      */
-    @org.junit.Test
+    @Test
     public void testNoKeyStoreFile() throws Exception {
         Crypto crypto = CryptoFactory.getInstance(
             "nofile.properties"
@@ -92,7 +93,7 @@ public class CryptoTest extends org.junit.Assert {
     /**
      * Test that we can sign and verify a signature using dynamically loaded keystores/truststore
      */
-    @org.junit.Test
+    @Test
     public void testDynamicCrypto() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");
@@ -136,7 +137,7 @@ public class CryptoTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testCryptoFactoryMerlin() throws Exception {
         ClassLoader classLoader = this.getClass().getClassLoader();
         Properties properties = CryptoFactory.getProperties("crypto.properties", classLoader);
@@ -145,7 +146,7 @@ public class CryptoTest extends org.junit.Assert {
         assertTrue(crypto instanceof Merlin);
     }
 
-    @org.junit.Test
+    @Test
     public void testCryptoFactoryMerlinDevice() throws Exception {
         ClassLoader classLoader = this.getClass().getClassLoader();
         Properties properties = CryptoFactory.getProperties("crypto_device.properties", classLoader);

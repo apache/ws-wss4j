@@ -21,12 +21,14 @@ package org.apache.wss4j.policy.tests;
 import org.apache.neethi.*;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.UsernameToken;
+import org.junit.Test;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class UsernameTokenTest extends AbstractTestBase {
 
+    @Test
     public void testUsernameToken12() throws Exception {
         String fileName = "UsernameToken.xml";
         String policyFile = loadPolicyFile("policy/model/sp12/" + fileName);
@@ -86,6 +88,7 @@ public class UsernameTokenTest extends AbstractTestBase {
         assertEquals(UsernameToken.UsernameTokenType.WssUsernameToken10, usernameToken.getUsernameTokenType());
     }
 
+    @Test
     public void testUsernameToken13() throws Exception {
         String fileName = "UsernameToken.xml";
         String policyFile = loadPolicyFile("policy/model/sp13/" + fileName);

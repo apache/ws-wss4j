@@ -19,13 +19,14 @@
 
 package org.apache.wss4j.common.crypto;
 
+import org.junit.Test;
 
 /**
  * This is a test for the PasswordEncryptor interface
  */
 public class PasswordEncryptorTest extends org.junit.Assert {
 
-    @org.junit.Test
+    @Test
     public void testStrongJasyptPasswordEncryptor() throws Exception {
 
         PasswordEncryptor passwordEncryptor =

@@ -32,6 +32,7 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -53,7 +54,7 @@ public class PasswordTypeTest extends org.junit.Assert {
     /**
      * Test that adds a UserNameToken with password Digest to a WS-Security envelope
      */
-    @org.junit.Test
+    @Test
     public void testPasswordDigest() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setUserInfo("wernerd", "verySecret");
@@ -104,7 +105,7 @@ public class PasswordTypeTest extends org.junit.Assert {
     /**
      * Test that adds a UserNameToken with password text to a WS-Security envelope
      */
-    @org.junit.Test
+    @Test
     public void testUsernameTokenText() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
@@ -157,7 +158,7 @@ public class PasswordTypeTest extends org.junit.Assert {
     /**
      * Test that adds a UserNameToken via WSHandler
      */
-    @org.junit.Test
+    @Test
     public void testUsernameTokenWSHandler() throws Exception {
         CustomHandler handler = new CustomHandler();
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);

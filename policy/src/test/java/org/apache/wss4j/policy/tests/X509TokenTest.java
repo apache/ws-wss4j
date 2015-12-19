@@ -21,12 +21,14 @@ package org.apache.wss4j.policy.tests;
 import org.apache.neethi.*;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.X509Token;
+import org.junit.Test;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class X509TokenTest extends AbstractTestBase {
 
+    @Test
     public void testX509Token() throws Exception {
         String fileName = "X509Token.xml";
         String policyFile = loadPolicyFile("policy/model/sp12/" + fileName);

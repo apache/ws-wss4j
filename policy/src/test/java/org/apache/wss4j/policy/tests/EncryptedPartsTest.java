@@ -21,12 +21,14 @@ package org.apache.wss4j.policy.tests;
 import org.apache.neethi.*;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.EncryptedParts;
+import org.junit.Test;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class EncryptedPartsTest extends AbstractTestBase {
 
+    @Test
     public void testEncryptedParts12() throws Exception {
         String fileName = "EncryptedParts.xml";
         String policyFile = loadPolicyFile("policy/model/sp12/" + fileName);
@@ -88,6 +90,7 @@ public class EncryptedPartsTest extends AbstractTestBase {
         assertEquals(2, encryptedParts.getHeaders().size());
     }
 
+    @Test
     public void testEncryptedParts13() throws Exception {
         String fileName = "EncryptedParts.xml";
         String policyFile = loadPolicyFile("policy/model/sp13/" + fileName);

@@ -41,6 +41,7 @@ import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 
@@ -74,14 +75,14 @@ public class PasswordEncryptorTest extends org.junit.Assert {
                                       passwordEncryptor);
     }
 
-    @org.junit.Test
+    @Test
     public void testEncryptedPassword() throws Exception {
         String encryptedPassword = passwordEncryptor.encrypt("security");
         //System.out.println(encryptedPassword);
         assertNotNull(encryptedPassword);
     }
 
-    @org.junit.Test
+    @Test
     public void testSignature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -100,7 +101,7 @@ public class PasswordEncryptorTest extends org.junit.Assert {
         verify(signedDoc);
     }
 
-    @org.junit.Test
+    @Test
     public void testSignatureWSHandler() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -130,7 +131,7 @@ public class PasswordEncryptorTest extends org.junit.Assert {
         verify(doc);
     }
 
-    @org.junit.Test
+    @Test
     public void testDecryption() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -151,7 +152,7 @@ public class PasswordEncryptorTest extends org.junit.Assert {
         verify(encryptedDoc);
     }
 
-    @org.junit.Test
+    @Test
     public void testDecryptionWSHandler() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();

@@ -22,12 +22,14 @@ import org.apache.neethi.*;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.model.Trust13;
+import org.junit.Test;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class Trust13Test extends AbstractTestBase {
 
+    @Test
     public void testTrust13_12() throws Exception {
         String fileName = "Trust13.xml";
         String policyFile = loadPolicyFile("policy/model/sp12/" + fileName);
@@ -101,6 +103,7 @@ public class Trust13Test extends AbstractTestBase {
         assertFalse(trust13.isMustSupportInteractiveChallenge());
     }
 
+    @Test
     public void testTrust13_13() throws Exception {
         String fileName = "Trust13.xml";
         String policyFile = loadPolicyFile("policy/model/sp13/" + fileName);

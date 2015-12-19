@@ -45,6 +45,7 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * A set of tests for using a derived key for encryption/signature using WSHandler actions.
@@ -65,7 +66,7 @@ public class DerivedKeyActionTest extends Assert {
         WSSConfig.init();
     }
 
-    @org.junit.Test
+    @Test
     public void testSignatureThumbprintSHA1() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -97,7 +98,7 @@ public class DerivedKeyActionTest extends Assert {
         verify(doc);
     }
 
-    @org.junit.Test
+    @Test
     public void testSignatureThumbprintSHA1OldNamespace() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -130,7 +131,7 @@ public class DerivedKeyActionTest extends Assert {
         verify(doc);
     }
 
-    @org.junit.Test
+    @Test
     public void testSignatureThumbprintSHA1StrongDigest() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -162,7 +163,7 @@ public class DerivedKeyActionTest extends Assert {
         verify(doc);
     }
 
-    @org.junit.Test
+    @Test
     public void testSignatureThumbprintDifferentKeyLength() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -195,7 +196,7 @@ public class DerivedKeyActionTest extends Assert {
         verify(doc);
     }
 
-    @org.junit.Test
+    @Test
     public void testSignatureSKI() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -226,7 +227,7 @@ public class DerivedKeyActionTest extends Assert {
         verify(doc);
     }
 
-    @org.junit.Test
+    @Test
     public void testSignatureX509() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -258,7 +259,7 @@ public class DerivedKeyActionTest extends Assert {
         verify(doc);
     }
 
-    @org.junit.Test
+    @Test
     public void testSignatureEncryptedKeyThumbprintSHA1() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -290,7 +291,7 @@ public class DerivedKeyActionTest extends Assert {
         verify(doc);
     }
 
-    @org.junit.Test
+    @Test
     public void testSignatureSCT() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -327,7 +328,7 @@ public class DerivedKeyActionTest extends Assert {
         verify(doc, secretKeyCallbackHandler);
     }
 
-    @org.junit.Test
+    @Test
     public void testEncryptionThumbprintSHA1() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -360,7 +361,7 @@ public class DerivedKeyActionTest extends Assert {
         verify(doc);
     }
 
-    @org.junit.Test
+    @Test
     public void testEncryptionSCT() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -400,7 +401,7 @@ public class DerivedKeyActionTest extends Assert {
         verify(doc, secretKeyCallbackHandler);
     }
 
-    @org.junit.Test
+    @Test
     public void testSignatureEncryptionThumbprintSHA1() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -436,7 +437,7 @@ public class DerivedKeyActionTest extends Assert {
         verify(doc);
     }
 
-    @org.junit.Test
+    @Test
     public void testEncryptionSignatureThumbprintSHA1() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -472,7 +473,7 @@ public class DerivedKeyActionTest extends Assert {
         verify(doc);
     }
 
-    @org.junit.Test
+    @Test
     public void testSignatureEncryptionSecurityContextToken() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -514,7 +515,7 @@ public class DerivedKeyActionTest extends Assert {
         verify(doc, secretKeyCallbackHandler);
     }
 
-    @org.junit.Test
+    @Test
     public void testEncryptionSignatureSecurityContextToken() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();

@@ -23,6 +23,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.engine.WSSConfig;
+import org.junit.Test;
 
 /**
  * unit test for the Reference type
@@ -66,7 +67,7 @@ public class ReferenceTest extends org.junit.Assert {
     }
 
 
-    @org.junit.Test
+    @Test
     public void testConstructor() throws Exception {
         //
         // null input
@@ -108,7 +109,7 @@ public class ReferenceTest extends org.junit.Assert {
         );
     }
 
-    @org.junit.Test
+    @Test
     public void
     testAccessors() throws Exception {
         final Reference ref = new Reference(
@@ -121,7 +122,7 @@ public class ReferenceTest extends org.junit.Assert {
         assertEquals(ref.getURI(), "bar");
     }
 
-    @org.junit.Test
+    @Test
     public void testEquals() throws Exception{
         assertTrue(ref.equals(refEqual));
         assertTrue(refEqual.equals(ref));
@@ -130,7 +131,7 @@ public class ReferenceTest extends org.junit.Assert {
         assertFalse(ref.equals("string"));
     }
 
-    @org.junit.Test
+    @Test
     public void testHashcode() throws Exception{
         assertEquals(ref.hashCode(), refEqual.hashCode());
         assertFalse(ref.hashCode() == refNotEqual.hashCode());

@@ -39,6 +39,7 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
 import org.joda.time.DateTime;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 /**
@@ -61,7 +62,7 @@ public class SamlAuthnTest extends org.junit.Assert {
         secEngine.setWssConfig(config);
     }
 
-    @org.junit.Test
+    @Test
     public void testSAML1AuthnAssertion() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -70,7 +71,7 @@ public class SamlAuthnTest extends org.junit.Assert {
         createAndVerifyMessage(callbackHandler, true);
     }
 
-    @org.junit.Test
+    @Test
     public void testSAML2AuthnAssertion() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -79,7 +80,7 @@ public class SamlAuthnTest extends org.junit.Assert {
         createAndVerifyMessage(callbackHandler, true);
     }
 
-    @org.junit.Test
+    @Test
     public void testSAML1FutureAuthnInstant() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -90,7 +91,7 @@ public class SamlAuthnTest extends org.junit.Assert {
         createAndVerifyMessage(callbackHandler, false);
     }
 
-    @org.junit.Test
+    @Test
     public void testSAML2FutureAuthnInstant() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -101,7 +102,7 @@ public class SamlAuthnTest extends org.junit.Assert {
         createAndVerifyMessage(callbackHandler, false);
     }
 
-    @org.junit.Test
+    @Test
     public void testSAML2StaleSessionNotOnOrAfter() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -112,7 +113,7 @@ public class SamlAuthnTest extends org.junit.Assert {
         createAndVerifyMessage(callbackHandler, false);
     }
 
-    @org.junit.Test
+    @Test
     public void testSAML1ValidSubjectLocality() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -123,7 +124,7 @@ public class SamlAuthnTest extends org.junit.Assert {
         createAndVerifyMessage(callbackHandler, true);
     }
 
-    @org.junit.Test
+    @Test
     public void testSAML2ValidSubjectLocality() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -134,7 +135,7 @@ public class SamlAuthnTest extends org.junit.Assert {
         createAndVerifyMessage(callbackHandler, true);
     }
 
-    @org.junit.Test
+    @Test
     public void testSAML1InvalidSubjectLocality() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -145,7 +146,7 @@ public class SamlAuthnTest extends org.junit.Assert {
         createAndVerifyMessage(callbackHandler, false);
     }
 
-    @org.junit.Test
+    @Test
     public void testSAML2InalidSubjectLocality() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);

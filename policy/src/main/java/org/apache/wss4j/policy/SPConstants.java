@@ -48,8 +48,9 @@ public abstract class SPConstants {
         private static final Map<String, SPVersion> lookup = new HashMap<>();
 
         static {
-            for (SPVersion spVersion : EnumSet.allOf(SPVersion.class))
+            for (SPVersion spVersion : EnumSet.allOf(SPVersion.class)) {
                 lookup.put(spVersion.namespace, spVersion);
+            }
         }
 
         public static SPVersion getSPVersion(String namespace) {
@@ -504,8 +505,9 @@ public abstract class SPConstants {
         private static final Map<String, IncludeTokenType> lookup = new HashMap<>();
 
         static {
-            for (IncludeTokenType u : EnumSet.allOf(IncludeTokenType.class))
+            for (IncludeTokenType u : EnumSet.allOf(IncludeTokenType.class)) {
                 lookup.put(u.name(), u);
+            }
         }
 
         public static IncludeTokenType lookUp(String name) {

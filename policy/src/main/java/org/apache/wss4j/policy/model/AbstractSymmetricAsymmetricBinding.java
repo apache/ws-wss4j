@@ -33,8 +33,9 @@ public abstract class AbstractSymmetricAsymmetricBinding extends AbstractBinding
         private static final Map<String, ProtectionOrder> lookup = new HashMap<>();
 
         static {
-            for (ProtectionOrder u : EnumSet.allOf(ProtectionOrder.class))
+            for (ProtectionOrder u : EnumSet.allOf(ProtectionOrder.class)) {
                 lookup.put(u.name(), u);
+            }
         }
 
         public static ProtectionOrder lookUp(String name) {

@@ -22,6 +22,7 @@ package org.apache.wss4j.dom.message;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.engine.WSSConfig;
+import org.junit.Test;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.w3c.dom.Document;
@@ -45,7 +46,7 @@ public class CertErrorTest extends org.junit.Assert {
     /**
      * Test for when a bad certificate is used for Signature
      */
-    @org.junit.Test
+    @Test
     public void testX509Signature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("bob", "security");
@@ -64,7 +65,7 @@ public class CertErrorTest extends org.junit.Assert {
     /**
      * Test for when a bad certificate is used for Encryption
      */
-    @org.junit.Test
+    @Test
     public void testEncryption() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("alice");

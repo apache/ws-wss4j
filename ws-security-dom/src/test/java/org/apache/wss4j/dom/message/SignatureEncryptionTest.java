@@ -32,6 +32,7 @@ import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.junit.Test;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
@@ -86,7 +87,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
      *             Thrown when there is any problem in signing, encryption,
      *             decryption, or verification
      */
-    @org.junit.Test
+    @Test
     public void testEncryptionSigning() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         WSSecSignature sign = new WSSecSignature();
@@ -128,7 +129,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
      *             decryption, or verification
      */
     @SuppressWarnings("unchecked")
-    @org.junit.Test
+    @Test
     public void testEncryptionElementSigning() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         WSSecSignature sign = new WSSecSignature();
@@ -214,7 +215,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
      *             Thrown when there is any problem in signing, encryption,
      *             decryption, or verification
      */
-    @org.junit.Test
+    @Test
     public void testSigningEncryption() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         WSSecSignature sign = new WSSecSignature();
@@ -238,7 +239,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
      * As the encryption adds a wsu:Id to the encrypted element, this test checks that
      * verification still works ok.
      */
-    @org.junit.Test
+    @Test
     public void testWSS198() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         WSSecSignature sign = new WSSecSignature();
@@ -277,7 +278,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
      * @throws Exception Thrown when there is any problem in signing, encryption,
      *                   decryption, or verification
      */
-    @org.junit.Test
+    @Test
     public void testSigningEncryptionIS3DES() throws Exception {
         WSSecEncrypt encrypt = new WSSecEncrypt();
         encrypt.setUserInfo("wss40");
@@ -313,7 +314,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
      * put into the Encrypted Key, as a child of the EncryptedKey. Signature is created
      * using the encrypted key.
      */
-    @org.junit.Test
+    @Test
     public void testEncryptedKeySignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         LOG.info("Before Sign/Encryption....");
@@ -355,7 +356,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         verify(encryptedSignedDoc);
     }
 
-    @org.junit.Test
+    @Test
     public void testEncryptionSigningHandler() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -400,7 +401,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         newEngine.processSecurityHeader(doc, reqData);
     }
 
-    @org.junit.Test
+    @Test
     public void testSigningEncryptionHandler() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();

@@ -52,6 +52,8 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.str.STRParser.REFERENCE_TYPE;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
+import org.junit.Before;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -88,7 +90,7 @@ public class EncryptionTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is a problem in setup
      */
-    @org.junit.Before
+    @Before
     public void setUp() throws Exception {
         KeyGenerator keyGen = KeyGenerator.getInstance("AES");
         keyGen.init(128);
@@ -105,7 +107,7 @@ public class EncryptionTest extends org.junit.Assert {
      *
      * @throws Exception Thrown when there is any problem in signing or verification
      */
-    @org.junit.Test
+    @Test
     public void testEncryptionDecryptionRSA15() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
@@ -183,7 +185,7 @@ public class EncryptionTest extends org.junit.Assert {
      *
      * @throws Exception Thrown when there is any problem in signing or verification
      */
-    @org.junit.Test
+    @Test
     public void testEncryptionDecryptionOAEP() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
@@ -225,7 +227,7 @@ public class EncryptionTest extends org.junit.Assert {
      *             Thrown when there is any problem in encryption or
      *             verification
      */
-    @org.junit.Test
+    @Test
     public void testEncryptionEncryption() throws Exception {
         Crypto encCrypto = CryptoFactory.getInstance();
         WSSecEncrypt encrypt = new WSSecEncrypt();
@@ -264,7 +266,7 @@ public class EncryptionTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
      */
-    @org.junit.Test
+    @Test
     public void testX509EncryptionThumb() throws Exception {
         Crypto encCrypto = CryptoFactory.getInstance();
         WSSecEncrypt builder = new WSSecEncrypt();
@@ -304,7 +306,7 @@ public class EncryptionTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
      */
-    @org.junit.Test
+    @Test
     public void testX509EncryptionSHA1() throws Exception {
         Crypto encCrypto = CryptoFactory.getInstance();
         WSSecEncrypt builder = new WSSecEncrypt();
@@ -335,7 +337,7 @@ public class EncryptionTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
      */
-    @org.junit.Test
+    @Test
     public void testEncryptionSHA1Symmetric() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
@@ -370,7 +372,7 @@ public class EncryptionTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
      */
-    @org.junit.Test
+    @Test
     public void testEncryptionSHA1SymmetricBytes() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
@@ -407,7 +409,7 @@ public class EncryptionTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in encryption or decryption
      */
-    @org.junit.Test
+    @Test
     public void testEncryptionSHA1SymmetricBytesHandler() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -450,7 +452,7 @@ public class EncryptionTest extends org.junit.Assert {
      *
      * Refer to OASIS WS Security spec 1.1, chap 7.7
      */
-    @org.junit.Test
+    @Test
     public void testEncryptionDecryptionRSA15STR() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
@@ -519,7 +521,7 @@ public class EncryptionTest extends org.junit.Assert {
     }
 
 
-    @org.junit.Test
+    @Test
     public void testBadAttribute() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
@@ -591,7 +593,7 @@ public class EncryptionTest extends org.junit.Assert {
      * In this test an EncryptedKey structure is embedded in the EncryptedData structure.
      * The EncryptedKey structure refers to a certificate via the SKI_KEY_IDENTIFIER.
      */
-    @org.junit.Test
+    @Test
     public void testEmbeddedEncryptedKey() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -629,7 +631,7 @@ public class EncryptionTest extends org.junit.Assert {
      *
      * @throws Exception Thrown when there is any problem in signing or verification
      */
-    @org.junit.Test
+    @Test
     public void testEncryptionDecryptionOAEPSHA256() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
@@ -660,7 +662,7 @@ public class EncryptionTest extends org.junit.Assert {
     }
 
     // CN has a "*" in it
-    @org.junit.Test
+    @Test
     public void testEncryptionWithRegexpCert() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("regexp");

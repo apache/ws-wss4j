@@ -30,6 +30,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.str.STRParser.REFERENCE_TYPE;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 /**
@@ -59,7 +60,7 @@ public class SKISignatureTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    @org.junit.Test
+    @Test
     public void testX509SignatureDSA_SKI() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40DSA", "security");
@@ -103,7 +104,7 @@ public class SKISignatureTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    @org.junit.Test
+    @Test
     public void testX509SignatureDSA_Autodetect() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40DSA", "security");
@@ -137,7 +138,7 @@ public class SKISignatureTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    @org.junit.Test
+    @Test
     public void testX509SignatureRSA_Autodetect() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");

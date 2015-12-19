@@ -39,6 +39,7 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.utils.Base64;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -62,7 +63,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
         crypto = CryptoFactory.getInstance("wss40.properties");
     }
 
-    @org.junit.Test
+    @Test
     public void testEncryption() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
@@ -96,7 +97,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testEncryptionKeyTransportRSA15() throws Exception {
 
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
@@ -133,7 +134,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
         verify(securityHeader, algorithmSuite, wssCrypto);
     }
 
-    @org.junit.Test
+    @Test
     public void testEncryptionKeyTransportRSA15NoAlgorithmSuite() throws Exception {
 
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
@@ -176,7 +177,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
         secEngine.processSecurityHeader(securityHeader, data);
     }
 
-    @org.junit.Test
+    @Test
     public void testEncryptionMethodAES128() throws Exception {
 
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
@@ -212,7 +213,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
         verify(securityHeader, algorithmSuite, wssCrypto);
     }
 
-    @org.junit.Test
+    @Test
     public void testSymmetricEncryption() throws Exception {
 
         KeyGenerator keyGen = KeyGenerator.getInstance("AES");

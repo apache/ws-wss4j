@@ -49,6 +49,7 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecDKSign;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 /**
@@ -77,7 +78,7 @@ public class SamlTokenDerivedTest extends org.junit.Assert {
      * Test that creates, sends and processes a signed SAML 1.1 authentication assertion
      * using a derived key.
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML1AuthnAssertionDerived() throws Exception {
         //

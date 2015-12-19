@@ -245,8 +245,9 @@ public class WSSConstants extends XMLSecurityConstants {
         private static final Map<String, UsernameTokenPasswordType> lookup = new HashMap<>();
 
         static {
-            for (UsernameTokenPasswordType u : EnumSet.allOf(UsernameTokenPasswordType.class))
+            for (UsernameTokenPasswordType u : EnumSet.allOf(UsernameTokenPasswordType.class)) {
                 lookup.put(u.getNamespace(), u);
+            }
         }
 
         UsernameTokenPasswordType(String namespace) {

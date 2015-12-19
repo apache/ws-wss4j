@@ -34,6 +34,7 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -62,7 +63,7 @@ public class SignatureCertConstraintsTest extends org.junit.Assert {
     /**
      * The test uses the BinarySecurityToken key identifier type.
      */
-    @org.junit.Test
+    @Test
     public void testBSTSignature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");
@@ -96,7 +97,7 @@ public class SignatureCertConstraintsTest extends org.junit.Assert {
     /**
      * The test uses the BinarySecurityToken key identifier type.
      */
-    @org.junit.Test
+    @Test
     public void testBSTSignaturePKIPath() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");

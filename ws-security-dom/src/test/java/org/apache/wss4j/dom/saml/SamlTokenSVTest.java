@@ -42,6 +42,7 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecHeader;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 import java.util.Collections;
@@ -72,7 +73,7 @@ public class SamlTokenSVTest extends org.junit.Assert {
     /**
      * Test that creates, sends and processes a signed SAML 1.1 authentication assertion.
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML1AuthnAssertion() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
@@ -132,7 +133,7 @@ public class SamlTokenSVTest extends org.junit.Assert {
     /**
      * Test that creates, sends and processes a signed SAML 1.1 attribute assertion.
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML1AttrAssertion() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
@@ -192,7 +193,7 @@ public class SamlTokenSVTest extends org.junit.Assert {
     /**
      * Test that creates, sends and processes a signed SAML 2 authentication assertion.
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML2AuthnAssertion() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
@@ -252,7 +253,7 @@ public class SamlTokenSVTest extends org.junit.Assert {
     /**
      * Test that creates, sends and processes a signed SAML 2 attribute assertion.
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML2AttrAssertion() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
@@ -315,7 +316,7 @@ public class SamlTokenSVTest extends org.junit.Assert {
      *
      * https://issues.apache.org/jira/browse/WSS-62
      */
-    @org.junit.Test
+    @Test
     public void testWSS62() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.ATTR);

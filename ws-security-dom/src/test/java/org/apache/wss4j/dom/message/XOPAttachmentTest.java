@@ -47,6 +47,7 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -99,7 +100,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
     // the SOAP Body. Then replace the encrypted SOAP Body with a xop:Include to the attachment,
     // and modify the request to remove the encryption stuff pointing to the attachment.
     // (NOTE: This test was before we supported creating requests with xop:Include)
-    @org.junit.Test
+    @Test
     public void testManualEncryptedSOAPBody() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecEncrypt encrypt = new WSSecEncrypt();
@@ -186,7 +187,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
         assertTrue(processedDoc.contains(SOAP_BODY));
     }
 
-    @org.junit.Test
+    @Test
     public void testEncryptedSOAPBody() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecEncrypt encrypt = new WSSecEncrypt();
@@ -224,7 +225,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
     }
 
     // Here we are storing the BinarySecurityToken bytes in an attachment
-    @org.junit.Test
+    @Test
     public void testSignedSOAPBody() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -256,7 +257,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
         verify(signedDoc, inboundAttachmentCallback);
     }
 
-    @org.junit.Test
+    @Test
     public void testSignedSOAPBodyAndBinarySecurityToken() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -289,7 +290,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
         verify(signedDoc, inboundAttachmentCallback);
     }
 
-    @org.junit.Test
+    @Test
     public void testEncryptedHeaderAsEncryptedData() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAP_HEADER_MSG);
         WSSecEncrypt encrypt = new WSSecEncrypt();
@@ -327,7 +328,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
         verify(encryptedDoc, inboundAttachmentCallback);
     }
 
-    @org.junit.Test
+    @Test
     public void testEncryptedHeaderasEncryptedHeader() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAP_HEADER_MSG);
         WSSecEncrypt encrypt = new WSSecEncrypt();
@@ -364,7 +365,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
         verify(encryptedDoc, inboundAttachmentCallback);
     }
 
-    @org.junit.Test
+    @Test
     public void testDerivedEncryptedSOAPBody() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -414,7 +415,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
         assertTrue(processedDoc.contains(SOAP_BODY));
     }
 
-    @org.junit.Test
+    @Test
     public void testDerivedSignedSOAPBody() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -462,7 +463,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
         assertTrue(processedDoc.contains(SOAP_BODY));
     }
 
-    @org.junit.Test
+    @Test
     public void testSignedEncryptedSOAPBody() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -507,7 +508,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
         assertTrue(processedDoc.contains(SOAP_BODY));
     }
 
-    @org.junit.Test
+    @Test
     public void testSignedEncryptedSOAPBodyViaHandler() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -557,7 +558,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
         assertTrue(processedDoc.contains(SOAP_BODY));
     }
 
-    @org.junit.Test
+    @Test
     public void testEncryptedSignedSOAPBodyViaHandler() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();

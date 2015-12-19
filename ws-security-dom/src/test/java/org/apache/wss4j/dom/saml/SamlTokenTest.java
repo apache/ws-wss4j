@@ -71,6 +71,7 @@ import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.keys.content.X509Data;
 import org.joda.time.DateTime;
+import org.junit.Test;
 import org.opensaml.core.xml.XMLObjectBuilder;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
@@ -106,7 +107,7 @@ public class SamlTokenTest extends org.junit.Assert {
     /**
      * Test that creates, sends and processes an unsigned SAML 1.1 authentication assertion.
      */
-    @org.junit.Test
+    @Test
     public void testSAML1AuthnAssertion() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -129,7 +130,7 @@ public class SamlTokenTest extends org.junit.Assert {
      * It set a DOM Element on the CallbackHandler rather than creating a set of beans for
      * SamlAssertionWrapper to parse.
      */
-    @org.junit.Test
+    @Test
     public void testSAML1AuthnAssertionViaElement() throws Exception {
         SAMLElementCallbackHandler callbackHandler = new SAMLElementCallbackHandler();
         callbackHandler.setIssuer("www.example.com");
@@ -149,7 +150,7 @@ public class SamlTokenTest extends org.junit.Assert {
     /**
      * Test that creates, sends and processes an unsigned SAML 1.1 attribute assertion.
      */
-    @org.junit.Test
+    @Test
     public void testSAML1AttrAssertion() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.ATTR);
@@ -169,7 +170,7 @@ public class SamlTokenTest extends org.junit.Assert {
     /**
      * Test that creates, sends and processes an unsigned SAML 1.1 authorization assertion.
      */
-    @org.junit.Test
+    @Test
     public void testSAML1AuthzAssertion() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHZ);
@@ -190,7 +191,7 @@ public class SamlTokenTest extends org.junit.Assert {
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion.
      */
-    @org.junit.Test
+    @Test
     public void testSAML2AuthnAssertion() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -210,7 +211,7 @@ public class SamlTokenTest extends org.junit.Assert {
     /**
      * Test that creates, sends and processes an unsigned SAML 2 attribute assertion.
      */
-    @org.junit.Test
+    @Test
     public void testSAML2AttrAssertion() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.ATTR);
@@ -230,7 +231,7 @@ public class SamlTokenTest extends org.junit.Assert {
     /**
      * Test that creates, sends and processes an unsigned SAML 2 authorization assertion.
      */
-    @org.junit.Test
+    @Test
     public void testSAML2AuthzAssertion() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHZ);
@@ -252,7 +253,7 @@ public class SamlTokenTest extends org.junit.Assert {
      * This test checks that an unsigned SAML1 sender-vouches authentication assertion
      * can be created by the WSHandler implementation
      */
-    @org.junit.Test
+    @Test
     public void testSaml1Action() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -293,7 +294,7 @@ public class SamlTokenTest extends org.junit.Assert {
      * The issuer is different from what the custom Validator is expecting, so it throws an
      * exception.
      */
-    @org.junit.Test
+    @Test
     public void testSAML1AuthnBadIssuerAssertion() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -307,7 +308,7 @@ public class SamlTokenTest extends org.junit.Assert {
      * The issuer is different from what the custom Validator is expecting, so it throws an
      * exception.
      */
-    @org.junit.Test
+    @Test
     public void testSAML2AuthnBadIssuerAssertion() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -320,7 +321,7 @@ public class SamlTokenTest extends org.junit.Assert {
      * Test that creates, sends and processes an unsigned SAML 1.1 authentication assertion with
      * a user-specified SubjectNameIDFormat.
      */
-    @org.junit.Test
+    @Test
     public void testSAML1SubjectNameIDFormat() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -361,7 +362,7 @@ public class SamlTokenTest extends org.junit.Assert {
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion with
      * a user-specified SubjectNameIDFormat.
      */
-    @org.junit.Test
+    @Test
     public void testSAML2SubjectNameIDFormat() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -402,7 +403,7 @@ public class SamlTokenTest extends org.junit.Assert {
      * Test that creates, sends and processes an unsigned SAML 1.1 authentication assertion with
      * a user-specified SubjectLocality statement.
      */
-    @org.junit.Test
+    @Test
     public void testSAML1SubjectLocality() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -444,7 +445,7 @@ public class SamlTokenTest extends org.junit.Assert {
      * Test that creates, sends and processes an unsigned SAML 2.0 authentication assertion with
      * a user-specified SessionNotOnOrAfter DateTime.
      */
-    @org.junit.Test
+    @Test
     public void testSAML2SessionNotOnOrAfter() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -485,7 +486,7 @@ public class SamlTokenTest extends org.junit.Assert {
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion with
      * a user-specified SubjectLocality statement.
      */
-    @org.junit.Test
+    @Test
     public void testSAML2SubjectLocality() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -527,7 +528,7 @@ public class SamlTokenTest extends org.junit.Assert {
      * Test that creates, sends and processes an unsigned SAML 1.1 authorization assertion
      * with a Resource URI.
      */
-    @org.junit.Test
+    @Test
     public void testSAML1Resource() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHZ);
@@ -568,7 +569,7 @@ public class SamlTokenTest extends org.junit.Assert {
      * Test that creates, sends and processes an unsigned SAML 2 attribute assertion. The attributeValue
      * has a custom XMLObject (not a String) value.
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML2AttrAssertionCustomAttribute() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
@@ -628,7 +629,7 @@ public class SamlTokenTest extends org.junit.Assert {
      * Test that creates, sends and processes an unsigned SAML 2 attribute assertion. The attributeValue
      * has a custom XMLObject (xsd:type="xsd:int") value.
      */
-    @org.junit.Test
+    @Test
     @SuppressWarnings("unchecked")
     public void testSAML2AttrAssertionIntegerAttribute() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
@@ -662,7 +663,7 @@ public class SamlTokenTest extends org.junit.Assert {
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion with
      * SubjectConfirmationData information.
      */
-    @org.junit.Test
+    @Test
     public void testSAML2SubjectConfirmationData() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -709,7 +710,7 @@ public class SamlTokenTest extends org.junit.Assert {
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion, which
      * is encrypted in a saml2:EncryptedAssertion Element in the security header
      */
-    @org.junit.Test
+    @Test
     public void testSAML2EncryptedAssertion() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -773,7 +774,7 @@ public class SamlTokenTest extends org.junit.Assert {
         assertTrue(actionResult != null);
     }
 
-    @org.junit.Test
+    @Test
     public void testSAML2EncryptedAssertionNoSTR() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -847,7 +848,7 @@ public class SamlTokenTest extends org.junit.Assert {
         assertTrue(actionResult != null);
     }
 
-    @org.junit.Test
+    @Test
     public void testAssertionWrapper() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -872,7 +873,7 @@ public class SamlTokenTest extends org.junit.Assert {
         assertEquals(assertionString, secondAssertionString);
     }
 
-    @org.junit.Test
+    @Test
     public void testAssertionWrapperNoDocument() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -897,7 +898,7 @@ public class SamlTokenTest extends org.junit.Assert {
         assertEquals(assertionString, secondAssertionString);
     }
 
-    @org.junit.Test
+    @Test
     public void testRequiredSubjectConfirmationMethod() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -950,7 +951,7 @@ public class SamlTokenTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testStandardSubjectConfirmationMethod() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -992,7 +993,7 @@ public class SamlTokenTest extends org.junit.Assert {
         newEngine.processSecurityHeader(doc, requestData);
     }
 
-    @org.junit.Test
+    @Test
     public void testUnsignedBearer() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -1034,7 +1035,7 @@ public class SamlTokenTest extends org.junit.Assert {
         newEngine.processSecurityHeader(doc, requestData);
     }
 
-    @org.junit.Test
+    @Test
     public void testSAML2Advice() throws Exception {
         // Create a "Advice" Element first
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
@@ -1082,7 +1083,7 @@ public class SamlTokenTest extends org.junit.Assert {
         assertFalse(receivedSamlAssertion.isSigned());
     }
 
-    @org.junit.Test
+    @Test
     public void testSAML2SpecialCharacter() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.ATTR);
@@ -1127,7 +1128,7 @@ public class SamlTokenTest extends org.junit.Assert {
         assertFalse(receivedSamlAssertion.isSigned());
     }
 
-    @org.junit.Test
+    @Test
     public void testSAML2IssuerFormat() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);

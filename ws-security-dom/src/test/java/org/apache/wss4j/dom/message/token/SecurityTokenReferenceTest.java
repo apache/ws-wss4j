@@ -31,6 +31,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.engine.WSSConfig;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -53,7 +54,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
     /**
      * Test for a Reference with no URI
      */
-    @org.junit.Test
+    @Test
     public void testReferenceNoURI() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -82,7 +83,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
     /**
      * Test for a SecurityTokenReference having multiple data references
      */
-    @org.junit.Test
+    @Test
     public void testMultipleChildren() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -117,7 +118,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
     /**
      * Test for a SecurityTokenReference having a Key Identifier with no ValueType
      */
-    @org.junit.Test
+    @Test
     public void testKeyIdentifierNoValueType() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -146,7 +147,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
     /**
      * Test for a SecurityTokenReference having a Key Identifier with a bad EncodingType
      */
-    @org.junit.Test
+    @Test
     public void testKeyIdentifierBadEncodingType() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -181,7 +182,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
     /**
      * Test for a SecurityTokenReference having a Key Identifier with no EncodingType
      */
-    @org.junit.Test
+    @Test
     public void testKeyIdentifierNoEncodingType() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -215,7 +216,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
      * Test for a SecurityTokenReference having a Key Identifier with no EncodingType, but
      * it should pass as the ValueType is for a SAML Assertion.
      */
-    @org.junit.Test
+    @Test
     public void testKeyIdentifierSAMLNoEncodingType() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -241,7 +242,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
      * Test for a SecurityTokenReference having an Embedded Child, which in turn has a
      * SecurityTokenReference child.
      */
-    @org.junit.Test
+    @Test
     public void testEmbeddedSTRChild() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -277,7 +278,7 @@ public class SecurityTokenReferenceTest extends org.junit.Assert {
      * Test for a SecurityTokenReference having an Embedded Child, which has multiple
      * children.
      */
-    @org.junit.Test
+    @Test
     public void testMultipleEmbeddedChildren() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 

@@ -36,6 +36,8 @@ import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.junit.Before;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 import java.util.ArrayList;
@@ -72,12 +74,12 @@ public class EncryptionGCMTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is a problem in setup
      */
-    @org.junit.Before
+    @Before
     public void setUp() throws Exception {
         secEngine.setWssConfig(WSSConfig.getNewInstance());
     }
 
-    @org.junit.Test
+    @Test
     public void testAES128GCM() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
@@ -98,7 +100,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
         verify(encryptedDoc, keystoreCallbackHandler, SOAP_BODY);
     }
 
-    @org.junit.Test
+    @Test
     public void testAES256GCM() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
@@ -119,7 +121,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
         verify(encryptedDoc, keystoreCallbackHandler, SOAP_BODY);
     }
 
-    @org.junit.Test
+    @Test
     public void testAES192GCM_RSAOAEP_SHA256_MGFSHA256() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");

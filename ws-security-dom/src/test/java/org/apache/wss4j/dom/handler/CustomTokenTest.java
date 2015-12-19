@@ -39,6 +39,7 @@ import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
 import org.apache.wss4j.dom.message.token.Timestamp;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -56,7 +57,7 @@ public class CustomTokenTest extends org.junit.Assert {
     }
 
     // Add a Timestamp via a "Custom Token"
-    @org.junit.Test
+    @Test
     public void testCustomTokenTimestamp() throws Exception {
         // Create a Timestamp manually
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

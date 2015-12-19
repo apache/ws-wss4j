@@ -49,6 +49,7 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
 import org.joda.time.DateTime;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 /**
@@ -75,7 +76,7 @@ public class SamlConditionsTest extends org.junit.Assert {
      * Test that creates, sends and processes an unsigned SAML 1.1 authentication assertion
      * with a custom Conditions statement.
      */
-    @org.junit.Test
+    @Test
     public void testSAML1Conditions() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -94,7 +95,7 @@ public class SamlConditionsTest extends org.junit.Assert {
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with an (invalid) custom Conditions statement.
      */
-    @org.junit.Test
+    @Test
     public void testSAML2InvalidAfterConditions() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -109,7 +110,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         createAndVerifyMessage(callbackHandler, false);
     }
 
-    @org.junit.Test
+    @Test
     public void testSAML2StaleNotOnOrAfter() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -124,7 +125,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         createAndVerifyMessage(callbackHandler, false);
     }
 
-    @org.junit.Test
+    @Test
     public void testSAML2FutureNotBefore() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -139,7 +140,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         createAndVerifyMessage(callbackHandler, false);
     }
 
-    @org.junit.Test
+    @Test
     public void testSAML2FutureIssueInstant() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -176,7 +177,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testSAML2StaleIssueInstant() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -214,7 +215,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testSAML2StaleIssueInstantButWithNotOnOrAfter() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -250,7 +251,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         verify(unsignedDoc);
     }
 
-    @org.junit.Test
+    @Test
     public void testSAML1StaleIssueInstant() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -292,7 +293,7 @@ public class SamlConditionsTest extends org.junit.Assert {
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with an (invalid) custom Conditions statement.
      */
-    @org.junit.Test
+    @Test
     public void testSAML2InvalidBeforeConditions() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -311,7 +312,7 @@ public class SamlConditionsTest extends org.junit.Assert {
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with a Conditions statement that has a NotBefore "in the future".
      */
-    @org.junit.Test
+    @Test
     public void testSAML2FutureTTLConditions() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -330,7 +331,7 @@ public class SamlConditionsTest extends org.junit.Assert {
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with a OneTimeUse Element
      */
-    @org.junit.Test
+    @Test
     public void testSAML2OneTimeUse() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -368,7 +369,7 @@ public class SamlConditionsTest extends org.junit.Assert {
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with a ProxyRestriction Element
      */
-    @org.junit.Test
+    @Test
     public void testSAML2ProxyRestriction() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -412,7 +413,7 @@ public class SamlConditionsTest extends org.junit.Assert {
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with an AudienceRestriction Element
      */
-    @org.junit.Test
+    @Test
     public void testSAML2AudienceRestriction() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -452,7 +453,7 @@ public class SamlConditionsTest extends org.junit.Assert {
     }
 
     // Now test AudienceRestrictions with supplied restrictions
-    @org.junit.Test
+    @Test
     public void testSAML2AudienceRestrictionVerification() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -512,7 +513,7 @@ public class SamlConditionsTest extends org.junit.Assert {
     }
 
     // Now test AudienceRestrictions with supplied restrictions
-    @org.junit.Test
+    @Test
     public void testSAML1AudienceRestrictionVerification() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -575,7 +576,7 @@ public class SamlConditionsTest extends org.junit.Assert {
      * Test that creates, sends and processes an unsigned SAML 2 authentication assertion
      * with two AudienceRestriction Elements
      */
-    @org.junit.Test
+    @Test
     public void testSAML2AudienceRestrictionSeparateRestrictions() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -620,7 +621,7 @@ public class SamlConditionsTest extends org.junit.Assert {
     }
 
     // Now test AudienceRestrictions with supplied restrictions
-    @org.junit.Test
+    @Test
     public void testSAML2AudienceRestrictionSeparateRestrictionsValidation() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -684,7 +685,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         newEngine.processSecurityHeader(doc, data);
     }
 
-    @org.junit.Test
+    @Test
     public void testSAML2Delegate() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);

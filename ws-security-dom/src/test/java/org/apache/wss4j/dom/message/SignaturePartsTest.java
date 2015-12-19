@@ -43,6 +43,7 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.saml.SignedSamlTokenHOKTest;
 import org.apache.wss4j.dom.saml.WSSecSignatureSAML;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -96,7 +97,7 @@ public class SignaturePartsTest extends org.junit.Assert {
      * Test signing a custom SOAP header
      */
     @SuppressWarnings("unchecked")
-    @org.junit.Test
+    @Test
     public void testSOAPHeader() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -154,7 +155,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         assertTrue(WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(transformAlgorithms.get(0)));
     }
 
-    @org.junit.Test
+    @Test
     public void testOptionalSOAPHeaderPresent() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -192,7 +193,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         verify(signedDoc);
     }
 
-    @org.junit.Test
+    @Test
     public void testOptionalSOAPHeaderNotPresent() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -230,7 +231,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         verify(signedDoc);
     }
 
-    @org.junit.Test
+    @Test
     public void testRequiredSOAPHeaderNotPresent() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -268,7 +269,7 @@ public class SignaturePartsTest extends org.junit.Assert {
      * Test signing of a header through a STR Dereference Transform
      */
     @SuppressWarnings("unchecked")
-    @org.junit.Test
+    @Test
     public void testSOAPHeaderSTRTransform() throws Exception {
         // Construct issuer and user crypto instances
         Crypto issuerCrypto = new Merlin();
@@ -347,7 +348,7 @@ public class SignaturePartsTest extends org.junit.Assert {
     /**
      * Test signing a custom SOAP header with a bad localname
      */
-    @org.junit.Test
+    @Test
     public void testBadLocalname() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -376,7 +377,7 @@ public class SignaturePartsTest extends org.junit.Assert {
     /**
      * Test signing a custom SOAP header with a bad namespace
      */
-    @org.junit.Test
+    @Test
     public void testBadNamespace() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -405,7 +406,7 @@ public class SignaturePartsTest extends org.junit.Assert {
     /**
      * Test signing a custom SOAP header and the SOAP body
      */
-    @org.junit.Test
+    @Test
     public void testSOAPHeaderAndBody() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -475,7 +476,7 @@ public class SignaturePartsTest extends org.junit.Assert {
     /**
      * Test getting a DOM Element from WSEncryptionPart directly
      */
-    @org.junit.Test
+    @Test
     public void testSignaturePartDOMElement() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -525,7 +526,7 @@ public class SignaturePartsTest extends org.junit.Assert {
     /**
      * Test signing two SOAP Body elements with the same QName.
      */
-    @org.junit.Test
+    @Test
     public void testMultipleElements() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG_MULTIPLE);
         WSSecSignature sign = new WSSecSignature();

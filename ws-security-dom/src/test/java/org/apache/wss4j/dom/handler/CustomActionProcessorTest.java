@@ -35,6 +35,7 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 import java.util.Collections;
@@ -63,7 +64,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
      * Test to see that a custom processor configured through a
      * WSSConfig instance is called
      */
-    @org.junit.Test
+    @Test
     public void
     testCustomUserProcessor() throws Exception {
         WSSecSignature builder = new WSSecSignature();
@@ -108,7 +109,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
      * Test to see that a custom processor (object) configured through a
      * WSSConfig instance is called
      */
-    @org.junit.Test
+    @Test
     public void
     testCustomUserProcessorObject() throws Exception {
         WSSecSignature builder = new WSSecSignature();
@@ -151,7 +152,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
      * Test to see that a custom action configured through a
      * WSSConfig instance is called
      */
-    @org.junit.Test
+    @Test
     public void
     testCustomAction() throws Exception {
 
@@ -178,7 +179,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
      * Test to see that a custom action object configured through a
      * WSSConfig instance is called
      */
-    @org.junit.Test
+    @Test
     public void
     testCustomActionObject() throws Exception {
 
@@ -205,7 +206,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
      * Test to see that a custom action can be configured via WSSecurityUtil.decodeAction.
      * A standard Timestamp action is also configured.
      */
-    @org.junit.Test
+    @Test
     public void
     testDecodeCustomAction() throws Exception {
 

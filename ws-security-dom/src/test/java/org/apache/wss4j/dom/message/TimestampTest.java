@@ -42,6 +42,7 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.Timestamp;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.wss4j.dom.validate.NoOpValidator;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -61,7 +62,7 @@ public class TimestampTest extends org.junit.Assert {
     /**
      * This is a test for processing a valid Timestamp.
      */
-    @org.junit.Test
+    @Test
     public void testValidTimestamp() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -99,7 +100,7 @@ public class TimestampTest extends org.junit.Assert {
     /**
      * This is a test for processing a valid Timestamp with no expires element
      */
-    @org.junit.Test
+    @Test
     public void testValidTimestampNoExpires() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -129,7 +130,7 @@ public class TimestampTest extends org.junit.Assert {
         assertTrue(receivedTimestamp != null);
     }
 
-    @org.junit.Test
+    @Test
     public void testInvalidTimestampNoExpires() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -176,7 +177,7 @@ public class TimestampTest extends org.junit.Assert {
     /**
      * This is a test for processing an expired Timestamp.
      */
-    @org.junit.Test
+    @Test
     public void testExpiredTimestamp() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -206,7 +207,7 @@ public class TimestampTest extends org.junit.Assert {
      * This is a test for processing an "old" Timestamp, i.e. one with a "Created" element that is
      * out of date
      */
-    @org.junit.Test
+    @Test
     public void testOldTimestamp() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -242,7 +243,7 @@ public class TimestampTest extends org.junit.Assert {
      * future. It should be accepted by default when it is created 30 seconds in the future,
      * and then rejected once we configure "0 seconds" for future-time-to-live.
      */
-    @org.junit.Test
+    @Test
     public void testNearFutureCreated() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -290,7 +291,7 @@ public class TimestampTest extends org.junit.Assert {
      * This is a test for processing an Timestamp where the "Created" element is in the future.
      * A Timestamp that is 120 seconds in the future should be rejected by default.
      */
-    @org.junit.Test
+    @Test
     public void testFutureCreated() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -336,7 +337,7 @@ public class TimestampTest extends org.junit.Assert {
      * This is a test for processing an Timestamp where the "Created" element is greater than
      * the expiration time.
      */
-    @org.junit.Test
+    @Test
     public void testExpiresBeforeCreated() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -390,7 +391,7 @@ public class TimestampTest extends org.junit.Assert {
     /**
      * This is a test for processing multiple Timestamps in the security header
      */
-    @org.junit.Test
+    @Test
     public void testMultipleTimestamps() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -428,7 +429,7 @@ public class TimestampTest extends org.junit.Assert {
      * This is a test for processing an Timestamp where it contains multiple "Created" elements.
      * This Timestamp should be rejected.
      */
-    @org.junit.Test
+    @Test
     public void testMultipleCreated() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -474,7 +475,7 @@ public class TimestampTest extends org.junit.Assert {
      * This is a test for processing an Timestamp where it contains no "Created" element.
      * This Timestamp should be rejected.
      */
-    @org.junit.Test
+    @Test
     public void testNoCreated() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -524,7 +525,7 @@ public class TimestampTest extends org.junit.Assert {
      * This is a test for processing an Timestamp where it contains multiple "Expires" elements.
      * This Timestamp should be rejected.
      */
-    @org.junit.Test
+    @Test
     public void testMultipleExpires() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -581,7 +582,7 @@ public class TimestampTest extends org.junit.Assert {
      * This is a test for processing an Timestamp where it contains an "Expires" element before
      * the Created element. This Timestamp should be rejected as per the BSP spec.
      */
-    @org.junit.Test
+    @Test
     public void testExpiresInFrontOfCreated() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -636,7 +637,7 @@ public class TimestampTest extends org.junit.Assert {
      * This is a test for processing an Timestamp where it contains a Created element with
      * seconds > 60. This should be rejected as per the BSP spec.
      */
-    @org.junit.Test
+    @Test
     public void testCreatedSeconds() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -681,7 +682,7 @@ public class TimestampTest extends org.junit.Assert {
      * This is a test for processing an Timestamp where it contains a Created element with
      * a ValueType. This should be rejected as per the BSP spec.
      */
-    @org.junit.Test
+    @Test
     public void testCreatedValueType() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -734,7 +735,7 @@ public class TimestampTest extends org.junit.Assert {
      * This is a test for processing an Timestamp where it contains a CustomElement. This should
      * be rejected as per the BSP spec.
      */
-    @org.junit.Test
+    @Test
     public void testCustomElement() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -793,7 +794,7 @@ public class TimestampTest extends org.junit.Assert {
     /**
      * This is a test to create a "Spoofed" Timestamp (see WSS-441)
      */
-    @org.junit.Test
+    @Test
     public void testSpoofedTimestamp() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -833,7 +834,7 @@ public class TimestampTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testTimestampNoMilliseconds() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -860,7 +861,7 @@ public class TimestampTest extends org.junit.Assert {
         assertTrue(actionResult != null);
     }
 
-    @org.junit.Test
+    @Test
     public void testThaiLocaleVerification() throws Exception {
 
         Locale defaultLocale = Locale.getDefault();

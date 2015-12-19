@@ -51,6 +51,7 @@ import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 /**
@@ -70,7 +71,7 @@ public class ValidatorTest extends org.junit.Assert {
     /**
      * This is a test for processing an expired Timestamp.
      */
-    @org.junit.Test
+    @Test
     public void testExpiredTimestamp() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
@@ -104,7 +105,7 @@ public class ValidatorTest extends org.junit.Assert {
     /**
      * Test for processing an untrusted signature
      */
-    @org.junit.Test
+    @Test
     public void testUntrustedSignature() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("wss40", "security");
@@ -148,7 +149,7 @@ public class ValidatorTest extends org.junit.Assert {
     /**
      * Test that adds a UserNameToken with (bad) password text to a WS-Security envelope
      */
-    @org.junit.Test
+    @Test
     public void testUsernameTokenBadText() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
@@ -183,7 +184,7 @@ public class ValidatorTest extends org.junit.Assert {
      * In this test, a BinarySecurityToken is added to the SOAP header. A custom processor
      * validates the BST and transforms it into a SAML Assertion.
      */
-    @org.junit.Test
+    @Test
     public void testTransformedBST() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -232,7 +233,7 @@ public class ValidatorTest extends org.junit.Assert {
      * The second time, a custom Validator (NoOpValidator for this case) is installed for the
      * BST, and so trust verification passes on the Signature.
      */
-    @org.junit.Test
+    @Test
     public void testValidatedBSTSignature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");

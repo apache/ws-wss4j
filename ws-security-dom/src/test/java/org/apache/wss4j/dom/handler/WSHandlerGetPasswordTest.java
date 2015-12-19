@@ -27,6 +27,7 @@ import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.common.UsernamePasswordCallbackHandler;
 import org.apache.wss4j.dom.engine.WSSConfig;
+import org.junit.Test;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.w3c.dom.Document;
@@ -51,7 +52,7 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
      * A unit test for WSHandler.getPassword(...), where the password is obtained
      * from the Message Context.
      */
-    @org.junit.Test
+    @Test
     public void
     testGetPasswordRequestContextUnit() throws Exception {
 
@@ -76,7 +77,7 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
      * A WSHandler test for WSHandler.getPassword(...), where the password is obtained
      * from the Message Context.
      */
-    @org.junit.Test
+    @Test
     public void
     testGetPasswordRequestContext() throws Exception {
 
@@ -114,7 +115,7 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
      * A test for WSHandler.getPassword(...), where the password is obtained from a
      * Callback Handler, which is placed on the Message Context using a reference.
      */
-    @org.junit.Test
+    @Test
     public void
     testGetPasswordCallbackHandlerRef() throws Exception {
 

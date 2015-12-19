@@ -47,6 +47,7 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.str.STRParser.REFERENCE_TYPE;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -79,7 +80,7 @@ public class SignatureTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    @org.junit.Test
+    @Test
     public void testX509SignatureIS() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -108,7 +109,7 @@ public class SignatureTest extends org.junit.Assert {
         assertTrue(referenceType == REFERENCE_TYPE.ISSUER_SERIAL);
     }
 
-    @org.junit.Test
+    @Test
     public void testX509SignatureISAttached() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -145,7 +146,7 @@ public class SignatureTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    @org.junit.Test
+    @Test
     public void testDoubleX509SignatureIS() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -163,7 +164,7 @@ public class SignatureTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    @org.junit.Test
+    @Test
     public void testIssuerSerialSignature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -189,7 +190,7 @@ public class SignatureTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    @org.junit.Test
+    @Test
     public void testSignatureInclusiveC14N() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setSigCanonicalization(WSConstants.C14N_OMIT_COMMENTS);
@@ -230,7 +231,7 @@ public class SignatureTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    @org.junit.Test
+    @Test
     public void testSignatureInclusivePrefixes() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setAddInclusivePrefixes(true);
@@ -257,7 +258,7 @@ public class SignatureTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    @org.junit.Test
+    @Test
     public void testBSTSignature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -292,7 +293,7 @@ public class SignatureTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    @org.junit.Test
+    @Test
     public void testBSTPKIPathSignature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");
@@ -322,7 +323,7 @@ public class SignatureTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    @org.junit.Test
+    @Test
     public void testX509Signature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -360,7 +361,7 @@ public class SignatureTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    @org.junit.Test
+    @Test
     public void testX509SignatureThumb() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -392,7 +393,7 @@ public class SignatureTest extends org.junit.Assert {
         assertTrue(referenceType == REFERENCE_TYPE.THUMBPRINT_SHA1);
     }
 
-    @org.junit.Test
+    @Test
     public void testX509SignatureThumbAttached() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -432,7 +433,7 @@ public class SignatureTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    @org.junit.Test
+    @Test
     public void testDoubleX509SignatureThumb() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -455,7 +456,7 @@ public class SignatureTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    @org.junit.Test
+    @Test
     public void testValidModifiedSignature() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -499,7 +500,7 @@ public class SignatureTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    @org.junit.Test
+    @Test
     public void testX509SignatureSha256() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -525,7 +526,7 @@ public class SignatureTest extends org.junit.Assert {
     /**
      * A test for "SignatureAction does not set DigestAlgorithm on WSSecSignature instance"
      */
-    @org.junit.Test
+    @Test
     public void
     testWSS170() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
@@ -575,7 +576,7 @@ public class SignatureTest extends org.junit.Assert {
      * "When a document contains a comment as its first child element,
      * wss4j will not find the SOAP body."
      */
-    @org.junit.Test
+    @Test
     public void testWSS234() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -606,7 +607,7 @@ public class SignatureTest extends org.junit.Assert {
      * Test that signs and verifies a Timestamp. The Signature element is appended to the security
      * header, and so appears after the Timestamp element.
      */
-    @org.junit.Test
+    @Test
     public void testSignedTimestamp() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -649,7 +650,7 @@ public class SignatureTest extends org.junit.Assert {
      *
      * https://issues.apache.org/jira/browse/WSS-283
      */
-    @org.junit.Test
+    @Test
     public void testWSS283() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -675,7 +676,7 @@ public class SignatureTest extends org.junit.Assert {
     /**
      * Create a signature that uses a custom SecurityTokenReference.
      */
-    @org.junit.Test
+    @Test
     public void testCustomSTR() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -706,7 +707,7 @@ public class SignatureTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    @org.junit.Test
+    @Test
     public void testX509SignatureDefaultPassword() throws Exception {
         Crypto passwordCrypto = CryptoFactory.getInstance("alice.properties");
 
@@ -734,7 +735,7 @@ public class SignatureTest extends org.junit.Assert {
      * A test for "There is an issue with the position of the <Timestamp> element in the
      * <Security> header when using WSS4J calling .NET Web Services with WS-Security."
      */
-    @org.junit.Test
+    @Test
     public void
     testWSS231() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
@@ -776,7 +777,7 @@ public class SignatureTest extends org.junit.Assert {
         assertTrue(handler.checkResults(results.getResults(), receivedActions));
     }
 
-    @org.junit.Test
+    @Test
     public void
     testSignatureEncryptTimestampOrder() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
@@ -813,7 +814,7 @@ public class SignatureTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void
     testEncryptSignatureTimestampOrder() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
@@ -850,7 +851,7 @@ public class SignatureTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testWSHandlerSignatureCanonicalization() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -895,7 +896,7 @@ public class SignatureTest extends org.junit.Assert {
                                         Collections.singletonList(WSConstants.SIGN)));
     }
 
-    @org.junit.Test
+    @Test
     public void testCommentInSOAPBody() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");

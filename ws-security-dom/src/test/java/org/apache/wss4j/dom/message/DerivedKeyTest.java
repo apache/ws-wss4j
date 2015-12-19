@@ -27,6 +27,7 @@ import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.junit.Test;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -63,7 +64,7 @@ public class DerivedKeyTest extends org.junit.Assert {
      * @throws Exception Thrown when there is any problem in signing or
      * verification
      */
-    @org.junit.Test
+    @Test
     public void testEncryptionDecryptionTRIPLEDES() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -101,7 +102,7 @@ public class DerivedKeyTest extends org.junit.Assert {
      * Test encryption using a DerivedKeyToken using AES128
      * @throws Exception Thrown when there is any problem in signing or verification
      */
-    @org.junit.Test
+    @Test
     public void testEncryptionDecryptionAES128() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -135,7 +136,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         verify(doc);
      }
 
-    @org.junit.Test
+    @Test
     public void testSignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -182,7 +183,7 @@ public class DerivedKeyTest extends org.junit.Assert {
      * which uses a Thumbprint-SHA1 reference to the encoded certificate (which is in the
      * keystore)
      */
-    @org.junit.Test
+    @Test
     public void testSignatureThumbprintSHA1() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -223,7 +224,7 @@ public class DerivedKeyTest extends org.junit.Assert {
      * which uses an SKI reference to the encoded certificate (which is in the
      * keystore)
      */
-    @org.junit.Test
+    @Test
     public void testSignatureSKI() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -258,7 +259,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         assertTrue(actionResult.get(WSSecurityEngineResult.TAG_SECRET) != null);
     }
 
-    @org.junit.Test
+    @Test
     public void testSignatureEncrypt() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -299,7 +300,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         verify(signedEncryptedDoc);
     }
 
-    @org.junit.Test
+    @Test
     public void testEncryptSignature() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);

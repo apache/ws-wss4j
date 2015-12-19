@@ -54,6 +54,7 @@ import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.transforms.params.XPath2FilterContainer;
 import org.apache.xml.security.utils.Constants;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -78,7 +79,7 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
     /**
      * Test that creates, sends and processes a signed SAML 1.1 authentication assertion.
      */
-    @org.junit.Test
+    @Test
     public void testSAML1AuthnAssertion() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -119,7 +120,7 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
     /**
      * Test that creates, sends and processes a signed SAML 2.0 authentication assertion.
      */
-    @org.junit.Test
+    @Test
     public void testSAML2AuthnAssertion() throws Exception {
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -157,7 +158,7 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
         verifyWithoutProfile(doc);
     }
 
-    @org.junit.Test
+    @Test
     public void testAddSAML1AndSign() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -197,7 +198,7 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
         verify(signedDoc);
     }
 
-    @org.junit.Test
+    @Test
     public void testAddSAML1AndSignAction() throws Exception {
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);

@@ -21,12 +21,14 @@ package org.apache.wss4j.policy.tests;
 import org.apache.neethi.*;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.RelToken;
+import org.junit.Test;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class RelTokenTest extends AbstractTestBase {
 
+    @Test
     public void testRelToken() throws Exception {
         String fileName = "RelToken.xml";
         String policyFile = loadPolicyFile("policy/model/sp12/" + fileName);

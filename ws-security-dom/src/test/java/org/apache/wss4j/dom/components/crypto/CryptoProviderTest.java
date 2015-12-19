@@ -33,6 +33,7 @@ import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.xml.security.utils.Base64;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -77,7 +78,7 @@ public class CryptoProviderTest extends org.junit.Assert {
     /**
      * Test signing a SOAP message using a cert with an OID
      */
-    @org.junit.Test
+    @Test
     public void testSignatureOID() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecSignature sign = new WSSecSignature();
@@ -100,7 +101,7 @@ public class CryptoProviderTest extends org.junit.Assert {
      * Like before but substitute in an "EMAILADDRESS" instead of the OID
      * @throws Exception
      */
-    @org.junit.Test
+    @Test
     public void testSignatureEmailAddress() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecSignature sign = new WSSecSignature();
@@ -127,7 +128,7 @@ public class CryptoProviderTest extends org.junit.Assert {
      * Like before but substitute in an "E" instead of the OID
      * @throws Exception
      */
-    @org.junit.Test
+    @Test
     public void testSignatureOtherEmailAddress() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecSignature sign = new WSSecSignature();
@@ -154,7 +155,7 @@ public class CryptoProviderTest extends org.junit.Assert {
      * Test loading a certificate using BouncyCastle, and using it to encrypt a message, but
      * decrypt the message using the Java Keystore provider
      */
-    @org.junit.Test
+    @Test
     public void testInterop() throws Exception {
         //
         // This cert corresponds to the cert in wss86.keystore
@@ -216,7 +217,7 @@ public class CryptoProviderTest extends org.junit.Assert {
      * decrypt the message using the Java Keystore provider. In this case though the cert doesn't
      * correspond with the cert in wss86.keystore.
      */
-    @org.junit.Test
+    @Test
     public void testBadInterop() throws Exception {
         byte[] certBytes =
             Base64.decode(

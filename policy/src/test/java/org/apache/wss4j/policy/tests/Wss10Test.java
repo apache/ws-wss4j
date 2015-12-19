@@ -21,12 +21,14 @@ package org.apache.wss4j.policy.tests;
 import org.apache.neethi.*;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.Wss10;
+import org.junit.Test;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class Wss10Test extends AbstractTestBase {
 
+    @Test
     public void testWss10() throws Exception {
         String fileName = "Wss10.xml";
         String policyFile = loadPolicyFile("policy/model/sp12/" + fileName);

@@ -42,8 +42,9 @@ public abstract class AbstractToken extends AbstractSecurityAssertion implements
         private static final Map<String, X509Token.DerivedKeys> lookup = new HashMap<>();
 
         static {
-            for (DerivedKeys u : EnumSet.allOf(DerivedKeys.class))
+            for (DerivedKeys u : EnumSet.allOf(DerivedKeys.class)) {
                 lookup.put(u.name(), u);
+            }
         }
 
         public static DerivedKeys lookUp(String name) {

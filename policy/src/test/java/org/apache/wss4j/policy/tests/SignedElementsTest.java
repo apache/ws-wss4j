@@ -21,12 +21,14 @@ package org.apache.wss4j.policy.tests;
 import org.apache.neethi.*;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.SignedElements;
+import org.junit.Test;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class SignedElementsTest extends AbstractTestBase {
 
+    @Test
     public void testSignedElements12() throws Exception {
         String fileName = "SignedElements.xml";
         String policyFile = loadPolicyFile("policy/model/sp12/" + fileName);
@@ -86,6 +88,7 @@ public class SignedElementsTest extends AbstractTestBase {
         assertEquals(2, signedElements.getXPaths().size());
     }
 
+    @Test
     public void testSignedElements13() throws Exception {
         String fileName = "SignedElements.xml";
         String policyFile = loadPolicyFile("policy/model/sp13/" + fileName);

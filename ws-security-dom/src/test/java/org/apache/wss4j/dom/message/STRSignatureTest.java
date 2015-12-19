@@ -22,6 +22,7 @@ package org.apache.wss4j.dom.message;
 import org.apache.wss4j.dom.SOAPConstants;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.junit.Test;
 import org.apache.wss4j.dom.common.SOAPUtil;
 import org.apache.wss4j.dom.common.SecurityTestUtil;
 import org.apache.wss4j.dom.engine.WSSConfig;
@@ -61,7 +62,7 @@ public class STRSignatureTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    @org.junit.Test
+    @Test
     public void testX509SignatureDirectSTR() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");
@@ -109,7 +110,7 @@ public class STRSignatureTest extends org.junit.Assert {
      * "Error when making a signature when containing a WSSecTimestamp"
      * A timestamp is added to the document and signed.
      */
-    @org.junit.Test
+    @Test
     public void testWSS96() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");
@@ -166,7 +167,7 @@ public class STRSignatureTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    @org.junit.Test
+    @Test
     public void testX509SignatureISSTR() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");
@@ -219,7 +220,7 @@ public class STRSignatureTest extends org.junit.Assert {
      *
      * @throws java.lang.Exception Thrown when there is any problem in signing or verification
      */
-    @org.junit.Test
+    @Test
     public void testX509SignatureSKISTR() throws Exception {
         WSSecSignature builder = new WSSecSignature();
         builder.setUserInfo("wss40", "security");

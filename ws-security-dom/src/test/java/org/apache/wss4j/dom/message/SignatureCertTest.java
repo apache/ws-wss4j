@@ -35,6 +35,7 @@ import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 import java.security.cert.X509Certificate;
@@ -90,7 +91,7 @@ public class SignatureCertTest extends org.junit.Assert {
     /**
      * Test signing a SOAP message using a BST.
      */
-    @org.junit.Test
+    @Test
     public void testSignatureDirectReference() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("wss40", "security");
@@ -119,7 +120,7 @@ public class SignatureCertTest extends org.junit.Assert {
     }
 
     //disabling this test as the certs are expired
-    @org.junit.Test
+    @Test
     @org.junit.Ignore
     public void testBSTCertChain() throws Exception {
         //
@@ -165,7 +166,7 @@ public class SignatureCertTest extends org.junit.Assert {
      * Test signing a SOAP message using a BST, sending the CA cert as well in the
      * message.
      */
-    @org.junit.Test
+    @Test
     public void testSignatureDirectReferenceCACert() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("wss40", "security");
@@ -204,7 +205,7 @@ public class SignatureCertTest extends org.junit.Assert {
      * trust-store does not contain the cert corresponding to wss40, only the CA cert
      * wss40CA.
      */
-    @org.junit.Test
+    @Test
     public void testSignatureIssuerSerial() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("wss40", "security");
@@ -235,7 +236,7 @@ public class SignatureCertTest extends org.junit.Assert {
      * Test signing a SOAP message using a BST. The signature verification passes, but the trust
      * verification will fail as the CA cert is out of date.
      */
-    @org.junit.Test
+    @Test
     public void testSignatureBadCACert() throws Exception {
         WSSecSignature sign = new WSSecSignature();
         sign.setUserInfo("wss4jcertdsa", "security");
@@ -267,7 +268,7 @@ public class SignatureCertTest extends org.junit.Assert {
     /**
      * A test for "SignatureAction does not set DigestAlgorithm on WSSecSignature instance"
      */
-    @org.junit.Test
+    @Test
     public void testMultipleCertsWSHandler() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -304,7 +305,7 @@ public class SignatureCertTest extends org.junit.Assert {
         assertTrue(certs != null && certs.length == 2);
     }
 
-    @org.junit.Test
+    @Test
     public void testExpiredCert() throws Exception {
         Properties clientProperties = new Properties();
         clientProperties.put("org.apache.wss4j.crypto.provider",
@@ -343,7 +344,7 @@ public class SignatureCertTest extends org.junit.Assert {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testExpiredCertInKeystore() throws Exception {
         Properties clientProperties = new Properties();
         clientProperties.put("org.apache.wss4j.crypto.provider",

@@ -47,6 +47,8 @@ import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.apache.xml.security.utils.Base64;
+import org.junit.Before;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 
@@ -65,7 +67,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         SecurityTestUtil.cleanup();
     }
 
-    @org.junit.Before
+    @Before
     public void setUp() throws Exception {
         KeyGenerator keyGen = KeyGenerator.getInstance("AES");
         keyGen.init(128);
@@ -78,7 +80,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         crypto = CryptoFactory.getInstance("wss40.properties");
     }
 
-    @org.junit.Test
+    @Test
     public void testAsymmetricSignature() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -113,7 +115,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         verify(doc, null);
     }
 
-    @org.junit.Test
+    @Test
     public void testSymmetricSignature() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -154,7 +156,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         verify(doc, secretKeyCallbackHandler);
     }
 
-    @org.junit.Test
+    @Test
     public void testAsymmetricDoubleSignature() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -200,7 +202,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         // Not verifying due to two separate Crypto instances...
     }
 
-    @org.junit.Test
+    @Test
     public void testMixedDoubleSignature() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -251,7 +253,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         verify(doc, secretKeyCallbackHandler);
     }
 
-    @org.junit.Test
+    @Test
     public void testAsymmetricEncryption() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -286,7 +288,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         verify(doc, new KeystoreCallbackHandler());
     }
 
-    @org.junit.Test
+    @Test
     public void testAsymmetricEncryptionIncludeToken() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -322,7 +324,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         verify(doc, new KeystoreCallbackHandler());
     }
 
-    @org.junit.Test
+    @Test
     public void testSymmetricEncryption() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -364,7 +366,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         verify(doc, secretKeyCallbackHandler);
     }
 
-    @org.junit.Test
+    @Test
     public void testAsymmetricDoubleEncryption() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -408,7 +410,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         // Not verifying due to two separate Crypto instances...
     }
 
-    @org.junit.Test
+    @Test
     public void testMixedDoubleEncryption() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -463,7 +465,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
     }
 
     // Using the same key for signature + encryption here for convenience...
-    @org.junit.Test
+    @Test
     public void testAsymmetricSignatureEncryption() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -504,7 +506,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         verify(doc, new KeystoreCallbackHandler());
     }
 
-    @org.junit.Test
+    @Test
     public void testSymmetricSignatureEncryption() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();
@@ -551,7 +553,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
         verify(doc, new KeystoreCallbackHandler());
     }
 
-    @org.junit.Test
+    @Test
     public void testSymmetricSignatureEncryptionResponse() throws Exception {
         final WSSConfig cfg = WSSConfig.getNewInstance();
         final RequestData reqData = new RequestData();

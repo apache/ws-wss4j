@@ -34,6 +34,7 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -85,7 +86,7 @@ public class SignatureCRLTest extends org.junit.Assert {
      * should pass.
      * TODO Re-enable once CRL issue fixed
      */
-    @org.junit.Test
+    @Test
     @org.junit.Ignore
     public void testSignatureDirectReference() throws Exception {
         WSSecSignature sign = new WSSecSignature();
@@ -119,7 +120,7 @@ public class SignatureCRLTest extends org.junit.Assert {
      * should fail.
      * TODO Re-enable once CRL issue fixed
      */
-    @org.junit.Test
+    @Test
     @org.junit.Ignore
     public void testSignatureDirectReferenceRevocation() throws Exception {
         WSSecSignature sign = new WSSecSignature();
@@ -157,7 +158,7 @@ public class SignatureCRLTest extends org.junit.Assert {
      *
      * TODO Re-enable once CRL issue fixed
      */
-    @org.junit.Test
+    @Test
     @org.junit.Ignore
     public void testSignatureDirectReferenceRevocationKeyStore() throws Exception {
         WSSecSignature sign = new WSSecSignature();

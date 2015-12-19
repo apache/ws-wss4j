@@ -36,8 +36,9 @@ public class HttpsToken extends AbstractToken {
         private static final Map<String, AuthenticationType> lookup = new HashMap<>();
 
         static {
-            for (AuthenticationType u : EnumSet.allOf(AuthenticationType.class))
+            for (AuthenticationType u : EnumSet.allOf(AuthenticationType.class)) {
                 lookup.put(u.name(), u);
+            }
         }
 
         public static AuthenticationType lookUp(String name) {

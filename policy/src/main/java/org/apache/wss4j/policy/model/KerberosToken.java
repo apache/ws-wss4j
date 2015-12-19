@@ -35,8 +35,9 @@ public class KerberosToken extends AbstractToken {
         private static final Map<String, ApReqTokenType> lookup = new HashMap<>();
 
         static {
-            for (ApReqTokenType u : EnumSet.allOf(ApReqTokenType.class))
+            for (ApReqTokenType u : EnumSet.allOf(ApReqTokenType.class)) {
                 lookup.put(u.name(), u);
+            }
         }
 
         public static ApReqTokenType lookUp(String name) {

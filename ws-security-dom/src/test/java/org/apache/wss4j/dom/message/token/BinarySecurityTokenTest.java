@@ -37,6 +37,7 @@ import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 import java.security.cert.X509Certificate;
@@ -61,7 +62,7 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
     /**
      * A unit test for an X.509 BinarySecurityToken
      */
-    @org.junit.Test
+    @Test
     public void testX509() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -102,7 +103,7 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
     /**
      * A unit test for an PKIPath BinarySecurityToken
      */
-    @org.junit.Test
+    @Test
     public void testPKIPath() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
@@ -139,7 +140,7 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
     /**
      * A unit test for a custom BinarySecurityToken
      */
-    @org.junit.Test
+    @Test
     public void testCustomToken() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
