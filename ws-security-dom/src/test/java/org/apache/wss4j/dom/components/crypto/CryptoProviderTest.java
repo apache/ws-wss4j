@@ -183,7 +183,7 @@ public class CryptoProviderTest extends org.junit.Assert {
             CertificateFactory.getInstance("X.509", "BC");
         X509Certificate cert =
             (X509Certificate)factory.generateCertificate(
-                new java.io.ByteArrayInputStream(certBytes)
+                new ByteArrayInputStream(certBytes)
             );
 
         WSSecEncrypt encrypt = new WSSecEncrypt();
@@ -232,7 +232,7 @@ public class CryptoProviderTest extends org.junit.Assert {
             CertificateFactory.getInstance("X.509", "BC");
         X509Certificate cert =
             (X509Certificate)factory.generateCertificate(
-                new java.io.ByteArrayInputStream(certBytes)
+                new ByteArrayInputStream(certBytes)
             );
 
         WSSecEncrypt encrypt = new WSSecEncrypt();
