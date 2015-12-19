@@ -29,15 +29,15 @@ import java.security.PrivilegedAction;
 public class KerberosClientAction implements PrivilegedAction<byte[]> {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(KerberosClientAction.class);
-    
+
     private Principal clientPrincipal;
     private String serviceName;
     private boolean isUsernameServiceNameForm;
-    
+
     public KerberosClientAction(Principal clientPrincipal, String serviceName) {
         this(clientPrincipal, serviceName, false);
     }
-    
+
     public KerberosClientAction(Principal clientPrincipal, String serviceName, boolean isUsernameServiceNameForm) {
         this.clientPrincipal = clientPrincipal;
         this.serviceName = serviceName;
@@ -46,8 +46,8 @@ public class KerberosClientAction implements PrivilegedAction<byte[]> {
 
     public byte[] run() {
         try {
-            KerberosContext krbCtx = 
-                (KerberosContext)new KerberosClientExceptionAction(clientPrincipal, serviceName, 
+            KerberosContext krbCtx =
+                (KerberosContext)new KerberosClientExceptionAction(clientPrincipal, serviceName,
                                                                    isUsernameServiceNameForm, false).run();
             return krbCtx.getKerberosToken();
         } catch (Exception e) {
@@ -57,7 +57,7 @@ public class KerberosClientAction implements PrivilegedAction<byte[]> {
         }
 
         return null;
-        
+
     }
-    
+
 }

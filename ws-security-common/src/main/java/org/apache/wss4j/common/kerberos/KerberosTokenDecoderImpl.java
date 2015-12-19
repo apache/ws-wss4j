@@ -39,7 +39,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class KerberosTokenDecoderImpl implements KerberosTokenDecoder {
-    
+
     private static final String KERBEROS_OID = "1.2.840.113554.1.2.2";
 
     private byte[] serviceTicket;
@@ -138,7 +138,7 @@ public class KerberosTokenDecoderImpl implements KerberosTokenDecoder {
                 throw new KerberosTokenDecoderException("invalid kerberos token");
             }
 
-            ApReq applicationRequest = 
+            ApReq applicationRequest =
                 KerberosDecoder.decodeApReq(toByteArray(asn1InputStream));
 
             final int encryptionType = applicationRequest.getTicket().getEncPart().getEType().getValue();
@@ -149,9 +149,9 @@ public class KerberosTokenDecoderImpl implements KerberosTokenDecoder {
 
             CipherTextHandler cipherTextHandler = new CipherTextHandler();
             byte[] dec = cipherTextHandler.decrypt(
-                         encryptionKey, applicationRequest.getTicket().getEncPart(), 
+                         encryptionKey, applicationRequest.getTicket().getEncPart(),
                                                       KeyUsage.getTypeByOrdinal(2));
-            
+
             this.encTicketPart = KerberosDecoder.decodeEncTicketPart(dec);
         } catch (KerberosException | IOException e) {
             throw new KerberosTokenDecoderException(e);

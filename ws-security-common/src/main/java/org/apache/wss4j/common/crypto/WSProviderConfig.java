@@ -67,7 +67,7 @@ public final class WSProviderConfig {
                 AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
                     public Boolean run() {
                         addXMLDSigRIInternal();
-                        String bcProviderStr = 
+                        String bcProviderStr =
                             addJceProvider("BC", "org.bouncycastle.jce.provider.BouncyCastleProvider");
                         // If we have BouncyCastle v1.49 installed then use IvParameterSpec in
                         // Santuario. This can be removed when we pick up BouncyCastle 1.51+

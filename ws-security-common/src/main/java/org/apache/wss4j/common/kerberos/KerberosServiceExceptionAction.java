@@ -131,7 +131,7 @@ public class KerberosServiceExceptionAction implements PrivilegedExceptionAction
                         ErrorCode.FAILURE, e, KERBEROS_TICKET_VALIDATION_ERROR_MSG_ID
                     );
                 }
-            }            
+            }
         } finally {
             if (null != secContext && !spnego) {
                 secContext.dispose();

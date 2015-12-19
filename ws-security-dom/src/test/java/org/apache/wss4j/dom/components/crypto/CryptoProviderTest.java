@@ -179,9 +179,9 @@ public class CryptoProviderTest extends org.junit.Assert {
                 + "UyZ50HRroKJx1PPCE+OTO5JYPNQB2rauK63RHGGC94mY2ySCE2KP/yaWhkDJ60X2JKgnTLKUZxLP"
                 + "9IioeHVeUzGIccIicoiZR5kqaiqoEk82V81R+VA="
             );
-        CertificateFactory factory = 
+        CertificateFactory factory =
             CertificateFactory.getInstance("X.509", "BC");
-        X509Certificate cert = 
+        X509Certificate cert =
             (X509Certificate)factory.generateCertificate(
                 new java.io.ByteArrayInputStream(certBytes)
             );
@@ -192,14 +192,14 @@ public class CryptoProviderTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
         verify(encryptedDoc);
-        
+
     }
 
 
@@ -228,9 +228,9 @@ public class CryptoProviderTest extends org.junit.Assert {
                 + "HapMIIWiJRclIAiA8Hnb0Sv/puuHYD4G4NWFdiVjRord90eZJe40NMGruRmlqIRIGGKCv+wv3E6U"
                 + "x1cWW862f5H9Eyrcocke2P+3GNAGy83vghA="
             );
-        CertificateFactory factory = 
+        CertificateFactory factory =
             CertificateFactory.getInstance("X.509", "BC");
-        X509Certificate cert = 
+        X509Certificate cert =
             (X509Certificate)factory.generateCertificate(
                 new java.io.ByteArrayInputStream(certBytes)
             );
@@ -241,9 +241,9 @@ public class CryptoProviderTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
-        
+
         if (LOG.isDebugEnabled()) {
-            String outputString = 
+            String outputString =
                 XMLUtils.PrettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
@@ -251,9 +251,9 @@ public class CryptoProviderTest extends org.junit.Assert {
             verify(encryptedDoc);
             fail("Failure expected on encryption with a key that does not exist in the keystore");
         } catch (WSSecurityException ex) {
-            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE); 
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
         }
-        
+
     }
 
     /**
