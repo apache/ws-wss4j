@@ -112,6 +112,7 @@
     </properties>
 
     <modules>
+        <module>build-tools</module>
         <module>parent</module>
         <module>bindings</module>
         <module>policy</module>
@@ -131,12 +132,7 @@
                 <version>3.5</version>
                 <configuration>
                     <rulesets>
-                        <ruleset>/rulesets/java/basic.xml</ruleset>
-                        <ruleset>/rulesets/java/braces.xml</ruleset>
-                        <ruleset>/rulesets/java/unusedcode.xml</ruleset>
-                        <ruleset>/rulesets/java/imports.xml</ruleset>
-                        <ruleset>/rulesets/java/empty.xml</ruleset>
-                        <ruleset>/rulesets/java/unnecessary.xml</ruleset>
+                        <ruleset>wss4j-pmd-ruleset.xml</ruleset>
                     </rulesets>
                     <sourceEncoding>UTF-8</sourceEncoding>
                     <failOnViolation>true</failOnViolation>
@@ -148,6 +144,13 @@
                         <excludeRoot>${basedir}/src/main/generated</excludeRoot>
                     </excludeRoots>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.wss4j</groupId>
+                        <artifactId>build-tools</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <id>validate</id>
