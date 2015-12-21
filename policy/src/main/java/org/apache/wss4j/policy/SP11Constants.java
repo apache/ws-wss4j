@@ -34,26 +34,26 @@ public class SP11Constants extends SPConstants {
         return sp11Constants;
     }
 
-    public final static String SP_NS = "http://schemas.xmlsoap.org/ws/2005/07/securitypolicy";
+    public static final String SP_NS = "http://schemas.xmlsoap.org/ws/2005/07/securitypolicy";
 
-    public final static String SP_PREFIX = "sp";
+    public static final String SP_PREFIX = "sp";
 
     public static final QName INCLUDE_TOKEN = new QName(
             SP11Constants.SP_NS, SPConstants.ATTR_INCLUDE_TOKEN, SP11Constants.SP_PREFIX);
 
-    public final static String INCLUDE_NEVER =
+    public static final String INCLUDE_NEVER =
             SP11Constants.SP_NS + SPConstants.INCLUDE_TOKEN_NEVER_SUFFIX;
 
-    public final static String INCLUDE_ONCE =
+    public static final String INCLUDE_ONCE =
             SP11Constants.SP_NS + SPConstants.INCLUDE_TOKEN_ONCE_SUFFIX;
 
-    public final static String INCLUDE_ALWAYS_TO_RECIPIENT =
+    public static final String INCLUDE_ALWAYS_TO_RECIPIENT =
             SP11Constants.SP_NS + SPConstants.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT_SUFFIX;
 
-    public final static String INCLUDE_ALWAYS_TO_INITIATOR =
+    public static final String INCLUDE_ALWAYS_TO_INITIATOR =
             SP11Constants.SP_NS + SPConstants.INCLUDE_TOKEN_ALWAYS_TO_INITIATOR_SUFFIX;
 
-    public final static String INCLUDE_ALWAYS =
+    public static final String INCLUDE_ALWAYS =
             SP11Constants.SP_NS + SPConstants.INCLUDE_TOKEN_ALWAYS_SUFFIX;
 
     public static final QName ATTR_XPATH_VERSION = new QName(
@@ -317,7 +317,7 @@ public class SP11Constants extends SPConstants {
     public static final QName BOOTSTRAP_POLICY = new QName(
             SP11Constants.SP_NS, SPConstants.BOOTSTRAP_POLICY, SP11Constants.SP_PREFIX);
 
-    public final static QName XPATH = new QName(
+    public static final QName XPATH = new QName(
             SP11Constants.SP_NS, SPConstants.XPATH_EXPR, SP11Constants.SP_PREFIX);
 
     public static final QName HEADER = new QName(

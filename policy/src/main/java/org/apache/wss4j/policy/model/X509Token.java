@@ -40,16 +40,16 @@ public class X509Token extends AbstractToken {
         WssX509Pkcs7Token11,
         WssX509PkiPathV1Token11;
 
-        private static final Map<String, TokenType> lookup = new HashMap<String, TokenType>();
+        private static final Map<String, TokenType> LOOKUP = new HashMap<String, TokenType>();
 
         static {
             for (TokenType u : EnumSet.allOf(TokenType.class)) {
-                lookup.put(u.name(), u);
+                LOOKUP.put(u.name(), u);
             }
         }
 
         public static TokenType lookUp(String name) {
-            return lookup.get(name);
+            return LOOKUP.get(name);
         }
     }
 
@@ -74,7 +74,8 @@ public class X509Token extends AbstractToken {
 
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
-        return new X509Token(getVersion(), getIncludeTokenType(), getIssuer(), getIssuerName(), getClaims(), nestedPolicy);
+        return new X509Token(getVersion(), getIncludeTokenType(), getIssuer(), getIssuerName(),
+                             getClaims(), nestedPolicy);
     }
 
     protected void parseNestedPolicy(Policy nestedPolicy, X509Token x509Token) {
@@ -107,29 +108,38 @@ public class X509Token extends AbstractToken {
                     x509Token.setTokenType(tokenType);
                     continue;
                 }
-                if (getVersion().getSPConstants().getRequireKeyIdentifierReference().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getRequireKeyIdentifierReference().getNamespaceURI().equals(assertionNamespace)) {
+
+                QName requireKeyIdentifierRef =
+                    getVersion().getSPConstants().getRequireKeyIdentifierReference();
+                QName requireIssuerSerialRef =
+                    getVersion().getSPConstants().getRequireIssuerSerialReference();
+                QName requireEmbeddedRef =
+                    getVersion().getSPConstants().getRequireEmbeddedTokenReference();
+                QName requireThumbprintRef =
+                    getVersion().getSPConstants().getRequireThumbprintReference();
+                if (requireKeyIdentifierRef.getLocalPart().equals(assertionName)
+                    && requireKeyIdentifierRef.getNamespaceURI().equals(assertionNamespace)) {
                     if (x509Token.isRequireKeyIdentifierReference()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     x509Token.setRequireKeyIdentifierReference(true);
                     continue;
-                } else if (getVersion().getSPConstants().getRequireIssuerSerialReference().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getRequireIssuerSerialReference().getNamespaceURI().equals(assertionNamespace)) {
+                } else if (requireIssuerSerialRef.getLocalPart().equals(assertionName)
+                        && requireIssuerSerialRef.getNamespaceURI().equals(assertionNamespace)) {
                     if (x509Token.isRequireIssuerSerialReference()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     x509Token.setRequireIssuerSerialReference(true);
                     continue;
-                } else if (getVersion().getSPConstants().getRequireEmbeddedTokenReference().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getRequireEmbeddedTokenReference().getNamespaceURI().equals(assertionNamespace)) {
+                } else if (requireEmbeddedRef.getLocalPart().equals(assertionName)
+                        && requireEmbeddedRef.getNamespaceURI().equals(assertionNamespace)) {
                     if (x509Token.isRequireEmbeddedTokenReference()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     x509Token.setRequireEmbeddedTokenReference(true);
                     continue;
-                } else if (getVersion().getSPConstants().getRequireThumbprintReference().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getRequireThumbprintReference().getNamespaceURI().equals(assertionNamespace)) {
+                } else if (requireThumbprintRef.getLocalPart().equals(assertionName)
+                        && requireThumbprintRef.getNamespaceURI().equals(assertionNamespace)) {
                     if (x509Token.isRequireThumbprintReference()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }

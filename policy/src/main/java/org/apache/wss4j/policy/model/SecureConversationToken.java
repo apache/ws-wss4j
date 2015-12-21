@@ -49,7 +49,8 @@ public class SecureConversationToken extends SecurityContextToken {
 
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
-        return new SecureConversationToken(getVersion(), getIncludeTokenType(), getIssuer(), getIssuerName(), getClaims(), nestedPolicy);
+        return new SecureConversationToken(getVersion(), getIncludeTokenType(), getIssuer(),
+                                           getIssuerName(), getClaims(), nestedPolicy);
     }
 
     protected void parseNestedPolicy(Policy nestedPolicy, SecureConversationToken secureConversationToken) {
@@ -63,32 +64,39 @@ public class SecureConversationToken extends SecurityContextToken {
                 Assertion assertion = assertions.get(i);
                 String assertionName = assertion.getName().getLocalPart();
                 String assertionNamespace = assertion.getName().getNamespaceURI();
-                if (getVersion().getSPConstants().getMustNotSendCancel().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getMustNotSendCancel().getNamespaceURI().equals(assertionNamespace)) {
+                QName mustNotSendCancel = getVersion().getSPConstants().getMustNotSendCancel();
+                if (mustNotSendCancel.getLocalPart().equals(assertionName)
+                    && mustNotSendCancel.getNamespaceURI().equals(assertionNamespace)) {
                     if (secureConversationToken.isMustNotSendCancel()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     secureConversationToken.setMustNotSendCancel(true);
                     continue;
                 }
-                if (getVersion().getSPConstants().getMustNotSendAmend().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getMustNotSendAmend().getNamespaceURI().equals(assertionNamespace)) {
+
+                QName mustNotSendAmend = getVersion().getSPConstants().getMustNotSendAmend();
+                if (mustNotSendAmend.getLocalPart().equals(assertionName)
+                    && mustNotSendAmend.getNamespaceURI().equals(assertionNamespace)) {
                     if (secureConversationToken.isMustNotSendAmend()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     secureConversationToken.setMustNotSendAmend(true);
                     continue;
                 }
-                if (getVersion().getSPConstants().getMustNotSendRenew().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getMustNotSendRenew().getNamespaceURI().equals(assertionNamespace)) {
+
+                QName mustNotSendRenew = getVersion().getSPConstants().getMustNotSendRenew();
+                if (mustNotSendRenew.getLocalPart().equals(assertionName)
+                    && mustNotSendRenew.getNamespaceURI().equals(assertionNamespace)) {
                     if (secureConversationToken.isMustNotSendRenew()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     secureConversationToken.setMustNotSendRenew(true);
                     continue;
                 }
-                if (getVersion().getSPConstants().getBootstrapPolicy().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getBootstrapPolicy().getNamespaceURI().equals(assertionNamespace)) {
+
+                QName bootstrapPolicy = getVersion().getSPConstants().getBootstrapPolicy();
+                if (bootstrapPolicy.getLocalPart().equals(assertionName)
+                    && bootstrapPolicy.getNamespaceURI().equals(assertionNamespace)) {
                     if (secureConversationToken.getBootstrapPolicy() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }

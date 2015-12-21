@@ -39,16 +39,16 @@ public abstract class AbstractToken extends AbstractSecurityAssertion implements
         RequireExplicitDerivedKeys,
         RequireImpliedDerivedKeys;
 
-        private static final Map<String, X509Token.DerivedKeys> lookup = new HashMap<>();
+        private static final Map<String, X509Token.DerivedKeys> LOOKUP = new HashMap<>();
 
         static {
             for (DerivedKeys u : EnumSet.allOf(DerivedKeys.class)) {
-                lookup.put(u.name(), u);
+                LOOKUP.put(u.name(), u);
             }
         }
 
         public static DerivedKeys lookUp(String name) {
-            return lookup.get(name);
+            return LOOKUP.get(name);
         }
     }
 
@@ -141,10 +141,14 @@ public abstract class AbstractToken extends AbstractSecurityAssertion implements
             );
         }
         if (!isNormalized() && isOptional()) {
-            writer.writeAttribute(Constants.ATTR_WSP, writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), Constants.ATTR_OPTIONAL, "true");
+            writer.writeAttribute(Constants.ATTR_WSP,
+                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP),
+                                  Constants.ATTR_OPTIONAL, "true");
         }
         if (isIgnorable()) {
-            writer.writeAttribute(Constants.ATTR_WSP, writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), Constants.ATTR_IGNORABLE, "true");
+            writer.writeAttribute(Constants.ATTR_WSP,
+                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP),
+                                  Constants.ATTR_IGNORABLE, "true");
         }
         if (getIssuer() != null) {
             SPUtils.serialize(getIssuer(), writer);

@@ -40,4 +40,17 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>disable-checkstyle</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <checkstyle.skip>true</checkstyle.skip>
+            </properties>
+        </profile>
+    </profiles>
+        
+
 </project>

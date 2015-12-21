@@ -37,16 +37,16 @@ public class Layout extends AbstractSecurityAssertion implements PolicyContainin
         LaxTsFirst,
         LaxTsLast;
 
-        private static final Map<String, LayoutType> lookup = new HashMap<>();
+        private static final Map<String, LayoutType> LOOKUP = new HashMap<>();
 
         static {
             for (LayoutType u : EnumSet.allOf(LayoutType.class)) {
-                lookup.put(u.name(), u);
+                LOOKUP.put(u.name(), u);
             }
         }
 
         public static LayoutType lookUp(String name) {
-            return lookup.get(name);
+            return LOOKUP.get(name);
         }
     }
 

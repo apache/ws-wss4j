@@ -29,7 +29,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
-public class SPUtils {
+public final class SPUtils {
 
     private SPUtils() {
     }
@@ -137,7 +137,7 @@ public class SPUtils {
             String value = attr.getValue();
             if ("true".equalsIgnoreCase(value) || "1".equals(value)) {
                 if (SP13Constants.SP_NS.equals(element.getNamespaceURI())) {
-                    throw new IllegalArgumentException("Ignorable attribute not allowed. @see http://docs.oasis-open.org/ws-sx/ws-securitypolicy/v1.3/os/ws-securitypolicy-1.3-spec-os.html#_Toc212617792");
+                    throw new IllegalArgumentException("Ignorable attribute not allowed.");
                 }
                 return true;
             }
@@ -188,7 +188,10 @@ public class SPUtils {
                 } else if (prefix == null && "xmlns".equals(attr.getLocalName())) {
                     xmlStreamWriter.writeDefaultNamespace(attr.getValue());
                 } else {
-                    xmlStreamWriter.writeAttribute(prefix, attr.getNamespaceURI(), attr.getLocalName(), attr.getValue());
+                    xmlStreamWriter.writeAttribute(prefix,
+                                                   attr.getNamespaceURI(),
+                                                   attr.getLocalName(),
+                                                   attr.getValue());
                 }
             }
             //write ns after processing element namespaces to prevent redeclarations

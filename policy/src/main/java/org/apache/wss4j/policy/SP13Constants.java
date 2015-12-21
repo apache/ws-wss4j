@@ -35,8 +35,8 @@ public class SP13Constants extends SP12Constants {
         return sp13Constants;
     }
 
-    public final static String SP_NS = "http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802";
-    public final static String SP_PREFIX = "sp13";
+    public static final String SP_NS = "http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200802";
+    public static final String SP_PREFIX = "sp13";
 
     public static final QName CONTENT_SIGNATURE_TRANSFORM = new QName(
             SP13Constants.SP_NS, SPConstants.CONTENT_SIGNATURE_TRANSFORM, SP13Constants.SP_PREFIX);

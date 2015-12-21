@@ -38,7 +38,8 @@ public class ContentEncryptedElementsBuilder extends EncryptedElementsBuilder {
         final SPConstants.SPVersion spVersion = SPConstants.SPVersion.getSPVersion(element.getNamespaceURI());
         final String xPathVersion = getXPathVersion(element);
         final List<XPath> xPaths = getXPathExpressions(element, spVersion);
-        ContentEncryptedElements contentEncryptedElements = new ContentEncryptedElements(spVersion, xPathVersion, xPaths);
+        ContentEncryptedElements contentEncryptedElements =
+            new ContentEncryptedElements(spVersion, xPathVersion, xPaths);
         contentEncryptedElements.setOptional(SPUtils.isOptional(element));
         contentEncryptedElements.setIgnorable(SPUtils.isIgnorable(element));
         return contentEncryptedElements;

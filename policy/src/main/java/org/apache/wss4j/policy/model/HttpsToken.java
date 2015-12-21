@@ -33,16 +33,16 @@ public class HttpsToken extends AbstractToken {
         HttpDigestAuthentication,
         RequireClientCertificate;
 
-        private static final Map<String, AuthenticationType> lookup = new HashMap<>();
+        private static final Map<String, AuthenticationType> LOOKUP = new HashMap<>();
 
         static {
             for (AuthenticationType u : EnumSet.allOf(AuthenticationType.class)) {
-                lookup.put(u.name(), u);
+                LOOKUP.put(u.name(), u);
             }
         }
 
         public static AuthenticationType lookUp(String name) {
-            return lookup.get(name);
+            return LOOKUP.get(name);
         }
     }
 

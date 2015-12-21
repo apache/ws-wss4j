@@ -39,7 +39,8 @@ public class SupportingTokensBuilder implements AssertionBuilder<Element> {
         final SPConstants.SPVersion spVersion = SPConstants.SPVersion.getSPVersion(element.getNamespaceURI());
         final QName supportingTokenType = SPUtils.getElementQName(element);
         final Element nestedPolicyElement = SPUtils.getFirstPolicyChildElement(element);
-        final Policy nestedPolicy = nestedPolicyElement != null ? factory.getPolicyEngine().getPolicy(nestedPolicyElement) : new Policy();
+        final Policy nestedPolicy =
+            nestedPolicyElement != null ? factory.getPolicyEngine().getPolicy(nestedPolicyElement) : new Policy();
         SupportingTokens supportingTokens = new SupportingTokens(
                 spVersion,
                 supportingTokenType,

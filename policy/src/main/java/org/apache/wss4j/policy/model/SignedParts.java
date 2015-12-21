@@ -33,7 +33,8 @@ public class SignedParts extends RequiredParts {
     private Attachments attachments;
     private boolean signAllHeaders;
 
-    public SignedParts(SPConstants.SPVersion version, boolean body, Attachments attachments, List<Header> headers, boolean signAllHeaders) {
+    public SignedParts(SPConstants.SPVersion version, boolean body, Attachments attachments,
+                       List<Header> headers, boolean signAllHeaders) {
         super(version, headers);
 
         this.body = body;
@@ -51,10 +52,14 @@ public class SignedParts extends RequiredParts {
         writer.writeStartElement(getName().getPrefix(), getName().getLocalPart(), getName().getNamespaceURI());
         writer.writeNamespace(getName().getPrefix(), getName().getNamespaceURI());
         if (!isNormalized() && isOptional()) {
-            writer.writeAttribute(Constants.ATTR_WSP, writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), Constants.ATTR_OPTIONAL, "true");
+            writer.writeAttribute(Constants.ATTR_WSP,
+                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP),
+                                  Constants.ATTR_OPTIONAL, "true");
         }
         if (isIgnorable()) {
-            writer.writeAttribute(Constants.ATTR_WSP, writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), Constants.ATTR_IGNORABLE, "true");
+            writer.writeAttribute(Constants.ATTR_WSP,
+                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP),
+                                  Constants.ATTR_IGNORABLE, "true");
         }
         if (isBody()) {
             final QName body = getVersion().getSPConstants().getBody();

@@ -47,7 +47,8 @@ public class SpnegoContextToken extends AbstractToken {
 
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
-        return new SpnegoContextToken(getVersion(), getIncludeTokenType(), getIssuer(), getIssuerName(), getClaims(), nestedPolicy);
+        return new SpnegoContextToken(getVersion(), getIncludeTokenType(), getIssuer(),
+                                      getIssuerName(), getClaims(), nestedPolicy);
     }
 
     protected void parseNestedPolicy(Policy nestedPolicy, SpnegoContextToken spnegoContextToken) {
@@ -69,24 +70,28 @@ public class SpnegoContextToken extends AbstractToken {
                     spnegoContextToken.setDerivedKeys(derivedKeys);
                     continue;
                 }
-                if (getVersion().getSPConstants().getMustNotSendCancel().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getMustNotSendCancel().getNamespaceURI().equals(assertionNamespace)) {
+
+                QName mustNotSendCancel = getVersion().getSPConstants().getMustNotSendCancel();
+                if (mustNotSendCancel.getLocalPart().equals(assertionName)
+                    && mustNotSendCancel.getNamespaceURI().equals(assertionNamespace)) {
                     if (spnegoContextToken.isMustNotSendCancel()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     spnegoContextToken.setMustNotSendCancel(true);
                     continue;
                 }
-                if (getVersion().getSPConstants().getMustNotSendAmend().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getMustNotSendAmend().getNamespaceURI().equals(assertionNamespace)) {
+                QName mustNotSendAmend = getVersion().getSPConstants().getMustNotSendAmend();
+                if (mustNotSendAmend.getLocalPart().equals(assertionName)
+                    && mustNotSendAmend.getNamespaceURI().equals(assertionNamespace)) {
                     if (spnegoContextToken.isMustNotSendAmend()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     spnegoContextToken.setMustNotSendAmend(true);
                     continue;
                 }
-                if (getVersion().getSPConstants().getMustNotSendRenew().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getMustNotSendRenew().getNamespaceURI().equals(assertionNamespace)) {
+                QName mustNotSendRenew = getVersion().getSPConstants().getMustNotSendRenew();
+                if (mustNotSendRenew.getLocalPart().equals(assertionName)
+                    && mustNotSendRenew.getNamespaceURI().equals(assertionNamespace)) {
                     if (spnegoContextToken.isMustNotSendRenew()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
