@@ -93,6 +93,10 @@ public class EncryptedDataProcessor implements Processor {
             XMLUtils.getDirectChildElement(
                 kiElem, WSConstants.ENC_KEY_LN, WSConstants.ENC_NS
             );
+        Element retrievalMethodElement =
+            XMLUtils.getDirectChildElement(
+                kiElem, "RetrievalMethod", WSConstants.SIG_NS
+            );
 
         if (request.isRequireSignedEncryptedDataElements()) {
             List<WSSecurityEngineResult> signedResults =
@@ -124,6 +128,16 @@ public class EncryptedDataProcessor implements Processor {
             byte[] symmKey =
                 (byte[])encrKeyResults.get(0).get(WSSecurityEngineResult.TAG_SECRET);
             key = KeyUtils.prepareSecretKey(symEncAlgo, symmKey);
+        } else if (retrievalMethodElement != null
+            && "http://www.w3.org/2001/04/xmlenc#EncryptedKey".equals(
+                retrievalMethodElement.getAttributeNS(null, "Type"))) {
+            String uri = retrievalMethodElement.getAttributeNS(null, "URI");
+            uri = XMLUtils.getIDFromReference(uri);
+            WSSecurityEngineResult result = wsDocInfo.getResult(uri);
+            if (result != null) {
+                byte[] symmKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
+                key = KeyUtils.prepareSecretKey(symEncAlgo, symmKey);
+            }
         } else {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "noEncKey"
