@@ -20,21 +20,23 @@
 package org.apache.wss4j.dom.processor;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 
 /**
- * This will process incoming <code>saml2:EncryptedAssertion</code> elements. EncryptedKey
- * children are not supported, only an EncryptedData structure.
+ * This will process incoming <code>saml2:EncryptedAssertion</code> elements.
  */
 public class EncryptedAssertionProcessor implements Processor {
 
@@ -56,6 +58,57 @@ public class EncryptedAssertionProcessor implements Processor {
             // Maybe it has already been decrypted...
             return Collections.emptyList();
         }
+
+        List<WSSecurityEngineResult> completeResults = new LinkedList<>();
+
+        // Check all EncryptedKey elements
+        for (Node currentChild = elem.getFirstChild();
+            currentChild != null;
+            currentChild = currentChild.getNextSibling()
+        ) {
+            if (Node.ELEMENT_NODE == currentChild.getNodeType()
+                    && "EncryptedKey".equals(currentChild.getLocalName())
+                    && WSConstants.ENC_NS.equals(currentChild.getNamespaceURI())) {
+                QName el =
+                    new QName(((Element)currentChild).getNamespaceURI(),
+                              ((Element)currentChild).getLocalName());
+                Processor proc = request.getWssConfig().getProcessor(el);
+                if (proc != null) {
+                    completeResults.addAll(proc.handleToken(((Element)currentChild), request, wsDocInfo));
+                }
+            }
+        }
+
+        // If we have processed EncryptedKey elements, then the Assertion is already decrypted
+        // at this point. Process it accordingly.
+        if (!completeResults.isEmpty()) {
+            for (WSSecurityEngineResult r : completeResults) {
+                List<WSDataRef> dataRefs =
+                    (List<WSDataRef>)r.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
+                if (dataRefs != null) {
+                    for (WSDataRef dataRef : dataRefs) {
+                        if (WSConstants.SAML_TOKEN.equals(dataRef.getName())
+                            || WSConstants.SAML2_TOKEN.equals(dataRef.getName())) {
+                            // Get hold of the plain text element
+                            Element decryptedElem = dataRef.getProtectedElement();
+                            QName el = new QName(decryptedElem.getNamespaceURI(), decryptedElem.getLocalName());
+                            Processor proc = request.getWssConfig().getProcessor(el);
+                            if (proc != null) {
+                                if (LOG.isDebugEnabled()) {
+                                    LOG.debug("Processing decrypted element with: " + proc.getClass().getName());
+                                }
+                                List<WSSecurityEngineResult> results =
+                                    proc.handleToken(decryptedElem, request, wsDocInfo);
+                                completeResults.addAll(0, results);
+                                return completeResults;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Otherwise decrypt the element ourselves
 
         // Type must be "Element" if specified
         String typeStr = encryptedDataElement.getAttributeNS(null, "Type");

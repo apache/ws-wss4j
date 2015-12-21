@@ -67,9 +67,13 @@ import org.apache.wss4j.dom.message.WSSecSAMLToken;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
 import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.EncryptedKey;
+import org.apache.xml.security.encryption.Reference;
+import org.apache.xml.security.encryption.ReferenceList;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.keys.KeyInfo;
+import org.apache.xml.security.keys.content.RetrievalMethod;
 import org.apache.xml.security.keys.content.X509Data;
+import org.apache.xml.security.stax.impl.util.IDGenerator;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.opensaml.core.xml.XMLObjectBuilder;
@@ -759,6 +763,119 @@ public class SamlTokenTest extends org.junit.Assert {
         requestData.setCallbackHandler(new KeystoreCallbackHandler());
         requestData.setDecCrypto(crypto);
         requestData.setSigVerCrypto(crypto);
+        WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
+
+        WSSecurityEngineResult actionResult =
+            results.getActionResults().get(WSConstants.ST_UNSIGNED).get(0);
+
+        SamlAssertionWrapper receivedSamlAssertion =
+            (SamlAssertionWrapper) actionResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
+        assertTrue(receivedSamlAssertion != null);
+        assertTrue(receivedSamlAssertion.getElement() != null);
+        assertTrue("Assertion".equals(receivedSamlAssertion.getElement().getLocalName()));
+
+        actionResult = results.getActionResults().get(WSConstants.ENCR).get(0);
+        assertTrue(actionResult != null);
+    }
+
+    @Test
+    public void testSAML2EncryptedAssertionViaSeparateEncryptedKey() throws Exception {
+        SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
+        callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
+        callbackHandler.setIssuer("www.example.com");
+
+        SAMLCallback samlCallback = new SAMLCallback();
+        SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
+        SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
+
+        WSSecSAMLToken wsSign = new WSSecSAMLToken();
+
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        wsSign.prepare(doc, samlAssertion);
+
+        // Get the Element + add it to the security header as an EncryptedAssertion
+        Element assertionElement = wsSign.getElement();
+        Element encryptedAssertionElement =
+            doc.createElementNS(WSConstants.SAML2_NS, WSConstants.ENCRYPED_ASSERTION_LN);
+        encryptedAssertionElement.appendChild(assertionElement);
+        secHeader.getSecurityHeader().appendChild(encryptedAssertionElement);
+
+        // Encrypt the Assertion
+        KeyGenerator keygen = KeyGenerator.getInstance("AES");
+        keygen.init(128);
+        SecretKey secretKey = keygen.generateKey();
+        Crypto crypto = CryptoFactory.getInstance("wss40.properties");
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("wss40");
+        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+        assertTrue(certs != null && certs.length > 0 && certs[0] != null);
+
+        XMLCipher cipher = XMLCipher.getInstance(WSConstants.AES_128);
+        cipher.init(XMLCipher.ENCRYPT_MODE, secretKey);
+
+        // Create a KeyInfo for the EncryptedData
+        EncryptedData builder = cipher.getEncryptedData();
+        KeyInfo builderKeyInfo = builder.getKeyInfo();
+        if (builderKeyInfo == null) {
+            builderKeyInfo = new KeyInfo(doc);
+            builderKeyInfo.getElement().setAttributeNS(
+                "http://www.w3.org/2000/xmlns/", "xmlns:dsig",
+                "http://www.w3.org/2000/09/xmldsig#"
+            );
+            builder.setKeyInfo(builderKeyInfo);
+        }
+        String encryptedKeyId = IDGenerator.generateID(null);
+        RetrievalMethod retrievalMethod = new RetrievalMethod(doc, "#" + encryptedKeyId,
+                                                              null, "http://www.w3.org/2001/04/xmlenc#EncryptedKey");
+        builderKeyInfo.add(retrievalMethod);
+
+        cipher.doFinal(doc, assertionElement, false);
+
+        String id = IDGenerator.generateID(null);
+        Element encryptedData =
+            (Element)encryptedAssertionElement.getElementsByTagNameNS(WSConstants.ENC_NS, "EncryptedData").item(0);
+        encryptedData.setAttributeNS(null, "Id", id);
+
+        XMLCipher newCipher = XMLCipher.getInstance(WSConstants.KEYTRANSPORT_RSAOEP);
+        newCipher.init(XMLCipher.WRAP_MODE, certs[0].getPublicKey());
+        EncryptedKey encryptedKey = newCipher.encryptKey(doc, secretKey);
+
+        KeyInfo encryptedKeyKeyInfo = encryptedKey.getKeyInfo();
+        if (encryptedKeyKeyInfo == null) {
+            encryptedKeyKeyInfo = new KeyInfo(doc);
+            encryptedKeyKeyInfo.getElement().setAttributeNS(
+                "http://www.w3.org/2000/xmlns/", "xmlns:dsig", "http://www.w3.org/2000/09/xmldsig#"
+            );
+            encryptedKey.setKeyInfo(encryptedKeyKeyInfo);
+        }
+        X509Data x509Data = new X509Data(doc);
+        x509Data.addIssuerSerial(certs[0].getIssuerX500Principal().getName(),
+                                 certs[0].getSerialNumber());
+        encryptedKeyKeyInfo.add(x509Data);
+
+        ReferenceList referenceList = newCipher.createReferenceList(ReferenceList.DATA_REFERENCE);
+        Reference reference = referenceList.newDataReference("#" + id);
+        referenceList.add(reference);
+        encryptedKey.setReferenceList(referenceList);
+        Element encryptedKeyElement = newCipher.martial(encryptedKey);
+        encryptedKeyElement.setAttributeNS(null, "Id", encryptedKeyId);
+        encryptedAssertionElement.appendChild(encryptedKeyElement);
+
+        if (LOG.isDebugEnabled()) {
+            String outputString =
+                XMLUtils.PrettyDocumentToString(doc);
+            LOG.debug(outputString);
+        }
+
+        RequestData requestData = new RequestData();
+        requestData.setValidateSamlSubjectConfirmation(false);
+        requestData.setCallbackHandler(new KeystoreCallbackHandler());
+        requestData.setDecCrypto(crypto);
+        requestData.setSigVerCrypto(crypto);
+        requestData.setDisableBSPEnforcement(true);
         WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
 
         WSSecurityEngineResult actionResult =
