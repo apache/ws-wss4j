@@ -58,8 +58,9 @@ public class SignedElementsBuilder implements AssertionBuilder<Element> {
 
         Element child = SPUtils.getFirstChildElement(element);
         while (child != null) {
+            QName xpathExpression = spVersion.getSPConstants().getXPathExpression();
             if (SPConstants.XPATH_EXPR.equals(child.getLocalName())
-                    && spVersion.getSPConstants().getXPathExpression().getNamespaceURI().equals(child.getNamespaceURI())) {
+                && xpathExpression.getNamespaceURI().equals(child.getNamespaceURI())) {
                 Map<String, String> declaredNamespaces = new HashMap<>();
                 addDeclaredNamespaces(child, declaredNamespaces);
                 xPaths.add(new XPath(child.getTextContent().trim(), XPath.Version.V1, null, declaredNamespaces));
@@ -74,8 +75,9 @@ public class SignedElementsBuilder implements AssertionBuilder<Element> {
 
         Element child = SPUtils.getFirstChildElement(element);
         while (child != null) {
+            QName xpathExpression = spVersion.getSPConstants().getXPath2Expression();
             if (SPConstants.XPATH2_EXPR.equals(child.getLocalName())
-                    && spVersion.getSPConstants().getXPath2Expression().getNamespaceURI().equals(child.getNamespaceURI())) {
+                && xpathExpression.getNamespaceURI().equals(child.getNamespaceURI())) {
                 Map<String, String> declaredNamespaces = new HashMap<>();
                 addDeclaredNamespaces(child, declaredNamespaces);
                 String filter = child.getAttributeNS(null, SPConstants.FILTER);

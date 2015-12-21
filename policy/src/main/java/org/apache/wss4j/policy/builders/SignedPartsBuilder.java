@@ -55,8 +55,12 @@ public class SignedPartsBuilder extends RequiredPartsBuilder {
         while (child != null) {
             if (spVersion.getSPConstants().getAttachments().getLocalPart().equals(child.getLocalName())
                     && spVersion.getSPConstants().getAttachments().getNamespaceURI().equals(child.getNamespaceURI())) {
-                boolean contentSignatureTransform = SPUtils.hasChildElementWithName(child, spVersion.getSPConstants().getContentSignatureTransform());
-                boolean attachmentCompleteSignatureTransform = SPUtils.hasChildElementWithName(child, spVersion.getSPConstants().getAttachmentCompleteSignatureTransform());
+                boolean contentSignatureTransform =
+                    SPUtils.hasChildElementWithName(child, spVersion.getSPConstants().getContentSignatureTransform());
+                QName completeSigTransform =
+                    spVersion.getSPConstants().getAttachmentCompleteSignatureTransform();
+                boolean attachmentCompleteSignatureTransform =
+                    SPUtils.hasChildElementWithName(child, completeSigTransform);
                 return new Attachments(spVersion, contentSignatureTransform, attachmentCompleteSignatureTransform);
             }
             child = SPUtils.getNextSiblingElement(child);

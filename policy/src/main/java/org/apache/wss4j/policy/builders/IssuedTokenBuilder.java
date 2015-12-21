@@ -49,7 +49,8 @@ public class IssuedTokenBuilder implements AssertionBuilder<Element> {
             throw new IllegalArgumentException("sp:IssuedToken must have an inner wsp:Policy element");
         }
         final Policy nestedPolicy = factory.getPolicyEngine().getPolicy(nestedPolicyElement);
-        final Element requestSecurityTokenTemplate = SPUtils.getFirstChildElement(element, spVersion.getSPConstants().getRequestSecurityTokenTemplate());
+        final Element requestSecurityTokenTemplate =
+            SPUtils.getFirstChildElement(element, spVersion.getSPConstants().getRequestSecurityTokenTemplate());
         if (requestSecurityTokenTemplate == null) {
             throw new IllegalArgumentException("sp:IssuedToken must have a sp:RequestSecurityTokenTemplate element");
         }

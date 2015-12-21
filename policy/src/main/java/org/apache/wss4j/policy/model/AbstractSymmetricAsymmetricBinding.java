@@ -30,16 +30,16 @@ public abstract class AbstractSymmetricAsymmetricBinding extends AbstractBinding
         EncryptBeforeSigning,
         SignBeforeEncrypting;
 
-        private static final Map<String, ProtectionOrder> lookup = new HashMap<>();
+        private static final Map<String, ProtectionOrder> LOOKUP = new HashMap<>();
 
         static {
             for (ProtectionOrder u : EnumSet.allOf(ProtectionOrder.class)) {
-                lookup.put(u.name(), u);
+                LOOKUP.put(u.name(), u);
             }
         }
 
         public static ProtectionOrder lookUp(String name) {
-            return lookup.get(name);
+            return LOOKUP.get(name);
         }
     }
 

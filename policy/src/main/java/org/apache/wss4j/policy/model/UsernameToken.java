@@ -32,16 +32,16 @@ public class UsernameToken extends AbstractToken {
         NoPassword,
         HashPassword;
 
-        private static final Map<String, PasswordType> lookup = new HashMap<>();
+        private static final Map<String, PasswordType> LOOKUP = new HashMap<>();
 
         static {
             for (PasswordType u : EnumSet.allOf(PasswordType.class)) {
-                lookup.put(u.name(), u);
+                LOOKUP.put(u.name(), u);
             }
         }
 
         public static PasswordType lookUp(String name) {
-            return lookup.get(name);
+            return LOOKUP.get(name);
         }
     }
 
@@ -49,16 +49,16 @@ public class UsernameToken extends AbstractToken {
         WssUsernameToken10,
         WssUsernameToken11;
 
-        private static final Map<String, UsernameTokenType> lookup = new HashMap<>();
+        private static final Map<String, UsernameTokenType> LOOKUP = new HashMap<>();
 
         static {
             for (UsernameTokenType u : EnumSet.allOf(UsernameTokenType.class)) {
-                lookup.put(u.name(), u);
+                LOOKUP.put(u.name(), u);
             }
         }
 
         public static UsernameTokenType lookUp(String name) {
-            return lookup.get(name);
+            return LOOKUP.get(name);
         }
     }
 
@@ -81,7 +81,8 @@ public class UsernameToken extends AbstractToken {
 
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
-        return new UsernameToken(getVersion(), getIncludeTokenType(), getIssuer(), getIssuerName(), getClaims(), nestedPolicy);
+        return new UsernameToken(getVersion(), getIncludeTokenType(), getIssuer(),
+                                 getIssuerName(), getClaims(), nestedPolicy);
     }
 
     protected void parseNestedPolicy(Policy nestedPolicy, UsernameToken usernameToken) {

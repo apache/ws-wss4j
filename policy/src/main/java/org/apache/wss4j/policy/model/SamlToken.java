@@ -35,16 +35,16 @@ public class SamlToken extends AbstractToken {
         WssSamlV11Token11,
         WssSamlV20Token11;
 
-        private static final Map<String, SamlTokenType> lookup = new HashMap<>();
+        private static final Map<String, SamlTokenType> LOOKUP = new HashMap<>();
 
         static {
             for (SamlTokenType u : EnumSet.allOf(SamlTokenType.class)) {
-                lookup.put(u.name(), u);
+                LOOKUP.put(u.name(), u);
             }
         }
 
         public static SamlTokenType lookUp(String name) {
-            return lookup.get(name);
+            return LOOKUP.get(name);
         }
     }
 

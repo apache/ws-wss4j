@@ -34,16 +34,16 @@ public class RelToken extends AbstractToken {
         WssRelV10Token11,
         WssRelV20Token11;
 
-        private static final Map<String, RelTokenType> lookup = new HashMap<>();
+        private static final Map<String, RelTokenType> LOOKUP = new HashMap<>();
 
         static {
             for (RelTokenType u : EnumSet.allOf(RelTokenType.class)) {
-                lookup.put(u.name(), u);
+                LOOKUP.put(u.name(), u);
             }
         }
 
         public static RelTokenType lookUp(String name) {
-            return lookup.get(name);
+            return LOOKUP.get(name);
         }
     }
 
@@ -64,7 +64,8 @@ public class RelToken extends AbstractToken {
 
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
-        return new RelToken(getVersion(), getIncludeTokenType(), getIssuer(), getIssuerName(), getClaims(), nestedPolicy);
+        return new RelToken(getVersion(), getIncludeTokenType(), getIssuer(), getIssuerName(),
+                            getClaims(), nestedPolicy);
     }
 
     protected void parseNestedPolicy(Policy nestedPolicy, RelToken relToken) {
@@ -86,8 +87,10 @@ public class RelToken extends AbstractToken {
                     relToken.setDerivedKeys(derivedKeys);
                     continue;
                 }
-                if (getVersion().getSPConstants().getRequireKeyIdentifierReference().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getRequireKeyIdentifierReference().getNamespaceURI().equals(assertionNamespace)) {
+                QName requireKeyIdentifierRef =
+                    getVersion().getSPConstants().getRequireKeyIdentifierReference();
+                if (requireKeyIdentifierRef.getLocalPart().equals(assertionName)
+                    && requireKeyIdentifierRef.getNamespaceURI().equals(assertionNamespace)) {
                     if (relToken.isRequireKeyIdentifierReference()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }

@@ -47,10 +47,12 @@ public class SecurityContextToken extends AbstractToken {
 
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
-        return new SecurityContextToken(getVersion(), getIncludeTokenType(), getIssuer(), getIssuerName(), getClaims(), nestedPolicy);
+        return new SecurityContextToken(getVersion(), getIncludeTokenType(), getIssuer(),
+                                        getIssuerName(), getClaims(), nestedPolicy);
     }
 
-    protected void parseNestedSecurityContextTokenPolicy(Policy nestedPolicy, SecurityContextToken securityContextToken) {
+    protected void parseNestedSecurityContextTokenPolicy(Policy nestedPolicy,
+                                                         SecurityContextToken securityContextToken) {
         Iterator<List<Assertion>> alternatives = nestedPolicy.getAlternatives();
         //we just process the first alternative
         //this means that if we have a compact policy only the first alternative is visible
@@ -69,24 +71,30 @@ public class SecurityContextToken extends AbstractToken {
                     securityContextToken.setDerivedKeys(derivedKeys);
                     continue;
                 }
-                if (getVersion().getSPConstants().getRequireExternalUriReference().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getRequireExternalUriReference().getNamespaceURI().equals(assertionNamespace)) {
+
+                QName requireExternalUriRef = getVersion().getSPConstants().getRequireExternalUriReference();
+                if (requireExternalUriRef.getLocalPart().equals(assertionName)
+                    && requireExternalUriRef.getNamespaceURI().equals(assertionNamespace)) {
                     if (securityContextToken.isRequireExternalUriReference()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     securityContextToken.setRequireExternalUriReference(true);
                     continue;
                 }
-                if (getVersion().getSPConstants().getSc13SecurityContextToken().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getSc13SecurityContextToken().getNamespaceURI().equals(assertionNamespace)) {
+
+                QName sc13SCT = getVersion().getSPConstants().getSc13SecurityContextToken();
+                if (sc13SCT.getLocalPart().equals(assertionName)
+                    && sc13SCT.getNamespaceURI().equals(assertionNamespace)) {
                     if (securityContextToken.isSc13SecurityContextToken()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     securityContextToken.setSc13SecurityContextToken(true);
                     continue;
                 }
-                if (getVersion().getSPConstants().getSc10SecurityContextToken().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getSc10SecurityContextToken().getNamespaceURI().equals(assertionNamespace)) {
+
+                QName sc10SCT = getVersion().getSPConstants().getSc10SecurityContextToken();
+                if (sc10SCT.getLocalPart().equals(assertionName)
+                    && sc10SCT.getNamespaceURI().equals(assertionNamespace)) {
                     if (securityContextToken.isSc10SecurityContextToken()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }

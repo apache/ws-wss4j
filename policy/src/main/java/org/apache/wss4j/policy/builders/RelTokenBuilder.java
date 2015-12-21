@@ -48,7 +48,8 @@ public class RelTokenBuilder implements AssertionBuilder<Element> {
         }
         final Element nestedPolicyElement = SPUtils.getFirstPolicyChildElement(element);
         final Element claims = SPUtils.getFirstChildElement(element, spVersion.getSPConstants().getClaims());
-        final Policy nestedPolicy = nestedPolicyElement != null ? factory.getPolicyEngine().getPolicy(nestedPolicyElement) : new Policy();
+        final Policy nestedPolicy =
+            nestedPolicyElement != null ? factory.getPolicyEngine().getPolicy(nestedPolicyElement) : new Policy();
         RelToken relToken = new RelToken(
                 spVersion,
                 spVersion.getSPConstants().getInclusionFromAttributeValue(includeTokenValue),

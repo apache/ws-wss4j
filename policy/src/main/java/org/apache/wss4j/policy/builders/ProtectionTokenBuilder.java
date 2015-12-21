@@ -37,7 +37,8 @@ public class ProtectionTokenBuilder implements AssertionBuilder<Element> {
     public Assertion build(Element element, AssertionBuilderFactory factory) throws IllegalArgumentException {
         final SPConstants.SPVersion spVersion = SPConstants.SPVersion.getSPVersion(element.getNamespaceURI());
         final Element nestedPolicyElement = SPUtils.getFirstPolicyChildElement(element);
-        final Policy nestedPolicy = nestedPolicyElement != null ? factory.getPolicyEngine().getPolicy(nestedPolicyElement) : new Policy();
+        final Policy nestedPolicy =
+            nestedPolicyElement != null ? factory.getPolicyEngine().getPolicy(nestedPolicyElement) : new Policy();
         ProtectionToken protectionToken = new ProtectionToken(
                 spVersion,
                 nestedPolicy

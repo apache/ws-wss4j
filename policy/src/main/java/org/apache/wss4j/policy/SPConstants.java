@@ -45,16 +45,16 @@ public abstract class SPConstants {
             this.prefix = prefix;
         }
 
-        private static final Map<String, SPVersion> lookup = new HashMap<>();
+        private static final Map<String, SPVersion> LOOKUP = new HashMap<>();
 
         static {
             for (SPVersion spVersion : EnumSet.allOf(SPVersion.class)) {
-                lookup.put(spVersion.namespace, spVersion);
+                LOOKUP.put(spVersion.namespace, spVersion);
             }
         }
 
         public static SPVersion getSPVersion(String namespace) {
-            return lookup.get(namespace);
+            return LOOKUP.get(namespace);
         }
 
         public SPConstants getSPConstants() {
@@ -73,270 +73,272 @@ public abstract class SPConstants {
     public static final String P_LOCALNAME = "Policy";
 
 
-    public final static String LAYOUT = "Layout";
+    public static final String LAYOUT = "Layout";
 
     /**
      * Security Header Layout : Strict
      */
-    public final static String LAYOUT_STRICT = "Strict";
+    public static final String LAYOUT_STRICT = "Strict";
 
     /**
      * Security Header Layout : Lax
      */
-    public final static String LAYOUT_LAX = "Lax";
+    public static final String LAYOUT_LAX = "Lax";
 
     /**
      * Security Header Layout : LaxTsFirst
      */
-    public final static String LAYOUT_LAX_TIMESTAMP_FIRST = "LaxTsFirst";
+    public static final String LAYOUT_LAX_TIMESTAMP_FIRST = "LaxTsFirst";
 
     /**
      * Security Header Layout : LaxTsLast
      */
-    public final static String LAYOUT_LAX_TIMESTAMP_LAST = "LaxTsLast";
+    public static final String LAYOUT_LAX_TIMESTAMP_LAST = "LaxTsLast";
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Protection Order : EncryptBeforeSigning
      */
-    public final static String ENCRYPT_BEFORE_SIGNING = "EncryptBeforeSigning";
+    public static final String ENCRYPT_BEFORE_SIGNING = "EncryptBeforeSigning";
 
     /**
      * Protection Order : SignBeforeEncrypting
      */
-    public final static String SIGN_BEFORE_ENCRYPTING = "SignBeforeEncrypting";
+    public static final String SIGN_BEFORE_ENCRYPTING = "SignBeforeEncrypting";
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public final static String ENCRYPT_SIGNATURE = "EncryptSignature";
+    public static final String ENCRYPT_SIGNATURE = "EncryptSignature";
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public final static String PROTECT_TOKENS = "ProtectTokens";
+    public static final String PROTECT_TOKENS = "ProtectTokens";
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public final static String ONLY_SIGN_ENTIRE_HEADERS_AND_BODY = "OnlySignEntireHeadersAndBody";
+    public static final String ONLY_SIGN_ENTIRE_HEADERS_AND_BODY = "OnlySignEntireHeadersAndBody";
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public final static String INCLUDE_TIMESTAMP = "IncludeTimestamp";
+    public static final String INCLUDE_TIMESTAMP = "IncludeTimestamp";
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public final static String SIGNED_PARTS = "SignedParts";
+    public static final String SIGNED_PARTS = "SignedParts";
 
-    public final static String ENCRYPTED_PARTS = "EncryptedParts";
+    public static final String ENCRYPTED_PARTS = "EncryptedParts";
 
-    public final static String SIGNED_ELEMENTS = "SignedElements";
+    public static final String SIGNED_ELEMENTS = "SignedElements";
 
-    public final static String ENCRYPTED_ELEMENTS = "EncryptedElements";
+    public static final String ENCRYPTED_ELEMENTS = "EncryptedElements";
 
-    public final static String REQUIRED_ELEMENTS = "RequiredElements";
+    public static final String REQUIRED_ELEMENTS = "RequiredElements";
 
-    public final static String CONTENT_ENCRYPTED_ELEMENTS = "ContentEncryptedElements";
+    public static final String CONTENT_ENCRYPTED_ELEMENTS = "ContentEncryptedElements";
 
-    public final static String REQUIRED_PARTS = "RequiredParts";
+    public static final String REQUIRED_PARTS = "RequiredParts";
 
-    public final static String XPATH_VERSION = "XPathVersion";
+    public static final String XPATH_VERSION = "XPathVersion";
 
-    public final static String XPATH_EXPR = "XPath";
+    public static final String XPATH_EXPR = "XPath";
 
-    public final static String XPATH2_EXPR = "Xpath2";
+    public static final String XPATH2_EXPR = "Xpath2";
 
-    public final static String FILTER = "Filter";
+    public static final String FILTER = "Filter";
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     // X509 Token types
 
-    public final static String X509_TOKEN = "X509Token";
+    public static final String X509_TOKEN = "X509Token";
 
-    public final static String WSS_X509_V1_TOKEN10 = "WssX509V1Token10";
+    public static final String WSS_X509_V1_TOKEN10 = "WssX509V1Token10";
 
-    public final static String WSS_X509_V3_TOKEN10 = "WssX509V3Token10";
+    public static final String WSS_X509_V3_TOKEN10 = "WssX509V3Token10";
 
-    public final static String WSS_X509_PKCS7_TOKEN10 = "WssX509Pkcs7Token10";
+    public static final String WSS_X509_PKCS7_TOKEN10 = "WssX509Pkcs7Token10";
 
-    public final static String WSS_X509_PKI_PATH_V1_TOKEN10 = "WssX509PkiPathV1Token10";
+    public static final String WSS_X509_PKI_PATH_V1_TOKEN10 = "WssX509PkiPathV1Token10";
 
-    public final static String WSS_X509_V1_TOKEN11 = "WssX509V1Token11";
+    public static final String WSS_X509_V1_TOKEN11 = "WssX509V1Token11";
 
-    public final static String WSS_X509_V3_TOKEN11 = "WssX509V3Token11";
+    public static final String WSS_X509_V3_TOKEN11 = "WssX509V3Token11";
 
-    public final static String WSS_X509_PKCS7_TOKEN11 = "WssX509Pkcs7Token11";
+    public static final String WSS_X509_PKCS7_TOKEN11 = "WssX509Pkcs7Token11";
 
-    public final static String WSS_X509_PKI_PATH_V1_TOKEN11 = "WssX509PkiPathV1Token11";
-
-
-    public final static String USERNAME_TOKEN = "UsernameToken";
-
-    public final static String USERNAME_TOKEN10 = "WssUsernameToken10";
-
-    public final static String USERNAME_TOKEN11 = "WssUsernameToken11";
+    public static final String WSS_X509_PKI_PATH_V1_TOKEN11 = "WssX509PkiPathV1Token11";
 
 
-    public final static String TRANSPORT_TOKEN = "TransportToken";
+    public static final String USERNAME_TOKEN = "UsernameToken";
 
-    public final static String HTTPS_TOKEN = "HttpsToken";
+    public static final String USERNAME_TOKEN10 = "WssUsernameToken10";
 
-    public final static String KERBEROS_TOKEN = "KerberosToken";
-
-    public final static String SPNEGO_CONTEXT_TOKEN = "SpnegoContextToken";
-
-    public final static String REQUIRE_CLIENT_CERTIFICATE = "RequireClientCertificate";
-
-    public final static String HTTP_BASIC_AUTHENTICATION = "HttpBasicAuthentication";
-
-    public final static String HTTP_DIGEST_AUTHENTICATION = "HttpDigestAuthentication";
-
-    public final static String SECURITY_CONTEXT_TOKEN = "SecurityContextToken";
-
-    public final static String SECURE_CONVERSATION_TOKEN = "SecureConversationToken";
-
-    public final static String SAML_TOKEN = "SamlToken";
-
-    public final static String REL_TOKEN = "RelToken";
-
-    public final static String KEY_VALUE_TOKEN = "KeyValueToken";
-
-    public final static String RSA_KEY_VALUE = "RsaKeyValue";
-
-    public final static String ISSUED_TOKEN = "IssuedToken";
+    public static final String USERNAME_TOKEN11 = "WssUsernameToken11";
 
 
-    public final static String SIGNATURE_TOKEN = "SignatureToken";
+    public static final String TRANSPORT_TOKEN = "TransportToken";
 
-    public final static String ENCRYPTION_TOKEN = "EncryptionToken";
+    public static final String HTTPS_TOKEN = "HttpsToken";
 
-    public final static String PROTECTION_TOKEN = "ProtectionToken";
+    public static final String KERBEROS_TOKEN = "KerberosToken";
 
-    public final static String INITIATOR_TOKEN = "InitiatorToken";
+    public static final String SPNEGO_CONTEXT_TOKEN = "SpnegoContextToken";
 
-    public final static String INITIATOR_SIGNATURE_TOKEN = "InitiatorSignatureToken";
+    public static final String REQUIRE_CLIENT_CERTIFICATE = "RequireClientCertificate";
 
-    public final static String INITIATOR_ENCRYPTION_TOKEN = "InitiatorEncryptionToken";
+    public static final String HTTP_BASIC_AUTHENTICATION = "HttpBasicAuthentication";
 
-    public final static String RECIPIENT_TOKEN = "RecipientToken";
+    public static final String HTTP_DIGEST_AUTHENTICATION = "HttpDigestAuthentication";
 
-    public final static String RECIPIENT_SIGNATURE_TOKEN = "RecipientSignatureToken";
+    public static final String SECURITY_CONTEXT_TOKEN = "SecurityContextToken";
 
-    public final static String RECIPIENT_ENCRYPTION_TOKEN = "RecipientEncryptionToken";
+    public static final String SECURE_CONVERSATION_TOKEN = "SecureConversationToken";
+
+    public static final String SAML_TOKEN = "SamlToken";
+
+    public static final String REL_TOKEN = "RelToken";
+
+    public static final String KEY_VALUE_TOKEN = "KeyValueToken";
+
+    public static final String RSA_KEY_VALUE = "RsaKeyValue";
+
+    public static final String ISSUED_TOKEN = "IssuedToken";
 
 
-    public final static String SUPPORTING_TOKENS = "SupportingTokens";
+    public static final String SIGNATURE_TOKEN = "SignatureToken";
 
-    public final static String SIGNED_SUPPORTING_TOKENS = "SignedSupportingTokens";
+    public static final String ENCRYPTION_TOKEN = "EncryptionToken";
 
-    public final static String ENDORSING_SUPPORTING_TOKENS = "EndorsingSupportingTokens";
+    public static final String PROTECTION_TOKEN = "ProtectionToken";
 
-    public final static String SIGNED_ENDORSING_SUPPORTING_TOKENS = "SignedEndorsingSupportingTokens";
+    public static final String INITIATOR_TOKEN = "InitiatorToken";
 
-    public final static String ENCRYPTED_SUPPORTING_TOKENS = "EncryptedSupportingTokens";
+    public static final String INITIATOR_SIGNATURE_TOKEN = "InitiatorSignatureToken";
 
-    public final static String SIGNED_ENCRYPTED_SUPPORTING_TOKENS = "SignedEncryptedSupportingTokens";
+    public static final String INITIATOR_ENCRYPTION_TOKEN = "InitiatorEncryptionToken";
 
-    public final static String ENDORSING_ENCRYPTED_SUPPORTING_TOKENS = "EndorsingEncryptedSupportingTokens";
+    public static final String RECIPIENT_TOKEN = "RecipientToken";
 
-    public final static String SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS = "SignedEndorsingEncryptedSupportingTokens";
+    public static final String RECIPIENT_SIGNATURE_TOKEN = "RecipientSignatureToken";
+
+    public static final String RECIPIENT_ENCRYPTION_TOKEN = "RecipientEncryptionToken";
+
+
+    public static final String SUPPORTING_TOKENS = "SupportingTokens";
+
+    public static final String SIGNED_SUPPORTING_TOKENS = "SignedSupportingTokens";
+
+    public static final String ENDORSING_SUPPORTING_TOKENS = "EndorsingSupportingTokens";
+
+    public static final String SIGNED_ENDORSING_SUPPORTING_TOKENS = "SignedEndorsingSupportingTokens";
+
+    public static final String ENCRYPTED_SUPPORTING_TOKENS = "EncryptedSupportingTokens";
+
+    public static final String SIGNED_ENCRYPTED_SUPPORTING_TOKENS = "SignedEncryptedSupportingTokens";
+
+    public static final String ENDORSING_ENCRYPTED_SUPPORTING_TOKENS = "EndorsingEncryptedSupportingTokens";
+
+    public static final String SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS =
+        "SignedEndorsingEncryptedSupportingTokens";
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public final static String ALGORITHM_SUITE = "AlgorithmSuite";
+    public static final String ALGORITHM_SUITE = "AlgorithmSuite";
 
-    public final static String ALGO_SUITE_BASIC256 = "Basic256";
+    public static final String ALGO_SUITE_BASIC256 = "Basic256";
 
-    public final static String ALGO_SUITE_BASIC192 = "Basic192";
+    public static final String ALGO_SUITE_BASIC192 = "Basic192";
 
-    public final static String ALGO_SUITE_BASIC128 = "Basic128";
+    public static final String ALGO_SUITE_BASIC128 = "Basic128";
 
-    public final static String ALGO_SUITE_TRIPLE_DES = "TripleDes";
+    public static final String ALGO_SUITE_TRIPLE_DES = "TripleDes";
 
-    public final static String ALGO_SUITE_BASIC256_RSA15 = "Basic256Rsa15";
+    public static final String ALGO_SUITE_BASIC256_RSA15 = "Basic256Rsa15";
 
-    public final static String ALGO_SUITE_BASIC192_RSA15 = "Basic192Rsa15";
+    public static final String ALGO_SUITE_BASIC192_RSA15 = "Basic192Rsa15";
 
-    public final static String ALGO_SUITE_BASIC128_RSA15 = "Basic128Rsa15";
+    public static final String ALGO_SUITE_BASIC128_RSA15 = "Basic128Rsa15";
 
-    public final static String ALGO_SUITE_TRIPLE_DES_RSA15 = "TripleDesRsa15";
+    public static final String ALGO_SUITE_TRIPLE_DES_RSA15 = "TripleDesRsa15";
 
-    public final static String ALGO_SUITE_BASIC256_SHA256 = "Basic256Sha256";
+    public static final String ALGO_SUITE_BASIC256_SHA256 = "Basic256Sha256";
 
-    public final static String ALGO_SUITE_BASIC192_SHA256 = "Basic192Sha256";
+    public static final String ALGO_SUITE_BASIC192_SHA256 = "Basic192Sha256";
 
-    public final static String ALGO_SUITE_BASIC128_SHA256 = "Basic128Sha256";
+    public static final String ALGO_SUITE_BASIC128_SHA256 = "Basic128Sha256";
 
-    public final static String ALGO_SUITE_TRIPLE_DES_SHA256 = "TripleDesSha256";
+    public static final String ALGO_SUITE_TRIPLE_DES_SHA256 = "TripleDesSha256";
 
-    public final static String ALGO_SUITE_BASIC256_SHA256_RSA15 = "Basic256Sha256Rsa15";
+    public static final String ALGO_SUITE_BASIC256_SHA256_RSA15 = "Basic256Sha256Rsa15";
 
-    public final static String ALGO_SUITE_BASIC192_SHA256_RSA15 = "Basic192Sha256Rsa15";
+    public static final String ALGO_SUITE_BASIC192_SHA256_RSA15 = "Basic192Sha256Rsa15";
 
-    public final static String ALGO_SUITE_BASIC128_SHA256_RSA15 = "Basic128Sha256Rsa15";
+    public static final String ALGO_SUITE_BASIC128_SHA256_RSA15 = "Basic128Sha256Rsa15";
 
-    public final static String ALGO_SUITE_TRIPLE_DES_SHA256_RSA15 = "TripleDesSha256Rsa15";
+    public static final String ALGO_SUITE_TRIPLE_DES_SHA256_RSA15 = "TripleDesSha256Rsa15";
 
     // /
     // /Algorithms
     // /
-    public final static String HMAC_SHA1 = "http://www.w3.org/2000/09/xmldsig#hmac-sha1";
+    public static final String HMAC_SHA1 = "http://www.w3.org/2000/09/xmldsig#hmac-sha1";
 
-    public final static String RSA_SHA1 = "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
+    public static final String RSA_SHA1 = "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
 
-    public final static String RSA_SHA256 = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+    public static final String RSA_SHA256 = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
 
-    public final static String RSA_SHA384 = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384";
+    public static final String RSA_SHA384 = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384";
 
-    public final static String RSA_SHA512 = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512";
+    public static final String RSA_SHA512 = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512";
 
-    public final static String SHA1 = "http://www.w3.org/2000/09/xmldsig#sha1";
+    public static final String SHA1 = "http://www.w3.org/2000/09/xmldsig#sha1";
 
-    public final static String SHA256 = "http://www.w3.org/2001/04/xmlenc#sha256";
+    public static final String SHA256 = "http://www.w3.org/2001/04/xmlenc#sha256";
 
-    public final static String SHA512 = "http://www.w3.org/2001/04/xmlenc#sha512";
+    public static final String SHA512 = "http://www.w3.org/2001/04/xmlenc#sha512";
 
-    public final static String AES128 = "http://www.w3.org/2001/04/xmlenc#aes128-cbc";
+    public static final String AES128 = "http://www.w3.org/2001/04/xmlenc#aes128-cbc";
 
-    public final static String AES192 = "http://www.w3.org/2001/04/xmlenc#aes192-cbc";
+    public static final String AES192 = "http://www.w3.org/2001/04/xmlenc#aes192-cbc";
 
-    public final static String AES256 = "http://www.w3.org/2001/04/xmlenc#aes256-cbc";
+    public static final String AES256 = "http://www.w3.org/2001/04/xmlenc#aes256-cbc";
 
-    public final static String TRIPLE_DES = "http://www.w3.org/2001/04/xmlenc#tripledes-cbc";
+    public static final String TRIPLE_DES = "http://www.w3.org/2001/04/xmlenc#tripledes-cbc";
 
-    public final static String KW_AES128 = "http://www.w3.org/2001/04/xmlenc#kw-aes128";
+    public static final String KW_AES128 = "http://www.w3.org/2001/04/xmlenc#kw-aes128";
 
-    public final static String KW_AES192 = "http://www.w3.org/2001/04/xmlenc#kw-aes192";
+    public static final String KW_AES192 = "http://www.w3.org/2001/04/xmlenc#kw-aes192";
 
-    public final static String KW_AES256 = "http://www.w3.org/2001/04/xmlenc#kw-aes256";
+    public static final String KW_AES256 = "http://www.w3.org/2001/04/xmlenc#kw-aes256";
 
-    public final static String KW_TRIPLE_DES = "http://www.w3.org/2001/04/xmlenc#kw-tripledes";
+    public static final String KW_TRIPLE_DES = "http://www.w3.org/2001/04/xmlenc#kw-tripledes";
 
-    public final static String KW_RSA_OAEP = "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p";
+    public static final String KW_RSA_OAEP = "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p";
 
-    public final static String KW_RSA15 = "http://www.w3.org/2001/04/xmlenc#rsa-1_5";
+    public static final String KW_RSA15 = "http://www.w3.org/2001/04/xmlenc#rsa-1_5";
 
-    public final static String P_SHA1 = "http://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1";
+    public static final String P_SHA1 = "http://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1";
 
-    public final static String P_SHA1_L128 = "http://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1";
+    public static final String P_SHA1_L128 = "http://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1";
 
-    public final static String P_SHA1_L192 = "http://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1";
+    public static final String P_SHA1_L192 = "http://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1";
 
-    public final static String P_SHA1_L256 = "http://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1";
+    public static final String P_SHA1_L256 = "http://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1";
 
-    public final static String XPATH = "http://www.w3.org/TR/1999/REC-xpath-19991116";
+    public static final String XPATH = "http://www.w3.org/TR/1999/REC-xpath-19991116";
 
-    public final static String XPATH20 = "http://www.w3.org/2002/06/xmldsig-filter2";
+    public static final String XPATH20 = "http://www.w3.org/2002/06/xmldsig-filter2";
 
-    public final static String C14N = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
+    public static final String C14N = "http://www.w3.org/TR/2001/REC-xml-c14n-20010315";
 
-    public final static String C14N11 = "http://www.w3.org/2006/12/xml-c14n11";
+    public static final String C14N11 = "http://www.w3.org/2006/12/xml-c14n11";
 
-    public final static String EX_C14N = "http://www.w3.org/2001/10/xml-exc-c14n#";
+    public static final String EX_C14N = "http://www.w3.org/2001/10/xml-exc-c14n#";
 
-    public final static String SNT = "http://www.w3.org/TR/soap12-n11n";
+    public static final String SNT = "http://www.w3.org/TR/soap12-n11n";
 
-    public final static String STRT10 = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#STR-Transform";
+    public static final String STRT10 =
+        "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#STR-Transform";
 
     // /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -354,7 +356,7 @@ public abstract class SPConstants {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public final static String ATTR_INCLUDE_TOKEN = "IncludeToken";
+    public static final String ATTR_INCLUDE_TOKEN = "IncludeToken";
 
     public static final String INCLUDE_TOKEN_NEVER_SUFFIX = "/IncludeToken/Never";
 
@@ -502,16 +504,16 @@ public abstract class SPConstants {
         INCLUDE_TOKEN_ALWAYS_TO_INITIATOR,
         INCLUDE_TOKEN_ALWAYS;
 
-        private static final Map<String, IncludeTokenType> lookup = new HashMap<>();
+        private static final Map<String, IncludeTokenType> LOOKUP = new HashMap<>();
 
         static {
             for (IncludeTokenType u : EnumSet.allOf(IncludeTokenType.class)) {
-                lookup.put(u.name(), u);
+                LOOKUP.put(u.name(), u);
             }
         }
 
         public static IncludeTokenType lookUp(String name) {
-            return lookup.get(name);
+            return LOOKUP.get(name);
         }
     }
 

@@ -32,16 +32,16 @@ public class KerberosToken extends AbstractToken {
         WssKerberosV5ApReqToken11,
         WssGssKerberosV5ApReqToken11;
 
-        private static final Map<String, ApReqTokenType> lookup = new HashMap<>();
+        private static final Map<String, ApReqTokenType> LOOKUP = new HashMap<>();
 
         static {
             for (ApReqTokenType u : EnumSet.allOf(ApReqTokenType.class)) {
-                lookup.put(u.name(), u);
+                LOOKUP.put(u.name(), u);
             }
         }
 
         public static ApReqTokenType lookUp(String name) {
-            return lookup.get(name);
+            return LOOKUP.get(name);
         }
     }
 
@@ -63,7 +63,8 @@ public class KerberosToken extends AbstractToken {
 
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
-        return new KerberosToken(getVersion(), getIncludeTokenType(), getIssuer(), getIssuerName(), getClaims(), nestedPolicy);
+        return new KerberosToken(getVersion(), getIncludeTokenType(), getIssuer(),
+                                 getIssuerName(), getClaims(), nestedPolicy);
     }
 
     protected void parseNestedPolicy(Policy nestedPolicy, KerberosToken kerberosToken) {
@@ -85,8 +86,10 @@ public class KerberosToken extends AbstractToken {
                     kerberosToken.setDerivedKeys(derivedKeys);
                     continue;
                 }
-                if (getVersion().getSPConstants().getRequireKeyIdentifierReference().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getRequireKeyIdentifierReference().getNamespaceURI().equals(assertionNamespace)) {
+                QName requireKeyIdentifierRef =
+                    getVersion().getSPConstants().getRequireKeyIdentifierReference();
+                if (requireKeyIdentifierRef.getLocalPart().equals(assertionName)
+                    && requireKeyIdentifierRef.getNamespaceURI().equals(assertionNamespace)) {
                     if (kerberosToken.isRequireKeyIdentifierReference()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
