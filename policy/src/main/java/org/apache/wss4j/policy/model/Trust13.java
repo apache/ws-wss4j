@@ -61,32 +61,41 @@ public class Trust13 extends Trust10 {
                 Assertion assertion = assertions.get(i);
                 String assertionName = assertion.getName().getLocalPart();
                 String assertionNamespace = assertion.getName().getNamespaceURI();
-                if (getVersion().getSPConstants().getRequireRequestSecurityTokenCollection().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getRequireRequestSecurityTokenCollection().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName requireRSTC = getVersion().getSPConstants().getRequireRequestSecurityTokenCollection();
+                if (requireRSTC.getLocalPart().equals(assertionName)
+                    && requireRSTC.getNamespaceURI().equals(assertionNamespace)) {
                     if (trust13.isRequireRequestSecurityTokenCollection()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     trust13.setRequireRequestSecurityTokenCollection(true);
                     continue;
                 }
-                if (getVersion().getSPConstants().getRequireAppliesTo().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getRequireAppliesTo().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName requireAppliesTo = getVersion().getSPConstants().getRequireAppliesTo();
+                if (requireAppliesTo.getLocalPart().equals(assertionName)
+                    && requireAppliesTo.getNamespaceURI().equals(assertionNamespace)) {
                     if (trust13.isRequireAppliesTo()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     trust13.setRequireAppliesTo(true);
                     continue;
                 }
-                if (getVersion().getSPConstants().getScopePolicy15().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getScopePolicy15().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName scopePolicy15 = getVersion().getSPConstants().getScopePolicy15();
+                if (scopePolicy15.getLocalPart().equals(assertionName)
+                    && scopePolicy15.getNamespaceURI().equals(assertionNamespace)) {
                     if (trust13.isScopePolicy15()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     trust13.setScopePolicy15(true);
                     continue;
                 }
-                if (getVersion().getSPConstants().getMustSupportInteractiveChallenge().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getMustSupportInteractiveChallenge().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName supportInteractiveChallenge = 
+                    getVersion().getSPConstants().getMustSupportInteractiveChallenge();
+                if (supportInteractiveChallenge.getLocalPart().equals(assertionName)
+                    && supportInteractiveChallenge.getNamespaceURI().equals(assertionNamespace)) {
                     if (trust13.isMustSupportInteractiveChallenge()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }

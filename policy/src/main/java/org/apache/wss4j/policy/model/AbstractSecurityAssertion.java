@@ -148,10 +148,14 @@ public abstract class AbstractSecurityAssertion implements Assertion {
         writer.writeStartElement(getName().getPrefix(), getName().getLocalPart(), getName().getNamespaceURI());
         writer.writeNamespace(getName().getPrefix(), getName().getNamespaceURI());
         if (isOptional()) {
-            writer.writeAttribute(Constants.ATTR_WSP, writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), Constants.ATTR_OPTIONAL, "true");
+            writer.writeAttribute(Constants.ATTR_WSP, 
+                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), 
+                                  Constants.ATTR_OPTIONAL, "true");
         }
         if (isIgnorable()) {
-            writer.writeAttribute(Constants.ATTR_WSP, writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), Constants.ATTR_IGNORABLE, "true");
+            writer.writeAttribute(Constants.ATTR_WSP, 
+                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), 
+                                  Constants.ATTR_IGNORABLE, "true");
         }
         nestedPolicy.serialize(writer);
         writer.writeEndElement();

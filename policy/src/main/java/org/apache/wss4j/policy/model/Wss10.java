@@ -81,32 +81,40 @@ public class Wss10 extends AbstractSecurityAssertion implements PolicyContaining
                 Assertion assertion = assertions.get(i);
                 String assertionName = assertion.getName().getLocalPart();
                 String assertionNamespace = assertion.getName().getNamespaceURI();
-                if (getVersion().getSPConstants().getMustSupportRefKeyIdentifier().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getMustSupportRefKeyIdentifier().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName mustSupportRefKeyIdentifier = getVersion().getSPConstants().getMustSupportRefKeyIdentifier();
+                if (mustSupportRefKeyIdentifier.getLocalPart().equals(assertionName)
+                    && mustSupportRefKeyIdentifier.getNamespaceURI().equals(assertionNamespace)) {
                     if (wss10.isMustSupportRefKeyIdentifier()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     wss10.setMustSupportRefKeyIdentifier(true);
                     continue;
                 }
-                if (getVersion().getSPConstants().getMustSupportRefIssuerSerial().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getMustSupportRefIssuerSerial().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName mustSupportRefIssuerSerial = getVersion().getSPConstants().getMustSupportRefIssuerSerial();
+                if (mustSupportRefIssuerSerial.getLocalPart().equals(assertionName)
+                    && mustSupportRefIssuerSerial.getNamespaceURI().equals(assertionNamespace)) {
                     if (wss10.isMustSupportRefIssuerSerial()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     wss10.setMustSupportRefIssuerSerial(true);
                     continue;
                 }
-                if (getVersion().getSPConstants().getMustSupportRefExternalUri().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getMustSupportRefExternalUri().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName mustSupportRefExternal = getVersion().getSPConstants().getMustSupportRefExternalUri();
+                if (mustSupportRefExternal.getLocalPart().equals(assertionName)
+                    && mustSupportRefExternal.getNamespaceURI().equals(assertionNamespace)) {
                     if (wss10.isMustSupportRefExternalURI()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     wss10.setMustSupportRefExternalURI(true);
                     continue;
                 }
-                if (getVersion().getSPConstants().getMustSupportRefEmbeddedToken().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getMustSupportRefEmbeddedToken().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName mustSupportRefEmbedded = getVersion().getSPConstants().getMustSupportRefEmbeddedToken();
+                if (mustSupportRefEmbedded.getLocalPart().equals(assertionName)
+                    && mustSupportRefEmbedded.getNamespaceURI().equals(assertionNamespace)) {
                     if (wss10.isMustSupportRefEmbeddedToken()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }

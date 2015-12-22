@@ -65,7 +65,8 @@ public class SamlToken extends AbstractToken {
 
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
-        return new SamlToken(getVersion(), getIncludeTokenType(), getIssuer(), getIssuerName(), getClaims(), nestedPolicy);
+        return new SamlToken(getVersion(), getIncludeTokenType(), getIssuer(), getIssuerName(), 
+                             getClaims(), nestedPolicy);
     }
 
     protected void parseNestedPolicy(Policy nestedPolicy, SamlToken samlToken) {
@@ -87,8 +88,11 @@ public class SamlToken extends AbstractToken {
                     samlToken.setDerivedKeys(derivedKeys);
                     continue;
                 }
-                if (getVersion().getSPConstants().getRequireKeyIdentifierReference().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getRequireKeyIdentifierReference().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName requireKeyIdentifierRef = 
+                    getVersion().getSPConstants().getRequireKeyIdentifierReference();
+                if (requireKeyIdentifierRef.getLocalPart().equals(assertionName)
+                    && requireKeyIdentifierRef.getNamespaceURI().equals(assertionNamespace)) {
                     if (samlToken.isRequireKeyIdentifierReference()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }

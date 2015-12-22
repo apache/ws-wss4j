@@ -93,40 +93,50 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
                     abstractToken.setParentAssertion(supportingTokens);
                     continue;
                 }
-                if (getVersion().getSPConstants().getAlgorithmSuite().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getAlgorithmSuite().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName algSuite = getVersion().getSPConstants().getAlgorithmSuite();
+                if (algSuite.getLocalPart().equals(assertionName)
+                    && algSuite.getNamespaceURI().equals(assertionNamespace)) {
                     if (supportingTokens.getAlgorithmSuite() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     supportingTokens.setAlgorithmSuite((AlgorithmSuite) assertion);
                     continue;
                 }
-                if (getVersion().getSPConstants().getSignedParts().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getSignedParts().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName signedParts = getVersion().getSPConstants().getSignedParts();
+                if (signedParts.getLocalPart().equals(assertionName)
+                    && signedParts.getNamespaceURI().equals(assertionNamespace)) {
                     if (supportingTokens.getSignedParts() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     supportingTokens.setSignedParts((SignedParts) assertion);
                     continue;
                 }
-                if (getVersion().getSPConstants().getSignedElements().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getSignedElements().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName signedElements = getVersion().getSPConstants().getSignedElements();
+                if (signedElements.getLocalPart().equals(assertionName)
+                    && signedElements.getNamespaceURI().equals(assertionNamespace)) {
                     if (supportingTokens.getSignedElements() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     supportingTokens.setSignedElements((SignedElements) assertion);
                     continue;
                 }
-                if (getVersion().getSPConstants().getEncryptedParts().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getEncryptedParts().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName encryptedParts = getVersion().getSPConstants().getEncryptedParts();
+                if (encryptedParts.getLocalPart().equals(assertionName)
+                    && encryptedParts.getNamespaceURI().equals(assertionNamespace)) {
                     if (supportingTokens.getEncryptedParts() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     supportingTokens.setEncryptedParts((EncryptedParts) assertion);
                     continue;
                 }
-                if (getVersion().getSPConstants().getEncryptedElements().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getEncryptedElements().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName encryptedElements = getVersion().getSPConstants().getEncryptedElements();
+                if (encryptedElements.getLocalPart().equals(assertionName)
+                    && encryptedElements.getNamespaceURI().equals(assertionNamespace)) {
                     if (supportingTokens.getEncryptedElements() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }

@@ -62,8 +62,10 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
                 Assertion assertion = assertions.get(i);
                 String assertionName = assertion.getName().getLocalPart();
                 String assertionNamespace = assertion.getName().getNamespaceURI();
-                if (getVersion().getSPConstants().getInitiatorToken().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getInitiatorToken().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName initiatorToken = getVersion().getSPConstants().getInitiatorToken();
+                if (initiatorToken.getLocalPart().equals(assertionName)
+                    && initiatorToken.getNamespaceURI().equals(assertionNamespace)) {
                     if (asymmetricBinding.getInitiatorToken() != null
                             || asymmetricBinding.getInitiatorSignatureToken() != null
                             || asymmetricBinding.getInitiatorEncryptionToken() != null) {
@@ -74,8 +76,10 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
                     initiatorToken1.setParentAssertion(asymmetricBinding);
                     continue;
                 }
-                if (getVersion().getSPConstants().getInitiatorSignatureToken().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getInitiatorSignatureToken().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName initiatorSigToken = getVersion().getSPConstants().getInitiatorSignatureToken();
+                if (initiatorSigToken.getLocalPart().equals(assertionName)
+                    && initiatorSigToken.getNamespaceURI().equals(assertionNamespace)) {
                     if (asymmetricBinding.getInitiatorToken() != null
                             || asymmetricBinding.getInitiatorSignatureToken() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
@@ -85,8 +89,10 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
                     initiatorSignatureToken1.setParentAssertion(asymmetricBinding);
                     continue;
                 }
-                if (getVersion().getSPConstants().getInitiatorEncryptionToken().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getInitiatorEncryptionToken().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName initiatorEncToken = getVersion().getSPConstants().getInitiatorEncryptionToken();
+                if (initiatorEncToken.getLocalPart().equals(assertionName)
+                    && initiatorEncToken.getNamespaceURI().equals(assertionNamespace)) {
                     if (asymmetricBinding.getInitiatorToken() != null
                             || asymmetricBinding.getInitiatorEncryptionToken() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
@@ -96,8 +102,10 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
                     initiatorEncryptionToken1.setParentAssertion(asymmetricBinding);
                     continue;
                 }
-                if (getVersion().getSPConstants().getRecipientToken().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getRecipientToken().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName recipientToken = getVersion().getSPConstants().getRecipientToken();
+                if (recipientToken.getLocalPart().equals(assertionName)
+                    && recipientToken.getNamespaceURI().equals(assertionNamespace)) {
                     if (asymmetricBinding.getRecipientToken() != null
                             || asymmetricBinding.getRecipientSignatureToken() != null
                             || asymmetricBinding.getRecipientEncryptionToken() != null) {
@@ -108,8 +116,10 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
                     recipientToken1.setParentAssertion(asymmetricBinding);
                     continue;
                 }
-                if (getVersion().getSPConstants().getRecipientSignatureToken().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getRecipientSignatureToken().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName recipientSigToken = getVersion().getSPConstants().getRecipientSignatureToken();
+                if (recipientSigToken.getLocalPart().equals(assertionName)
+                    && recipientSigToken.getNamespaceURI().equals(assertionNamespace)) {
                     if (asymmetricBinding.getRecipientToken() != null
                             || asymmetricBinding.getRecipientSignatureToken() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
@@ -119,8 +129,10 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
                     recipientSignatureToken1.setParentAssertion(asymmetricBinding);
                     continue;
                 }
-                if (getVersion().getSPConstants().getRecipientEncryptionToken().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getRecipientEncryptionToken().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName recipientEncToken = getVersion().getSPConstants().getRecipientEncryptionToken(); 
+                if (recipientEncToken.getLocalPart().equals(assertionName)
+                    && recipientEncToken.getNamespaceURI().equals(assertionNamespace)) {
                     if (asymmetricBinding.getRecipientToken() != null
                             || asymmetricBinding.getRecipientEncryptionToken() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);

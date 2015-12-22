@@ -59,8 +59,10 @@ public class TransportBinding extends AbstractBinding {
                 Assertion assertion = assertions.get(i);
                 String assertionName = assertion.getName().getLocalPart();
                 String assertionNamespace = assertion.getName().getNamespaceURI();
-                if (getVersion().getSPConstants().getTransportToken().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getTransportToken().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName transportToken = getVersion().getSPConstants().getTransportToken();
+                if (transportToken.getLocalPart().equals(assertionName)
+                    && transportToken.getNamespaceURI().equals(assertionNamespace)) {
                     if (transportBinding.getTransportToken() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
