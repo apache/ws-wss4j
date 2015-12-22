@@ -24,6 +24,8 @@ import org.apache.wss4j.policy.SPConstants;
 
 import java.util.*;
 
+import javax.xml.namespace.QName;
+
 public abstract class AbstractSymmetricAsymmetricBinding extends AbstractBinding {
 
     public enum ProtectionOrder {
@@ -54,7 +56,9 @@ public abstract class AbstractSymmetricAsymmetricBinding extends AbstractBinding
         parseNestedSymmetricAsymmetricBindingBasePolicy(nestedPolicy, this);
     }
 
-    protected void parseNestedSymmetricAsymmetricBindingBasePolicy(Policy nestedPolicy, AbstractSymmetricAsymmetricBinding asymmetricBindingBase) {
+    protected void parseNestedSymmetricAsymmetricBindingBasePolicy(
+        Policy nestedPolicy,  AbstractSymmetricAsymmetricBinding asymmetricBindingBase
+    ) {
         Iterator<List<Assertion>> alternatives = nestedPolicy.getAlternatives();
         //we just process the first alternative
         //this means that if we have a compact policy only the first alternative is visible
@@ -73,24 +77,30 @@ public abstract class AbstractSymmetricAsymmetricBinding extends AbstractBinding
                     asymmetricBindingBase.setProtectionOrder(protectionOrder);
                     continue;
                 }
-                if (getVersion().getSPConstants().getEncryptSignature().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getEncryptSignature().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName encryptSignature = getVersion().getSPConstants().getEncryptSignature();
+                if (encryptSignature.getLocalPart().equals(assertionName)
+                    && encryptSignature.getNamespaceURI().equals(assertionNamespace)) {
                     if (asymmetricBindingBase.isEncryptSignature()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     asymmetricBindingBase.setEncryptSignature(true);
                     continue;
                 }
-                if (getVersion().getSPConstants().getProtectTokens().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getProtectTokens().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName protectTokens = getVersion().getSPConstants().getProtectTokens();
+                if (protectTokens.getLocalPart().equals(assertionName)
+                    && protectTokens.getNamespaceURI().equals(assertionNamespace)) {
                     if (asymmetricBindingBase.isProtectTokens()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     asymmetricBindingBase.setProtectTokens(true);
                     continue;
                 }
-                if (getVersion().getSPConstants().getOnlySignEntireHeadersAndBody().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getOnlySignEntireHeadersAndBody().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName onlySign = getVersion().getSPConstants().getOnlySignEntireHeadersAndBody(); 
+                if (onlySign.getLocalPart().equals(assertionName)
+                    && onlySign.getNamespaceURI().equals(assertionNamespace)) {
                     if (asymmetricBindingBase.isOnlySignEntireHeadersAndBody()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }

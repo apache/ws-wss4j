@@ -218,10 +218,12 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         private String mgfAlgo;
         private String ns;
 
-        public AlgorithmSuiteType(String name, String digest, String encryption, String symmetricKeyWrap, String asymmetricKeyWrap,
-                           String encryptionKeyDerivation, String signatureKeyDerivation, int encryptionDerivedKeyLength,
-                           int signatureDerivedKeyLength, int minimumSymmetricKeyLength,
-                           int maximumSymmetricKeyLength, int minimumAsymmetricKeyLength, int maximumAsymmetricKeyLength) {
+        public AlgorithmSuiteType(String name, String digest, String encryption, String symmetricKeyWrap, 
+                                  String asymmetricKeyWrap, String encryptionKeyDerivation, 
+                                  String signatureKeyDerivation, int encryptionDerivedKeyLength,
+                                  int signatureDerivedKeyLength, int minimumSymmetricKeyLength,
+                                  int maximumSymmetricKeyLength, int minimumAsymmetricKeyLength, 
+                                  int maximumAsymmetricKeyLength) {
             this.name = name;
             this.digest = digest;
             this.encryption = encryption;

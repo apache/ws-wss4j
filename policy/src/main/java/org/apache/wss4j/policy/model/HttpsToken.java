@@ -68,7 +68,8 @@ public class HttpsToken extends AbstractToken {
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
         boolean requireClientCert = authenticationType == AuthenticationType.RequireClientCertificate;
-        return new HttpsToken(getVersion(), getIncludeTokenType(), getIssuer(), getIssuerName(), getClaims(), nestedPolicy, requireClientCert);
+        return new HttpsToken(getVersion(), getIncludeTokenType(), getIssuer(), getIssuerName(), 
+                              getClaims(), nestedPolicy, requireClientCert);
     }
 
     protected void parseNestedPolicy(Policy nestedPolicy, HttpsToken httpsToken) {

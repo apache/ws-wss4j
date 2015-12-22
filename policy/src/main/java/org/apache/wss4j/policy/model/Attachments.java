@@ -31,7 +31,8 @@ public class Attachments extends AbstractSecurityAssertion {
     private boolean contentSignatureTransform;
     private boolean attachmentCompleteSignatureTransform;
 
-    public Attachments(SPConstants.SPVersion version, boolean contentSignatureTransform, boolean attachmentCompleteSignatureTransform) {
+    public Attachments(SPConstants.SPVersion version, boolean contentSignatureTransform, 
+                       boolean attachmentCompleteSignatureTransform) {
         super(version);
 
         this.contentSignatureTransform = contentSignatureTransform;
@@ -53,10 +54,14 @@ public class Attachments extends AbstractSecurityAssertion {
         writer.writeStartElement(getName().getPrefix(), getName().getLocalPart(), getName().getNamespaceURI());
         writer.writeNamespace(getName().getPrefix(), getName().getNamespaceURI());
         if (!isNormalized() && isOptional()) {
-            writer.writeAttribute(Constants.ATTR_WSP, writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), Constants.ATTR_OPTIONAL, "true");
+            writer.writeAttribute(Constants.ATTR_WSP, 
+                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), 
+                                  Constants.ATTR_OPTIONAL, "true");
         }
         if (isIgnorable()) {
-            writer.writeAttribute(Constants.ATTR_WSP, writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), Constants.ATTR_IGNORABLE, "true");
+            writer.writeAttribute(Constants.ATTR_WSP, 
+                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), 
+                                  Constants.ATTR_IGNORABLE, "true");
         }
         if (isContentSignatureTransform()) {
             writer.writeEmptyElement(

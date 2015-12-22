@@ -57,13 +57,17 @@ public class RequiredElements extends AbstractSecurityAssertion {
         writer.writeStartElement(getName().getPrefix(), getName().getLocalPart(), getName().getNamespaceURI());
         writer.writeNamespace(getName().getPrefix(), getName().getNamespaceURI());
         if (!isNormalized() && isOptional()) {
-            writer.writeAttribute(Constants.ATTR_WSP, writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), Constants.ATTR_OPTIONAL, "true");
+            writer.writeAttribute(Constants.ATTR_WSP, 
+                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), 
+                                  Constants.ATTR_OPTIONAL, "true");
         }
         if (getXPathVersion() != null) {
             writer.writeAttribute(SPConstants.XPATH_VERSION, getXPathVersion());
         }
         if (isIgnorable()) {
-            writer.writeAttribute(Constants.ATTR_WSP, writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), Constants.ATTR_IGNORABLE, "true");
+            writer.writeAttribute(Constants.ATTR_WSP, 
+                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), 
+                                  Constants.ATTR_IGNORABLE, "true");
         }
         for (int i = 0; i < xPaths.size(); i++) {
             XPath xPath = xPaths.get(i);
@@ -82,7 +86,8 @@ public class RequiredElements extends AbstractSecurityAssertion {
                         getVersion().getSPConstants().getXPath2Expression().getNamespaceURI());
                 writer.writeAttribute(SPConstants.FILTER, xPath.getFilter());
             }
-            Iterator<Map.Entry<String, String>> namespaceIterator = xPath.getPrefixNamespaceMap().entrySet().iterator();
+            Iterator<Map.Entry<String, String>> namespaceIterator = 
+                xPath.getPrefixNamespaceMap().entrySet().iterator();
             while (namespaceIterator.hasNext()) {
                 Map.Entry<String, String> namespaceEntry = namespaceIterator.next();
                 writer.writeNamespace(namespaceEntry.getKey(), namespaceEntry.getValue());

@@ -59,24 +59,30 @@ public class Wss11 extends Wss10 {
                 Assertion assertion = assertions.get(i);
                 String assertionName = assertion.getName().getLocalPart();
                 String assertionNamespace = assertion.getName().getNamespaceURI();
-                if (getVersion().getSPConstants().getMustSupportRefThumbprint().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getMustSupportRefThumbprint().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName mustSupportRefThumbprint = getVersion().getSPConstants().getMustSupportRefThumbprint();
+                if (mustSupportRefThumbprint.getLocalPart().equals(assertionName)
+                    && mustSupportRefThumbprint.getNamespaceURI().equals(assertionNamespace)) {
                     if (wss11.isMustSupportRefThumbprint()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     wss11.setMustSupportRefThumbprint(true);
                     continue;
                 }
-                if (getVersion().getSPConstants().getMustSupportRefEncryptedKey().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getMustSupportRefEncryptedKey().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName mustSupportRefEncryptedKey = getVersion().getSPConstants().getMustSupportRefEncryptedKey();
+                if (mustSupportRefEncryptedKey.getLocalPart().equals(assertionName)
+                    && mustSupportRefEncryptedKey.getNamespaceURI().equals(assertionNamespace)) {
                     if (wss11.isMustSupportRefEncryptedKey()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     wss11.setMustSupportRefEncryptedKey(true);
                     continue;
                 }
-                if (getVersion().getSPConstants().getRequireSignatureConfirmation().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getRequireSignatureConfirmation().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName requireSigConf = getVersion().getSPConstants().getRequireSignatureConfirmation();
+                if (requireSigConf.getLocalPart().equals(assertionName)
+                    && requireSigConf.getNamespaceURI().equals(assertionNamespace)) {
                     if (wss11.isRequireSignatureConfirmation()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }

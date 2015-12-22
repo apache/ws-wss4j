@@ -30,7 +30,8 @@ public class KeyValueToken extends AbstractToken {
 
     private boolean rsaKeyValue;
 
-    public KeyValueToken(SPConstants.SPVersion version, SPConstants.IncludeTokenType includeTokenType, Policy nestedPolicy) {
+    public KeyValueToken(SPConstants.SPVersion version, SPConstants.IncludeTokenType includeTokenType, 
+                         Policy nestedPolicy) {
         super(version, includeTokenType, null, null, null, nestedPolicy);
         setIncludeTokenType(includeTokenType);
 
@@ -58,8 +59,10 @@ public class KeyValueToken extends AbstractToken {
                 Assertion assertion = assertions.get(i);
                 String assertionName = assertion.getName().getLocalPart();
                 String assertionNamespace = assertion.getName().getNamespaceURI();
-                if (getVersion().getSPConstants().getRsaKeyValue().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getRsaKeyValue().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName rsaKeyValue = getVersion().getSPConstants().getRsaKeyValue();
+                if (rsaKeyValue.getLocalPart().equals(assertionName)
+                    && rsaKeyValue.getNamespaceURI().equals(assertionNamespace)) {
                     if (keyValueToken.isRsaKeyValue()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }

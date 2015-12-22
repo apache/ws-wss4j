@@ -38,7 +38,8 @@ public class IssuedToken extends AbstractToken {
     private boolean requireInternalReference;
 
     public IssuedToken(SPConstants.SPVersion version, SPConstants.IncludeTokenType includeTokenType,
-                       Element issuer, String issuerName, Element requestSecurityTokenTemplate, Element claims, Policy nestedPolicy) {
+                       Element issuer, String issuerName, Element requestSecurityTokenTemplate, Element claims, 
+                       Policy nestedPolicy) {
         super(version, includeTokenType, issuer, issuerName, claims, nestedPolicy);
         setRequestSecurityTokenTemplate(requestSecurityTokenTemplate);
 
@@ -63,10 +64,14 @@ public class IssuedToken extends AbstractToken {
             );
         }
         if (!isNormalized() && isOptional()) {
-            writer.writeAttribute(Constants.ATTR_WSP, writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), Constants.ATTR_OPTIONAL, "true");
+            writer.writeAttribute(Constants.ATTR_WSP, 
+                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), 
+                                  Constants.ATTR_OPTIONAL, "true");
         }
         if (isIgnorable()) {
-            writer.writeAttribute(Constants.ATTR_WSP, writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), Constants.ATTR_IGNORABLE, "true");
+            writer.writeAttribute(Constants.ATTR_WSP, 
+                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP), 
+                                  Constants.ATTR_IGNORABLE, "true");
         }
         if (getIssuer() != null) {
             SPUtils.serialize(getIssuer(), writer);
@@ -113,16 +118,20 @@ public class IssuedToken extends AbstractToken {
                     issuedToken.setDerivedKeys(derivedKeys);
                     continue;
                 }
-                if (getVersion().getSPConstants().getRequireExternalReference().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getRequireExternalReference().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName requireExternalRef = getVersion().getSPConstants().getRequireExternalReference();
+                if (requireExternalRef.getLocalPart().equals(assertionName)
+                    && requireExternalRef.getNamespaceURI().equals(assertionNamespace)) {
                     if (issuedToken.isRequireExternalReference()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     issuedToken.setRequireExternalReference(true);
                     continue;
                 }
-                if (getVersion().getSPConstants().getRequireInternalReference().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getRequireInternalReference().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName requireInternalRef = getVersion().getSPConstants().getRequireInternalReference();
+                if (requireInternalRef.getLocalPart().equals(assertionName)
+                    && requireInternalRef.getNamespaceURI().equals(assertionNamespace)) {
                     if (issuedToken.isRequireInternalReference()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }

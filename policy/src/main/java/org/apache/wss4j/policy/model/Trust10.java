@@ -82,40 +82,50 @@ public class Trust10 extends AbstractSecurityAssertion implements PolicyContaini
                 Assertion assertion = assertions.get(i);
                 String assertionName = assertion.getName().getLocalPart();
                 String assertionNamespace = assertion.getName().getNamespaceURI();
-                if (getVersion().getSPConstants().getMustSupportClientChallenge().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getMustSupportClientChallenge().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName mustSupportClientChallenge = getVersion().getSPConstants().getMustSupportClientChallenge();
+                if (mustSupportClientChallenge.getLocalPart().equals(assertionName)
+                    && mustSupportClientChallenge.getNamespaceURI().equals(assertionNamespace)) {
                     if (trust10.isMustSupportClientChallenge()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     trust10.setMustSupportClientChallenge(true);
                     continue;
                 }
-                if (getVersion().getSPConstants().getMustSupportServerChallenge().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getMustSupportServerChallenge().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName mustSupportServerChallenge = getVersion().getSPConstants().getMustSupportServerChallenge();
+                if (mustSupportServerChallenge.getLocalPart().equals(assertionName)
+                    && mustSupportServerChallenge.getNamespaceURI().equals(assertionNamespace)) {
                     if (trust10.isMustSupportServerChallenge()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     trust10.setMustSupportServerChallenge(true);
                     continue;
                 }
-                if (getVersion().getSPConstants().getRequireClientEntropy().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getRequireClientEntropy().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName requireClientEntropy = getVersion().getSPConstants().getRequireClientEntropy();
+                if (requireClientEntropy.getLocalPart().equals(assertionName)
+                    && requireClientEntropy.getNamespaceURI().equals(assertionNamespace)) {
                     if (trust10.isRequireClientEntropy()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     trust10.setRequireClientEntropy(true);
                     continue;
                 }
-                if (getVersion().getSPConstants().getRequireServerEntropy().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getRequireServerEntropy().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName requireServerEntropy = getVersion().getSPConstants().getRequireServerEntropy();
+                if (requireServerEntropy.getLocalPart().equals(assertionName)
+                    && requireServerEntropy.getNamespaceURI().equals(assertionNamespace)) {
                     if (trust10.isRequireServerEntropy()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     trust10.setRequireServerEntropy(true);
                     continue;
                 }
-                if (getVersion().getSPConstants().getMustSupportIssuedTokens().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getMustSupportIssuedTokens().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName mustSupportIssuedTokens = getVersion().getSPConstants().getMustSupportIssuedTokens();
+                if (mustSupportIssuedTokens.getLocalPart().equals(assertionName)
+                    && mustSupportIssuedTokens.getNamespaceURI().equals(assertionNamespace)) {
                     if (trust10.isMustSupportIssuedTokens()) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }

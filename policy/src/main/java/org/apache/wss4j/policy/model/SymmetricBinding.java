@@ -59,24 +59,32 @@ public class SymmetricBinding extends AbstractSymmetricAsymmetricBinding {
                 Assertion assertion = assertions.get(i);
                 String assertionName = assertion.getName().getLocalPart();
                 String assertionNamespace = assertion.getName().getNamespaceURI();
-                if (getVersion().getSPConstants().getEncryptionToken().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getEncryptionToken().getNamespaceURI().equals(assertionNamespace)) {
-                    if (symmetricBinding.getEncryptionToken() != null || symmetricBinding.getProtectionToken() != null) {
+                
+                QName encryptionToken = getVersion().getSPConstants().getEncryptionToken();
+                if (encryptionToken.getLocalPart().equals(assertionName)
+                    && encryptionToken.getNamespaceURI().equals(assertionNamespace)) {
+                    if (symmetricBinding.getEncryptionToken() != null 
+                        || symmetricBinding.getProtectionToken() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     symmetricBinding.setEncryptionToken((EncryptionToken) assertion);
                     continue;
                 }
-                if (getVersion().getSPConstants().getSignatureToken().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getSignatureToken().getNamespaceURI().equals(assertionNamespace)) {
-                    if (symmetricBinding.getSignatureToken() != null || symmetricBinding.getProtectionToken() != null) {
+                
+                QName signatureToken = getVersion().getSPConstants().getSignatureToken();
+                if (signatureToken.getLocalPart().equals(assertionName)
+                    && signatureToken.getNamespaceURI().equals(assertionNamespace)) {
+                    if (symmetricBinding.getSignatureToken() != null 
+                        || symmetricBinding.getProtectionToken() != null) {
                         throw new IllegalArgumentException(SPConstants.ERR_INVALID_POLICY);
                     }
                     symmetricBinding.setSignatureToken((SignatureToken) assertion);
                     continue;
                 }
-                if (getVersion().getSPConstants().getProtectionToken().getLocalPart().equals(assertionName)
-                        && getVersion().getSPConstants().getProtectionToken().getNamespaceURI().equals(assertionNamespace)) {
+                
+                QName protectionToken = getVersion().getSPConstants().getProtectionToken();
+                if (protectionToken.getLocalPart().equals(assertionName)
+                    && protectionToken.getNamespaceURI().equals(assertionNamespace)) {
                     if (symmetricBinding.getProtectionToken() != null
                             || symmetricBinding.getEncryptionToken() != null
                             || symmetricBinding.getSignatureToken() != null) {
