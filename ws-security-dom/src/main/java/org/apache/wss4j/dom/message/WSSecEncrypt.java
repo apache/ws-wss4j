@@ -465,7 +465,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         encryptionMethod.setAttributeNS(null, "Algorithm", encryptionAlgorithm);
 
         encryptedData.appendChild(encryptionMethod);
-        encryptedData.appendChild(keyInfo.getElement());
+        encryptedData.appendChild(keyInfo.getElement().cloneNode(true));
 
         Element cipherData =
             doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":CipherData");
@@ -576,7 +576,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             encryptionMethod.setAttributeNS(null, "Algorithm", encryptionAlgorithm);
 
             encryptedData.appendChild(encryptionMethod);
-            encryptedData.appendChild(keyInfo.getElement());
+            encryptedData.appendChild(keyInfo.getElement().cloneNode(true));
 
             Element cipherData =
                 doc.createElementNS(WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":CipherData");
