@@ -93,7 +93,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authn Assertion (holder-of-key):");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -134,7 +134,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Attr Assertion (holder-of-key):");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -147,7 +147,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
 
         WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
 
         WSSecurityEngineResult actionResult =
@@ -185,7 +185,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion (holder-of-key):");
             String outputString =
-                XMLUtils.PrettyDocumentToString(unsignedDoc);
+                XMLUtils.prettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
 
@@ -226,7 +226,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Attr Assertion (holder-of-key):");
             String outputString =
-                XMLUtils.PrettyDocumentToString(unsignedDoc);
+                XMLUtils.prettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
 
@@ -239,7 +239,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
 
         WSSecurityEngineResult actionResult =
@@ -265,7 +265,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         return results;
     }

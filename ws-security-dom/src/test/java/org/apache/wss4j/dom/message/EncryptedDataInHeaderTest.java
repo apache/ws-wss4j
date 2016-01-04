@@ -97,7 +97,7 @@ public class EncryptedDataInHeaderTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -122,7 +122,7 @@ public class EncryptedDataInHeaderTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verified and decrypted message:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         return results;

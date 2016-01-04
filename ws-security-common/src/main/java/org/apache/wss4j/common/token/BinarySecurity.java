@@ -114,7 +114,7 @@ public class BinarySecurity {
             LOG.debug("Trying to create a BinarySecurityToken via a null CallbackHandler");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
         }
-        TokenElementCallback[] callback = new TokenElementCallback[] { new TokenElementCallback() };
+        TokenElementCallback[] callback = new TokenElementCallback[] {new TokenElementCallback()};
 
         try {
             callbackHandler.handle(callback);

@@ -104,7 +104,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Encryption....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(encryptedDoc);
+                XMLUtils.prettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
 
@@ -113,7 +113,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
+                XMLUtils.prettyDocumentToString(encryptedSignedDoc);
             LOG.debug(outputString);
         }
         verify(encryptedSignedDoc);
@@ -153,7 +153,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Encryption....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(encryptedDoc);
+                XMLUtils.prettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
 
@@ -169,7 +169,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
+                XMLUtils.prettyDocumentToString(encryptedSignedDoc);
             LOG.debug(outputString);
         }
 
@@ -263,7 +263,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         LOG.info("WSS198");
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
+                XMLUtils.prettyDocumentToString(encryptedSignedDoc);
             LOG.debug(outputString);
         }
         verify(encryptedSignedDoc);
@@ -300,7 +300,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed and encrypted message with IssuerSerial key identifier (both), 3DES:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
+                XMLUtils.prettyDocumentToString(encryptedSignedDoc);
             LOG.debug(outputString);
         }
 
@@ -348,7 +348,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed and encrypted message with IssuerSerial key identifier (both), 3DES:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
+                XMLUtils.prettyDocumentToString(encryptedSignedDoc);
             LOG.debug(outputString);
         }
 
@@ -385,7 +385,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         );
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -430,7 +430,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         );
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -461,7 +461,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 

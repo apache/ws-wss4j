@@ -37,7 +37,7 @@ public class AuthDecisionStatementBean {
     /**
      * enum representing the possible decision types as specified in the SAML spec
      */
-    public enum Decision {PERMIT, INDETERMINATE, DENY}
+    public enum Decision { PERMIT, INDETERMINATE, DENY }
 
     /**
      * The decision rendered by the SAML authority with respect to the specified resource

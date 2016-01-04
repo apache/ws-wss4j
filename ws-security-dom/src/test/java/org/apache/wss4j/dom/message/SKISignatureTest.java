@@ -78,7 +78,7 @@ public class SKISignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with DSA_SKI key identifier:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -121,7 +121,7 @@ public class SKISignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with DSA_Autodetect:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -155,7 +155,7 @@ public class SKISignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with RSA Autodetect:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 

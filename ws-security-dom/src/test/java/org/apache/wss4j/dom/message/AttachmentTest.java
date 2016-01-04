@@ -120,7 +120,7 @@ public class AttachmentTest extends Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
-            String outputString = XMLUtils.PrettyDocumentToString(signedDoc);
+            String outputString = XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -165,7 +165,7 @@ public class AttachmentTest extends Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
-            String outputString = XMLUtils.PrettyDocumentToString(signedDoc);
+            String outputString = XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -221,7 +221,7 @@ public class AttachmentTest extends Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
-            String outputString = XMLUtils.PrettyDocumentToString(signedDoc);
+            String outputString = XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -266,7 +266,7 @@ public class AttachmentTest extends Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
-            String outputString = XMLUtils.PrettyDocumentToString(signedDoc);
+            String outputString = XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -329,7 +329,7 @@ public class AttachmentTest extends Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
-            String outputString = XMLUtils.PrettyDocumentToString(signedDoc);
+            String outputString = XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -379,7 +379,7 @@ public class AttachmentTest extends Assert {
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(encryptedDoc);
+            String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
 
@@ -438,7 +438,7 @@ public class AttachmentTest extends Assert {
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(encryptedDoc);
+            String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
 
@@ -497,7 +497,7 @@ public class AttachmentTest extends Assert {
         encrypt.prependToHeader(secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(doc);
+            String outputString = XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -562,7 +562,7 @@ public class AttachmentTest extends Assert {
         encrypt.prependToHeader(secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(doc);
+            String outputString = XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -624,7 +624,7 @@ public class AttachmentTest extends Assert {
         Assert.assertEquals(1, encryptedAttachments.get(0).getHeaders().size());
 
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(encryptedDoc);
+            String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
 
@@ -670,7 +670,7 @@ public class AttachmentTest extends Assert {
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(encryptedDoc);
+            String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
 
@@ -730,7 +730,7 @@ public class AttachmentTest extends Assert {
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(encryptedDoc);
+            String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
 
@@ -794,7 +794,7 @@ public class AttachmentTest extends Assert {
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(encryptedDoc);
+            String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
 
@@ -883,7 +883,7 @@ public class AttachmentTest extends Assert {
         Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(encryptedDoc);
+            String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
 
@@ -958,7 +958,7 @@ public class AttachmentTest extends Assert {
         doc = signature.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(doc);
+            String outputString = XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -1047,7 +1047,7 @@ public class AttachmentTest extends Assert {
         doc = signature.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(doc);
+            String outputString = XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 

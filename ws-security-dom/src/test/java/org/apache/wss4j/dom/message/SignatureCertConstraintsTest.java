@@ -77,7 +77,7 @@ public class SignatureCertConstraintsTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with BST key identifier:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -112,7 +112,7 @@ public class SignatureCertConstraintsTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with BST key identifier:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 

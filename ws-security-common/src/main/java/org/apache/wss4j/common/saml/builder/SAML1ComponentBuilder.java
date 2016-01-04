@@ -223,17 +223,14 @@ public final class SAML1ComponentBuilder {
                 X509KeyInfoGeneratorFactory kiFactory = new X509KeyInfoGeneratorFactory();
                 KeyInfoBean.CERT_IDENTIFIER certIdentifier = keyInfo.getCertIdentifer();
                 switch (certIdentifier) {
-                    case X509_CERT: {
+                    case X509_CERT:
                         kiFactory.setEmitEntityCertificate(true);
                         break;
-                    }
-                    case KEY_VALUE: {
+                    case KEY_VALUE:
                         kiFactory.setEmitPublicKeyValue(true);
                         break;
-                    }
-                    case X509_ISSUER_SERIAL: {
+                    case X509_ISSUER_SERIAL:
                         kiFactory.setEmitX509IssuerSerial(true);
-                    }
                 }
                 return kiFactory.newInstance().generate(keyInfoCredential);
 

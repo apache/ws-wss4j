@@ -94,7 +94,7 @@ public class SignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After Signing IS....");
@@ -124,7 +124,7 @@ public class SignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After Signing IS....");
@@ -177,7 +177,7 @@ public class SignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -204,7 +204,7 @@ public class SignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -245,7 +245,7 @@ public class SignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -272,7 +272,7 @@ public class SignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -310,7 +310,7 @@ public class SignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After PKI Signing....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -337,7 +337,7 @@ public class SignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -377,7 +377,7 @@ public class SignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with ThumbprintSHA1 key identifier:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After Signing ThumbprintSHA1....");
@@ -410,7 +410,7 @@ public class SignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with ThumbprintSHA1 key identifier:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After Signing ThumbprintSHA1....");
@@ -487,7 +487,7 @@ public class SignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -516,7 +516,7 @@ public class SignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After Signing IS....");
@@ -556,7 +556,7 @@ public class SignatureTest extends org.junit.Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message:");
             LOG.debug(outputString);
@@ -596,7 +596,7 @@ public class SignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -637,7 +637,7 @@ public class SignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -666,7 +666,7 @@ public class SignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with text node:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -696,7 +696,7 @@ public class SignatureTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
     }
@@ -723,7 +723,7 @@ public class SignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After Signing IS....");
@@ -763,7 +763,7 @@ public class SignatureTest extends org.junit.Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message:");
             LOG.debug(outputString);
@@ -807,7 +807,7 @@ public class SignatureTest extends org.junit.Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message:");
             LOG.debug(outputString);
@@ -844,7 +844,7 @@ public class SignatureTest extends org.junit.Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message:");
             LOG.debug(outputString);
@@ -874,7 +874,7 @@ public class SignatureTest extends org.junit.Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message:");
             LOG.debug(outputString);
@@ -913,7 +913,7 @@ public class SignatureTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 

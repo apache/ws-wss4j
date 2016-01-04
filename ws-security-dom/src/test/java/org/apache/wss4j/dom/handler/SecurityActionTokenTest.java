@@ -108,7 +108,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -144,7 +144,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -195,7 +195,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -241,7 +241,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -281,7 +281,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -317,7 +317,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -354,7 +354,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -403,7 +403,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -449,7 +449,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -499,7 +499,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -546,7 +546,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -589,7 +589,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 

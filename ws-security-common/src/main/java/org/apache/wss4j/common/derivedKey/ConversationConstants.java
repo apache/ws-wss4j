@@ -21,6 +21,8 @@ package org.apache.wss4j.common.derivedKey;
 
 import javax.xml.namespace.QName;
 
+import org.apache.wss4j.common.ext.WSSecurityException;
+
 /**
  * Class ConversationConstants
  */
@@ -178,6 +180,9 @@ public final class ConversationConstants {
 
         String P_SHA_1_2005_12 =
             "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512/dk/p_sha1";
+        
+        byte[] createKey(byte[] secret, byte[] seed, int offset, long length)
+            throws WSSecurityException;
     }
 
     public static String getWSCNs(int version) {

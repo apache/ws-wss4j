@@ -90,7 +90,7 @@ public class UTSignatureTest extends org.junit.Assert {
         builder.prependToHeader(secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.prettyDocumentToString(signedDoc);
         assertTrue(outputString.contains("wsse:Username"));
         assertFalse(outputString.contains("wsse:Password"));
         assertTrue(outputString.contains("wsse11:Salt"));
@@ -141,7 +141,7 @@ public class UTSignatureTest extends org.junit.Assert {
         builder.prependToHeader(secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.prettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -180,7 +180,7 @@ public class UTSignatureTest extends org.junit.Assert {
         );
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         assertTrue(outputString.contains("wsse:Username"));
         assertFalse(outputString.contains("wsse:Password"));
         assertTrue(outputString.contains("wsse11:Salt"));
@@ -223,7 +223,7 @@ public class UTSignatureTest extends org.junit.Assert {
         );
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         assertTrue(outputString.contains("wsse:Username"));
         assertFalse(outputString.contains("wsse:Password"));
         assertTrue(outputString.contains("wsse11:Salt"));

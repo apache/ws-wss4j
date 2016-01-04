@@ -125,14 +125,14 @@ public final class XMLUtils {
         return null;
     }
 
-    public static String PrettyDocumentToString(Document doc) throws IOException, TransformerException {
+    public static String prettyDocumentToString(Document doc) throws IOException, TransformerException {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            ElementToStream(doc.getDocumentElement(), baos);
+            elementToStream(doc.getDocumentElement(), baos);
             return new String(baos.toByteArray());
         }
     }
 
-    public static void ElementToStream(Element element, OutputStream out)
+    public static void elementToStream(Element element, OutputStream out)
         throws TransformerException {
         DOMSource source = new DOMSource(element);
         StreamResult result = new StreamResult(out);
@@ -156,7 +156,7 @@ public final class XMLUtils {
             }
             Element domElement = (Element) node;
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                ElementToStream(domElement, baos);
+                elementToStream(domElement, baos);
                 InputSource isource = new InputSource(source.getSystemId());
                 isource.setByteStream(new ByteArrayInputStream(baos.toByteArray()));
                 return isource;

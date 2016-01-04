@@ -37,7 +37,7 @@ import org.ietf.jgss.Oid;
 
 public class KerberosServiceExceptionAction implements PrivilegedExceptionAction<KerberosServiceContext> {
 
-    private static final boolean isIBMJavaVendor = System.getProperty("java.vendor").startsWith("IBM");
+    private static final boolean IS_IBM_VENDOR = System.getProperty("java.vendor").startsWith("IBM");
 
     private static final String SUN_JGSS_INQUIRE_TYPE_CLASS = "com.sun.security.jgss.InquireType";
     private static final String SUN_JGSS_EXT_GSSCTX_CLASS = "com.sun.security.jgss.ExtendedGSSContext";
@@ -70,7 +70,7 @@ public class KerberosServiceExceptionAction implements PrivilegedExceptionAction
     /* (non-Javadoc)
      * @see java.security.PrivilegedExceptionAction#run()
      */
-    public KerberosServiceContext run() throws GSSException, WSSecurityException{
+    public KerberosServiceContext run() throws GSSException, WSSecurityException {
 
         GSSManager gssManager = GSSManager.getInstance();
 
@@ -91,7 +91,7 @@ public class KerberosServiceExceptionAction implements PrivilegedExceptionAction
 
         KerberosServiceContext krbServiceCtx = null;
 
-        try{
+        try {
             byte[] returnedToken = secContext.acceptSecContext(ticket, 0, ticket.length);
 
             krbServiceCtx = new KerberosServiceContext();
@@ -107,20 +107,23 @@ public class KerberosServiceExceptionAction implements PrivilegedExceptionAction
 
             try {
                 @SuppressWarnings("rawtypes")
-                Class inquireType = Class.forName(isIBMJavaVendor ? IBM_JGSS_INQUIRE_TYPE_CLASS : SUN_JGSS_INQUIRE_TYPE_CLASS);
+                Class inquireType = Class.forName(IS_IBM_VENDOR ? IBM_JGSS_INQUIRE_TYPE_CLASS 
+                    : SUN_JGSS_INQUIRE_TYPE_CLASS);
 
                 @SuppressWarnings("rawtypes")
-                Class extendedGSSContext = Class.forName(isIBMJavaVendor ? IBM_JGSS_EXT_GSSCTX_CLASS : SUN_JGSS_EXT_GSSCTX_CLASS);
+                Class extendedGSSContext = Class.forName(IS_IBM_VENDOR ? IBM_JGSS_EXT_GSSCTX_CLASS 
+                    : SUN_JGSS_EXT_GSSCTX_CLASS);
 
                 @SuppressWarnings("unchecked")
-                Method inquireSecContext = extendedGSSContext.getMethod(EXTENDED_JGSS_CONTEXT_INQUIRE_SEC_CONTEXT_METHOD_NAME, inquireType);
+                Method inquireSecContext = 
+                extendedGSSContext.getMethod(EXTENDED_JGSS_CONTEXT_INQUIRE_SEC_CONTEXT_METHOD_NAME, inquireType);
 
                 @SuppressWarnings("unchecked")
-                Key key = (Key) inquireSecContext.invoke(secContext, Enum.valueOf(inquireType, EXTENDED_JGSS_CONTEXT_INQUIRE_TYPE_KRB5_GET_SESSION_KEY));
+                Object obj = Enum.valueOf(inquireType, EXTENDED_JGSS_CONTEXT_INQUIRE_TYPE_KRB5_GET_SESSION_KEY);
+                Key key = (Key) inquireSecContext.invoke(secContext, obj);
 
                 krbServiceCtx.setSessionKey(key);
-            }
-            catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException
+            } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException
                 | InvocationTargetException e) {
                 throw new WSSecurityException(
                     ErrorCode.FAILURE, e, KERBEROS_TICKET_VALIDATION_ERROR_MSG_ID

@@ -98,7 +98,7 @@ public class STRSignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with STR DirectReference key identifier:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After Signing STR DirectReference....");
@@ -150,7 +150,7 @@ public class STRSignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with STR DirectReference key identifier:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After Signing STR DirectReference....");
@@ -204,7 +204,7 @@ public class STRSignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with STR IssuerSerial key identifier:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After Signing STR IS....");
@@ -256,7 +256,7 @@ public class STRSignatureTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with STR SKI key identifier:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After Signing STR SKI....");

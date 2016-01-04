@@ -64,7 +64,7 @@ public class NSStack {
     public void push() {
         top++;
         if (top >= stack.length) {
-            Mapping newstack[] = new Mapping[stack.length * 2];
+            Mapping[] newstack = new Mapping[stack.length * 2];
             System.arraycopy(stack, 0, newstack, 0, stack.length);
             stack = newstack;
         }
@@ -87,8 +87,8 @@ public class NSStack {
             // Reset the currentDefaultNS to ignore the frame just removed.
             currentDefaultNS = top;
             while (currentDefaultNS > 0) {
-                if (stack[currentDefaultNS] != null &&
-                        stack[currentDefaultNS].getPrefix().length() == 0) {
+                if (stack[currentDefaultNS] != null 
+                    && stack[currentDefaultNS].getPrefix().length() == 0) {
                     break;
                 }
                 currentDefaultNS--;
@@ -205,8 +205,8 @@ public class NSStack {
 
         // If defaults are OK, and the given NS is the current default,
         // return "" as the prefix to favor defaults where possible.
-        if (!noDefault && currentDefaultNS > 0 && stack[currentDefaultNS] != null &&
-                namespaceURI.equals(stack[currentDefaultNS].getNamespaceURI())) {
+        if (!noDefault && currentDefaultNS > 0 && stack[currentDefaultNS] != null 
+            && namespaceURI.equals(stack[currentDefaultNS].getNamespaceURI())) {
             return "";
         }
         for (int cursor = top; cursor > 0; cursor--) {
@@ -214,8 +214,7 @@ public class NSStack {
             if (map == null) {
                 continue;
             }
-            if (map.getNamespaceHash() == hash &&
-                    map.getNamespaceURI().equals(namespaceURI)) {
+            if (map.getNamespaceHash() == hash && map.getNamespaceURI().equals(namespaceURI)) {
                 String possiblePrefix = map.getPrefix();
                 if (noDefault && possiblePrefix.length() == 0) {
                     continue;
@@ -232,8 +231,7 @@ public class NSStack {
                     if (map == null) {
                         continue;
                     }
-                    if (ppHash == map.getPrefixHash() &&
-                            possiblePrefix.equals(map.getPrefix())) {
+                    if (ppHash == map.getPrefixHash() && possiblePrefix.equals(map.getPrefix())) {
                         break;
                     }
                 }

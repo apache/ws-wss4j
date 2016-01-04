@@ -122,7 +122,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.prettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML 1.1 Authn Assertion (key holder):");
             LOG.debug(outputString);
@@ -193,7 +193,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.prettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML 1.1 Attr Assertion (key holder):");
             LOG.debug(outputString);
@@ -255,7 +255,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.prettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML 2 Authn Assertion (key holder):");
             LOG.debug(outputString);
@@ -318,7 +318,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.prettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML 2 Attr Assertion (key holder):");
             LOG.debug(outputString);
@@ -382,7 +382,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.prettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authn Assertion Issuer Serial (holder-of-key):");
             LOG.debug(outputString);
@@ -443,7 +443,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.prettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authn Assertion Key Value (holder-of-key):");
             LOG.debug(outputString);
@@ -504,7 +504,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.prettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion Key Value (holder-of-key):");
             LOG.debug(outputString);
@@ -570,7 +570,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             wsSign.build(doc, crypto, samlAssertion, null, null, null, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.prettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML 1.1 Authn Assertion (key holder):");
             LOG.debug(outputString);
@@ -646,7 +646,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
             wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.prettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML 2 Attr Assertion (key holder):");
             LOG.debug(outputString);
@@ -690,7 +690,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
                 doc, null, callbackHandler, sigCrypto, userCrypto
             );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         return results;
     }

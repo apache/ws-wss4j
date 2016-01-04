@@ -98,7 +98,7 @@ public class ReplayTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(createdDoc);
+                XMLUtils.prettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
 
@@ -149,7 +149,7 @@ public class ReplayTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(createdDoc);
+                XMLUtils.prettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
 
@@ -194,7 +194,7 @@ public class ReplayTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(createdDoc);
+                XMLUtils.prettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
 
@@ -240,7 +240,7 @@ public class ReplayTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(createdDoc);
+                XMLUtils.prettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
 
@@ -290,7 +290,7 @@ public class ReplayTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(createdDoc);
+                XMLUtils.prettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
 
@@ -341,7 +341,7 @@ public class ReplayTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(createdDoc);
+                XMLUtils.prettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
 
@@ -374,7 +374,7 @@ public class ReplayTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -408,7 +408,7 @@ public class ReplayTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -460,7 +460,7 @@ public class ReplayTest extends org.junit.Assert {
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(unsignedDoc);
+            String outputString = XMLUtils.prettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
 
@@ -511,7 +511,7 @@ public class ReplayTest extends org.junit.Assert {
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(unsignedDoc);
+            XMLUtils.prettyDocumentToString(unsignedDoc);
         assertTrue(outputString.contains("OneTimeUse"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);

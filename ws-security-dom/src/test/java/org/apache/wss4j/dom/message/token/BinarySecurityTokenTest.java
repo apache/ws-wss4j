@@ -80,7 +80,7 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("BST output");
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -121,7 +121,7 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("PKIPath output");
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -155,7 +155,7 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Custom Token output");
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 

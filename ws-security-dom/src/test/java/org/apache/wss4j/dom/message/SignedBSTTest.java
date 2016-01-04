@@ -115,7 +115,7 @@ public class SignedBSTTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -149,7 +149,7 @@ public class SignedBSTTest extends org.junit.Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message:");
             LOG.debug(outputString);
@@ -173,7 +173,7 @@ public class SignedBSTTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         return results;

@@ -75,7 +75,7 @@ public class TimestampTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(createdDoc);
+                XMLUtils.prettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
 
@@ -113,7 +113,7 @@ public class TimestampTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(createdDoc);
+                XMLUtils.prettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
 
@@ -143,7 +143,7 @@ public class TimestampTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(createdDoc);
+                XMLUtils.prettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
 
@@ -190,7 +190,7 @@ public class TimestampTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(createdDoc);
+                XMLUtils.prettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
 
@@ -219,7 +219,7 @@ public class TimestampTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(createdDoc);
+                XMLUtils.prettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
 
@@ -270,7 +270,7 @@ public class TimestampTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         //
@@ -318,7 +318,7 @@ public class TimestampTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         //
@@ -374,7 +374,7 @@ public class TimestampTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         //
@@ -408,7 +408,7 @@ public class TimestampTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(createdDoc);
+                XMLUtils.prettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
 
@@ -455,7 +455,7 @@ public class TimestampTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         //
@@ -502,7 +502,7 @@ public class TimestampTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         //
@@ -562,7 +562,7 @@ public class TimestampTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         //
@@ -616,7 +616,7 @@ public class TimestampTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         //
@@ -660,7 +660,7 @@ public class TimestampTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         //
@@ -710,7 +710,7 @@ public class TimestampTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         //
@@ -774,7 +774,7 @@ public class TimestampTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         //
@@ -819,7 +819,7 @@ public class TimestampTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(createdDoc);
+                XMLUtils.prettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
 
@@ -848,7 +848,7 @@ public class TimestampTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(createdDoc);
+                XMLUtils.prettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
 

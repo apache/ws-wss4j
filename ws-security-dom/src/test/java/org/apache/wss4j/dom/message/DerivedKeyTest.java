@@ -92,7 +92,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: 3DES  + DerivedKeys");
             String outputString =
-                XMLUtils.PrettyDocumentToString(encryptedDoc);
+                XMLUtils.prettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
         verify(doc);
@@ -130,7 +130,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: 3DES  + DerivedKeys");
             String outputString =
-                XMLUtils.PrettyDocumentToString(encryptedDoc);
+                XMLUtils.prettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
         verify(doc);
@@ -164,7 +164,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message: 3DES  + DerivedKeys");
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         WSHandlerResult results = verify(doc);
@@ -206,7 +206,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: ThumbprintSHA1 + DerivedKeys");
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         WSHandlerResult results = verify(doc);
@@ -247,7 +247,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: SKI + DerivedKeys");
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         WSHandlerResult results = verify(doc);
@@ -294,7 +294,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: 3DES  + DerivedKeys");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedEncryptedDoc);
+                XMLUtils.prettyDocumentToString(signedEncryptedDoc);
             LOG.debug(outputString);
         }
         verify(signedEncryptedDoc);
@@ -335,7 +335,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: 3DES  + DerivedKeys");
             String outputString =
-                XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
+                XMLUtils.prettyDocumentToString(encryptedSignedDoc);
             LOG.debug(outputString);
         }
 
@@ -353,7 +353,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         WSHandlerResult results =
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
 
         return results;

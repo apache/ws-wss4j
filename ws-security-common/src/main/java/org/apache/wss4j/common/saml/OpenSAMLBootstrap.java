@@ -21,8 +21,6 @@ package org.apache.wss4j.common.saml;
 
 import java.io.InputStream;
 
-import javax.naming.ConfigurationException;
-
 import org.opensaml.core.config.Configuration;
 import org.opensaml.core.xml.config.XMLConfigurationException;
 import org.opensaml.core.xml.config.XMLConfigurator;
@@ -34,7 +32,7 @@ import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 public final class OpenSAMLBootstrap {
 
     /** List of default configuration files. */
-    private static final String[] xmlConfigs = {
+    private static final String[] XML_CONFIGS = {
         "/default-config.xml",
         "/schema-config.xml",
         "/saml1-assertion-config.xml",
@@ -83,7 +81,7 @@ public final class OpenSAMLBootstrap {
 
             Thread.currentThread().setContextClassLoader(XMLObjectProviderRegistrySupport.class.getClassLoader());
 
-            for (String config : xmlConfigs) {
+            for (String config : XML_CONFIGS) {
                 //most are found in the Configuration.class classloader
                 InputStream ins = Configuration.class.getResourceAsStream(config);
                 if (ins == null) {

@@ -302,7 +302,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Encryption....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(encryptedDoc);
+                XMLUtils.prettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
 
@@ -311,7 +311,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
+                XMLUtils.prettyDocumentToString(encryptedSignedDoc);
             LOG.debug(outputString);
         }
         return encryptedSignedDoc;
@@ -333,7 +333,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -342,7 +342,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Encryption....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(encryptedDoc);
+                XMLUtils.prettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
 
@@ -356,7 +356,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
             secEngine.processSecurityHeader(elem, reqData);
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 

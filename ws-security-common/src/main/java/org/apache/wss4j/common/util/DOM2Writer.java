@@ -94,130 +94,114 @@ public final class DOM2Writer {
         int type = node.getNodeType();
         switch (type) {
             case Node.DOCUMENT_NODE:
-                {
-                    Node child = node.getFirstChild();
-                    while (child != null) {
-                        print(child, namespaceStack, out, pretty, indent);
-                        child = child.getNextSibling();
-                    }
-                    break;
+                Node child = node.getFirstChild();
+                while (child != null) {
+                    print(child, namespaceStack, out, pretty, indent);
+                    child = child.getNextSibling();
                 }
+                break;
             case Node.ELEMENT_NODE:
-                {
-                    namespaceStack.push();
-                    if (pretty) {
-                        for (int i = 0; i < indent; i++) {
-                            out.print(' ');
-                        }
+                namespaceStack.push();
+                if (pretty) {
+                    for (int i = 0; i < indent; i++) {
+                        out.print(' ');
                     }
-                    out.print('<' + node.getNodeName());
-                    String elPrefix = node.getPrefix();
-                    String elNamespaceURI = node.getNamespaceURI();
-                    if (elPrefix != null &&
-                            elNamespaceURI != null &&
-                            elPrefix.length() > 0) {
+                }
+                out.print('<' + node.getNodeName());
+                String elPrefix = node.getPrefix();
+                String elNamespaceURI = node.getNamespaceURI();
+                if (elPrefix != null && elNamespaceURI != null && elPrefix.length() > 0) {
+                    boolean prefixIsDeclared = false;
+                    try {
+                        String namespaceURI = namespaceStack.getNamespaceURI(elPrefix);
+                        if (elNamespaceURI.equals(namespaceURI)) {
+                            prefixIsDeclared = true;
+                        }
+                    } catch (IllegalArgumentException e) { //NOPMD
+                        //
+                    }
+                    if (!prefixIsDeclared) {
+                        printNamespaceDecl(node, namespaceStack, out);
+                    }
+                }
+                NamedNodeMap attrs = node.getAttributes();
+                int len = (attrs != null) ? attrs.getLength() : 0;
+                for (int i = 0; i < len; i++) {
+                    Attr attr = (Attr) attrs.item(i);
+                    out.print(' ' + attr.getNodeName() + "=\"");
+                    normalize(attr.getValue(), out);
+                    out.print('\"');
+                    String attrPrefix = attr.getPrefix();
+                    String attrNamespaceURI = attr.getNamespaceURI();
+                    if (attrPrefix != null && attrNamespaceURI != null) {
                         boolean prefixIsDeclared = false;
                         try {
-                            String namespaceURI = namespaceStack.getNamespaceURI(elPrefix);
-                            if (elNamespaceURI.equals(namespaceURI)) {
+                            String namespaceURI = namespaceStack.getNamespaceURI(attrPrefix);
+                            if (attrNamespaceURI.equals(namespaceURI)) {
                                 prefixIsDeclared = true;
                             }
                         } catch (IllegalArgumentException e) { //NOPMD
                             //
                         }
                         if (!prefixIsDeclared) {
-                            printNamespaceDecl(node, namespaceStack, out);
+                            printNamespaceDecl(attr, namespaceStack, out);
                         }
                     }
-                    NamedNodeMap attrs = node.getAttributes();
-                    int len = (attrs != null) ? attrs.getLength() : 0;
-                    for (int i = 0; i < len; i++) {
-                        Attr attr = (Attr) attrs.item(i);
-                        out.print(' ' + attr.getNodeName() + "=\"");
-                        normalize(attr.getValue(), out);
-                        out.print('\"');
-                        String attrPrefix = attr.getPrefix();
-                        String attrNamespaceURI = attr.getNamespaceURI();
-                        if (attrPrefix != null && attrNamespaceURI != null) {
-                            boolean prefixIsDeclared = false;
-                            try {
-                                String namespaceURI = namespaceStack.getNamespaceURI(attrPrefix);
-                                if (attrNamespaceURI.equals(namespaceURI)) {
-                                    prefixIsDeclared = true;
-                                }
-                            } catch (IllegalArgumentException e) { //NOPMD
-                                //
-                            }
-                            if (!prefixIsDeclared) {
-                                printNamespaceDecl(attr, namespaceStack, out);
-                            }
-                        }
-                    }
-                    Node child = node.getFirstChild();
-                    if (child != null) {
-                        hasChildren = true;
-                        out.print('>');
-                        if (pretty) {
-                            out.print(LS);
-                        }
-                        while (child != null) {
-                            print(child, namespaceStack, out, pretty, indent + 1);
-                            child = child.getNextSibling();
-                        }
-                    } else {
-                        hasChildren = false;
-                        out.print("/>");
-                        if (pretty) {
-                            out.print(LS);
-                        }
-                    }
-                    namespaceStack.pop();
-                    break;
                 }
+                child = node.getFirstChild();
+                if (child != null) {
+                    hasChildren = true;
+                    out.print('>');
+                    if (pretty) {
+                        out.print(LS);
+                    }
+                    while (child != null) {
+                        print(child, namespaceStack, out, pretty, indent + 1);
+                        child = child.getNextSibling();
+                    }
+                } else {
+                    hasChildren = false;
+                    out.print("/>");
+                    if (pretty) {
+                        out.print(LS);
+                    }
+                }
+                namespaceStack.pop();
+                break;
             case Node.ENTITY_REFERENCE_NODE:
-                {
-                    out.print('&');
-                    out.print(node.getNodeName());
-                    out.print(';');
-                    break;
-                }
+                out.print('&');
+                out.print(node.getNodeName());
+                out.print(';');
+                break;
             case Node.CDATA_SECTION_NODE:
-                {
-                    out.print("<![CDATA[");
-                    out.print(node.getNodeValue());
-                    out.print("]]>");
-                    break;
-                }
+                out.print("<![CDATA[");
+                out.print(node.getNodeValue());
+                out.print("]]>");
+                break;
             case Node.TEXT_NODE:
-                {
-                    normalize(node.getNodeValue(), out);
-                    break;
-                }
+                normalize(node.getNodeValue(), out);
+                break;
             case Node.COMMENT_NODE:
-                {
-                    out.print("<!--");
-                    out.print(node.getNodeValue());
-                    out.print("-->");
-                    if (pretty) {
-                        out.print(LS);
-                    }
-                    break;
+                out.print("<!--");
+                out.print(node.getNodeValue());
+                out.print("-->");
+                if (pretty) {
+                    out.print(LS);
                 }
+                break;
             case Node.PROCESSING_INSTRUCTION_NODE:
-                {
-                    out.print("<?");
-                    out.print(node.getNodeName());
-                    String data = node.getNodeValue();
-                    if (data != null && data.length() > 0) {
-                        out.print(' ');
-                        out.print(data);
-                    }
-                    out.println("?>");
-                    if (pretty) {
-                        out.print(LS);
-                    }
-                    break;
+                out.print("<?");
+                out.print(node.getNodeName());
+                String data = node.getNodeValue();
+                if (data != null && data.length() > 0) {
+                    out.print(' ');
+                    out.print(data);
                 }
+                out.println("?>");
+                if (pretty) {
+                    out.print(LS);
+                }
+                break;
         }
         if (type == Node.ELEMENT_NODE && hasChildren) {
             if (pretty) {
@@ -240,16 +224,12 @@ public final class DOM2Writer {
                                            PrintWriter out) {
         switch (node.getNodeType()) {
             case Node.ATTRIBUTE_NODE:
-                {
-                    printNamespaceDecl(((Attr) node).getOwnerElement(), node,
-                            namespaceStack, out);
-                    break;
-                }
+                printNamespaceDecl(((Attr) node).getOwnerElement(), node,
+                                   namespaceStack, out);
+                break;
             case Node.ELEMENT_NODE:
-                {
-                    printNamespaceDecl((Element) node, node, namespaceStack, out);
-                    break;
-                }
+                printNamespaceDecl((Element) node, node, namespaceStack, out);
+                break;
         }
     }
 
@@ -258,8 +238,8 @@ public final class DOM2Writer {
                                            PrintWriter out) {
         String namespaceURI = node.getNamespaceURI();
         String prefix = node.getPrefix();
-        if (!(namespaceURI.equals(XMLUtils.XMLNS_NS) && prefix.equals("xmlns")) &&
-                !(namespaceURI.equals(XMLUtils.XML_NS) && prefix.equals("xml"))) {
+        if (!(namespaceURI.equals(XMLUtils.XMLNS_NS) && prefix.equals("xmlns")) 
+            && !(namespaceURI.equals(XMLUtils.XML_NS) && prefix.equals("xml"))) {
             if (XMLUtils.getNamespace(prefix, owner) == null) {
                 out.print(" xmlns:" + prefix + "=\"" + namespaceURI + '\"');
             }
@@ -279,31 +259,21 @@ public final class DOM2Writer {
             char c = s.charAt(i);
             switch (c) {
                 case '<':
-                    {
-                        fOut.print("&lt;");
-                        break;
-                    }
+                    fOut.print("&lt;");
+                    break;
                 case '>':
-                    {
-                        fOut.print("&gt;");
-                        break;
-                    }
+                    fOut.print("&gt;");
+                    break;
                 case '&':
-                    {
-                        fOut.print("&amp;");
-                        break;
-                    }
+                    fOut.print("&amp;");
+                    break;
                 case '"':
-                    {
-                        fOut.print("&quot;");
-                        break;
-                    }
+                    fOut.print("&quot;");
+                    break;
                 case '\r':
                 case '\n':
                 default:
-                    {
-                        fOut.print(c);
-                    }
+                    fOut.print(c);
             }
         }
     }

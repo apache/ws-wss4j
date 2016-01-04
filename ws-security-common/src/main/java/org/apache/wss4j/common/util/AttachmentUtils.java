@@ -185,8 +185,7 @@ public final class AttachmentUtils {
         int count = 0;
         char[] chars = text.toCharArray();
         for (int i = 0; i < chars.length; i++) {
-            if (SPACE != chars[i] &&
-                    HTAB != chars[i]) {
+            if (SPACE != chars[i] && HTAB != chars[i]) {
                 break;
             }
             count++;
@@ -208,10 +207,7 @@ public final class AttachmentUtils {
             final char ch2 = text.charAt(i + 1);
             final char ch3 = text.charAt(i + 2);
 
-            if (CARRIAGE_RETURN == ch1 &&
-                    LINEFEED == ch2 &&
-                    (SPACE == ch3 ||
-                            HTAB == ch3)) {
+            if (CARRIAGE_RETURN == ch1 && LINEFEED == ch2 && (SPACE == ch3 || HTAB == ch3)) {
 
                 i += 2;
                 if (i >= text.length() - 3) {
@@ -344,11 +340,9 @@ public final class AttachmentUtils {
     public static String quote(String text) {
         char startChar = text.charAt(0);
         char endChar = text.charAt(text.length() - 1);
-        if (DOUBLE_QUOTE == startChar &&
-                DOUBLE_QUOTE == endChar) {
+        if (DOUBLE_QUOTE == startChar && DOUBLE_QUOTE == endChar) {
             return text;
-        } else if (DOUBLE_QUOTE != startChar &&
-                DOUBLE_QUOTE != endChar) {
+        } else if (DOUBLE_QUOTE != startChar && DOUBLE_QUOTE != endChar) {
             return DOUBLE_QUOTE + text + DOUBLE_QUOTE;
         } else if (DOUBLE_QUOTE != startChar) {
             return DOUBLE_QUOTE + text;
@@ -488,13 +482,16 @@ public final class AttachmentUtils {
                 // For now, we only work with Block ciphers, so this will work.
                 // This should probably be put into the JCE mapper.
                 int ivLen = cipher.getBlockSize();
-                if (XMLCipher.AES_128_GCM.equals(encAlgo) || XMLCipher.AES_192_GCM.equals(encAlgo) || XMLCipher.AES_256_GCM.equals(encAlgo)) {
+                if (XMLCipher.AES_128_GCM.equals(encAlgo) || XMLCipher.AES_192_GCM.equals(encAlgo) 
+                    || XMLCipher.AES_256_GCM.equals(encAlgo)) {
                     ivLen = 12;
                 }
 
                 byte[] ivBytes = new byte[ivLen];
-                int read = 0;
-                while ((read += super.in.read(ivBytes, read, ivLen - read)) != ivLen) ; //NOPMD
+                int read = super.in.read(ivBytes, 0, ivLen);
+                while (read != ivLen) {
+                    read += super.in.read(ivBytes, read, ivLen - read);
+                }
                 IvParameterSpec iv = new IvParameterSpec(ivBytes);
 
                 try {
@@ -574,12 +571,11 @@ public final class AttachmentUtils {
                     //the encryption. If a header listed in the profile is present it MUST be included in
                     //the encryption. If a header is not listed in this profile, then it MUST NOT be
                     //included in the encryption.
-                    if (AttachmentUtils.MIME_HEADER_CONTENT_DESCRIPTION.equals(key) ||
-                            AttachmentUtils.MIME_HEADER_CONTENT_DISPOSITION.equals(key) ||
-                            AttachmentUtils.MIME_HEADER_CONTENT_ID.equals(key) ||
-                            AttachmentUtils.MIME_HEADER_CONTENT_LOCATION.equals(key) ||
-                            AttachmentUtils.MIME_HEADER_CONTENT_TYPE.equals(key)
-                            ) {
+                    if (AttachmentUtils.MIME_HEADER_CONTENT_DESCRIPTION.equals(key) 
+                        || AttachmentUtils.MIME_HEADER_CONTENT_DISPOSITION.equals(key) 
+                        || AttachmentUtils.MIME_HEADER_CONTENT_ID.equals(key) 
+                        || AttachmentUtils.MIME_HEADER_CONTENT_LOCATION.equals(key) 
+                        || AttachmentUtils.MIME_HEADER_CONTENT_TYPE.equals(key)) {
                         iterator.remove();
                         outputStreamWriter.write(key);
                         outputStreamWriter.write(':');

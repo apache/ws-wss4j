@@ -83,7 +83,7 @@ public class UseReqSigCertTest extends org.junit.Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message:");
             LOG.debug(outputString);
@@ -128,7 +128,7 @@ public class UseReqSigCertTest extends org.junit.Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message:");
             LOG.debug(outputString);
@@ -173,7 +173,7 @@ public class UseReqSigCertTest extends org.junit.Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message:");
             LOG.debug(outputString);

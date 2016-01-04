@@ -125,7 +125,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -182,7 +182,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -247,7 +247,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authn Assertion (sender vouches):");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -298,7 +298,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed Timestamp");
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -333,7 +333,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         encryptionMethod.setAttributeNS(null, "Algorithm", "http://new-algorithm");
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.prettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -379,7 +379,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         cipherValue.setTextContent(stringBuilder.toString());
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.prettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -442,7 +442,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         cipherValue.setTextContent(stringBuilder.toString());
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.prettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -489,7 +489,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         cipherValue.setTextContent(stringBuilder.toString());
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.prettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -545,7 +545,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -573,7 +573,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -608,7 +608,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 

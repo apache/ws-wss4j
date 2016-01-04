@@ -436,7 +436,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
             }
             if (doDebug) {
                 log.debug("WSS4JHandler: orginal SOAP request: ");
-                log.debug(XMLUtils.PrettyDocumentToString(doc));
+                log.debug(XMLUtils.prettyDocumentToString(doc));
             }
             doSenderAction(doc, reqData, actions, isRequest);
 

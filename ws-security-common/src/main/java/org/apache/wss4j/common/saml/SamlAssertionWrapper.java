@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
-import javax.xml.bind.ValidationException;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -643,7 +642,7 @@ public class SamlAssertionWrapper {
                 validator.validate(sig);
             } catch (SignatureException ex) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex,
-                    "empty", new Object[] { "SAML signature validation failed"});
+                    "empty", new Object[] {"SAML signature validation failed"});
             }
         }
     }

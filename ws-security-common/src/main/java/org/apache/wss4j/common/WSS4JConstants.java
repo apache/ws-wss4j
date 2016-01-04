@@ -170,7 +170,7 @@ public class WSS4JConstants {
     // Localnames
     //
     public static final String WSSE_LN = "Security";
-    public static final String THUMBPRINT ="ThumbprintSHA1";
+    public static final String THUMBPRINT = "ThumbprintSHA1";
     public static final String SAML_ASSERTION_ID = "SAMLAssertionID";
     public static final String SAML2_ASSERTION_ID = "SAMLID";
     public static final String ENC_KEY_VALUE_TYPE = "EncryptedKey";

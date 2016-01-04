@@ -305,7 +305,7 @@ public class TestMessageTransformer extends org.junit.Assert {
     private static void print(Document doc) throws TransformerException, IOException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After transformation....");
-            String outputString = XMLUtils.PrettyDocumentToString(doc);
+            String outputString = XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
     }

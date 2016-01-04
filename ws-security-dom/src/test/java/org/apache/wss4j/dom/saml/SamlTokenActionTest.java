@@ -96,7 +96,7 @@ public class SamlTokenActionTest extends org.junit.Assert {
             true
         );
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(doc);
+            String outputString = XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -133,7 +133,7 @@ public class SamlTokenActionTest extends org.junit.Assert {
             true
         );
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(doc);
+            String outputString = XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -172,7 +172,7 @@ public class SamlTokenActionTest extends org.junit.Assert {
             true
         );
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(doc);
+            String outputString = XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -190,7 +190,7 @@ public class SamlTokenActionTest extends org.junit.Assert {
 
         WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         return results;
     }
