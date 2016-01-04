@@ -206,8 +206,8 @@ public class SubjectBean {
 
         if (subjectConfirmationMethod == null && that.subjectConfirmationMethod != null) {
             return false;
-        } else if (subjectConfirmationMethod != null &&
-            !subjectConfirmationMethod.equals(that.subjectConfirmationMethod)) {
+        } else if (subjectConfirmationMethod != null 
+            && !subjectConfirmationMethod.equals(that.subjectConfirmationMethod)) {
             return false;
         }
 

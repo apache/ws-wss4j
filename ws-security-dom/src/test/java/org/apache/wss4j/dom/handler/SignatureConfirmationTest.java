@@ -91,7 +91,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -132,7 +132,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -171,7 +171,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -199,7 +199,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
             false
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signature Confirmation response....");
             LOG.debug(outputString);
@@ -235,7 +235,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -255,7 +255,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
             false
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signature Confirmation response....");
             LOG.debug(outputString);
@@ -290,7 +290,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -324,7 +324,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         return results;

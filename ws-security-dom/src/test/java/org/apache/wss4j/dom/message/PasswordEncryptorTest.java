@@ -95,7 +95,7 @@ public class PasswordEncryptorTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         verify(signedDoc);
@@ -123,7 +123,7 @@ public class PasswordEncryptorTest extends org.junit.Assert {
         );
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -144,7 +144,7 @@ public class PasswordEncryptorTest extends org.junit.Assert {
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.prettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -174,7 +174,7 @@ public class PasswordEncryptorTest extends org.junit.Assert {
         );
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }

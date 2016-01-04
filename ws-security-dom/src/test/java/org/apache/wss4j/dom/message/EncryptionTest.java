@@ -121,7 +121,7 @@ public class EncryptionTest extends org.junit.Assert {
         LOG.info("After Encryption Triple DES....");
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.prettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message, RSA-15 keytransport, 3DES:");
             LOG.debug(outputString);
@@ -153,7 +153,7 @@ public class EncryptionTest extends org.junit.Assert {
         encryptedDoc = builder.build(doc, crypto, secHeader);
         LOG.info("After Encryption AES 128/RSA-15....");
         outputString =
-            XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.prettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message, RSA-15 keytransport, AES 128:");
             LOG.debug(outputString);
@@ -199,7 +199,7 @@ public class EncryptionTest extends org.junit.Assert {
         LOG.info("After Encryption Triple DES/RSA-OAEP....");
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.prettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
             LOG.debug(outputString);
@@ -242,7 +242,7 @@ public class EncryptionTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After the first encryption:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(encryptedDoc);
+                XMLUtils.prettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
 
@@ -251,7 +251,7 @@ public class EncryptionTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After the second encryption:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(encryptedEncryptedDoc);
+                XMLUtils.prettyDocumentToString(encryptedEncryptedDoc);
             LOG.debug(outputString);
         }
 
@@ -280,7 +280,7 @@ public class EncryptionTest extends org.junit.Assert {
         Document encryptedDoc = builder.build(doc, encCrypto, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.prettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message with THUMBPRINT_IDENTIFIER:");
             LOG.debug(outputString);
@@ -320,7 +320,7 @@ public class EncryptionTest extends org.junit.Assert {
         Document encryptedDoc = builder.build(doc, encCrypto, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.prettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message with ENCRYPTED_KEY_SHA1_IDENTIFIER:");
             LOG.debug(outputString);
@@ -355,7 +355,7 @@ public class EncryptionTest extends org.junit.Assert {
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.prettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message with ENCRYPTED_KEY_SHA1_IDENTIFIER:");
             LOG.debug(outputString);
@@ -390,7 +390,7 @@ public class EncryptionTest extends org.junit.Assert {
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.prettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message with ENCRYPTED_KEY_SHA1_IDENTIFIER:");
             LOG.debug(outputString);
@@ -433,7 +433,7 @@ public class EncryptionTest extends org.junit.Assert {
         );
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -499,7 +499,7 @@ public class EncryptionTest extends org.junit.Assert {
         LOG.info("After Encryption Triple DES....");
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.prettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message, RSA-15 keytransport, 3DES:");
             LOG.debug(outputString);
@@ -508,7 +508,7 @@ public class EncryptionTest extends org.junit.Assert {
         WSHandlerResult results = verify(encryptedDoc, crypto, keystoreCallbackHandler);
 
         outputString =
-            XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.prettyDocumentToString(encryptedDoc);
         assertTrue(outputString.contains("counter_port_type"));
 
         WSSecurityEngineResult actionResult =
@@ -569,7 +569,7 @@ public class EncryptionTest extends org.junit.Assert {
         Document encryptedDoc = doc;
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.prettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -615,7 +615,7 @@ public class EncryptionTest extends org.junit.Assert {
         builder.encrypt();
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -645,7 +645,7 @@ public class EncryptionTest extends org.junit.Assert {
         LOG.info("After Encryption Triple DES/RSA-OAEP....");
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.prettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
             LOG.debug(outputString);
@@ -678,7 +678,7 @@ public class EncryptionTest extends org.junit.Assert {
         LOG.info("After Encryption Triple DES/RSA-OAEP....");
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.prettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message, RSA-OAEP keytransport, 3DES:");
             LOG.debug(outputString);
@@ -703,7 +703,7 @@ public class EncryptionTest extends org.junit.Assert {
             secEngine.processSecurityHeader(doc, null, handler, decCrypto);
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
         return results;
@@ -725,7 +725,7 @@ public class EncryptionTest extends org.junit.Assert {
         final WSHandlerResult results =
             secEngine.processSecurityHeader(doc, null, handler, null, crypto);
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }

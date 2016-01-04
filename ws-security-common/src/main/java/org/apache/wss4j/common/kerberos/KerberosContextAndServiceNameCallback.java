@@ -43,11 +43,11 @@ public class KerberosContextAndServiceNameCallback implements Callback {
         this.serviceName = serviceName;
     }
 
-    public void setIsUsernameServiceNameForm(boolean isUsernameServiceNameForm){
+    public void setIsUsernameServiceNameForm(boolean isUsernameServiceNameForm) {
         this.isUsernameServiceNameForm = isUsernameServiceNameForm;
     }
 
-    public boolean isUsernameServiceNameForm(){
+    public boolean isUsernameServiceNameForm() {
         return this.isUsernameServiceNameForm;
     }
 

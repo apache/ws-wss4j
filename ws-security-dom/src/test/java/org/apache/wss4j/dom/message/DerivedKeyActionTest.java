@@ -89,7 +89,7 @@ public class DerivedKeyActionTest extends Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         Assert.assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
@@ -122,7 +122,7 @@ public class DerivedKeyActionTest extends Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         Assert.assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_02));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
@@ -155,7 +155,7 @@ public class DerivedKeyActionTest extends Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -187,7 +187,7 @@ public class DerivedKeyActionTest extends Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         Assert.assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
@@ -219,7 +219,7 @@ public class DerivedKeyActionTest extends Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -251,7 +251,7 @@ public class DerivedKeyActionTest extends Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -283,7 +283,7 @@ public class DerivedKeyActionTest extends Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -320,7 +320,7 @@ public class DerivedKeyActionTest extends Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -352,7 +352,7 @@ public class DerivedKeyActionTest extends Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         Assert.assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
@@ -392,7 +392,7 @@ public class DerivedKeyActionTest extends Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         Assert.assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
@@ -428,7 +428,7 @@ public class DerivedKeyActionTest extends Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         Assert.assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
@@ -464,7 +464,7 @@ public class DerivedKeyActionTest extends Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         Assert.assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
@@ -506,7 +506,7 @@ public class DerivedKeyActionTest extends Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         Assert.assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
@@ -548,7 +548,7 @@ public class DerivedKeyActionTest extends Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         Assert.assertTrue(outputString.contains(ConversationConstants.WSC_NS_05_12));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
@@ -566,7 +566,7 @@ public class DerivedKeyActionTest extends Assert {
         WSHandlerResult results =
             secEngine.processSecurityHeader(doc, null, cbHandler, crypto);
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
 
         return results;

@@ -79,7 +79,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After Signing IS....");
@@ -124,7 +124,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         LOG.info("After Signing IS....");
@@ -261,7 +261,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
     }

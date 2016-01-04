@@ -137,7 +137,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion (sender vouches):");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -191,7 +191,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed (modified) SAML message (key holder):");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -238,7 +238,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed (modified) SAML message (key holder):");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -275,7 +275,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         Document signedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.prettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authn Assertion (key holder):");
             LOG.debug(outputString);
@@ -318,7 +318,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         Document signedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.prettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authn Assertion (unsigned key holder):");
             LOG.debug(outputString);
@@ -366,7 +366,7 @@ public class SamlNegativeTest extends org.junit.Assert {
             wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.prettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Untrusted signed SAML 2 Authn Assertion (key holder):");
             LOG.debug(outputString);
@@ -396,7 +396,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         return results;
     }

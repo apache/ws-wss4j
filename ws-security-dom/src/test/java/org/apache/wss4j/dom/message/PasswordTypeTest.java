@@ -66,7 +66,7 @@ public class PasswordTypeTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Digest:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         WSSecurityEngine secEngine = new WSSecurityEngine();
@@ -118,7 +118,7 @@ public class PasswordTypeTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Text:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         WSSecurityEngine secEngine = new WSSecurityEngine();
@@ -181,7 +181,7 @@ public class PasswordTypeTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Username Token via WSHandler");
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 

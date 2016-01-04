@@ -165,7 +165,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion (sender vouches):");
             String outputString =
-                XMLUtils.PrettyDocumentToString(unsignedDoc);
+                XMLUtils.prettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
 
@@ -203,7 +203,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion (sender vouches):");
             String outputString =
-                XMLUtils.PrettyDocumentToString(unsignedDoc);
+                XMLUtils.prettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
 
@@ -244,7 +244,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion (sender vouches):");
             String outputString =
-                XMLUtils.PrettyDocumentToString(unsignedDoc);
+                XMLUtils.prettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
 
@@ -277,7 +277,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1 Authn Assertion (sender vouches):");
             String outputString =
-                XMLUtils.PrettyDocumentToString(unsignedDoc);
+                XMLUtils.prettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
 
@@ -356,7 +356,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(unsignedDoc);
+            XMLUtils.prettyDocumentToString(unsignedDoc);
         assertTrue(outputString.contains("OneTimeUse"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
@@ -400,7 +400,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(unsignedDoc);
+            XMLUtils.prettyDocumentToString(unsignedDoc);
         assertTrue(outputString.contains("ProxyRestriction"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
@@ -443,7 +443,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(unsignedDoc);
+            XMLUtils.prettyDocumentToString(unsignedDoc);
         assertTrue(outputString.contains("AudienceRestriction"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
@@ -483,7 +483,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(unsignedDoc);
+            XMLUtils.prettyDocumentToString(unsignedDoc);
         assertTrue(outputString.contains("AudienceRestriction"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
@@ -543,7 +543,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(unsignedDoc);
+            XMLUtils.prettyDocumentToString(unsignedDoc);
         assertTrue(outputString.contains("AudienceRestriction"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
@@ -611,7 +611,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(unsignedDoc);
+            XMLUtils.prettyDocumentToString(unsignedDoc);
         assertTrue(outputString.contains("AudienceRestriction"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
@@ -656,7 +656,7 @@ public class SamlConditionsTest extends org.junit.Assert {
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(unsignedDoc);
+            XMLUtils.prettyDocumentToString(unsignedDoc);
         assertTrue(outputString.contains("AudienceRestriction"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
@@ -729,7 +729,7 @@ public class SamlConditionsTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(unsignedDoc);
+                XMLUtils.prettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
 
@@ -757,7 +757,7 @@ public class SamlConditionsTest extends org.junit.Assert {
 
         WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         return results;
     }

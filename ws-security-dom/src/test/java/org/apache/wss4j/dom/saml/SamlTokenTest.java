@@ -276,7 +276,7 @@ public class SamlTokenTest extends org.junit.Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Unsigned SAML 1.1 authentication assertion via an Action:");
             LOG.debug(outputString);
@@ -345,7 +345,7 @@ public class SamlTokenTest extends org.junit.Assert {
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(unsignedDoc);
+            XMLUtils.prettyDocumentToString(unsignedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authn Assertion (sender vouches):");
             LOG.debug(outputString);
@@ -386,7 +386,7 @@ public class SamlTokenTest extends org.junit.Assert {
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(unsignedDoc);
+            XMLUtils.prettyDocumentToString(unsignedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion (sender vouches):");
             LOG.debug(outputString);
@@ -427,7 +427,7 @@ public class SamlTokenTest extends org.junit.Assert {
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(unsignedDoc);
+            XMLUtils.prettyDocumentToString(unsignedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authn Assertion (sender vouches):");
             LOG.debug(outputString);
@@ -469,7 +469,7 @@ public class SamlTokenTest extends org.junit.Assert {
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(unsignedDoc);
+            XMLUtils.prettyDocumentToString(unsignedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2.0 Authn Assertion (sender vouches):");
             LOG.debug(outputString);
@@ -510,7 +510,7 @@ public class SamlTokenTest extends org.junit.Assert {
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(unsignedDoc);
+            XMLUtils.prettyDocumentToString(unsignedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion (sender vouches):");
             LOG.debug(outputString);
@@ -552,7 +552,7 @@ public class SamlTokenTest extends org.junit.Assert {
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(unsignedDoc);
+            XMLUtils.prettyDocumentToString(unsignedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authz Assertion (sender vouches):");
             LOG.debug(outputString);
@@ -615,7 +615,7 @@ public class SamlTokenTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Attr Assertion (sender vouches):");
             String outputString =
-                XMLUtils.PrettyDocumentToString(unsignedDoc);
+                XMLUtils.prettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
 
@@ -693,7 +693,7 @@ public class SamlTokenTest extends org.junit.Assert {
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(unsignedDoc);
+            XMLUtils.prettyDocumentToString(unsignedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion (sender vouches):");
             LOG.debug(outputString);
@@ -754,7 +754,7 @@ public class SamlTokenTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -866,7 +866,7 @@ public class SamlTokenTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -931,7 +931,7 @@ public class SamlTokenTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -1184,7 +1184,7 @@ public class SamlTokenTest extends org.junit.Assert {
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(unsignedDoc);
+            XMLUtils.prettyDocumentToString(unsignedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -1224,7 +1224,7 @@ public class SamlTokenTest extends org.junit.Assert {
 
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
-        String outputString = XMLUtils.PrettyDocumentToString(unsignedDoc);
+        String outputString = XMLUtils.prettyDocumentToString(unsignedDoc);
         // assertTrue(outputString.contains("j\u00f6e") && outputString.contains("j\u00f6an"));
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
@@ -1265,7 +1265,7 @@ public class SamlTokenTest extends org.junit.Assert {
         Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(unsignedDoc);
+            XMLUtils.prettyDocumentToString(unsignedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -1356,7 +1356,7 @@ public class SamlTokenTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(unsignedDoc);
+                XMLUtils.prettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
 
@@ -1386,7 +1386,7 @@ public class SamlTokenTest extends org.junit.Assert {
 
         WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
         String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         return results;
     }

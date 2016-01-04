@@ -35,7 +35,8 @@ public class WSSecurityException extends XMLSecurityException {
      * Fault codes defined in the WSS 1.1 spec under section 12, Error handling
      */
 
-    public static final String NS_WSSE10 = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+    public static final String NS_WSSE10 = 
+        "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
 
     /**
      * An unsupported token was provided
@@ -112,8 +113,7 @@ public class WSSecurityException extends XMLSecurityException {
         MESSAGE_EXPIRED(WSSecurityException.MESSAGE_EXPIRED),
         FAILED_ENCRYPTION(null), //Non standard error message
         FAILED_SIGNATURE(null), //Non standard error message
-        SECURITY_ERROR(WSSecurityException.SECURITY_ERROR)
-        ;
+        SECURITY_ERROR(WSSecurityException.SECURITY_ERROR);
 
         private QName qName;
 

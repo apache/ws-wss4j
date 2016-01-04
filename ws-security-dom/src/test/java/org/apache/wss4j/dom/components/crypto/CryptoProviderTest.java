@@ -89,7 +89,7 @@ public class CryptoProviderTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         verify(signedDoc);
@@ -110,7 +110,7 @@ public class CryptoProviderTest extends org.junit.Assert {
         secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, crypto, secHeader);
 
-        String outputString = XMLUtils.PrettyDocumentToString(signedDoc);
+        String outputString = XMLUtils.prettyDocumentToString(signedDoc);
         outputString =
             outputString.replace("1.2.840.113549.1.9.1=#16125765726e6572406578616d706c652e636f6d",
                              "EMAILADDRESS=Werner@example.com");
@@ -137,7 +137,7 @@ public class CryptoProviderTest extends org.junit.Assert {
         secHeader.insertSecurityHeader();
         Document signedDoc = sign.build(doc, crypto, secHeader);
 
-        String outputString = XMLUtils.PrettyDocumentToString(signedDoc);
+        String outputString = XMLUtils.prettyDocumentToString(signedDoc);
         outputString =
             outputString.replace("1.2.840.113549.1.9.1=#16125765726e6572406578616d706c652e636f6d",
                              "E=Werner@example.com");
@@ -196,7 +196,7 @@ public class CryptoProviderTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(encryptedDoc);
+                XMLUtils.prettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
         verify(encryptedDoc);
@@ -245,7 +245,7 @@ public class CryptoProviderTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(encryptedDoc);
+                XMLUtils.prettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
         try {
@@ -269,7 +269,7 @@ public class CryptoProviderTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
     }

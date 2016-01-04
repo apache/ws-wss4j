@@ -86,7 +86,7 @@ public class PrincipalTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         WSHandlerResult results = verify(signedDoc, null);
@@ -118,7 +118,7 @@ public class PrincipalTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         WSHandlerResult results =
@@ -154,7 +154,7 @@ public class PrincipalTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(unsignedDoc);
+                XMLUtils.prettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
 
@@ -197,7 +197,7 @@ public class PrincipalTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(unsignedDoc);
+                XMLUtils.prettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
 
@@ -241,7 +241,7 @@ public class PrincipalTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(unsignedDoc);
+                XMLUtils.prettyDocumentToString(unsignedDoc);
             LOG.debug(outputString);
         }
 
@@ -284,7 +284,7 @@ public class PrincipalTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 

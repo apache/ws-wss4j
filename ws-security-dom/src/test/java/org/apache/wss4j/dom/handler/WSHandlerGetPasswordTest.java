@@ -103,7 +103,7 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
         );
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -144,7 +144,7 @@ public class WSHandlerGetPasswordTest extends org.junit.Assert {
         );
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }

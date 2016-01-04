@@ -108,8 +108,7 @@ public class KerberosContext {
             if (gssContext != null) {
                 try {
                     gssContext.dispose();
-                }
-                catch (GSSException e) {
+                } catch (GSSException e) {
                     LOG.error("Error disposing of the GSSContext", e);
                 }
             }

@@ -102,7 +102,7 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authn Assertion (Bearer):");
-            String outputString = XMLUtils.PrettyDocumentToString(doc);
+            String outputString = XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -143,7 +143,7 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2.0 Authn Assertion (Bearer):");
-            String outputString = XMLUtils.PrettyDocumentToString(doc);
+            String outputString = XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -191,7 +191,7 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
         Document signedDoc = sign.build(doc, crypto, secHeader);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(doc);
+            String outputString = XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
 
@@ -237,7 +237,7 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message:");
             LOG.debug(outputString);
@@ -285,7 +285,7 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
         requestData.setValidateSamlSubjectConfirmation(false);
 
         WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
-        String outputString = XMLUtils.PrettyDocumentToString(doc);
+        String outputString = XMLUtils.prettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         return results;
     }
@@ -303,7 +303,7 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
             secEngine.processSecurityHeader(
                 doc, null, null, crypto
             );
-        String outputString = XMLUtils.PrettyDocumentToString(doc);
+        String outputString = XMLUtils.prettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         return results;
     }

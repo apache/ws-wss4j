@@ -69,7 +69,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
             String out =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug(out);
@@ -120,7 +120,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
             if (LOG.isDebugEnabled()) {
-                String out = XMLUtils.PrettyDocumentToString(doc);
+                String out = XMLUtils.prettyDocumentToString(doc);
                 LOG.debug(out);
             }
 
@@ -170,7 +170,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
             if (LOG.isDebugEnabled()) {
-                String out = XMLUtils.PrettyDocumentToString(doc);
+                String out = XMLUtils.prettyDocumentToString(doc);
                 LOG.debug(out);
             }
 
@@ -220,7 +220,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("DKT Absolute");
                 String outputString =
-                    XMLUtils.PrettyDocumentToString(doc);
+                    XMLUtils.prettyDocumentToString(doc);
                 LOG.debug(outputString);
             }
 
@@ -263,7 +263,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
             if (LOG.isDebugEnabled()) {
-                String out = XMLUtils.PrettyDocumentToString(doc);
+                String out = XMLUtils.prettyDocumentToString(doc);
                 LOG.debug(out);
             }
 
@@ -306,7 +306,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             sctBuilder.prependSCTElementToHeader(doc, secHeader);
 
             if (LOG.isDebugEnabled()) {
-                String out = XMLUtils.PrettyDocumentToString(doc);
+                String out = XMLUtils.prettyDocumentToString(doc);
                 LOG.debug(out);
             }
 
@@ -352,7 +352,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("SCT sign");
                 String outputString =
-                    XMLUtils.PrettyDocumentToString(doc);
+                    XMLUtils.prettyDocumentToString(doc);
                 LOG.debug(outputString);
             }
 
@@ -374,7 +374,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
         WSHandlerResult results =
             secEngine.processSecurityHeader(doc, null, callbackHandler, crypto);
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         assertTrue(outputString.indexOf("counter_port_type") > 0 ? true : false);
         return results;
     }

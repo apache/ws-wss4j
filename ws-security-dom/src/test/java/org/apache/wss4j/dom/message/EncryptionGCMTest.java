@@ -91,7 +91,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.prettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message:");
             LOG.debug(outputString);
@@ -112,7 +112,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(encryptedDoc);
+            XMLUtils.prettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message:");
             LOG.debug(outputString);
@@ -136,7 +136,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
 
         String outputString =
-                XMLUtils.PrettyDocumentToString(encryptedDoc);
+                XMLUtils.prettyDocumentToString(encryptedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message:");
             LOG.debug(outputString);
@@ -170,7 +170,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
         requestData.setDecCrypto(crypto);
         final WSHandlerResult results = secEngine.processSecurityHeader(doc, requestData);
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }

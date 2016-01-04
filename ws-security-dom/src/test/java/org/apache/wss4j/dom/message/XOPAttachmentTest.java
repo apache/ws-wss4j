@@ -175,7 +175,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
         }
 
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(encryptedDoc);
+            String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
             //System.out.println(outputString);
         }
@@ -183,7 +183,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
         attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
         verify(encryptedDoc, attachmentCallbackHandler);
 
-        String processedDoc = XMLUtils.PrettyDocumentToString(encryptedDoc);
+        String processedDoc = XMLUtils.prettyDocumentToString(encryptedDoc);
         assertTrue(processedDoc.contains(SOAP_BODY));
     }
 
@@ -211,7 +211,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
         assertTrue(encryptedAttachments.size() == 2);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(encryptedDoc);
+            String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
             // System.out.println(outputString);
         }
@@ -220,7 +220,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
             new AttachmentCallbackHandler(encryptedAttachments);
         verify(encryptedDoc, inboundAttachmentCallback);
 
-        String processedDoc = XMLUtils.PrettyDocumentToString(encryptedDoc);
+        String processedDoc = XMLUtils.prettyDocumentToString(encryptedDoc);
         assertTrue(processedDoc.contains(SOAP_BODY));
     }
 
@@ -248,7 +248,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -281,7 +281,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -318,7 +318,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
         assertTrue(encryptedAttachments.size() == 3);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(encryptedDoc);
+            String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
             // System.out.println(outputString);
         }
@@ -356,7 +356,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
         assertTrue(encryptedAttachments.size() == 3);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(encryptedDoc);
+            String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
         }
 
@@ -402,7 +402,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
         assertTrue(encryptedAttachments.size() == 2);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(encryptedDoc);
+            String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
             // System.out.println(outputString);
         }
@@ -411,7 +411,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
             new AttachmentCallbackHandler(encryptedAttachments);
         verify(encryptedDoc, inboundAttachmentCallback);
 
-        String processedDoc = XMLUtils.PrettyDocumentToString(encryptedDoc);
+        String processedDoc = XMLUtils.prettyDocumentToString(encryptedDoc);
         assertTrue(processedDoc.contains(SOAP_BODY));
     }
 
@@ -451,7 +451,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
         assertTrue(signedAttachments.size() == 1);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(signedDoc);
+            String outputString = XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -459,7 +459,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
             new AttachmentCallbackHandler(signedAttachments);
         verify(signedDoc, inboundAttachmentCallback);
 
-        String processedDoc = XMLUtils.PrettyDocumentToString(signedDoc);
+        String processedDoc = XMLUtils.prettyDocumentToString(signedDoc);
         assertTrue(processedDoc.contains(SOAP_BODY));
     }
 
@@ -495,7 +495,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
         assertTrue(encryptedAttachments.size() == 3);
 
         if (LOG.isDebugEnabled()) {
-            String outputString = XMLUtils.PrettyDocumentToString(encryptedDoc);
+            String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
             LOG.debug(outputString);
             // System.out.println(outputString);
         }
@@ -504,7 +504,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
             new AttachmentCallbackHandler(encryptedAttachments);
         verify(encryptedDoc, inboundAttachmentCallback);
 
-        String processedDoc = XMLUtils.PrettyDocumentToString(encryptedDoc);
+        String processedDoc = XMLUtils.prettyDocumentToString(encryptedDoc);
         assertTrue(processedDoc.contains(SOAP_BODY));
     }
 
@@ -540,7 +540,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message:");
             LOG.debug(outputString);
@@ -554,7 +554,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
             new AttachmentCallbackHandler(encryptedAttachments);
         verify(doc, inboundAttachmentCallback);
 
-        String processedDoc = XMLUtils.PrettyDocumentToString(doc);
+        String processedDoc = XMLUtils.prettyDocumentToString(doc);
         assertTrue(processedDoc.contains(SOAP_BODY));
     }
 
@@ -590,7 +590,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
             true
         );
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message:");
             LOG.debug(outputString);
@@ -604,7 +604,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
             new AttachmentCallbackHandler(encryptedAttachments);
         verify(doc, inboundAttachmentCallback);
 
-        String processedDoc = XMLUtils.PrettyDocumentToString(doc);
+        String processedDoc = XMLUtils.prettyDocumentToString(doc);
         assertTrue(processedDoc.contains(SOAP_BODY));
     }
 

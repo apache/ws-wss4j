@@ -70,7 +70,7 @@ public class SignatureAKITest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         Crypto caCrypto = CryptoFactory.getInstance("wss40CAAKI.properties");
@@ -96,7 +96,7 @@ public class SignatureAKITest extends org.junit.Assert {
 
         if (LOG.isDebugEnabled()) {
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
         MerlinAKI caCrypto = new MerlinAKI();

@@ -273,7 +273,7 @@ public abstract class CryptoBase implements Crypto {
         List<?> l = path.getCertificates();
         X509Certificate[] certs = new X509Certificate[l.size()];
         int i = 0;
-        for (Iterator<?> iterator = l.iterator(); iterator.hasNext(); ) {
+        for (Iterator<?> iterator = l.iterator(); iterator.hasNext();) {
             certs[i++] = (X509Certificate) iterator.next();
         }
         return certs;

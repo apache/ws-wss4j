@@ -79,14 +79,16 @@ public final class OpenSAMLUtil {
             ConfigurationService.setConfiguration(configuration);
 
             XMLObjectProviderRegistry providerRegistry = new XMLObjectProviderRegistry();
-            configuration.register(XMLObjectProviderRegistry.class, providerRegistry, ConfigurationService.DEFAULT_PARTITION_NAME);
+            configuration.register(XMLObjectProviderRegistry.class, providerRegistry, 
+                                   ConfigurationService.DEFAULT_PARTITION_NAME);
 
             try {
                 OpenSAMLBootstrap.bootstrap();
 
                 SAMLConfiguration samlConfiguration = new SAMLConfiguration();
 
-                configuration.register(SAMLConfiguration.class, samlConfiguration, ConfigurationService.DEFAULT_PARTITION_NAME);
+                configuration.register(SAMLConfiguration.class, samlConfiguration, 
+                                       ConfigurationService.DEFAULT_PARTITION_NAME);
 
                 builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
                 marshallerFactory = XMLObjectProviderRegistrySupport.getMarshallerFactory();
@@ -95,7 +97,8 @@ public final class OpenSAMLUtil {
                 try {
                     configureParserPool(providerRegistry);
                 } catch (Throwable t) {
-                    LOG.warn("Unable to bootstrap the parser pool part of the opensaml library - some SAML operations may fail", t);
+                    LOG.warn("Unable to bootstrap the parser pool part of the opensaml library "
+                             + "- some SAML operations may fail", t);
                 }
 
                 samlEngineInitialized = true;

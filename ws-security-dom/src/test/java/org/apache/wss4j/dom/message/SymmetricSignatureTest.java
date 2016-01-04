@@ -113,7 +113,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed symmetric message SHA1:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -151,7 +151,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed symmetric message DR:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(signedDoc);
+                XMLUtils.prettyDocumentToString(signedDoc);
             LOG.debug(outputString);
         }
 
@@ -199,7 +199,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed and encrypted message with IssuerSerial key identifier (both), 3DES:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(encryptedSignedDoc);
+                XMLUtils.prettyDocumentToString(encryptedSignedDoc);
             LOG.debug(outputString);
         }
 
@@ -234,7 +234,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         );
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(doc);
+            XMLUtils.prettyDocumentToString(doc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -264,7 +264,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         if (LOG.isDebugEnabled()) {
             LOG.debug("Verfied and decrypted message:");
             String outputString =
-                XMLUtils.PrettyDocumentToString(doc);
+                XMLUtils.prettyDocumentToString(doc);
             LOG.debug(outputString);
         }
     }

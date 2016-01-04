@@ -72,7 +72,7 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.prettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -115,7 +115,7 @@ public class SignatureKeyValueTest extends org.junit.Assert {
             builder.build(doc, CryptoFactory.getInstance("wss86.properties"), secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.prettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
@@ -149,7 +149,7 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         Document signedDoc = builder.build(doc, crypto, secHeader);
 
         String outputString =
-            XMLUtils.PrettyDocumentToString(signedDoc);
+            XMLUtils.prettyDocumentToString(signedDoc);
         if (LOG.isDebugEnabled()) {
             LOG.debug(outputString);
         }
