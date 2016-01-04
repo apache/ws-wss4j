@@ -48,10 +48,17 @@ public class KerberosTokenBuilder implements AssertionBuilder<Element> {
         }
         final Element claims = SPUtils.getFirstChildElement(element, spVersion.getSPConstants().getClaims());
         final Element nestedPolicyElement = SPUtils.getFirstPolicyChildElement(element);
+        
+        Policy nestedPolicy = null;
         if (nestedPolicyElement == null) {
-            throw new IllegalArgumentException("sp:KerberosToken must have an inner wsp:Policy element");
+            if (spVersion != SPConstants.SPVersion.SP11) {
+                throw new IllegalArgumentException("sp:KerberosToken must have an inner wsp:Policy element");
+            }
+            nestedPolicy = new Policy();
+        } else {
+            nestedPolicy = factory.getPolicyEngine().getPolicy(nestedPolicyElement);
         }
-        final Policy nestedPolicy = factory.getPolicyEngine().getPolicy(nestedPolicyElement);
+        
         KerberosToken kerberosToken = new KerberosToken(
                 spVersion,
                 spVersion.getSPConstants().getInclusionFromAttributeValue(includeTokenValue),
