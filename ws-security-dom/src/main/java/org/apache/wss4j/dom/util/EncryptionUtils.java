@@ -36,9 +36,11 @@ import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.utils.Base64;
+import org.apache.xml.security.utils.JavaUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
@@ -52,6 +54,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
@@ -367,13 +370,28 @@ public final class EncryptionUtils {
         InputStream attachmentInputStream =
                 AttachmentUtils.setupAttachmentDecryptionStream(
                         symEncAlgo, cipher, symmetricKey, attachment.getSourceStream());
-
+        
         // For the xop:Include case, we need to replace the xop:Include Element with the
         // decrypted Element
         DocumentBuilder db =
                 org.apache.xml.security.utils.XMLUtils.createDocumentBuilder(false);
-        Document document = db.parse(attachmentInputStream);
-        Node decryptedNode = 
+        byte[] bytes = JavaUtils.getBytesFromStream(attachmentInputStream);
+
+        Document document = null;
+        try {
+            document = db.parse(new ByteArrayInputStream(bytes));
+        } catch (SAXException ex) {
+            // See if a prefix was not bound. Try to fix the DOM Element in this case.
+            if (ex.getMessage() != null && ex.getMessage().startsWith("The prefix")
+                && ex.getMessage().endsWith("is not bound.")) {
+                String fixedElementStr = setParentPrefixes(encData, new String(bytes));
+                document = db.parse(new ByteArrayInputStream(fixedElementStr.getBytes()));
+            } else {
+                throw ex;
+            }
+        }
+        
+        Node decryptedNode =
             encData.getOwnerDocument().importNode(document.getDocumentElement(), true);
         encData.getParentNode().appendChild(decryptedNode);
         org.apache.xml.security.utils.XMLUtils.repoolDocumentBuilder(db);
@@ -381,7 +399,40 @@ public final class EncryptionUtils {
         return decryptedNode;
     }
 
-    
+    /**
+     * Set the parent prefix definitions on the "String" (representation of the Element to be parsed)
+     */
+    private static String setParentPrefixes(Element target, String str) {
+        Node parent = target;
+        
+        // Get the point at where to insert new prefix definitions
+        int insertionIndex = str.indexOf('>');
+        StringBuilder prefix = new StringBuilder(str.substring(0, insertionIndex));
+        StringBuilder suffix = new StringBuilder(str.substring(insertionIndex, str.length()));
+        
+        // Don't add more than 20 prefixes
+        int prefixAddedCount = 0;
+        while (parent.getParentNode() != null && prefixAddedCount < 20
+            && !(Node.DOCUMENT_NODE == parent.getParentNode().getNodeType())) {
+            parent = parent.getParentNode();
+            NamedNodeMap attributes = parent.getAttributes();
+            for (int i = 0; i < attributes.getLength(); i++) {
+                Node attribute = attributes.item(i);
+                String attrDef = "xmlns:" + attribute.getLocalName();
+                if (WSConstants.XMLNS_NS.equals(attribute.getNamespaceURI()) && !prefix.toString().contains(attrDef)) {
+                    attrDef += "=\"" + attribute.getNodeValue() + "\"";
+                    prefix.append(" " + attrDef);
+                    prefixAddedCount++;
+                }
+                if (prefixAddedCount >= 20) {
+                    break;
+                }
+            }
+        }
+
+        return prefix.toString() + suffix.toString();
+    }
+
     /**
      * @param decryptedNode the decrypted node
      * @return a fully built xpath 
