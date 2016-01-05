@@ -22,6 +22,7 @@ package org.apache.wss4j.common.bsp;
 /**
  * A Basic Security Profile rule.
  */
+@SuppressWarnings("checkstyle:linelength")
 public enum BSPRule {
     R3203("A TIMESTAMP MUST contain exactly one CREATED"),
     R3224("Any TIMESTAMP MUST NOT contain more than one EXPIRES"),

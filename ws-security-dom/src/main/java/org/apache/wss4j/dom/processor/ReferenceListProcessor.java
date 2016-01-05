@@ -231,8 +231,8 @@ public class ReferenceListProcessor implements Processor {
             bspEnforcer.handleBSPRule(BSPRule.R5424);
         }
 
-        if (child == null || !WSConstants.WSSE_NS.equals(child.getNamespaceURI()) ||
-            !SecurityTokenReference.SECURITY_TOKEN_REFERENCE.equals(child.getLocalName())) {
+        if (child == null || !WSConstants.WSSE_NS.equals(child.getNamespaceURI()) 
+            || !SecurityTokenReference.SECURITY_TOKEN_REFERENCE.equals(child.getLocalName())) {
             bspEnforcer.handleBSPRule(BSPRule.R5426);
         }
 

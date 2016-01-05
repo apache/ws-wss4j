@@ -56,7 +56,7 @@ public class P_SHA1 implements DerivationAlgorithm {
         try {
             Mac mac = Mac.getInstance("HmacSHA1");
 
-            byte[] tempBytes = P_hash(secret, seed, mac, offset + (int) length);
+            byte[] tempBytes = pHash(secret, seed, mac, offset + (int) length);
 
             byte[] key = new byte[(int) length];
 
@@ -78,7 +78,7 @@ public class P_SHA1 implements DerivationAlgorithm {
      * @return a byte array that contains a secret key
      * @throws InvalidKeyException
      */
-    private static byte[] P_hash(byte[] secret, byte[] seed, Mac mac, int required)
+    private static byte[] pHash(byte[] secret, byte[] seed, Mac mac, int required)
             throws InvalidKeyException {
 
         byte[] out = new byte[required];

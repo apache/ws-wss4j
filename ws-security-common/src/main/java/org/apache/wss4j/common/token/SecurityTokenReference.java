@@ -184,7 +184,7 @@ public class SecurityTokenReference {
     public void setKeyIdentifier(X509Certificate cert)
         throws WSSecurityException {
         Document doc = element.getOwnerDocument();
-        byte data[] = null;
+        byte[] data = null;
         try {
             data = cert.getEncoded();
         } catch (CertificateEncodingException e) {
@@ -223,7 +223,7 @@ public class SecurityTokenReference {
         if (skiCrypto == null) {
             skiCrypto = new Merlin();
         }
-        byte data[] = skiCrypto.getSKIBytesFromCert(cert);
+        byte[] data = skiCrypto.getSKIBytesFromCert(cert);
 
         Text text = doc.createTextNode(Base64.encode(data));
         createKeyIdentifier(doc, SKI_URI, text, true);

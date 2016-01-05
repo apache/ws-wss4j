@@ -78,26 +78,21 @@ public class CertificateStore extends CryptoBase {
         CryptoType.TYPE type = cryptoType.getType();
         X509Certificate[] certs = null;
         switch (type) {
-        case ISSUER_SERIAL: {
+        case ISSUER_SERIAL:
             certs = getX509Certificates(cryptoType.getIssuer(), cryptoType.getSerial());
             break;
-        }
-        case THUMBPRINT_SHA1: {
+        case THUMBPRINT_SHA1:
             certs = getX509Certificates(cryptoType.getBytes());
             break;
-        }
-        case SKI_BYTES: {
+        case SKI_BYTES:
             certs = getX509CertificatesSKI(cryptoType.getBytes());
             break;
-        }
         case ALIAS:
-        case SUBJECT_DN: {
+        case SUBJECT_DN:
             certs = getX509CertificatesSubjectDN(cryptoType.getSubjectDN());
             break;
-        }
-        case ENDPOINT: {
+        case ENDPOINT:
             break;
-        }
         }
         return certs;
     }

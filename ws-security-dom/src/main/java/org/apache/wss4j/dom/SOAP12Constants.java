@@ -29,12 +29,9 @@ public class SOAP12Constants implements SOAPConstants {
      *
      */
     private static final long serialVersionUID = 3784866613259361834L;
-    private static final QName headerQName = new QName(WSConstants.URI_SOAP12_ENV,
-            WSConstants.ELEM_HEADER);
-    private static final QName bodyQName = new QName(WSConstants.URI_SOAP12_ENV,
-            WSConstants.ELEM_BODY);
-    private static final QName roleQName = new QName(WSConstants.URI_SOAP12_ENV,
-            WSConstants.ATTR_ROLE);
+    private static final QName HEADER_QNAME = new QName(WSConstants.URI_SOAP12_ENV, WSConstants.ELEM_HEADER);
+    private static final QName BODY_QNAME = new QName(WSConstants.URI_SOAP12_ENV, WSConstants.ELEM_BODY);
+    private static final QName ROLE_QNAME = new QName(WSConstants.URI_SOAP12_ENV, WSConstants.ATTR_ROLE);
 
     // Public constants for SOAP 1.2
 
@@ -48,18 +45,18 @@ public class SOAP12Constants implements SOAPConstants {
     }
 
     public QName getHeaderQName() {
-        return headerQName;
+        return HEADER_QNAME;
     }
 
     public QName getBodyQName() {
-        return bodyQName;
+        return BODY_QNAME;
     }
 
     /**
      * Obtain the QName for the role attribute (actor/role)
      */
     public QName getRoleAttributeQName() {
-        return roleQName;
+        return ROLE_QNAME;
     }
 
     /**

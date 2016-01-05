@@ -121,7 +121,7 @@ public class Timestamp {
             XMLGregorianCalendar createdCalendar = null;
             try {
                 createdCalendar =
-                    WSSConfig.datatypeFactory.newXMLGregorianCalendar(strCreated);
+                    WSSConfig.DATATYPE_FACTORY.newXMLGregorianCalendar(strCreated);
             } catch (IllegalArgumentException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }
@@ -143,7 +143,7 @@ public class Timestamp {
             XMLGregorianCalendar expiresCalendar = null;
             try {
                 expiresCalendar =
-                    WSSConfig.datatypeFactory.newXMLGregorianCalendar(strExpires);
+                    WSSConfig.DATATYPE_FACTORY.newXMLGregorianCalendar(strExpires);
             } catch (IllegalArgumentException e) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
             }

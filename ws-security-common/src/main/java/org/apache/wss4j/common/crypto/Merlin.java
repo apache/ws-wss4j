@@ -94,17 +94,17 @@ public class Merlin extends CryptoBase {
      * KeyStore configuration types
      */
     public static final String KEYSTORE_FILE = "keystore.file";
-    public static final String KEYSTORE_PASSWORD ="keystore.password";
-    public static final String KEYSTORE_TYPE ="keystore.type";
-    public static final String KEYSTORE_ALIAS ="keystore.alias";
-    public static final String KEYSTORE_PRIVATE_PASSWORD ="keystore.private.password";
+    public static final String KEYSTORE_PASSWORD = "keystore.password";
+    public static final String KEYSTORE_TYPE = "keystore.type";
+    public static final String KEYSTORE_ALIAS = "keystore.alias";
+    public static final String KEYSTORE_PRIVATE_PASSWORD = "keystore.private.password";
 
     /*
      * TrustStore configuration types
      */
-    public static final String LOAD_CA_CERTS ="load.cacerts";
-    public static final String TRUSTSTORE_FILE ="truststore.file";
-    public static final String TRUSTSTORE_PASSWORD ="truststore.password";
+    public static final String LOAD_CA_CERTS = "load.cacerts";
+    public static final String TRUSTSTORE_FILE = "truststore.file";
+    public static final String TRUSTSTORE_PASSWORD = "truststore.password";
     public static final String TRUSTSTORE_TYPE = "truststore.type";
 
     /*
@@ -555,29 +555,23 @@ public class Merlin extends CryptoBase {
         CryptoType.TYPE type = cryptoType.getType();
         X509Certificate[] certs = null;
         switch (type) {
-        case ISSUER_SERIAL: {
+        case ISSUER_SERIAL:
             certs = getX509Certificates(cryptoType.getIssuer(), cryptoType.getSerial());
             break;
-        }
-        case THUMBPRINT_SHA1: {
+        case THUMBPRINT_SHA1:
             certs = getX509Certificates(cryptoType.getBytes());
             break;
-        }
-        case SKI_BYTES: {
+        case SKI_BYTES:
             certs = getX509CertificatesSKI(cryptoType.getBytes());
             break;
-        }
-        case SUBJECT_DN: {
+        case SUBJECT_DN:
             certs = getX509CertificatesSubjectDN(cryptoType.getSubjectDN());
             break;
-        }
-        case ALIAS: {
+        case ALIAS:
             certs = getX509Certificates(cryptoType.getAlias());
             break;
-        }
-        case ENDPOINT: {
+        case ENDPOINT:
             break;
-        }
         }
         return certs;
     }

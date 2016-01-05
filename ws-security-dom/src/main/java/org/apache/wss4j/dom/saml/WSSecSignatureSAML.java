@@ -232,13 +232,12 @@ public class WSSecSignatureSAML extends WSSecSignature {
             cryptoType.setAlias(issuerKeyName);
             certs = issuerCrypto.getX509Certificates(cryptoType);
             wsDocInfo.setCrypto(issuerCrypto);
-        }
-        //
-        // in case of key holder: - get the user's certificate that _must_ be
-        // included in the SAML token. To ensure the cert integrity the SAML
-        // token must be signed (by the issuer).
-        //
-        else {
+        } else {
+            //
+            // in case of key holder: - get the user's certificate that _must_ be
+            // included in the SAML token. To ensure the cert integrity the SAML
+            // token must be signed (by the issuer).
+            //
             if (userCrypto == null || !samlAssertion.isSigned()) {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.FAILURE,

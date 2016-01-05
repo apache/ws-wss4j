@@ -55,13 +55,13 @@ import org.apache.xml.security.utils.resolver.ResourceResolver;
  * <p/> <b>WARNING: changing the default settings will break the compliance with
  * the latest specs. Do this only if you know what you are doing.</b> <p/>
  */
-public class WSSConfig {
+public final class WSSConfig {
 
-    public static final DatatypeFactory datatypeFactory;
+    public static final DatatypeFactory DATATYPE_FACTORY;
 
     static {
         try {
-            datatypeFactory = DatatypeFactory.newInstance();
+            DATATYPE_FACTORY = DatatypeFactory.newInstance();
         } catch (DatatypeConfigurationException e) {
             throw new RuntimeException(e);
         }

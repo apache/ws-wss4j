@@ -91,7 +91,7 @@ public class X509SubjectPublicKeyInfo extends DERDecoder {
         }
         skip(algIDlen);           // AlgorithmIdentifier contents
         expect(TYPE_BIT_STRING);  // subjectPublicKey BIT STRING
-        int keyLen = getLength()-1;
+        int keyLen = getLength() - 1;
         if (keyLen < 0) {
             // Invalid BIT STRING length
             throw new WSSecurityException(

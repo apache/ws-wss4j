@@ -90,8 +90,8 @@ public class EncryptedKeyProcessor implements Processor {
         String id = elem.getAttributeNS(null, "Id");
         if (!"".equals(id)) {
              WSSecurityEngineResult result = wsDocInfo.getResult(id);
-             if (result != null &&
-                 WSConstants.ENCR == (Integer)result.get(WSSecurityEngineResult.TAG_ACTION)
+             if (result != null 
+                 && WSConstants.ENCR == (Integer)result.get(WSSecurityEngineResult.TAG_ACTION)
              ) {
                  return Collections.singletonList(result);
              }
@@ -425,7 +425,8 @@ public class EncryptedKeyProcessor implements Processor {
                 } else if (WSConstants.X509_CERT_LN.equals(x509Child.getLocalName())) {
                     byte[] token = EncryptionUtils.getDecodedBase64EncodedData(x509Child);
                     if (token == null) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidCertData", new Object[] {"0"});
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidCertData", 
+                                                      new Object[] {"0"});
                     }
                     try (InputStream in = new ByteArrayInputStream(token)) {
                         X509Certificate cert = data.getDecCrypto().loadCertificate(in);
