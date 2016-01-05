@@ -102,7 +102,8 @@ public final class WSSecurityUtil {
      * Returns the first WS-Security header element for a given actor. Only one
      * WS-Security header is allowed for an actor.
      */
-    public static Element getSecurityHeader(Element soapHeader, String actor, boolean soap12) throws WSSecurityException {
+    public static Element getSecurityHeader(Element soapHeader, String actor, boolean soap12) 
+        throws WSSecurityException {
 
         String actorLocal = WSConstants.ATTR_ACTOR;
         String soapNamespace = WSConstants.URI_SOAP11_ENV;
@@ -385,7 +386,7 @@ public final class WSSecurityUtil {
      * @param data to encode
      * @return a Text node containing the base64 encoded data
      */
-    public static Text createBase64EncodedTextNode(Document doc, byte data[]) {
+    public static Text createBase64EncodedTextNode(Document doc, byte[] data) {
         return doc.createTextNode(Base64.encode(data));
     }
 
@@ -413,7 +414,7 @@ public final class WSSecurityUtil {
         }
 
         List<Integer> actions = new ArrayList<>();
-        String single[] = actionToParse.split("\\s");
+        String[] single = actionToParse.split("\\s");
         for (int i = 0; i < single.length; i++) {
             if (single[i].equals(WSHandlerConstants.NO_SECURITY)) {
                 return actions;
@@ -467,7 +468,7 @@ public final class WSSecurityUtil {
         }
 
         List<HandlerAction> actions = new ArrayList<>();
-        String single[] = action.split(" ");
+        String[] single = action.split(" ");
         for (int i = 0; i < single.length; i++) {
             if (single[i].equals(WSHandlerConstants.NO_SECURITY)) {
                 return actions;

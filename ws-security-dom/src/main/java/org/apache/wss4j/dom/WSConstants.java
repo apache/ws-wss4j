@@ -138,38 +138,32 @@ public final class WSConstants extends WSS4JConstants {
     /**
      * An error was discovered processing the <Security> header
      */
-    public static final QName INVALID_SECURITY =
-        new QName (WSSE_NS, "InvalidSecurity");
+    public static final QName INVALID_SECURITY = new QName(WSSE_NS, "InvalidSecurity");
 
     /**
      * An invalid security token was provided
      */
-    public static final QName INVALID_SECURITY_TOKEN =
-        new QName (WSSE_NS, "InvalidSecurityToken");
+    public static final QName INVALID_SECURITY_TOKEN = new QName(WSSE_NS, "InvalidSecurityToken");
 
     /**
      * The security token could not be authenticated or authorized
      */
-    public static final QName FAILED_AUTHENTICATION =
-        new QName (WSSE_NS, "FailedAuthentication");
+    public static final QName FAILED_AUTHENTICATION = new QName(WSSE_NS, "FailedAuthentication");
 
     /**
      * The signature or decryption was invalid
      */
-    public static final QName FAILED_CHECK =
-        new QName (WSSE_NS, "FailedCheck");
+    public static final QName FAILED_CHECK = new QName(WSSE_NS, "FailedCheck");
 
     /**
      * Referenced security token could not be retrieved
      */
-    public static final QName SECURITY_TOKEN_UNAVAILABLE =
-        new QName (WSSE_NS, "SecurityTokenUnavailable");
+    public static final QName SECURITY_TOKEN_UNAVAILABLE = new QName(WSSE_NS, "SecurityTokenUnavailable");
 
     /**
      * The message has expired
      */
-    public static final QName MESSAGE_EXPIRED =
-        new QName (WSSE_NS, "MessageExpired");
+    public static final QName MESSAGE_EXPIRED = new QName(WSSE_NS, "MessageExpired");
 
     /*
      * Constants used to configure WSS4J

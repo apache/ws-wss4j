@@ -91,7 +91,7 @@ public class JAASUsernameTokenValidator implements Validator {
 
         if (!WSConstants.PASSWORD_TEXT.equals(pwType)) {
             LOG.warn("Password type " + pwType + " not supported");
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);        	
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
 
         if (!(user != null && user.length() > 0 && password != null && password.length() > 0)) {

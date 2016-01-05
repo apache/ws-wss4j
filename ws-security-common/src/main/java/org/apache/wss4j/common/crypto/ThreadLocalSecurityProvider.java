@@ -32,7 +32,7 @@ public final class ThreadLocalSecurityProvider extends Provider {
 
     private static final long serialVersionUID = 3556396671069994931L;
     private static final String NAME = "TLSP";
-    private static final ThreadLocal<Provider> provider = new ThreadLocal<Provider>();
+    private static final ThreadLocal<Provider> PROVIDER = new ThreadLocal<Provider>();
     private static boolean installed = false;
 
     public static synchronized void install() {
@@ -55,15 +55,15 @@ public final class ThreadLocalSecurityProvider extends Provider {
     }
 
     public static void setProvider(Provider p) {
-        provider.set(p);
+        PROVIDER.set(p);
     }
 
     public static void unsetProvider() {
-        provider.remove();
+        PROVIDER.remove();
     }
 
     private Provider getProvider() {
-        return provider.get();
+        return PROVIDER.get();
     }
 
     public void clear() {

@@ -217,7 +217,7 @@ public class UsernameToken {
                 XMLGregorianCalendar createdCalendar = null;
                 try {
                     createdCalendar =
-                        WSSConfig.datatypeFactory.newXMLGregorianCalendar(createdString);
+                        WSSConfig.DATATYPE_FACTORY.newXMLGregorianCalendar(createdString);
                 } catch (IllegalArgumentException e) {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e,

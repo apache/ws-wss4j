@@ -597,7 +597,8 @@ public class SignatureProcessor implements Processor {
                             }
                         }
                     } else if (dereferencedData instanceof OctetStreamData) {
-                        se = doc.createElementNS("http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1", "attachment");
+                        se = doc.createElementNS("http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1", 
+                                                 "attachment");
                         attachment = true;
                     }
                 }

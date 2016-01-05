@@ -120,9 +120,9 @@ public final class EncryptionUtils {
         // See if it is an attachment, and handle that differently
         String typeStr = encData.getAttributeNS(null, "Type");
         String xopURI = getXOPURIFromEncryptedData(encData);
-        if (typeStr != null &&
-            (WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY.equals(typeStr) ||
-            WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE.equals(typeStr))) {
+        if (typeStr != null 
+            && (WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY.equals(typeStr) 
+                || WSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE.equals(typeStr))) {
 
             Element cipherData = XMLUtils.getDirectChildElement(encData, "CipherData", WSConstants.ENC_NS);
             if (cipherData == null) {
@@ -328,9 +328,11 @@ public final class EncryptionUtils {
     }
 
 
-    private static Node decryptXopAttachment(SecretKey symmetricKey, String symEncAlgo, CallbackHandler attachmentCallbackHandler,
-                                             String xopURI, Element encData) throws WSSecurityException, IOException,
-            UnsupportedCallbackException, NoSuchAlgorithmException, NoSuchPaddingException, ParserConfigurationException, SAXException {
+    private static Node decryptXopAttachment(
+       SecretKey symmetricKey, String symEncAlgo, CallbackHandler attachmentCallbackHandler,
+       String xopURI, Element encData
+   ) throws WSSecurityException, IOException, UnsupportedCallbackException, NoSuchAlgorithmException, 
+        NoSuchPaddingException, ParserConfigurationException, SAXException {
 
         if (attachmentCallbackHandler == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
