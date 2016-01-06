@@ -289,8 +289,8 @@ public class WSSecSignatureBase extends WSSecBase {
     public List<String> getInclusivePrefixes(Element target, boolean excludeVisible) {
         List<String> result = new ArrayList<>();
         Node parent = target;
-        while (parent.getParentNode() != null &&
-            !(Node.DOCUMENT_NODE == parent.getParentNode().getNodeType())) {
+        while (parent.getParentNode() != null 
+            && !(Node.DOCUMENT_NODE == parent.getParentNode().getNodeType())) {
             parent = parent.getParentNode();
             NamedNodeMap attributes = parent.getAttributes();
             for (int i = 0; i < attributes.getLength(); i++) {

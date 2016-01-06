@@ -113,8 +113,8 @@ public class DerivedKeyToken {
         this.bspEnforcer = bspEnforcer;
         QName el = new QName(element.getNamespaceURI(), element.getLocalName());
 
-        if (!(el.equals(ConversationConstants.DERIVED_KEY_TOKEN_QNAME_05_02) ||
-            el.equals(ConversationConstants.DERIVED_KEY_TOKEN_QNAME_05_12))) {
+        if (!(el.equals(ConversationConstants.DERIVED_KEY_TOKEN_QNAME_05_02) 
+            || el.equals(ConversationConstants.DERIVED_KEY_TOKEN_QNAME_05_12))) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN
             );

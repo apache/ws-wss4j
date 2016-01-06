@@ -29,30 +29,27 @@ public class SOAP11Constants implements SOAPConstants {
      *
      */
     private static final long serialVersionUID = 3809268485386395322L;
-    private static final QName headerQName = new QName(WSConstants.URI_SOAP11_ENV,
-            WSConstants.ELEM_HEADER);
-    private static final QName bodyQName = new QName(WSConstants.URI_SOAP11_ENV,
-            WSConstants.ELEM_BODY);
-    private static final QName roleQName = new QName(WSConstants.URI_SOAP11_ENV,
-            WSConstants.ATTR_ACTOR);
+    private static final QName HEADER_QNAME = new QName(WSConstants.URI_SOAP11_ENV, WSConstants.ELEM_HEADER);
+    private static final QName BODY_QNAME = new QName(WSConstants.URI_SOAP11_ENV, WSConstants.ELEM_BODY);
+    private static final QName ROLE_QNAME = new QName(WSConstants.URI_SOAP11_ENV, WSConstants.ATTR_ACTOR);
 
     public String getEnvelopeURI() {
         return WSConstants.URI_SOAP11_ENV;
     }
 
     public QName getHeaderQName() {
-        return headerQName;
+        return HEADER_QNAME;
     }
 
     public QName getBodyQName() {
-        return bodyQName;
+        return BODY_QNAME;
     }
 
     /**
      * Obtain the QName for the role attribute (actor/role)
      */
     public QName getRoleAttributeQName() {
-        return roleQName;
+        return ROLE_QNAME;
     }
 
     /**

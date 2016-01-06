@@ -107,15 +107,18 @@ public class AttachmentContentSignatureTransform extends TransformService {
         Attachment attachment;
         if (attachmentTransformParameterSpec != null) {
             attachment = attachmentTransformParameterSpec.getAttachment();
-            context.setProperty(ATTACHMENT_CALLBACKHANDLER, attachmentTransformParameterSpec.getAttachmentCallbackHandler());
+            context.setProperty(ATTACHMENT_CALLBACKHANDLER, 
+                                attachmentTransformParameterSpec.getAttachmentCallbackHandler());
         } else {
             attachment = attachmentRequestCallback(context, attachmentId);
         }
         return processAttachment(context, os, attachmentUri, attachment);
     }
 
-    protected Attachment attachmentRequestCallback(XMLCryptoContext context, String attachmentId) throws TransformException {
-        CallbackHandler attachmentCallbackHandler = (CallbackHandler) context.getProperty(ATTACHMENT_CALLBACKHANDLER);
+    protected Attachment attachmentRequestCallback(XMLCryptoContext context, String attachmentId) 
+        throws TransformException {
+        CallbackHandler attachmentCallbackHandler = 
+            (CallbackHandler) context.getProperty(ATTACHMENT_CALLBACKHANDLER);
         if (attachmentCallbackHandler == null) {
             throw new TransformException("No attachment callbackhandler supplied");
         }
@@ -133,8 +136,10 @@ public class AttachmentContentSignatureTransform extends TransformService {
         return attachments.get(0);
     }
 
-    protected void attachmentResultCallback(XMLCryptoContext context, Attachment attachment) throws TransformException {
-        CallbackHandler attachmentCallbackHandler = (CallbackHandler) context.getProperty(ATTACHMENT_CALLBACKHANDLER);
+    protected void attachmentResultCallback(XMLCryptoContext context, Attachment attachment) 
+        throws TransformException {
+        CallbackHandler attachmentCallbackHandler = 
+            (CallbackHandler) context.getProperty(ATTACHMENT_CALLBACKHANDLER);
         if (attachmentCallbackHandler == null) {
             throw new TransformException("No attachment callbackhandler supplied");
         }
@@ -149,7 +154,8 @@ public class AttachmentContentSignatureTransform extends TransformService {
     }
 
     @SuppressWarnings("resource")
-    protected Data processAttachment(XMLCryptoContext context, OutputStream os, String attachmentUri, Attachment attachment) throws TransformException {
+    protected Data processAttachment(XMLCryptoContext context, OutputStream os, String attachmentUri, 
+                                     Attachment attachment) throws TransformException {
         try {
             //try to reuse the inputStream in the hope that the provided inputStream is backed by a disk storage
             InputStream inputStream = attachment.getSourceStream();

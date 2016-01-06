@@ -71,12 +71,11 @@ public final class STRTransformUtil {
 
             Reference reference = secRef.getReference();
             return STRParserUtil.getTokenElement(doc, wsDocInfo, null, reference.getURI(), reference.getValueType());
-        }
-        //
-        // second case: IssuerSerial, lookup in keystore, wrap in BST according
-        // to specification
-        //
-        else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
+        } else if (secRef.containsX509Data() || secRef.containsX509IssuerSerial()) {
+            //
+            // second case: IssuerSerial, lookup in keystore, wrap in BST according
+            // to specification
+            //
             if (LOG.isDebugEnabled()) {
                 LOG.debug("STR: IssuerSerial");
             }
@@ -86,13 +85,12 @@ public final class STRTransformUtil {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
             }
             return createBSTX509(doc, certs[0], secRef.getElement(), secRef.getKeyIdentifierEncodingType());
-        }
-        //
-        // third case: KeyIdentifier. For SKI, lookup in keystore, wrap in
-        // BST according to specification. Otherwise if it's a wsse:KeyIdentifier it could
-        // be a SAML assertion, so try and find the referenced element.
-        //
-        else if (secRef.containsKeyIdentifier()) {
+        } else if (secRef.containsKeyIdentifier()) {
+            //
+            // third case: KeyIdentifier. For SKI, lookup in keystore, wrap in
+            // BST according to specification. Otherwise if it's a wsse:KeyIdentifier it could
+            // be a SAML assertion, so try and find the referenced element.
+            //
             if (LOG.isDebugEnabled()) {
                 LOG.debug("STR: KeyIdentifier");
             }
@@ -119,7 +117,7 @@ public final class STRTransformUtil {
     public static Element createBSTX509(Document doc, X509Certificate cert, Element secRefE,
                                         String secRefEncType)
         throws WSSecurityException {
-        byte data[];
+        byte[] data;
         try {
             data = cert.getEncoded();
         } catch (CertificateEncodingException e) {

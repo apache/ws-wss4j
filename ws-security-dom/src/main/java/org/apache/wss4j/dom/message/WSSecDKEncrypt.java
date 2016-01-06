@@ -197,9 +197,8 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         symEncAlgo = algo;
     }
 
-    protected int getDerivedKeyLength() throws WSSecurityException{
-        return derivedKeyLength > 0 ? derivedKeyLength :
-            KeyUtils.getKeyLength(symEncAlgo);
+    protected int getDerivedKeyLength() throws WSSecurityException {
+        return derivedKeyLength > 0 ? derivedKeyLength : KeyUtils.getKeyLength(symEncAlgo);
     }
 
     public void setDerivedKeyLength(int keyLength) {

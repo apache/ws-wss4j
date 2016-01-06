@@ -259,7 +259,7 @@ public class WSSecEncryptedKey extends WSSecBase {
                 if (WSConstants.KEYTRANSPORT_RSAOEP_XENC11.equals(keyEncAlgo)) {
                     if (WSConstants.MGF_SHA224.equals(mgfAlgo)) {
                         mgf1ParameterSpec = new MGF1ParameterSpec("SHA-224");
-                    } if (WSConstants.MGF_SHA256.equals(mgfAlgo)) {
+                    } else if (WSConstants.MGF_SHA256.equals(mgfAlgo)) {
                         mgf1ParameterSpec = new MGF1ParameterSpec("SHA-256");
                     } else if (WSConstants.MGF_SHA384.equals(mgfAlgo)) {
                         mgf1ParameterSpec = new MGF1ParameterSpec("SHA-384");

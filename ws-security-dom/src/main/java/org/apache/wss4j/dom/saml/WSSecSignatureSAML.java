@@ -374,13 +374,24 @@ public class WSSecSignatureSAML extends WSSecSignature {
             );
         }
 
+        X509Certificate cert = certs != null ? certs[0] : null;
+        configureKeyInfo(doc, secRef, cert, iCrypto != null ? iCrypto : uCrypto, 
+            samlAssertion);
+
+        wsDocInfo.addTokenElement(samlToken, false);
+    }
+    
+    private void configureKeyInfo(
+        Document doc, SecurityTokenReference secRef, X509Certificate cert,
+        Crypto crypto, SamlAssertionWrapper samlAssertion
+    ) throws WSSecurityException {
         if (senderVouches) {
             switch (keyIdentifierType) {
             case WSConstants.BST_DIRECT_REFERENCE:
                 Reference ref = new Reference(doc);
                 ref.setURI("#" + certUri);
                 BinarySecurity binarySecurity = new X509Security(doc);
-                ((X509Security) binarySecurity).setX509Certificate(certs[0]);
+                ((X509Security) binarySecurity).setX509Certificate(cert);
                 binarySecurity.setID(certUri);
                 bstToken = binarySecurity.getElement();
                 wsDocInfo.addTokenElement(bstToken, false);
@@ -389,20 +400,20 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 break;
 
             case WSConstants.X509_KEY_IDENTIFIER :
-                secRef.setKeyIdentifier(certs[0]);
+                secRef.setKeyIdentifier(cert);
                 break;
 
             case WSConstants.SKI_KEY_IDENTIFIER:
-                secRef.setKeyIdentifierSKI(certs[0], iCrypto != null ? iCrypto : uCrypto);
+                secRef.setKeyIdentifierSKI(cert, crypto);
                 break;
 
             case WSConstants.THUMBPRINT_IDENTIFIER:
-                secRef.setKeyIdentifierThumb(certs[0]);
+                secRef.setKeyIdentifierThumb(cert);
                 break;
 
             case WSConstants.ISSUER_SERIAL:
-                final String issuer = certs[0].getIssuerDN().getName();
-                final java.math.BigInteger serialNumber = certs[0].getSerialNumber();
+                final String issuer = cert.getIssuerDN().getName();
+                final java.math.BigInteger serialNumber = cert.getSerialNumber();
                 final DOMX509IssuerSerial domIssuerSerial =
                         new DOMX509IssuerSerial(document, issuer, serialNumber);
                 final DOMX509Data domX509Data = new DOMX509Data(document, domIssuerSerial);
@@ -449,8 +460,6 @@ public class WSSecSignatureSAML extends WSSecSignature {
             keyInfoFactory.newKeyInfo(
                 java.util.Collections.singletonList(structure), keyInfoUri
             );
-
-        wsDocInfo.addTokenElement(samlToken, false);
     }
 
     /**
