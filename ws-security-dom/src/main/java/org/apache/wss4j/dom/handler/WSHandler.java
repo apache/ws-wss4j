@@ -419,7 +419,7 @@ public abstract class WSHandler {
     protected void checkSignatureConfirmation(
         RequestData reqData,
         WSHandlerResult handlerResults
-    ) throws WSSecurityException{
+    ) throws WSSecurityException {
         if (doDebug) {
             LOG.debug("Check Signature confirmation");
         }
@@ -1392,7 +1392,7 @@ public abstract class WSHandler {
      */
     public String getStringOption(String key) {
         Object o = getOption(key);
-        if (o instanceof String){
+        if (o instanceof String) {
             return (String) o;
         } else {
             return null;

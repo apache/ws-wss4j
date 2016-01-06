@@ -61,7 +61,8 @@ public class AttachmentCompleteSignatureTransform extends AttachmentContentSigna
         Attachment attachment;
         if (attachmentTransformParameterSpec != null) {
             attachment = attachmentTransformParameterSpec.getAttachment();
-            context.setProperty(ATTACHMENT_CALLBACKHANDLER, attachmentTransformParameterSpec.getAttachmentCallbackHandler());
+            context.setProperty(ATTACHMENT_CALLBACKHANDLER, 
+                                attachmentTransformParameterSpec.getAttachmentCallbackHandler());
         } else {
             attachment = attachmentRequestCallback(context, attachmentId);
         }

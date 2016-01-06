@@ -153,8 +153,7 @@ public class DOMCallbackLookup implements CallbackLookup {
         // Try the SOAP Body first
         //
         Element bodyElement = getSOAPBody();
-        if (WSConstants.ELEM_BODY.equals(localname) &&
-            bodyElement.getNamespaceURI().equals(namespace)) {
+        if (WSConstants.ELEM_BODY.equals(localname) && bodyElement.getNamespaceURI().equals(namespace)) {
             return Collections.singletonList(bodyElement);
         }
         return XMLUtils.findElements(doc.getDocumentElement(), localname, namespace);

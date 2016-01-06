@@ -80,8 +80,7 @@ public class STRTransform extends TransformService {
     public void init(XMLStructure parent, XMLCryptoContext context)
     throws InvalidAlgorithmParameterException {
         if (context != null && !(context instanceof DOMCryptoContext)) {
-            throw new ClassCastException
-                ("context must be of type DOMCryptoContext");
+            throw new ClassCastException("context must be of type DOMCryptoContext");
         }
         if (!(parent instanceof javax.xml.crypto.dom.DOMStructure)) {
             throw new ClassCastException("parent must be of type DOMStructure");
@@ -93,8 +92,7 @@ public class STRTransform extends TransformService {
     public void marshalParams(XMLStructure parent, XMLCryptoContext context)
     throws MarshalException {
         if (context != null && !(context instanceof DOMCryptoContext)) {
-            throw new ClassCastException
-                ("context must be of type DOMCryptoContext");
+            throw new ClassCastException("context must be of type DOMCryptoContext");
         }
         if (!(parent instanceof javax.xml.crypto.dom.DOMStructure)) {
             throw new ClassCastException("parent must be of type DOMStructure");

@@ -118,7 +118,8 @@ public class KerberosSecurity extends BinarySecurity {
     public void retrieveServiceTicket(
         CallbackHandler callbackHandler
     ) throws WSSecurityException {
-        KerberosContextAndServiceNameCallback contextAndServiceNameCallback = new KerberosContextAndServiceNameCallback();
+        KerberosContextAndServiceNameCallback contextAndServiceNameCallback = 
+            new KerberosContextAndServiceNameCallback();
         try {
             callbackHandler.handle(new Callback[]{contextAndServiceNameCallback});
         } catch (IOException | UnsupportedCallbackException e) {
@@ -127,11 +128,13 @@ public class KerberosSecurity extends BinarySecurity {
 
         String jaasLoginModuleName = contextAndServiceNameCallback.getContextName();
         if (jaasLoginModuleName == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "kerberosCallbackContextNameNotSupplied");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+                                          "kerberosCallbackContextNameNotSupplied");
         }
         String serviceName = contextAndServiceNameCallback.getServiceName();
         if (serviceName == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "kerberosCallbackServiceNameNotSupplied");
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+                                          "kerberosCallbackServiceNameNotSupplied");
         }
 
         retrieveServiceTicket(jaasLoginModuleName, callbackHandler, serviceName);
@@ -237,7 +240,7 @@ public class KerberosSecurity extends BinarySecurity {
             }
 
             if (LOG.isDebugEnabled()) {
-                if (secretKey == null ) {
+                if (secretKey == null) {
                     LOG.debug("No secret key for kerberos was found");
                 } else {
                     LOG.debug("Successfully retrieved a secret key for kerberos");
@@ -245,8 +248,7 @@ public class KerberosSecurity extends BinarySecurity {
             }
 
             setToken(krbCtx.getKerberosToken());
-        }
-        catch (PrivilegedActionException e) {
+        } catch (PrivilegedActionException e) {
             Throwable cause = e.getCause();
             if (cause instanceof WSSecurityException) {
                 throw (WSSecurityException) cause;

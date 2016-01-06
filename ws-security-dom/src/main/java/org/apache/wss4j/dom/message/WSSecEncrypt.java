@@ -487,7 +487,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             if (null != children) {
                 serializedOctets = serializer.serializeToByteArray(children);
             } else {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, "Element has no content.");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, 
+                                              "Element has no content.");
             }
         } else {
             serializedOctets = serializer.serializeToByteArray(elementToEncrypt);
