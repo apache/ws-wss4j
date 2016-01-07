@@ -618,42 +618,63 @@ public class Merlin extends CryptoBase {
         }
 
         String identifier = getIdentifier(certificate, keystore);
-        try {
-            if (identifier == null || !keystore.isKeyEntry(identifier)) {
+        if (identifier == null) {
+            try {
                 String msg = "Cannot find key for alias: [" + identifier + "]";
                 String logMsg = createKeyStoreErrorMessage(keystore);
                 LOG.error(msg + logMsg);
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                                               new Object[] {msg});
+            } catch (KeyStoreException ex) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, ex, "noPrivateKey", 
+                        new Object[] {ex.getMessage()}
+                );
             }
-            String password = getPassword(identifier, callbackHandler);
-            if (password == null && privatePasswordSet) {
-                password = properties.getProperty(PREFIX + KEYSTORE_PRIVATE_PASSWORD);
-                if (password == null) {
-                    password = properties.getProperty(OLD_PREFIX + KEYSTORE_PRIVATE_PASSWORD);
-                }
-                if (password != null) {
-                    password = password.trim();
-                    password = decryptPassword(password, passwordEncryptor);
-                }
-            }
-            Key keyTmp = keystore.getKey(identifier, password == null
-                                         ? new char[]{} : password.toCharArray());
-            if (!(keyTmp instanceof PrivateKey)) {
-                String msg = "Key is not a private key, alias: [" + identifier + "]";
+        }
+        String password = getPassword(identifier, callbackHandler);
+        return getPrivateKey(identifier, password);
+    }
+    
+    /**
+     * Gets the private key corresponding to the given PublicKey.
+     *
+     * @param publicKey The PublicKey corresponding to the private key
+     * @param callbackHandler The callbackHandler needed to get the password
+     * @return The private key
+     */
+    public PrivateKey getPrivateKey(
+        PublicKey publicKey,
+        CallbackHandler callbackHandler
+    ) throws WSSecurityException {
+        if (keystore == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
+                                          new Object[] {"The keystore is null"});
+        }
+        if (callbackHandler == null) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
+                                          new Object[] {"The CallbackHandler is null"});
+        }
+
+        String identifier = getIdentifier(publicKey, keystore);
+        if (identifier == null) {
+            try {
+                String msg = "Cannot find key for alias: [" + identifier + "]";
                 String logMsg = createKeyStoreErrorMessage(keystore);
                 LOG.error(msg + logMsg);
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
-                                              new Object[]{msg});
+                                              new Object[] {msg});
+            } catch (KeyStoreException ex) {
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILURE, ex, "noPrivateKey", 
+                        new Object[] {ex.getMessage()}
+                );
             }
-            return (PrivateKey) keyTmp;
-        } catch (KeyStoreException | UnrecoverableKeyException | NoSuchAlgorithmException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, ex, "noPrivateKey", new Object[] {ex.getMessage()}
-            );
         }
+        String password = getPassword(identifier, callbackHandler);
+        return getPrivateKey(identifier, password);
     }
-
+    
     /**
      * Gets the private key corresponding to the identifier.
      *
@@ -685,6 +706,7 @@ public class Merlin extends CryptoBase {
                 }
                 if (pwd != null) {
                     pwd = pwd.trim();
+                    pwd = decryptPassword(pwd, passwordEncryptor);
                 }
             }
             Key keyTmp = keystore.getKey(identifier, pwd == null
@@ -1321,6 +1343,31 @@ public class Merlin extends CryptoBase {
                 }
 
                 if (certs != null && certs.length > 0 && certs[0].equals(cert)) {
+                    return alias;
+                }
+            }
+        } catch (KeyStoreException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "keystore");
+        }
+        return null;
+    }
+    
+    private String getIdentifier(PublicKey publicKey, KeyStore store)
+        throws WSSecurityException {
+        try {
+            for (Enumeration<String> e = store.aliases(); e.hasMoreElements();) {
+                String alias = e.nextElement();
+
+                Certificate[] certs = store.getCertificateChain(alias);
+                if (certs == null || certs.length == 0) {
+                    // no cert chain, so lets check if getCertificate gives us a  result.
+                    Certificate retrievedCert = store.getCertificate(alias);
+                    if (retrievedCert != null) {
+                        certs = new Certificate[]{retrievedCert};
+                    }
+                }
+
+                if (certs != null && certs.length > 0 && certs[0].getPublicKey().equals(publicKey)) {
                     return alias;
                 }
             }

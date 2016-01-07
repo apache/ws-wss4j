@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.dom.message;
 
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -30,6 +31,7 @@ import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.KeyUtils;
@@ -217,6 +219,39 @@ public class EncryptionTest extends org.junit.Assert {
         REFERENCE_TYPE referenceType =
             (REFERENCE_TYPE)actionResult.get(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE);
         assertTrue(referenceType == REFERENCE_TYPE.KEY_IDENTIFIER);
+    }
+    
+    @Test
+    public void testEncryptionDecryptionPublicKey() throws Exception {
+        WSSecEncrypt builder = new WSSecEncrypt();
+        builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
+        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOEP);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+        cryptoType.setAlias("wss40");
+        X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+        assertNotNull(certs);
+        builder.setUseThisPublicKey(certs[0].getPublicKey());
+        
+        Document encryptedDoc = builder.build(doc, crypto, secHeader);
+
+        String outputString =
+            XMLUtils.prettyDocumentToString(encryptedDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(outputString);
+        }
+        assertFalse(outputString.contains("counter_port_type"));
+
+        WSSecurityEngine newEngine = new WSSecurityEngine();
+        WSHandlerResult results =
+            newEngine.processSecurityHeader(encryptedDoc, null, keystoreCallbackHandler, crypto);
+
+        WSSecurityEngineResult actionResult =
+                results.getActionResults().get(WSConstants.ENCR).get(0);
+        assertNotNull(actionResult.get(WSSecurityEngineResult.TAG_PUBLIC_KEY));
     }
 
     /**

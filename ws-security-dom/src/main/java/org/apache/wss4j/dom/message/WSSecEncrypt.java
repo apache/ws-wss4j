@@ -143,26 +143,30 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         // algorithm that will encrypt the generated symmetric (session) key.
         //
         if (encryptSymmKey && encryptedEphemeralKey == null) {
-            X509Certificate remoteCert = getUseThisCert();
-            if (remoteCert == null) {
-                CryptoType cryptoType = null;
-                if (keyIdentifierType == WSConstants.ENDPOINT_KEY_IDENTIFIER) {
-                    cryptoType = new CryptoType(CryptoType.TYPE.ENDPOINT);
-                    cryptoType.setEndpoint(user);
-                } else {
-                    cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-                    cryptoType.setAlias(user);
+            if (getUseThisPublicKey() != null) {
+                prepareInternal(symmetricKey, getUseThisPublicKey(), crypto);
+            } else {
+                X509Certificate remoteCert = getUseThisCert();
+                if (remoteCert == null) {
+                    CryptoType cryptoType = null;
+                    if (keyIdentifierType == WSConstants.ENDPOINT_KEY_IDENTIFIER) {
+                        cryptoType = new CryptoType(CryptoType.TYPE.ENDPOINT);
+                        cryptoType.setEndpoint(user);
+                    } else {
+                        cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+                        cryptoType.setAlias(user);
+                    }
+                    X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+                    if (certs == null || certs.length <= 0) {
+                        throw new WSSecurityException(
+                            WSSecurityException.ErrorCode.FAILURE,
+                            "noUserCertsFound",
+                            new Object[] {user, "encryption"});
+                    }
+                    remoteCert = certs[0];
                 }
-                X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
-                if (certs == null || certs.length <= 0) {
-                    throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILURE,
-                        "noUserCertsFound",
-                        new Object[] {user, "encryption"});
-                }
-                remoteCert = certs[0];
+                prepareInternal(symmetricKey, remoteCert, crypto);
             }
-            prepareInternal(symmetricKey, remoteCert, crypto);
         } else if (encryptedEphemeralKey != null) {
             prepareInternal(symmetricKey);
         } else {

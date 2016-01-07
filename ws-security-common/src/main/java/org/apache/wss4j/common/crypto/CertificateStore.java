@@ -122,6 +122,20 @@ public class CertificateStore extends CryptoBase {
     }
 
     /**
+     * Gets the private key corresponding to the given PublicKey.
+     *
+     * @param publicKey The PublicKey corresponding to the private key
+     * @param callbackHandler The callbackHandler needed to get the password
+     * @return The private key
+     */
+    public PrivateKey getPrivateKey(
+        PublicKey publicKey,
+        CallbackHandler callbackHandler
+    ) throws WSSecurityException {
+        return null;
+    }
+    
+    /**
      * Gets the private key corresponding to the identifier. Not supported.
      *
      * @param identifier The implementation-specific identifier corresponding to the key

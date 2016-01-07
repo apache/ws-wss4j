@@ -29,8 +29,17 @@ import org.w3c.dom.Node;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.xml.crypto.MarshalException;
+import javax.xml.crypto.XMLStructure;
+import javax.xml.crypto.dom.DOMStructure;
+import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
+import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
+import javax.xml.crypto.dsig.keyinfo.KeyValue;
 
 import java.io.IOException;
+import java.security.PublicKey;
+import java.util.List;
 
 public final class X509Util {
     private static final org.slf4j.Logger LOG =
@@ -107,5 +116,54 @@ public final class X509Util {
         }
         return decryptedData;
     }
+    
+    public static PublicKey parseKeyValue( Element keyInfoElement,
+                                           XMLSignatureFactory signatureFactory) throws WSSecurityException {
+        KeyValue keyValue = null;
+        try {
+            //
+            // Look for a KeyValue object
+            //
+            keyValue = getKeyValue(keyInfoElement, signatureFactory);
+        } catch (MarshalException ex) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
+        }
+
+        if (keyValue != null) {
+            try {
+                //
+                // Look for a Public Key in Key Value
+                //
+                return keyValue.getPublicKey();
+            } catch (java.security.KeyException ex) {
+                LOG.error(ex.getMessage(), ex);
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
+            }
+        } else {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.INVALID_SECURITY, "unsupportedKeyInfo"
+            );
+        }
+    }
+
+    /**
+     * Get the KeyValue object from the KeyInfo DOM element if it exists
+     */
+    public static KeyValue getKeyValue(Element keyInfoElement,
+                                       XMLSignatureFactory signatureFactory) throws MarshalException {
+        XMLStructure keyInfoStructure = new DOMStructure(keyInfoElement);
+        KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
+        KeyInfo keyInfo = keyInfoFactory.unmarshalKeyInfo(keyInfoStructure);
+        List<?> list = keyInfo.getContent();
+
+        for (int i = 0; i < list.size(); i++) {
+            XMLStructure xmlStructure = (XMLStructure) list.get(i);
+            if (xmlStructure instanceof KeyValue) {
+                return (KeyValue)xmlStructure;
+            }
+        }
+        return null;
+    }
+
 
 }

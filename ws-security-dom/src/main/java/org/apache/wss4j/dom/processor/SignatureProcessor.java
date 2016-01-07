@@ -33,11 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.crypto.Data;
-import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.NodeSetData;
 import javax.xml.crypto.OctetStreamData;
-import javax.xml.crypto.XMLStructure;
-import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.Manifest;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.SignedInfo;
@@ -47,9 +44,6 @@ import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.XMLValidateContext;
 import javax.xml.crypto.dsig.dom.DOMValidateContext;
-import javax.xml.crypto.dsig.keyinfo.KeyInfo;
-import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
-import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 import javax.xml.crypto.dsig.spec.HMACParameterSpec;
 
@@ -85,6 +79,7 @@ import org.apache.wss4j.dom.transform.STRTransform;
 import org.apache.wss4j.dom.transform.STRTransformUtil;
 import org.apache.wss4j.dom.util.EncryptionUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.dom.util.X509Util;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
@@ -154,7 +149,7 @@ public class SignatureProcessor implements Processor {
                 && WSConstants.WSSE_NS.equals(child.getNamespaceURI()))) {
                 data.getBSPEnforcer().handleBSPRule(BSPRule.R5417);
 
-                publicKey = parseKeyValue(keyInfoElement);
+                publicKey = X509Util.parseKeyValue(keyInfoElement, signatureFactory);
                 if (validator != null) {
                     credential.setPublicKey(publicKey);
                     principal = new PublicKeyPrincipalImpl(publicKey);
@@ -289,57 +284,6 @@ public class SignatureProcessor implements Processor {
             );
         }
     }
-
-    private PublicKey parseKeyValue(
-        Element keyInfoElement
-    ) throws WSSecurityException {
-        KeyValue keyValue = null;
-        try {
-            //
-            // Look for a KeyValue object
-            //
-            keyValue = getKeyValue(keyInfoElement);
-        } catch (MarshalException ex) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
-        }
-
-        if (keyValue != null) {
-            try {
-                //
-                // Look for a Public Key in Key Value
-                //
-                return keyValue.getPublicKey();
-            } catch (java.security.KeyException ex) {
-                LOG.error(ex.getMessage(), ex);
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
-            }
-        } else {
-            throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.INVALID_SECURITY, "unsupportedKeyInfo"
-            );
-        }
-    }
-
-    /**
-     * Get the KeyValue object from the KeyInfo DOM element if it exists
-     */
-    private KeyValue getKeyValue(
-        Element keyInfoElement
-    ) throws MarshalException {
-        XMLStructure keyInfoStructure = new DOMStructure(keyInfoElement);
-        KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
-        KeyInfo keyInfo = keyInfoFactory.unmarshalKeyInfo(keyInfoStructure);
-        List<?> list = keyInfo.getContent();
-
-        for (int i = 0; i < list.size(); i++) {
-            XMLStructure xmlStructure = (XMLStructure) list.get(i);
-            if (xmlStructure instanceof KeyValue) {
-                return (KeyValue)xmlStructure;
-            }
-        }
-        return null;
-    }
-
 
     /**
      * Verify the WS-Security signature.
