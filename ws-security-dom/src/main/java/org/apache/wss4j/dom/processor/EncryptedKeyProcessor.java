@@ -47,6 +47,7 @@ import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
 import org.apache.wss4j.common.crypto.CryptoType;
+import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.DOMX509IssuerSerial;
 import org.apache.wss4j.common.token.SecurityTokenReference;
@@ -250,8 +251,10 @@ public class EncryptedKeyProcessor implements Processor {
         try {
             if (certs != null) {
                 return data.getDecCrypto().getPrivateKey(certs[0], data.getCallbackHandler());
+            } else if (data.getDecCrypto() instanceof Merlin) {
+                return ((Merlin)data.getDecCrypto()).getPrivateKey(publicKey, data.getCallbackHandler());
             }
-            return data.getDecCrypto().getPrivateKey(publicKey, data.getCallbackHandler());
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
         } catch (WSSecurityException ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
         }
