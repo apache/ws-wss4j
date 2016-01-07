@@ -23,7 +23,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.spec.MGF1ParameterSpec;
 import java.util.ArrayList;
@@ -35,6 +37,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
+import javax.xml.crypto.dsig.XMLSignatureFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -135,6 +138,7 @@ public class EncryptedKeyProcessor implements Processor {
 
         X509Certificate[] certs = null;
         STRParser.REFERENCE_TYPE referenceType = null;
+        PublicKey publicKey = null;
         boolean symmetricKeyWrap = isSymmetricKeyWrap(encryptedKeyTransportMethod);
         if (!symmetricKeyWrap) {
             if (SecurityTokenReference.SECURITY_TOKEN_REFERENCE.equals(keyInfoChildElement.getLocalName())
@@ -151,13 +155,27 @@ public class EncryptedKeyProcessor implements Processor {
                 referenceType = parserResult.getCertificatesReferenceType();
             } else {
                 certs = getCertificatesFromX509Data(keyInfoChildElement, data);
+                if (certs == null) {
+                    XMLSignatureFactory signatureFactory;
+                    try {
+                        signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
+                    } catch (NoSuchProviderException ex) {
+                        signatureFactory = XMLSignatureFactory.getInstance("DOM");
+                    }
+                    
+                    publicKey = X509Util.parseKeyValue((Element)keyInfoChildElement.getParentNode(), 
+                                                       signatureFactory);
+                }
             }
-
-            if (certs == null || certs.length < 1 || certs[0] == null) {
+            
+            if (publicKey == null && (certs == null || certs.length < 1 || certs[0] == null)) {
                 throw new WSSecurityException(
                                           WSSecurityException.ErrorCode.FAILURE,
                                           "noCertsFound",
                                           new Object[] {"decryption (KeyId)"});
+            }
+            if (certs != null && certs.length > 0) {
+                publicKey = certs[0].getPublicKey();
             }
         }
 
@@ -167,7 +185,7 @@ public class EncryptedKeyProcessor implements Processor {
                 AlgorithmSuiteValidator(algorithmSuite);
 
             if (!symmetricKeyWrap) {
-                algorithmSuiteValidator.checkAsymmetricKeyLength(certs[0]);
+                algorithmSuiteValidator.checkAsymmetricKeyLength(publicKey);
             }
             algorithmSuiteValidator.checkEncryptionKeyWrapAlgorithm(
                 encryptedKeyTransportMethod
@@ -191,9 +209,10 @@ public class EncryptedKeyProcessor implements Processor {
             decryptedBytes = getSymmetricDecryptedBytes(data, wsDocInfo, keyInfoChildElement,
                                                         refList, encryptedEphemeralKey);
         } else {
+            PrivateKey privateKey = getPrivateKey(data, certs, publicKey);
             decryptedBytes = getAsymmetricDecryptedBytes(data, wsDocInfo, encryptedKeyTransportMethod,
                                                          encryptedEphemeralKey, refList,
-                                                         elem, certs[0]);
+                                                         elem, privateKey);
         }
 
         List<WSDataRef> dataRefs = decryptDataRefs(refList, wsDocInfo, decryptedBytes, data);
@@ -217,9 +236,25 @@ public class EncryptedKeyProcessor implements Processor {
         if (referenceType != null) {
             result.put(WSSecurityEngineResult.TAG_X509_REFERENCE_TYPE, referenceType);
         }
+        if (publicKey != null) {
+            result.put(WSSecurityEngineResult.TAG_PUBLIC_KEY, publicKey);
+        }
         wsDocInfo.addResult(result);
         wsDocInfo.addTokenElement(elem);
         return Collections.singletonList(result);
+    }
+    
+    private PrivateKey getPrivateKey(
+        RequestData data, X509Certificate[] certs, PublicKey publicKey
+    ) throws WSSecurityException {
+        try {
+            if (certs != null) {
+                return data.getDecCrypto().getPrivateKey(certs[0], data.getCallbackHandler());
+            }
+            return data.getDecCrypto().getPrivateKey(publicKey, data.getCallbackHandler());
+        } catch (WSSecurityException ex) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, ex);
+        }
     }
 
     private static byte[] getSymmetricDecryptedBytes(
@@ -249,14 +284,13 @@ public class EncryptedKeyProcessor implements Processor {
         byte[] encryptedEphemeralKey,
         Element refList,
         Element encryptedKeyElement,
-        X509Certificate cert
+        PrivateKey privateKey
     ) throws WSSecurityException {
         if (data.getDecCrypto() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noDecCryptoFile");
         }
         Cipher cipher = KeyUtils.getCipherInstance(encryptedKeyTransportMethod);
         try {
-            PrivateKey privateKey = data.getDecCrypto().getPrivateKey(cert, data.getCallbackHandler());
             OAEPParameterSpec oaepParameterSpec = null;
             if (WSConstants.KEYTRANSPORT_RSAOEP.equals(encryptedKeyTransportMethod)
                 || WSConstants.KEYTRANSPORT_RSAOEP_XENC11.equals(encryptedKeyTransportMethod)) {
@@ -406,15 +440,15 @@ public class EncryptedKeyProcessor implements Processor {
     }
 
     private X509Certificate[] getCertificatesFromX509Data(
-        Element strElement,
+        Element keyInfoChildElement,
         RequestData data
     ) throws WSSecurityException {
 
-        if (WSConstants.SIG_NS.equals(strElement.getNamespaceURI())
-            && WSConstants.X509_DATA_LN.equals(strElement.getLocalName())) {
+        if (WSConstants.SIG_NS.equals(keyInfoChildElement.getNamespaceURI())
+            && WSConstants.X509_DATA_LN.equals(keyInfoChildElement.getLocalName())) {
             data.getBSPEnforcer().handleBSPRule(BSPRule.R5426);
 
-            Element x509Child = getFirstElement(strElement);
+            Element x509Child = getFirstElement(keyInfoChildElement);
 
             if (x509Child != null && WSConstants.SIG_NS.equals(x509Child.getNamespaceURI())) {
                 if (WSConstants.X509_ISSUER_SERIAL_LN.equals(x509Child.getLocalName())) {
@@ -444,7 +478,7 @@ public class EncryptedKeyProcessor implements Processor {
 
         return null;
     }
-
+    
     private Element getFirstElement(Element element) {
         for (Node currentChild = element.getFirstChild();
              currentChild != null;

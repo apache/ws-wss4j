@@ -21,6 +21,8 @@ package org.apache.wss4j.dom.message;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.spec.MGF1ParameterSpec;
 
@@ -30,6 +32,12 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
+import javax.xml.crypto.MarshalException;
+import javax.xml.crypto.dom.DOMStructure;
+import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
+import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
+import javax.xml.crypto.dsig.keyinfo.KeyValue;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -122,6 +130,8 @@ public class WSSecEncryptedKey extends WSSecBase {
     private BinarySecurity bstToken;
 
     private X509Certificate useThisCert;
+    
+    private PublicKey useThisPublicKey;
 
     /**
      * Custom token value
@@ -198,53 +208,42 @@ public class WSSecEncryptedKey extends WSSecBase {
         }
 
         if (encryptedEphemeralKey == null) {
-            //
-            // Get the certificate that contains the public key for the public key
-            // algorithm that will encrypt the generated symmetric (session) key.
-            //
-            X509Certificate remoteCert = useThisCert;
-            if (remoteCert == null) {
-                CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
-                cryptoType.setAlias(user);
-                if (crypto == null) {
-                    throw new WSSecurityException(
-                                                  WSSecurityException.ErrorCode.FAILURE,
-                                                  "noUserCertsFound",
-                                                  new Object[] {user, "encryption"});
+            if (useThisPublicKey != null) {
+                prepareInternal(symmetricKey, useThisPublicKey, crypto);
+            } else {
+                //
+                // Get the certificate that contains the public key for the public key
+                // algorithm that will encrypt the generated symmetric (session) key.
+                //
+                X509Certificate remoteCert = useThisCert;
+                if (remoteCert == null) {
+                    CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+                    cryptoType.setAlias(user);
+                    if (crypto == null) {
+                        throw new WSSecurityException(
+                                                      WSSecurityException.ErrorCode.FAILURE,
+                                                      "noUserCertsFound",
+                                                      new Object[] {user, "encryption"});
+                    }
+                    X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
+                    if (certs == null || certs.length <= 0) {
+                        throw new WSSecurityException(
+                            WSSecurityException.ErrorCode.FAILURE,
+                            "noUserCertsFound",
+                            new Object[] {user, "encryption"});
+                    }
+                    remoteCert = certs[0];
                 }
-                X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
-                if (certs == null || certs.length <= 0) {
-                    throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILURE,
-                        "noUserCertsFound",
-                        new Object[] {user, "encryption"});
-                }
-                remoteCert = certs[0];
+                
+                prepareInternal(symmetricKey, remoteCert, crypto);
             }
-
-            prepareInternal(symmetricKey, remoteCert, crypto);
         } else {
             prepareInternal(symmetricKey);
         }
     }
-
-    /**
-     * Encrypt the symmetric key data and prepare the EncryptedKey element
-     *
-     * This method does the most work for to prepare the EncryptedKey element.
-     * It is also used by the WSSecEncrypt sub-class.
-     *
-     * @param secretKey The symmetric key
-     * @param remoteCert The certificate that contains the public key to encrypt the
-     *                   symmetric key data
-     * @param crypto An instance of the Crypto API to handle keystore and certificates
-     * @throws WSSecurityException
-     */
-    protected void prepareInternal(
-        SecretKey secretKey,
-        X509Certificate remoteCert,
-        Crypto crypto
-    ) throws WSSecurityException {
+    
+    private void encryptSymmetricKey(PublicKey encryptingKey, SecretKey keyToBeEncrypted) 
+        throws WSSecurityException {
         Cipher cipher = KeyUtils.getCipherInstance(keyEncAlgo);
         try {
             OAEPParameterSpec oaepParameterSpec = null;
@@ -274,9 +273,9 @@ public class WSSecEncryptedKey extends WSSecBase {
                     );
             }
             if (oaepParameterSpec == null) {
-                cipher.init(Cipher.WRAP_MODE, remoteCert);
+                cipher.init(Cipher.WRAP_MODE, encryptingKey);
             } else {
-                cipher.init(Cipher.WRAP_MODE, remoteCert.getPublicKey(), oaepParameterSpec);
+                cipher.init(Cipher.WRAP_MODE, encryptingKey, oaepParameterSpec);
             }
         } catch (InvalidKeyException | InvalidAlgorithmParameterException e) {
             throw new WSSecurityException(
@@ -289,12 +288,32 @@ public class WSSecEncryptedKey extends WSSecBase {
         }
 
         try {
-            encryptedEphemeralKey = cipher.wrap(secretKey);
+            encryptedEphemeralKey = cipher.wrap(keyToBeEncrypted);
         } catch (IllegalStateException | IllegalBlockSizeException | InvalidKeyException ex) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
             );
         }
+    }
+
+    /**
+     * Encrypt the symmetric key data and prepare the EncryptedKey element
+     *
+     * This method does the most work for to prepare the EncryptedKey element.
+     * It is also used by the WSSecEncrypt sub-class.
+     *
+     * @param secretKey The symmetric key
+     * @param remoteCert The certificate that contains the public key to encrypt the
+     *                   symmetric key data
+     * @param crypto An instance of the Crypto API to handle keystore and certificates
+     * @throws WSSecurityException
+     */
+    protected void prepareInternal(
+        SecretKey secretKey,
+        X509Certificate remoteCert,
+        Crypto crypto
+    ) throws WSSecurityException {
+        encryptSymmetricKey(remoteCert.getPublicKey(), secretKey);
 
         //
         // Now we need to setup the EncryptedKey header block 1) create a
@@ -426,6 +445,67 @@ public class WSSecEncryptedKey extends WSSecBase {
             );
             keyInfoElement.appendChild(secToken.getElement());
             encryptedKeyElement.appendChild(keyInfoElement);
+        }
+
+        Element xencCipherValue = createCipherValue(document, encryptedKeyElement);
+        if (storeBytesInAttachment) {
+            final String attachmentId = getIdAllocator().createId("", document);
+            WSSecurityUtil.storeBytesInAttachment(xencCipherValue, document, attachmentId,
+                                                  encryptedEphemeralKey, attachmentCallbackHandler);
+        } else {
+            Text keyText =
+                WSSecurityUtil.createBase64EncodedTextNode(document, encryptedEphemeralKey);
+            xencCipherValue.appendChild(keyText);
+        }
+    }
+    
+    protected void prepareInternal(
+        SecretKey secretKey,
+        PublicKey remoteKey,
+        Crypto crypto
+    ) throws WSSecurityException {
+        encryptSymmetricKey(remoteKey, secretKey);
+
+        //
+        // Now we need to setup the EncryptedKey header block 1) create a
+        // EncryptedKey element and set a wsu:Id for it 2) Generate ds:KeyInfo
+        // element, this wraps the wsse:SecurityTokenReference 3) Create and set
+        // up the SecurityTokenReference according to the keyIdentifier parameter
+        // 4) Create the CipherValue element structure and insert the encrypted
+        // session key
+        //
+        encryptedKeyElement = createEncryptedKey(document, keyEncAlgo);
+        if (encKeyId == null || "".equals(encKeyId)) {
+            encKeyId = IDGenerator.generateID("EK-");
+        }
+        encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);
+
+        if (customEKKeyInfoElement != null) {
+            encryptedKeyElement.appendChild(document.adoptNode(customEKKeyInfoElement));
+        } else {
+            try {
+                XMLSignatureFactory signatureFactory;
+                try {
+                    signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
+                } catch (NoSuchProviderException ex) {
+                    signatureFactory = XMLSignatureFactory.getInstance("DOM");
+                }
+                
+                KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
+                KeyValue keyValue = keyInfoFactory.newKeyValue(remoteKey);
+                String keyInfoUri = getIdAllocator().createSecureId("KI-", null);
+                KeyInfo keyInfo =
+                    keyInfoFactory.newKeyInfo(
+                        java.util.Collections.singletonList(keyValue), keyInfoUri
+                    );
+                
+                keyInfo.marshal(new DOMStructure(encryptedKeyElement), null);
+            } catch (java.security.KeyException | MarshalException ex) {
+                LOG.error("", ex);
+                throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
+                );
+            }
         }
 
         Element xencCipherValue = createCipherValue(document, encryptedKeyElement);
@@ -666,9 +746,21 @@ public class WSSecEncryptedKey extends WSSecBase {
     public void setUseThisCert(X509Certificate cert) {
         useThisCert = cert;
     }
-
+    
     public X509Certificate getUseThisCert() {
         return useThisCert;
+    }
+    
+    /**
+     * Set the PublicKey to use for encryption.
+     * @param key the PublicKey instance to use for encryption
+     */
+    public void setUseThisPublicKey(PublicKey key) {
+        useThisPublicKey = key;
+    }
+    
+    public PublicKey getUseThisPublicKey() {
+        return useThisPublicKey;
     }
 
     /**

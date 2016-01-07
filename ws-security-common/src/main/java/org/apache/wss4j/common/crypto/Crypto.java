@@ -167,6 +167,18 @@ public interface Crypto {
     PrivateKey getPrivateKey(
         X509Certificate certificate, CallbackHandler callbackHandler
     ) throws WSSecurityException;
+    
+    /**
+     * Gets the private key corresponding to the given PublicKey.
+     *
+     * @param publicKey The PublicKey corresponding to the private key
+     * @param callbackHandler The callbackHandler needed to get the password
+     * @return The private key
+     */
+    PrivateKey getPrivateKey(
+        PublicKey publicKey,
+        CallbackHandler callbackHandler
+    ) throws WSSecurityException;
 
     /**
      * Gets the private key corresponding to the identifier.
