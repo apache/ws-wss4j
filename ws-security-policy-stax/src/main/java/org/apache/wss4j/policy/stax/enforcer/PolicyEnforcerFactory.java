@@ -98,7 +98,7 @@ import org.w3c.dom.NodeList;
  */
 public class PolicyEnforcerFactory {
 
-    protected static final transient org.slf4j.Logger log =
+    protected static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(PolicyEnforcerFactory.class);
 
     private final List<AssertionBuilder<Element>> assertionBuilders;
@@ -107,7 +107,7 @@ public class PolicyEnforcerFactory {
     private List<OperationPolicy> operationPolicies;
     private final Map<Element, Policy> elementPolicyCache;
 
-    private PolicyEnforcerFactory(List<AssertionBuilder<Element>> customAssertionBuilders) {
+    protected PolicyEnforcerFactory(List<AssertionBuilder<Element>> customAssertionBuilders) {
         elementPolicyCache = new HashMap<>();
 
         assertionBuilders = new ArrayList<>();
@@ -163,7 +163,8 @@ public class PolicyEnforcerFactory {
         return newInstance(wsdlUrl, null);
     }
 
-    public static PolicyEnforcerFactory newInstance(URL wsdlUrl, List<AssertionBuilder<Element>> customAssertionBuilders)
+    public static PolicyEnforcerFactory newInstance(URL wsdlUrl, 
+                                                    List<AssertionBuilder<Element>> customAssertionBuilders)
             throws WSSPolicyException {
 
         PolicyEnforcerFactory policyEnforcerFactory = new PolicyEnforcerFactory(customAssertionBuilders);
@@ -175,7 +176,8 @@ public class PolicyEnforcerFactory {
         return newInstance(document, null);
     }
 
-    public static PolicyEnforcerFactory newInstance(Document document, List<AssertionBuilder<Element>> customAssertionBuilders)
+    public static PolicyEnforcerFactory newInstance(Document document, 
+                                                    List<AssertionBuilder<Element>> customAssertionBuilders)
             throws WSSPolicyException {
 
         PolicyEnforcerFactory policyEnforcerFactory = new PolicyEnforcerFactory(customAssertionBuilders);
@@ -262,7 +264,8 @@ public class PolicyEnforcerFactory {
         return operationPolicyList;
     }
 
-    private Policy getPolicy(Service service, Port port, Binding binding, BindingOperation bindingOperation, Operation operation) throws WSSPolicyException {
+    private Policy getPolicy(Service service, Port port, Binding binding, 
+                             BindingOperation bindingOperation, Operation operation) throws WSSPolicyException {
         List<Policy> policies = new ArrayList<>();
 
         Policy servicePolicy = findPolicies(service);
@@ -361,15 +364,18 @@ public class PolicyEnforcerFactory {
         for (int i = 0; i < extensibilityElements.size(); i++) {
             ExtensibilityElement extensibilityElement = extensibilityElements.get(i);
             if (extensibilityElement instanceof UnknownExtensibilityElement) {
-                UnknownExtensibilityElement unknownExtensibilityElement = (UnknownExtensibilityElement) extensibilityElement;
+                UnknownExtensibilityElement unknownExtensibilityElement = 
+                    (UnknownExtensibilityElement) extensibilityElement;
                 if (unknownExtensibilityElement.getElementType().getLocalPart().equals("PolicyReference")) {
                     String uri = unknownExtensibilityElement.getElement().getAttributeNS(null, "URI").substring(1);
-                    NodeList policyNodeList = unknownExtensibilityElement.getElement().getOwnerDocument().getElementsByTagNameNS("*", "Policy");
+                    NodeList policyNodeList = 
+                        unknownExtensibilityElement.getElement().getOwnerDocument().getElementsByTagNameNS("*", 
+                                                                                                           "Policy");
 
                     boolean found = false;
                     for (int j = 0; j < policyNodeList.getLength(); j++) {
                         Element element = (Element) policyNodeList.item(j);
-                        String refUri = element.getAttributeNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd", "Id");
+                        String refUri = element.getAttributeNS(WSSConstants.NS_WSU10, "Id");
                         if (refUri != null && refUri.equals(uri)) {
                             found = true;
                             Policy policy = parsePolicy(element);
@@ -422,7 +428,8 @@ public class PolicyEnforcerFactory {
      * creates a new PolicyEnforcer instance
      * @param soapAction The requested soapAction of the actual request
      * @param initiator Boolean flag to tell the engine if it is running in client or server mode
-     * @param roleOrActor The actor or role of the security processing. Must be set to the same value as WSSSecurityProperties#setActor()
+     * @param roleOrActor The actor or role of the security processing. Must be set to the same value 
+     * as WSSSecurityProperties#setActor()
      * @param attachmentCount The number of Attachments received in the message
      * @return the newly created PolicyEnforcer instance
      * @throws WSSPolicyException
