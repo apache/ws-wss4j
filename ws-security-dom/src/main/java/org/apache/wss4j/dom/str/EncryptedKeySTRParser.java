@@ -114,6 +114,7 @@ public class EncryptedKeySTRParser implements STRParser {
                         new WSSSAMLKeyInfoProcessor(data, parameters.getWsDocInfo()),
                         data.getSigVerCrypto(), data.getCallbackHandler());
             parserResult.setCerts(keyInfo.getCerts());
+            parserResult.setPublicKey(keyInfo.getPublicKey());
         } else {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
@@ -151,6 +152,7 @@ public class EncryptedKeySTRParser implements STRParser {
                             new WSSSAMLKeyInfoProcessor(data, wsDocInfo),
                             data.getSigVerCrypto(), data.getCallbackHandler());
                 parserResult.setCerts(samlKi.getCerts());
+                parserResult.setPublicKey(samlKi.getPublicKey());
             } else {
                 STRParserUtil.checkBinarySecurityBSPCompliance(secRef, null, data.getBSPEnforcer());
                 parserResult.setCerts(secRef.getKeyIdentifier(crypto));

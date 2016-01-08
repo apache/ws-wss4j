@@ -153,6 +153,7 @@ public class EncryptedKeyProcessor implements Processor {
                 STRParserResult parserResult = strParser.parseSecurityTokenReference(parameters);
 
                 certs = parserResult.getCertificates();
+                publicKey = parserResult.getPublicKey();
                 referenceType = parserResult.getCertificatesReferenceType();
             } else {
                 certs = getCertificatesFromX509Data(keyInfoChildElement, data);
