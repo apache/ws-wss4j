@@ -55,6 +55,7 @@ public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityTok
     private KerberosTokenDecoder kerberosTokenDecoder;
     private Subject subject;
     private Principal principal;
+    private byte[] sessionKey;
 
     public KerberosServiceSecurityTokenImpl(WSInboundSecurityContext wsInboundSecurityContext, CallbackHandler callbackHandler,
                                             byte[] binaryContent, String kerberosTokenValueType, String id,
@@ -76,6 +77,9 @@ public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityTok
     }
 
     protected byte[] getTGTSessionKey() throws WSSecurityException {
+        if (sessionKey != null) {
+            return sessionKey;
+        }
         try {
             KerberosContextAndServiceNameCallback contextAndServiceNameCallback = new KerberosContextAndServiceNameCallback();
             callbackHandler.handle(new Callback[]{contextAndServiceNameCallback});
@@ -129,17 +133,15 @@ public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityTok
 
             Key key = krbServiceCtx.getSessionKey();
             if (key != null) {
-                return key.getEncoded();
-            }
-
-            if (kerberosTokenDecoder != null) {
+                sessionKey = key.getEncoded();
+            } else if (kerberosTokenDecoder != null) {
                 kerberosTokenDecoder.clear();
                 kerberosTokenDecoder.setToken(binaryContent);
                 kerberosTokenDecoder.setSubject(subject);
-                return kerberosTokenDecoder.getSessionKey();
+                sessionKey = kerberosTokenDecoder.getSessionKey();
             }
 
-            return null;
+            return sessionKey;
         } catch (LoginException | UnsupportedCallbackException | IOException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         } catch (KerberosTokenDecoderException e) {
