@@ -91,7 +91,8 @@ public class ContentEncryptedElementsAssertionState extends AssertionState imple
                 } else {
                     //an element must be encrypted but isn't
                     setAsserted(false);
-                    setErrorMessage("Content of element " + WSSUtils.pathAsString(contentEncryptedElementSecurityEvent.getElementPath()) + " must be encrypted");
+                    setErrorMessage("Content of element " + WSSUtils.pathAsString(contentEncryptedElementSecurityEvent.getElementPath()) 
+                        + " must be encrypted");
                     policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
                     return false;
                 }

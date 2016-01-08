@@ -72,8 +72,8 @@ public class KeyValueTokenAssertionState extends TokenAssertionState {
         String namespace = getAssertion().getName().getNamespaceURI();
         if (keyValueToken.isRsaKeyValue()) {
             if (!(keyValueTokenSecurityEvent.getSecurityToken() instanceof RsaKeyValueSecurityToken)) {
-                setErrorMessage("Policy enforces that a RsaKeyValue must be present in the KeyValueToken but we got a " +
-                    keyValueTokenSecurityEvent.getSecurityToken().getClass().getSimpleName());
+                setErrorMessage("Policy enforces that a RsaKeyValue must be present in the KeyValueToken but we got a "
+                    + keyValueTokenSecurityEvent.getSecurityToken().getClass().getSimpleName());
                 getPolicyAsserter().unassertPolicy(new QName(namespace, SPConstants.RSA_KEY_VALUE),
                                                    getErrorMessage());
                 return false;

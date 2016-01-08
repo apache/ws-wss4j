@@ -80,10 +80,10 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
         IssuedTokenSecurityEvent<? extends SecurityToken> issuedTokenSecurityEvent
             = (IssuedTokenSecurityEvent<? extends SecurityToken>) tokenSecurityEvent;
         try {
-            if (issuedToken.getIssuerName() != null &&
-                    !issuedToken.getIssuerName().equals(issuedTokenSecurityEvent.getIssuerName())) {
-                setErrorMessage("IssuerName in Policy (" + issuedToken.getIssuerName() +
-                        ") didn't match with the one in the IssuedToken (" + issuedTokenSecurityEvent.getIssuerName() + ")");
+            if (issuedToken.getIssuerName() != null 
+                && !issuedToken.getIssuerName().equals(issuedTokenSecurityEvent.getIssuerName())) {
+                setErrorMessage("IssuerName in Policy (" + issuedToken.getIssuerName() 
+                    + ") didn't match with the one in the IssuedToken (" + issuedTokenSecurityEvent.getIssuerName() + ")");
                 getPolicyAsserter().unassertPolicy(getAssertion(), getErrorMessage());
                 return false;
             }

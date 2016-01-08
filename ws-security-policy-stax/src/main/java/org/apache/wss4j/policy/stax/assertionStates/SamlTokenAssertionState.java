@@ -35,6 +35,7 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenConstants.KeyIdentifier;
 
 /**
  * WSP1.3, 5.4.8 SamlToken Assertion
@@ -75,15 +76,18 @@ public class SamlTokenAssertionState extends TokenAssertionState {
         SamlToken samlToken = (SamlToken) abstractToken;
 
         if (samlToken.getIssuerName() != null && !samlToken.getIssuerName().equals(samlTokenSecurityEvent.getIssuerName())) {
-            setErrorMessage("IssuerName in Policy (" + samlToken.getIssuerName() + ") didn't match with the one in the SamlToken (" + samlTokenSecurityEvent.getIssuerName() + ")");
+            setErrorMessage("IssuerName in Policy (" + samlToken.getIssuerName() + ") didn't match with the one in the SamlToken (" 
+                + samlTokenSecurityEvent.getIssuerName() + ")");
             getPolicyAsserter().unassertPolicy(getAssertion(), getErrorMessage());
             return false;
         }
 
         String namespace = getAssertion().getName().getNamespaceURI();
         if (samlToken.isRequireKeyIdentifierReference()) {
-            if (!WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier.equals(samlTokenSecurityEvent.getSecurityToken().getKeyIdentifier())) {
-                setErrorMessage("Policy enforces KeyIdentifierReference but we got " + samlTokenSecurityEvent.getSecurityToken().getTokenType());
+            KeyIdentifier keyIdentifier = samlTokenSecurityEvent.getSecurityToken().getKeyIdentifier();
+            if (!WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier.equals(keyIdentifier)) {
+                setErrorMessage("Policy enforces KeyIdentifierReference but we got " 
+                    + samlTokenSecurityEvent.getSecurityToken().getTokenType());
                 getPolicyAsserter().unassertPolicy(new QName(namespace, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE),
                                                  getErrorMessage());
                 return false;

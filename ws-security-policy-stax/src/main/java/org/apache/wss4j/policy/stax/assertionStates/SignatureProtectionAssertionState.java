@@ -212,7 +212,8 @@ public class SignatureProtectionAssertionState extends AssertionState implements
                 return true;
             } else {
                 setAsserted(false);
-                setErrorMessage("Element " + WSSUtils.pathAsString(encryptedElementSecurityEvent.getElementPath()) + " must not be encrypted");
+                setErrorMessage("Element " + WSSUtils.pathAsString(encryptedElementSecurityEvent.getElementPath()) 
+                    + " must not be encrypted");
                 policyAsserter.unassertPolicy(new QName(namespace, SPConstants.ENCRYPT_SIGNATURE),
                                               getErrorMessage());
                 return false;
@@ -220,7 +221,8 @@ public class SignatureProtectionAssertionState extends AssertionState implements
         } else {
             if (abstractSymmetricAsymmetricBinding.isEncryptSignature()) {
                 setAsserted(false);
-                setErrorMessage("Element " + WSSUtils.pathAsString(encryptedElementSecurityEvent.getElementPath()) + " must be encrypted");
+                setErrorMessage("Element " + WSSUtils.pathAsString(encryptedElementSecurityEvent.getElementPath()) 
+                    + " must be encrypted");
                 policyAsserter.unassertPolicy(new QName(namespace, SPConstants.ENCRYPT_SIGNATURE),
                                             getErrorMessage());
                 return false;

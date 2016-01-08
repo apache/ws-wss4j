@@ -101,8 +101,7 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
                         && !(parentAssertion instanceof TransportToken)) {
                     ignoreToken++;
                     continue loop;
-                }
-                else if (!initiator && !(parentAssertion instanceof InitiatorToken)
+                } else if (!initiator && !(parentAssertion instanceof InitiatorToken)
                         && !(parentAssertion instanceof InitiatorSignatureToken)
                         && !(parentAssertion instanceof SignatureToken)
                         && !(parentAssertion instanceof ProtectionToken)
@@ -111,7 +110,7 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
                     continue loop;
                 }
             } else if (WSSecurityTokenConstants.TokenUsage_Signature.equals(tokenUsage)) {
-                    throw new WSSPolicyException("Illegal token usage!");
+                throw new WSSPolicyException("Illegal token usage!");
             } else if (WSSecurityTokenConstants.TokenUsage_MainEncryption.equals(tokenUsage)) {
                 if (initiator && !(parentAssertion instanceof InitiatorToken)
                         && !(parentAssertion instanceof InitiatorEncryptionToken)
@@ -120,8 +119,7 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
                         && !(parentAssertion instanceof TransportToken)) {
                     ignoreToken++;
                     continue loop;
-                }
-                else if (!initiator && !(parentAssertion instanceof RecipientToken)
+                } else if (!initiator && !(parentAssertion instanceof RecipientToken)
                         && !(parentAssertion instanceof RecipientEncryptionToken)
                         && !(parentAssertion instanceof EncryptionToken)
                         && !(parentAssertion instanceof ProtectionToken)
@@ -130,16 +128,16 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
                     continue loop;
                 }
             } else if (WSSecurityTokenConstants.TokenUsage_Encryption.equals(tokenUsage)) {
-                    throw new WSSPolicyException("Illegal token usage!");
-            } else if (WSSecurityTokenConstants.TokenUsage_SupportingTokens.equals(tokenUsage) ||
-                    WSSecurityTokenConstants.TokenUsage_SignedSupportingTokens.equals(tokenUsage) ||
-                    WSSecurityTokenConstants.TokenUsage_EndorsingSupportingTokens.equals(tokenUsage) ||
-                    WSSecurityTokenConstants.TokenUsage_SignedEndorsingSupportingTokens.equals(tokenUsage) ||
-                    WSSecurityTokenConstants.TokenUsage_SignedEncryptedSupportingTokens.equals(tokenUsage) ||
-                    WSSecurityTokenConstants.TokenUsage_EncryptedSupportingTokens.equals(tokenUsage) ||
-                    WSSecurityTokenConstants.TokenUsage_EndorsingEncryptedSupportingTokens.equals(tokenUsage) ||
-                    WSSecurityTokenConstants.TokenUsage_SignedEndorsingEncryptedSupportingTokens.equals(tokenUsage)
-                    ) {
+                throw new WSSPolicyException("Illegal token usage!");
+            } else if (WSSecurityTokenConstants.TokenUsage_SupportingTokens.equals(tokenUsage) 
+                || WSSecurityTokenConstants.TokenUsage_SignedSupportingTokens.equals(tokenUsage) 
+                || WSSecurityTokenConstants.TokenUsage_EndorsingSupportingTokens.equals(tokenUsage) 
+                || WSSecurityTokenConstants.TokenUsage_SignedEndorsingSupportingTokens.equals(tokenUsage) 
+                || WSSecurityTokenConstants.TokenUsage_SignedEncryptedSupportingTokens.equals(tokenUsage) 
+                || WSSecurityTokenConstants.TokenUsage_EncryptedSupportingTokens.equals(tokenUsage) 
+                || WSSecurityTokenConstants.TokenUsage_EndorsingEncryptedSupportingTokens.equals(tokenUsage) 
+                || WSSecurityTokenConstants.TokenUsage_SignedEndorsingEncryptedSupportingTokens.equals(tokenUsage)
+            ) {
 
                 if (parentAssertion instanceof TransportToken) {
                     continue loop;
