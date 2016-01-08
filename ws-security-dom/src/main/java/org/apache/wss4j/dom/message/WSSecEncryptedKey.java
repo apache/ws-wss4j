@@ -483,28 +483,95 @@ public class WSSecEncryptedKey extends WSSecBase {
         if (customEKKeyInfoElement != null) {
             encryptedKeyElement.appendChild(document.adoptNode(customEKKeyInfoElement));
         } else {
-            try {
-                XMLSignatureFactory signatureFactory;
-                try {
-                    signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
-                } catch (NoSuchProviderException ex) {
-                    signatureFactory = XMLSignatureFactory.getInstance("DOM");
+            SecurityTokenReference secToken = null;
+            
+            switch (keyIdentifierType) {
+            case WSConstants.CUSTOM_SYMM_SIGNING :
+                secToken = new SecurityTokenReference(document);
+                Reference refCust = new Reference(document);
+                if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                    secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+                    refCust.setValueType(customEKTokenValueType);
+                } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                    secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+                } else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customEKTokenValueType)) {
+                    secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+                    refCust.setValueType(customEKTokenValueType);
+                } else {
+                    refCust.setValueType(customEKTokenValueType);
                 }
-                
-                KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
-                KeyValue keyValue = keyInfoFactory.newKeyValue(remoteKey);
-                String keyInfoUri = getIdAllocator().createSecureId("KI-", null);
-                KeyInfo keyInfo =
-                    keyInfoFactory.newKeyInfo(
-                        java.util.Collections.singletonList(keyValue), keyInfoUri
+                refCust.setURI("#" + customEKTokenId);
+                secToken.setReference(refCust);
+                break;
+
+            case WSConstants.CUSTOM_SYMM_SIGNING_DIRECT :
+                secToken = new SecurityTokenReference(document);
+                Reference refCustd = new Reference(document);
+                if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                    secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+                    refCustd.setValueType(customEKTokenValueType);
+                } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                    secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+                }  else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customEKTokenValueType)) {
+                    secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+                    refCustd.setValueType(customEKTokenValueType);
+                } else {
+                    refCustd.setValueType(customEKTokenValueType);
+                }
+                refCustd.setURI(customEKTokenId);
+                secToken.setReference(refCustd);
+                break;
+
+            case WSConstants.CUSTOM_KEY_IDENTIFIER:
+                secToken = new SecurityTokenReference(document);
+                secToken.setKeyIdentifier(customEKTokenValueType, customEKTokenId);
+                if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                    secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+                } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
+                    secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+                } else if (WSConstants.WSS_ENC_KEY_VALUE_TYPE.equals(customEKTokenValueType)) {
+                    secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+                } else if (SecurityTokenReference.ENC_KEY_SHA1_URI.equals(customEKTokenValueType)) {
+                    secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
+                }
+                break;
+
+            default:
+                try {
+                    XMLSignatureFactory signatureFactory;
+                    try {
+                        signatureFactory = XMLSignatureFactory.getInstance("DOM", "ApacheXMLDSig");
+                    } catch (NoSuchProviderException ex) {
+                        signatureFactory = XMLSignatureFactory.getInstance("DOM");
+                    }
+                    
+                    KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
+                    KeyValue keyValue = keyInfoFactory.newKeyValue(remoteKey);
+                    String keyInfoUri = getIdAllocator().createSecureId("KI-", null);
+                    KeyInfo keyInfo =
+                        keyInfoFactory.newKeyInfo(
+                            java.util.Collections.singletonList(keyValue), keyInfoUri
+                        );
+                    
+                    keyInfo.marshal(new DOMStructure(encryptedKeyElement), null);
+                } catch (java.security.KeyException | MarshalException ex) {
+                    LOG.error("", ex);
+                    throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
                     );
-                
-                keyInfo.marshal(new DOMStructure(encryptedKeyElement), null);
-            } catch (java.security.KeyException | MarshalException ex) {
-                LOG.error("", ex);
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
+                }
+            }
+            
+            if (secToken != null) {
+                Element keyInfoElement =
+                    document.createElementNS(
+                        WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
+                    );
+                keyInfoElement.setAttributeNS(
+                    WSConstants.XMLNS_NS, "xmlns:" + WSConstants.SIG_PREFIX, WSConstants.SIG_NS
                 );
+                keyInfoElement.appendChild(secToken.getElement());
+                encryptedKeyElement.appendChild(keyInfoElement);
             }
         }
 
