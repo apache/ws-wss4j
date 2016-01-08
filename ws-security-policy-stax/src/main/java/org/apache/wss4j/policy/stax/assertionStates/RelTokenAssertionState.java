@@ -58,7 +58,8 @@ public class RelTokenAssertionState extends TokenAssertionState {
         RelToken relToken = (RelToken) abstractToken;
 
         if (relToken.getIssuerName() != null && !relToken.getIssuerName().equals(relTokenSecurityEvent.getIssuerName())) {
-            setErrorMessage("IssuerName in Policy (" + relToken.getIssuerName() + ") didn't match with the one in the RelToken (" + relTokenSecurityEvent.getIssuerName() + ")");
+            setErrorMessage("IssuerName in Policy (" + relToken.getIssuerName() + ") didn't match with the one in the RelToken (" 
+                + relTokenSecurityEvent.getIssuerName() + ")");
             getPolicyAsserter().unassertPolicy(getAssertion(), getErrorMessage());
             return false;
         }

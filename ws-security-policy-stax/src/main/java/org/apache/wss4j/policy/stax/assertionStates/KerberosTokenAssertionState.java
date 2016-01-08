@@ -74,9 +74,10 @@ public class KerberosTokenAssertionState extends TokenAssertionState {
         KerberosTokenSecurityEvent kerberosTokenSecurityEvent = (KerberosTokenSecurityEvent) tokenSecurityEvent;
         KerberosServiceSecurityToken kerberosServiceSecurityToken = kerberosTokenSecurityEvent.getSecurityToken();
 
-        if (kerberosToken.getIssuerName() != null &&
-            !kerberosToken.getIssuerName().equals(kerberosTokenSecurityEvent.getIssuerName())) {
-            setErrorMessage("IssuerName in Policy (" + kerberosToken.getIssuerName() + ") didn't match with the one in the IssuedToken (" + kerberosTokenSecurityEvent.getIssuerName() + ")");
+        if (kerberosToken.getIssuerName() != null 
+            && !kerberosToken.getIssuerName().equals(kerberosTokenSecurityEvent.getIssuerName())) {
+            setErrorMessage("IssuerName in Policy (" + kerberosToken.getIssuerName() + ") didn't match with the one in the IssuedToken (" 
+                + kerberosTokenSecurityEvent.getIssuerName() + ")");
             getPolicyAsserter().unassertPolicy(getAssertion(), getErrorMessage());
             return false;
         }

@@ -69,7 +69,8 @@ public class HttpsTokenAssertionState extends TokenAssertionState {
         HttpsToken httpsToken = (HttpsToken) abstractToken;
 
         if (httpsToken.getIssuerName() != null && !httpsToken.getIssuerName().equals(httpsTokenSecurityEvent.getIssuerName())) {
-            setErrorMessage("IssuerName in Policy (" + httpsToken.getIssuerName() + ") didn't match with the one in the HttpsToken (" + httpsTokenSecurityEvent.getIssuerName() + ")");
+            setErrorMessage("IssuerName in Policy (" + httpsToken.getIssuerName() + ") didn't match with the one in the HttpsToken (" 
+                + httpsTokenSecurityEvent.getIssuerName() + ")");
             getPolicyAsserter().unassertPolicy(getAssertion(), getErrorMessage());
             return false;
         }
@@ -78,8 +79,10 @@ public class HttpsTokenAssertionState extends TokenAssertionState {
 
             switch (httpsToken.getAuthenticationType()) {
                 case HttpBasicAuthentication:
-                    if (httpsTokenSecurityEvent.getAuthenticationType() != HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication) {
-                        setErrorMessage("Policy enforces HttpBasicAuthentication but we got " + httpsTokenSecurityEvent.getAuthenticationType());
+                    if (httpsTokenSecurityEvent.getAuthenticationType() 
+                        != HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication) {
+                        setErrorMessage("Policy enforces HttpBasicAuthentication but we got " 
+                            + httpsTokenSecurityEvent.getAuthenticationType());
                         getPolicyAsserter().unassertPolicy(new QName(namespace, SPConstants.HTTP_BASIC_AUTHENTICATION),
                                                          getErrorMessage());
                         return false;
@@ -87,8 +90,10 @@ public class HttpsTokenAssertionState extends TokenAssertionState {
                     getPolicyAsserter().assertPolicy(new QName(namespace, SPConstants.HTTP_BASIC_AUTHENTICATION));
                     break;
                 case HttpDigestAuthentication:
-                    if (httpsTokenSecurityEvent.getAuthenticationType() != HttpsTokenSecurityEvent.AuthenticationType.HttpDigestAuthentication) {
-                        setErrorMessage("Policy enforces HttpDigestAuthentication but we got " + httpsTokenSecurityEvent.getAuthenticationType());
+                    if (httpsTokenSecurityEvent.getAuthenticationType() 
+                        != HttpsTokenSecurityEvent.AuthenticationType.HttpDigestAuthentication) {
+                        setErrorMessage("Policy enforces HttpDigestAuthentication but we got " 
+                            + httpsTokenSecurityEvent.getAuthenticationType());
                         getPolicyAsserter().unassertPolicy(new QName(namespace, SPConstants.HTTP_DIGEST_AUTHENTICATION),
                                                            getErrorMessage());
                         return false;
@@ -96,8 +101,10 @@ public class HttpsTokenAssertionState extends TokenAssertionState {
                     getPolicyAsserter().assertPolicy(new QName(namespace, SPConstants.HTTP_DIGEST_AUTHENTICATION));
                     break;
                 case RequireClientCertificate:
-                    if (httpsTokenSecurityEvent.getAuthenticationType() != HttpsTokenSecurityEvent.AuthenticationType.HttpsClientCertificateAuthentication) {
-                        setErrorMessage("Policy enforces HttpClientCertificateAuthentication but we got " + httpsTokenSecurityEvent.getAuthenticationType());
+                    if (httpsTokenSecurityEvent.getAuthenticationType() 
+                        != HttpsTokenSecurityEvent.AuthenticationType.HttpsClientCertificateAuthentication) {
+                        setErrorMessage("Policy enforces HttpClientCertificateAuthentication but we got "
+                            + httpsTokenSecurityEvent.getAuthenticationType());
                         getPolicyAsserter().unassertPolicy(new QName(namespace, SPConstants.REQUIRE_CLIENT_CERTIFICATE),
                                                            getErrorMessage());
                         return false;

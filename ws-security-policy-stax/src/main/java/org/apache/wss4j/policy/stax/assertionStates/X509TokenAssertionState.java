@@ -95,8 +95,8 @@ public class X509TokenAssertionState extends TokenAssertionState {
             if (x509Token.getIssuerName() != null) {
                 final String certificateIssuerName = x509Certificate.getIssuerX500Principal().getName();
                 if (!x509Token.getIssuerName().equals(certificateIssuerName)) {
-                    setErrorMessage("IssuerName in Policy (" + x509Token.getIssuerName() +
-                            ") didn't match with the one in the certificate (" + certificateIssuerName + ")");
+                    setErrorMessage("IssuerName in Policy (" + x509Token.getIssuerName() 
+                        + ") didn't match with the one in the certificate (" + certificateIssuerName + ")");
                     getPolicyAsserter().unassertPolicy(getAssertion(), getErrorMessage());
                     return false;
                 }
@@ -148,10 +148,10 @@ public class X509TokenAssertionState extends TokenAssertionState {
                 switch (x509Token.getTokenType()) {
                     case WssX509V3Token10:
                     case WssX509V3Token11:
-                        if (!WSSecurityTokenConstants.X509V3Token.equals(securityToken.getTokenType()) ||
-                                x509Certificate.getVersion() != 3) {
-                            setErrorMessage("X509Certificate Version " + x509Certificate.getVersion() +
-                                    " mismatch; Policy enforces " + x509Token.getTokenType());
+                        if (!WSSecurityTokenConstants.X509V3Token.equals(securityToken.getTokenType()) 
+                            || x509Certificate.getVersion() != 3) {
+                            setErrorMessage("X509Certificate Version " + x509Certificate.getVersion() 
+                                + " mismatch; Policy enforces " + x509Token.getTokenType());
                             getPolicyAsserter().unassertPolicy(new QName(namespace, x509Token.getTokenType().name()),
                                                                          getErrorMessage());
                             return false;
@@ -160,10 +160,10 @@ public class X509TokenAssertionState extends TokenAssertionState {
                         break;
                     case WssX509V1Token10:
                     case WssX509V1Token11:
-                        if (!WSSecurityTokenConstants.X509V1Token.equals(securityToken.getTokenType()) ||
-                                x509Certificate.getVersion() != 1) {
-                            setErrorMessage("X509Certificate Version " + x509Certificate.getVersion() +
-                                    " mismatch; Policy enforces " + x509Token.getTokenType());
+                        if (!WSSecurityTokenConstants.X509V1Token.equals(securityToken.getTokenType()) 
+                            || x509Certificate.getVersion() != 1) {
+                            setErrorMessage("X509Certificate Version " + x509Certificate.getVersion() 
+                                + " mismatch; Policy enforces " + x509Token.getTokenType());
                             getPolicyAsserter().unassertPolicy(new QName(namespace, SPConstants.WSS_X509_V1_TOKEN11),
                                                                getErrorMessage());
                             return false;
@@ -173,8 +173,8 @@ public class X509TokenAssertionState extends TokenAssertionState {
                     case WssX509PkiPathV1Token10:
                     case WssX509PkiPathV1Token11:
                         if (!WSSecurityTokenConstants.X509PkiPathV1Token.equals(securityToken.getTokenType())) {
-                            setErrorMessage("Policy enforces " + x509Token.getTokenType() +
-                                    " but we got " + securityToken.getTokenType());
+                            setErrorMessage("Policy enforces " + x509Token.getTokenType() 
+                                + " but we got " + securityToken.getTokenType());
                             getPolicyAsserter().unassertPolicy(new QName(namespace, x509Token.getTokenType().name()),
                                                                getErrorMessage());
                             return false;

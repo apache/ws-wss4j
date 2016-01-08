@@ -115,13 +115,15 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                     boolean signsItsSignatureToken = signsItsSignatureToken(securityToken);
                     if (protectTokens && !signsItsSignatureToken) {
                         setAsserted(false);
-                        setErrorMessage("Token " + WSSUtils.pathAsString(((InboundSecurityToken)securityToken).getElementPath()) + " must be signed by its signature.");
+                        setErrorMessage("Token " + WSSUtils.pathAsString(((InboundSecurityToken)securityToken).getElementPath()) 
+                            + " must be signed by its signature.");
                         policyAsserter.unassertPolicy(new QName(namespace, SPConstants.PROTECT_TOKENS),
                                                       getErrorMessage());
                         return false;
                     } else if (!protectTokens && signsItsSignatureToken) {
                         setAsserted(false);
-                        setErrorMessage("Token " + WSSUtils.pathAsString(((InboundSecurityToken)securityToken).getElementPath()) + " must not be signed by its signature.");
+                        setErrorMessage("Token " + WSSUtils.pathAsString(((InboundSecurityToken)securityToken).getElementPath()) 
+                            + " must not be signed by its signature.");
                         policyAsserter.unassertPolicy(new QName(namespace, SPConstants.PROTECT_TOKENS),
                                                       getErrorMessage());
                         return false;
@@ -131,7 +133,8 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
                 if (isEndorsingToken(securityToken) && !signsMainSignature(securityToken)) {
                     //[WSP1.3_8.9b]
                     setAsserted(false);
-                    setErrorMessage("Token " + WSSUtils.pathAsString(((InboundSecurityToken)securityToken).getElementPath()) + " must sign the main signature.");
+                    setErrorMessage("Token " + WSSUtils.pathAsString(((InboundSecurityToken)securityToken).getElementPath()) 
+                        + " must sign the main signature.");
                     policyAsserter.unassertPolicy(new QName(namespace, SPConstants.PROTECT_TOKENS),
                                                   getErrorMessage());
                     return false;
@@ -217,7 +220,8 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
     private boolean signsItsSignatureToken(SecurityToken securityToken) throws XMLSecurityException {
         for (int i = 0; i < signedElementEvents.size(); i++) {
             SignedElementSecurityEvent signedElementSecurityEvent = signedElementEvents.get(i);
-            if (WSSUtils.pathMatches(signedElementSecurityEvent.getElementPath(), ((InboundSecurityToken)securityToken).getElementPath(), false, false)) {
+            if (WSSUtils.pathMatches(signedElementSecurityEvent.getElementPath(), 
+                                     ((InboundSecurityToken)securityToken).getElementPath(), false, false)) {
 
                 SecurityToken signingSecurityToken = signedElementSecurityEvent.getSecurityToken();
                 signingSecurityToken = getEffectiveSignatureToken(signingSecurityToken);
