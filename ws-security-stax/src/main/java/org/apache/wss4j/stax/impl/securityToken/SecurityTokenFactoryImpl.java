@@ -97,7 +97,8 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             final KeyValueType keyValueType
                     = XMLSecurityUtils.getQNameType(keyInfoType.getContent(), WSSConstants.TAG_dsig_KeyValue);
             if (keyValueType != null) {
-                return getSecurityToken(keyValueType, crypto, ((WSSSecurityProperties)securityProperties).getCallbackHandler(), inboundSecurityContext);
+                return getSecurityToken(keyValueType, crypto, ((WSSSecurityProperties)securityProperties).getCallbackHandler(), inboundSecurityContext,
+                                        ((WSSSecurityProperties)securityProperties));
             }
 
         } else if (crypto != null && crypto.getDefaultX509Identifier() != null) {
@@ -406,25 +407,29 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
     }
 
     public static InboundSecurityToken getSecurityToken(KeyValueType keyValueType, final Crypto crypto,
-                                                 final CallbackHandler callbackHandler, SecurityContext securityContext)
+                                                 final CallbackHandler callbackHandler, SecurityContext securityContext,
+                                                 WSSSecurityProperties securityProperties)
             throws XMLSecurityException {
 
         final RSAKeyValueType rsaKeyValueType
                 = XMLSecurityUtils.getQNameType(keyValueType.getContent(), WSSConstants.TAG_dsig_RSAKeyValue);
         if (rsaKeyValueType != null) {
-            return new RsaKeyValueSecurityTokenImpl(rsaKeyValueType, (WSInboundSecurityContext) securityContext, crypto);
+            return new RsaKeyValueSecurityTokenImpl(rsaKeyValueType, (WSInboundSecurityContext) securityContext, crypto,
+                                                    callbackHandler, securityProperties);
         }
 
         final DSAKeyValueType dsaKeyValueType
                 = XMLSecurityUtils.getQNameType(keyValueType.getContent(), WSSConstants.TAG_dsig_DSAKeyValue);
         if (dsaKeyValueType != null) {
-            return new DsaKeyValueSecurityTokenImpl(dsaKeyValueType, (WSInboundSecurityContext) securityContext, crypto);
+            return new DsaKeyValueSecurityTokenImpl(dsaKeyValueType, (WSInboundSecurityContext) securityContext, crypto,
+                                                    callbackHandler, securityProperties);
         }
 
         final ECKeyValueType ecKeyValueType
                 = XMLSecurityUtils.getQNameType(keyValueType.getContent(), WSSConstants.TAG_dsig11_ECKeyValue);
         if (ecKeyValueType != null) {
-            return new ECKeyValueSecurityTokenImpl(ecKeyValueType, (WSInboundSecurityContext) securityContext, crypto);
+            return new ECKeyValueSecurityTokenImpl(ecKeyValueType, (WSInboundSecurityContext) securityContext, crypto,
+                                                   callbackHandler, securityProperties);
         }
         throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "unsupportedKeyInfo");
     }

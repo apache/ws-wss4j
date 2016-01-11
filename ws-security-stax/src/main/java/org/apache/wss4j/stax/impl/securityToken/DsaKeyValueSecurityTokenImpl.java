@@ -18,29 +18,39 @@
  */
 package org.apache.wss4j.stax.impl.securityToken;
 
+import java.security.Key;
 import java.security.Principal;
+import java.security.PublicKey;
 
 import javax.security.auth.Subject;
+import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.PublicKeyPrincipalImpl;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
+import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.DsaKeyValueSecurityToken;
 import org.apache.xml.security.binding.xmldsig.DSAKeyValueType;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 
 public class DsaKeyValueSecurityTokenImpl
         extends org.apache.xml.security.stax.impl.securityToken.DsaKeyValueSecurityToken
         implements DsaKeyValueSecurityToken {
 
+    private CallbackHandler callbackHandler;
     private Crypto crypto;
+    private WSSSecurityProperties securityProperties;
     private Principal principal;
 
     public DsaKeyValueSecurityTokenImpl(
-            DSAKeyValueType dsaKeyValueType, WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto) {
+            DSAKeyValueType dsaKeyValueType, WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto,
+            CallbackHandler callbackHandler, WSSSecurityProperties securityProperties) {
         super(dsaKeyValueType, wsInboundSecurityContext);
         this.crypto = crypto;
+        this.callbackHandler = callbackHandler;
+        this.securityProperties = securityProperties;
     }
 
     @Override
@@ -51,6 +61,23 @@ public class DsaKeyValueSecurityTokenImpl
     @Override
     public Subject getSubject() throws WSSecurityException {
         return null;
+    }
+    
+    @Override
+    public Key getKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage,
+                      String correlationID) throws XMLSecurityException {
+        PublicKey publicKey = getPublicKey();
+        
+        try {
+            return crypto.getPrivateKey(publicKey, callbackHandler);
+        } catch (WSSecurityException ex) {
+            // Check to see if we are decrypting rather than signature verification
+            Crypto decCrypto = securityProperties.getDecryptionCrypto();
+            if (decCrypto != null && decCrypto != crypto) {
+                return decCrypto.getPrivateKey(publicKey, callbackHandler);
+            }
+            throw ex;
+        }
     }
 
     @Override

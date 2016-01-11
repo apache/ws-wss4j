@@ -166,17 +166,17 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
     }
 
     public RsaKeyValueSecurityTokenImpl getRsaKeyValueSecurityToken() throws Exception {
-        return new RsaKeyValueSecurityTokenImpl(null, null, null);
+        return new RsaKeyValueSecurityTokenImpl(null, null, null, null, null);
     }
 
     public DsaKeyValueSecurityTokenImpl getDsaKeyValueSecurityToken() throws Exception {
-        return new DsaKeyValueSecurityTokenImpl(null, null, null);
+        return new DsaKeyValueSecurityTokenImpl(null, null, null, null, null);
     }
 
     public ECKeyValueSecurityTokenImpl getECKeyValueSecurityToken() throws Exception {
         ECKeyValueType ecKeyValueType = new ECKeyValueType();
         ecKeyValueType.setNamedCurve(new NamedCurveType());
-        return new ECKeyValueSecurityTokenImpl(ecKeyValueType, null, null);
+        return new ECKeyValueSecurityTokenImpl(ecKeyValueType, null, null, null, null);
     }
 
     protected String loadResourceAsString(String resource, Charset encoding) throws IOException {
