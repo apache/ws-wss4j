@@ -54,11 +54,13 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
     }
 
     @Override
-    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) 
+        throws XMLStreamException, XMLSecurityException {
 
         try {
             CallbackHandler callbackHandler = ((WSSSecurityProperties)getSecurityProperties()).getCallbackHandler();
-            WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType = ((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType();
+            WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType = 
+                ((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType();
 
             if (callbackHandler == null
                 && WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE != usernameTokenPasswordType) {
@@ -68,7 +70,8 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
             String password = null;
             if (callbackHandler != null) {
                 WSPasswordCallback pwCb =
-                    new WSPasswordCallback(((WSSSecurityProperties) getSecurityProperties()).getTokenUser(), WSPasswordCallback.USERNAME_TOKEN);
+                    new WSPasswordCallback(((WSSSecurityProperties) getSecurityProperties()).getTokenUser(),
+                                           WSPasswordCallback.USERNAME_TOKEN);
                 WSSUtils.doPasswordCallback(callbackHandler, pwCb);
                 password = pwCb.getPassword();
             }
@@ -187,18 +190,21 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                 attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, this.wsuId));
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, false, attributes);
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Username, false, null);
-                createCharactersAndOutputAsEvent(subOutputProcessorChain, ((WSSSecurityProperties) getSecurityProperties()).getTokenUser());
+                createCharactersAndOutputAsEvent(subOutputProcessorChain, 
+                                                 ((WSSSecurityProperties) getSecurityProperties()).getTokenUser());
                 createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Username);
-                if (((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType() != WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE
-                        && !WSSConstants.USERNAMETOKEN_SIGNED.equals(action)) {
+                if (((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType() 
+                    != WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE && !WSSConstants.USERNAMETOKEN_SIGNED.equals(action)) {
                     attributes = new ArrayList<>(1);
                     attributes.add(createAttribute(WSSConstants.ATT_NULL_Type,
-                            ((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType() == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
+                            ((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType() 
+                                == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
                                     ? WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST.getNamespace()
                                     : WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT.getNamespace()));
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Password, false, attributes);
                     createCharactersAndOutputAsEvent(subOutputProcessorChain,
-                            ((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType() == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
+                            ((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType() 
+                                == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
                                     ? WSSUtils.doPasswordDigest(this.nonceValue, this.created.toXMLFormat(), this.password)
                                     : this.password);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Password);
@@ -220,7 +226,8 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                     attributes = new ArrayList<>(1);
                     attributes.add(createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Nonce, false, attributes);
-                    createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(this.nonceValue));
+                    createCharactersAndOutputAsEvent(subOutputProcessorChain, 
+                                                     new Base64(76, new byte[]{'\n'}).encodeToString(this.nonceValue));
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Nonce);
                 }
 

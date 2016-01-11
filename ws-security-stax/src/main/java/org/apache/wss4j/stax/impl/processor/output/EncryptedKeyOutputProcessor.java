@@ -65,7 +65,8 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
     }
 
     @Override
-    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) 
+        throws XMLStreamException, XMLSecurityException {
         try {
 
             String tokenId = outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTED_KEY);
@@ -104,7 +105,8 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
             boolean sharedToken = encTokenId.equals(sigTokenId);
 
-            FinalEncryptedKeyOutputProcessor finalEncryptedKeyOutputProcessor = new FinalEncryptedKeyOutputProcessor(encryptedKeySecurityToken);
+            FinalEncryptedKeyOutputProcessor finalEncryptedKeyOutputProcessor = 
+                new FinalEncryptedKeyOutputProcessor(encryptedKeySecurityToken);
             finalEncryptedKeyOutputProcessor.setXMLSecurityProperties(getSecurityProperties());
             finalEncryptedKeyOutputProcessor.setAction(getAction());
             XMLSecurityConstants.Action action = getAction();
@@ -192,27 +194,6 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
             this.outputReferenceList = outputReferenceList;
         }
 
-        /*
-       <xenc:EncryptedKey xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" Id="EncKeyId-1483925398">
-           <xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-1_5" />
-           <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
-               <wsse:SecurityTokenReference xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
-                   <wsse:KeyIdentifier EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary" ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509SubjectKeyIdentifier">
-                       pHoiKNGY2YsLBKxwIV+jURt858M=
-                   </wsse:KeyIdentifier>
-               </wsse:SecurityTokenReference>
-           </ds:KeyInfo>
-           <xenc:CipherData>
-               <xenc:CipherValue>
-                   Khsa9SN3ALNXOgGDKOqihvfwGsXb9QN/q4Fpi9uuThgz+3D4oRSMkrGSPCqwG13vddvHywGAA/XNbWNT+5Xivz3lURCDCc2H/92YlXXo/crQNJnPlLrLZ81bGOzbNo7lnYQBLp/77K7b1bhldZAeV9ZfEW7DjbOMZ+k1dnDCu3A=
-               </xenc:CipherValue>
-           </xenc:CipherData>
-           <xenc:ReferenceList>
-               <xenc:DataReference URI="#EncDataId-1612925417" />
-           </xenc:ReferenceList>
-       </xenc:EncryptedKey>
-        */
-
         @Override
         public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain)
                 throws XMLStreamException, XMLSecurityException {
@@ -244,7 +225,8 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
                     byte[] oaepParams = getSecurityProperties().getEncryptionKeyTransportOAEPParams();
                     if (oaepParams != null) {
-                        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc_OAEPparams, false, null);
+                        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc_OAEPparams, 
+                                                           false, null);
                         createCharactersAndOutputAsEvent(subOutputProcessorChain, Base64.encodeBase64String(oaepParams));
                         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc_OAEPparams);
                     }
@@ -253,14 +235,16 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     if (encryptionKeyTransportDigestAlgorithm != null) {
                         attributes = new ArrayList<>(1);
                         attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm, encryptionKeyTransportDigestAlgorithm));
-                        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_DigestMethod, true, attributes);
+                        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_DigestMethod, 
+                                                           true, attributes);
                         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_dsig_DigestMethod);
                     }
 
                     if (encryptionKeyTransportMGFAlgorithm != null) {
                         attributes = new ArrayList<>(1);
                         attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_Algorithm, encryptionKeyTransportMGFAlgorithm));
-                        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc11_MGF, true, attributes);
+                        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc11_MGF, 
+                                                           true, attributes);
                         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_xenc11_MGF);
                     }
                 }
@@ -286,7 +270,8 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                             XMLSecurityConstants.NS_XENC_RSAOAEPMGF1P.equals(encryptionKeyTransportAlgorithm)) {
 
                         String jceDigestAlgorithm = "SHA-1";
-                        String encryptionKeyTransportDigestAlgorithm = getSecurityProperties().getEncryptionKeyTransportDigestAlgorithm();
+                        String encryptionKeyTransportDigestAlgorithm = 
+                            getSecurityProperties().getEncryptionKeyTransportDigestAlgorithm();
                         if (encryptionKeyTransportDigestAlgorithm != null) {
                             jceDigestAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(encryptionKeyTransportDigestAlgorithm);
                         }
@@ -331,7 +316,8 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                         }
                     }
 
-                    createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(encryptedEphemeralKey));
+                    createCharactersAndOutputAsEvent(subOutputProcessorChain, 
+                                                     new Base64(76, new byte[]{'\n'}).encodeToString(encryptedEphemeralKey));
 
                 } catch (NoSuchPaddingException | NoSuchAlgorithmException
                     | InvalidKeyException | IllegalBlockSizeException

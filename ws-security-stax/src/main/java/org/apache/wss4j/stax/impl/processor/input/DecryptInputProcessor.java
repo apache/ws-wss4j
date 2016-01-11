@@ -238,7 +238,8 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
     protected void handleSecurityToken(InboundSecurityToken inboundSecurityToken, InboundSecurityContext inboundSecurityContext,
                                        EncryptedDataType encryptedDataType) throws XMLSecurityException {
         inboundSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_Encryption);
-        TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent = WSSUtils.createTokenSecurityEvent(inboundSecurityToken, encryptedDataType.getId());
+        TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent = 
+            WSSUtils.createTokenSecurityEvent(inboundSecurityToken, encryptedDataType.getId());
         inboundSecurityContext.registerSecurityEvent(tokenSecurityEvent);
     }
 
@@ -372,22 +373,6 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
             return inboundSecurityToken;
         }
     }
-
-    /*
-   <xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" Id="EncDataId-1612925417" Type="http://www.w3.org/2001/04/xmlenc#Content">
-       <xenc:EncryptionMethod xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc" />
-       <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
-           <wsse:SecurityTokenReference xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
-               <wsse:Reference xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" URI="#EncKeyId-1483925398" />
-           </wsse:SecurityTokenReference>
-       </ds:KeyInfo>
-       <xenc:CipherData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#">
-           <xenc:CipherValue xmlns:xenc="http://www.w3.org/2001/04/xmlenc#">
-           ...
-           </xenc:CipherValue>
-       </xenc:CipherData>
-   </xenc:EncryptedData>
-    */
 
     /**
      * The DecryptedEventReaderInputProcessor reads the decrypted stream with a StAX reader and

@@ -49,7 +49,8 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
     }
 
     @Override
-    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) 
+        throws XMLStreamException, XMLSecurityException {
 
         boolean eventHandled = false;
 
@@ -125,7 +126,8 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                     //so output one and add securityHeader
 
                     //create subchain and output soap-header and securityHeader
-                    OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this, xmlSecStartElement.getParentXMLSecStartElement());
+                    OutputProcessorChain subOutputProcessorChain = 
+                        outputProcessorChain.createSubChain(this, xmlSecStartElement.getParentXMLSecStartElement());
                     createStartElementAndOutputAsEvent(subOutputProcessorChain,
                             new QName(soapMessageVersion, WSSConstants.TAG_soap_Header_LocalName, WSSConstants.PREFIX_SOAPENV), true, null);
                     boolean mustUnderstand = ((WSSSecurityProperties) getSecurityProperties()).isMustUnderstand();
@@ -144,8 +146,10 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
             case XMLStreamConstants.END_ELEMENT:
                 XMLSecEndElement xmlSecEndElement = xmlSecEvent.asEndElement();
                 int documentLevel = xmlSecEndElement.getDocumentLevel();
+                String soapMessageVersionNS = 
+                    WSSUtils.getSOAPMessageVersionNamespace(xmlSecEndElement.getParentXMLSecStartElement());
                 if (documentLevel == 2 && WSSConstants.TAG_soap_Header_LocalName.equals(xmlSecEndElement.getName().getLocalPart())
-                        && xmlSecEndElement.getName().getNamespaceURI().equals(WSSUtils.getSOAPMessageVersionNamespace(xmlSecEndElement.getParentXMLSecStartElement()))) {
+                        && xmlSecEndElement.getName().getNamespaceURI().equals(soapMessageVersionNS)) {
                     OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                     boolean mustUnderstand = ((WSSSecurityProperties) getSecurityProperties()).isMustUnderstand();
                     buildSecurityHeader(xmlSecEndElement.getName().getNamespaceURI(), subOutputProcessorChain, mustUnderstand);

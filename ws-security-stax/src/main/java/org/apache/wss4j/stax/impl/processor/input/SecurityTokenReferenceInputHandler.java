@@ -176,12 +176,14 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
                                 return securityTokenReferenceId;
                             }
                         };
-                        inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(securityTokenReferenceId, securityTokenProvider);
+                        inputProcessorChain.getSecurityContext().registerSecurityTokenProvider(securityTokenReferenceId, 
+                                                                                               securityTokenProvider);
 
                         return xmlSecEvent;
                     } else if (xmlSecEndElement.getDocumentLevel() == 3
                             && xmlSecEndElement.getName().equals(WSSConstants.TAG_wsse_Security)
-                            && WSSUtils.isInSecurityHeader(xmlSecEndElement, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
+                            && WSSUtils.isInSecurityHeader(xmlSecEndElement, 
+                                                           ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
                         //we can now remove this processor from the chain
                         inputProcessorChain.removeProcessor(this);
                     }

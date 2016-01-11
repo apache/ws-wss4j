@@ -224,7 +224,9 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                                 && !WSSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(algorithm)) {
                             securityContext.handleBSPRule(BSPRule.R5412);
                         }
-                        InclusiveNamespaces inclusiveNamespacesType = XMLSecurityUtils.getQNameType(transformType.getContent(), XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
+                        InclusiveNamespaces inclusiveNamespacesType = 
+                            XMLSecurityUtils.getQNameType(transformType.getContent(), 
+                                                          XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
                         if (WSSConstants.NS_C14N_EXCL.equals(algorithm)
                                 && inclusiveNamespacesType != null
                                 && inclusiveNamespacesType.getPrefixList().size() == 0) {
@@ -236,12 +238,14 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                                 securityContext.handleBSPRule(BSPRule.R5413);
                             }
                             TransformationParametersType transformationParametersType =
-                                    XMLSecurityUtils.getQNameType(transformType.getContent(), WSSConstants.TAG_wsse_TransformationParameters);
+                                    XMLSecurityUtils.getQNameType(transformType.getContent(), 
+                                                                  WSSConstants.TAG_wsse_TransformationParameters);
                             if (transformationParametersType == null) {
                                 securityContext.handleBSPRule(BSPRule.R3065);
                             } else {
                                 CanonicalizationMethodType canonicalizationMethodType =
-                                        XMLSecurityUtils.getQNameType(transformationParametersType.getAny(), WSSConstants.TAG_dsig_CanonicalizationMethod);
+                                        XMLSecurityUtils.getQNameType(transformationParametersType.getAny(), 
+                                                                      WSSConstants.TAG_dsig_CanonicalizationMethod);
                                 if (canonicalizationMethodType == null) {
                                     securityContext.handleBSPRule(BSPRule.R3065);
                                 }
@@ -354,13 +358,15 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                     XMLSecurityUtils.getQNameType(transformType.getContent(), WSSConstants.TAG_wsse_TransformationParameters);
             if (transformationParametersType != null) {
                 CanonicalizationMethodType canonicalizationMethodType =
-                        XMLSecurityUtils.getQNameType(transformationParametersType.getAny(), WSSConstants.TAG_dsig_CanonicalizationMethod);
+                        XMLSecurityUtils.getQNameType(transformationParametersType.getAny(), 
+                                                      WSSConstants.TAG_dsig_CanonicalizationMethod);
                 if (canonicalizationMethodType != null) {
 
                     algorithm = canonicalizationMethodType.getAlgorithm();
 
                     InclusiveNamespaces inclusiveNamespacesType =
-                            XMLSecurityUtils.getQNameType(canonicalizationMethodType.getContent(), XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
+                            XMLSecurityUtils.getQNameType(canonicalizationMethodType.getContent(), 
+                                                          XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
 
                     Map<String, Object> transformerProperties = null;
                     if (inclusiveNamespacesType != null) {
@@ -381,7 +387,8 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             inputProcessorChain.getSecurityContext().registerSecurityEvent(algorithmSuiteSecurityEvent);
 
             InclusiveNamespaces inclusiveNamespacesType =
-                    XMLSecurityUtils.getQNameType(transformType.getContent(), XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
+                    XMLSecurityUtils.getQNameType(transformType.getContent(), 
+                                                  XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
 
             Map<String, Object> transformerProperties = null;
             if (inclusiveNamespacesType != null) {
@@ -404,8 +411,9 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
 
             internalSignatureReferenceVerifier.setTransformer(parentTransformer);
 
+            String uri = XMLSecurityUtils.dropReferenceMarker(referenceType.getURI());
             SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider =
-                    inputProcessorChain.getSecurityContext().getSecurityTokenProvider(XMLSecurityUtils.dropReferenceMarker(referenceType.getURI()));
+                    inputProcessorChain.getSecurityContext().getSecurityTokenProvider(uri);
             if (securityTokenProvider == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "noReference");
             }
@@ -415,7 +423,8 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             }
             SecurityTokenReference securityTokenReference = (SecurityTokenReference) securityToken;
             //todo analyse and fix me: the following statement could be problematic
-            inputProcessorChain.getDocumentContext().setIsInSignedContent(inputProcessorChain.getProcessors().indexOf(internalSignatureReferenceVerifier), internalSignatureReferenceVerifier);
+            int index = inputProcessorChain.getProcessors().indexOf(internalSignatureReferenceVerifier);
+            inputProcessorChain.getDocumentContext().setIsInSignedContent(index, internalSignatureReferenceVerifier);
             XMLSecStartElement xmlSecStartElement = securityTokenReference.getXmlSecEvents().getLast().asStartElement();
             internalSignatureReferenceVerifier.setStartElement(xmlSecStartElement);
             Iterator<XMLSecEvent> xmlSecEventIterator = securityTokenReference.getXmlSecEvents().descendingIterator();

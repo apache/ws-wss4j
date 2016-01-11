@@ -44,7 +44,9 @@ public class WSSEncryptedKeyInputHandler extends XMLEncryptedKeyInputHandler {
         org.slf4j.LoggerFactory.getLogger(WSSEncryptedKeyInputHandler.class);
 
     @Override
-    public void handle(InputProcessorChain inputProcessorChain, EncryptedKeyType encryptedKeyType, XMLSecEvent responsibleXMLSecStartXMLEvent, XMLSecurityProperties securityProperties) throws XMLSecurityException {
+    public void handle(InputProcessorChain inputProcessorChain, EncryptedKeyType encryptedKeyType, 
+                       XMLSecEvent responsibleXMLSecStartXMLEvent, XMLSecurityProperties securityProperties) 
+        throws XMLSecurityException {
         checkBSPCompliance(inputProcessorChain, encryptedKeyType);
 
         // Check encryption algorithm against the required algorithm, if defined
@@ -110,22 +112,4 @@ public class WSSEncryptedKeyInputHandler extends XMLEncryptedKeyInputHandler {
             }
         }
     }
-
-    /*
-    <xenc:EncryptedKey xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" Id="EncKeyId-1483925398">
-        <xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-1_5" />
-        <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
-            <wsse:SecurityTokenReference xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
-                <wsse:KeyIdentifier EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"
-                    ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509SubjectKeyIdentifier">pHoiKNGY2YsLBKxwIV+jURt858M=</wsse:KeyIdentifier>
-                </wsse:SecurityTokenReference>
-        </ds:KeyInfo>
-        <xenc:CipherData>
-            <xenc:CipherValue>Khsa9SN3ALNXOgGDKOqihvfwGsXb9QN/q4Fpi9uuThgz+3D4oRSMkrGSPCqwG13vddvHywGAA/XNbWNT+5Xivz3lURCDCc2H/92YlXXo/crQNJnPlLrLZ81bGOzbNo7lnYQBLp/77K7b1bhldZAeV9ZfEW7DjbOMZ+k1dnDCu3A=</xenc:CipherValue>
-        </xenc:CipherData>
-        <xenc:ReferenceList>
-            <xenc:DataReference URI="#EncDataId-1612925417" />
-        </xenc:ReferenceList>
-    </xenc:EncryptedKey>
-     */
 }
