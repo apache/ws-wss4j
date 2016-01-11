@@ -26,6 +26,7 @@ import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.common.crypto.Crypto;
+import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.PublicKeyPrincipalImpl;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
@@ -67,18 +68,21 @@ public class ECKeyValueSecurityTokenImpl
     @Override
     public Key getKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage,
                       String correlationID) throws XMLSecurityException {
-        PublicKey publicKey = getPublicKey();
-        
-        try {
-            return crypto.getPrivateKey(publicKey, callbackHandler);
-        } catch (WSSecurityException ex) {
-            // Check to see if we are decrypting rather than signature verification
-            Crypto decCrypto = securityProperties.getDecryptionCrypto();
-            if (decCrypto != null && decCrypto != crypto) {
-                return decCrypto.getPrivateKey(publicKey, callbackHandler);
+        if (crypto instanceof Merlin) {
+            PublicKey publicKey = getPublicKey();
+            
+            try {
+                return ((Merlin)crypto).getPrivateKey(publicKey, callbackHandler);
+            } catch (WSSecurityException ex) {
+                // Check to see if we are decrypting rather than signature verification
+                Crypto decCrypto = securityProperties.getDecryptionCrypto();
+                if (decCrypto instanceof Merlin && decCrypto != crypto) {
+                    return ((Merlin)decCrypto).getPrivateKey(publicKey, callbackHandler);
+                }
+                throw ex;
             }
-            throw ex;
         }
+        return super.getKey(algorithmURI, algorithmUsage, correlationID);
     }
 
     @Override
