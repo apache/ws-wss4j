@@ -116,7 +116,8 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                 || WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier.equals(keyIdentifier)
                 || WSSecurityTokenConstants.KeyIdentifier_EncryptedKey.equals(keyIdentifier)) {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
-            } else if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier) && !useSingleCertificate) {
+            } else if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier) 
+                && !useSingleCertificate) {
                 attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_X509PKIPathv1));
             }
             createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
@@ -194,7 +195,8 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
     }
 
     @Override
-    protected void createTransformsStructureForSignature(OutputProcessorChain subOutputProcessorChain, SignaturePartDef signaturePartDef) throws XMLStreamException, XMLSecurityException {
+    protected void createTransformsStructureForSignature(OutputProcessorChain subOutputProcessorChain, SignaturePartDef signaturePartDef) 
+        throws XMLStreamException, XMLSecurityException {
         String[] transforms = signaturePartDef.getTransforms();
         if (transforms != null && transforms.length > 0) {
             createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transforms, false, null);
@@ -225,8 +227,10 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                             && !WSSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(transform))
                     {
                         attributes = new ArrayList<>(1);
-                        attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_PrefixList, signaturePartDef.getInclusiveNamespacesPrefixes()));
-                        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces, true, attributes);
+                        attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_PrefixList, 
+                                                       signaturePartDef.getInclusiveNamespacesPrefixes()));
+                        createStartElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces, 
+                                                           true, attributes);
                         createEndElementAndOutputAsEvent(subOutputProcessorChain, XMLSecurityConstants.TAG_c14nExcl_InclusiveNamespaces);
                     }
 

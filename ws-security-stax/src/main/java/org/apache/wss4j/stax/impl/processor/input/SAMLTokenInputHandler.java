@@ -83,6 +83,7 @@ import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.apache.xml.security.stax.securityEvent.SignedElementSecurityEvent;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenConstants.TokenUsage;
 import org.apache.xml.security.stax.securityToken.SecurityTokenFactory;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 import org.opensaml.security.credential.BasicCredential;
@@ -122,7 +123,8 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         final Element samlElement = samlTokenDocument.getDocumentElement();
         final SamlAssertionWrapper samlAssertionWrapper = new SamlAssertionWrapper(samlElement);
 
-        SamlTokenValidator samlTokenValidator = wssSecurityProperties.getValidator(new QName(samlElement.getNamespaceURI(), samlElement.getLocalName()));
+        SamlTokenValidator samlTokenValidator = 
+            wssSecurityProperties.getValidator(new QName(samlElement.getNamespaceURI(), samlElement.getLocalName()));
         if (samlTokenValidator == null) {
             samlTokenValidator = new SamlTokenValidatorImpl();
         }
@@ -230,7 +232,8 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
         final List<XMLSecEvent> xmlSecEvents = getResponsibleXMLSecEvents(eventQueue, index);
         final List<QName> elementPath = getElementPath(eventQueue);
-        final TokenContext tokenContext = new TokenContext(wssSecurityProperties, wsInboundSecurityContext, xmlSecEvents, elementPath);
+        final TokenContext tokenContext = 
+            new TokenContext(wssSecurityProperties, wsInboundSecurityContext, xmlSecEvents, elementPath);
 
         //jdk 1.6 compiler bug? http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6302954
         //type parameters of <T>T cannot be determined; no unique maximal instance exists for type variable T with
@@ -584,8 +587,10 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         private List<SignedElementSecurityEvent> samlTokenSignedElementSecurityEvents = new ArrayList<>();
         private SignedPartSecurityEvent bodySignedPartSecurityEvent;
 
-        SAMLTokenVerifierInputProcessor(XMLSecurityProperties securityProperties, SamlAssertionWrapper samlAssertionWrapper,
-                                        SecurityTokenProvider<InboundSecurityToken> securityTokenProvider, InboundSecurityToken subjectSecurityToken) {
+        SAMLTokenVerifierInputProcessor(XMLSecurityProperties securityProperties, 
+                                        SamlAssertionWrapper samlAssertionWrapper,
+                                        SecurityTokenProvider<InboundSecurityToken> securityTokenProvider, 
+                                        InboundSecurityToken subjectSecurityToken) {
             super(securityProperties);
             this.setPhase(XMLSecurityConstants.Phase.POSTPROCESSING);
             this.addAfterProcessor(OperationInputProcessor.class.getName());
@@ -691,12 +696,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                             InboundSecurityToken securityToken = securityTokenProvider.getSecurityToken();
                             // Don't compare to the original SAML Token credentials...
                             if (securityToken == httpsSecurityToken || securityToken == subjectSecurityToken
-                                || !(securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_MainSignature)
-                                    || securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_Signature)
-                                    || securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_EndorsingEncryptedSupportingTokens)
-                                    || securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_EndorsingSupportingTokens)
-                                    || securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_SignedEndorsingEncryptedSupportingTokens)
-                                    || securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_SignedEndorsingSupportingTokens))) {
+                                || !containsSignature(securityToken.getTokenUsages())) {
                                 continue;
                             }
                             X509Certificate[] x509Certificates = securityToken.getX509Certificates();
@@ -773,6 +773,15 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                 }
             }
             return null;
+        }
+        
+        private boolean containsSignature(List<TokenUsage> tokenUses) {
+            return tokenUses.contains(WSSecurityTokenConstants.TokenUsage_MainSignature)
+            || tokenUses.contains(WSSecurityTokenConstants.TokenUsage_Signature)
+            || tokenUses.contains(WSSecurityTokenConstants.TokenUsage_EndorsingEncryptedSupportingTokens)
+            || tokenUses.contains(WSSecurityTokenConstants.TokenUsage_EndorsingSupportingTokens)
+            || tokenUses.contains(WSSecurityTokenConstants.TokenUsage_SignedEndorsingEncryptedSupportingTokens)
+            || tokenUses.contains(WSSecurityTokenConstants.TokenUsage_SignedEndorsingSupportingTokens);
         }
     }
 }

@@ -97,10 +97,12 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             }
         }
 
-        final WSInboundSecurityContext wsInboundSecurityContext = (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
+        final WSInboundSecurityContext wsInboundSecurityContext = 
+            (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
         final List<QName> elementPath = getElementPath(eventQueue);
 
-        final TokenContext tokenContext = new TokenContext(wssSecurityProperties, wsInboundSecurityContext, xmlSecEvents, elementPath);
+        final TokenContext tokenContext = 
+            new TokenContext(wssSecurityProperties, wsInboundSecurityContext, xmlSecEvents, elementPath);
 
         UsernameTokenValidator usernameTokenValidator =
                 wssSecurityProperties.getValidator(WSSConstants.TAG_wsse_UsernameToken);

@@ -175,8 +175,10 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                         }
                     };
 
-                    outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(binarySecurityTokenId, securityTokenProvider);
-                    outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, binarySecurityTokenId);
+                    outputProcessorChain.getSecurityContext().registerSecurityTokenProvider(binarySecurityTokenId, 
+                                                                                            securityTokenProvider);
+                    outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, 
+                                                                  binarySecurityTokenId);
 
                     securityToken = bstSecurityToken;
                 }

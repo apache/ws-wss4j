@@ -52,7 +52,8 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
                        Deque<XMLSecEvent> eventQueue, Integer index) throws XMLSecurityException {
 
         final WSSSecurityProperties wssSecurityProperties = (WSSSecurityProperties) securityProperties;
-        final WSInboundSecurityContext wssecurityContextInbound = (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
+        final WSInboundSecurityContext wssecurityContextInbound = 
+            (WSInboundSecurityContext) inputProcessorChain.getSecurityContext();
 
         //Chapter 10 Security Timestamps: ...may only be present at most once per header (that is, per SOAP actor/role)
         Boolean alreadyProcessed = wssecurityContextInbound.<Boolean>get(WSSConstants.TIMESTAMP_PROCESSED);
@@ -156,7 +157,8 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
             if (createdCalendar.getSecond() > 59) {
                 securityContext.handleBSPRule(BSPRule.R3213);
             }
-            String valueType = XMLSecurityUtils.getQNameAttribute(timestampType.getCreated().getOtherAttributes(), WSSConstants.ATT_NULL_ValueType);
+            String valueType = XMLSecurityUtils.getQNameAttribute(timestampType.getCreated().getOtherAttributes(), 
+                                                                  WSSConstants.ATT_NULL_ValueType);
             if (valueType != null) {
                 securityContext.handleBSPRule(BSPRule.R3225);
             }
@@ -181,7 +183,8 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
             if (expiresCalendar.getSecond() > 59) {
                 securityContext.handleBSPRule(BSPRule.R3215);
             }
-            String valueType = XMLSecurityUtils.getQNameAttribute(timestampType.getExpires().getOtherAttributes(), WSSConstants.ATT_NULL_ValueType);
+            String valueType = XMLSecurityUtils.getQNameAttribute(timestampType.getExpires().getOtherAttributes(), 
+                                                                  WSSConstants.ATT_NULL_ValueType);
             if (valueType != null) {
                 securityContext.handleBSPRule(BSPRule.R3226);
             }
@@ -191,10 +194,4 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
         }
     }
 
-    /*
-    <wsu:Timestamp xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="Timestamp-1106985890">
-        <wsu:Created xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">2009-11-18T10:11:28.358Z</wsu:Created>
-        <wsu:Expires xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">2009-11-18T10:26:28.358Z</wsu:Expires>
-    </wsu:Timestamp>
-     */
 }

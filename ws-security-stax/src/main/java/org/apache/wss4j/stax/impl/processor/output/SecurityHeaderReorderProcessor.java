@@ -87,7 +87,8 @@ public class SecurityHeaderReorderProcessor extends AbstractOutputProcessor {
     }
 
     @Override
-    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) throws XMLStreamException, XMLSecurityException {
+    public void processEvent(XMLSecEvent xmlSecEvent, OutputProcessorChain outputProcessorChain) 
+        throws XMLStreamException, XMLSecurityException {
 
         int documentLevel = xmlSecEvent.getDocumentLevel();
         if (documentLevel < 3 ||
@@ -102,7 +103,8 @@ public class SecurityHeaderReorderProcessor extends AbstractOutputProcessor {
             if (xmlSecEvent.isEndElement() && xmlSecEvent.asEndElement().getName().equals(WSSConstants.TAG_wsse_Security)) {
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-                Iterator<Map.Entry<XMLSecurityConstants.Action, Map<SecurityHeaderOrder, Deque<XMLSecEvent>>>> iterator = actionEventMap.entrySet().iterator();
+                Iterator<Map.Entry<XMLSecurityConstants.Action, Map<SecurityHeaderOrder, Deque<XMLSecEvent>>>> iterator = 
+                    actionEventMap.entrySet().iterator();
                 loop:
                 while (iterator.hasNext()) {
                     Map.Entry<XMLSecurityConstants.Action, Map<SecurityHeaderOrder, Deque<XMLSecEvent>>> next = iterator.next();
@@ -156,7 +158,8 @@ public class SecurityHeaderReorderProcessor extends AbstractOutputProcessor {
                 case XMLStreamConstants.START_ELEMENT:
                     XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
 
-                    List<SecurityHeaderOrder> securityHeaderOrderList = outputProcessorChain.getSecurityContext().getAsList(SecurityHeaderOrder.class);
+                    List<SecurityHeaderOrder> securityHeaderOrderList = 
+                        outputProcessorChain.getSecurityContext().getAsList(SecurityHeaderOrder.class);
                     SecurityHeaderOrder securityHeaderOrder = securityHeaderOrderList.get(securityHeaderIndex);
                     if (!xmlSecStartElement.getName().equals(WSSConstants.TAG_xenc_EncryptedData) &&
                             !xmlSecStartElement.getName().equals(securityHeaderOrder.getSecurityHeaderElementName())) {

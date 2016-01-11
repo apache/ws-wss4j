@@ -57,7 +57,8 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
             if (tokenId == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
-            SecurityTokenProvider<OutboundSecurityToken> wrappingSecurityTokenProvider = outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
+            SecurityTokenProvider<OutboundSecurityToken> wrappingSecurityTokenProvider = 
+                outputProcessorChain.getSecurityContext().getSecurityTokenProvider(tokenId);
             if (wrappingSecurityTokenProvider == null) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
             }
@@ -69,7 +70,8 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
             final String wsuId = IDGenerator.generateID(null);
             final String identifier = IDGenerator.generateID(null);
 
-            final GenericOutboundSecurityToken securityContextSecurityToken = new GenericOutboundSecurityToken(wsuId, WSSecurityTokenConstants.SecurityContextToken) {
+            final GenericOutboundSecurityToken securityContextSecurityToken = 
+                new GenericOutboundSecurityToken(wsuId, WSSecurityTokenConstants.SecurityContextToken) {
 
                 @Override
                 public Key getSecretKey(String algorithmURI) throws XMLSecurityException {
@@ -141,7 +143,8 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
         private final String identifier;
         private final boolean use200512Namespace;
 
-        FinalSecurityContextTokenOutputProcessor(OutboundSecurityToken securityToken, String identifier, boolean use200512Namespace) throws XMLSecurityException {
+        FinalSecurityContextTokenOutputProcessor(OutboundSecurityToken securityToken, String identifier, boolean use200512Namespace) 
+            throws XMLSecurityException {
             super();
             this.securityToken = securityToken;
             this.identifier = identifier;

@@ -80,13 +80,15 @@ public class EncryptedDataInputHandler extends AbstractInputSecurityHeaderHandle
         //replay the EncryptedData event for the DecryptInputProcessor:
         InputProcessor tmpProcessor = new AbstractInputProcessor(securityProperties) {
             @Override
-            public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+            public XMLSecEvent processNextHeaderEvent(InputProcessorChain inputProcessorChain) 
+                throws XMLStreamException, XMLSecurityException {
                 inputProcessorChain.removeProcessor(this);
                 return encryptedDataElement;
             }
 
             @Override
-            public XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain) throws XMLStreamException, XMLSecurityException {
+            public XMLSecEvent processNextEvent(InputProcessorChain inputProcessorChain) 
+                throws XMLStreamException, XMLSecurityException {
                 inputProcessorChain.removeProcessor(this);
                 return encryptedDataElement;
             }
