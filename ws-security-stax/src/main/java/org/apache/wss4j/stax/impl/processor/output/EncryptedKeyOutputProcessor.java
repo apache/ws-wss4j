@@ -23,6 +23,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.MGF1ParameterSpec;
@@ -207,7 +208,20 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
-                final X509Certificate x509Certificate = securityToken.getKeyWrappingToken().getX509Certificates()[0];
+                PublicKey publicKey = null;
+                if (securityToken.getKeyWrappingToken().getX509Certificates() != null
+                    && securityToken.getKeyWrappingToken().getX509Certificates().length > 0) {
+                    publicKey = securityToken.getKeyWrappingToken().getX509Certificates()[0].getPublicKey();
+                } else {
+                    publicKey = securityToken.getKeyWrappingToken().getPublicKey();
+                }
+                if (publicKey == null) {
+                    throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.FAILURE,
+                        "failedCredentialLoad"
+                    );
+                }
+                
                 final String encryptionKeyTransportAlgorithm = getSecurityProperties().getEncryptionKeyTransportAlgorithm();
 
                 List<XMLSecAttribute> attributes = new ArrayList<>(1);
@@ -290,7 +304,7 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                         algorithmParameterSpec = new OAEPParameterSpec(jceDigestAlgorithm, "MGF1", mgfParameterSpec, pSource);
                     }
 
-                    cipher.init(Cipher.WRAP_MODE, x509Certificate.getPublicKey(), algorithmParameterSpec);
+                    cipher.init(Cipher.WRAP_MODE, publicKey, algorithmParameterSpec);
 
                     Key secretKey = securityToken.getSecretKey("");
 
@@ -347,6 +361,14 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                 outputDOMElement(securityToken.getCustomTokenReference(), outputProcessorChain);
                 return;
             }
+            
+            X509Certificate[] x509Certificates = securityToken.getKeyWrappingToken().getX509Certificates();
+            if ((x509Certificates == null || x509Certificates.length == 0)
+                && securityToken.getKeyWrappingToken().getPublicKey() != null) {
+                WSSUtils.createKeyValueTokenStructure(this, outputProcessorChain, 
+                                                      securityToken.getKeyWrappingToken().getPublicKey());
+                return;
+            } 
 
             List<XMLSecAttribute> attributes = new ArrayList<>(2);
             attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
@@ -355,7 +377,6 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
             }
             createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
 
-            X509Certificate[] x509Certificates = securityToken.getKeyWrappingToken().getX509Certificates();
             String tokenId = securityToken.getKeyWrappingToken().getId();
 
             if (WSSecurityTokenConstants.KeyIdentifier_IssuerSerial.equals(keyIdentifier)) {

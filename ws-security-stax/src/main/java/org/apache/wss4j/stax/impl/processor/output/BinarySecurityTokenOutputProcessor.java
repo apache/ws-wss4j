@@ -156,14 +156,14 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
             if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
 
                 final QName headerElementName = WSSConstants.TAG_wsse_BinarySecurityToken;
-                OutputProcessorUtils.updateSecurityHeaderOrder(
-                        outputProcessorChain, headerElementName, getAction(), false);
-
-                OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
                 if (WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN.equals(getAction())
                     || WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN.equals(getAction())
                     || WSSConstants.KERBEROS_TOKEN.equals(getAction())) {
+                    OutputProcessorUtils.updateSecurityHeaderOrder(
+                        outputProcessorChain, headerElementName, getAction(), false);
+                    OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
+                                                           
                     List<XMLSecAttribute> attributes = new ArrayList<>(3);
                     attributes.add(createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
                     attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_GSS_Kerberos5_AP_REQ));
@@ -179,7 +179,12 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                                                                        getAction(), false);
                         WSSUtils.createReferenceListStructureForEncryption(this, subOutputProcessorChain);
                     }
-                } else {
+                } else if (securityToken.getX509Certificates() != null
+                    && securityToken.getX509Certificates().length > 0) {
+                    OutputProcessorUtils.updateSecurityHeaderOrder(
+                        outputProcessorChain, headerElementName, getAction(), false);
+                    OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
+                                                               
                     boolean useSingleCertificate = getSecurityProperties().isUseSingleCert();
                     WSSUtils.createBinarySecurityTokenStructure(
                             this, subOutputProcessorChain, securityToken.getId(),

@@ -21,6 +21,7 @@ package org.apache.wss4j.stax.setup;
 import java.io.OutputStream;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
@@ -544,17 +545,21 @@ public class OutboundWSSec {
 
         // Set up a security token with the certs required to encrypt the symmetric key
         X509Certificate[] x509Certificates = null;
-        X509Certificate x509Certificate = getReqSigCert(outputProcessorChain.getSecurityContext());
+        PublicKey publicKey = null;
         if (securityProperties.isUseReqSigCertForEncryption()) {
+            X509Certificate x509Certificate = getReqSigCert(outputProcessorChain.getSecurityContext());
             if (x509Certificate == null) {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, "noCert");
+                publicKey = getReqSigPublicKey(outputProcessorChain.getSecurityContext());
+                if (publicKey == null) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, "noCert");
+                }
+            } else {
+                x509Certificates = new X509Certificate[1];
+                x509Certificates[0] = x509Certificate;
             }
-            x509Certificates = new X509Certificate[1];
-            x509Certificates[0] = x509Certificate;
         } else if (securityProperties.getEncryptionUseThisCertificate() != null) {
-            x509Certificate = securityProperties.getEncryptionUseThisCertificate();
             x509Certificates = new X509Certificate[1];
-            x509Certificates[0] = x509Certificate;
+            x509Certificates[0] = securityProperties.getEncryptionUseThisCertificate();
         } else {
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
             cryptoType.setAlias(securityProperties.getEncryptionUser());
@@ -567,7 +572,7 @@ public class OutboundWSSec {
         }
 
         // Check for Revocation
-        if (securityProperties.isEnableRevocation()) {
+        if (securityProperties.isEnableRevocation() && x509Certificates != null) {
             Crypto crypto = securityProperties.getEncryptionCrypto();
             crypto.verifyTrust(x509Certificates, true, null);
         }
@@ -575,7 +580,7 @@ public class OutboundWSSec {
         // Create a new outbound EncryptedKey token for the cert
         final String id = IDGenerator.generateID(null);
         final GenericOutboundSecurityToken encryptedKeyToken =
-            new GenericOutboundSecurityToken(id, WSSecurityTokenConstants.X509V3Token, null, x509Certificates);
+            new GenericOutboundSecurityToken(id, WSSecurityTokenConstants.X509V3Token, publicKey, x509Certificates);
 
         encryptedKeyToken.addWrappedToken(securityToken);
         securityToken.setKeyWrappingToken(encryptedKeyToken);
@@ -680,6 +685,28 @@ public class OutboundWSSec {
                     X509Certificate[] x509Certificates = tokenSecurityEvent.getSecurityToken().getX509Certificates();
                     if (x509Certificates != null && x509Certificates.length > 0) {
                         return x509Certificates[0];
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    
+    private PublicKey getReqSigPublicKey(SecurityContext securityContext) throws XMLSecurityException {
+        List<SecurityEvent> securityEventList = securityContext.getAsList(SecurityEvent.class);
+        if (securityEventList != null) {
+            for (int i = 0; i < securityEventList.size(); i++) {
+                SecurityEvent securityEvent = securityEventList.get(i);
+                if (securityEvent instanceof TokenSecurityEvent) {
+                    @SuppressWarnings("unchecked")
+                    TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent
+                        = (TokenSecurityEvent<? extends SecurityToken>) securityEvent;
+                    if (!tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_MainSignature)) {
+                        continue;
+                    }
+                    PublicKey publicKey = tokenSecurityEvent.getSecurityToken().getPublicKey();
+                    if (publicKey != null) {
+                        return publicKey;
                     }
                 }
             }
