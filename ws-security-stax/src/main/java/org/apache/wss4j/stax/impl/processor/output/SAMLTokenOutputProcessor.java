@@ -427,8 +427,9 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
         }
 
         private boolean includeBST() {
-            if (senderVouches && getSecurityProperties().getSignatureKeyIdentifier() ==
-                WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
+            if (senderVouches 
+                && getSecurityProperties().getSignatureKeyIdentifier() 
+                    == WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
                 && securityToken != null
                 && !(WSSConstants.SAML_TOKEN_SIGNED.equals(action)
                     && ((WSSSecurityProperties)getSecurityProperties()).isIncludeSignatureToken())) {

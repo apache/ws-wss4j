@@ -101,15 +101,15 @@ import org.w3c.dom.Node;
  */
 public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
-    private static final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+    private static final DocumentBuilderFactory DOC_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
 
-    private static final List<QName> saml1TokenPath = new ArrayList<>(WSSConstants.WSSE_SECURITY_HEADER_PATH);
-    private static final List<QName> saml2TokenPath = new ArrayList<>(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+    private static final List<QName> SAML1_TOKEN_PATH = new ArrayList<>(WSSConstants.WSSE_SECURITY_HEADER_PATH);
+    private static final List<QName> SAML2_TOKEN_PATH = new ArrayList<>(WSSConstants.WSSE_SECURITY_HEADER_PATH);
 
     static {
-        documentBuilderFactory.setNamespaceAware(true);
-        saml1TokenPath.add(WSSConstants.TAG_saml_Assertion);
-        saml2TokenPath.add(WSSConstants.TAG_saml2_Assertion);
+        DOC_BUILDER_FACTORY.setNamespaceAware(true);
+        SAML1_TOKEN_PATH.add(WSSConstants.TAG_saml_Assertion);
+        SAML2_TOKEN_PATH.add(WSSConstants.TAG_saml2_Assertion);
     }
 
     @Override
@@ -283,23 +283,22 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             XMLSecEvent xmlSecEvent = xmlSecEventIterator.next();
             idx++;
             switch (xmlSecEvent.getEventType()) {
-                case XMLStreamConstants.START_ELEMENT: {
+                case XMLStreamConstants.START_ELEMENT:
                     QName elementName = xmlSecEvent.asStartElement().getName();
                     if (WSSConstants.TAG_dsig_KeyInfo.equals(elementName)) {
                         List<QName> elementPath = xmlSecEvent.asStartElement().getElementPath();
                         if (elementPath.size() >= 4) {
                             int lastIndex = elementPath.size() - 2;
-                            if ("SubjectConfirmationData".equals(elementPath.get(lastIndex).getLocalPart()) &&
-                                    "SubjectConfirmation".equals(elementPath.get(lastIndex - 1).getLocalPart()) &&
-                                    "Subject".equals(elementPath.get(lastIndex - 2).getLocalPart())) {
+                            if ("SubjectConfirmationData".equals(elementPath.get(lastIndex).getLocalPart()) 
+                                && "SubjectConfirmation".equals(elementPath.get(lastIndex - 1).getLocalPart()) 
+                                && "Subject".equals(elementPath.get(lastIndex - 2).getLocalPart())) {
                                 return idx;
-                            } else if ("SubjectConfirmation".equals(elementPath.get(lastIndex).getLocalPart()) &&
-                                    "Subject".equals(elementPath.get(lastIndex - 1).getLocalPart())) {
+                            } else if ("SubjectConfirmation".equals(elementPath.get(lastIndex).getLocalPart()) 
+                                && "Subject".equals(elementPath.get(lastIndex - 1).getLocalPart())) {
                                 return idx;
                             }
                         }
                     }
-                }
             }
         }
         return idx;
@@ -312,19 +311,18 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             XMLSecEvent xmlSecEvent = xmlSecEventIterator.next();
             idx++;
             switch (xmlSecEvent.getEventType()) {
-                case XMLStreamConstants.START_ELEMENT: {
+                case XMLStreamConstants.START_ELEMENT:
                     QName elementName = xmlSecEvent.asStartElement().getName();
                     if (WSSConstants.TAG_dsig_KeyInfo.equals(elementName)) {
                         List<QName> elementPath = xmlSecEvent.asStartElement().getElementPath();
                         if (elementPath.size() >= 4) {
                             int lastIndex = elementPath.size() - 2;
-                            if ("Signature".equals(elementPath.get(lastIndex).getLocalPart()) &&
-                                    "Assertion".equals(elementPath.get(lastIndex - 1).getLocalPart())) {
+                            if ("Signature".equals(elementPath.get(lastIndex).getLocalPart()) 
+                                && "Assertion".equals(elementPath.get(lastIndex - 1).getLocalPart())) {
                                 return idx;
                             }
                         }
                     }
-                }
             }
         }
         return idx;
@@ -353,8 +351,8 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
         final XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
         final QName elementName = xmlSecStartElement.getName();
-        if (WSSConstants.TAG_wst_BinarySecret.equals(elementName) ||
-                WSSConstants.TAG_wst0512_BinarySecret.equals(elementName)) {
+        if (WSSConstants.TAG_wst_BinarySecret.equals(elementName)
+            || WSSConstants.TAG_wst0512_BinarySecret.equals(elementName)) {
 
             final StringBuilder stringBuilder = new StringBuilder();
             loop:
@@ -458,7 +456,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             throws XMLSecurityException {
         Document document;
         try {
-            document = documentBuilderFactory.newDocumentBuilder().newDocument();
+            document = DOC_BUILDER_FACTORY.newDocumentBuilder().newDocument();
         } catch (ParserConfigurationException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
         }
@@ -608,12 +606,11 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                 if (elementPath.equals(WSSConstants.SOAP_11_BODY_PATH)) {
                     bodySignedPartSecurityEvent = signedPartSecurityEvent;
                 }
-            }
-            else if (WSSecurityEventConstants.SignedElement.equals(securityEvent.getSecurityEventType())) {
+            } else if (WSSecurityEventConstants.SignedElement.equals(securityEvent.getSecurityEventType())) {
                 SignedElementSecurityEvent signedPartSecurityEvent = (SignedElementSecurityEvent) securityEvent;
 
                 List<QName> elementPath = signedPartSecurityEvent.getElementPath();
-                if (elementPath.equals(saml2TokenPath) || elementPath.equals(saml1TokenPath)) {
+                if (elementPath.equals(SAML2_TOKEN_PATH) || elementPath.equals(SAML1_TOKEN_PATH)) {
                     samlTokenSignedElementSecurityEvents.add(signedPartSecurityEvent);
                 }
             }
@@ -703,8 +700,8 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                             PublicKey publicKey = securityToken.getPublicKey();
                             Map<String, Key> keyMap = securityToken.getSecretKey();
                             if (x509Certificates != null && x509Certificates.length > 0
-                                && subjectCertificates != null && subjectCertificates.length > 0 &&
-                                subjectCertificates[0].equals(x509Certificates[0])) {
+                                && subjectCertificates != null && subjectCertificates.length > 0 
+                                && subjectCertificates[0].equals(x509Certificates[0])) {
                                 return;
                             }
                             if (publicKey != null && publicKey.equals(subjectPublicKey)) {
@@ -737,16 +734,16 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
                         SignedElementSecurityEvent samlTokenSignedElementSecurityEvent = null;
                         for (int j = 0; j < samlTokenSignedElementSecurityEvents.size(); j++) {
                             SignedElementSecurityEvent signedElementSecurityEvent = samlTokenSignedElementSecurityEvents.get(j);
-                            if (securityTokenProvider.getSecurityToken().getXMLSecEvent() ==
-                                    signedElementSecurityEvent.getXmlSecEvent()) {
+                            if (securityTokenProvider.getSecurityToken().getXMLSecEvent() 
+                                == signedElementSecurityEvent.getXmlSecEvent()) {
 
                                 samlTokenSignedElementSecurityEvent = signedElementSecurityEvent;
                             }
                         }
-                        if (bodySignedPartSecurityEvent != null &&
-                                samlTokenSignedElementSecurityEvent != null &&
-                                bodySignedPartSecurityEvent.getSecurityToken() ==
-                                        samlTokenSignedElementSecurityEvent.getSecurityToken()) {
+                        if (bodySignedPartSecurityEvent != null 
+                            && samlTokenSignedElementSecurityEvent != null 
+                            && bodySignedPartSecurityEvent.getSecurityToken() 
+                                == samlTokenSignedElementSecurityEvent.getSecurityToken()) {
                             return;
                         }
                         methodNotSatisfied = true;
@@ -777,11 +774,11 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         
         private boolean containsSignature(List<TokenUsage> tokenUses) {
             return tokenUses.contains(WSSecurityTokenConstants.TokenUsage_MainSignature)
-            || tokenUses.contains(WSSecurityTokenConstants.TokenUsage_Signature)
-            || tokenUses.contains(WSSecurityTokenConstants.TokenUsage_EndorsingEncryptedSupportingTokens)
-            || tokenUses.contains(WSSecurityTokenConstants.TokenUsage_EndorsingSupportingTokens)
-            || tokenUses.contains(WSSecurityTokenConstants.TokenUsage_SignedEndorsingEncryptedSupportingTokens)
-            || tokenUses.contains(WSSecurityTokenConstants.TokenUsage_SignedEndorsingSupportingTokens);
+                || tokenUses.contains(WSSecurityTokenConstants.TokenUsage_Signature)
+                || tokenUses.contains(WSSecurityTokenConstants.TokenUsage_EndorsingEncryptedSupportingTokens)
+                || tokenUses.contains(WSSecurityTokenConstants.TokenUsage_EndorsingSupportingTokens)
+                || tokenUses.contains(WSSecurityTokenConstants.TokenUsage_SignedEndorsingEncryptedSupportingTokens)
+                || tokenUses.contains(WSSecurityTokenConstants.TokenUsage_SignedEndorsingSupportingTokens);
         }
     }
 }

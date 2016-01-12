@@ -257,7 +257,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                 String encryptionSymAlgorithm = getSecurityProperties().getEncryptionSymAlgorithm();
                 String jceAlgorithm = JCEAlgorithmMapper.translateURItoJCEID(encryptionSymAlgorithm);
                 if (jceAlgorithm == null) {
-                    throw new XMLSecurityException("algorithms.NoSuchMap", new Object[] { encryptionSymAlgorithm });
+                    throw new XMLSecurityException("algorithms.NoSuchMap", new Object[] {encryptionSymAlgorithm});
                 }
                 //initialize the cipher
                 Cipher cipher = null;
@@ -356,9 +356,9 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                 Iterator<Attribute> attributeIterator = getXmlSecStartElement().getAttributes();
                 while (attributeIterator.hasNext()) {
                     Attribute attribute = attributeIterator.next();
-                    if (!attribute.isNamespace() &&
-                            (WSSConstants.NS_SOAP11.equals(attribute.getName().getNamespaceURI()) ||
-                                    WSSConstants.NS_SOAP12.equals(attribute.getName().getNamespaceURI()))) {
+                    if (!attribute.isNamespace() 
+                        && (WSSConstants.NS_SOAP11.equals(attribute.getName().getNamespaceURI()) 
+                            || WSSConstants.NS_SOAP12.equals(attribute.getName().getNamespaceURI()))) {
                         attributes.add(createAttribute(attribute.getName(), attribute.getValue()));
                     }
                 }
