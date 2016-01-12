@@ -782,7 +782,7 @@ public abstract class AbstractTestBase extends Assert {
     }
 
     public static long changeValueOfMaximumAllowedDecompressedBytes(Long value) throws NoSuchFieldException, IllegalAccessException {
-        Field field = DecryptInputProcessor.class.getDeclaredField("maximumAllowedDecompressedBytes");
+        Field field = DecryptInputProcessor.class.getDeclaredField("MAX_ALLOWED_DECOMPRESSED_BYTES");
         field.setAccessible(true);
 
         Field modifiersField = Field.class.getDeclaredField("modifiers");

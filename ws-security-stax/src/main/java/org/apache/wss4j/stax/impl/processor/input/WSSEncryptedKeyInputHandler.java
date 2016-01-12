@@ -40,7 +40,7 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
  */
 public class WSSEncryptedKeyInputHandler extends XMLEncryptedKeyInputHandler {
 
-    private static final transient org.slf4j.Logger log =
+    private static final transient org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSEncryptedKeyInputHandler.class);
 
     @Override
@@ -55,7 +55,7 @@ public class WSSEncryptedKeyInputHandler extends XMLEncryptedKeyInputHandler {
             && encryptionMethodType != null) {
             String encryptionMethod = encryptionMethodType.getAlgorithm();
             if (!securityProperties.getEncryptionKeyTransportAlgorithm().equals(encryptionMethod)) {
-                log.debug(
+                LOG.debug(
                     "The Key transport method does not match the requirement"
                 );
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);

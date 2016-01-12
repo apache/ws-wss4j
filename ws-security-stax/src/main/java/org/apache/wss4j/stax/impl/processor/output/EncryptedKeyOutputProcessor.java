@@ -118,8 +118,8 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
 
                     //hint for the headerReordering processor where to place the EncryptedKey
-                    if (getSecurityProperties().getActions().indexOf(WSSConstants.ENCRYPT) <
-                            getSecurityProperties().getActions().indexOf(WSSConstants.SIGNATURE)) {
+                    if (getSecurityProperties().getActions().indexOf(WSSConstants.ENCRYPT) 
+                        < getSecurityProperties().getActions().indexOf(WSSConstants.SIGNATURE)) {
                         finalEncryptedKeyOutputProcessor.addBeforeProcessor(WSSSignatureOutputProcessor.class.getName());
                         finalEncryptedKeyOutputProcessor.setAction(WSSConstants.SIGNATURE);
                     }
@@ -151,8 +151,8 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     finalEncryptedKeyOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
 
                     //hint for the headerReordering processor where to place the EncryptedKey
-                    if (getSecurityProperties().getActions().indexOf(WSSConstants.ENCRYPT_WITH_DERIVED_KEY) <
-                            getSecurityProperties().getActions().indexOf(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
+                    if (getSecurityProperties().getActions().indexOf(WSSConstants.ENCRYPT_WITH_DERIVED_KEY) 
+                        < getSecurityProperties().getActions().indexOf(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
                         finalEncryptedKeyOutputProcessor.setAction(WSSConstants.SIGNATURE_WITH_DERIVED_KEY);
                     }
                     finalEncryptedKeyOutputProcessor.setOutputReferenceList(false);
@@ -220,8 +220,8 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
 
                 final String encryptionKeyTransportMGFAlgorithm = getSecurityProperties().getEncryptionKeyTransportMGFAlgorithm();
 
-                if (XMLSecurityConstants.NS_XENC11_RSAOAEP.equals(encryptionKeyTransportAlgorithm) ||
-                        XMLSecurityConstants.NS_XENC_RSAOAEPMGF1P.equals(encryptionKeyTransportAlgorithm)) {
+                if (XMLSecurityConstants.NS_XENC11_RSAOAEP.equals(encryptionKeyTransportAlgorithm) 
+                    || XMLSecurityConstants.NS_XENC_RSAOAEPMGF1P.equals(encryptionKeyTransportAlgorithm)) {
 
                     byte[] oaepParams = getSecurityProperties().getEncryptionKeyTransportOAEPParams();
                     if (oaepParams != null) {
@@ -266,8 +266,8 @@ public class EncryptedKeyOutputProcessor extends AbstractOutputProcessor {
                     Cipher cipher = Cipher.getInstance(jceid);
 
                     AlgorithmParameterSpec algorithmParameterSpec = null;
-                    if (XMLSecurityConstants.NS_XENC11_RSAOAEP.equals(encryptionKeyTransportAlgorithm) ||
-                            XMLSecurityConstants.NS_XENC_RSAOAEPMGF1P.equals(encryptionKeyTransportAlgorithm)) {
+                    if (XMLSecurityConstants.NS_XENC11_RSAOAEP.equals(encryptionKeyTransportAlgorithm) 
+                        || XMLSecurityConstants.NS_XENC_RSAOAEPMGF1P.equals(encryptionKeyTransportAlgorithm)) {
 
                         String jceDigestAlgorithm = "SHA-1";
                         String encryptionKeyTransportDigestAlgorithm = 

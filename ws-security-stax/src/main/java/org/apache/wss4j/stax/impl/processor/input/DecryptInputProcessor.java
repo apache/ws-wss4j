@@ -79,10 +79,10 @@ import org.apache.xml.security.stax.securityToken.SecurityToken;
  */
 public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
 
-    private static final transient org.slf4j.Logger log =
+    private static final transient org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(DecryptInputProcessor.class);
 
-    private static final Long maximumAllowedDecompressedBytes =
+    private static final Long MAX_ALLOWED_DECOMPRESSED_BYTES =
             Long.valueOf(ConfigurationProperties.getProperty("MaximumAllowedDecompressedBytes"));
 
     private List<DeferredAttachment> attachmentReferences = new ArrayList<>();
@@ -139,8 +139,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
                 try {
                     Constructor<InputStream> constructor = transformerClass.getConstructor(InputStream.class);
                     inputStream = new LimitingInputStream(
-                            constructor.newInstance(inputStream),
-                            maximumAllowedDecompressedBytes);
+                            constructor.newInstance(inputStream), MAX_ALLOWED_DECOMPRESSED_BYTES);
                 } catch (InvocationTargetException | NoSuchMethodException
                     | InstantiationException | IllegalAccessException e) {
                     throw new XMLSecurityException(e);
@@ -180,9 +179,9 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
                                          Cipher cipher, InboundSecurityToken inboundSecurityToken) throws XMLSecurityException {
 
         String typeStr = encryptedDataType.getType();
-        if (typeStr != null &&
-                (WSSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY.equals(typeStr) ||
-                        WSSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE.equals(typeStr))) {
+        if (typeStr != null 
+            && (WSSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_CONTENT_ONLY.equals(typeStr) 
+                || WSSConstants.SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE.equals(typeStr))) {
 
             CipherReferenceType cipherReferenceType = encryptedDataType.getCipherData().getCipherReference();
             if (cipherReferenceType == null) {
@@ -215,7 +214,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
         String encryptionAlgorithm = encryptedDataType.getEncryptionMethod().getAlgorithm();
         if (this.getSecurityProperties().getEncryptionSymAlgorithm() != null
             && !this.getSecurityProperties().getEncryptionSymAlgorithm().equals(encryptionAlgorithm)) {
-            log.debug(
+            LOG.debug(
                 "The Key encryption method does not match the requirement"
             );
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
@@ -252,8 +251,8 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
             List<ReferenceType> processedReferences = getProcessedReferences();
             if (references != null) {
                 Iterator<Map.Entry<String,ReferenceType>> iterator = references.entrySet().iterator();
-                while(iterator.hasNext()){
-                    Map.Entry<String,ReferenceType> next = iterator.next();
+                while (iterator.hasNext()) {
+                    Map.Entry<String, ReferenceType> next = iterator.next();
                     final ReferenceType referenceType = next.getValue();
                     String uri = WSSUtils.dropReferenceMarker(referenceType.getURI());
 
@@ -346,7 +345,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
         }
     }
 
-    private class DeferredAttachment {
+    private final class DeferredAttachment {
 
         private EncryptedDataType encryptedDataType;
         private Cipher cipher;

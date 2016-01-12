@@ -52,7 +52,7 @@ import org.apache.xml.security.stax.securityToken.SecurityTokenFactory;
 
 public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
 
-    private static final transient org.slf4j.Logger log =
+    private static final transient org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSSignatureInputHandler.class);
 
     @Override
@@ -68,7 +68,7 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
         String algorithm = signatureType.getSignedInfo().getSignatureMethod().getAlgorithm();
         if (securityProperties.getSignatureAlgorithm() != null
             && !securityProperties.getSignatureAlgorithm().equals(algorithm)) {
-            log.debug(
+            LOG.debug(
                 "The Signature method does not match the requirement"
             );
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY);
