@@ -36,7 +36,7 @@ public class HttpsTokenSecurityEvent extends TokenSecurityEvent<HttpsSecurityTok
     private String issuerName;
 
     public HttpsTokenSecurityEvent() {
-        super(WSSecurityEventConstants.HttpsToken);
+        super(WSSecurityEventConstants.HTTPS_TOKEN);
     }
 
     public AuthenticationType getAuthenticationType() {

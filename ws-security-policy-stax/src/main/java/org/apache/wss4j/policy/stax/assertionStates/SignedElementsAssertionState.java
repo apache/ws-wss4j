@@ -75,7 +75,7 @@ public class SignedElementsAssertionState extends AssertionState implements Asse
     public SecurityEventConstants.Event[] getSecurityEventType() {
         return new SecurityEventConstants.Event[]{
                 SecurityEventConstants.SignedElement,
-                WSSecurityEventConstants.SignedPart
+                WSSecurityEventConstants.SIGNED_PART
         };
     }
 

@@ -55,7 +55,7 @@ public class SignatureConfirmationAssertionState extends AssertionState implemen
     @Override
     public SecurityEventConstants.Event[] getSecurityEventType() {
         return new SecurityEventConstants.Event[]{
-                WSSecurityEventConstants.SignatureConfirmation
+                WSSecurityEventConstants.SIGNATURE_CONFIRMATION
         };
     }
 

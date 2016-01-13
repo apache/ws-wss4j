@@ -88,14 +88,12 @@ public final class ConfigurationConverter {
         if ("".equals(actionToParse)) {
             return;
         }
-        String single[] = actionToParse.split("\\s");
+        String[] single = actionToParse.split("\\s");
         List<Action> actions = new ArrayList<Action>();
         for (int i = 0; i < single.length; i++) {
             if (single[i].equals(ConfigurationConstants.USERNAME_TOKEN)) {
                 actions.add(WSSConstants.USERNAMETOKEN);
-            } /* else if (single[i].equals(ConfigurationConstants.USERNAME_TOKEN_NO_PASSWORD)) {
-                actions.add(WSConstants.UT_NOPASSWORD);
-            } */else if (single[i].equals(ConfigurationConstants.SIGNATURE)) {
+            } else if (single[i].equals(ConfigurationConstants.SIGNATURE)) {
                 actions.add(WSSConstants.SIGNATURE);
             } else if (single[i].equals(ConfigurationConstants.ENCRYPT)) {
                 actions.add(WSSConstants.ENCRYPT);
@@ -119,7 +117,9 @@ public final class ConfigurationConverter {
                 actions.add(WSSConstants.KERBEROS_TOKEN);
             } else if (single[i].equals(ConfigurationConstants.CUSTOM_TOKEN)) {
                 actions.add(WSSConstants.CUSTOM_TOKEN);
-            }
+            } /* else if (single[i].equals(ConfigurationConstants.USERNAME_TOKEN_NO_PASSWORD)) {
+                actions.add(WSConstants.UT_NOPASSWORD);
+            } */
         }
 
         boolean sigConf =

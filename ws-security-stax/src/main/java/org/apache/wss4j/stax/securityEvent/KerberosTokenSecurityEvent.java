@@ -26,7 +26,7 @@ public class KerberosTokenSecurityEvent extends IssuedTokenSecurityEvent<Kerbero
     private String issuerName;
 
     public KerberosTokenSecurityEvent() {
-        super(WSSecurityEventConstants.KerberosToken);
+        super(WSSecurityEventConstants.KERBEROS_TOKEN);
     }
 
     public String getIssuerName() {

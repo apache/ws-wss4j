@@ -43,7 +43,7 @@ public class RelTokenAssertionState extends TokenAssertionState {
     @Override
     public SecurityEventConstants.Event[] getSecurityEventType() {
         return new SecurityEventConstants.Event[]{
-                WSSecurityEventConstants.RelToken
+                WSSecurityEventConstants.REL_TOKEN
         };
     }
 

@@ -179,8 +179,8 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.X509Token,
-                    WSSecurityEventConstants.EncryptedPart,
-                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.ENCRYPTED_PART,
+                    WSSecurityEventConstants.OPERATION,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(
@@ -194,8 +194,8 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
             securityEventListener.compare();
 
-            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
-            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.ENCRYPTED_PART);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.OPERATION);
             String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
@@ -256,8 +256,8 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.X509Token,
-                    WSSecurityEventConstants.EncryptedPart,
-                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.ENCRYPTED_PART,
+                    WSSecurityEventConstants.OPERATION,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(
@@ -271,8 +271,8 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
             securityEventListener.compare();
 
-            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
-            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.ENCRYPTED_PART);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.OPERATION);
             String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
@@ -920,9 +920,9 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.X509Token,
                     WSSecurityEventConstants.SignatureValue,
-                    WSSecurityEventConstants.SignedPart,
-                    WSSecurityEventConstants.EncryptedPart,
-                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.SIGNED_PART,
+                    WSSecurityEventConstants.ENCRYPTED_PART,
+                    WSSecurityEventConstants.OPERATION,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
 
@@ -938,10 +938,10 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
             securityEventListener.compare();
 
-            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
-            SignedPartSecurityEvent signedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignedPart);
+            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.ENCRYPTED_PART);
+            SignedPartSecurityEvent signedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SIGNED_PART);
             SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
-            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.OPERATION);
             String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
             String signedElementCorrelationID = signedPartSecurityEvent.getCorrelationID();
             String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();

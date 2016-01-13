@@ -25,7 +25,7 @@ public class SignatureConfirmationSecurityEvent extends SecurityEvent {
     private byte[] signatureValue;
 
     public SignatureConfirmationSecurityEvent() {
-        super(WSSecurityEventConstants.SignatureConfirmation);
+        super(WSSecurityEventConstants.SIGNATURE_CONFIRMATION);
     }
 
     public byte[] getSignatureValue() {

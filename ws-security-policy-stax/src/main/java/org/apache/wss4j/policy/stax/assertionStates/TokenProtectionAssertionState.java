@@ -74,15 +74,15 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
         return new SecurityEventConstants.Event[]{
                 SecurityEventConstants.SignedElement,
                 WSSecurityEventConstants.EncryptedKeyToken,
-                WSSecurityEventConstants.IssuedToken,
-                WSSecurityEventConstants.KerberosToken,
+                WSSecurityEventConstants.ISSUED_TOKEN,
+                WSSecurityEventConstants.KERBEROS_TOKEN,
                 SecurityEventConstants.KeyValueToken,
-                WSSecurityEventConstants.RelToken,
-                WSSecurityEventConstants.SamlToken,
-                WSSecurityEventConstants.SecurityContextToken,
-                WSSecurityEventConstants.UsernameToken,
+                WSSecurityEventConstants.REL_TOKEN,
+                WSSecurityEventConstants.SAML_TOKEN,
+                WSSecurityEventConstants.SECURITY_CONTEXT_TOKEN,
+                WSSecurityEventConstants.USERNAME_TOKEN,
                 SecurityEventConstants.X509Token,
-                WSSecurityEventConstants.Operation,
+                WSSecurityEventConstants.OPERATION,
         };
     }
 

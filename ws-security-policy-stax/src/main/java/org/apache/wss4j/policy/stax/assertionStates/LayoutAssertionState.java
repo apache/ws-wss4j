@@ -41,16 +41,16 @@ public class LayoutAssertionState extends AssertionState implements Assertable {
     @Override
     public SecurityEventConstants.Event[] getSecurityEventType() {
         return new SecurityEventConstants.Event[]{
-                WSSecurityEventConstants.UsernameToken,
-                WSSecurityEventConstants.IssuedToken,
+                WSSecurityEventConstants.USERNAME_TOKEN,
+                WSSecurityEventConstants.ISSUED_TOKEN,
                 SecurityEventConstants.X509Token,
-                WSSecurityEventConstants.KerberosToken,
-                WSSecurityEventConstants.SecurityContextToken,
-                WSSecurityEventConstants.SamlToken,
-                WSSecurityEventConstants.RelToken,
-                WSSecurityEventConstants.HttpsToken,
+                WSSecurityEventConstants.KERBEROS_TOKEN,
+                WSSecurityEventConstants.SECURITY_CONTEXT_TOKEN,
+                WSSecurityEventConstants.SAML_TOKEN,
+                WSSecurityEventConstants.REL_TOKEN,
+                WSSecurityEventConstants.HTTPS_TOKEN,
                 SecurityEventConstants.KeyValueToken,
-                WSSecurityEventConstants.Timestamp,
+                WSSecurityEventConstants.TIMESTAMP,
         };
     }
 
@@ -66,14 +66,14 @@ public class LayoutAssertionState extends AssertionState implements Assertable {
                 break;
             case LaxTsFirst:
                 if (occuredEvents.isEmpty() 
-                    && !WSSecurityEventConstants.Timestamp.equals(securityEvent.getSecurityEventType())) {
+                    && !WSSecurityEventConstants.TIMESTAMP.equals(securityEvent.getSecurityEventType())) {
                     setAsserted(false);
                     setErrorMessage("Policy enforces " + layout.getLayoutType() + " but " 
                         + securityEvent.getSecurityEventType() + " occured first");
                 }
                 break;
             case LaxTsLast:
-                if (occuredEvents.contains(WSSecurityEventConstants.Timestamp)) {
+                if (occuredEvents.contains(WSSecurityEventConstants.TIMESTAMP)) {
                     setAsserted(false);
                     setErrorMessage("Policy enforces " + layout.getLayoutType() + " but " 
                         + securityEvent.getSecurityEventType() + " occured last");

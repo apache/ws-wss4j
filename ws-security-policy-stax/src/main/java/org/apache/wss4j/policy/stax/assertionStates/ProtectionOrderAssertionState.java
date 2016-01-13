@@ -75,9 +75,9 @@ public class ProtectionOrderAssertionState extends AssertionState implements Ass
     public SecurityEventConstants.Event[] getSecurityEventType() {
         return new SecurityEventConstants.Event[]{
                 SecurityEventConstants.SignedElement,
-                WSSecurityEventConstants.SignedPart,
+                WSSecurityEventConstants.SIGNED_PART,
                 WSSecurityEventConstants.EncryptedElement,
-                WSSecurityEventConstants.EncryptedPart,
+                WSSecurityEventConstants.ENCRYPTED_PART,
                 WSSecurityEventConstants.ContentEncrypted,
         };
     }
@@ -94,7 +94,7 @@ public class ProtectionOrderAssertionState extends AssertionState implements Ass
             }
             List<XMLSecurityConstants.ContentType> contentTypes = signedElementSecurityEvent.getProtectionOrder();
             testProtectionOrder(protectionOrder, contentTypes, signedElementSecurityEvent.getElementPath());
-        } else if (WSSecurityEventConstants.SignedPart.equals(event)) {
+        } else if (WSSecurityEventConstants.SIGNED_PART.equals(event)) {
             SignedPartSecurityEvent signedPartSecurityEvent = (SignedPartSecurityEvent) securityEvent;
             if (!signedPartSecurityEvent.isSigned()) {
                 return true;
@@ -108,7 +108,7 @@ public class ProtectionOrderAssertionState extends AssertionState implements Ass
             }
             List<XMLSecurityConstants.ContentType> contentTypes = encryptedElementSecurityEvent.getProtectionOrder();
             testProtectionOrder(protectionOrder, contentTypes, encryptedElementSecurityEvent.getElementPath());
-        } else if (WSSecurityEventConstants.EncryptedPart.equals(event)) {
+        } else if (WSSecurityEventConstants.ENCRYPTED_PART.equals(event)) {
             EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
             if (!encryptedPartSecurityEvent.isEncrypted()) {
                 return true;

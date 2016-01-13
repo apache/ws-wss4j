@@ -62,10 +62,10 @@ public class IssuedTokenAssertionState extends TokenAssertionState {
     @Override
     public SecurityEventConstants.Event[] getSecurityEventType() {
         return new SecurityEventConstants.Event[]{
-                WSSecurityEventConstants.KerberosToken,
-                WSSecurityEventConstants.RelToken,
-                WSSecurityEventConstants.SamlToken,
-                WSSecurityEventConstants.SecurityContextToken,
+                WSSecurityEventConstants.KERBEROS_TOKEN,
+                WSSecurityEventConstants.REL_TOKEN,
+                WSSecurityEventConstants.SAML_TOKEN,
+                WSSecurityEventConstants.SECURITY_CONTEXT_TOKEN,
         };
     }
 

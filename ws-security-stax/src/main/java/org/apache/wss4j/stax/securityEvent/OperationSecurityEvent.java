@@ -27,7 +27,7 @@ public class OperationSecurityEvent extends SecurityEvent {
     private QName operation;
 
     public OperationSecurityEvent() {
-        super(WSSecurityEventConstants.Operation);
+        super(WSSecurityEventConstants.OPERATION);
     }
 
     public QName getOperation() {

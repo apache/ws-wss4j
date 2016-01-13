@@ -59,7 +59,7 @@ public class KerberosTokenAssertionState extends TokenAssertionState {
     @Override
     public SecurityEventConstants.Event[] getSecurityEventType() {
         return new SecurityEventConstants.Event[]{
-                WSSecurityEventConstants.KerberosToken
+                WSSecurityEventConstants.KERBEROS_TOKEN
         };
     }
 

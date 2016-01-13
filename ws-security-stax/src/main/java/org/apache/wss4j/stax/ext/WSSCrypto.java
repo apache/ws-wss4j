@@ -35,7 +35,7 @@ import org.apache.xml.security.stax.config.ConfigurationProperties;
  */
 class WSSCrypto {
 
-    protected static final transient org.slf4j.Logger log =
+    protected static final transient org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSCrypto.class);
 
     private Class<? extends Merlin> cryptoClass = Merlin.class;

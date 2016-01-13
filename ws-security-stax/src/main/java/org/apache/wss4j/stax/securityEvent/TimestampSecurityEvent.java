@@ -28,7 +28,7 @@ public class TimestampSecurityEvent extends SecurityEvent {
     private Calendar expires;
 
     public TimestampSecurityEvent() {
-        super(WSSecurityEventConstants.Timestamp);
+        super(WSSecurityEventConstants.TIMESTAMP);
     }
 
     public Calendar getCreated() {

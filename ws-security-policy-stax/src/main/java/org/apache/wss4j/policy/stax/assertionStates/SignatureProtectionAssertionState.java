@@ -86,15 +86,15 @@ public class SignatureProtectionAssertionState extends AssertionState implements
         return new SecurityEventConstants.Event[]{
                 WSSecurityEventConstants.EncryptedElement,
                 WSSecurityEventConstants.EncryptedKeyToken,
-                WSSecurityEventConstants.IssuedToken,
-                WSSecurityEventConstants.KerberosToken,
+                WSSecurityEventConstants.ISSUED_TOKEN,
+                WSSecurityEventConstants.KERBEROS_TOKEN,
                 SecurityEventConstants.KeyValueToken,
-                WSSecurityEventConstants.RelToken,
-                WSSecurityEventConstants.SamlToken,
-                WSSecurityEventConstants.SecurityContextToken,
-                WSSecurityEventConstants.UsernameToken,
+                WSSecurityEventConstants.REL_TOKEN,
+                WSSecurityEventConstants.SAML_TOKEN,
+                WSSecurityEventConstants.SECURITY_CONTEXT_TOKEN,
+                WSSecurityEventConstants.USERNAME_TOKEN,
                 SecurityEventConstants.X509Token,
-                WSSecurityEventConstants.Operation,
+                WSSecurityEventConstants.OPERATION,
         };
     }
 

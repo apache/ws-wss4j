@@ -71,6 +71,7 @@ import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.OutboundSecurityToken;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenConstants.TokenUsage;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 /**
@@ -156,7 +157,8 @@ public class OutboundWSSec {
      * @throws WSSecurityException thrown when a Security failure occurs
      */
     public XMLStreamWriter processOutMessage(
-            XMLStreamWriter xmlStreamWriter, String encoding, OutboundSecurityContext outbounSecurityContext) throws WSSecurityException {
+            XMLStreamWriter xmlStreamWriter, String encoding, OutboundSecurityContext outbounSecurityContext) 
+                throws WSSecurityException {
         return processOutMessage((Object) xmlStreamWriter, encoding, outbounSecurityContext);
     }
 
@@ -257,7 +259,8 @@ public class OutboundWSSec {
                         }
                         encryptionAction = true;
                         derivedEncryption = true;
-                    } else if (securityProperties.getDerivedKeyTokenReference() == WSSConstants.DerivedKeyTokenReference.SecurityContextToken) {
+                    } else if (securityProperties.getDerivedKeyTokenReference() 
+                        == WSSConstants.DerivedKeyTokenReference.SecurityContextToken) {
                         final SecurityContextTokenOutputProcessor securityContextTokenOutputProcessor =
                                 new SecurityContextTokenOutputProcessor();
                         initializeOutputProcessor(outputProcessorChain, securityContextTokenOutputProcessor, action);
@@ -284,7 +287,8 @@ public class OutboundWSSec {
                         encryptedKeyOutputProcessor = new EncryptedKeyOutputProcessor();
                         initializeOutputProcessor(outputProcessorChain, encryptedKeyOutputProcessor, action);
 
-                    } else if (securityProperties.getDerivedKeyTokenReference() == WSSConstants.DerivedKeyTokenReference.SecurityContextToken) {
+                    } else if (securityProperties.getDerivedKeyTokenReference() 
+                        == WSSConstants.DerivedKeyTokenReference.SecurityContextToken) {
                         final SecurityContextTokenOutputProcessor securityContextTokenOutputProcessor =
                                 new SecurityContextTokenOutputProcessor();
                         initializeOutputProcessor(outputProcessorChain, securityContextTokenOutputProcessor, action);
@@ -679,7 +683,8 @@ public class OutboundWSSec {
                     @SuppressWarnings("unchecked")
                     TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent
                         = (TokenSecurityEvent<? extends SecurityToken>) securityEvent;
-                    if (!tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_MainSignature)) {
+                    TokenUsage mainSig = WSSecurityTokenConstants.TokenUsage_MainSignature;
+                    if (!tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(mainSig)) {
                         continue;
                     }
                     X509Certificate[] x509Certificates = tokenSecurityEvent.getSecurityToken().getX509Certificates();
@@ -701,7 +706,8 @@ public class OutboundWSSec {
                     @SuppressWarnings("unchecked")
                     TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent
                         = (TokenSecurityEvent<? extends SecurityToken>) securityEvent;
-                    if (!tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_MainSignature)) {
+                    TokenUsage mainSig = WSSecurityTokenConstants.TokenUsage_MainSignature;
+                    if (!tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(mainSig)) {
                         continue;
                     }
                     PublicKey publicKey = tokenSecurityEvent.getSecurityToken().getPublicKey();

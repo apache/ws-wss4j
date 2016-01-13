@@ -55,20 +55,20 @@ import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
  */
 public class InboundWSSec {
 
-    protected static final transient org.slf4j.Logger log =
+    protected static final transient org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(InboundWSSec.class);
 
-    private static final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+    private static final XMLInputFactory XML_INPUT_FACTORY = XMLInputFactory.newInstance();
 
     static {
-        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
-        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+        XML_INPUT_FACTORY.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        XML_INPUT_FACTORY.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
         try {
-            xmlInputFactory.setProperty("org.codehaus.stax2.internNames", true);
-            xmlInputFactory.setProperty("org.codehaus.stax2.internNsUris", true);
-            xmlInputFactory.setProperty("org.codehaus.stax2.preserveLocation", false);
+            XML_INPUT_FACTORY.setProperty("org.codehaus.stax2.internNames", true);
+            XML_INPUT_FACTORY.setProperty("org.codehaus.stax2.internNsUris", true);
+            XML_INPUT_FACTORY.setProperty("org.codehaus.stax2.preserveLocation", false);
         } catch (IllegalArgumentException e) {
-            log.debug(e.getMessage(), e);
+            LOG.debug(e.getMessage(), e);
             //ignore
         }
     }
@@ -204,7 +204,7 @@ public class InboundWSSec {
                         final TokenSecurityEvent<? extends InboundSecurityToken> tokenSecurityEvent =
                                 (TokenSecurityEvent<? extends InboundSecurityToken>)securityEvent;
 
-                        if (WSSecurityEventConstants.HttpsToken.equals(securityEvent.getSecurityEventType())) {
+                        if (WSSecurityEventConstants.HTTPS_TOKEN.equals(securityEvent.getSecurityEventType())) {
                             securityContextImpl.registerSecurityEvent(securityEvent);
                             securityContextImpl.put(WSSConstants.TRANSPORT_SECURITY_ACTIVE, Boolean.TRUE);
                         }
@@ -238,7 +238,7 @@ public class InboundWSSec {
             }
         }
 
-        securityContextImpl.put(WSSConstants.XMLINPUTFACTORY, xmlInputFactory);
+        securityContextImpl.put(WSSConstants.XMLINPUTFACTORY, XML_INPUT_FACTORY);
 
         DocumentContextImpl documentContext = new DocumentContextImpl();
         documentContext.setEncoding(xmlStreamReader.getEncoding() != null ? xmlStreamReader.getEncoding() : StandardCharsets.UTF_8.name());
@@ -251,7 +251,7 @@ public class InboundWSSec {
             inputProcessorChain.addProcessor(new SignatureConfirmationInputProcessor(securityProperties));
         }
 
-        if (log.isTraceEnabled()) {
+        if (LOG.isTraceEnabled()) {
             LogInputProcessor logInputProcessor = new LogInputProcessor(securityProperties);
             logInputProcessor.addAfterProcessor(SecurityHeaderInputProcessor.class.getName());
             inputProcessorChain.addProcessor(logInputProcessor);

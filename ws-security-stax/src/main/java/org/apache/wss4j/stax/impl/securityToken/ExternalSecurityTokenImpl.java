@@ -70,7 +70,8 @@ public class ExternalSecurityTokenImpl extends AbstractInboundSecurityToken {
     }
 
     @Override
-    protected Key getKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage, String correlationID) throws XMLSecurityException {
+    protected Key getKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage algorithmUsage, String correlationID) 
+        throws XMLSecurityException {
         String keyAlgorithm = JCEMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
         return new SecretKeySpec(key, keyAlgorithm);
     }

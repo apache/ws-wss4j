@@ -79,7 +79,7 @@ public class RequiredElementsAssertionState extends AssertionState implements As
     @Override
     public SecurityEventConstants.Event[] getSecurityEventType() {
         return new SecurityEventConstants.Event[]{
-                WSSecurityEventConstants.RequiredElement
+                WSSecurityEventConstants.REQUIRED_ELEMENT
         };
     }
 

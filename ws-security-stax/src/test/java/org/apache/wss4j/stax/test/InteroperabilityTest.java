@@ -104,11 +104,11 @@ public class InteroperabilityTest extends AbstractTestBase {
                 WSSecurityEventConstants.X509Token,
                 WSSecurityEventConstants.X509Token,
                 WSSecurityEventConstants.SignatureValue,
-                WSSecurityEventConstants.Timestamp,
+                WSSecurityEventConstants.TIMESTAMP,
                 WSSecurityEventConstants.SignedElement,
-                WSSecurityEventConstants.SignedPart,
-                WSSecurityEventConstants.EncryptedPart,
-                WSSecurityEventConstants.Operation,
+                WSSecurityEventConstants.SIGNED_PART,
+                WSSecurityEventConstants.ENCRYPTED_PART,
+                WSSecurityEventConstants.OPERATION,
         };
         final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
         Document document = doInboundSecurity(securityProperties,
@@ -127,11 +127,11 @@ public class InteroperabilityTest extends AbstractTestBase {
         ));
         securityEventListener.compare();
 
-        EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
+        EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.ENCRYPTED_PART);
         List<SignedElementSecurityEvent> signedElementSecurityEventList = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SignedElement);
-        List<SignedPartSecurityEvent> signedPartSecurityEventList = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SignedPart);
+        List<SignedPartSecurityEvent> signedPartSecurityEventList = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SIGNED_PART);
         SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
-        OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+        OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.OPERATION);
         String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
         String signedElementCorrelationID1 = signedElementSecurityEventList.get(0).getCorrelationID();
         String signedElementCorrelationID2 = signedPartSecurityEventList.get(0).getCorrelationID();
@@ -205,11 +205,11 @@ public class InteroperabilityTest extends AbstractTestBase {
                 WSSecurityEventConstants.X509Token,
                 WSSecurityEventConstants.X509Token,
                 WSSecurityEventConstants.SignatureValue,
-                WSSecurityEventConstants.Timestamp,
+                WSSecurityEventConstants.TIMESTAMP,
                 WSSecurityEventConstants.SignedElement,
-                WSSecurityEventConstants.SignedPart,
-                WSSecurityEventConstants.EncryptedPart,
-                WSSecurityEventConstants.Operation,
+                WSSecurityEventConstants.SIGNED_PART,
+                WSSecurityEventConstants.ENCRYPTED_PART,
+                WSSecurityEventConstants.OPERATION,
         };
         final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
         Document document = doInboundSecurity(
@@ -263,11 +263,11 @@ public class InteroperabilityTest extends AbstractTestBase {
                 WSSecurityEventConstants.X509Token,
                 WSSecurityEventConstants.EncryptedElement,
                 WSSecurityEventConstants.SignatureValue,
-                WSSecurityEventConstants.Timestamp,
+                WSSecurityEventConstants.TIMESTAMP,
                 WSSecurityEventConstants.SignedElement,
-                WSSecurityEventConstants.SignedPart,
-                WSSecurityEventConstants.EncryptedPart,
-                WSSecurityEventConstants.Operation,
+                WSSecurityEventConstants.SIGNED_PART,
+                WSSecurityEventConstants.ENCRYPTED_PART,
+                WSSecurityEventConstants.OPERATION,
         };
         final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
         Document document = doInboundSecurity(
@@ -288,11 +288,11 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityEventListener.compare();
 
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedElement);
-        EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
+        EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.ENCRYPTED_PART);
         List<SignedElementSecurityEvent> signedElementSecurityEventList = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SignedElement);
-        List<SignedPartSecurityEvent> signedPartSecurityEventList = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SignedPart);
+        List<SignedPartSecurityEvent> signedPartSecurityEventList = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SIGNED_PART);
         SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
-        OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+        OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.OPERATION);
         String encryptedElementCorrelationID = encryptedElementSecurityEvent.getCorrelationID();
         String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
         String signedElementCorrelationID1 = signedElementSecurityEventList.get(0).getCorrelationID();
@@ -405,11 +405,11 @@ public class InteroperabilityTest extends AbstractTestBase {
                 WSSecurityEventConstants.AlgorithmSuite,
                 WSSecurityEventConstants.X509Token,
                 WSSecurityEventConstants.X509Token,
-                WSSecurityEventConstants.Timestamp,
+                WSSecurityEventConstants.TIMESTAMP,
                 WSSecurityEventConstants.SignatureValue,
-                WSSecurityEventConstants.SignedPart,
-                WSSecurityEventConstants.EncryptedPart,
-                WSSecurityEventConstants.Operation,
+                WSSecurityEventConstants.SIGNED_PART,
+                WSSecurityEventConstants.ENCRYPTED_PART,
+                WSSecurityEventConstants.OPERATION,
         };
         final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
         Document document = doInboundSecurity(
@@ -428,10 +428,10 @@ public class InteroperabilityTest extends AbstractTestBase {
         ));
         securityEventListener.compare();
 
-        EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
-        List<SignedPartSecurityEvent> signedPartSecurityEvents = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SignedPart);
+        EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.ENCRYPTED_PART);
+        List<SignedPartSecurityEvent> signedPartSecurityEvents = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SIGNED_PART);
         SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
-        OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+        OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.OPERATION);
         String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
         String signedElementCorrelationID1 = signedPartSecurityEvents.get(0).getCorrelationID();
         String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
@@ -576,11 +576,11 @@ public class InteroperabilityTest extends AbstractTestBase {
                 WSSecurityEventConstants.X509Token,
                 WSSecurityEventConstants.SignatureValue,
                 WSSecurityEventConstants.EncryptedElement,
-                WSSecurityEventConstants.Timestamp,
+                WSSecurityEventConstants.TIMESTAMP,
                 WSSecurityEventConstants.SignedElement,
-                WSSecurityEventConstants.SignedPart,
-                WSSecurityEventConstants.EncryptedPart,
-                WSSecurityEventConstants.Operation,
+                WSSecurityEventConstants.SIGNED_PART,
+                WSSecurityEventConstants.ENCRYPTED_PART,
+                WSSecurityEventConstants.OPERATION,
         };
         final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
         Document document = doInboundSecurity(
@@ -599,11 +599,11 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityEventListener.compare();
 
         EncryptedElementSecurityEvent encryptedElementSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedElement);
-        EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
+        EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.ENCRYPTED_PART);
         List<SignedElementSecurityEvent> signedElementSecurityEvents = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SignedElement);
-        List<SignedPartSecurityEvent> signedPartSecurityEvents = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SignedPart);
+        List<SignedPartSecurityEvent> signedPartSecurityEvents = securityEventListener.getSecurityEvents(WSSecurityEventConstants.SIGNED_PART);
         SignatureValueSecurityEvent signatureValueSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.SignatureValue);
-        OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+        OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.OPERATION);
         String encryptedElementCorrelationID = encryptedElementSecurityEvent.getCorrelationID();
         String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
         String signedElementCorrelationID1 = signedElementSecurityEvents.get(0).getCorrelationID();
@@ -848,8 +848,8 @@ public class InteroperabilityTest extends AbstractTestBase {
                         WSSecurityEventConstants.X509Token,
                         WSSecurityEventConstants.X509Token,
                         WSSecurityEventConstants.SignatureValue,
-                        WSSecurityEventConstants.EncryptedPart,
-                        WSSecurityEventConstants.Operation,
+                        WSSecurityEventConstants.ENCRYPTED_PART,
+                        WSSecurityEventConstants.OPERATION,
                         WSSecurityEventConstants.AlgorithmSuite,
                         WSSecurityEventConstants.AlgorithmSuite,
                         WSSecurityEventConstants.SignedElement,
@@ -975,11 +975,11 @@ public class InteroperabilityTest extends AbstractTestBase {
                 WSSecurityEventConstants.X509Token,
                 WSSecurityEventConstants.X509Token,
                 WSSecurityEventConstants.SignatureValue,
-                WSSecurityEventConstants.Timestamp,
+                WSSecurityEventConstants.TIMESTAMP,
                 WSSecurityEventConstants.SignedElement,
-                WSSecurityEventConstants.SignedPart,
-                WSSecurityEventConstants.EncryptedPart,
-                WSSecurityEventConstants.Operation,
+                WSSecurityEventConstants.SIGNED_PART,
+                WSSecurityEventConstants.ENCRYPTED_PART,
+                WSSecurityEventConstants.OPERATION,
         };
         final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
         Document document = doInboundSecurity(
@@ -1020,8 +1020,8 @@ public class InteroperabilityTest extends AbstractTestBase {
         securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
 
         WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
-                WSSecurityEventConstants.NoSecurity,
-                WSSecurityEventConstants.Operation
+                WSSecurityEventConstants.NO_SECURITY,
+                WSSecurityEventConstants.OPERATION
         };
         final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
         Document document = doInboundSecurity(
@@ -1073,11 +1073,11 @@ public class InteroperabilityTest extends AbstractTestBase {
                 WSSecurityEventConstants.X509Token,
                 WSSecurityEventConstants.X509Token,
                 WSSecurityEventConstants.SignatureValue,
-                WSSecurityEventConstants.Timestamp,
+                WSSecurityEventConstants.TIMESTAMP,
                 WSSecurityEventConstants.SignedElement,
-                WSSecurityEventConstants.SignedPart,
-                WSSecurityEventConstants.EncryptedPart,
-                WSSecurityEventConstants.Operation,
+                WSSecurityEventConstants.SIGNED_PART,
+                WSSecurityEventConstants.ENCRYPTED_PART,
+                WSSecurityEventConstants.OPERATION,
         };
         final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
         Document document = doInboundSecurity(
