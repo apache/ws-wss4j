@@ -29,6 +29,6 @@ public class SignedPartSecurityEvent extends AbstractSecuredElementSecurityEvent
     public SignedPartSecurityEvent(
             InboundSecurityToken inboundSecurityToken, boolean signed,
             List<XMLSecurityConstants.ContentType> protectionOrder) {
-        super(WSSecurityEventConstants.SignedPart, inboundSecurityToken, protectionOrder, signed, false);
+        super(WSSecurityEventConstants.SIGNED_PART, inboundSecurityToken, protectionOrder, signed, false);
     }
 }

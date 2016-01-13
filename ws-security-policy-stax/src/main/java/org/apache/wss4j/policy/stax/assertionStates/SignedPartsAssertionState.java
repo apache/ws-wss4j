@@ -68,7 +68,7 @@ public class SignedPartsAssertionState extends AssertionState implements Asserta
     @Override
     public SecurityEventConstants.Event[] getSecurityEventType() {
         return new SecurityEventConstants.Event[]{
-                WSSecurityEventConstants.SignedPart
+                WSSecurityEventConstants.SIGNED_PART
         };
     }
 

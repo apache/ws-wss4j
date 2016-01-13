@@ -171,8 +171,8 @@ public class EncDecryptionTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.X509Token,
-                    WSSecurityEventConstants.EncryptedPart,
-                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.ENCRYPTED_PART,
+                    WSSecurityEventConstants.OPERATION,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
 
@@ -192,10 +192,10 @@ public class EncDecryptionTest extends AbstractTestBase {
             List<SecurityEvent> receivedSecurityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < receivedSecurityEvents.size(); i++) {
                 SecurityEvent securityEvent = receivedSecurityEvents.get(i);
-                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.Operation) {
+                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.OPERATION) {
                     OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
                     Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
-                } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.EncryptedPart) {
+                } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.ENCRYPTED_PART) {
                     EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
                     Assert.assertNotNull(encryptedPartSecurityEvent.getXmlSecEvent());
                     Assert.assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
@@ -207,8 +207,8 @@ public class EncDecryptionTest extends AbstractTestBase {
                 }
             }
 
-            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
-            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.ENCRYPTED_PART);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.OPERATION);
             String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
@@ -317,8 +317,8 @@ public class EncDecryptionTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.X509Token,
-                    WSSecurityEventConstants.EncryptedPart,
-                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.ENCRYPTED_PART,
+                    WSSecurityEventConstants.OPERATION,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
 
@@ -338,10 +338,10 @@ public class EncDecryptionTest extends AbstractTestBase {
             List<SecurityEvent> receivedSecurityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < receivedSecurityEvents.size(); i++) {
                 SecurityEvent securityEvent = receivedSecurityEvents.get(i);
-                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.Operation) {
+                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.OPERATION) {
                     OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
                     Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
-                } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.EncryptedPart) {
+                } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.ENCRYPTED_PART) {
                     EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
                     Assert.assertNotNull(encryptedPartSecurityEvent.getXmlSecEvent());
                     Assert.assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
@@ -353,8 +353,8 @@ public class EncDecryptionTest extends AbstractTestBase {
                 }
             }
 
-            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
-            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.ENCRYPTED_PART);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.OPERATION);
             String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
@@ -454,7 +454,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
                     WSSecurityEventConstants.X509Token,
-                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.OPERATION,
                     WSSecurityEventConstants.X509Token,
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
@@ -526,7 +526,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             List<SecurityEvent> receivedSecurityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < receivedSecurityEvents.size(); i++) {
                 SecurityEvent securityEvent = receivedSecurityEvents.get(i);
-                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.Operation) {
+                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.OPERATION) {
                     OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
                     Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
                 } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.ContentEncrypted) {
@@ -542,7 +542,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             }
 
             List<ContentEncryptedElementSecurityEvent> contentEncryptedElementSecurityEventList = securityEventListener.getSecurityEvents(SecurityEventConstants.ContentEncrypted);
-            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.OPERATION);
             String encryptedPartCorrelationID1 = contentEncryptedElementSecurityEventList.get(0).getCorrelationID();
             String encryptedPartCorrelationID2 = contentEncryptedElementSecurityEventList.get(1).getCorrelationID();
             String encryptedPartCorrelationID3 = contentEncryptedElementSecurityEventList.get(2).getCorrelationID();
@@ -769,7 +769,7 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
                     WSSecurityEventConstants.X509Token,
-                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.OPERATION,
                     WSSecurityEventConstants.X509Token,
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
@@ -841,7 +841,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             List<SecurityEvent> receivedSecurityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < receivedSecurityEvents.size(); i++) {
                 SecurityEvent securityEvent = receivedSecurityEvents.get(i);
-                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.Operation) {
+                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.OPERATION) {
                     OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
                     Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
                 } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.EncryptedElement) {
@@ -888,8 +888,8 @@ public class EncDecryptionTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.X509Token,
-                    WSSecurityEventConstants.EncryptedPart,
-                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.ENCRYPTED_PART,
+                    WSSecurityEventConstants.OPERATION,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
 
@@ -909,10 +909,10 @@ public class EncDecryptionTest extends AbstractTestBase {
             List<SecurityEvent> receivedSecurityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < receivedSecurityEvents.size(); i++) {
                 SecurityEvent securityEvent = receivedSecurityEvents.get(i);
-                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.Operation) {
+                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.OPERATION) {
                     OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
                     Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
-                } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.EncryptedPart) {
+                } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.ENCRYPTED_PART) {
                     EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
                     Assert.assertNotNull(encryptedPartSecurityEvent.getXmlSecEvent());
                     Assert.assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
@@ -924,8 +924,8 @@ public class EncDecryptionTest extends AbstractTestBase {
                 }
             }
 
-            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
-            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.ENCRYPTED_PART);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.OPERATION);
             String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
@@ -1763,8 +1763,8 @@ public class EncDecryptionTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.X509Token,
-                    WSSecurityEventConstants.EncryptedPart,
-                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.ENCRYPTED_PART,
+                    WSSecurityEventConstants.OPERATION,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
 
@@ -1784,10 +1784,10 @@ public class EncDecryptionTest extends AbstractTestBase {
             List<SecurityEvent> receivedSecurityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < receivedSecurityEvents.size(); i++) {
                 SecurityEvent securityEvent = receivedSecurityEvents.get(i);
-                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.Operation) {
+                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.OPERATION) {
                     OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
                     Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
-                } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.EncryptedPart) {
+                } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.ENCRYPTED_PART) {
                     EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
                     Assert.assertNotNull(encryptedPartSecurityEvent.getXmlSecEvent());
                     Assert.assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
@@ -1799,8 +1799,8 @@ public class EncDecryptionTest extends AbstractTestBase {
                 }
             }
 
-            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
-            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.ENCRYPTED_PART);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.OPERATION);
             String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
@@ -2448,8 +2448,8 @@ public class EncDecryptionTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.X509Token,
-                    WSSecurityEventConstants.EncryptedPart,
-                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.ENCRYPTED_PART,
+                    WSSecurityEventConstants.OPERATION,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
 
@@ -2476,10 +2476,10 @@ public class EncDecryptionTest extends AbstractTestBase {
             List<SecurityEvent> receivedSecurityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < receivedSecurityEvents.size(); i++) {
                 SecurityEvent securityEvent = receivedSecurityEvents.get(i);
-                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.Operation) {
+                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.OPERATION) {
                     OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
                     Assert.assertEquals(operationSecurityEvent.getOperation(), new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"));
-                } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.EncryptedPart) {
+                } else if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.ENCRYPTED_PART) {
                     EncryptedPartSecurityEvent encryptedPartSecurityEvent = (EncryptedPartSecurityEvent) securityEvent;
                     Assert.assertNotNull(encryptedPartSecurityEvent.getXmlSecEvent());
                     Assert.assertNotNull(encryptedPartSecurityEvent.getSecurityToken());
@@ -2491,8 +2491,8 @@ public class EncDecryptionTest extends AbstractTestBase {
                 }
             }
 
-            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.EncryptedPart);
-            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.Operation);
+            EncryptedPartSecurityEvent encryptedPartSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.ENCRYPTED_PART);
+            OperationSecurityEvent operationSecurityEvent = securityEventListener.getSecurityEvent(WSSecurityEventConstants.OPERATION);
             String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 

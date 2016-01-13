@@ -26,7 +26,7 @@ import org.apache.wss4j.stax.securityToken.SamlSecurityToken;
 public class SamlTokenSecurityEvent extends IssuedTokenSecurityEvent<SamlSecurityToken> {
 
     public SamlTokenSecurityEvent() {
-        super(WSSecurityEventConstants.SamlToken);
+        super(WSSecurityEventConstants.SAML_TOKEN);
     }
 
     @Override

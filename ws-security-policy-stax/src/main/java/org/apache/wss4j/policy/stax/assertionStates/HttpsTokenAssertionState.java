@@ -54,7 +54,7 @@ public class HttpsTokenAssertionState extends TokenAssertionState {
     @Override
     public SecurityEventConstants.Event[] getSecurityEventType() {
         return new SecurityEventConstants.Event[]{
-                WSSecurityEventConstants.HttpsToken
+                WSSecurityEventConstants.HTTPS_TOKEN
         };
     }
 

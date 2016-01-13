@@ -56,7 +56,7 @@ public class IncludeTimeStampAssertionState extends AssertionState implements As
     @Override
     public SecurityEventConstants.Event[] getSecurityEventType() {
         return new SecurityEventConstants.Event[]{
-                WSSecurityEventConstants.Timestamp
+                WSSecurityEventConstants.TIMESTAMP
         };
     }
 

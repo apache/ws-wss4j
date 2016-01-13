@@ -83,8 +83,8 @@ public class PrincipalTest extends AbstractTestBase {
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
             WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
-                    WSSecurityEventConstants.UsernameToken,
-                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.USERNAME_TOKEN,
+                    WSSecurityEventConstants.OPERATION,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
@@ -93,7 +93,7 @@ public class PrincipalTest extends AbstractTestBase {
 
             // Check principal
             UsernameTokenSecurityEvent event =
-                (UsernameTokenSecurityEvent)securityEventListener.getSecurityEvent(WSSecurityEventConstants.UsernameToken);
+                (UsernameTokenSecurityEvent)securityEventListener.getSecurityEvent(WSSecurityEventConstants.USERNAME_TOKEN);
             Assert.assertNotNull(event);
             UsernameSecurityToken usernameSecurityToken = event.getSecurityToken();
             Principal principal = usernameSecurityToken.getPrincipal();
@@ -141,8 +141,8 @@ public class PrincipalTest extends AbstractTestBase {
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
             WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
-                WSSecurityEventConstants.SamlToken,
-                WSSecurityEventConstants.Operation,
+                WSSecurityEventConstants.SAML_TOKEN,
+                WSSecurityEventConstants.OPERATION,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
@@ -151,7 +151,7 @@ public class PrincipalTest extends AbstractTestBase {
 
             // Check principal
             SamlTokenSecurityEvent event =
-                (SamlTokenSecurityEvent)securityEventListener.getSecurityEvent(WSSecurityEventConstants.SamlToken);
+                (SamlTokenSecurityEvent)securityEventListener.getSecurityEvent(WSSecurityEventConstants.SAML_TOKEN);
             Assert.assertNotNull(event);
             SamlSecurityToken token = event.getSecurityToken();
 
@@ -187,7 +187,7 @@ public class PrincipalTest extends AbstractTestBase {
 
             WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
                 WSSecurityEventConstants.X509Token,
-                WSSecurityEventConstants.Operation,
+                WSSecurityEventConstants.OPERATION,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
@@ -233,7 +233,7 @@ public class PrincipalTest extends AbstractTestBase {
 
             WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
                     WSSecurityEventConstants.KeyValueToken,
-                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.OPERATION,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
@@ -281,7 +281,7 @@ public class PrincipalTest extends AbstractTestBase {
 
             WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
                     WSSecurityEventConstants.KeyValueToken,
-                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.OPERATION,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
@@ -340,7 +340,7 @@ public class PrincipalTest extends AbstractTestBase {
 
             WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
                     WSSecurityEventConstants.KeyValueToken,
-                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.OPERATION,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);

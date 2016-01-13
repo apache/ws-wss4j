@@ -69,7 +69,7 @@ public class RequiredPartsAssertionState extends AssertionState implements Asser
     @Override
     public SecurityEventConstants.Event[] getSecurityEventType() {
         return new SecurityEventConstants.Event[]{
-                WSSecurityEventConstants.RequiredPart
+                WSSecurityEventConstants.REQUIRED_PART
         };
     }
 

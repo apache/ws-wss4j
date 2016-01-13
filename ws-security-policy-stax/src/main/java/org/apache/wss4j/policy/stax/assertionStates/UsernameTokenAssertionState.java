@@ -69,7 +69,7 @@ public class UsernameTokenAssertionState extends TokenAssertionState {
     @Override
     public SecurityEventConstants.Event[] getSecurityEventType() {
         return new SecurityEventConstants.Event[]{
-                WSSecurityEventConstants.UsernameToken
+                WSSecurityEventConstants.USERNAME_TOKEN
         };
     }
 

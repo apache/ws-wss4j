@@ -29,6 +29,6 @@ public class EncryptedPartSecurityEvent extends AbstractSecuredElementSecurityEv
     public EncryptedPartSecurityEvent(
             InboundSecurityToken inboundSecurityToken, boolean encrypted,
             List<XMLSecurityConstants.ContentType> protectionOrder) {
-        super(WSSecurityEventConstants.EncryptedPart, inboundSecurityToken, protectionOrder, false, encrypted);
+        super(WSSecurityEventConstants.ENCRYPTED_PART, inboundSecurityToken, protectionOrder, false, encrypted);
     }
 }

@@ -24,6 +24,6 @@ import org.apache.xml.security.stax.securityToken.SecurityToken;
 public class DerivedKeyTokenSecurityEvent extends TokenSecurityEvent<SecurityToken> {
 
     public DerivedKeyTokenSecurityEvent() {
-        super(WSSecurityEventConstants.DerivedKeyToken);
+        super(WSSecurityEventConstants.DERIVED_KEY_TOKEN);
     }
 }

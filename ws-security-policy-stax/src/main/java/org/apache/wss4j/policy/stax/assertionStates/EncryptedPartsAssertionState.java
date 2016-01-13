@@ -68,7 +68,7 @@ public class EncryptedPartsAssertionState extends AssertionState implements Asse
     @Override
     public SecurityEventConstants.Event[] getSecurityEventType() {
         return new SecurityEventConstants.Event[]{
-                WSSecurityEventConstants.EncryptedPart
+                WSSecurityEventConstants.ENCRYPTED_PART
         };
     }
 

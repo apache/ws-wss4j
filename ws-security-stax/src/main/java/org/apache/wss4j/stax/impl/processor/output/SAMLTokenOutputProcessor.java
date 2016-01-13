@@ -296,7 +296,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
                 //fire a tokenSecurityEvent
                 TokenSecurityEvent<OutboundSecurityToken> tokenSecurityEvent =
-                    new TokenSecurityEvent<OutboundSecurityToken>(WSSecurityEventConstants.SamlToken) {
+                    new TokenSecurityEvent<OutboundSecurityToken>(WSSecurityEventConstants.SAML_TOKEN) {
 
                     public OutboundSecurityToken getSecurityToken() {
                         try {

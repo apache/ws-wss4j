@@ -62,7 +62,7 @@ public class SamlTokenAssertionState extends TokenAssertionState {
     @Override
     public SecurityEventConstants.Event[] getSecurityEventType() {
         return new SecurityEventConstants.Event[]{
-                WSSecurityEventConstants.SamlToken
+                WSSecurityEventConstants.SAML_TOKEN
         };
     }
 

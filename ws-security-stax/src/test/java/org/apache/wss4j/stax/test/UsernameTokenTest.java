@@ -90,8 +90,8 @@ public class UsernameTokenTest extends AbstractTestBase {
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
             WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
-                    WSSecurityEventConstants.UsernameToken,
-                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.USERNAME_TOKEN,
+                    WSSecurityEventConstants.OPERATION,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
@@ -812,8 +812,8 @@ public class UsernameTokenTest extends AbstractTestBase {
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
 
             WSSecurityEventConstants.Event[] expectedSecurityEvents = new WSSecurityEventConstants.Event[]{
-                    WSSecurityEventConstants.UsernameToken,
-                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.USERNAME_TOKEN,
+                    WSSecurityEventConstants.OPERATION,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);

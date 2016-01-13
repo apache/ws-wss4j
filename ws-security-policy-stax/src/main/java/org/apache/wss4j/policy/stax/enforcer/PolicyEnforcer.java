@@ -736,7 +736,7 @@ public class PolicyEnforcer implements SecurityEventListener {
             }
         }
 
-        if (WSSecurityEventConstants.Operation.equals(securityEvent.getSecurityEventType())) {
+        if (WSSecurityEventConstants.OPERATION.equals(securityEvent.getSecurityEventType())) {
             operationSecurityEventOccured = true;
             final OperationSecurityEvent operationSecurityEvent = (OperationSecurityEvent) securityEvent;
             if (!faultOccurred && (SOAP11_FAULT.equals(operationSecurityEvent.getOperation())

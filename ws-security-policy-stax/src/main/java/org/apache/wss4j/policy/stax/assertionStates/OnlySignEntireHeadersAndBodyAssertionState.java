@@ -64,7 +64,7 @@ public class OnlySignEntireHeadersAndBodyAssertionState extends AssertionState i
     @Override
     public SecurityEventConstants.Event[] getSecurityEventType() {
         return new SecurityEventConstants.Event[]{
-                WSSecurityEventConstants.SignedPart,
+                WSSecurityEventConstants.SIGNED_PART,
                 WSSecurityEventConstants.SignedElement
         };
     }

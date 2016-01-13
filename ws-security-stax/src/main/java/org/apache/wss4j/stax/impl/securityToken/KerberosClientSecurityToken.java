@@ -107,8 +107,7 @@ public class KerberosClientSecurityToken extends GenericOutboundSecurityToken {
                 }
 
                 ticket = krbCtx.getKerberosToken();
-            }
-            catch (PrivilegedActionException e) {
+            } catch (PrivilegedActionException e) {
                 Throwable cause = e.getCause();
                 if (cause instanceof WSSecurityException) {
                     throw (WSSecurityException) cause;

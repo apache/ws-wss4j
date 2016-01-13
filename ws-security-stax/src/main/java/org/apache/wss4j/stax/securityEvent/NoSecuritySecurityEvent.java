@@ -23,6 +23,6 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 public class NoSecuritySecurityEvent extends SecurityEvent {
 
     public NoSecuritySecurityEvent() {
-        super(WSSecurityEventConstants.NoSecurity);
+        super(WSSecurityEventConstants.NO_SECURITY);
     }
 }

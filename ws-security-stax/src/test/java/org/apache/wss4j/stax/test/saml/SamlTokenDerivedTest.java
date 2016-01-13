@@ -122,11 +122,11 @@ public class SamlTokenDerivedTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.X509Token,
-                    WSSecurityEventConstants.SamlToken,
+                    WSSecurityEventConstants.SAML_TOKEN,
                     WSSecurityEventConstants.SignatureValue,
                     WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.SignedPart,
-                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.SIGNED_PART,
+                    WSSecurityEventConstants.OPERATION,
             };
             TestSecurityEventListener testSecurityEventListener = new TestSecurityEventListener(securityEvents);
 

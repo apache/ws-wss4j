@@ -40,7 +40,7 @@ public class SecureConversationTokenAssertionState extends SecurityContextTokenA
     @Override
     public SecurityEventConstants.Event[] getSecurityEventType() {
         return new SecurityEventConstants.Event[]{
-                WSSecurityEventConstants.SecurityContextToken
+                WSSecurityEventConstants.SECURITY_CONTEXT_TOKEN
         };
     }
 

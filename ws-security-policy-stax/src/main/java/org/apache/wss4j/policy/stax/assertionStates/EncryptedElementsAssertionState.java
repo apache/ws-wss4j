@@ -73,7 +73,7 @@ public class EncryptedElementsAssertionState extends AssertionState implements A
     public SecurityEventConstants.Event[] getSecurityEventType() {
         return new SecurityEventConstants.Event[]{
                 WSSecurityEventConstants.EncryptedElement,
-                WSSecurityEventConstants.EncryptedPart
+                WSSecurityEventConstants.ENCRYPTED_PART
         };
     }
 

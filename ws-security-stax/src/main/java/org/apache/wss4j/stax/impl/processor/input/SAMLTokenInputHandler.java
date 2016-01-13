@@ -599,7 +599,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
         @Override
         public void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
-            if (WSSecurityEventConstants.SignedPart.equals(securityEvent.getSecurityEventType())) {
+            if (WSSecurityEventConstants.SIGNED_PART.equals(securityEvent.getSecurityEventType())) {
                 SignedPartSecurityEvent signedPartSecurityEvent = (SignedPartSecurityEvent) securityEvent;
 
                 List<QName> elementPath = signedPartSecurityEvent.getElementPath();

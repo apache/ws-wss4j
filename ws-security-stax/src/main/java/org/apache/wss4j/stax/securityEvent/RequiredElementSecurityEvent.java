@@ -23,6 +23,6 @@ import org.apache.xml.security.stax.securityEvent.AbstractElementSecurityEvent;
 public class RequiredElementSecurityEvent extends AbstractElementSecurityEvent {
 
     public RequiredElementSecurityEvent() {
-        super(WSSecurityEventConstants.RequiredElement);
+        super(WSSecurityEventConstants.REQUIRED_ELEMENT);
     }
 }

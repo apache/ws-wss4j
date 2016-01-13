@@ -160,12 +160,12 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SamlToken,
+                    WSSecurityEventConstants.SAML_TOKEN,
                     WSSecurityEventConstants.X509Token,
                     WSSecurityEventConstants.SignatureValue,
                     WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.SignedPart,
-                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.SIGNED_PART,
+                    WSSecurityEventConstants.OPERATION,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
@@ -273,10 +273,10 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SamlToken,
+                    WSSecurityEventConstants.SAML_TOKEN,
                     WSSecurityEventConstants.SignatureValue,
-                    WSSecurityEventConstants.SignedPart,
-                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.SIGNED_PART,
+                    WSSecurityEventConstants.OPERATION,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
@@ -407,9 +407,9 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SamlToken,
+                    WSSecurityEventConstants.SAML_TOKEN,
                     WSSecurityEventConstants.EncryptedElement,
-                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.OPERATION,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
@@ -492,9 +492,9 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
                      WSSecurityEventConstants.AlgorithmSuite,
                      WSSecurityEventConstants.AlgorithmSuite,
                      WSSecurityEventConstants.AlgorithmSuite,
-                     WSSecurityEventConstants.SamlToken,
+                     WSSecurityEventConstants.SAML_TOKEN,
                      WSSecurityEventConstants.EncryptedElement,
-                     WSSecurityEventConstants.Operation,
+                     WSSecurityEventConstants.OPERATION,
              };
              final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
              XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
@@ -607,12 +607,12 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SamlToken,
+                    WSSecurityEventConstants.SAML_TOKEN,
                     WSSecurityEventConstants.X509Token,
                     WSSecurityEventConstants.SignatureValue,
                     WSSecurityEventConstants.SignedElement,
-                    WSSecurityEventConstants.SignedPart,
-                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.SIGNED_PART,
+                    WSSecurityEventConstants.OPERATION,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
@@ -721,10 +721,10 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SamlToken,
+                    WSSecurityEventConstants.SAML_TOKEN,
                     WSSecurityEventConstants.SignatureValue,
-                    WSSecurityEventConstants.SignedPart,
-                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.SIGNED_PART,
+                    WSSecurityEventConstants.OPERATION,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
@@ -846,10 +846,10 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
                     WSSecurityEventConstants.AlgorithmSuite,
-                    WSSecurityEventConstants.SamlToken,
+                    WSSecurityEventConstants.SAML_TOKEN,
                     WSSecurityEventConstants.SignatureValue,
-                    WSSecurityEventConstants.SignedPart,
-                    WSSecurityEventConstants.Operation,
+                    WSSecurityEventConstants.SIGNED_PART,
+                    WSSecurityEventConstants.OPERATION,
             };
             final TestSecurityEventListener securityEventListener = new TestSecurityEventListener(expectedSecurityEvents);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())), null, securityEventListener);
