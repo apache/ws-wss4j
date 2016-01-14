@@ -41,12 +41,12 @@ public class ResolverSameDocument extends org.apache.xml.security.stax.impl.reso
 
     @Override
     public boolean matches(XMLSecStartElement xmlSecStartElement) {
-        Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_wsu_Id);
+        Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_WSU_ID);
         if (attribute != null && attribute.getValue().equals(getId())) {
             return true;
         }
 
-        attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_NULL_AssertionID);
+        attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_NULL_ASSERTION_ID);
         if (attribute != null && attribute.getValue().equals(getId())) {
             return true;
         }

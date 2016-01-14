@@ -411,7 +411,7 @@ public class WSSec {
             List<SecurePart> signatureParts = securityProperties.getSignatureSecureParts();
             if (signatureParts.isEmpty()) {
                 SecurePart securePart = new SecurePart(
-                    new QName(WSSConstants.NS_SOAP12, WSSConstants.TAG_soap_Body_LocalName),
+                    new QName(WSSConstants.NS_SOAP12, WSSConstants.TAG_SOAP_BODY_LN),
                     SecurePart.Modifier.Element);
                 signatureParts.add(securePart);
             }
@@ -419,7 +419,7 @@ public class WSSec {
             List<SecurePart> encryptionParts = securityProperties.getEncryptionSecureParts();
             if (encryptionParts.isEmpty()) {
                 SecurePart securePart = new SecurePart(
-                    new QName(WSSConstants.NS_SOAP12, WSSConstants.TAG_soap_Body_LocalName),
+                    new QName(WSSConstants.NS_SOAP12, WSSConstants.TAG_SOAP_BODY_LN),
                     SecurePart.Modifier.Content);
                 encryptionParts.add(securePart);
             }

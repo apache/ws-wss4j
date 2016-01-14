@@ -89,7 +89,7 @@ public class SignatureCRLTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -107,7 +107,7 @@ public class SignatureCRLTest extends AbstractTestBase {
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
         }
 
         //done signature; now test sig-verification: This should fail as revocation is enabled

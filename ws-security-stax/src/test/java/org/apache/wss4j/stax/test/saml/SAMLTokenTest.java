@@ -930,7 +930,7 @@ public class SAMLTokenTest extends AbstractTestBase {
 
             // Decrypted Assertion element must be there
             NodeList nodeList =
-                document.getElementsByTagNameNS(WSSConstants.TAG_saml2_Assertion.getNamespaceURI(), WSSConstants.TAG_saml2_Assertion.getLocalPart());
+                document.getElementsByTagNameNS(WSSConstants.TAG_SAML2_ASSERTION.getNamespaceURI(), WSSConstants.TAG_SAML2_ASSERTION.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
         }
     }
@@ -968,8 +968,8 @@ public class SAMLTokenTest extends AbstractTestBase {
 
             SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
             validator.setRequiredSubjectConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
-            securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
-            securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
+            securityProperties.addValidator(WSSConstants.TAG_SAML2_ASSERTION, validator);
+            securityProperties.addValidator(WSSConstants.TAG_SAML_ASSERTION, validator);
 
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
@@ -1013,8 +1013,8 @@ public class SAMLTokenTest extends AbstractTestBase {
 
             SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
             validator.setRequiredSubjectConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
-            securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
-            securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
+            securityProperties.addValidator(WSSConstants.TAG_SAML2_ASSERTION, validator);
+            securityProperties.addValidator(WSSConstants.TAG_SAML_ASSERTION, validator);
 
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
@@ -1079,8 +1079,8 @@ public class SAMLTokenTest extends AbstractTestBase {
 
             SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
             validator.setRequireStandardSubjectConfirmationMethod(false);
-            securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
-            securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
+            securityProperties.addValidator(WSSConstants.TAG_SAML2_ASSERTION, validator);
+            securityProperties.addValidator(WSSConstants.TAG_SAML_ASSERTION, validator);
 
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
@@ -1140,8 +1140,8 @@ public class SAMLTokenTest extends AbstractTestBase {
 
             SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
             validator.setRequireBearerSignature(false);
-            securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
-            securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
+            securityProperties.addValidator(WSSConstants.TAG_SAML2_ASSERTION, validator);
+            securityProperties.addValidator(WSSConstants.TAG_SAML_ASSERTION, validator);
 
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));

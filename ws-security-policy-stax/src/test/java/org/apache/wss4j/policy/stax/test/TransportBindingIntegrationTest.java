@@ -783,7 +783,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
         actions.add(WSSConstants.TIMESTAMP);
@@ -914,8 +914,8 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
         actions.add(WSSConstants.TIMESTAMP);
@@ -1034,8 +1034,8 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
         actions.add(WSSConstants.TIMESTAMP);
@@ -1149,11 +1149,11 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512");
 
-        outSecurityProperties.addSignaturePart(new SecurePart(new QName(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart()), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Created.getNamespaceURI(), WSSConstants.TAG_wsu_Created.getLocalPart()), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Expires.getNamespaceURI(), WSSConstants.TAG_wsu_Expires.getLocalPart()), SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(new QName(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart()), SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_WSU_CREATED.getNamespaceURI(), WSSConstants.TAG_WSU_CREATED.getLocalPart()), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_WSU_EXPIRES.getNamespaceURI(), WSSConstants.TAG_WSU_EXPIRES.getLocalPart()), SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -1267,11 +1267,11 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/2006/12/xml-c14n11");
 
-        outSecurityProperties.addSignaturePart(new SecurePart(new QName(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart()), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body  , SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Created.getNamespaceURI(), WSSConstants.TAG_wsu_Created.getLocalPart()), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Expires.getNamespaceURI(), WSSConstants.TAG_wsu_Expires.getLocalPart()), SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(new QName(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart()), SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY  , SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_WSU_CREATED.getNamespaceURI(), WSSConstants.TAG_WSU_CREATED.getLocalPart()), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_WSU_EXPIRES.getNamespaceURI(), WSSConstants.TAG_WSU_EXPIRES.getLocalPart()), SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -1387,11 +1387,11 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setSignatureDigestAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-md5");
 
-        outSecurityProperties.addSignaturePart(new SecurePart(new QName(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart()), SecurePart.Modifier.Element, new String[]{WSSConstants.NS_C14N_EXCL}, "http://www.w3.org/2001/04/xmldsig-more#md5"));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element, new String[]{WSSConstants.NS_C14N_EXCL}, "http://www.w3.org/2001/04/xmldsig-more#md5"));
-        outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Created.getNamespaceURI(), WSSConstants.TAG_wsu_Created.getLocalPart()), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Expires.getNamespaceURI(), WSSConstants.TAG_wsu_Expires.getLocalPart()), SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(new QName(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart()), SecurePart.Modifier.Element, new String[]{WSSConstants.NS_C14N_EXCL}, "http://www.w3.org/2001/04/xmldsig-more#md5"));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element, new String[]{WSSConstants.NS_C14N_EXCL}, "http://www.w3.org/2001/04/xmldsig-more#md5"));
+        outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_WSU_CREATED.getNamespaceURI(), WSSConstants.TAG_WSU_CREATED.getLocalPart()), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_WSU_EXPIRES.getNamespaceURI(), WSSConstants.TAG_WSU_EXPIRES.getLocalPart()), SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -1509,11 +1509,11 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(new QName(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart()), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Created.getNamespaceURI(), WSSConstants.TAG_wsu_Created.getLocalPart()), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Expires.getNamespaceURI(), WSSConstants.TAG_wsu_Expires.getLocalPart()), SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(new QName(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart()), SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_WSU_CREATED.getNamespaceURI(), WSSConstants.TAG_WSU_CREATED.getLocalPart()), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_WSU_EXPIRES.getNamespaceURI(), WSSConstants.TAG_WSU_EXPIRES.getLocalPart()), SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -1626,11 +1626,11 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(new QName(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart()), SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap12_Body, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Created.getNamespaceURI(), WSSConstants.TAG_wsu_Created.getLocalPart()), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_wsu_Expires.getNamespaceURI(), WSSConstants.TAG_wsu_Expires.getLocalPart()), SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap12_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(new QName(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart()), SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP12_ROLEBody, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_WSU_CREATED.getNamespaceURI(), WSSConstants.TAG_WSU_CREATED.getLocalPart()), SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(new QName(WSSConstants.TAG_WSU_EXPIRES.getNamespaceURI(), WSSConstants.TAG_WSU_EXPIRES.getLocalPart()), SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP12_ROLEBody, SecurePart.Modifier.Content));
         WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
         outSecurityProperties.setActions(actions);
 

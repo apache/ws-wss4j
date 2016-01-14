@@ -80,7 +80,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         Element securityTokenReferenceElement = (Element) keyIdentifierElement.getParentNode();
         securityTokenReferenceElement.removeChild(keyIdentifierElement);
         //wsse:Reference xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" URI="#EncKeyId-1483925398"/>
-        Element referenceElement = securedDocument.createElementNS(WSSConstants.TAG_wsse_Reference.getNamespaceURI(), WSSConstants.TAG_wsse_Reference.getLocalPart());
+        Element referenceElement = securedDocument.createElementNS(WSSConstants.TAG_WSSE_REFERENCE.getNamespaceURI(), WSSConstants.TAG_WSSE_REFERENCE.getLocalPart());
         referenceElement.setAttributeNS(null, "URI", "#G1");
         securityTokenReferenceElement.appendChild(referenceElement);
 
@@ -139,7 +139,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         Element securityTokenReferenceElement = (Element) keyIdentifierElement.getParentNode();
         securityTokenReferenceElement.removeChild(keyIdentifierElement);
         //wsse:Reference xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" URI="#EncKeyId-1483925398"/>
-        Element referenceElement = securedDocument.createElementNS(WSSConstants.TAG_wsse_Reference.getNamespaceURI(), WSSConstants.TAG_wsse_Reference.getLocalPart());
+        Element referenceElement = securedDocument.createElementNS(WSSConstants.TAG_WSSE_REFERENCE.getNamespaceURI(), WSSConstants.TAG_WSSE_REFERENCE.getLocalPart());
         referenceElement.setAttributeNS(null, "URI", "#1");
         securityTokenReferenceElement.appendChild(referenceElement);
 
@@ -282,7 +282,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));

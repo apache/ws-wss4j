@@ -210,7 +210,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
 
             List<QName> signatureConfirmationElementPath = new ArrayList<>(4);
             signatureConfirmationElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
-            signatureConfirmationElementPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
+            signatureConfirmationElementPath.add(WSSConstants.TAG_WSSE11_SIG_CONF);
             boolean signsSignatureConfirmation = 
                 signsElement(tokenSecurityEvent, signatureConfirmationElementPath, securityEventDeque);
             boolean encryptsSignatureConfirmation = 
@@ -218,12 +218,12 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
 
             List<QName> timestampElementPath = new ArrayList<>(4);
             timestampElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
-            timestampElementPath.add(WSSConstants.TAG_wsu_Timestamp);
+            timestampElementPath.add(WSSConstants.TAG_WSU_TIMESTAMP);
             boolean signsTimestamp = signsElement(tokenSecurityEvent, timestampElementPath, securityEventDeque);
 
             List<QName> usernameTokenElementPath = new ArrayList<>(4);
             usernameTokenElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
-            usernameTokenElementPath.add(WSSConstants.TAG_wsse_UsernameToken);
+            usernameTokenElementPath.add(WSSConstants.TAG_WSSE_USERNAME_TOKEN);
             boolean encryptsUsernameToken = encryptsElement(tokenSecurityEvent, usernameTokenElementPath, securityEventDeque);
 
             boolean transportSecurityActive = Boolean.TRUE == get(WSSConstants.TRANSPORT_SECURITY_ACTIVE);

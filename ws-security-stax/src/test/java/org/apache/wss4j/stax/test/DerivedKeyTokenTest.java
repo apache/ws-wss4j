@@ -118,7 +118,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_soap11_Body.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_SOAP11_BODY.getLocalPart());
         }
         {
             String action = WSHandlerConstants.ENCRYPT;
@@ -238,7 +238,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_soap11_Body.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_SOAP11_BODY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -319,7 +319,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_soap11_Body.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_SOAP11_BODY.getLocalPart());
         }
         {
             String action = WSHandlerConstants.ENCRYPT;
@@ -401,7 +401,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_soap11_Body.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_SOAP11_BODY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -447,7 +447,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
         }
         {
             String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
@@ -525,7 +525,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -570,17 +570,17 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
-            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsc0512_SecurityContextToken.getNamespaceURI(), WSSConstants.TAG_wsc0512_SecurityContextToken.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSC0512_SCT.getNamespaceURI(), WSSConstants.TAG_WSC0512_SCT.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 0);
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 0);
-            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsc0512_DerivedKeyToken.getNamespaceURI(), WSSConstants.TAG_wsc0512_DerivedKeyToken.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSC0512_DKT.getNamespaceURI(), WSSConstants.TAG_WSC0512_DKT.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsse_KeyIdentifier.getNamespaceURI(), WSSConstants.TAG_wsse_KeyIdentifier.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSSE_KEY_IDENTIFIER.getNamespaceURI(), WSSConstants.TAG_WSSE_KEY_IDENTIFIER.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Attr attr = (Attr) nodeList.item(0).getAttributes().getNamedItem(WSSConstants.ATT_NULL_ValueType.getLocalPart());
+            Attr attr = (Attr) nodeList.item(0).getAttributes().getNamedItem(WSSConstants.ATT_NULL_VALUE_TYPE.getLocalPart());
             Assert.assertEquals(attr.getValue(), WSSConstants.NS_THUMBPRINT);
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
@@ -656,7 +656,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -701,18 +701,18 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
-            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsc0512_SecurityContextToken.getNamespaceURI(), WSSConstants.TAG_wsc0512_SecurityContextToken.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSC0512_SCT.getNamespaceURI(), WSSConstants.TAG_WSC0512_SCT.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 0);
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 0);
-            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsc0512_DerivedKeyToken.getNamespaceURI(), WSSConstants.TAG_wsc0512_DerivedKeyToken.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSC0512_DKT.getNamespaceURI(), WSSConstants.TAG_WSC0512_DKT.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsse_KeyIdentifier.getNamespaceURI(), WSSConstants.TAG_wsse_KeyIdentifier.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSSE_KEY_IDENTIFIER.getNamespaceURI(), WSSConstants.TAG_WSSE_KEY_IDENTIFIER.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Attr attr = (Attr) nodeList.item(0).getAttributes().getNamedItem(WSSConstants.ATT_NULL_ValueType.getLocalPart());
-            Assert.assertEquals(attr.getValue(), WSSConstants.NS_X509SubjectKeyIdentifier);
+            Attr attr = (Attr) nodeList.item(0).getAttributes().getNamedItem(WSSConstants.ATT_NULL_VALUE_TYPE.getLocalPart());
+            Assert.assertEquals(attr.getValue(), WSSConstants.NS_X509_SKI);
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
         }
@@ -787,7 +787,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -835,13 +835,13 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
-            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsc0512_SecurityContextToken.getNamespaceURI(), WSSConstants.TAG_wsc0512_SecurityContextToken.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSC0512_SCT.getNamespaceURI(), WSSConstants.TAG_WSC0512_SCT.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 0);
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsc0512_DerivedKeyToken.getNamespaceURI(), WSSConstants.TAG_wsc0512_DerivedKeyToken.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSC0512_DKT.getNamespaceURI(), WSSConstants.TAG_WSC0512_DKT.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 2);
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
@@ -1062,7 +1062,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_soap11_Body.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_SOAP11_BODY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));

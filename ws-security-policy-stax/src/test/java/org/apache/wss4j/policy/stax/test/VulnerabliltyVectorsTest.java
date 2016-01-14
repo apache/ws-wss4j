@@ -63,9 +63,9 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -114,7 +114,7 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         Element soapEnvElement = (Element) bodyElement.getParentNode();
         soapEnvElement.removeChild(bodyElement);
 
-        Element newBody = securedDocument.createElementNS(WSSConstants.NS_SOAP11, WSSConstants.TAG_soap_Body_LocalName);
+        Element newBody = securedDocument.createElementNS(WSSConstants.NS_SOAP11, WSSConstants.TAG_SOAP_BODY_LN);
         Element operationElement = securedDocument.createElementNS("http://schemas.xmlsoap.org/wsdl/", "definitions");
         newBody.appendChild(operationElement);
         soapEnvElement.appendChild(newBody);

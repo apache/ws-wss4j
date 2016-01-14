@@ -39,9 +39,9 @@ public class KerberosTokenSecurityEvent extends IssuedTokenSecurityEvent<Kerbero
 
     public boolean isKerberosV5ApReqToken11() {
         String type = getSecurityToken().getKerberosTokenValueType();
-        if (WSSConstants.NS_Kerberos5_AP_REQ.equals(type)
-                || WSSConstants.NS_Kerberos5_AP_REQ1510.equals(type)
-                || WSSConstants.NS_Kerberos5_AP_REQ4120.equals(type)) {
+        if (WSSConstants.NS_KERBEROS5_AP_REQ.equals(type)
+                || WSSConstants.NS_KERBEROS5_AP_REQ1510.equals(type)
+                || WSSConstants.NS_KERBEROS5_AP_REQ4120.equals(type)) {
             return true;
         }
         return false;
@@ -49,9 +49,9 @@ public class KerberosTokenSecurityEvent extends IssuedTokenSecurityEvent<Kerbero
 
     public boolean isGssKerberosV5ApReqToken11() {
         String type = getSecurityToken().getKerberosTokenValueType();
-        if (WSSConstants.NS_GSS_Kerberos5_AP_REQ.equals(type)
-                || WSSConstants.NS_GSS_Kerberos5_AP_REQ1510.equals(type)
-                || WSSConstants.NS_GSS_Kerberos5_AP_REQ4120.equals(type)) {
+        if (WSSConstants.NS_GSS_KERBEROS5_AP_REQ.equals(type)
+                || WSSConstants.NS_GSS_KERBEROS5_AP_REQ1510.equals(type)
+                || WSSConstants.NS_GSS_KERBEROS5_AP_REQ4120.equals(type)) {
             return true;
         }
         return false;

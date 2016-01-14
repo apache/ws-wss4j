@@ -34,7 +34,7 @@ import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 public class BinarySecurityTokenValidatorImpl implements BinarySecurityTokenValidator {
 
-    private static final transient org.slf4j.Logger log =
+    private static final transient org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(BinarySecurityTokenValidatorImpl.class);
 
     @Override
@@ -77,7 +77,7 @@ public class BinarySecurityTokenValidatorImpl implements BinarySecurityTokenVali
                 x509PKIPathv1SecurityToken.setElementPath(tokenContext.getElementPath());
                 x509PKIPathv1SecurityToken.setXMLSecEvent(tokenContext.getFirstXMLSecEvent());
                 return x509PKIPathv1SecurityToken;
-            } else if (WSSConstants.NS_GSS_Kerberos5_AP_REQ.equals(binarySecurityTokenType.getValueType())) {
+            } else if (WSSConstants.NS_GSS_KERBEROS5_AP_REQ.equals(binarySecurityTokenType.getValueType())) {
                 KerberosServiceSecurityTokenImpl kerberosServiceSecurityToken = new KerberosServiceSecurityTokenImpl(
                         tokenContext.getWsSecurityContext(),
                         tokenContext.getWssSecurityProperties().getCallbackHandler(),
@@ -103,7 +103,7 @@ public class BinarySecurityTokenValidatorImpl implements BinarySecurityTokenVali
         try {
             crypto = securityProperties.getSignatureVerificationCrypto();
         } catch (WSSConfigurationException e) {
-            log.debug(e.getMessage(), e);
+            LOG.debug(e.getMessage(), e);
             //ignore
         }
         if (crypto == null) {

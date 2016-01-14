@@ -54,7 +54,7 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
 
         if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
 
-            final QName headerElementName = WSSConstants.TAG_wsse11_SignatureConfirmation;
+            final QName headerElementName = WSSConstants.TAG_WSSE11_SIG_CONF;
 
             OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
@@ -70,10 +70,10 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
                     OutputProcessorUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
 
                     List<XMLSecAttribute> attributes = new ArrayList<>(2);
-                    attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
+                    attributes.add(createAttribute(WSSConstants.ATT_WSU_ID, IDGenerator.generateID(null)));
                     String base64SigValue = 
                         new Base64(76, new byte[]{'\n'}).encodeToString(signatureValueSecurityEvent.getSignatureValue());
-                    attributes.add(createAttribute(WSSConstants.ATT_NULL_Value, base64SigValue));
+                    attributes.add(createAttribute(WSSConstants.ATT_NULL_VALUE, base64SigValue));
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, true, attributes);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);
                 }
@@ -82,7 +82,7 @@ public class SignatureConfirmationOutputProcessor extends AbstractOutputProcesso
             if (!aSignatureFound) {
                 OutputProcessorUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
                 List<XMLSecAttribute> attributes = new ArrayList<>(1);
-                attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
+                attributes.add(createAttribute(WSSConstants.ATT_WSU_ID, IDGenerator.generateID(null)));
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, true, attributes);
                 createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);
             }

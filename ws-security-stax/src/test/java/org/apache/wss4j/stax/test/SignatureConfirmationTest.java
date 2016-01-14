@@ -72,7 +72,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -99,7 +99,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
         }
 
         //so we have a request generated, now do the response:
@@ -110,8 +110,8 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             actions.add(WSSConstants.SIGNATURE_CONFIRMATION);
             actions.add(WSSConstants.SIGNATURE);
             securityProperties.setActions(actions);
-            securityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-            securityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse11_SignatureConfirmation, SecurePart.Modifier.Element));
+            securityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+            securityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSSE11_SIG_CONF, SecurePart.Modifier.Element));
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("receiver");
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
@@ -124,20 +124,20 @@ public class SignatureConfirmationTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Reference.getNamespaceURI(), WSSConstants.TAG_dsig_Reference.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 2);
 
-            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsse11_SignatureConfirmation.getNamespaceURI(), WSSConstants.TAG_wsse11_SignatureConfirmation.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSSE11_SIG_CONF.getNamespaceURI(), WSSConstants.TAG_WSSE11_SIG_CONF.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertNotSame(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_NULL_Value.getLocalPart()), "");
-            Assert.assertNotNull(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_wsu_Id.getLocalPart()), "");
-            Assert.assertTrue(((Element) nodeList.item(0)).getAttributeNS(WSSConstants.ATT_wsu_Id.getNamespaceURI(), WSSConstants.ATT_wsu_Id.getLocalPart()).length() > 0);
+            Assert.assertNotSame(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_NULL_VALUE.getLocalPart()), "");
+            Assert.assertNotNull(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_WSU_ID.getLocalPart()), "");
+            Assert.assertTrue(((Element) nodeList.item(0)).getAttributeNS(WSSConstants.ATT_WSU_ID.getNamespaceURI(), WSSConstants.ATT_WSU_ID.getLocalPart()).length() > 0);
 
-            nodeList = document.getElementsByTagNameNS(WSSConstants.NS_SOAP11, WSSConstants.TAG_soap_Body_LocalName);
+            nodeList = document.getElementsByTagNameNS(WSSConstants.NS_SOAP11, WSSConstants.TAG_SOAP_BODY_LN);
             Assert.assertEquals(nodeList.getLength(), 1);
-            String idAttrValue = ((Element) nodeList.item(0)).getAttributeNS(WSSConstants.ATT_wsu_Id.getNamespaceURI(), WSSConstants.ATT_wsu_Id.getLocalPart());
+            String idAttrValue = ((Element) nodeList.item(0)).getAttributeNS(WSSConstants.ATT_WSU_ID.getNamespaceURI(), WSSConstants.ATT_WSU_ID.getLocalPart());
             Assert.assertNotNull(idAttrValue);
             Assert.assertTrue(idAttrValue.length() > 0);
         }
@@ -168,7 +168,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -195,7 +195,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
         }
 
         //so we have a request generated, now do the response:
@@ -205,8 +205,8 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
             actions.add(WSSConstants.SIGNATURE_CONFIRMATION);
             securityProperties.setActions(actions);
-            securityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-            securityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse11_SignatureConfirmation, SecurePart.Modifier.Element));
+            securityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+            securityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSSE11_SIG_CONF, SecurePart.Modifier.Element));
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("receiver");
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
@@ -221,11 +221,11 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 0);
 
-            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsse11_SignatureConfirmation.getNamespaceURI(), WSSConstants.TAG_wsse11_SignatureConfirmation.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSSE11_SIG_CONF.getNamespaceURI(), WSSConstants.TAG_WSSE11_SIG_CONF.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertNotSame(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_NULL_Value.getLocalPart()), "");
-            Assert.assertNotNull(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_wsu_Id.getLocalPart()), "");
-            Assert.assertTrue(((Element) nodeList.item(0)).getAttributeNS(WSSConstants.ATT_wsu_Id.getNamespaceURI(), WSSConstants.ATT_wsu_Id.getLocalPart()).length() > 0);
+            Assert.assertNotSame(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_NULL_VALUE.getLocalPart()), "");
+            Assert.assertNotNull(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_WSU_ID.getLocalPart()), "");
+            Assert.assertTrue(((Element) nodeList.item(0)).getAttributeNS(WSSConstants.ATT_WSU_ID.getNamespaceURI(), WSSConstants.ATT_WSU_ID.getLocalPart()).length() > 0);
         }
 
         //verify SigConf response:
@@ -267,7 +267,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Reference.getNamespaceURI(), WSSConstants.TAG_dsig_Reference.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
@@ -295,16 +295,16 @@ public class SignatureConfirmationTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
-            nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_wsse11_SignatureConfirmation.getNamespaceURI(), WSSConstants.TAG_wsse11_SignatureConfirmation.getLocalPart());
+            nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_WSSE11_SIG_CONF.getNamespaceURI(), WSSConstants.TAG_WSSE11_SIG_CONF.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertNotSame(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_NULL_Value.getLocalPart()), "");
-            Assert.assertNotNull(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_wsu_Id.getLocalPart()), "");
+            Assert.assertNotSame(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_NULL_VALUE.getLocalPart()), "");
+            Assert.assertNotNull(((Element) nodeList.item(0)).getAttributeNS(null, WSSConstants.ATT_WSU_ID.getLocalPart()), "");
 
-            nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.NS_SOAP11, WSSConstants.TAG_soap_Body_LocalName);
+            nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.NS_SOAP11, WSSConstants.TAG_SOAP_BODY_LN);
             Assert.assertEquals(nodeList.getLength(), 1);
-            String idAttrValue = ((Element) nodeList.item(0)).getAttributeNS(WSSConstants.ATT_wsu_Id.getNamespaceURI(), WSSConstants.ATT_wsu_Id.getLocalPart());
+            String idAttrValue = ((Element) nodeList.item(0)).getAttributeNS(WSSConstants.ATT_WSU_ID.getNamespaceURI(), WSSConstants.ATT_WSU_ID.getLocalPart());
             Assert.assertNotNull(idAttrValue);
             Assert.assertTrue(idAttrValue.length() > 0);
 
@@ -330,7 +330,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
         }
     }
 
@@ -363,7 +363,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Reference.getNamespaceURI(), WSSConstants.TAG_dsig_Reference.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
@@ -386,14 +386,14 @@ public class SignatureConfirmationTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
-            nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_wsse11_SignatureConfirmation.getNamespaceURI(), WSSConstants.TAG_wsse11_SignatureConfirmation.getLocalPart());
+            nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_WSSE11_SIG_CONF.getNamespaceURI(), WSSConstants.TAG_WSSE11_SIG_CONF.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 0);
 
-            nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.NS_SOAP11, WSSConstants.TAG_soap_Body_LocalName);
+            nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.NS_SOAP11, WSSConstants.TAG_SOAP_BODY_LN);
             Assert.assertEquals(nodeList.getLength(), 1);
-            String idAttrValue = ((Element) nodeList.item(0)).getAttributeNS(WSSConstants.ATT_wsu_Id.getNamespaceURI(), WSSConstants.ATT_wsu_Id.getLocalPart());
+            String idAttrValue = ((Element) nodeList.item(0)).getAttributeNS(WSSConstants.ATT_WSU_ID.getNamespaceURI(), WSSConstants.ATT_WSU_ID.getLocalPart());
             Assert.assertNotNull(idAttrValue);
             Assert.assertTrue(idAttrValue.length() > 0);
 

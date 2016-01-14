@@ -155,7 +155,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
 
             if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
 
-                final QName headerElementName = WSSConstants.TAG_wsse_BinarySecurityToken;
+                final QName headerElementName = WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN;
 
                 if (WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN.equals(getAction())
                     || WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN.equals(getAction())
@@ -165,9 +165,9 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                                                            
                     List<XMLSecAttribute> attributes = new ArrayList<>(3);
-                    attributes.add(createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
-                    attributes.add(createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_GSS_Kerberos5_AP_REQ));
-                    attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, securityToken.getId()));
+                    attributes.add(createAttribute(WSSConstants.ATT_NULL_ENCODING_TYPE, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
+                    attributes.add(createAttribute(WSSConstants.ATT_NULL_VALUE_TYPE, WSSConstants.NS_GSS_KERBEROS5_AP_REQ));
+                    attributes.add(createAttribute(WSSConstants.ATT_WSU_ID, securityToken.getId()));
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, false, attributes);
                     createCharactersAndOutputAsEvent(subOutputProcessorChain,
                             new Base64(76, new byte[]{'\n'}).encodeToString(

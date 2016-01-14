@@ -61,7 +61,7 @@ public class ReplayTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -81,7 +81,7 @@ public class ReplayTest extends AbstractTestBase {
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
         }
 
         //done signature; now test sig-verification:
@@ -113,8 +113,8 @@ public class ReplayTest extends AbstractTestBase {
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
 
             //some test that we can really sure we get what we want from WSS4J
-            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_wsse_UsernameToken.getNamespaceURI(), WSSConstants.TAG_wsse_UsernameToken.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_WSSE_USERNAME_TOKEN.getNamespaceURI(), WSSConstants.TAG_WSSE_USERNAME_TOKEN.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -132,9 +132,9 @@ public class ReplayTest extends AbstractTestBase {
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
             //header element must still be there
-            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsse_UsernameToken.getNamespaceURI(), WSSConstants.TAG_wsse_UsernameToken.getLocalPart());
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSSE_USERNAME_TOKEN.getNamespaceURI(), WSSConstants.TAG_WSSE_USERNAME_TOKEN.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
         }
 
         //done UsernameToken; now test verification:
@@ -191,8 +191,8 @@ public class ReplayTest extends AbstractTestBase {
 
             SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
             validator.setRequireBearerSignature(false);
-            securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
-            securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
+            securityProperties.addValidator(WSSConstants.TAG_SAML2_ASSERTION, validator);
+            securityProperties.addValidator(WSSConstants.TAG_SAML_ASSERTION, validator);
 
             replayCache = securityProperties.getSamlOneTimeUseReplayCache();
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
@@ -208,8 +208,8 @@ public class ReplayTest extends AbstractTestBase {
 
             SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
             validator.setRequireBearerSignature(false);
-            securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
-            securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
+            securityProperties.addValidator(WSSConstants.TAG_SAML2_ASSERTION, validator);
+            securityProperties.addValidator(WSSConstants.TAG_SAML_ASSERTION, validator);
 
             securityProperties.setSamlOneTimeUseReplayCache(replayCache);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
@@ -256,8 +256,8 @@ public class ReplayTest extends AbstractTestBase {
 
             SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
             validator.setRequireBearerSignature(false);
-            securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
-            securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
+            securityProperties.addValidator(WSSConstants.TAG_SAML2_ASSERTION, validator);
+            securityProperties.addValidator(WSSConstants.TAG_SAML_ASSERTION, validator);
 
             replayCache = securityProperties.getSamlOneTimeUseReplayCache();
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
@@ -273,8 +273,8 @@ public class ReplayTest extends AbstractTestBase {
 
             SamlTokenValidatorImpl validator = new SamlTokenValidatorImpl();
             validator.setRequireBearerSignature(false);
-            securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
-            securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
+            securityProperties.addValidator(WSSConstants.TAG_SAML2_ASSERTION, validator);
+            securityProperties.addValidator(WSSConstants.TAG_SAML_ASSERTION, validator);
 
             securityProperties.setSamlOneTimeUseReplayCache(replayCache);
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);

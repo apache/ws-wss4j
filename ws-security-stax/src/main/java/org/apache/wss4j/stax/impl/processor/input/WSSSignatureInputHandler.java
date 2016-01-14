@@ -118,7 +118,7 @@ public class WSSSignatureInputHandler extends AbstractSignatureInputHandler {
         }
 
         SecurityTokenReferenceType securityTokenReferenceType = XMLSecurityUtils.getQNameType(keyInfoContent,
-                WSSConstants.TAG_wsse_SecurityTokenReference);
+                WSSConstants.TAG_WSSE_SECURITY_TOKEN_REFERENCE);
         if (securityTokenReferenceType == null) {
             securityContext.handleBSPRule(BSPRule.R5417);
         }

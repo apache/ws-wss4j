@@ -117,7 +117,7 @@ public class PolicyEnforcer implements SecurityEventListener {
     //todo:
     // AlgorithmSuite SoapNorm
     // AlgorithmSuite STR Trans
-    // AlgorithmSuite XPath
+    // AlgorithmSuite XPATH
     // AlgorithmSuite Comp Key
     // Layout? I don't know if it is that relevant and worth. We need security header element numbering
     //to implement it.
@@ -393,7 +393,7 @@ public class PolicyEnforcer implements SecurityEventListener {
             if (abstractBinding.isIncludeTimestamp()) {
                 List<QName> timestampElementPath = new LinkedList<>();
                 timestampElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
-                timestampElementPath.add(WSSConstants.TAG_wsu_Timestamp);
+                timestampElementPath.add(WSSConstants.TAG_WSU_TIMESTAMP);
                 RequiredElementsAssertionState requiredElementsAssertionState =
                     new RequiredElementsAssertionState(abstractBinding, policyAsserter, false);
                 requiredElementsAssertionState.addElement(timestampElementPath);
@@ -436,7 +436,7 @@ public class PolicyEnforcer implements SecurityEventListener {
                         //9 WSS: SOAP Message Security Options [Signature Confirmation]
                         List<QName> signatureConfirmationElementPath = new LinkedList<>();
                         signatureConfirmationElementPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
-                        signatureConfirmationElementPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
+                        signatureConfirmationElementPath.add(WSSConstants.TAG_WSSE11_SIG_CONF);
                         RequiredElementsAssertionState requiredElementsAssertionState =
                             new RequiredElementsAssertionState(wss11, policyAsserter, false);
                         requiredElementsAssertionState.addElement(signatureConfirmationElementPath);

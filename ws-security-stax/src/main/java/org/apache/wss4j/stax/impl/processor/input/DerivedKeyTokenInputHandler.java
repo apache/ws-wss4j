@@ -140,9 +140,9 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                         );
                         XMLSecurityConstants.AlgorithmUsage derivedKeyAlgorithmUsage;
                         if (WSSConstants.Enc.equals(algorithmUsage)) {
-                            derivedKeyAlgorithmUsage = WSSConstants.Enc_KD;
+                            derivedKeyAlgorithmUsage = WSSConstants.ENC_KD;
                         } else {
-                            derivedKeyAlgorithmUsage = WSSConstants.Sig_KD;
+                            derivedKeyAlgorithmUsage = WSSConstants.SIG_KD;
                         }
                         AlgorithmSuiteSecurityEvent algorithmSuiteSecurityEvent = new AlgorithmSuiteSecurityEvent();
                         algorithmSuiteSecurityEvent.setAlgorithmURI(derivedKeyAlgorithm);

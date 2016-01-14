@@ -181,18 +181,18 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
 
             if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
 
-                final QName headerElementName = WSSConstants.TAG_wsse_UsernameToken;
+                final QName headerElementName = WSSConstants.TAG_WSSE_USERNAME_TOKEN;
                 OutputProcessorUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
 
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
                 List<XMLSecAttribute> attributes = new ArrayList<>(1);
-                attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, this.wsuId));
+                attributes.add(createAttribute(WSSConstants.ATT_WSU_ID, this.wsuId));
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, false, attributes);
-                createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Username, false, null);
+                createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE_USERNAME, false, null);
                 createCharactersAndOutputAsEvent(subOutputProcessorChain, 
                                                  ((WSSSecurityProperties) getSecurityProperties()).getTokenUser());
-                createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Username);
+                createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE_USERNAME);
                 if (((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType() 
                     != WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE && !WSSConstants.USERNAMETOKEN_SIGNED.equals(action)) {
                     attributes = new ArrayList<>(1);
@@ -201,40 +201,40 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
                                 == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
                                     ? WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST.getNamespace()
                                     : WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT.getNamespace()));
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Password, false, attributes);
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE_PASSWORD, false, attributes);
                     createCharactersAndOutputAsEvent(subOutputProcessorChain,
                             ((WSSSecurityProperties) getSecurityProperties()).getUsernameTokenPasswordType() 
                                 == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST
                                     ? WSSUtils.doPasswordDigest(this.nonceValue, this.created.toXMLFormat(), this.password)
                                     : this.password);
-                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Password);
+                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE_PASSWORD);
                 }
 
                 if (salt != null) {
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_Salt, true, null);
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE11_SALT, true, null);
                     createCharactersAndOutputAsEvent(subOutputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(this.salt));
-                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_Salt);
+                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE11_SALT);
 
                     if (iterations > 0) {
-                        createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_Iteration, true, null);
+                        createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE11_ITERATION, true, null);
                         createCharactersAndOutputAsEvent(subOutputProcessorChain, "" + iterations);
-                        createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse11_Iteration);
+                        createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE11_ITERATION);
                     }
                 }
 
                 if (nonceValue != null && !WSSConstants.USERNAMETOKEN_SIGNED.equals(action)) {
                     attributes = new ArrayList<>(1);
-                    attributes.add(createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Nonce, false, attributes);
+                    attributes.add(createAttribute(WSSConstants.ATT_NULL_ENCODING_TYPE, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE_NONCE, false, attributes);
                     createCharactersAndOutputAsEvent(subOutputProcessorChain, 
                                                      new Base64(76, new byte[]{'\n'}).encodeToString(this.nonceValue));
-                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Nonce);
+                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE_NONCE);
                 }
 
                 if (created != null && !WSSConstants.USERNAMETOKEN_SIGNED.equals(action)) {
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Created, false, null);
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSU_CREATED, false, null);
                     createCharactersAndOutputAsEvent(subOutputProcessorChain, this.created.toXMLFormat());
-                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Created);
+                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSU_CREATED);
                 }
 
                 createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);

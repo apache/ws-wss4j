@@ -212,14 +212,14 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                     final String algorithm = transformType.getAlgorithm();
                     if (!WSSConstants.NS_C14N_EXCL.equals(algorithm)
                             && !WSSConstants.NS_XMLDSIG_FILTER2.equals(algorithm)
-                            && !WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(algorithm)
+                            && !WSSConstants.SOAPMESSAGE_NS10_STR_TRANSFORM.equals(algorithm)
                             && !WSSConstants.NS_XMLDSIG_ENVELOPED_SIGNATURE.equals(algorithm)
                             && !WSSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(algorithm)
                             && !WSSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(algorithm)) {
                         securityContext.handleBSPRule(BSPRule.R5423);
                         if (j == transformTypes.size() - 1 
                             && !WSSConstants.NS_C14N_EXCL.equals(algorithm)
-                            && !WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(algorithm)
+                            && !WSSConstants.SOAPMESSAGE_NS10_STR_TRANSFORM.equals(algorithm)
                             && !WSSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(algorithm)
                             && !WSSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(algorithm)) {
                             securityContext.handleBSPRule(BSPRule.R5412);
@@ -232,14 +232,14 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
                                 && inclusiveNamespacesType.getPrefixList().size() == 0) {
                             securityContext.handleBSPRule(BSPRule.R5407);
                         }
-                        if (WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(algorithm)) {
+                        if (WSSConstants.SOAPMESSAGE_NS10_STR_TRANSFORM.equals(algorithm)) {
                             if (inclusiveNamespacesType != null
                                     && inclusiveNamespacesType.getPrefixList().size() == 0) {
                                 securityContext.handleBSPRule(BSPRule.R5413);
                             }
                             TransformationParametersType transformationParametersType =
                                     XMLSecurityUtils.getQNameType(transformType.getContent(), 
-                                                                  WSSConstants.TAG_wsse_TransformationParameters);
+                                                                  WSSConstants.TAG_WSSE_TRANSFORMATION_PARAMETERS);
                             if (transformationParametersType == null) {
                                 securityContext.handleBSPRule(BSPRule.R3065);
                             } else {
@@ -355,7 +355,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
         for (int i = transformTypeList.size() - 1; i >= 0; i--) {
             TransformType transformType = transformTypeList.get(i);
             TransformationParametersType transformationParametersType =
-                    XMLSecurityUtils.getQNameType(transformType.getContent(), WSSConstants.TAG_wsse_TransformationParameters);
+                    XMLSecurityUtils.getQNameType(transformType.getContent(), WSSConstants.TAG_WSSE_TRANSFORMATION_PARAMETERS);
             if (transformationParametersType != null) {
                 CanonicalizationMethodType canonicalizationMethodType =
                         XMLSecurityUtils.getQNameType(transformationParametersType.getAny(), 
@@ -407,7 +407,7 @@ public class WSSSignatureReferenceVerifyInputProcessor extends AbstractSignature
             }
         }
 
-        if (WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(algorithm)) {
+        if (WSSConstants.SOAPMESSAGE_NS10_STR_TRANSFORM.equals(algorithm)) {
 
             internalSignatureReferenceVerifier.setTransformer(parentTransformer);
 

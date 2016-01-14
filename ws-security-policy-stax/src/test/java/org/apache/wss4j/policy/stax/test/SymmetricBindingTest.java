@@ -66,7 +66,7 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
         List<QName> headerPath = new ArrayList<>();
         headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
-        headerPath.add(WSSConstants.TAG_wsu_Timestamp);
+        headerPath.add(WSSConstants.TAG_WSU_TIMESTAMP);
         requiredElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
 
@@ -98,7 +98,7 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, protectionOrder);
         headerPath = new ArrayList<>();
         headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
-        headerPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
+        headerPath.add(WSSConstants.TAG_WSSE11_SIG_CONF);
         encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 
@@ -107,7 +107,7 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(operationSecurityEvent);
 
         SignedPartSecurityEvent signedPartSecurityEvent = new SignedPartSecurityEvent(null, true, protectionOrder);
-        signedPartSecurityEvent.setXmlSecEvent(XMLSecEventFactory.createXmlSecStartElement(WSSConstants.TAG_soap11_Body, null, null));
+        signedPartSecurityEvent.setXmlSecEvent(XMLSecEventFactory.createXmlSecStartElement(WSSConstants.TAG_SOAP11_BODY, null, null));
         signedPartSecurityEvent.setElementPath(WSSConstants.SOAP_11_BODY_PATH);
         policyEnforcer.registerSecurityEvent(signedPartSecurityEvent);
         policyEnforcer.doFinal();
@@ -311,7 +311,7 @@ public class SymmetricBindingTest extends AbstractPolicyTestBase {
         encryptedElementSecurityEvent = new EncryptedElementSecurityEvent(null, true, protectionOrder);
         headerPath = new ArrayList<>();
         headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
-        headerPath.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
+        headerPath.add(WSSConstants.TAG_WSSE11_SIG_CONF);
         encryptedElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(encryptedElementSecurityEvent);
 

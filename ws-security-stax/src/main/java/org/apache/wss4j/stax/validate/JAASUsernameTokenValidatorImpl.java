@@ -43,7 +43,7 @@ import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
  */
 public class JAASUsernameTokenValidatorImpl implements UsernameTokenValidator {
 
-    private static final transient org.slf4j.Logger log =
+    private static final transient org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(JAASUsernameTokenValidatorImpl.class);
 
     private String contextName = null;
@@ -60,7 +60,7 @@ public class JAASUsernameTokenValidatorImpl implements UsernameTokenValidator {
     public <T extends UsernameSecurityToken & InboundSecurityToken> T validate(
             UsernameTokenType usernameTokenType, TokenContext tokenContext) throws WSSecurityException {
 
-        PasswordString passwordType = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Password);
+        PasswordString passwordType = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_WSSE_PASSWORD);
         WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType = WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE;
         if (passwordType != null && passwordType.getType() != null) {
             usernameTokenPasswordType = WSSConstants.UsernameTokenPasswordType.getUsernameTokenPasswordType(passwordType.getType());
@@ -68,7 +68,7 @@ public class JAASUsernameTokenValidatorImpl implements UsernameTokenValidator {
 
         // Digest not supported
         if (usernameTokenPasswordType != WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT) {
-            log.warn("Password type is not supported");
+            LOG.warn("Password type is not supported");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
 
@@ -82,7 +82,7 @@ public class JAASUsernameTokenValidatorImpl implements UsernameTokenValidator {
         }
 
         if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
-            log.warn("User or password empty");
+            LOG.warn("User or password empty");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
 
@@ -93,14 +93,14 @@ public class JAASUsernameTokenValidatorImpl implements UsernameTokenValidator {
             ctx.login();
             subject = ctx.getSubject();
         } catch (LoginException ex) {
-            log.info("Authentication failed", ex);
+            LOG.info("Authentication failed", ex);
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, ex
             );
         }
 
         final EncodedString encodedNonce =
-                XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Nonce);
+                XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_WSSE_NONCE);
         byte[] nonceVal = null;
         if (encodedNonce != null) {
             if (!WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(encodedNonce.getEncodingType())) {
@@ -110,7 +110,7 @@ public class JAASUsernameTokenValidatorImpl implements UsernameTokenValidator {
         }
 
         final AttributedDateTime attributedDateTimeCreated =
-                XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsu_Created);
+                XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_WSU_CREATED);
 
         UsernameSecurityTokenImpl usernameSecurityToken = new UsernameSecurityTokenImpl(
                 usernameTokenPasswordType, username, password,

@@ -36,7 +36,7 @@ import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
 
-    private static final transient org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UsernameTokenValidatorImpl.class);
+    private static final transient org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(UsernameTokenValidatorImpl.class);
 
     @Override
     public <T extends UsernameSecurityToken & InboundSecurityToken> T validate(
@@ -45,9 +45,9 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
         // If the UsernameToken is to be used for key derivation, the (1.1)
         // spec says that it cannot contain a password, and it must contain
         // an Iteration element
-        final byte[] salt = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse11_Salt);
-        PasswordString passwordType = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Password);
-        final Long iteration = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse11_Iteration);
+        final byte[] salt = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_WSSE11_SALT);
+        PasswordString passwordType = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_WSSE_PASSWORD);
+        final Long iteration = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_WSSE11_ITERATION);
         if (salt != null && (passwordType != null || iteration == null)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "badTokenType01");
         }
@@ -62,8 +62,8 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
             tokenContext.getWssSecurityProperties().getUsernameTokenPasswordType();
         if (requiredPasswordType != null) {
             if (passwordType == null || passwordType.getType() == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Authentication failed as the received password type does not "
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Authentication failed as the received password type does not "
                         + "match the required password type of: " + requiredPasswordType);
                 }
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
@@ -71,8 +71,8 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
             WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType =
                 WSSConstants.UsernameTokenPasswordType.getUsernameTokenPasswordType(passwordType.getType());
             if (requiredPasswordType != usernameTokenPasswordType) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Authentication failed as the received password type does not "
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Authentication failed as the received password type does not "
                         + "match the required password type of: " + requiredPasswordType);
                 }
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
@@ -90,14 +90,14 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
         }
 
         final EncodedString encodedNonce =
-                XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Nonce);
+                XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_WSSE_NONCE);
         byte[] nonceVal = null;
         if (encodedNonce != null && encodedNonce.getValue() != null) {
             nonceVal = Base64.decodeBase64(encodedNonce.getValue());
         }
 
         final AttributedDateTime attributedDateTimeCreated =
-                XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsu_Created);
+                XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_WSU_CREATED);
 
         String created = null;
         if (attributedDateTimeCreated != null) {

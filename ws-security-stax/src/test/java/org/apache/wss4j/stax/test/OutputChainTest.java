@@ -60,7 +60,7 @@ public class OutputChainTest extends AbstractTestBase {
 
         Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
         NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-        Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+        Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
         nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
         Assert.assertEquals(nodeList.getLength(), 1);
@@ -81,7 +81,7 @@ public class OutputChainTest extends AbstractTestBase {
         nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
         Assert.assertEquals(nodeList.getLength(), 0);
 
-        nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
+        nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart());
         Assert.assertEquals(nodeList.getLength(), 0);
     }
 
@@ -106,18 +106,18 @@ public class OutputChainTest extends AbstractTestBase {
         NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
         Assert.assertEquals(nodeList.getLength(), 1);
 
-        Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+        Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
-        nodeList = document.getElementsByTagNameNS(WSSConstants.NS_SOAP11, WSSConstants.TAG_soap_Body_LocalName);
+        nodeList = document.getElementsByTagNameNS(WSSConstants.NS_SOAP11, WSSConstants.TAG_SOAP_BODY_LN);
         Assert.assertEquals(nodeList.getLength(), 1);
 
-        Node attr = nodeList.item(0).getAttributes().getNamedItemNS(WSSConstants.ATT_wsu_Id.getNamespaceURI(), WSSConstants.ATT_wsu_Id.getLocalPart());
+        Node attr = nodeList.item(0).getAttributes().getNamedItemNS(WSSConstants.ATT_WSU_ID.getNamespaceURI(), WSSConstants.ATT_WSU_ID.getLocalPart());
         Assert.assertNotNull(attr);
 
         nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
         Assert.assertEquals(nodeList.getLength(), 0);
 
-        nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
+        nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart());
         Assert.assertEquals(nodeList.getLength(), 0);
     }
 
@@ -137,10 +137,10 @@ public class OutputChainTest extends AbstractTestBase {
 
         Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
 
-        NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
+        NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart());
         Assert.assertEquals(nodeList.getLength(), 1);
 
-        Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+        Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
         nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
         Assert.assertEquals(nodeList.getLength(), 0);

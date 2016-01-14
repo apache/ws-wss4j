@@ -100,7 +100,7 @@ public class SecurityHeaderReorderProcessor extends AbstractOutputProcessor {
         //now we are in our security header
 
         if (documentLevel == 3) {
-            if (xmlSecEvent.isEndElement() && xmlSecEvent.asEndElement().getName().equals(WSSConstants.TAG_wsse_Security)) {
+            if (xmlSecEvent.isEndElement() && xmlSecEvent.asEndElement().getName().equals(WSSConstants.TAG_WSSE_SECURITY)) {
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
                 Iterator<Map.Entry<XMLSecurityConstants.Action, Map<SecurityHeaderOrder, Deque<XMLSecEvent>>>> iterator = 

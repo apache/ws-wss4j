@@ -100,19 +100,19 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                         signaturePartDef.setGenerateXPointer(securePart.isGenerateXPointer());
                         signaturePartDef.setSigRefId(IDGenerator.generateID(null));
 
-                        Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_wsu_Id);
+                        Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_WSU_ID);
                         if (attribute != null) {
                             signaturePartDef.setSigRefId(attribute.getValue());
                         } else {
                             List<XMLSecAttribute> attributeList = new ArrayList<>(1);
-                            attributeList.add(createAttribute(WSSConstants.ATT_wsu_Id, signaturePartDef.getSigRefId()));
+                            attributeList.add(createAttribute(WSSConstants.ATT_WSU_ID, signaturePartDef.getSigRefId()));
                             xmlSecEvent = addAttributes(xmlSecStartElement, attributeList);
                         }
                     } else {
-                        if (WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(securePart.getName().getLocalPart())) {
+                        if (WSSConstants.SOAPMESSAGE_NS10_STR_TRANSFORM.equals(securePart.getName().getLocalPart())) {
                             signaturePartDef.setSigRefId(securePart.getIdToReference());
                             String[] transforms = new String[]{
-                                    WSSConstants.SOAPMESSAGE_NS10_STRTransform,
+                                    WSSConstants.SOAPMESSAGE_NS10_STR_TRANSFORM,
                                     WSSConstants.NS_C14N_EXCL
                             };
                             signaturePartDef.setTransforms(transforms);
@@ -133,7 +133,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                     setActiveInternalSignatureOutputProcessor(internalSignatureOutputProcessor);
                     //we can remove this processor when the whole body will be signed since there is
                     //nothing more which can be signed.
-                    if (WSSConstants.TAG_soap_Body_LocalName.equals(xmlSecStartElement.getName().getLocalPart())
+                    if (WSSConstants.TAG_SOAP_BODY_LN.equals(xmlSecStartElement.getName().getLocalPart())
                             && WSSUtils.isInSOAPBody(xmlSecStartElement)) {
                         doFinalInternal(outputProcessorChain);
                         outputProcessorChain.removeProcessor(this);
@@ -254,7 +254,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
     protected SecurePart securePartMatches(XMLSecStartElement xmlSecStartElement, Map<Object, SecurePart> secureParts) {
 
         if (!xmlSecStartElement.getOnElementDeclaredAttributes().isEmpty()) {
-            Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_wsu_Id);
+            Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_WSU_ID);
             if (attribute != null) {
                 SecurePart securePart = secureParts.get(attribute.getValue());
                 if (securePart != null) {
@@ -275,7 +275,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
                     return securePart;
                 }
             }
-            attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_NULL_AssertionID);
+            attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_NULL_ASSERTION_ID);
             if (attribute != null) {
                 SecurePart securePart = secureParts.get(attribute.getValue());
                 if (securePart != null) {

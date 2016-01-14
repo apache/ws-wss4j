@@ -165,21 +165,21 @@ public class AlgorithmSuiteAssertionState extends AssertionState implements Asse
                 setErrorMessage("Asymmetric key wrap algorithm key length " + keyLength + " does not meet policy");
                 policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
             }
-        } else if (WSSConstants.Comp_Key.equals(keyUsage)) {
+        } else if (WSSConstants.COMP_KEY.equals(keyUsage)) {
             if (algorithmSuite.getComputedKey() != null
                     && !algorithmSuite.getComputedKey().equals(algorithmURI)) {
                 setAsserted(false);
                 setErrorMessage("Computed key algorithm " + algorithmURI + " does not meet policy");
                 policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
             }
-        } else if (WSSConstants.Enc_KD.equals(keyUsage)) {
+        } else if (WSSConstants.ENC_KD.equals(keyUsage)) {
             if (algorithmSuite.getAlgorithmSuiteType() != null
                     && !algorithmSuite.getAlgorithmSuiteType().getEncryptionKeyDerivation().equals(algorithmURI)) {
                 setAsserted(false);
                 setErrorMessage("Encryption key derivation algorithm " + algorithmURI + " does not meet policy");
                 policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
             }
-        } else if (WSSConstants.Sig_KD.equals(keyUsage)) {
+        } else if (WSSConstants.SIG_KD.equals(keyUsage)) {
             if (algorithmSuite.getAlgorithmSuiteType() != null
                     && !algorithmSuite.getAlgorithmSuiteType().getSignatureKeyDerivation().equals(algorithmURI)) {
                 setAsserted(false);
@@ -197,31 +197,31 @@ public class AlgorithmSuiteAssertionState extends AssertionState implements Asse
             if (algorithmSuite.getC14n() != null
                 && !algorithmSuite.getC14n().getValue().equals(algorithmURI)
                 && !WSSConstants.NS_C14N_EXCL.equals(algorithmURI)
-                && !WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(algorithmURI)
+                && !WSSConstants.SOAPMESSAGE_NS10_STR_TRANSFORM.equals(algorithmURI)
                 && !WSSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(algorithmURI)
                 && !WSSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(algorithmURI)) {
                 setAsserted(false);
                 setErrorMessage("Transform C14N algorithm " + algorithmURI + " does not meet policy");
                 policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
             }
-        } else if (WSSConstants.Soap_Norm.equals(keyUsage)) {
+        } else if (WSSConstants.SOAP_NORM.equals(keyUsage)) {
             if (algorithmSuite.getSoapNormType() != null
                     && !algorithmSuite.getSoapNormType().getValue().equals(algorithmURI)) {
                 setAsserted(false);
                 setErrorMessage("Soap normalization algorithm " + algorithmURI + " does not meet policy");
                 policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
             }
-        } else if (WSSConstants.STR_Trans.equals(keyUsage)) {
+        } else if (WSSConstants.STR_TRANS.equals(keyUsage)) {
             if (algorithmSuite.getStrType() != null
                     && !algorithmSuite.getStrType().getValue().equals(algorithmURI)) {
                 setAsserted(false);
                 setErrorMessage("STR transformation algorithm " + algorithmURI  + " does not meet policy");
                 policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
             }
-        } else if (WSSConstants.XPath.equals(keyUsage) && algorithmSuite.getXPathType() != null 
+        } else if (WSSConstants.XPATH.equals(keyUsage) && algorithmSuite.getXPathType() != null 
             && !algorithmSuite.getXPathType().getValue().equals(algorithmURI)) {
             setAsserted(false);
-            setErrorMessage("XPath algorithm " + algorithmURI + " does not meet policy");
+            setErrorMessage("XPATH algorithm " + algorithmURI + " does not meet policy");
             policyAsserter.unassertPolicy(getAssertion(), getErrorMessage());
         }
 

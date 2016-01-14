@@ -120,7 +120,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                         //remove this processor. its no longer needed.
                         outputProcessorChain.removeProcessor(this);
                 } else if (level == 2
-                        && WSSConstants.TAG_soap_Body_LocalName.equals(xmlSecStartElement.getName().getLocalPart())
+                        && WSSConstants.TAG_SOAP_BODY_LN.equals(xmlSecStartElement.getName().getLocalPart())
                         && xmlSecStartElement.getName().getNamespaceURI().equals(soapMessageVersion)) {
                     //hmm it seems we don't have a soap header in the current document
                     //so output one and add securityHeader
@@ -129,11 +129,11 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                     OutputProcessorChain subOutputProcessorChain = 
                         outputProcessorChain.createSubChain(this, xmlSecStartElement.getParentXMLSecStartElement());
                     createStartElementAndOutputAsEvent(subOutputProcessorChain,
-                            new QName(soapMessageVersion, WSSConstants.TAG_soap_Header_LocalName, WSSConstants.PREFIX_SOAPENV), true, null);
+                            new QName(soapMessageVersion, WSSConstants.TAG_SOAP_HEADER_LN, WSSConstants.PREFIX_SOAPENV), true, null);
                     boolean mustUnderstand = ((WSSSecurityProperties) getSecurityProperties()).isMustUnderstand();
                     buildSecurityHeader(soapMessageVersion, subOutputProcessorChain, mustUnderstand);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain,
-                            new QName(soapMessageVersion, WSSConstants.TAG_soap_Header_LocalName, WSSConstants.PREFIX_SOAPENV));
+                            new QName(soapMessageVersion, WSSConstants.TAG_SOAP_HEADER_LN, WSSConstants.PREFIX_SOAPENV));
 
                     //output current soap-header event
                     outputProcessorChain.processEvent(xmlSecEvent);
@@ -148,7 +148,7 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
                 int documentLevel = xmlSecEndElement.getDocumentLevel();
                 String soapMessageVersionNS = 
                     WSSUtils.getSOAPMessageVersionNamespace(xmlSecEndElement.getParentXMLSecStartElement());
-                if (documentLevel == 2 && WSSConstants.TAG_soap_Header_LocalName.equals(xmlSecEndElement.getName().getLocalPart())
+                if (documentLevel == 2 && WSSConstants.TAG_SOAP_HEADER_LN.equals(xmlSecEndElement.getName().getLocalPart())
                         && xmlSecEndElement.getName().getNamespaceURI().equals(soapMessageVersionNS)) {
                     OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
                     boolean mustUnderstand = ((WSSSecurityProperties) getSecurityProperties()).isMustUnderstand();
@@ -206,19 +206,19 @@ public class SecurityHeaderOutputProcessor extends AbstractOutputProcessor {
         final String actor = ((WSSSecurityProperties) getSecurityProperties()).getActor();
         if (actor != null && !actor.isEmpty()) {
             if (WSSConstants.NS_SOAP11.equals(soapMessageVersion)) {
-                attributes.add(createAttribute(WSSConstants.ATT_soap11_Actor, actor));
+                attributes.add(createAttribute(WSSConstants.ATT_SOAP11_ACTOR, actor));
             } else {
-                attributes.add(createAttribute(WSSConstants.ATT_soap12_Role, actor));
+                attributes.add(createAttribute(WSSConstants.ATT_SOAP12_ROLE, actor));
             }
         }
         if (mustUnderstand) {
             if (WSSConstants.NS_SOAP11.equals(soapMessageVersion)) {
-                attributes.add(createAttribute(WSSConstants.ATT_soap11_MustUnderstand, "1"));
+                attributes.add(createAttribute(WSSConstants.ATT_SOAP11_MUST_UNDERSTAND, "1"));
             } else {
-                attributes.add(createAttribute(WSSConstants.ATT_soap12_MustUnderstand, "true"));
+                attributes.add(createAttribute(WSSConstants.ATT_SOAP12_MUST_UNDERSTAND, "true"));
             }
         }
-        createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Security, true, attributes);
-        createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_Security);
+        createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE_SECURITY, true, attributes);
+        createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE_SECURITY);
     }
 }

@@ -351,7 +351,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             if (includeSTR) {
                 SecurePart securePart =
                         new SecurePart(
-                                new QName(WSSConstants.SOAPMESSAGE_NS10_STRTransform),
+                                new QName(WSSConstants.SOAPMESSAGE_NS10_STR_TRANSFORM),
                                 tokenId, securityTokenReferenceId, SecurePart.Modifier.Element);
                 outputProcessorChain.getSecurityContext().putAsMap(WSSConstants.SIGNATURE_PARTS, tokenId, securePart);
             }
@@ -395,7 +395,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 if (includeBST()) {
 
                     OutputProcessorUtils.updateSecurityHeaderOrder(
-                            outputProcessorChain, WSSConstants.TAG_wsse_BinarySecurityToken, getAction(), false);
+                            outputProcessorChain, WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN, getAction(), false);
 
                     WSSUtils.createBinarySecurityTokenStructure(this, outputProcessorChain, securityToken.getId(),
                             securityToken.getX509Certificates(), getSecurityProperties().isUseSingleCert());
@@ -403,9 +403,9 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
                 final QName headerElementName;
                 if (samlAssertionWrapper.getSamlVersion() == SAMLVersion.VERSION_11) {
-                    headerElementName = WSSConstants.TAG_saml_Assertion;
+                    headerElementName = WSSConstants.TAG_SAML_ASSERTION;
                 } else {
-                    headerElementName = WSSConstants.TAG_saml2_Assertion;
+                    headerElementName = WSSConstants.TAG_SAML2_ASSERTION;
                 }
                 OutputProcessorUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
 
@@ -418,7 +418,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 }
                 if (includeSTR) {
                     OutputProcessorUtils.updateSecurityHeaderOrder(
-                            outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, getAction(), false);
+                            outputProcessorChain, WSSConstants.TAG_WSSE_SECURITY_TOKEN_REFERENCE, getAction(), false);
                     outputSecurityTokenReference(subOutputProcessorChain, samlAssertionWrapper,
                             securityTokenReferenceId, samlAssertionWrapper.getId());
                 }
@@ -446,15 +446,15 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
         List<XMLSecAttribute> attributes = new ArrayList<>(2);
         WSSecurityTokenConstants.TokenType tokenType = WSSecurityTokenConstants.Saml11Token;
         if (samlAssertionWrapper.getSamlVersion() == SAMLVersion.VERSION_11) {
-            attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE));
+            attributes.add(createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE, WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE));
         } else {
             tokenType = WSSecurityTokenConstants.Saml20Token;
-            attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE));
+            attributes.add(createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE, WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE));
         }
-        attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, referenceId));
-        createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
+        attributes.add(createAttribute(WSSConstants.ATT_WSU_ID, referenceId));
+        createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_SECURITY_TOKEN_REFERENCE, false, attributes);
         WSSUtils.createSAMLKeyIdentifierStructure(this, outputProcessorChain, tokenType, tokenId);
-        createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference);
+        createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_SECURITY_TOKEN_REFERENCE);
     }
 
 }

@@ -67,21 +67,21 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
         String attributeValue = null;
 
         final KeyIdentifierType keyIdentifierType = XMLSecurityUtils.getQNameType(
-                securityTokenReferenceType.getAny(), WSSConstants.TAG_wsse_KeyIdentifier);
+                securityTokenReferenceType.getAny(), WSSConstants.TAG_WSSE_KEY_IDENTIFIER);
         if (keyIdentifierType != null) {
             attributeValue = keyIdentifierType.getValue().trim();
             if (WSSConstants.NS_SAML10_TYPE.equals(keyIdentifierType.getValueType())) {
-                attributeName = WSSConstants.ATT_NULL_AssertionID;
+                attributeName = WSSConstants.ATT_NULL_ASSERTION_ID;
             } else if (WSSConstants.NS_SAML20_TYPE.equals(keyIdentifierType.getValueType())) {
                 attributeName = WSSConstants.ATT_NULL_ID;
             }
         }
         final ReferenceType referenceType = XMLSecurityUtils.getQNameType(
-                securityTokenReferenceType.getAny(), WSSConstants.TAG_wsse_Reference);
+                securityTokenReferenceType.getAny(), WSSConstants.TAG_WSSE_REFERENCE);
         if (referenceType != null) {
             attributeValue = WSSUtils.dropReferenceMarker(referenceType.getURI());
             if (WSSConstants.NS_SAML10_TYPE.equals(referenceType.getValueType())) {
-                attributeName = WSSConstants.ATT_NULL_AssertionID;
+                attributeName = WSSConstants.ATT_NULL_ASSERTION_ID;
             } else if (WSSConstants.NS_SAML20_TYPE.equals(referenceType.getValueType())) {
                 attributeName = WSSConstants.ATT_NULL_ID;
             }
@@ -181,7 +181,7 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
 
                         return xmlSecEvent;
                     } else if (xmlSecEndElement.getDocumentLevel() == 3
-                            && xmlSecEndElement.getName().equals(WSSConstants.TAG_wsse_Security)
+                            && xmlSecEndElement.getName().equals(WSSConstants.TAG_WSSE_SECURITY)
                             && WSSUtils.isInSecurityHeader(xmlSecEndElement, 
                                                            ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
                         //we can now remove this processor from the chain
