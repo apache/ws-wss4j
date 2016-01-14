@@ -117,10 +117,10 @@ public class SecurityContextTokenTest extends AbstractTestBase {
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_soap11_Body.getLocalPart());
-            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsc0512_SecurityContextToken.getNamespaceURI(), WSSConstants.TAG_wsc0512_SecurityContextToken.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_SOAP11_BODY.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSC0512_SCT.getNamespaceURI(), WSSConstants.TAG_WSC0512_SCT.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsc0512_DerivedKeyToken.getNamespaceURI(), WSSConstants.TAG_wsc0512_DerivedKeyToken.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSC0512_DKT.getNamespaceURI(), WSSConstants.TAG_WSC0512_DKT.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_ReferenceList.getNamespaceURI(), WSSConstants.TAG_xenc_ReferenceList.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
@@ -245,7 +245,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_soap11_Body.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_SOAP11_BODY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -328,9 +328,9 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsc0512_SecurityContextToken.getNamespaceURI(), WSSConstants.TAG_wsc0512_SecurityContextToken.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSC0512_SCT.getNamespaceURI(), WSSConstants.TAG_WSC0512_SCT.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsc0512_DerivedKeyToken.getNamespaceURI(), WSSConstants.TAG_wsc0512_DerivedKeyToken.getLocalPart());
+            nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSC0512_DKT.getNamespaceURI(), WSSConstants.TAG_WSC0512_DKT.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_ReferenceList.getNamespaceURI(), WSSConstants.TAG_xenc_ReferenceList.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 0);

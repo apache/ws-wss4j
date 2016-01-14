@@ -40,7 +40,7 @@ public class LayoutTest extends AbstractPolicyTestBase {
         RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
         List<QName> headerPath = new ArrayList<>();
         headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
-        headerPath.add(WSSConstants.TAG_wsu_Timestamp);
+        headerPath.add(WSSConstants.TAG_WSU_TIMESTAMP);
         requiredElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
 
@@ -84,7 +84,7 @@ public class LayoutTest extends AbstractPolicyTestBase {
         RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
         List<QName> headerPath = new ArrayList<>();
         headerPath.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
-        headerPath.add(WSSConstants.TAG_wsu_Timestamp);
+        headerPath.add(WSSConstants.TAG_WSU_TIMESTAMP);
         requiredElementSecurityEvent.setElementPath(headerPath);
         policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
 

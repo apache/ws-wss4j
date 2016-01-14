@@ -30,7 +30,7 @@ import org.apache.wss4j.stax.ext.WSSConstants;
 
 public class TimestampValidatorImpl implements TimestampValidator {
 
-    private static final transient org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TimestampValidatorImpl.class);
+    private static final transient org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(TimestampValidatorImpl.class);
 
     @Override
     public void validate(TimestampType timestampType, TokenContext tokenContext) throws WSSecurityException {
@@ -50,7 +50,7 @@ public class TimestampValidatorImpl implements TimestampValidator {
                 } catch (IllegalArgumentException e) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
                 }
-                log.debug("Timestamp created: " + created);
+                LOG.debug("Timestamp created: " + created);
                 createdDate = created.toGregorianCalendar().getTime();
             }
 
@@ -62,7 +62,7 @@ public class TimestampValidatorImpl implements TimestampValidator {
                 } catch (IllegalArgumentException e) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, e);
                 }
-                log.debug("Timestamp expires: " + expires);
+                LOG.debug("Timestamp expires: " + expires);
                 expiresDate = expires.toGregorianCalendar().getTime();
             } else if (tokenContext.getWssSecurityProperties().isRequireTimestampExpires()) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "invalidTimestamp",
@@ -75,13 +75,13 @@ public class TimestampValidatorImpl implements TimestampValidator {
 
             if (expiresDate != null && tokenContext.getWssSecurityProperties().isStrictTimestampCheck()
                 && expiresDate.before(rightNow)) {
-                log.debug("Time now: " + WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
+                LOG.debug("Time now: " + WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED, "invalidTimestamp",
                                               new Object[] {"The security semantics of the message have expired"});
             }
 
             if (createdDate != null && !DateUtil.verifyCreated(createdDate, ttl, futureTTL)) {
-                log.debug("Time now: " + WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
+                LOG.debug("Time now: " + WSSConstants.datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar()).toXMLFormat());
                 throw new WSSecurityException(WSSecurityException.ErrorCode.MESSAGE_EXPIRED, "invalidTimestamp",
                                               new Object[] {"The security semantics of the message have expired"});
             }

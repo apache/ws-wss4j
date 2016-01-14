@@ -60,7 +60,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
             OutputProcessorChain outputProcessorChain) throws XMLSecurityException {
 
         //we have to search for the SecurityHeaderElement for InclusiveNamespaces (same behavior as in wss-dom):
-        while (!WSSConstants.TAG_wsse_Security.equals(xmlSecStartElement.getName())) {
+        while (!WSSConstants.TAG_WSSE_SECURITY.equals(xmlSecStartElement.getName())) {
             xmlSecStartElement = xmlSecStartElement.getParentXMLSecStartElement();
         }
 
@@ -102,25 +102,25 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
         } else {
             boolean isSAMLToken = false;
             List<XMLSecAttribute> attributes = new ArrayList<>(2);
-            attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
+            attributes.add(createAttribute(WSSConstants.ATT_WSU_ID, IDGenerator.generateID(null)));
             if (WSSecurityTokenConstants.Saml10Token.equals(securityToken.getTokenType())
                 || WSSecurityTokenConstants.Saml11Token.equals(securityToken.getTokenType())) {
-                attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE));
+                attributes.add(createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE, WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE));
                 isSAMLToken = true;
             } else if (WSSecurityTokenConstants.Saml20Token.equals(securityToken.getTokenType())) {
-                attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE));
+                attributes.add(createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE, WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE));
                 isSAMLToken = true;
             } else if (WSSecurityTokenConstants.KerberosToken.equals(securityToken.getTokenType())) {
-                attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_GSS_Kerberos5_AP_REQ));
+                attributes.add(createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE, WSSConstants.NS_GSS_KERBEROS5_AP_REQ));
             } else if (WSSecurityTokenConstants.EncryptedKeyToken.equals(securityToken.getTokenType())
                 || WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier.equals(keyIdentifier)
                 || WSSecurityTokenConstants.KeyIdentifier_EncryptedKey.equals(keyIdentifier)) {
-                attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
+                attributes.add(createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
             } else if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier) 
                 && !useSingleCertificate) {
-                attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_X509PKIPathv1));
+                attributes.add(createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE, WSSConstants.NS_X509PKIPathv1));
             }
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
+            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_SECURITY_TOKEN_REFERENCE, false, attributes);
 
             String tokenId = securityToken.getId();
 
@@ -156,7 +156,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                 if (WSSecurityTokenConstants.Saml20Token.equals(securityToken.getTokenType())) {
                     valueType = null;
                 } else if (WSSecurityTokenConstants.KerberosToken.equals(securityToken.getTokenType())) {
-                    valueType = WSSConstants.NS_GSS_Kerberos5_AP_REQ;
+                    valueType = WSSConstants.NS_GSS_KERBEROS5_AP_REQ;
                 } else if (WSSecurityTokenConstants.DerivedKeyToken.equals(securityToken.getTokenType())) {
                     boolean use200512Namespace = ((WSSSecurityProperties)getSecurityProperties()).isUse200512Namespace();
                     if (use200512Namespace) {
@@ -190,7 +190,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_SIGNATURE, "unsupportedSecurityToken",
                                               new Object[] {keyIdentifier});
             }
-            createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference);
+            createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_SECURITY_TOKEN_REFERENCE);
         }
     }
 
@@ -201,19 +201,19 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
         if (transforms != null && transforms.length > 0) {
             createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transforms, false, null);
 
-            if (WSSConstants.SOAPMESSAGE_NS10_STRTransform.equals(transforms[0])) {
+            if (WSSConstants.SOAPMESSAGE_NS10_STR_TRANSFORM.equals(transforms[0])) {
                 List<XMLSecAttribute> attributes = new ArrayList<>(1);
                 attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, transforms[0]));
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform, false, attributes);
                 if (transforms.length >= 2) {
-                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_TransformationParameters, 
+                    createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE_TRANSFORMATION_PARAMETERS, 
                                                        false, null);
                     attributes = new ArrayList<>(1);
                     attributes.add(createAttribute(WSSConstants.ATT_NULL_Algorithm, transforms[1]));
                     createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_CanonicalizationMethod, 
                                                        false, attributes);
                     createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_CanonicalizationMethod);
-                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsse_TransformationParameters);
+                    createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSSE_TRANSFORMATION_PARAMETERS);
                 }
                 createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_dsig_Transform);
             } else {

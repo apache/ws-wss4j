@@ -60,14 +60,14 @@ public class SignatureProtectionAssertionState extends AssertionState implements
         super(assertion, asserted);
         List<QName> signature11Path = new LinkedList<>();
         signature11Path.addAll(WSSConstants.SOAP_11_HEADER_PATH);
-        signature11Path.add(WSSConstants.TAG_wsse_Security);
+        signature11Path.add(WSSConstants.TAG_WSSE_SECURITY);
         signature11Path.add(WSSConstants.TAG_dsig_Signature);
         elementPaths.add(signature11Path);
 
         List<QName> signatureConfirmation11Path = new LinkedList<>();
         signatureConfirmation11Path.addAll(WSSConstants.SOAP_11_HEADER_PATH);
-        signatureConfirmation11Path.add(WSSConstants.TAG_wsse_Security);
-        signatureConfirmation11Path.add(WSSConstants.TAG_wsse11_SignatureConfirmation);
+        signatureConfirmation11Path.add(WSSConstants.TAG_WSSE_SECURITY);
+        signatureConfirmation11Path.add(WSSConstants.TAG_WSSE11_SIG_CONF);
         elementPaths.add(signatureConfirmation11Path);
 
         this.policyAsserter = policyAsserter;

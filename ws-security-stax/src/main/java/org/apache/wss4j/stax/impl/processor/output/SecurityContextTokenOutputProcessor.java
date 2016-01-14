@@ -165,7 +165,7 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
                 List<XMLSecAttribute> attributes = new ArrayList<>(1);
-                attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, securityToken.getId()));
+                attributes.add(createAttribute(WSSConstants.ATT_WSU_ID, securityToken.getId()));
                 QName identifierName = getIdentifierName();
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, true, attributes);
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, identifierName, false, null);
@@ -179,16 +179,16 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
 
         private QName getHeaderElementName() {
             if (use200512Namespace) {
-                return WSSConstants.TAG_wsc0512_SecurityContextToken;
+                return WSSConstants.TAG_WSC0512_SCT;
             }
-            return WSSConstants.TAG_wsc0502_SecurityContextToken;
+            return WSSConstants.TAG_WSC0502_SCT;
         }
 
         private QName getIdentifierName() {
             if (use200512Namespace) {
-                return WSSConstants.TAG_wsc0512_Identifier;
+                return WSSConstants.TAG_WSC0512_IDENTIFIER;
             }
-            return WSSConstants.TAG_wsc0502_Identifier;
+            return WSSConstants.TAG_WSC0502_IDENTIFIER;
         }
     }
 }

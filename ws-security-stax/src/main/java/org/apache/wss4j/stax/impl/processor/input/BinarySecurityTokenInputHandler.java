@@ -76,7 +76,7 @@ public class BinarySecurityTokenInputHandler extends AbstractInputSecurityHeader
             new TokenContext(wssSecurityProperties, wsInboundSecurityContext, xmlSecEvents, elementPath);
 
         BinarySecurityTokenValidator binarySecurityTokenValidator =
-                wssSecurityProperties.getValidator(WSSConstants.TAG_wsse_BinarySecurityToken);
+                wssSecurityProperties.getValidator(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN);
         if (binarySecurityTokenValidator == null) {
             binarySecurityTokenValidator = new BinarySecurityTokenValidatorImpl();
         }

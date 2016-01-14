@@ -225,7 +225,7 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
     protected String getId(XMLSecEvent xmlSecEvent) {
         XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
         if (!xmlSecStartElement.getOnElementDeclaredAttributes().isEmpty()) {
-            Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_wsu_Id);
+            Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_WSU_ID);
             if (attribute != null) {
                 return attribute.getValue();
             }
@@ -237,7 +237,7 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
             if (attribute != null) {
                 return attribute.getValue();
             }
-            attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_NULL_AssertionID);
+            attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_NULL_ASSERTION_ID);
             if (attribute != null) {
                 return attribute.getValue();
             }

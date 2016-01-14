@@ -884,7 +884,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             Assert.assertEquals(kerberosTokenSecurityEvents.size(), 1);
             final KerberosTokenSecurityEvent kerberosTokenSecurityEvent = kerberosTokenSecurityEvents.get(0);
@@ -981,7 +981,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             //header element must still be there
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             Assert.assertEquals(kerberosTokenSecurityEvents.size(), 1);
         }
@@ -1146,9 +1146,9 @@ public class KerberosTest extends AbstractLdapTestUnit {
             Document document = StAX2DOM.readDoc(dbf.newDocumentBuilder(), xmlStreamReader);
 
             //header element must still be there
-            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsse_BinarySecurityToken.getNamespaceURI(), WSSConstants.TAG_wsse_BinarySecurityToken.getLocalPart());
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN.getNamespaceURI(), WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());
@@ -1242,9 +1242,9 @@ public class KerberosTest extends AbstractLdapTestUnit {
             Document document = StAX2DOM.readDoc(dbf.newDocumentBuilder(), xmlStreamReader);
 
             //header element must still be there
-            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsse_BinarySecurityToken.getNamespaceURI(), WSSConstants.TAG_wsse_BinarySecurityToken.getLocalPart());
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN.getNamespaceURI(), WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             //no encrypted content
             nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedData.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedData.getLocalPart());

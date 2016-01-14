@@ -78,7 +78,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
 
         ReplayCache replayCache = wssSecurityProperties.getNonceReplayCache();
         final EncodedString encodedNonce =
-                XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Nonce);
+                XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_WSSE_NONCE);
         if (encodedNonce != null && replayCache != null) {
             // Check for replay attacks
             String nonce = encodedNonce.getValue();
@@ -105,7 +105,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
             new TokenContext(wssSecurityProperties, wsInboundSecurityContext, xmlSecEvents, elementPath);
 
         UsernameTokenValidator usernameTokenValidator =
-                wssSecurityProperties.getValidator(WSSConstants.TAG_wsse_UsernameToken);
+                wssSecurityProperties.getValidator(WSSConstants.TAG_WSSE_USERNAME_TOKEN);
         if (usernameTokenValidator == null) {
             usernameTokenValidator = new UsernameTokenValidatorImpl();
         }
@@ -156,19 +156,19 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         for (int i = 0; i < xmlSecEvents.size(); i++) {
             XMLSecEvent xmlSecEvent = xmlSecEvents.get(i);
             if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
-                if (xmlSecEvent.asStartElement().getName().equals(WSSConstants.TAG_wsse_UsernameToken)) {
+                if (xmlSecEvent.asStartElement().getName().equals(WSSConstants.TAG_WSSE_USERNAME_TOKEN)) {
                     continue;
-                } else if (xmlSecEvent.asStartElement().getName().equals(WSSConstants.TAG_wsse_Password)) {
+                } else if (xmlSecEvent.asStartElement().getName().equals(WSSConstants.TAG_WSSE_PASSWORD)) {
                     if (passwordIndex != -1) {
                         securityContext.handleBSPRule(BSPRule.R4222);
                     }
                     passwordIndex = i;
-                } else if (xmlSecEvent.asStartElement().getName().equals(WSSConstants.TAG_wsu_Created)) {
+                } else if (xmlSecEvent.asStartElement().getName().equals(WSSConstants.TAG_WSU_CREATED)) {
                     if (createdIndex != -1) {
                         securityContext.handleBSPRule(BSPRule.R4223);
                     }
                     createdIndex = i;
-                } else if (xmlSecEvent.asStartElement().getName().equals(WSSConstants.TAG_wsse_Nonce)) {
+                } else if (xmlSecEvent.asStartElement().getName().equals(WSSConstants.TAG_WSSE_NONCE)) {
                     if (nonceIndex != -1) {
                         securityContext.handleBSPRule(BSPRule.R4225);
                     }
@@ -178,13 +178,13 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         }
 
         PasswordString passwordType =
-                XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Password);
+                XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_WSSE_PASSWORD);
         if (passwordType != null && passwordType.getType() == null) {
             securityContext.handleBSPRule(BSPRule.R4201);
         }
 
         EncodedString encodedNonce =
-                XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsse_Nonce);
+                XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_WSSE_NONCE);
         if (encodedNonce != null) {
             if (encodedNonce.getEncodingType() == null) {
                 securityContext.handleBSPRule(BSPRule.R4220);
@@ -204,7 +204,7 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         int futureTTL = wssSecurityProperties.getUtFutureTTL();
 
         final AttributedDateTime attributedDateTimeCreated =
-            XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_wsu_Created);
+            XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_WSU_CREATED);
 
         if (attributedDateTimeCreated != null) {
             // Parse the Date

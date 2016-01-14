@@ -108,8 +108,8 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
     static {
         DOC_BUILDER_FACTORY.setNamespaceAware(true);
-        SAML1_TOKEN_PATH.add(WSSConstants.TAG_saml_Assertion);
-        SAML2_TOKEN_PATH.add(WSSConstants.TAG_saml2_Assertion);
+        SAML1_TOKEN_PATH.add(WSSConstants.TAG_SAML_ASSERTION);
+        SAML2_TOKEN_PATH.add(WSSConstants.TAG_SAML2_ASSERTION);
     }
 
     @Override
@@ -351,8 +351,8 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
 
         final XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
         final QName elementName = xmlSecStartElement.getName();
-        if (WSSConstants.TAG_wst_BinarySecret.equals(elementName)
-            || WSSConstants.TAG_wst0512_BinarySecret.equals(elementName)) {
+        if (WSSConstants.TAG_WST_BINARY_SECRET.equals(elementName)
+            || WSSConstants.TAG_WST0512_BINARY_SECRET.equals(elementName)) {
 
             final StringBuilder stringBuilder = new StringBuilder();
             loop:

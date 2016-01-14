@@ -63,7 +63,7 @@ public class TimestampOutputProcessor extends AbstractOutputProcessor {
 
         if (WSSUtils.isSecurityHeaderElement(xmlSecEvent, ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
 
-            final QName headerElementName = WSSConstants.TAG_wsu_Timestamp;
+            final QName headerElementName = WSSConstants.TAG_WSU_TIMESTAMP;
             OutputProcessorUtils.updateSecurityHeaderOrder(outputProcessorChain, headerElementName, getAction(), false);
 
             XMLGregorianCalendar created = 
@@ -76,12 +76,12 @@ public class TimestampOutputProcessor extends AbstractOutputProcessor {
             OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
             //wsu:id is optional and will be added when signing...
             createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, true, null);
-            createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Created, false, null);
+            createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSU_CREATED, false, null);
             createCharactersAndOutputAsEvent(subOutputProcessorChain, created.toXMLFormat());
-            createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Created);
-            createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Expires, false, null);
+            createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSU_CREATED);
+            createStartElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSU_EXPIRES, false, null);
             createCharactersAndOutputAsEvent(subOutputProcessorChain, expires.toXMLFormat());
-            createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_wsu_Expires);
+            createEndElementAndOutputAsEvent(subOutputProcessorChain, WSSConstants.TAG_WSU_EXPIRES);
             createEndElementAndOutputAsEvent(subOutputProcessorChain, headerElementName);
 
             outputProcessorChain.removeProcessor(this);

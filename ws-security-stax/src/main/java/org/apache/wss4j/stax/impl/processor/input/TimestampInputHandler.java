@@ -76,7 +76,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
             timestampType.setId(IDGenerator.generateID(null));
         }
 
-        TimestampValidator timestampValidator = wssSecurityProperties.getValidator(WSSConstants.TAG_wsu_Timestamp);
+        TimestampValidator timestampValidator = wssSecurityProperties.getValidator(WSSConstants.TAG_WSU_TIMESTAMP);
         if (timestampValidator == null) {
             timestampValidator = new TimestampValidatorImpl();
         }
@@ -119,9 +119,9 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
             if (xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT) {
                 QName name = xmlSecEvent.asStartElement().getName();
 
-                if (name.equals(WSSConstants.TAG_wsu_Timestamp)) {
+                if (name.equals(WSSConstants.TAG_WSU_TIMESTAMP)) {
                     continue;
-                } else if (name.equals(WSSConstants.TAG_wsu_Created)) {
+                } else if (name.equals(WSSConstants.TAG_WSU_CREATED)) {
                     if (createdIndex != -1) {
                         securityContext.handleBSPRule(BSPRule.R3203);
                     }
@@ -129,7 +129,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
                         securityContext.handleBSPRule(BSPRule.R3221);
                     }
                     createdIndex = i;
-                } else if (name.equals(WSSConstants.TAG_wsu_Expires)) {
+                } else if (name.equals(WSSConstants.TAG_WSU_EXPIRES)) {
                     if (expiresIndex != -1) {
                         securityContext.handleBSPRule(BSPRule.R3224);
                     }
@@ -158,7 +158,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
                 securityContext.handleBSPRule(BSPRule.R3213);
             }
             String valueType = XMLSecurityUtils.getQNameAttribute(timestampType.getCreated().getOtherAttributes(), 
-                                                                  WSSConstants.ATT_NULL_ValueType);
+                                                                  WSSConstants.ATT_NULL_VALUE_TYPE);
             if (valueType != null) {
                 securityContext.handleBSPRule(BSPRule.R3225);
             }
@@ -184,7 +184,7 @@ public class TimestampInputHandler extends AbstractInputSecurityHeaderHandler {
                 securityContext.handleBSPRule(BSPRule.R3215);
             }
             String valueType = XMLSecurityUtils.getQNameAttribute(timestampType.getExpires().getOtherAttributes(), 
-                                                                  WSSConstants.ATT_NULL_ValueType);
+                                                                  WSSConstants.ATT_NULL_VALUE_TYPE);
             if (valueType != null) {
                 securityContext.handleBSPRule(BSPRule.R3226);
             }

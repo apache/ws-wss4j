@@ -48,7 +48,7 @@ public class SignatureConfirmationInputProcessor extends AbstractInputProcessor 
         XMLSecEvent xmlSecEvent = inputProcessorChain.processHeaderEvent();
         if (xmlSecEvent.getEventType() == XMLStreamConstants.END_ELEMENT) {
             XMLSecEndElement xmlSecEndElement = xmlSecEvent.asEndElement();
-            if (xmlSecEndElement.getName().equals(WSSConstants.TAG_wsse_Security)) {
+            if (xmlSecEndElement.getName().equals(WSSConstants.TAG_WSSE_SECURITY)) {
                 inputProcessorChain.removeProcessor(this);
 
                 List<SignatureValueSecurityEvent> signatureValueSecurityEventList =

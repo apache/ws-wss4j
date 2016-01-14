@@ -128,11 +128,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_CREATED, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_EXPIRES, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -271,11 +271,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_CREATED, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_EXPIRES, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -377,11 +377,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_CREATED, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_EXPIRES, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -503,13 +503,13 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse_UsernameToken, SecurePart.Modifier.Element));
-        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSSE_USERNAME_TOKEN, SecurePart.Modifier.Element));
+        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_CREATED, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_EXPIRES, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
         actions.add(WSSConstants.TIMESTAMP);
@@ -624,13 +624,13 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        //outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        //outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse_UsernameToken, SecurePart.Modifier.Element));
-        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        //outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        //outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSSE_USERNAME_TOKEN, SecurePart.Modifier.Element));
+        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_CREATED, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_EXPIRES, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
         actions.add(WSSConstants.TIMESTAMP);
@@ -753,13 +753,13 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        //outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse_UsernameToken, SecurePart.Modifier.Element));
-        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        //outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSSE_USERNAME_TOKEN, SecurePart.Modifier.Element));
+        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_CREATED, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_EXPIRES, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
         actions.add(WSSConstants.TIMESTAMP);
@@ -875,13 +875,13 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse_UsernameToken, SecurePart.Modifier.Element));
-        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
-        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSSE_USERNAME_TOKEN, SecurePart.Modifier.Element));
+        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_CREATED, SecurePart.Modifier.Element));
+        //outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_EXPIRES, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.USERNAMETOKEN);
         actions.add(WSSConstants.TIMESTAMP);
@@ -987,11 +987,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512");
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_CREATED, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_EXPIRES, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -1106,11 +1106,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setSignatureCanonicalizationAlgorithm("http://www.w3.org/2006/12/xml-c14n11");
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_CREATED, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_EXPIRES, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -1226,11 +1226,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setSignatureDigestAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-md5");
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element, new String[]{WSSConstants.NS_C14N_EXCL}, "http://www.w3.org/2001/04/xmldsig-more#md5"));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element, new String[]{WSSConstants.NS_C14N_EXCL}, "http://www.w3.org/2001/04/xmldsig-more#md5"));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element, new String[]{WSSConstants.NS_C14N_EXCL}, "http://www.w3.org/2001/04/xmldsig-more#md5"));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element, new String[]{WSSConstants.NS_C14N_EXCL}, "http://www.w3.org/2001/04/xmldsig-more#md5"));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_CREATED, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_EXPIRES, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -1348,11 +1348,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_CREATED, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_EXPIRES, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -1465,11 +1465,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_CREATED, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_EXPIRES, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -1573,12 +1573,12 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_dsig_Signature, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_CREATED, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_EXPIRES, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -1682,11 +1682,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_CREATED, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_EXPIRES, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -1795,12 +1795,12 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
         outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_dsig_Signature, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_CREATED, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_EXPIRES, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -1924,12 +1924,12 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
         outSecurityProperties.addSignaturePart(new SecurePart(new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_CREATED, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_EXPIRES, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -2025,11 +2025,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
         outSecurityProperties.addSignaturePart(new SecurePart(new QName("http://schemas.xmlsoap.org/wsdl/", "definitions"), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_CREATED, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_EXPIRES, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -2134,11 +2134,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
         outSecurityProperties.addSignaturePart(new SecurePart(new QName("http://schemas.xmlsoap.org/wsdl/", "service"), SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_CREATED, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_EXPIRES, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -2250,11 +2250,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_CREATED, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_EXPIRES, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         WSSConstants.Action[] actions = new WSSConstants.Action[]{WSSConstants.TIMESTAMP, WSSConstants.SIGNATURE, WSSConstants.ENCRYPT};
         outSecurityProperties.setActions(actions);
 
@@ -2399,14 +2399,14 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setSignatureUser("transmitter");
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse_UsernameToken, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSSE_USERNAME_TOKEN, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
         outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setEncryptionUser("receiver");
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_CREATED, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_EXPIRES, SecurePart.Modifier.Content));
         outSecurityProperties.setUsernameTokenPasswordType(UsernameTokenPasswordType.PASSWORD_TEXT);
 
         InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
@@ -2529,9 +2529,9 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setSignatureUser("transmitter");
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsse_UsernameToken, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSSE_USERNAME_TOKEN, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
         outSecurityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
         outSecurityProperties.setEncryptionUser("receiver");
         outSecurityProperties.addEncryptionPart(new SecurePart(new QName("http://www.w3.org/1999/XMLSchema", "simpleType"), SecurePart.Modifier.Element));
@@ -2632,11 +2632,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_CREATED, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_EXPIRES, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -2746,11 +2746,11 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Created, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_wsu_Expires, SecurePart.Modifier.Content));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_CREATED, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_WSU_EXPIRES, SecurePart.Modifier.Content));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);
@@ -2861,9 +2861,9 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.ENCRYPT);
@@ -2975,9 +2975,9 @@ public class AsymmetricBindingIntegrationTest extends AbstractPolicyTestBase {
         outSecurityProperties.setSignatureUser("transmitter");
         outSecurityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
 
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_wsu_Timestamp, SecurePart.Modifier.Element));
-        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Element));
-        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_soap11_Body, SecurePart.Modifier.Content));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_WSU_TIMESTAMP, SecurePart.Modifier.Element));
+        outSecurityProperties.addSignaturePart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Element));
+        outSecurityProperties.addEncryptionPart(new SecurePart(WSSConstants.TAG_SOAP11_BODY, SecurePart.Modifier.Content));
         List<WSSConstants.Action> actions = new ArrayList<>();
         actions.add(WSSConstants.TIMESTAMP);
         actions.add(WSSConstants.SIGNATURE);

@@ -96,8 +96,8 @@ public class SamlConditionsTest extends AbstractTestBase {
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 2);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_saml_Assertion.getLocalPart());
-            Assert.assertEquals(nodeList.item(1).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_SAML_ASSERTION.getLocalPart());
+            Assert.assertEquals(nodeList.item(1).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             nodeList = document.getElementsByTagNameNS("urn:oasis:names:tc:SAML:1.0:assertion", "Conditions");
             Assert.assertEquals(nodeList.getLength(), 1);
@@ -143,8 +143,8 @@ public class SamlConditionsTest extends AbstractTestBase {
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 2);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_saml_Assertion.getLocalPart());
-            Assert.assertEquals(nodeList.item(1).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_SAML_ASSERTION.getLocalPart());
+            Assert.assertEquals(nodeList.item(1).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             nodeList = securedDocument.getElementsByTagNameNS("urn:oasis:names:tc:SAML:1.0:assertion", "Conditions");
             Assert.assertEquals(nodeList.getLength(), 1);

@@ -58,83 +58,87 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final String NS_SAML2 = "urn:oasis:names:tc:SAML:2.0:assertion";
 
     public static final String PREFIX_SOAPENV = "soap";
-    public static final String TAG_soap_Envelope_LocalName = "Envelope";
-    public static final String TAG_soap_Header_LocalName = "Header";
-    public static final String TAG_soap_Body_LocalName = "Body";
+    public static final String TAG_SOAP_ENVELOPE_LN = "Envelope";
+    public static final String TAG_SOAP_HEADER_LN = "Header";
+    public static final String TAG_SOAP_BODY_LN = "Body";
 
-    public static final QName TAG_soap11_Envelope = new QName(NS_SOAP11, TAG_soap_Envelope_LocalName, PREFIX_SOAPENV);
-    public static final QName TAG_soap11_Header = new QName(NS_SOAP11, TAG_soap_Header_LocalName, PREFIX_SOAPENV);
-    public static final QName TAG_soap11_Body = new QName(NS_SOAP11, TAG_soap_Body_LocalName, PREFIX_SOAPENV);
-    public static final QName ATT_soap11_Actor = new QName(NS_SOAP11, "actor", PREFIX_SOAPENV);
-    public static final QName ATT_soap11_MustUnderstand = new QName(NS_SOAP11, "mustUnderstand", PREFIX_SOAPENV);
+    public static final QName TAG_SOAP11_ENVELOPE = new QName(NS_SOAP11, TAG_SOAP_ENVELOPE_LN, PREFIX_SOAPENV);
+    public static final QName TAG_SOAP11_HEADER = new QName(NS_SOAP11, TAG_SOAP_HEADER_LN, PREFIX_SOAPENV);
+    public static final QName TAG_SOAP11_BODY = new QName(NS_SOAP11, TAG_SOAP_BODY_LN, PREFIX_SOAPENV);
+    public static final QName ATT_SOAP11_ACTOR = new QName(NS_SOAP11, "actor", PREFIX_SOAPENV);
+    public static final QName ATT_SOAP11_MUST_UNDERSTAND = new QName(NS_SOAP11, "mustUnderstand", PREFIX_SOAPENV);
 
-    public static final QName TAG_soap12_Envelope = new QName(NS_SOAP12, TAG_soap_Envelope_LocalName, PREFIX_SOAPENV);
-    public static final QName TAG_soap12_Header = new QName(NS_SOAP12, TAG_soap_Header_LocalName, PREFIX_SOAPENV);
-    public static final QName TAG_soap12_Body = new QName(NS_SOAP12, TAG_soap_Body_LocalName, PREFIX_SOAPENV);
-    public static final QName ATT_soap12_Role = new QName(NS_SOAP12, "role", PREFIX_SOAPENV);
-    public static final QName ATT_soap12_MustUnderstand = new QName(NS_SOAP12, "mustUnderstand", PREFIX_SOAPENV);
+    public static final QName TAG_SOAP12_ENVELOPE = new QName(NS_SOAP12, TAG_SOAP_ENVELOPE_LN, PREFIX_SOAPENV);
+    public static final QName TAG_SOAP12_HEADER = new QName(NS_SOAP12, TAG_SOAP_HEADER_LN, PREFIX_SOAPENV);
+    public static final QName TAG_SOAP12_BODY = new QName(NS_SOAP12, TAG_SOAP_BODY_LN, PREFIX_SOAPENV);
+    public static final QName ATT_SOAP12_ROLE = new QName(NS_SOAP12, "role", PREFIX_SOAPENV);
+    public static final QName ATT_SOAP12_MUST_UNDERSTAND = new QName(NS_SOAP12, "mustUnderstand", PREFIX_SOAPENV);
 
     public static final String PREFIX_WSSE = "wsse";
     public static final String PREFIX_WSSE11 = "wsse11";
-    public static final QName TAG_wsse_Security = new QName(NS_WSSE10, "Security", PREFIX_WSSE);
+    public static final QName TAG_WSSE_SECURITY = new QName(NS_WSSE10, "Security", PREFIX_WSSE);
 
-    public static final QName TAG_wsse_SecurityTokenReference = new QName(NS_WSSE10, "SecurityTokenReference", PREFIX_WSSE);
-    public static final QName TAG_wsse_Reference = new QName(NS_WSSE10, "Reference", PREFIX_WSSE);
-    public static final QName ATT_wsse_Usage = new QName(NS_WSSE10, "Usage", PREFIX_WSSE);
-    public static final QName ATT_wsse11_TokenType = new QName(NS_WSSE11, "TokenType", PREFIX_WSSE11);
+    public static final QName TAG_WSSE_SECURITY_TOKEN_REFERENCE = new QName(NS_WSSE10, "SecurityTokenReference", PREFIX_WSSE);
+    public static final QName TAG_WSSE_REFERENCE = new QName(NS_WSSE10, "Reference", PREFIX_WSSE);
+    public static final QName ATT_WSSE_USAGE = new QName(NS_WSSE10, "Usage", PREFIX_WSSE);
+    public static final QName ATT_WSSE11_TOKEN_TYPE = new QName(NS_WSSE11, "TokenType", PREFIX_WSSE11);
 
-    public static final QName TAG_wsse_KeyIdentifier = new QName(NS_WSSE10, "KeyIdentifier", PREFIX_WSSE);
-    public static final QName ATT_NULL_EncodingType = new QName(null, "EncodingType");
-    public static final QName ATT_NULL_ValueType = new QName(null, "ValueType");
+    public static final QName TAG_WSSE_KEY_IDENTIFIER = new QName(NS_WSSE10, "KeyIdentifier", PREFIX_WSSE);
+    public static final QName ATT_NULL_ENCODING_TYPE = new QName(null, "EncodingType");
+    public static final QName ATT_NULL_VALUE_TYPE = new QName(null, "ValueType");
 
-    public static final QName TAG_wsse_BinarySecurityToken = new QName(NS_WSSE10, "BinarySecurityToken", PREFIX_WSSE);
+    public static final QName TAG_WSSE_BINARY_SECURITY_TOKEN = new QName(NS_WSSE10, "BinarySecurityToken", PREFIX_WSSE);
     public static final String PREFIX_WSU = "wsu";
-    public static final QName ATT_wsu_Id = new QName(NS_WSU10, "Id", PREFIX_WSU);
+    public static final QName ATT_WSU_ID = new QName(NS_WSU10, "Id", PREFIX_WSU);
 
-    public static final QName TAG_wsse11_EncryptedHeader = new QName(NS_WSSE11, "EncryptedHeader", PREFIX_WSSE11);
+    public static final QName TAG_WSSE11_ENCRYPTED_HEADER = new QName(NS_WSSE11, "EncryptedHeader", PREFIX_WSSE11);
 
-    public static final QName TAG_wsse_TransformationParameters = new QName(NS_WSSE10, "TransformationParameters", PREFIX_WSSE);
+    public static final QName TAG_WSSE_TRANSFORMATION_PARAMETERS = new QName(NS_WSSE10, "TransformationParameters", PREFIX_WSSE);
 
-    public static final QName TAG_wsu_Timestamp = new QName(NS_WSU10, "Timestamp", PREFIX_WSU);
-    public static final QName TAG_wsu_Created = new QName(NS_WSU10, "Created", PREFIX_WSU);
-    public static final QName TAG_wsu_Expires = new QName(NS_WSU10, "Expires", PREFIX_WSU);
+    public static final QName TAG_WSU_TIMESTAMP = new QName(NS_WSU10, "Timestamp", PREFIX_WSU);
+    public static final QName TAG_WSU_CREATED = new QName(NS_WSU10, "Created", PREFIX_WSU);
+    public static final QName TAG_WSU_EXPIRES = new QName(NS_WSU10, "Expires", PREFIX_WSU);
 
-    public static final String NS10_SOAPMESSAGE_SECURITY = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0";
-    public static final String NS11_SOAPMESSAGE_SECURITY = "http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1";
+    public static final String NS10_SOAPMESSAGE_SECURITY = 
+        "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0";
+    public static final String NS11_SOAPMESSAGE_SECURITY = 
+        "http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1";
 
-    public static final String NS_X509TOKEN_PROFILE = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0";
+    public static final String NS_X509TOKEN_PROFILE =
+        "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0";
 
     public static final String NS_X509_V3_TYPE = NS_X509TOKEN_PROFILE + "#X509v3";
     public static final String NS_X509PKIPathv1 = NS_X509TOKEN_PROFILE + "#X509PKIPathv1";
-    public static final String NS_X509SubjectKeyIdentifier = NS_X509TOKEN_PROFILE + "#X509SubjectKeyIdentifier";
+    public static final String NS_X509_SKI = NS_X509TOKEN_PROFILE + "#X509SubjectKeyIdentifier";
     public static final String NS_THUMBPRINT = NS11_SOAPMESSAGE_SECURITY + "#ThumbprintSHA1";
 
     public static final String NS_ENCRYPTED_KEY_SHA1 = NS11_SOAPMESSAGE_SECURITY + "#EncryptedKeySHA1";
 
     public static final String SOAPMESSAGE_NS10_BASE64_ENCODING = NS10_SOAPMESSAGE_SECURITY + "#Base64Binary";
 
-    public static final QName TAG_wsse_UsernameToken = new QName(NS_WSSE10, "UsernameToken", PREFIX_WSSE);
-    public static final QName TAG_wsse_Username = new QName(NS_WSSE10, "Username", PREFIX_WSSE);
-    public static final QName TAG_wsse_Password = new QName(NS_WSSE10, "Password", PREFIX_WSSE);
-    public static final QName TAG_wsse_Nonce = new QName(NS_WSSE10, "Nonce", PREFIX_WSSE);
-    public static final QName TAG_wsse11_Salt = new QName(NS_WSSE11, "Salt", PREFIX_WSSE11);
-    public static final QName TAG_wsse11_Iteration = new QName(NS_WSSE11, "Iteration", PREFIX_WSSE11);
+    public static final QName TAG_WSSE_USERNAME_TOKEN = new QName(NS_WSSE10, "UsernameToken", PREFIX_WSSE);
+    public static final QName TAG_WSSE_USERNAME = new QName(NS_WSSE10, "Username", PREFIX_WSSE);
+    public static final QName TAG_WSSE_PASSWORD = new QName(NS_WSSE10, "Password", PREFIX_WSSE);
+    public static final QName TAG_WSSE_NONCE = new QName(NS_WSSE10, "Nonce", PREFIX_WSSE);
+    public static final QName TAG_WSSE11_SALT = new QName(NS_WSSE11, "Salt", PREFIX_WSSE11);
+    public static final QName TAG_WSSE11_ITERATION = new QName(NS_WSSE11, "Iteration", PREFIX_WSSE11);
 
-    public static final String NS_USERNAMETOKEN_PROFILE11 = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0";
+    public static final String NS_USERNAMETOKEN_PROFILE11 = 
+        "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0";
     public static final String NS_PASSWORD_DIGEST = NS_USERNAMETOKEN_PROFILE11 + "#PasswordDigest";
     public static final String NS_PASSWORD_TEXT = NS_USERNAMETOKEN_PROFILE11 + "#PasswordText";
-    public static final String NS_USERNAMETOKEN_PROFILE_UsernameToken = NS_USERNAMETOKEN_PROFILE11 + "#UsernameToken";
+    public static final String NS_USERNAMETOKEN_PROFILE_USERNAME_TOKEN = NS_USERNAMETOKEN_PROFILE11 + "#UsernameToken";
 
-    public static final QName TAG_wsse11_SignatureConfirmation = new QName(NS_WSSE11, "SignatureConfirmation", PREFIX_WSSE11);
-    public static final QName ATT_NULL_Value = new QName(null, "Value");
+    public static final QName TAG_WSSE11_SIG_CONF = new QName(NS_WSSE11, "SignatureConfirmation", PREFIX_WSSE11);
+    public static final QName ATT_NULL_VALUE = new QName(null, "Value");
 
     public static final String NS_C14N_EXCL = "http://www.w3.org/2001/10/xml-exc-c14n#";
     public static final String PREFIX_C14N_EXCL = "c14nEx";
 
-    public static final QName TAG_wst_BinarySecret = new QName(NS_WST, "BinarySecret");
-    public static final QName TAG_wst0512_BinarySecret = new QName(NS_WST_05_12, "BinarySecret");
+    public static final QName TAG_WST_BINARY_SECRET = new QName(NS_WST, "BinarySecret");
+    public static final QName TAG_WST0512_BINARY_SECRET = new QName(NS_WST_05_12, "BinarySecret");
 
-    public static final String SOAPMESSAGE_NS10_STRTransform = NS10_SOAPMESSAGE_SECURITY + "#STR-Transform";
+    public static final String SOAPMESSAGE_NS10_STR_TRANSFORM = NS10_SOAPMESSAGE_SECURITY + "#STR-Transform";
     public static final String SWA_ATTACHMENT_CONTENT_SIG_TRANS =
             "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Content-Signature-Transform";
     public static final String SWA_ATTACHMENT_COMPLETE_SIG_TRANS =
@@ -146,9 +150,9 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final String SWA_ATTACHMENT_ENCRYPTED_DATA_TYPE_COMPLETE =
             "http://docs.oasis-open.org/wss/oasis-wss-SwAProfile-1.1#Attachment-Complete";
 
-    public static final QName TAG_saml_Assertion = new QName(NS_SAML, "Assertion");
-    public static final QName TAG_saml2_Assertion = new QName(NS_SAML2, "Assertion");
-    public static final QName TAG_saml2_EncryptedAssertion = new QName(NS_SAML2, "EncryptedAssertion");
+    public static final QName TAG_SAML_ASSERTION = new QName(NS_SAML, "Assertion");
+    public static final QName TAG_SAML2_ASSERTION = new QName(NS_SAML2, "Assertion");
+    public static final QName TAG_SAML2_ENCRYPTED_ASSERTION = new QName(NS_SAML2, "EncryptedAssertion");
 
     public static final String NS_SAML10_TOKEN_PROFILE = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0";
     public static final String NS_SAML11_TOKEN_PROFILE = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1";
@@ -158,16 +162,16 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final String NS_SAML20_TOKEN_PROFILE_TYPE = NS_SAML11_TOKEN_PROFILE + "#SAMLV2.0";
 
     public static final String NS_KERBEROS11_TOKEN_PROFILE = "http://docs.oasis-open.org/wss/oasis-wss-kerberos-token-profile-1.1#";
-    public static final String NS_GSS_Kerberos5_AP_REQ = NS_KERBEROS11_TOKEN_PROFILE + "GSS_Kerberosv5_AP_REQ";
-    public static final String NS_GSS_Kerberos5_AP_REQ1510 = NS_KERBEROS11_TOKEN_PROFILE + "GSS_Kerberosv5_AP_REQ1510";
-    public static final String NS_GSS_Kerberos5_AP_REQ4120 = NS_KERBEROS11_TOKEN_PROFILE + "GSS_Kerberosv5_AP_REQ4120";
-    public static final String NS_Kerberos5_AP_REQ = NS_KERBEROS11_TOKEN_PROFILE + "Kerberosv5_AP_REQ";
-    public static final String NS_Kerberos5_AP_REQ_SHA1 = NS_KERBEROS11_TOKEN_PROFILE + "Kerberosv5APREQSHA1";
-    public static final String NS_Kerberos5_AP_REQ1510 = NS_KERBEROS11_TOKEN_PROFILE + "Kerberosv5_AP_REQ1510";
-    public static final String NS_Kerberos5_AP_REQ4120 = NS_KERBEROS11_TOKEN_PROFILE + "Kerberosv5_AP_REQ4120";
+    public static final String NS_GSS_KERBEROS5_AP_REQ = NS_KERBEROS11_TOKEN_PROFILE + "GSS_Kerberosv5_AP_REQ";
+    public static final String NS_GSS_KERBEROS5_AP_REQ1510 = NS_KERBEROS11_TOKEN_PROFILE + "GSS_Kerberosv5_AP_REQ1510";
+    public static final String NS_GSS_KERBEROS5_AP_REQ4120 = NS_KERBEROS11_TOKEN_PROFILE + "GSS_Kerberosv5_AP_REQ4120";
+    public static final String NS_KERBEROS5_AP_REQ = NS_KERBEROS11_TOKEN_PROFILE + "Kerberosv5_AP_REQ";
+    public static final String NS_KERBEROS5_AP_REQ_SHA1 = NS_KERBEROS11_TOKEN_PROFILE + "Kerberosv5APREQSHA1";
+    public static final String NS_KERBEROS5_AP_REQ1510 = NS_KERBEROS11_TOKEN_PROFILE + "Kerberosv5_AP_REQ1510";
+    public static final String NS_KERBEROS5_AP_REQ4120 = NS_KERBEROS11_TOKEN_PROFILE + "Kerberosv5_AP_REQ4120";
 
 
-    public static final QName ATT_NULL_AssertionID = new QName(null, "AssertionID");
+    public static final QName ATT_NULL_ASSERTION_ID = new QName(null, "AssertionID");
     public static final QName ATT_NULL_ID = new QName(null, "ID");
 
 
@@ -175,29 +179,29 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final String NS_WSC_05_12 = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512";
     public static final String PREFIX_WSC = "wsc";
 
-    public static final QName TAG_wsc0502_SecurityContextToken = new QName(NS_WSC_05_02, "SecurityContextToken", PREFIX_WSC);
-    public static final QName TAG_wsc0512_SecurityContextToken = new QName(NS_WSC_05_12, "SecurityContextToken", PREFIX_WSC);
-    public static final QName TAG_wsc0502_Identifier = new QName(NS_WSC_05_02, "Identifier", PREFIX_WSC);
-    public static final QName TAG_wsc0512_Identifier = new QName(NS_WSC_05_12, "Identifier", PREFIX_WSC);
+    public static final QName TAG_WSC0502_SCT = new QName(NS_WSC_05_02, "SecurityContextToken", PREFIX_WSC);
+    public static final QName TAG_WSC0512_SCT = new QName(NS_WSC_05_12, "SecurityContextToken", PREFIX_WSC);
+    public static final QName TAG_WSC0502_IDENTIFIER = new QName(NS_WSC_05_02, "Identifier", PREFIX_WSC);
+    public static final QName TAG_WSC0512_IDENTIFIER = new QName(NS_WSC_05_12, "Identifier", PREFIX_WSC);
 
-    public static final QName TAG_wsc0502_DerivedKeyToken = new QName(NS_WSC_05_02, "DerivedKeyToken", PREFIX_WSC);
-    public static final QName TAG_wsc0512_DerivedKeyToken = new QName(NS_WSC_05_12, "DerivedKeyToken", PREFIX_WSC);
-    public static final QName TAG_wsc0502_Properties = new QName(NS_WSC_05_02, "Properties", PREFIX_WSC);
-    public static final QName TAG_wsc0512_Properties = new QName(NS_WSC_05_12, "Properties", PREFIX_WSC);
-    public static final QName TAG_wsc0502_Length = new QName(NS_WSC_05_02, "Length", PREFIX_WSC);
-    public static final QName TAG_wsc0512_Length = new QName(NS_WSC_05_12, "Length", PREFIX_WSC);
-    public static final QName TAG_wsc0502_Generation = new QName(NS_WSC_05_02, "Generation", PREFIX_WSC);
-    public static final QName TAG_wsc0512_Generation = new QName(NS_WSC_05_12, "Generation", PREFIX_WSC);
-    public static final QName TAG_wsc0502_Offset = new QName(NS_WSC_05_02, "Offset", PREFIX_WSC);
-    public static final QName TAG_wsc0512_Offset = new QName(NS_WSC_05_12, "Offset", PREFIX_WSC);
-    public static final QName TAG_wsc0502_Label = new QName(NS_WSC_05_02, "Label", PREFIX_WSC);
-    public static final QName TAG_wsc0512_Label = new QName(NS_WSC_05_12, "Label", PREFIX_WSC);
-    public static final QName TAG_wsc0502_Nonce = new QName(NS_WSC_05_02, "Nonce", PREFIX_WSC);
-    public static final QName TAG_wsc0512_Nonce = new QName(NS_WSC_05_12, "Nonce", PREFIX_WSC);
+    public static final QName TAG_WSC0502_DKT = new QName(NS_WSC_05_02, "DerivedKeyToken", PREFIX_WSC);
+    public static final QName TAG_WSC0512_DKT = new QName(NS_WSC_05_12, "DerivedKeyToken", PREFIX_WSC);
+    public static final QName TAG_WSC0502_PROPERTIES = new QName(NS_WSC_05_02, "Properties", PREFIX_WSC);
+    public static final QName TAG_WSC0512_PROPERTIES = new QName(NS_WSC_05_12, "Properties", PREFIX_WSC);
+    public static final QName TAG_WSC0502_LENGTH = new QName(NS_WSC_05_02, "Length", PREFIX_WSC);
+    public static final QName TAG_WSC0512_LENGTH = new QName(NS_WSC_05_12, "Length", PREFIX_WSC);
+    public static final QName TAG_WSC0502_GENERATION = new QName(NS_WSC_05_02, "Generation", PREFIX_WSC);
+    public static final QName TAG_WSC0512_GENERATION = new QName(NS_WSC_05_12, "Generation", PREFIX_WSC);
+    public static final QName TAG_WSC0502_OFFSET = new QName(NS_WSC_05_02, "Offset", PREFIX_WSC);
+    public static final QName TAG_WSC0512_OFFSET = new QName(NS_WSC_05_12, "Offset", PREFIX_WSC);
+    public static final QName TAG_WSC0502_LABEL = new QName(NS_WSC_05_02, "Label", PREFIX_WSC);
+    public static final QName TAG_WSC0512_LABEL = new QName(NS_WSC_05_12, "Label", PREFIX_WSC);
+    public static final QName TAG_WSC0502_NONCE = new QName(NS_WSC_05_02, "Nonce", PREFIX_WSC);
+    public static final QName TAG_WSC0512_NONCE = new QName(NS_WSC_05_12, "Nonce", PREFIX_WSC);
 
     public static final String P_SHA_1 = "http://schemas.xmlsoap.org/ws/2005/02/sc/dk/p_sha1";
     public static final String P_SHA_1_2005_12 = "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512/dk/p_sha1";
-    public static final String WS_SecureConversation_DEFAULT_LABEL = "WS-SecureConversation";
+    public static final String WS_SEC_CONV_DEFAULT_LABEL = "WS-SecureConversation";
 
     public static final String NS_WSS_ENC_KEY_VALUE_TYPE = NS11_SOAPMESSAGE_SECURITY + "#EncryptedKey";
 
@@ -223,12 +227,12 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final Action KERBEROS_TOKEN = new Action("KerberosToken");
     public static final Action CUSTOM_TOKEN = new Action("CustomToken");
 
-    public static final AlgorithmUsage Comp_Key = new AlgorithmUsage("Comp_Key");
-    public static final AlgorithmUsage Enc_KD = new AlgorithmUsage("Enc_KD");
-    public static final AlgorithmUsage Sig_KD = new AlgorithmUsage("Sig_KD");
-    public static final AlgorithmUsage Soap_Norm = new AlgorithmUsage("Soap_Norm");
-    public static final AlgorithmUsage STR_Trans = new AlgorithmUsage("STR_Trans");
-    public static final AlgorithmUsage XPath = new AlgorithmUsage("XPath");
+    public static final AlgorithmUsage COMP_KEY = new AlgorithmUsage("Comp_Key");
+    public static final AlgorithmUsage ENC_KD = new AlgorithmUsage("ENC_KD");
+    public static final AlgorithmUsage SIG_KD = new AlgorithmUsage("SIG_KD");
+    public static final AlgorithmUsage SOAP_NORM = new AlgorithmUsage("Soap_Norm");
+    public static final AlgorithmUsage STR_TRANS = new AlgorithmUsage("STR_Trans");
+    public static final AlgorithmUsage XPATH = new AlgorithmUsage("XPath");
 
     public enum DerivedKeyTokenReference {
         DirectReference,
@@ -242,11 +246,11 @@ public class WSSConstants extends XMLSecurityConstants {
         PASSWORD_DIGEST(NS_PASSWORD_DIGEST);
 
         private final String namespace;
-        private static final Map<String, UsernameTokenPasswordType> lookup = new HashMap<>();
+        private static final Map<String, UsernameTokenPasswordType> LOOKUP = new HashMap<>();
 
         static {
             for (UsernameTokenPasswordType u : EnumSet.allOf(UsernameTokenPasswordType.class)) {
-                lookup.put(u.getNamespace(), u);
+                LOOKUP.put(u.getNamespace(), u);
             }
         }
 
@@ -259,7 +263,7 @@ public class WSSConstants extends XMLSecurityConstants {
         }
 
         public static UsernameTokenPasswordType getUsernameTokenPasswordType(String namespace) {
-            return lookup.get(namespace);
+            return LOOKUP.get(namespace);
         }
     }
 
@@ -268,14 +272,14 @@ public class WSSConstants extends XMLSecurityConstants {
     public static final List<QName> WSSE_SECURITY_HEADER_PATH = new ArrayList<>(3);
 
     static {
-        SOAP_11_BODY_PATH.add(WSSConstants.TAG_soap11_Envelope);
-        SOAP_11_BODY_PATH.add(WSSConstants.TAG_soap11_Body);
+        SOAP_11_BODY_PATH.add(WSSConstants.TAG_SOAP11_ENVELOPE);
+        SOAP_11_BODY_PATH.add(WSSConstants.TAG_SOAP11_BODY);
 
-        SOAP_11_HEADER_PATH.add(WSSConstants.TAG_soap11_Envelope);
-        SOAP_11_HEADER_PATH.add(WSSConstants.TAG_soap11_Header);
+        SOAP_11_HEADER_PATH.add(WSSConstants.TAG_SOAP11_ENVELOPE);
+        SOAP_11_HEADER_PATH.add(WSSConstants.TAG_SOAP11_HEADER);
 
         WSSE_SECURITY_HEADER_PATH.addAll(SOAP_11_HEADER_PATH);
-        WSSE_SECURITY_HEADER_PATH.add(WSSConstants.TAG_wsse_Security);
+        WSSE_SECURITY_HEADER_PATH.add(WSSConstants.TAG_WSSE_SECURITY);
 
     }
 }

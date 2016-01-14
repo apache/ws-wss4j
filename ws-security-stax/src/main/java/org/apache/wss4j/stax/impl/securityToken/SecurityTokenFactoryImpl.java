@@ -90,7 +90,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
 
         if (keyInfoType != null) {
             final SecurityTokenReferenceType securityTokenReferenceType
-                    = XMLSecurityUtils.getQNameType(keyInfoType.getContent(), WSSConstants.TAG_wsse_SecurityTokenReference);
+                    = XMLSecurityUtils.getQNameType(keyInfoType.getContent(), WSSConstants.TAG_WSSE_SECURITY_TOKEN_REFERENCE);
             if (securityTokenReferenceType != null) {
                 return getSecurityToken(securityTokenReferenceType, crypto, 
                                         ((WSSSecurityProperties)securityProperties).getCallbackHandler(), inboundSecurityContext,
@@ -196,10 +196,10 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             String tokenType =
                     XMLSecurityUtils.getQNameAttribute(
                         securityTokenReferenceType.getOtherAttributes(),
-                        WSSConstants.ATT_wsse11_TokenType);
+                        WSSConstants.ATT_WSSE11_TOKEN_TYPE);
 
             final KeyIdentifierType keyIdentifierType
-                    = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_wsse_KeyIdentifier);
+                    = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_WSSE_KEY_IDENTIFIER);
             if (keyIdentifierType != null) {
                 String valueType = keyIdentifierType.getValueType();
                 if (valueType == null) {
@@ -225,7 +225,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     return new X509V3SecurityTokenImpl(
                             (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler,
                             binaryContent, securityTokenReferenceType.getId(), securityProperties);
-                } else if (WSSConstants.NS_X509SubjectKeyIdentifier.equals(valueType)) {
+                } else if (WSSConstants.NS_X509_SKI.equals(valueType)) {
                     return new X509SKISecurityTokenImpl(
                             (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler, binaryContent,
                             securityTokenReferenceType.getId(), securityProperties);
@@ -281,7 +281,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                                                      keyIdentifierType.getValue(),
                                                      WSSecurityTokenConstants.KeyIdentifier_ExternalReference,
                                                      securityProperties);
-                } else if (WSSConstants.NS_Kerberos5_AP_REQ_SHA1.equals(valueType)) {
+                } else if (WSSConstants.NS_KERBEROS5_AP_REQ_SHA1.equals(valueType)) {
                     SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider =
                             inboundSecurityContext.getSecurityTokenProvider(keyIdentifierType.getValue());
                     if (securityTokenProvider != null) {
@@ -322,7 +322,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             }
 
             final org.apache.wss4j.binding.wss10.ReferenceType referenceType
-                    = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_wsse_Reference);
+                    = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_WSSE_REFERENCE);
             if (referenceType != null) {
                 //We do not check for BSP.R3023, BSP.R3022, BSP.R3066, BSP.R3067, BSP.R3024, BSP.R3064, BSP.R3211, BSP.R3059
 
@@ -388,7 +388,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     }
                 } else if (securityTokenProvider.getSecurityToken() instanceof UsernameSecurityToken) {
                     String valueType = referenceType.getValueType();
-                    if (!WSSConstants.NS_USERNAMETOKEN_PROFILE_UsernameToken.equals(valueType)) {
+                    if (!WSSConstants.NS_USERNAMETOKEN_PROFILE_USERNAME_TOKEN.equals(valueType)) {
                         ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R4214);
                     }
                 } else if (securityTokenProvider.getSecurityToken() instanceof SamlSecurityToken) {

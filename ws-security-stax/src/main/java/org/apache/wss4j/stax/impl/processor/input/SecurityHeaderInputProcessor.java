@@ -95,7 +95,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "notASOAPMessage");
                         }
                     } else if (documentLevel == 3
-                            && xmlSecStartElement.getName().equals(WSSConstants.TAG_wsse_Security)
+                            && xmlSecStartElement.getName().equals(WSSConstants.TAG_WSSE_SECURITY)
                             && WSSUtils.isInSOAPHeader(xmlSecStartElement)) {
 
                         if (!WSSUtils.isResponsibleActorOrRole(xmlSecStartElement,
@@ -132,7 +132,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                     XMLSecEndElement xmlSecEndElement = xmlSecEvent.asEndElement();
                     documentLevel = xmlSecEndElement.getDocumentLevel();
                     if (documentLevel == 3 && responsibleSecurityHeaderFound
-                            && xmlSecEndElement.getName().equals(WSSConstants.TAG_wsse_Security)) {
+                            && xmlSecEndElement.getName().equals(WSSConstants.TAG_WSSE_SECURITY)) {
 
                         return finalizeHeaderProcessing(
                                 inputProcessorChain, subInputProcessorChain,
@@ -150,7 +150,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                         }
 
                         // Check for multiple timestamps
-                        if (xmlSecEndElement.getName().equals(WSSConstants.TAG_wsu_Timestamp)) {
+                        if (xmlSecEndElement.getName().equals(WSSConstants.TAG_WSU_TIMESTAMP)) {
                             if (timestampFound) {
                                 WSInboundSecurityContext context =
                                     (WSInboundSecurityContext)subInputProcessorChain.getSecurityContext();
@@ -163,7 +163,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
             }
 
         } while (!(xmlSecEvent.getEventType() == XMLStreamConstants.START_ELEMENT
-                && xmlSecEvent.asStartElement().getName().getLocalPart().equals(WSSConstants.TAG_soap_Body_LocalName)
+                && xmlSecEvent.asStartElement().getName().getLocalPart().equals(WSSConstants.TAG_SOAP_BODY_LN)
                 && xmlSecEvent.asStartElement().getName().getNamespaceURI().equals(
                 WSSUtils.getSOAPMessageVersionNamespace(xmlSecEvent.asStartElement()))
         ));

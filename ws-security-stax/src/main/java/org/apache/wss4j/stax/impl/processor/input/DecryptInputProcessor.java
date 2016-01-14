@@ -102,7 +102,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
                 securityContext.handleBSPRule(BSPRule.R5424);
             }
             SecurityTokenReferenceType securityTokenReferenceType = XMLSecurityUtils.getQNameType(keyInfoType.getContent(),
-                    WSSConstants.TAG_wsse_SecurityTokenReference);
+                    WSSConstants.TAG_WSSE_SECURITY_TOKEN_REFERENCE);
             if (securityTokenReferenceType == null) {
                 securityContext.handleBSPRule(BSPRule.R5426);
             }

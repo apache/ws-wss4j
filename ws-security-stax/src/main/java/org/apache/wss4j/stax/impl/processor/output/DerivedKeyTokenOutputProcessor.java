@@ -96,7 +96,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             }
 
             String defaultLabel = 
-                WSSConstants.WS_SecureConversation_DEFAULT_LABEL + WSSConstants.WS_SecureConversation_DEFAULT_LABEL;
+                WSSConstants.WS_SEC_CONV_DEFAULT_LABEL + WSSConstants.WS_SEC_CONV_DEFAULT_LABEL;
             byte[] label = defaultLabel.getBytes(StandardCharsets.UTF_8);
 
             byte[] nonce = WSSConstants.generateBytes(16);
@@ -225,7 +225,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 OutputProcessorChain subOutputProcessorChain = outputProcessorChain.createSubChain(this);
 
                 List<XMLSecAttribute> attributes = new ArrayList<>(1);
-                attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, securityToken.getId()));
+                attributes.add(createAttribute(WSSConstants.ATT_WSU_ID, securityToken.getId()));
                 createStartElementAndOutputAsEvent(subOutputProcessorChain, headerElementName, true, attributes);
 
                 createSecurityTokenReferenceStructureForDerivedKey(subOutputProcessorChain, securityToken,
@@ -257,16 +257,16 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
             SecurityToken wrappingToken = securityToken.getKeyWrappingToken();
             List<XMLSecAttribute> attributes = new ArrayList<>(2);
-            attributes.add(createAttribute(WSSConstants.ATT_wsu_Id, IDGenerator.generateID(null)));
+            attributes.add(createAttribute(WSSConstants.ATT_WSU_ID, IDGenerator.generateID(null)));
             if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier) && !useSingleCertificate) {
-                attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_X509PKIPathv1));
+                attributes.add(createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE, WSSConstants.NS_X509PKIPathv1));
             } else if (derivedKeyTokenReference == WSSConstants.DerivedKeyTokenReference.EncryptedKey
                 || WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier.equals(keyIdentifier)) {
-                attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
+                attributes.add(createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
             } else if (WSSecurityTokenConstants.KerberosToken.equals(wrappingToken.getTokenType())) {
-                attributes.add(createAttribute(WSSConstants.ATT_wsse11_TokenType, WSSConstants.NS_GSS_Kerberos5_AP_REQ));
+                attributes.add(createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE, WSSConstants.NS_GSS_KERBEROS5_AP_REQ));
             }
-            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference, false, attributes);
+            createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_SECURITY_TOKEN_REFERENCE, false, attributes);
 
             X509Certificate[] x509Certificates = wrappingToken.getX509Certificates();
             String tokenId = wrappingToken.getId();
@@ -288,7 +288,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             } else if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier)) {
                 String valueType;
                 if (WSSecurityTokenConstants.KerberosToken.equals(wrappingToken.getTokenType())) {
-                    valueType = WSSConstants.NS_GSS_Kerberos5_AP_REQ;
+                    valueType = WSSConstants.NS_GSS_KERBEROS5_AP_REQ;
                 } else if (WSSecurityTokenConstants.SpnegoContextToken.equals(wrappingToken.getTokenType())
                     || WSSecurityTokenConstants.SecurityContextToken.equals(wrappingToken.getTokenType())
                     || WSSecurityTokenConstants.SecureConversationToken.equals(wrappingToken.getTokenType())) {
@@ -310,35 +310,35 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             } else {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unsupportedSecurityToken");
             }
-            createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_SecurityTokenReference);
+            createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_SECURITY_TOKEN_REFERENCE);
         }
 
         private QName getHeaderElementName() {
             if (use200512Namespace) {
-                return WSSConstants.TAG_wsc0512_DerivedKeyToken;
+                return WSSConstants.TAG_WSC0512_DKT;
             }
-            return WSSConstants.TAG_wsc0502_DerivedKeyToken;
+            return WSSConstants.TAG_WSC0502_DKT;
         }
 
         private QName getOffsetName() {
             if (use200512Namespace) {
-                return WSSConstants.TAG_wsc0512_Offset;
+                return WSSConstants.TAG_WSC0512_OFFSET;
             }
-            return WSSConstants.TAG_wsc0502_Offset;
+            return WSSConstants.TAG_WSC0502_OFFSET;
         }
 
         private QName getLengthName() {
             if (use200512Namespace) {
-                return WSSConstants.TAG_wsc0512_Length;
+                return WSSConstants.TAG_WSC0512_LENGTH;
             }
-            return WSSConstants.TAG_wsc0502_Length;
+            return WSSConstants.TAG_WSC0502_LENGTH;
         }
 
         private QName getNonceName() {
             if (use200512Namespace) {
-                return WSSConstants.TAG_wsc0512_Nonce;
+                return WSSConstants.TAG_WSC0512_NONCE;
             }
-            return WSSConstants.TAG_wsc0502_Nonce;
+            return WSSConstants.TAG_WSC0502_NONCE;
         }
     }
 }

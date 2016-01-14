@@ -141,9 +141,9 @@ public class WSSUtils extends XMLSecurityUtils {
     public static String getSOAPMessageVersionNamespace(XMLSecEvent xmlSecEvent) {
         XMLSecStartElement xmlSecStartElement = xmlSecEvent.getStartElementAtLevel(1);
         if (xmlSecStartElement != null) {
-            if (WSSConstants.TAG_soap11_Envelope.equals(xmlSecStartElement.getName())) {
+            if (WSSConstants.TAG_SOAP11_ENVELOPE.equals(xmlSecStartElement.getName())) {
                 return WSSConstants.NS_SOAP11;
-            } else if (WSSConstants.TAG_soap12_Envelope.equals(xmlSecStartElement.getName())) {
+            } else if (WSSConstants.TAG_SOAP12_ENVELOPE.equals(xmlSecStartElement.getName())) {
                 return WSSConstants.NS_SOAP12;
             }
         }
@@ -158,7 +158,7 @@ public class WSSUtils extends XMLSecurityUtils {
     public static boolean isInSOAPHeader(List<QName> elementPath) {
         if (elementPath.size() > 1) {
             final QName secondLevelElementName = elementPath.get(1);
-            return WSSConstants.TAG_soap_Header_LocalName.equals(secondLevelElementName.getLocalPart())
+            return WSSConstants.TAG_SOAP_HEADER_LN.equals(secondLevelElementName.getLocalPart())
                     && elementPath.get(0).getNamespaceURI().equals(secondLevelElementName.getNamespaceURI());
         }
         return false;
@@ -172,7 +172,7 @@ public class WSSUtils extends XMLSecurityUtils {
     public static boolean isInSOAPBody(List<QName> elementPath) {
         if (elementPath.size() > 1) {
             final QName secondLevelElementName = elementPath.get(1);
-            return WSSConstants.TAG_soap_Body_LocalName.equals(secondLevelElementName.getLocalPart())
+            return WSSConstants.TAG_SOAP_BODY_LN.equals(secondLevelElementName.getLocalPart())
                     && elementPath.get(0).getNamespaceURI().equals(secondLevelElementName.getNamespaceURI());
         }
         return false;
@@ -186,9 +186,9 @@ public class WSSUtils extends XMLSecurityUtils {
     public static boolean isInSecurityHeader(XMLSecEvent xmlSecEvent, List<QName> elementPath, String actorOrRole) {
         if (elementPath.size() > 2) {
             final QName secondLevelElementName = elementPath.get(1);
-            return WSSConstants.TAG_wsse_Security.equals(elementPath.get(2))
+            return WSSConstants.TAG_WSSE_SECURITY.equals(elementPath.get(2))
                     && isResponsibleActorOrRole(xmlSecEvent.getStartElementAtLevel(3), actorOrRole)
-                    && WSSConstants.TAG_soap_Header_LocalName.equals(secondLevelElementName.getLocalPart())
+                    && WSSConstants.TAG_SOAP_HEADER_LN.equals(secondLevelElementName.getLocalPart())
                     && elementPath.get(0).getNamespaceURI().equals(secondLevelElementName.getNamespaceURI());
         }
         return false;
@@ -202,9 +202,9 @@ public class WSSUtils extends XMLSecurityUtils {
         final List<QName> elementPath = xmlSecEvent.getElementPath();
         if (elementPath.size() == 3) {
             final QName secondLevelElementName = elementPath.get(1);
-            return WSSConstants.TAG_wsse_Security.equals(elementPath.get(2))
+            return WSSConstants.TAG_WSSE_SECURITY.equals(elementPath.get(2))
                     && isResponsibleActorOrRole(xmlSecEvent.getStartElementAtLevel(3), actorOrRole)
-                    && WSSConstants.TAG_soap_Header_LocalName.equals(secondLevelElementName.getLocalPart())
+                    && WSSConstants.TAG_SOAP_HEADER_LN.equals(secondLevelElementName.getLocalPart())
                     && elementPath.get(0).getNamespaceURI().equals(secondLevelElementName.getNamespaceURI());
         }
         return false;
@@ -214,9 +214,9 @@ public class WSSUtils extends XMLSecurityUtils {
         final QName actorRole;
         final String soapVersionNamespace = getSOAPMessageVersionNamespace(xmlSecStartElement);
         if (WSSConstants.NS_SOAP11.equals(soapVersionNamespace)) {
-            actorRole = WSSConstants.ATT_soap11_Actor;
+            actorRole = WSSConstants.ATT_SOAP11_ACTOR;
         } else {
-            actorRole = WSSConstants.ATT_soap12_Role;
+            actorRole = WSSConstants.ATT_SOAP12_ROLE;
         }
 
         String actor = null;
@@ -244,10 +244,10 @@ public class WSSUtils extends XMLSecurityUtils {
             valueType = WSSConstants.NS_X509PKIPathv1;
         }
         List<XMLSecAttribute> attributes = new ArrayList<>(3);
-        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
-        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, valueType));
-        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_wsu_Id, referenceId));
-        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_BinarySecurityToken, false, attributes);
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ENCODING_TYPE, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_VALUE_TYPE, valueType));
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_WSU_ID, referenceId));
+        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN, false, attributes);
         try {
             if (useSingleCertificate) {
                 abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(x509Certificates[0].getEncoded()));
@@ -263,7 +263,7 @@ public class WSSUtils extends XMLSecurityUtils {
         } catch (CertificateEncodingException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
-        abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_BinarySecurityToken);
+        abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN);
     }
 
     public static void createX509SubjectKeyIdentifierStructure(AbstractOutputProcessor abstractOutputProcessor,
@@ -276,12 +276,12 @@ public class WSSUtils extends XMLSecurityUtils {
         }
 
         List<XMLSecAttribute> attributes = new ArrayList<>(2);
-        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
-        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_X509SubjectKeyIdentifier));
-        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ENCODING_TYPE, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_VALUE_TYPE, WSSConstants.NS_X509_SKI));
+        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_KEY_IDENTIFIER, false, attributes);
         byte data[] = new Merlin().getSKIBytesFromCert(x509Certificates[0]);
         abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(data));
-        abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
+        abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_KEY_IDENTIFIER);
     }
 
     public static void createX509KeyIdentifierStructure(AbstractOutputProcessor abstractOutputProcessor,
@@ -289,15 +289,15 @@ public class WSSUtils extends XMLSecurityUtils {
                                                         X509Certificate[] x509Certificates)
             throws XMLStreamException, XMLSecurityException {
         List<XMLSecAttribute> attributes = new ArrayList<>(2);
-        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
-        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_X509_V3_TYPE));
-        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ENCODING_TYPE, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_VALUE_TYPE, WSSConstants.NS_X509_V3_TYPE));
+        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_KEY_IDENTIFIER, false, attributes);
         try {
             abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, new Base64(76, new byte[]{'\n'}).encodeToString(x509Certificates[0].getEncoded()));
         } catch (CertificateEncodingException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
-        abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
+        abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_KEY_IDENTIFIER);
     }
 
     public static void createThumbprintKeyIdentifierStructure(AbstractOutputProcessor abstractOutputProcessor,
@@ -305,9 +305,9 @@ public class WSSUtils extends XMLSecurityUtils {
                                                               X509Certificate[] x509Certificates)
             throws XMLStreamException, XMLSecurityException {
         List<XMLSecAttribute> attributes = new ArrayList<>(2);
-        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
-        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_THUMBPRINT));
-        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ENCODING_TYPE, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_VALUE_TYPE, WSSConstants.NS_THUMBPRINT));
+        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_KEY_IDENTIFIER, false, attributes);
         try {
             MessageDigest sha = MessageDigest.getInstance("SHA-1");
             byte[] data = sha.digest(x509Certificates[0].getEncoded());
@@ -315,7 +315,7 @@ public class WSSUtils extends XMLSecurityUtils {
         } catch (CertificateEncodingException | NoSuchAlgorithmException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
-        abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
+        abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_KEY_IDENTIFIER);
     }
 
     public static void createEncryptedKeySha1IdentifierStructure(AbstractOutputProcessor abstractOutputProcessor,
@@ -336,11 +336,11 @@ public class WSSUtils extends XMLSecurityUtils {
             throws XMLStreamException, XMLSecurityException {
 
         List<XMLSecAttribute> attributes = new ArrayList<>(2);
-        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
-        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_ENCRYPTED_KEY_SHA1));
-        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ENCODING_TYPE, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_VALUE_TYPE, WSSConstants.NS_ENCRYPTED_KEY_SHA1));
+        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_KEY_IDENTIFIER, false, attributes);
         abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, identifier);
-        abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
+        abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_KEY_IDENTIFIER);
     }
 
     public static void createKerberosSha1IdentifierStructure(AbstractOutputProcessor abstractOutputProcessor,
@@ -348,11 +348,11 @@ public class WSSUtils extends XMLSecurityUtils {
             throws XMLStreamException, XMLSecurityException {
 
         List<XMLSecAttribute> attributes = new ArrayList<>(2);
-        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_EncodingType, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
-        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_Kerberos5_AP_REQ_SHA1));
-        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ENCODING_TYPE, WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING));
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_VALUE_TYPE, WSSConstants.NS_KERBEROS5_AP_REQ_SHA1));
+        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_KEY_IDENTIFIER, false, attributes);
         abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, identifier);
-        abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
+        abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_KEY_IDENTIFIER);
     }
 
     public static void createBSTReferenceStructure(AbstractOutputProcessor abstractOutputProcessor,
@@ -363,10 +363,10 @@ public class WSSUtils extends XMLSecurityUtils {
         String uri = includedInMessage ? "#" + referenceId : referenceId;
         attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_URI, uri));
         if (valueType != null) {
-            attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, valueType));
+            attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_VALUE_TYPE, valueType));
         }
-        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference, false, attributes);
-        abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference);
+        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_REFERENCE, false, attributes);
+        abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_REFERENCE);
     }
 
     public static void createEmbeddedKeyIdentifierStructure(AbstractOutputProcessor abstractOutputProcessor,
@@ -375,13 +375,13 @@ public class WSSUtils extends XMLSecurityUtils {
             throws XMLStreamException, XMLSecurityException {
         List<XMLSecAttribute> attributes = new ArrayList<>(1);
         if (WSSecurityTokenConstants.Saml10Token.equals(tokenType) || WSSecurityTokenConstants.Saml11Token.equals(tokenType)) {
-            attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML10_TYPE));
+            attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_VALUE_TYPE, WSSConstants.NS_SAML10_TYPE));
         } else if (WSSecurityTokenConstants.Saml20Token.equals(tokenType)) {
-            attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML20_TYPE));
+            attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_VALUE_TYPE, WSSConstants.NS_SAML20_TYPE));
         }
-        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
+        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_KEY_IDENTIFIER, false, attributes);
         abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, referenceId);
-        abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
+        abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_KEY_IDENTIFIER);
     }
 
     public static void createSAMLKeyIdentifierStructure(AbstractOutputProcessor abstractOutputProcessor,
@@ -390,13 +390,13 @@ public class WSSUtils extends XMLSecurityUtils {
             throws XMLStreamException, XMLSecurityException {
         List<XMLSecAttribute> attributes = new ArrayList<>(1);
         if (WSSecurityTokenConstants.Saml10Token.equals(tokenType) || WSSecurityTokenConstants.Saml11Token.equals(tokenType)) {
-            attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML10_TYPE));
+            attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_VALUE_TYPE, WSSConstants.NS_SAML10_TYPE));
         } else if (WSSecurityTokenConstants.Saml20Token.equals(tokenType)) {
-            attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_SAML20_TYPE));
+            attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_VALUE_TYPE, WSSConstants.NS_SAML20_TYPE));
         }
-        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier, false, attributes);
+        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_KEY_IDENTIFIER, false, attributes);
         abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, referenceId);
-        abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_KeyIdentifier);
+        abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_KEY_IDENTIFIER);
     }
 
     public static void createUsernameTokenReferenceStructure(AbstractOutputProcessor abstractOutputProcessor,
@@ -404,9 +404,9 @@ public class WSSUtils extends XMLSecurityUtils {
             throws XMLStreamException, XMLSecurityException {
         List<XMLSecAttribute> attributes = new ArrayList<>(2);
         attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_URI, "#" + tokenId));
-        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_ValueType, WSSConstants.NS_USERNAMETOKEN_PROFILE_UsernameToken));
-        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference, false, attributes);
-        abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse_Reference);
+        attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_VALUE_TYPE, WSSConstants.NS_USERNAMETOKEN_PROFILE_USERNAME_TOKEN));
+        abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_REFERENCE, false, attributes);
+        abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_REFERENCE);
     }
 
     public static void createReferenceListStructureForEncryption(AbstractOutputProcessor abstractOutputProcessor,
@@ -501,20 +501,20 @@ public class WSSUtils extends XMLSecurityUtils {
                     XMLSecurityConstants.TAG_dsig_KeyInfo, true, null);
 
             attributes = new ArrayList<>(1);
-            attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_wsse11_TokenType,
+            attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE,
                     WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
             abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain,
-                    WSSConstants.TAG_wsse_SecurityTokenReference, true, attributes);
+                    WSSConstants.TAG_WSSE_SECURITY_TOKEN_REFERENCE, true, attributes);
 
             attributes = new ArrayList<XMLSecAttribute>(1);
             attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_URI,
                     "#" + encryptionPartDef.getKeyId()));
             abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain,
-                    WSSConstants.TAG_wsse_Reference, false, attributes);
+                    WSSConstants.TAG_WSSE_REFERENCE, false, attributes);
             abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain,
-                    WSSConstants.TAG_wsse_Reference);
+                    WSSConstants.TAG_WSSE_REFERENCE);
             abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain,
-                    WSSConstants.TAG_wsse_SecurityTokenReference);
+                    WSSConstants.TAG_WSSE_SECURITY_TOKEN_REFERENCE);
             abstractOutputProcessor.createEndElementAndOutputAsEvent(outputProcessorChain,
                     XMLSecurityConstants.TAG_dsig_KeyInfo);
 

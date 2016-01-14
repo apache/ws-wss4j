@@ -50,7 +50,7 @@ public class ResolverXPointer extends org.apache.xml.security.stax.impl.resource
             return false;
         }
         //case #xpointer(id('ID')):
-        Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_wsu_Id);
+        Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_WSU_ID);
         if (attribute != null && attribute.getValue().equals(getId())) {
             return true;
         }

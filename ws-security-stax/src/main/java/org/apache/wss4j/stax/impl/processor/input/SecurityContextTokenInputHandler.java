@@ -56,7 +56,7 @@ public class SecurityContextTokenInputHandler extends AbstractInputSecurityHeade
         }
 
         final QName elementName = new QName(securityContextTokenTypeJAXBElement.getName().getNamespaceURI(),
-                WSSConstants.TAG_wsc0502_Identifier.getLocalPart());
+                WSSConstants.TAG_WSC0502_IDENTIFIER.getLocalPart());
         final String identifier = (String) XMLSecurityUtils.getQNameType(securityContextTokenType.getAny(),
                 elementName);
 

@@ -77,12 +77,12 @@ public class TimestampTest extends AbstractTestBase {
             xmlStreamWriter.close();
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
-            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
-            Element created = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_wsu_Created.getNamespaceURI(), WSSConstants.TAG_wsu_Created.getLocalPart()).item(0);
-            Element expires = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_wsu_Expires.getNamespaceURI(), WSSConstants.TAG_wsu_Expires.getLocalPart()).item(0);
+            Element created = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_WSU_CREATED.getNamespaceURI(), WSSConstants.TAG_WSU_CREATED.getLocalPart()).item(0);
+            Element expires = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_WSU_EXPIRES.getNamespaceURI(), WSSConstants.TAG_WSU_EXPIRES.getLocalPart()).item(0);
 
             DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
             GregorianCalendar gregorianCalendarCreated = datatypeFactory.newXMLGregorianCalendar(created.getTextContent()).toGregorianCalendar();
@@ -114,8 +114,8 @@ public class TimestampTest extends AbstractTestBase {
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
             //some test that we can really sure we get what we want from WSS4J
-            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -130,9 +130,9 @@ public class TimestampTest extends AbstractTestBase {
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
             //header element must still be there
-            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
         }
     }
 
@@ -154,12 +154,12 @@ public class TimestampTest extends AbstractTestBase {
             xmlStreamWriter.close();
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
-            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
-            Element created = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_wsu_Created.getNamespaceURI(), WSSConstants.TAG_wsu_Created.getLocalPart()).item(0);
-            Element expires = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_wsu_Expires.getNamespaceURI(), WSSConstants.TAG_wsu_Expires.getLocalPart()).item(0);
+            Element created = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_WSU_CREATED.getNamespaceURI(), WSSConstants.TAG_WSU_CREATED.getLocalPart()).item(0);
+            Element expires = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_WSU_EXPIRES.getNamespaceURI(), WSSConstants.TAG_WSU_EXPIRES.getLocalPart()).item(0);
 
             DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
             GregorianCalendar gregorianCalendarCreated = datatypeFactory.newXMLGregorianCalendar(created.getTextContent()).toGregorianCalendar();
@@ -193,8 +193,8 @@ public class TimestampTest extends AbstractTestBase {
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, outboundProperties);
 
             //some test that we can really sure we get what we want from WSS4J
-            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -233,7 +233,7 @@ public class TimestampTest extends AbstractTestBase {
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_xenc_EncryptedKey.getNamespaceURI(), WSSConstants.TAG_xenc_EncryptedKey.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -272,11 +272,11 @@ public class TimestampTest extends AbstractTestBase {
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, outboundProperties);
 
             //some test that we can really sure we get what we want from WSS4J
-            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
-            Element created = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_wsu_Created.getNamespaceURI(), WSSConstants.TAG_wsu_Created.getLocalPart()).item(0);
-            Element expires = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_wsu_Expires.getNamespaceURI(), WSSConstants.TAG_wsu_Expires.getLocalPart()).item(0);
+            Element created = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_WSU_CREATED.getNamespaceURI(), WSSConstants.TAG_WSU_CREATED.getLocalPart()).item(0);
+            Element expires = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_WSU_EXPIRES.getNamespaceURI(), WSSConstants.TAG_WSU_EXPIRES.getLocalPart()).item(0);
 
             DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
             GregorianCalendar gregorianCalendarCreated = new GregorianCalendar();
@@ -316,11 +316,11 @@ public class TimestampTest extends AbstractTestBase {
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, outboundProperties);
 
             //some test that we can really sure we get what we want from WSS4J
-            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
-            Element created = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_wsu_Created.getNamespaceURI(), WSSConstants.TAG_wsu_Created.getLocalPart()).item(0);
-            Element expires = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_wsu_Expires.getNamespaceURI(), WSSConstants.TAG_wsu_Expires.getLocalPart()).item(0);
+            Element created = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_WSU_CREATED.getNamespaceURI(), WSSConstants.TAG_WSU_CREATED.getLocalPart()).item(0);
+            Element expires = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_WSU_EXPIRES.getNamespaceURI(), WSSConstants.TAG_WSU_EXPIRES.getLocalPart()).item(0);
 
             DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
             GregorianCalendar gregorianCalendarCreated = new GregorianCalendar();
@@ -379,8 +379,8 @@ public class TimestampTest extends AbstractTestBase {
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, outboundProperties);
 
             //some test that we can really sure we get what we want from WSS4J
-            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -411,8 +411,8 @@ public class TimestampTest extends AbstractTestBase {
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, outboundProperties);
 
             //some test that we can really sure we get what we want from WSS4J
-            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -448,8 +448,8 @@ public class TimestampTest extends AbstractTestBase {
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
             //some test that we can really sure we get what we want from WSS4J
-            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
             for (int i = 0; i < nodeList.item(0).getChildNodes().getLength(); i++) {
                 Node node = nodeList.item(0).getChildNodes().item(i);
                 if (node.getNodeType() == Node.ELEMENT_NODE && node.getLocalName().equals("Created")) {
@@ -491,8 +491,8 @@ public class TimestampTest extends AbstractTestBase {
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
             //some test that we can really sure we get what we want from WSS4J
-            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
             for (int i = 0; i < nodeList.item(0).getChildNodes().getLength(); i++) {
                 Node node = nodeList.item(0).getChildNodes().item(i);
                 if (node.getNodeType() == Node.ELEMENT_NODE && node.getLocalName().equals("Expires")) {
@@ -513,9 +513,9 @@ public class TimestampTest extends AbstractTestBase {
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
             //header element must still be there
-            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
         }
     }
 
@@ -529,8 +529,8 @@ public class TimestampTest extends AbstractTestBase {
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
             //some test that we can really sure we get what we want from WSS4J
-            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
             for (int i = 0; i < nodeList.item(0).getChildNodes().getLength(); i++) {
                 Node node = nodeList.item(0).getChildNodes().item(i);
                 if (node.getNodeType() == Node.ELEMENT_NODE && node.getLocalName().equals("Expires")) {
@@ -567,9 +567,9 @@ public class TimestampTest extends AbstractTestBase {
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
             //header element must still be there
-            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
         }
     }
 
@@ -583,8 +583,8 @@ public class TimestampTest extends AbstractTestBase {
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
             //some test that we can really sure we get what we want from WSS4J
-            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             List<Node> nodesToRemove = new ArrayList<Node>();
             for (int i = 0; i < nodeList.item(0).getChildNodes().getLength(); i++) {
@@ -632,8 +632,8 @@ public class TimestampTest extends AbstractTestBase {
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
             //some test that we can really sure we get what we want from WSS4J
-            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             Node parentNode = nodeList.item(0).getParentNode();
             Node node = nodeList.item(0).cloneNode(true);
@@ -678,12 +678,12 @@ public class TimestampTest extends AbstractTestBase {
             xmlStreamWriter.close();
 
             Document document = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
-            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
-            Element created = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_wsu_Created.getNamespaceURI(), WSSConstants.TAG_wsu_Created.getLocalPart()).item(0);
-            Element expires = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_wsu_Expires.getNamespaceURI(), WSSConstants.TAG_wsu_Expires.getLocalPart()).item(0);
+            Element created = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_WSU_CREATED.getNamespaceURI(), WSSConstants.TAG_WSU_CREATED.getLocalPart()).item(0);
+            Element expires = (Element) ((Element) nodeList.item(0)).getElementsByTagNameNS(WSSConstants.TAG_WSU_EXPIRES.getNamespaceURI(), WSSConstants.TAG_WSU_EXPIRES.getLocalPart()).item(0);
 
             DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
             GregorianCalendar gregorianCalendarCreated = datatypeFactory.newXMLGregorianCalendar(created.getTextContent()).toGregorianCalendar();
@@ -715,8 +715,8 @@ public class TimestampTest extends AbstractTestBase {
             Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, new Properties());
 
             //some test that we can really sure we get what we want from WSS4J
-            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
@@ -734,9 +734,9 @@ public class TimestampTest extends AbstractTestBase {
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
 
             //header element must still be there
-            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsu_Timestamp.getNamespaceURI(), WSSConstants.TAG_wsu_Timestamp.getLocalPart());
+            NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
         }
     }
 }
