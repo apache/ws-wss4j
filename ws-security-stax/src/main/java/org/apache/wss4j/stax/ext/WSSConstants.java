@@ -108,7 +108,7 @@ public class WSSConstants extends XMLSecurityConstants {
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0";
 
     public static final String NS_X509_V3_TYPE = NS_X509TOKEN_PROFILE + "#X509v3";
-    public static final String NS_X509PKIPathv1 = NS_X509TOKEN_PROFILE + "#X509PKIPathv1";
+    public static final String NS_X509_PKIPATH_V1 = NS_X509TOKEN_PROFILE + "#X509PKIPathv1";
     public static final String NS_X509_SKI = NS_X509TOKEN_PROFILE + "#X509SubjectKeyIdentifier";
     public static final String NS_THUMBPRINT = NS11_SOAPMESSAGE_SECURITY + "#ThumbprintSHA1";
 

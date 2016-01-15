@@ -82,7 +82,7 @@ public class ConfigurationConverterTest extends AbstractTestBase {
         Assert.assertTrue(properties.getCallbackHandler() instanceof CallbackHandlerImpl);
         Assert.assertEquals(properties.getSignatureAlgorithm(), sigAlgo);
         Assert.assertEquals(properties.getSignatureKeyIdentifier(),
-                            WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier);
+                            WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER);
         Assert.assertFalse(properties.isAddExcC14NInclusivePrefixes());
         Assert.assertNotNull(properties.getSignatureCrypto());
         Assert.assertTrue(properties.getSignatureSecureParts() != null);
@@ -138,7 +138,7 @@ public class ConfigurationConverterTest extends AbstractTestBase {
         Assert.assertEquals(properties.getEncryptionKeyTransportAlgorithm(),
                             WSSConstants.NS_XENC_RSA15);
         Assert.assertEquals(properties.getEncryptionKeyIdentifier(),
-                            WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier);
+                            WSSecurityTokenConstants.KEYIDENTIFIER_ENCRYPTED_KEY_SHA1_IDENTIFIER);
         Assert.assertNotNull(properties.getEncryptionCrypto());
         Assert.assertTrue(properties.getEncryptionSecureParts() != null);
         Assert.assertEquals(properties.getEncryptionSecureParts().size(), 1);

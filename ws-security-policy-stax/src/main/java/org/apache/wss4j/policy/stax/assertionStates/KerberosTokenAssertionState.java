@@ -84,7 +84,7 @@ public class KerberosTokenAssertionState extends TokenAssertionState {
 
         String namespace = getAssertion().getName().getNamespaceURI();
         if (kerberosToken.isRequireKeyIdentifierReference()) {
-            if (!WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef.equals(kerberosServiceSecurityToken.getKeyIdentifier())) {
+            if (!WSSecurityTokenConstants.KEYIDENTIFIER_EMBEDDED_KEY_IDENTIFIER_REF.equals(kerberosServiceSecurityToken.getKeyIdentifier())) {
                 setErrorMessage("Policy enforces KeyIdentifierReference but we got " + kerberosServiceSecurityToken.getKeyIdentifier());
                 getPolicyAsserter().unassertPolicy(new QName(namespace, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE),
                                                  getErrorMessage());

@@ -244,7 +244,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
 
                                 if (Arrays.equals(tokenDigest, binaryContent)) {
                                     return createSecurityTokenProxy(inboundSecurityToken,
-                                            WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier);
+                                            WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER);
                                 }
                             }
                         }
@@ -273,20 +273,20 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                             inboundSecurityContext.getSecurityTokenProvider(keyIdentifierType.getValue());
                     if (securityTokenProvider != null) {
                         return createSecurityTokenProxy(securityTokenProvider.getSecurityToken(),
-                            WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
+                            WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
                     }
 
                     // Delegate to a CallbackHandler, in case the token is not in the request
                     return new SamlSecurityTokenImpl((WSInboundSecurityContext) inboundSecurityContext,
                                                      keyIdentifierType.getValue(),
-                                                     WSSecurityTokenConstants.KeyIdentifier_ExternalReference,
+                                                     WSSecurityTokenConstants.KEYIDENTIFIER_EXTERNAL_REFERENCE,
                                                      securityProperties);
                 } else if (WSSConstants.NS_KERBEROS5_AP_REQ_SHA1.equals(valueType)) {
                     SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider =
                             inboundSecurityContext.getSecurityTokenProvider(keyIdentifierType.getValue());
                     if (securityTokenProvider != null) {
                         return createSecurityTokenProxy(securityTokenProvider.getSecurityToken(),
-                                WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
+                                WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
                     }
 
                     try {
@@ -303,7 +303,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                                 byte[] tokenDigest = messageDigest.digest(kerberosSecurityToken.getBinaryContent());
                                 if (Arrays.equals(tokenDigest, binaryContent)) {
                                     return createSecurityTokenProxy(inboundSecurityToken,
-                                            WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier);
+                                            WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER);
                                 }
                             }
                         }
@@ -339,7 +339,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     try {
                         return new ExternalSecurityTokenImpl((WSInboundSecurityContext) inboundSecurityContext,
                                                      uri,
-                                                     WSSecurityTokenConstants.KeyIdentifier_ExternalReference,
+                                                     WSSecurityTokenConstants.KEYIDENTIFIER_EXTERNAL_REFERENCE,
                                                      securityProperties, false);
                     } catch (WSSecurityException ex) { //NOPMD
                         // just continue
@@ -368,17 +368,17 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     // Delegate to a CallbackHandler, in case the token is not in the request
                     return new ExternalSecurityTokenImpl((WSInboundSecurityContext) inboundSecurityContext,
                                                      uri,
-                                                     WSSecurityTokenConstants.KeyIdentifier_ExternalReference,
+                                                     WSSecurityTokenConstants.KEYIDENTIFIER_EXTERNAL_REFERENCE,
                                                      securityProperties, included);
                 }
                 if (securityTokenProvider.getSecurityToken() instanceof SecurityTokenReference) {
                     ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3057);
                 } else if (securityTokenProvider.getSecurityToken() instanceof X509PKIPathv1SecurityTokenImpl) {
                     String valueType = referenceType.getValueType();
-                    if (!WSSConstants.NS_X509PKIPathv1.equals(valueType)) {
+                    if (!WSSConstants.NS_X509_PKIPATH_V1.equals(valueType)) {
                         ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3058);
                     }
-                    if (!WSSConstants.NS_X509PKIPathv1.equals(tokenType)) {
+                    if (!WSSConstants.NS_X509_PKIPATH_V1.equals(tokenType)) {
                         ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R5215);
                     }
                 } else if (securityTokenProvider.getSecurityToken() instanceof X509SecurityToken) {
@@ -393,7 +393,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     }
                 } else if (securityTokenProvider.getSecurityToken() instanceof SamlSecurityToken) {
                     WSSecurityTokenConstants.TokenType samlTokenType = securityTokenProvider.getSecurityToken().getTokenType();
-                    if (WSSecurityTokenConstants.Saml20Token.equals(samlTokenType)) {
+                    if (WSSecurityTokenConstants.SAML_20_TOKEN.equals(samlTokenType)) {
                         String valueType = referenceType.getValueType();
                         if (valueType != null && !"".equals(valueType)) {
                             ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6614);
@@ -401,14 +401,14 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                         if (!WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE.equals(tokenType)) {
                             ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6617);
                         }
-                    } else if (WSSecurityTokenConstants.Saml10Token.equals(samlTokenType) 
+                    } else if (WSSecurityTokenConstants.SAML_10_TOKEN.equals(samlTokenType) 
                         && !WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE.equals(tokenType)) {
                         ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6611);
                     }
                 }
 
                 return createSecurityTokenProxy(securityTokenProvider.getSecurityToken(),
-                        WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
+                        WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
             }
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");
         } finally {

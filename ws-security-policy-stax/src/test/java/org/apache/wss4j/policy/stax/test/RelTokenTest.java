@@ -74,14 +74,14 @@ public class RelTokenTest extends AbstractPolicyTestBase {
         RelTokenSecurityEvent initiatorTokenSecurityEvent = new RelTokenSecurityEvent();
         initiatorTokenSecurityEvent.setIssuerName("xs:anyURI");
         X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
         RelTokenSecurityEvent recipientTokenSecurityEvent = new RelTokenSecurityEvent();
         recipientTokenSecurityEvent.setIssuerName("xs:anyURI");
         securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 

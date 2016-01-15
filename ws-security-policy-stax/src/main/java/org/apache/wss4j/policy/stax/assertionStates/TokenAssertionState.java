@@ -93,7 +93,7 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
         loop:
         while (tokenUsageIterator.hasNext()) {
             WSSecurityTokenConstants.TokenUsage tokenUsage = tokenUsageIterator.next();
-            if (WSSecurityTokenConstants.TokenUsage_MainSignature.equals(tokenUsage)) {
+            if (WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE.equals(tokenUsage)) {
                 if (initiator && !(parentAssertion instanceof RecipientToken)
                         && !(parentAssertion instanceof RecipientSignatureToken)
                         && !(parentAssertion instanceof SignatureToken)
@@ -111,7 +111,7 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
                 }
             } else if (WSSecurityTokenConstants.TokenUsage_Signature.equals(tokenUsage)) {
                 throw new WSSPolicyException("Illegal token usage!");
-            } else if (WSSecurityTokenConstants.TokenUsage_MainEncryption.equals(tokenUsage)) {
+            } else if (WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION.equals(tokenUsage)) {
                 if (initiator && !(parentAssertion instanceof InitiatorToken)
                         && !(parentAssertion instanceof InitiatorEncryptionToken)
                         && !(parentAssertion instanceof EncryptionToken)
@@ -129,14 +129,14 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
                 }
             } else if (WSSecurityTokenConstants.TokenUsage_Encryption.equals(tokenUsage)) {
                 throw new WSSPolicyException("Illegal token usage!");
-            } else if (WSSecurityTokenConstants.TokenUsage_SupportingTokens.equals(tokenUsage) 
-                || WSSecurityTokenConstants.TokenUsage_SignedSupportingTokens.equals(tokenUsage) 
-                || WSSecurityTokenConstants.TokenUsage_EndorsingSupportingTokens.equals(tokenUsage) 
-                || WSSecurityTokenConstants.TokenUsage_SignedEndorsingSupportingTokens.equals(tokenUsage) 
-                || WSSecurityTokenConstants.TokenUsage_SignedEncryptedSupportingTokens.equals(tokenUsage) 
-                || WSSecurityTokenConstants.TokenUsage_EncryptedSupportingTokens.equals(tokenUsage) 
-                || WSSecurityTokenConstants.TokenUsage_EndorsingEncryptedSupportingTokens.equals(tokenUsage) 
-                || WSSecurityTokenConstants.TokenUsage_SignedEndorsingEncryptedSupportingTokens.equals(tokenUsage)
+            } else if (WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS.equals(tokenUsage) 
+                || WSSecurityTokenConstants.TOKENUSAGE_SIGNED_SUPPORTING_TOKENS.equals(tokenUsage) 
+                || WSSecurityTokenConstants.TOKENUSAGE_ENDORSING_SUPPORTING_TOKENS.equals(tokenUsage) 
+                || WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENDORSING_SUPPORTING_TOKENS.equals(tokenUsage) 
+                || WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENCRYPTED_SUPPORTING_TOKENS.equals(tokenUsage) 
+                || WSSecurityTokenConstants.TOKENUSAGE_ENCRYPTED_SUPPORTING_TOKENS.equals(tokenUsage) 
+                || WSSecurityTokenConstants.TOKENUSAGE_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS.equals(tokenUsage) 
+                || WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS.equals(tokenUsage)
             ) {
 
                 if (parentAssertion instanceof TransportToken) {
@@ -246,8 +246,8 @@ public abstract class TokenAssertionState extends AssertionState implements Asse
         if (asserted) {
             setAsserted(true);
         }
-        if (!asserted && (tokenUsages.contains(WSSecurityTokenConstants.TokenUsage_MainSignature)
-                || tokenUsages.contains(WSSecurityTokenConstants.TokenUsage_MainEncryption))) {
+        if (!asserted && (tokenUsages.contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE)
+                || tokenUsages.contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION))) {
             //return false if not asserted for the main signature and encryption tokens
             return false;
         } else {

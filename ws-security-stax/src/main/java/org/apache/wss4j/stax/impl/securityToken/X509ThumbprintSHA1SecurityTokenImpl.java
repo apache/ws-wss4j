@@ -39,7 +39,7 @@ public class X509ThumbprintSHA1SecurityTokenImpl extends X509SecurityTokenImpl {
             byte[] binaryContent, String id, WSSSecurityProperties securityProperties) {
 
         super(WSSecurityTokenConstants.X509V3Token, wsInboundSecurityContext, crypto, callbackHandler, id,
-                WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier, securityProperties, false);
+                WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER, securityProperties, false);
         this.binaryContent = binaryContent;
     }
 

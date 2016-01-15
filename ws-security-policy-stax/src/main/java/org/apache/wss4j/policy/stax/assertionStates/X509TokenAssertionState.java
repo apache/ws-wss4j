@@ -121,7 +121,7 @@ public class X509TokenAssertionState extends TokenAssertionState {
                     getPolicyAsserter().assertPolicy(new QName(namespace, SPConstants.REQUIRE_ISSUER_SERIAL_REFERENCE));
                 }
             } else if (x509Token.isRequireEmbeddedTokenReference()) {
-                if (!WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(securityToken.getKeyIdentifier())) {
+                if (!WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE.equals(securityToken.getKeyIdentifier())) {
                     setErrorMessage("Policy enforces EmbeddedTokenReference but we got " + securityToken.getKeyIdentifier());
                     getPolicyAsserter().unassertPolicy(new QName(namespace, SPConstants.REQUIRE_EMBEDDED_TOKEN_REFERENCE),
                                                        getErrorMessage());
@@ -130,7 +130,7 @@ public class X509TokenAssertionState extends TokenAssertionState {
                     getPolicyAsserter().assertPolicy(new QName(namespace, SPConstants.REQUIRE_EMBEDDED_TOKEN_REFERENCE));
                 }
             } else if (x509Token.isRequireThumbprintReference()) {
-                if (!WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier.equals(securityToken.getKeyIdentifier())) {
+                if (!WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER.equals(securityToken.getKeyIdentifier())) {
                     setErrorMessage("Policy enforces ThumbprintReference but we got " + securityToken.getKeyIdentifier());
                     getPolicyAsserter().unassertPolicy(new QName(namespace, SPConstants.REQUIRE_THUMBPRINT_REFERENCE),
                                                        getErrorMessage());

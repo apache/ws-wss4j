@@ -46,7 +46,7 @@ public class LayoutTest extends AbstractPolicyTestBase {
 
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
         SecurityToken securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
-        securityToken.addTokenUsage(WSTokenConstants.TokenUsage_MainSignature);
+        securityToken.addTokenUsage(WSTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
@@ -90,7 +90,7 @@ public class LayoutTest extends AbstractPolicyTestBase {
 
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
         SecurityToken securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
-        securityToken.addTokenUsage(WSTokenConstants.TokenUsage_MainSignature);
+        securityToken.addTokenUsage(WSTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
@@ -119,7 +119,7 @@ public class LayoutTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
         SecurityToken securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
-        securityToken.addTokenUsage(WSTokenConstants.TokenUsage_MainSignature);
+        securityToken.addTokenUsage(WSTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
@@ -146,7 +146,7 @@ public class LayoutTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
         SecurityToken securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
-        securityToken.addTokenUsage(WSTokenConstants.TokenUsage_MainSignature);
+        securityToken.addTokenUsage(WSTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
         TimestampSecurityEvent timestampSecurityEvent = new TimestampSecurityEvent();
@@ -172,7 +172,7 @@ public class LayoutTest extends AbstractPolicyTestBase {
         policyEnforcer.registerSecurityEvent(timestampSecurityEvent);
         X509TokenSecurityEvent x509TokenSecurityEvent = new X509TokenSecurityEvent();
         SecurityToken securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
-        securityToken.addTokenUsage(WSTokenConstants.TokenUsage_MainSignature);
+        securityToken.addTokenUsage(WSTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 

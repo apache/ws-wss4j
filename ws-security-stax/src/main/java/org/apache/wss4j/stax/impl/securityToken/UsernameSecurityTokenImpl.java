@@ -91,7 +91,7 @@ public class UsernameSecurityTokenImpl extends AbstractInboundSecurityToken impl
 
     @Override
     public WSSecurityTokenConstants.TokenType getTokenType() {
-        return WSSecurityTokenConstants.UsernameToken;
+        return WSSecurityTokenConstants.USERNAME_TOKEN;
     }
 
     /**

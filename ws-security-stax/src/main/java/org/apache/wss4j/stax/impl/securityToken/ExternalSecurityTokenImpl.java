@@ -79,7 +79,7 @@ public class ExternalSecurityTokenImpl extends AbstractInboundSecurityToken {
     @Override
     public TokenType getTokenType() {
         if ("SecurityContextToken".equals(tokenElement.getLocalName())) {
-            return WSSecurityTokenConstants.SecurityContextToken;
+            return WSSecurityTokenConstants.SECURITY_CONTEXT_TOKEN;
         }
         return null;
     }

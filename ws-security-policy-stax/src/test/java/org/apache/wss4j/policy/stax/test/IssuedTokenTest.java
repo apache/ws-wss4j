@@ -120,8 +120,8 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         SamlSecurityTokenImpl securityToken =
             new SamlSecurityTokenImpl(
                     samlAssertionWrapper, getX509Token(WSSecurityTokenConstants.X509V3Token), null, null,
-                    WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference, null);
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+                    WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE, null);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
@@ -132,8 +132,8 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         securityToken =
             new SamlSecurityTokenImpl(
                     samlAssertionWrapper, getX509Token(WSSecurityTokenConstants.X509V3Token), null, null,
-                    WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference, null);
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
+                    WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE, null);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
@@ -187,8 +187,8 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         SamlSecurityTokenImpl securityToken =
             new SamlSecurityTokenImpl(
                     samlAssertionWrapper, getX509Token(WSSecurityTokenConstants.X509V3Token), null, null,
-                    WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference, null);
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+                    WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE, null);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
@@ -196,8 +196,8 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         securityToken =
             new SamlSecurityTokenImpl(
                     samlAssertionWrapper, getX509Token(WSSecurityTokenConstants.X509V3Token), null, null,
-                    WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference, null);
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
+                    WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE, null);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
@@ -256,8 +256,8 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         SamlSecurityTokenImpl securityToken =
             new SamlSecurityTokenImpl(
                     samlAssertionWrapper, getX509Token(WSSecurityTokenConstants.X509V3Token), null, null,
-                    WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference, null);
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+                    WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE, null);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
@@ -268,8 +268,8 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         securityToken =
             new SamlSecurityTokenImpl(
                     samlAssertionWrapper, getX509Token(WSSecurityTokenConstants.X509V3Token), null, null,
-                    WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference, null);
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
+                    WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE, null);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
@@ -328,8 +328,8 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         SamlSecurityTokenImpl securityToken =
             new SamlSecurityTokenImpl(
                     samlAssertionWrapper, getX509Token(WSSecurityTokenConstants.X509V3Token), null, null,
-                    WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference, null);
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+                    WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE, null);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
@@ -340,8 +340,8 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         securityToken =
             new SamlSecurityTokenImpl(
                     samlAssertionWrapper, getX509Token(WSSecurityTokenConstants.X509V3Token), null, null,
-                    WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference, null);
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
+                    WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE, null);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
@@ -397,8 +397,8 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         SamlSecurityTokenImpl securityToken =
             new SamlSecurityTokenImpl(
                     samlAssertionWrapper, getX509Token(WSSecurityTokenConstants.X509V3Token), null, null,
-                    WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference, null);
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+                    WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE, null);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
@@ -409,8 +409,8 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         securityToken =
             new SamlSecurityTokenImpl(
                     samlAssertionWrapper, getX509Token(WSSecurityTokenConstants.X509V3Token), null, null,
-                    WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference, null);
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
+                    WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE, null);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
@@ -486,8 +486,8 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         KerberosServiceSecurityTokenImpl securityToken = new KerberosServiceSecurityTokenImpl(
                 null, null, null,
                 "http://docs.oasisopen.org/wss/oasiswss-kerberos-tokenprofile-1.1#Kerberosv5APREQSHA1",
-                "1", WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+                "1", WSSecurityTokenConstants.KEYIDENTIFIER_EMBEDDED_KEY_IDENTIFIER_REF);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
@@ -496,8 +496,8 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         securityToken = new KerberosServiceSecurityTokenImpl(
                 null, null, null,
                 "http://docs.oasisopen.org/wss/oasiswss-kerberos-tokenprofile-1.1#Kerberosv5APREQSHA1",
-                "1", WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
+                "1", WSSecurityTokenConstants.KEYIDENTIFIER_EMBEDDED_KEY_IDENTIFIER_REF);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
@@ -533,8 +533,8 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         KerberosServiceSecurityTokenImpl securityToken = new KerberosServiceSecurityTokenImpl(
                 null, null, null,
                 "http://docs.oasisopen.org/wss/oasiswss-kerberos-tokenprofile-1.1#GSS_Kerberosv5_AP_REQ",
-                "1", WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+                "1", WSSecurityTokenConstants.KEYIDENTIFIER_EMBEDDED_KEY_IDENTIFIER_REF);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
@@ -543,8 +543,8 @@ public class IssuedTokenTest extends AbstractPolicyTestBase {
         securityToken = new KerberosServiceSecurityTokenImpl(
                 null, null, null,
                 "http://docs.oasisopen.org/wss/oasiswss-kerberos-tokenprofile-1.1#Kerberosv5APREQSHA1",
-                "1", WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
+                "1", WSSecurityTokenConstants.KEYIDENTIFIER_EMBEDDED_KEY_IDENTIFIER_REF);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 

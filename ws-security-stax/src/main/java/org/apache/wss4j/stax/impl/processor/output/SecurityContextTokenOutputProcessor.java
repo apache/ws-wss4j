@@ -71,7 +71,7 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
             final String identifier = IDGenerator.generateID(null);
 
             final GenericOutboundSecurityToken securityContextSecurityToken = 
-                new GenericOutboundSecurityToken(wsuId, WSSecurityTokenConstants.SecurityContextToken) {
+                new GenericOutboundSecurityToken(wsuId, WSSecurityTokenConstants.SECURITY_CONTEXT_TOKEN) {
 
                 @Override
                 public Key getSecretKey(String algorithmURI) throws XMLSecurityException {

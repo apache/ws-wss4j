@@ -121,7 +121,7 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
         X509SecurityTokenImpl x509SecurityToken =
                 new X509SecurityTokenImpl(
                         tokenType, null, null, null, IDGenerator.generateID(null),
-                        WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier, null, true) {
+                        WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER, null, true) {
             @Override
             protected String getAlias() throws XMLSecurityException {
                 return keyAlias;
@@ -158,7 +158,7 @@ public class AbstractPolicyTestBase extends AbstractTestBase {
     public KerberosServiceSecurityTokenImpl getKerberosServiceSecurityToken(WSSecurityTokenConstants.TokenType tokenType) throws Exception {
         return new KerberosServiceSecurityTokenImpl(
                 null, null, null, null, IDGenerator.generateID(null),
-                WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
+                WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
     }
 
     public HttpsSecurityTokenImpl getHttpsSecurityToken(WSSecurityTokenConstants.TokenType tokenType) throws Exception {

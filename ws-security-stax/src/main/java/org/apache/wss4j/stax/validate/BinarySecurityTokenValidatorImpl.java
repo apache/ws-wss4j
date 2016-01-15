@@ -64,14 +64,14 @@ public class BinarySecurityTokenValidatorImpl implements BinarySecurityTokenVali
                 x509V3SecurityToken.setElementPath(tokenContext.getElementPath());
                 x509V3SecurityToken.setXMLSecEvent(tokenContext.getFirstXMLSecEvent());
                 return x509V3SecurityToken;
-            } else if (WSSConstants.NS_X509PKIPathv1.equals(binarySecurityTokenType.getValueType())) {
+            } else if (WSSConstants.NS_X509_PKIPATH_V1.equals(binarySecurityTokenType.getValueType())) {
                 Crypto crypto = getCrypto(tokenContext.getWssSecurityProperties());
                 X509PKIPathv1SecurityTokenImpl x509PKIPathv1SecurityToken = new X509PKIPathv1SecurityTokenImpl(
                         tokenContext.getWsSecurityContext(),
                         crypto,
                         tokenContext.getWssSecurityProperties().getCallbackHandler(),
                         securityTokenData, binarySecurityTokenType.getId(),
-                        WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference,
+                        WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE,
                         tokenContext.getWssSecurityProperties()
                 );
                 x509PKIPathv1SecurityToken.setElementPath(tokenContext.getElementPath());
@@ -83,7 +83,7 @@ public class BinarySecurityTokenValidatorImpl implements BinarySecurityTokenVali
                         tokenContext.getWssSecurityProperties().getCallbackHandler(),
                         securityTokenData, binarySecurityTokenType.getValueType(),
                         binarySecurityTokenType.getId(),
-                        WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
+                        WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE
                 );
                 kerberosServiceSecurityToken.setElementPath(tokenContext.getElementPath());
                 kerberosServiceSecurityToken.setXMLSecEvent(tokenContext.getFirstXMLSecEvent());

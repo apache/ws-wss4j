@@ -201,7 +201,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             cryptoType.setAlias("transmitter");
             callbackHandler.setCerts(crypto.getX509Certificates(cryptoType));
             securityProperties.setSamlCallbackHandler(callbackHandler);
-            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
+            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_EMBEDDED_KEY_IDENTIFIER_REF);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
@@ -649,7 +649,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             cryptoType.setAlias("transmitter");
             callbackHandler.setCerts(crypto.getX509Certificates(cryptoType));
             securityProperties.setSamlCallbackHandler(callbackHandler);
-            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
+            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_EMBEDDED_KEY_IDENTIFIER_REF);
             securityProperties.loadSignatureKeyStore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());

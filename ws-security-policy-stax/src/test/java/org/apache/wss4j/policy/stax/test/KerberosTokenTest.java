@@ -81,8 +81,8 @@ public class KerberosTokenTest extends AbstractPolicyTestBase {
 
         KerberosServiceSecurityTokenImpl kerberosServiceSecurityToken =
                 new KerberosServiceSecurityTokenImpl(null, null, null, WSSConstants.NS_KERBEROS5_AP_REQ, IDGenerator.generateID(null),
-                        WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
-        kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+                        WSSecurityTokenConstants.KEYIDENTIFIER_EMBEDDED_KEY_IDENTIFIER_REF);
+        kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         initiatorTokenSecurityEvent.setSecurityToken(kerberosServiceSecurityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
@@ -91,8 +91,8 @@ public class KerberosTokenTest extends AbstractPolicyTestBase {
 
         kerberosServiceSecurityToken =
                 new KerberosServiceSecurityTokenImpl(null, null, null, WSSConstants.NS_KERBEROS5_AP_REQ, IDGenerator.generateID(null),
-                        WSSecurityTokenConstants.KeyIdentifier_EmbeddedKeyIdentifierRef);
-        kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
+                        WSSecurityTokenConstants.KEYIDENTIFIER_EMBEDDED_KEY_IDENTIFIER_REF);
+        kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION);
         recipientTokenSecurityEvent.setSecurityToken(kerberosServiceSecurityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
@@ -157,8 +157,8 @@ public class KerberosTokenTest extends AbstractPolicyTestBase {
 
         KerberosServiceSecurityTokenImpl kerberosServiceSecurityToken =
                 new KerberosServiceSecurityTokenImpl(null, null, null, WSSConstants.NS_GSS_KERBEROS5_AP_REQ, IDGenerator.generateID(null),
-                        WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier);
-        kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+                        WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER);
+        kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         initiatorTokenSecurityEvent.setSecurityToken(kerberosServiceSecurityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
@@ -167,8 +167,8 @@ public class KerberosTokenTest extends AbstractPolicyTestBase {
 
         kerberosServiceSecurityToken =
                 new KerberosServiceSecurityTokenImpl(null, null, null, WSSConstants.NS_KERBEROS5_AP_REQ, IDGenerator.generateID(null),
-                        WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier);
-        kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
+                        WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER);
+        kerberosServiceSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION);
         recipientTokenSecurityEvent.setSecurityToken(kerberosServiceSecurityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 

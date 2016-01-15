@@ -66,7 +66,7 @@ public class HttpsSecurityTokenImpl extends AbstractInboundSecurityToken impleme
 
     @Override
     public WSSecurityTokenConstants.TokenType getTokenType() {
-        return WSSecurityTokenConstants.HttpsToken;
+        return WSSecurityTokenConstants.HTTPS_TOKEN;
     }
 
     //todo username from principal?
