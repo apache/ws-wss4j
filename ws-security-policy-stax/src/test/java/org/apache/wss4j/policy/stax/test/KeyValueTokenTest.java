@@ -76,13 +76,13 @@ public class KeyValueTokenTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         KeyValueTokenSecurityEvent initiatorTokenSecurityEvent = new KeyValueTokenSecurityEvent();
         RsaKeyValueSecurityTokenImpl securityToken = getRsaKeyValueSecurityToken();
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
         KeyValueTokenSecurityEvent recipientTokenSecurityEvent = new KeyValueTokenSecurityEvent();
         securityToken = getRsaKeyValueSecurityToken();
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
@@ -143,13 +143,13 @@ public class KeyValueTokenTest extends AbstractPolicyTestBase {
         PolicyEnforcer policyEnforcer = buildAndStartPolicyEngine(policyString);
         KeyValueTokenSecurityEvent initiatorTokenSecurityEvent = new KeyValueTokenSecurityEvent();
         ECKeyValueSecurityTokenImpl securityToken = getECKeyValueSecurityToken();
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
         KeyValueTokenSecurityEvent recipientTokenSecurityEvent = new KeyValueTokenSecurityEvent();
         securityToken = getECKeyValueSecurityToken();
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 

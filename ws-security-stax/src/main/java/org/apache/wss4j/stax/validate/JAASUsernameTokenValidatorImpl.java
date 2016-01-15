@@ -117,7 +117,7 @@ public class JAASUsernameTokenValidatorImpl implements UsernameTokenValidator {
                 attributedDateTimeCreated != null ? attributedDateTimeCreated.getValue() : null,
                 nonceVal, null, null,
                 tokenContext.getWsSecurityContext(), usernameTokenType.getId(),
-                WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
+                WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
         usernameSecurityToken.setElementPath(tokenContext.getElementPath());
         usernameSecurityToken.setXMLSecEvent(tokenContext.getFirstXMLSecEvent());
         usernameSecurityToken.setSubject(subject);

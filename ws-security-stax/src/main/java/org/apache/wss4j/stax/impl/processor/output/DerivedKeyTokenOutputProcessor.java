@@ -109,7 +109,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 AlgoFactory.getInstance(WSSConstants.P_SHA_1);
 
             byte[] secret;
-            if (WSSecurityTokenConstants.SecurityContextToken.equals(wrappingSecurityToken.getTokenType())) {
+            if (WSSecurityTokenConstants.SECURITY_CONTEXT_TOKEN.equals(wrappingSecurityToken.getTokenType())) {
                 WSPasswordCallback passwordCallback = new WSPasswordCallback(wsuIdDKT, WSPasswordCallback.SECRET_KEY);
                 WSSUtils.doSecretKeyCallback(((WSSSecurityProperties)securityProperties).getCallbackHandler(), 
                                              passwordCallback, wsuIdDKT);
@@ -258,12 +258,12 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
             SecurityToken wrappingToken = securityToken.getKeyWrappingToken();
             List<XMLSecAttribute> attributes = new ArrayList<>(2);
             attributes.add(createAttribute(WSSConstants.ATT_WSU_ID, IDGenerator.generateID(null)));
-            if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier) && !useSingleCertificate) {
-                attributes.add(createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE, WSSConstants.NS_X509PKIPathv1));
+            if (WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE.equals(keyIdentifier) && !useSingleCertificate) {
+                attributes.add(createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE, WSSConstants.NS_X509_PKIPATH_V1));
             } else if (derivedKeyTokenReference == WSSConstants.DerivedKeyTokenReference.EncryptedKey
-                || WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier.equals(keyIdentifier)) {
+                || WSSecurityTokenConstants.KEYIDENTIFIER_ENCRYPTED_KEY_SHA1_IDENTIFIER.equals(keyIdentifier)) {
                 attributes.add(createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
-            } else if (WSSecurityTokenConstants.KerberosToken.equals(wrappingToken.getTokenType())) {
+            } else if (WSSecurityTokenConstants.KERBEROS_TOKEN.equals(wrappingToken.getTokenType())) {
                 attributes.add(createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE, WSSConstants.NS_GSS_KERBEROS5_AP_REQ));
             }
             createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_SECURITY_TOKEN_REFERENCE, false, attributes);
@@ -280,18 +280,18 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 WSSUtils.createX509SubjectKeyIdentifierStructure(this, outputProcessorChain, x509Certificates);
             } else if (WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier.equals(keyIdentifier)) {
                 WSSUtils.createX509KeyIdentifierStructure(this, outputProcessorChain, x509Certificates);
-            } else if (WSSecurityTokenConstants.KeyIdentifier_KerberosSha1Identifier.equals(keyIdentifier)) {
+            } else if (WSSecurityTokenConstants.KEYIDENTIFIER_KERBEROS_SHA1_IDENTIFIER.equals(keyIdentifier)) {
                 String identifier = wrappingToken.getSha1Identifier();
                 WSSUtils.createKerberosSha1IdentifierStructure(this, outputProcessorChain, identifier);
-            } else if (WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier.equals(keyIdentifier)) {
+            } else if (WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER.equals(keyIdentifier)) {
                 WSSUtils.createThumbprintKeyIdentifierStructure(this, outputProcessorChain, x509Certificates);
-            } else if (WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier)) {
+            } else if (WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE.equals(keyIdentifier)) {
                 String valueType;
-                if (WSSecurityTokenConstants.KerberosToken.equals(wrappingToken.getTokenType())) {
+                if (WSSecurityTokenConstants.KERBEROS_TOKEN.equals(wrappingToken.getTokenType())) {
                     valueType = WSSConstants.NS_GSS_KERBEROS5_AP_REQ;
-                } else if (WSSecurityTokenConstants.SpnegoContextToken.equals(wrappingToken.getTokenType())
-                    || WSSecurityTokenConstants.SecurityContextToken.equals(wrappingToken.getTokenType())
-                    || WSSecurityTokenConstants.SecureConversationToken.equals(wrappingToken.getTokenType())) {
+                } else if (WSSecurityTokenConstants.SPNEGO_CONTEXT_TOKEN.equals(wrappingToken.getTokenType())
+                    || WSSecurityTokenConstants.SECURITY_CONTEXT_TOKEN.equals(wrappingToken.getTokenType())
+                    || WSSecurityTokenConstants.SECURE_CONVERSATION_TOKEN.equals(wrappingToken.getTokenType())) {
                     boolean use200512Namespace = ((WSSSecurityProperties)getSecurityProperties()).isUse200512Namespace();
                     if (use200512Namespace) {
                         valueType = WSSConstants.NS_WSC_05_12 + "/sct";
@@ -301,11 +301,11 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
                 } else if (useSingleCertificate) {
                     valueType = WSSConstants.NS_X509_V3_TYPE;
                 } else {
-                    valueType = WSSConstants.NS_X509PKIPathv1;
+                    valueType = WSSConstants.NS_X509_PKIPATH_V1;
                 }
                 boolean included = ((WSSSecurityProperties)getSecurityProperties()).isIncludeSignatureToken();
                 WSSUtils.createBSTReferenceStructure(this, outputProcessorChain, tokenId, valueType, included);
-            } else if (WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier.equals(keyIdentifier)) {
+            } else if (WSSecurityTokenConstants.KEYIDENTIFIER_ENCRYPTED_KEY_SHA1_IDENTIFIER.equals(keyIdentifier)) {
                 WSSUtils.createEncryptedKeySha1IdentifierStructure(this, outputProcessorChain, sha1Identifier);
             } else {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unsupportedSecurityToken");

@@ -160,7 +160,7 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
         for (int i = 0; i < tokenUsages.size(); i++) {
             WSSecurityTokenConstants.TokenUsage tokenUsage = tokenUsages.get(i);
             if (WSSecurityTokenConstants.TokenUsage_Signature.equals(tokenUsage)
-                    || WSSecurityTokenConstants.TokenUsage_MainSignature.equals(tokenUsage)
+                    || WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE.equals(tokenUsage)
                     || tokenUsage.getName().contains("Endorsing")) {
                 return true;
             }
@@ -195,7 +195,7 @@ public class TokenProtectionAssertionState extends AssertionState implements Ass
     private boolean isMainSignatureToken(SecurityToken securityToken) throws XMLSecurityException {
         SecurityToken rootToken = WSSUtils.getRootToken(securityToken);
         List<WSSecurityTokenConstants.TokenUsage> tokenUsages = rootToken.getTokenUsages();
-        return tokenUsages.contains(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        return tokenUsages.contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
     }
 
     private boolean signsMainSignature(SecurityToken securityToken) throws XMLSecurityException {

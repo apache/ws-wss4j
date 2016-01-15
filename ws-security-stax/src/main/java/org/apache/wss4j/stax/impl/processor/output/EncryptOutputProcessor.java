@@ -380,7 +380,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
             }
 
             KeyIdentifier keyIdentifier = ((WSSSecurityProperties) getSecurityProperties()).getEncryptionKeyIdentifier();
-            if (WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier.equals(keyIdentifier)) {
+            if (WSSecurityTokenConstants.KEYIDENTIFIER_ENCRYPTED_KEY_SHA1_IDENTIFIER.equals(keyIdentifier)) {
                 List<XMLSecAttribute> attributes = new ArrayList<>(1);
                 attributes.add(createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE, WSSConstants.NS_WSS_ENC_KEY_VALUE_TYPE));
                 createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_SECURITY_TOKEN_REFERENCE, 
@@ -393,7 +393,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                     WSSUtils.createEncryptedKeySha1IdentifierStructure(this, outputProcessorChain, 
                                                                        getEncryptionPartDef().getSymmetricKey());
                 }
-            } else if (WSSecurityTokenConstants.KeyIdentifier_KerberosSha1Identifier.equals(keyIdentifier)) {
+            } else if (WSSecurityTokenConstants.KEYIDENTIFIER_KERBEROS_SHA1_IDENTIFIER.equals(keyIdentifier)) {
                 List<XMLSecAttribute> attributes = new ArrayList<>(1);
                 attributes.add(createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE, WSSConstants.NS_KERBEROS5_AP_REQ));
                 createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_SECURITY_TOKEN_REFERENCE, 
@@ -403,21 +403,21 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                                                                securityToken.getSha1Identifier());
             } else {
                 boolean isSAMLToken = false;
-                if (WSSecurityTokenConstants.KerberosToken.equals(securityToken.getTokenType())) {
+                if (WSSecurityTokenConstants.KERBEROS_TOKEN.equals(securityToken.getTokenType())) {
                     List<XMLSecAttribute> attributes = new ArrayList<>(2);
                     attributes.add(createAttribute(WSSConstants.ATT_WSU_ID, IDGenerator.generateID(null)));
                     attributes.add(createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE, WSSConstants.NS_GSS_KERBEROS5_AP_REQ));
                     createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_SECURITY_TOKEN_REFERENCE, 
                                                        false, attributes);
-                } else if (WSSecurityTokenConstants.Saml10Token.equals(securityToken.getTokenType())
-                    || WSSecurityTokenConstants.Saml11Token.equals(securityToken.getTokenType())) {
+                } else if (WSSecurityTokenConstants.SAML_10_TOKEN.equals(securityToken.getTokenType())
+                    || WSSecurityTokenConstants.SAML_11_TOKEN.equals(securityToken.getTokenType())) {
                     List<XMLSecAttribute> attributes = new ArrayList<>(2);
                     attributes.add(createAttribute(WSSConstants.ATT_WSU_ID, IDGenerator.generateID(null)));
                     attributes.add(createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE, WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE));
                     createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_WSSE_SECURITY_TOKEN_REFERENCE, 
                                                        false, attributes);
                     isSAMLToken = true;
-                } else if (WSSecurityTokenConstants.Saml20Token.equals(securityToken.getTokenType())) {
+                } else if (WSSecurityTokenConstants.SAML_20_TOKEN.equals(securityToken.getTokenType())) {
                     List<XMLSecAttribute> attributes = new ArrayList<>(2);
                     attributes.add(createAttribute(WSSConstants.ATT_WSU_ID, IDGenerator.generateID(null)));
                     attributes.add(createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE, WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE));
@@ -442,7 +442,7 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                 } else {
                     List<XMLSecAttribute> attributes = new ArrayList<>(1);
                     attributes.add(createAttribute(WSSConstants.ATT_NULL_URI, "#" + getEncryptionPartDef().getKeyId()));
-                    if (WSSecurityTokenConstants.KerberosToken.equals(securityToken.getTokenType())) {
+                    if (WSSecurityTokenConstants.KERBEROS_TOKEN.equals(securityToken.getTokenType())) {
                         attributes.add(createAttribute(WSSConstants.ATT_NULL_VALUE_TYPE, WSSConstants.NS_GSS_KERBEROS5_AP_REQ));
                     } else if (WSSecurityTokenConstants.DerivedKeyToken.equals(securityToken.getTokenType())) {
                         boolean use200512Namespace = ((WSSSecurityProperties)getSecurityProperties()).isUse200512Namespace();
@@ -451,9 +451,9 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                         } else {
                             attributes.add(createAttribute(WSSConstants.ATT_NULL_VALUE_TYPE, WSSConstants.NS_WSC_05_02 + "/dk"));
                         }
-                    } else if (WSSecurityTokenConstants.SpnegoContextToken.equals(securityToken.getTokenType())
-                        || WSSecurityTokenConstants.SecurityContextToken.equals(securityToken.getTokenType())
-                        || WSSecurityTokenConstants.SecureConversationToken.equals(securityToken.getTokenType())) {
+                    } else if (WSSecurityTokenConstants.SPNEGO_CONTEXT_TOKEN.equals(securityToken.getTokenType())
+                        || WSSecurityTokenConstants.SECURITY_CONTEXT_TOKEN.equals(securityToken.getTokenType())
+                        || WSSecurityTokenConstants.SECURE_CONVERSATION_TOKEN.equals(securityToken.getTokenType())) {
                         boolean use200512Namespace = ((WSSSecurityProperties)getSecurityProperties()).isUse200512Namespace();
                         if (use200512Namespace) {
                             attributes.add(createAttribute(WSSConstants.ATT_NULL_VALUE_TYPE, WSSConstants.NS_WSC_05_12 + "/sct"));

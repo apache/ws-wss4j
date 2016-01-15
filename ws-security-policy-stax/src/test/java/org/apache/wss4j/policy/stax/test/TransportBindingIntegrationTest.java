@@ -135,7 +135,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
         HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "transmitter");
-        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
         List<SecurityEvent> securityEventList = new ArrayList<>();
@@ -237,7 +237,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
         HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "transmitter");
-        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
         List<SecurityEvent> securityEventList = new ArrayList<>();
@@ -360,7 +360,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
         HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "transmitter");
-        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
         List<SecurityEvent> securityEventList = new ArrayList<>();
@@ -474,7 +474,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
         HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "transmitter");
-        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
         List<SecurityEvent> securityEventList = new ArrayList<>();
@@ -575,7 +575,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
         HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "transmitter");
-        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
         List<SecurityEvent> securityEventList = new ArrayList<>();
@@ -698,7 +698,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
         HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "transmitter");
-        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
         List<SecurityEvent> securityEventList = new ArrayList<>();
@@ -806,7 +806,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
         HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "transmitter");
         //todo token usage hard-coded in httpsSecurityToken?
-        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
         List<SecurityEvent> securityEventList = new ArrayList<>();
@@ -938,7 +938,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsTokenSecurityEvent.setIssuerName("CN=transmitter,OU=swssf,C=CH");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpsClientCertificateAuthentication);
         HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "CN=transmitter,OU=swssf,C=CH");
-        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
         List<SecurityEvent> securityEventList = new ArrayList<>();
@@ -1058,7 +1058,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsTokenSecurityEvent.setIssuerName("CN=example,OU=swssf,C=CH");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpsClientCertificateAuthentication);
         HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "CN=example,OU=swssf,C=CH");
-        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
         List<SecurityEvent> securityEventList = new ArrayList<>();
@@ -1176,7 +1176,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
         HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "transmitter");
-        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
         List<SecurityEvent> securityEventList = new ArrayList<>();
@@ -1296,7 +1296,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
         HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "transmitter");
-        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
         List<SecurityEvent> securityEventList = new ArrayList<>();
@@ -1414,7 +1414,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
         HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "transmitter");
-        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
         List<SecurityEvent> securityEventList = new ArrayList<>();
@@ -1535,7 +1535,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
         HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "transmitter");
-        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
         List<SecurityEvent> securityEventList = new ArrayList<>();
@@ -1649,7 +1649,7 @@ public class TransportBindingIntegrationTest extends AbstractPolicyTestBase {
         httpsTokenSecurityEvent.setIssuerName("transmitter");
         httpsTokenSecurityEvent.setAuthenticationType(HttpsTokenSecurityEvent.AuthenticationType.HttpBasicAuthentication);
         HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "transmitter", null);
-        httpsSecurityToken.addTokenUsage(WSTokenConstants.TokenUsage_MainSignature);
+        httpsSecurityToken.addTokenUsage(WSTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
         List<SecurityEvent> securityEventList = new ArrayList<>();

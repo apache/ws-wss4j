@@ -683,7 +683,7 @@ public class OutboundWSSec {
                     @SuppressWarnings("unchecked")
                     TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent
                         = (TokenSecurityEvent<? extends SecurityToken>) securityEvent;
-                    TokenUsage mainSig = WSSecurityTokenConstants.TokenUsage_MainSignature;
+                    TokenUsage mainSig = WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE;
                     if (!tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(mainSig)) {
                         continue;
                     }
@@ -706,7 +706,7 @@ public class OutboundWSSec {
                     @SuppressWarnings("unchecked")
                     TokenSecurityEvent<? extends SecurityToken> tokenSecurityEvent
                         = (TokenSecurityEvent<? extends SecurityToken>) securityEvent;
-                    TokenUsage mainSig = WSSecurityTokenConstants.TokenUsage_MainSignature;
+                    TokenUsage mainSig = WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE;
                     if (!tokenSecurityEvent.getSecurityToken().getTokenUsages().contains(mainSig)) {
                         continue;
                     }

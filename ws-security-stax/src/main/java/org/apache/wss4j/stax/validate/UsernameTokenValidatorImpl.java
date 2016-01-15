@@ -150,7 +150,7 @@ public class UsernameTokenValidatorImpl implements UsernameTokenValidator {
                 usernameTokenPasswordType, username.getValue(), password, created,
                 nonceVal, salt, iteration,
                 tokenContext.getWsSecurityContext(), usernameTokenType.getId(),
-                WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
+                WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
         usernameSecurityToken.setElementPath(tokenContext.getElementPath());
         usernameSecurityToken.setXMLSecEvent(tokenContext.getFirstXMLSecEvent());
 

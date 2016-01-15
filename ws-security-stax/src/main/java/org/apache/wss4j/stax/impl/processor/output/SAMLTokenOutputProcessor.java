@@ -249,11 +249,11 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
 
                         WSSecurityTokenConstants.TokenType tokenType;
                         if (samlCallback.getSamlVersion() == SAMLVersion.VERSION_10) {
-                            tokenType = WSSecurityTokenConstants.Saml10Token;
+                            tokenType = WSSecurityTokenConstants.SAML_10_TOKEN;
                         } else if (samlCallback.getSamlVersion() == SAMLVersion.VERSION_11) {
-                            tokenType = WSSecurityTokenConstants.Saml11Token;
+                            tokenType = WSSecurityTokenConstants.SAML_11_TOKEN;
                         } else {
-                            tokenType = WSSecurityTokenConstants.Saml20Token;
+                            tokenType = WSSecurityTokenConstants.SAML_20_TOKEN;
                         }
                         if (samlKeyInfo.getPrivateKey() != null) {
                             this.samlSecurityToken = new GenericOutboundSecurityToken(
@@ -429,7 +429,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
         private boolean includeBST() {
             if (senderVouches 
                 && getSecurityProperties().getSignatureKeyIdentifier() 
-                    == WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
+                    == WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE
                 && securityToken != null
                 && !(WSSConstants.SAML_TOKEN_SIGNED.equals(action)
                     && ((WSSSecurityProperties)getSecurityProperties()).isIncludeSignatureToken())) {
@@ -444,11 +444,11 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
             String referenceId, String tokenId) throws XMLStreamException, XMLSecurityException {
 
         List<XMLSecAttribute> attributes = new ArrayList<>(2);
-        WSSecurityTokenConstants.TokenType tokenType = WSSecurityTokenConstants.Saml11Token;
+        WSSecurityTokenConstants.TokenType tokenType = WSSecurityTokenConstants.SAML_11_TOKEN;
         if (samlAssertionWrapper.getSamlVersion() == SAMLVersion.VERSION_11) {
             attributes.add(createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE, WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE));
         } else {
-            tokenType = WSSecurityTokenConstants.Saml20Token;
+            tokenType = WSSecurityTokenConstants.SAML_20_TOKEN;
             attributes.add(createAttribute(WSSConstants.ATT_WSSE11_TOKEN_TYPE, WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE));
         }
         attributes.add(createAttribute(WSSConstants.ATT_WSU_ID, referenceId));

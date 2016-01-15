@@ -222,12 +222,12 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
     public WSSecurityTokenConstants.TokenType getTokenType() {
         if (samlAssertionWrapper != null
             && samlAssertionWrapper.getSamlVersion() == SAMLVersion.VERSION_10) {
-            return WSSecurityTokenConstants.Saml10Token;
+            return WSSecurityTokenConstants.SAML_10_TOKEN;
         } else if (samlAssertionWrapper != null
             && samlAssertionWrapper.getSamlVersion() == SAMLVersion.VERSION_11) {
-            return WSSecurityTokenConstants.Saml11Token;
+            return WSSecurityTokenConstants.SAML_11_TOKEN;
         }
-        return WSSecurityTokenConstants.Saml20Token;
+        return WSSecurityTokenConstants.SAML_20_TOKEN;
     }
 
     @Override

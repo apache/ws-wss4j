@@ -165,7 +165,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setTokenUser("transmitter");
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
+            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
             securityProperties.addSignaturePart(
                     new SecurePart(new QName(WSSConstants.NS_WSSE10, "UsernameToken"), SecurePart.Modifier.Element)
             );
@@ -418,7 +418,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setTokenUser("transmitter");
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
+            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
             securityProperties.addSignaturePart(
                     new SecurePart(new QName(WSSConstants.NS_WSSE10, "UsernameToken"), SecurePart.Modifier.Element)
             );
@@ -541,7 +541,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setTokenUser("transmitter");
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
+            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
             securityProperties.addSignaturePart(
                     new SecurePart(new QName(WSSConstants.NS_WSSE10, "UsernameToken"), SecurePart.Modifier.Element)
             );
@@ -554,7 +554,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
             securityProperties.setEncryptionUser("receiver");
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-            securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
+            securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
             securityProperties.addEncryptionPart(
                     new SecurePart(new QName(WSSConstants.NS_WSSE10, "UsernameToken"), SecurePart.Modifier.Element)
             );
@@ -653,7 +653,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
             actions.add(WSSConstants.USERNAMETOKEN);
             actions.add(WSSConstants.TIMESTAMP);
             securityProperties.setActions(actions);
-            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
+            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
             securityProperties.addSignaturePart(
                     new SecurePart(new QName(WSSConstants.NS_WSSE10, "UsernameToken"), SecurePart.Modifier.Element)
             );
@@ -718,7 +718,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
             securityProperties.setSignatureUser("transmitter");
             securityProperties.setTokenUser("transmitter");
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
-            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
+            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
             securityProperties.addSignaturePart(
                     new SecurePart(new QName(WSSConstants.NS_WSSE10, "UsernameToken"), SecurePart.Modifier.Element)
             );
@@ -731,7 +731,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
 
             securityProperties.setEncryptionUser("receiver");
             securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
-            securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference);
+            securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
             securityProperties.addEncryptionPart(
                     new SecurePart(new QName(WSSConstants.NS_DSIG, "Signature"), SecurePart.Modifier.Element)
             );

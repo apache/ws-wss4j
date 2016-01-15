@@ -708,21 +708,21 @@ public final class ConfigurationConverter {
         if ("IssuerSerial".equals(keyIdentifier)) {
            return WSSecurityTokenConstants.KeyIdentifier_IssuerSerial;
         } else if ("DirectReference".equals(keyIdentifier)) {
-            return WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference;
+            return WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE;
         } else if ("X509KeyIdentifier".equals(keyIdentifier)) {
             return WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier;
         } else if ("Thumbprint".equals(keyIdentifier)) {
-            return WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier;
+            return WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER;
         } else if ("SKIKeyIdentifier".equals(keyIdentifier)) {
             return WSSecurityTokenConstants.KeyIdentifier_SkiKeyIdentifier;
         } else if ("EncryptedKeySHA1".equals(keyIdentifier)) {
-            return WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier;
+            return WSSecurityTokenConstants.KEYIDENTIFIER_ENCRYPTED_KEY_SHA1_IDENTIFIER;
         } else if ("EncryptedKey".equals(keyIdentifier)) {
             return WSSecurityTokenConstants.KeyIdentifier_EncryptedKey;
         } else if ("KeyValue".equals(keyIdentifier)) {
             return WSSecurityTokenConstants.KeyIdentifier_KeyValue;
         } else if ("KerberosSHA1".equals(keyIdentifier)) {
-            return WSSecurityTokenConstants.KeyIdentifier_KerberosSha1Identifier;
+            return WSSecurityTokenConstants.KEYIDENTIFIER_KERBEROS_SHA1_IDENTIFIER;
         }
         return null;
     }

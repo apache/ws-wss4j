@@ -78,7 +78,7 @@ public class SecureConversationTokenTest extends AbstractPolicyTestBase {
         initiatorTokenSecurityEvent.setIssuerName("xs:anyURI");
         initiatorTokenSecurityEvent.setExternalUriRef(true);
         X509SecurityTokenImpl securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
@@ -86,7 +86,7 @@ public class SecureConversationTokenTest extends AbstractPolicyTestBase {
         recipientTokenSecurityEvent.setIssuerName("xs:anyURI");
         recipientTokenSecurityEvent.setExternalUriRef(true);
         securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION);
         recipientTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 
@@ -149,7 +149,7 @@ public class SecureConversationTokenTest extends AbstractPolicyTestBase {
         initiatorTokenSecurityEvent.setIssuerName("sss");
         initiatorTokenSecurityEvent.setExternalUriRef(true);
         InboundSecurityToken securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(initiatorTokenSecurityEvent);
 
@@ -157,7 +157,7 @@ public class SecureConversationTokenTest extends AbstractPolicyTestBase {
         recipientTokenSecurityEvent.setIssuerName("sss");
         recipientTokenSecurityEvent.setExternalUriRef(true);
         securityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION);
         initiatorTokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(recipientTokenSecurityEvent);
 

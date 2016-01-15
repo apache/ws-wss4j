@@ -86,7 +86,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
 
                     TokenSecurityEvent<? extends InboundSecurityToken> newTokenSecurityEvent =
                             WSSUtils.createTokenSecurityEvent(securityToken, tokenSecurityEvent.getCorrelationID());
-                    setTokenUsage(newTokenSecurityEvent, WSSecurityTokenConstants.TokenUsage_MainEncryption);
+                    setTokenUsage(newTokenSecurityEvent, WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION);
                     securityEvent = newTokenSecurityEvent;
                     this.messageEncryptionTokenOccured = true;
                 }
@@ -166,13 +166,13 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
                 if (WSSecurityEventConstants.HTTPS_TOKEN.equals(securityEvent.getSecurityEventType())) {
                     HttpsTokenSecurityEvent actHttpsTokenSecurityEvent = (HttpsTokenSecurityEvent) tokenSecurityEvent;
                     actHttpsTokenSecurityEvent.getSecurityToken().getTokenUsages().clear();
-                    actHttpsTokenSecurityEvent.getSecurityToken().addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+                    actHttpsTokenSecurityEvent.getSecurityToken().addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
                     messageSignatureTokens = addTokenSecurityEvent(actHttpsTokenSecurityEvent, messageSignatureTokens);
                     HttpsTokenSecurityEvent clonedHttpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
                     clonedHttpsTokenSecurityEvent.setAuthenticationType(actHttpsTokenSecurityEvent.getAuthenticationType());
                     clonedHttpsTokenSecurityEvent.setIssuerName(actHttpsTokenSecurityEvent.getIssuerName());
                     clonedHttpsTokenSecurityEvent.setSecurityToken(actHttpsTokenSecurityEvent.getSecurityToken());
-                    clonedHttpsTokenSecurityEvent.getSecurityToken().addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainEncryption);
+                    clonedHttpsTokenSecurityEvent.getSecurityToken().addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION);
                     messageEncryptionTokens = addTokenSecurityEvent(actHttpsTokenSecurityEvent, messageEncryptionTokens);
                     httpsTokenSecurityEvent = clonedHttpsTokenSecurityEvent;
                     continue;
@@ -342,17 +342,17 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
             this.messageEncryptionTokenOccured = true;
         }
 
-        setTokenUsage(messageSignatureTokens, WSSecurityTokenConstants.TokenUsage_MainSignature);
-        setTokenUsage(messageEncryptionTokens, WSSecurityTokenConstants.TokenUsage_MainEncryption);
-        setTokenUsage(supportingTokens, WSSecurityTokenConstants.TokenUsage_SupportingTokens);
-        setTokenUsage(signedSupportingTokens, WSSecurityTokenConstants.TokenUsage_SignedSupportingTokens);
-        setTokenUsage(endorsingSupportingTokens, WSSecurityTokenConstants.TokenUsage_EndorsingSupportingTokens);
-        setTokenUsage(signedEndorsingSupportingTokens, WSSecurityTokenConstants.TokenUsage_SignedEndorsingSupportingTokens);
-        setTokenUsage(signedEncryptedSupportingTokens, WSSecurityTokenConstants.TokenUsage_SignedEncryptedSupportingTokens);
-        setTokenUsage(encryptedSupportingTokens, WSSecurityTokenConstants.TokenUsage_EncryptedSupportingTokens);
-        setTokenUsage(endorsingEncryptedSupportingTokens, WSSecurityTokenConstants.TokenUsage_EndorsingEncryptedSupportingTokens);
+        setTokenUsage(messageSignatureTokens, WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
+        setTokenUsage(messageEncryptionTokens, WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION);
+        setTokenUsage(supportingTokens, WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS);
+        setTokenUsage(signedSupportingTokens, WSSecurityTokenConstants.TOKENUSAGE_SIGNED_SUPPORTING_TOKENS);
+        setTokenUsage(endorsingSupportingTokens, WSSecurityTokenConstants.TOKENUSAGE_ENDORSING_SUPPORTING_TOKENS);
+        setTokenUsage(signedEndorsingSupportingTokens, WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENDORSING_SUPPORTING_TOKENS);
+        setTokenUsage(signedEncryptedSupportingTokens, WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
+        setTokenUsage(encryptedSupportingTokens, WSSecurityTokenConstants.TOKENUSAGE_ENCRYPTED_SUPPORTING_TOKENS);
+        setTokenUsage(endorsingEncryptedSupportingTokens, WSSecurityTokenConstants.TOKENUSAGE_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
         setTokenUsage(signedEndorsingEncryptedSupportingTokens, 
-                      WSSecurityTokenConstants.TokenUsage_SignedEndorsingEncryptedSupportingTokens);
+                      WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
     }
 
     private void removeTokenSecurityEvent(TokenSecurityEvent<? extends InboundSecurityToken> tokenSecurityEvent,
@@ -473,7 +473,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
 
     private void setTokenUsage(TokenSecurityEvent<? extends InboundSecurityToken> tokenSecurityEvent, 
                                WSSecurityTokenConstants.TokenUsage tokenUsage) throws XMLSecurityException {
-        tokenSecurityEvent.getSecurityToken().getTokenUsages().remove(WSSecurityTokenConstants.TokenUsage_SupportingTokens);
+        tokenSecurityEvent.getSecurityToken().getTokenUsages().remove(WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS);
         tokenSecurityEvent.getSecurityToken().getTokenUsages().remove(WSSecurityTokenConstants.TokenUsage_Signature);
         tokenSecurityEvent.getSecurityToken().getTokenUsages().remove(WSSecurityTokenConstants.TokenUsage_Encryption);
         tokenSecurityEvent.getSecurityToken().addTokenUsage(tokenUsage);

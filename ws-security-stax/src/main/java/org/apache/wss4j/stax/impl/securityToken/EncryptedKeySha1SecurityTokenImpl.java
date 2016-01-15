@@ -45,7 +45,7 @@ public class EncryptedKeySha1SecurityTokenImpl
             WSInboundSecurityContext inboundSecurityContext, CallbackHandler callbackHandler,
             String sha1Identifier, String id) {
 
-        super(inboundSecurityContext, id, WSSecurityTokenConstants.KeyIdentifier_EncryptedKeySha1Identifier, false);
+        super(inboundSecurityContext, id, WSSecurityTokenConstants.KEYIDENTIFIER_ENCRYPTED_KEY_SHA1_IDENTIFIER, false);
         this.callbackHandler = callbackHandler;
         setSha1Identifier(sha1Identifier);
     }

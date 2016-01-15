@@ -64,7 +64,7 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
 
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
         HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "username");
-        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
 
@@ -112,7 +112,7 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
 
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
         HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "username");
-        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
 
@@ -160,7 +160,7 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
 
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
         HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "username");
-        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
 
@@ -207,7 +207,7 @@ public class TransportBindingTest extends AbstractPolicyTestBase {
 
         HttpsTokenSecurityEvent httpsTokenSecurityEvent = new HttpsTokenSecurityEvent();
         HttpsSecurityTokenImpl httpsSecurityToken = new HttpsSecurityTokenImpl(true, "username");
-        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        httpsSecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
         policyEnforcer.registerSecurityEvent(httpsTokenSecurityEvent);
 

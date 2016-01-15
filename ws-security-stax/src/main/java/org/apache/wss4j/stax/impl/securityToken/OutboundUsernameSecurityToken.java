@@ -39,7 +39,7 @@ public class OutboundUsernameSecurityToken extends GenericOutboundSecurityToken 
 
     public OutboundUsernameSecurityToken(String username, String password, String createdTime,
                                          byte[] nonce, String id, byte[] salt, int iterations) {
-        super(id, WSSecurityTokenConstants.UsernameToken);
+        super(id, WSSecurityTokenConstants.USERNAME_TOKEN);
         this.username = username;
         this.password = password;
         this.createdTime = createdTime;

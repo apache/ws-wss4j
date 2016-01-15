@@ -765,7 +765,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
             for (int i = 0; i < securityTokenProviders.size(); i++) {
                 SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider = securityTokenProviders.get(i);
                 SecurityToken securityToken = securityTokenProvider.getSecurityToken();
-                if (WSSecurityTokenConstants.HttpsToken.equals(securityToken.getTokenType())) {
+                if (WSSecurityTokenConstants.HTTPS_TOKEN.equals(securityToken.getTokenType())) {
                     return securityToken;
                 }
             }
@@ -773,12 +773,12 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         }
         
         private boolean containsSignature(List<TokenUsage> tokenUses) {
-            return tokenUses.contains(WSSecurityTokenConstants.TokenUsage_MainSignature)
+            return tokenUses.contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE)
                 || tokenUses.contains(WSSecurityTokenConstants.TokenUsage_Signature)
-                || tokenUses.contains(WSSecurityTokenConstants.TokenUsage_EndorsingEncryptedSupportingTokens)
-                || tokenUses.contains(WSSecurityTokenConstants.TokenUsage_EndorsingSupportingTokens)
-                || tokenUses.contains(WSSecurityTokenConstants.TokenUsage_SignedEndorsingEncryptedSupportingTokens)
-                || tokenUses.contains(WSSecurityTokenConstants.TokenUsage_SignedEndorsingSupportingTokens);
+                || tokenUses.contains(WSSecurityTokenConstants.TOKENUSAGE_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS)
+                || tokenUses.contains(WSSecurityTokenConstants.TOKENUSAGE_ENDORSING_SUPPORTING_TOKENS)
+                || tokenUses.contains(WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS)
+                || tokenUses.contains(WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENDORSING_SUPPORTING_TOKENS);
         }
     }
 }

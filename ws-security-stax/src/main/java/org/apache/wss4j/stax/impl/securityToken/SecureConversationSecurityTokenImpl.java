@@ -34,6 +34,6 @@ public class SecureConversationSecurityTokenImpl
 
     @Override
     public WSSecurityTokenConstants.TokenType getTokenType() {
-        return WSSecurityTokenConstants.SecureConversationToken;
+        return WSSecurityTokenConstants.SECURE_CONVERSATION_TOKEN;
     }
 }

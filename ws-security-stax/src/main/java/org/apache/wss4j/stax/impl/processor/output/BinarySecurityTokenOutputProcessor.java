@@ -87,7 +87,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
 
             if (securityToken != null) {
                 if (WSSConstants.SIGNATURE.equals(action)
-                    && (includeToken || WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier))
+                    && (includeToken || WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE.equals(keyIdentifier))
                     && (securityToken.getTokenType() == null 
                     || WSSecurityTokenConstants.X509V3Token.equals(securityToken.getTokenType()))) {
                     FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = 
@@ -108,7 +108,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
                     finalBinarySecurityTokenOutputProcessor.init(outputProcessorChain);
                     securityToken.setProcessor(finalBinarySecurityTokenOutputProcessor);
                 } else if (WSSConstants.ENCRYPT.equals(action)
-                    && (includeToken || WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(keyIdentifier))
+                    && (includeToken || WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE.equals(keyIdentifier))
                     && (securityToken.getTokenType() == null 
                         || WSSecurityTokenConstants.X509V3Token.equals(securityToken.getTokenType()))) {
                     FinalBinarySecurityTokenOutputProcessor finalBinarySecurityTokenOutputProcessor = 

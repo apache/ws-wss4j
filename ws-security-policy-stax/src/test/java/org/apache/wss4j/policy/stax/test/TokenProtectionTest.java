@@ -51,16 +51,16 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
     static {
         tokenUsages.add(WSSecurityTokenConstants.TokenUsage_Signature);
         tokenUsages.add(WSSecurityTokenConstants.TokenUsage_Encryption);
-        tokenUsages.add(WSSecurityTokenConstants.TokenUsage_MainSignature);
-        tokenUsages.add(WSSecurityTokenConstants.TokenUsage_MainEncryption);
-        tokenUsages.add(WSSecurityTokenConstants.TokenUsage_SupportingTokens);
-        tokenUsages.add(WSSecurityTokenConstants.TokenUsage_SignedSupportingTokens);
-        tokenUsages.add(WSSecurityTokenConstants.TokenUsage_SignedEndorsingSupportingTokens);
-        tokenUsages.add(WSSecurityTokenConstants.TokenUsage_SignedEncryptedSupportingTokens);
-        tokenUsages.add(WSSecurityTokenConstants.TokenUsage_SignedEndorsingEncryptedSupportingTokens);
-        tokenUsages.add(WSSecurityTokenConstants.TokenUsage_EndorsingEncryptedSupportingTokens);
-        tokenUsages.add(WSSecurityTokenConstants.TokenUsage_EndorsingSupportingTokens);
-        tokenUsages.add(WSSecurityTokenConstants.TokenUsage_EncryptedSupportingTokens);
+        tokenUsages.add(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
+        tokenUsages.add(WSSecurityTokenConstants.TOKENUSAGE_MAIN_ENCRYPTION);
+        tokenUsages.add(WSSecurityTokenConstants.TOKENUSAGE_SUPPORTING_TOKENS);
+        tokenUsages.add(WSSecurityTokenConstants.TOKENUSAGE_SIGNED_SUPPORTING_TOKENS);
+        tokenUsages.add(WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENDORSING_SUPPORTING_TOKENS);
+        tokenUsages.add(WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
+        tokenUsages.add(WSSecurityTokenConstants.TOKENUSAGE_SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
+        tokenUsages.add(WSSecurityTokenConstants.TOKENUSAGE_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
+        tokenUsages.add(WSSecurityTokenConstants.TOKENUSAGE_ENDORSING_SUPPORTING_TOKENS);
+        tokenUsages.add(WSSecurityTokenConstants.TOKENUSAGE_ENCRYPTED_SUPPORTING_TOKENS);
     }
 
     @Test
@@ -119,7 +119,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         Iterator<SecurityToken> securityTokenIterator = securityTokens.iterator();
         while (securityTokenIterator.hasNext()) {
             SecurityToken securityToken = securityTokenIterator.next();
-            if (securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_MainSignature)) {
+            if (securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE)) {
                 mainSignatureToken = securityToken;
                 break;
             }
@@ -192,7 +192,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         Iterator<SecurityToken> securityTokenIterator = securityTokens.iterator();
         while (securityTokenIterator.hasNext()) {
             SecurityToken securityToken = securityTokenIterator.next();
-            if (securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_MainSignature)) {
+            if (securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE)) {
                 mainSignatureToken = securityToken;
                 break;
             }
@@ -242,7 +242,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         path.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         path.add(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN);
         securityToken.setElementPath(path);
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
@@ -288,7 +288,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         path.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         path.add(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN);
         securityToken.setElementPath(path);
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
         policyEnforcer.registerSecurityEvent(x509TokenSecurityEvent);
 
@@ -334,7 +334,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         path.addAll(WSSConstants.WSSE_SECURITY_HEADER_PATH);
         path.add(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN);
         securityToken.setElementPath(path);
-        securityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        securityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         x509TokenSecurityEvent.setSecurityToken(securityToken);
 
         List<XMLSecurityConstants.ContentType> protectionOrder = new LinkedList<>();
@@ -407,7 +407,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         Iterator<SecurityToken> securityTokenIterator = securityTokens.iterator();
         while (securityTokenIterator.hasNext()) {
             SecurityToken securityToken = securityTokenIterator.next();
-            if (securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TokenUsage_MainSignature)) {
+            if (securityToken.getTokenUsages().contains(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE)) {
                 mainSignatureToken = securityToken;
                 break;
             }
@@ -529,7 +529,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         sigPath.add(WSSConstants.TAG_dsig_Signature);
 
         X509SecurityTokenImpl x509SecurityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
-        x509SecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        x509SecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         x509SecurityToken.setElementPath(bstPath);
 
         AbstractInboundSecurityToken ekSecurityToken = new AbstractInboundSecurityToken(
@@ -596,7 +596,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         sigPath.add(WSSConstants.TAG_dsig_Signature);
 
         X509SecurityTokenImpl x509SecurityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
-        x509SecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        x509SecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         x509SecurityToken.setElementPath(bstPath);
 
         AbstractInboundSecurityToken ekSecurityToken = new AbstractInboundSecurityToken(
@@ -669,7 +669,7 @@ public class TokenProtectionTest extends AbstractPolicyTestBase {
         sigPath.add(WSSConstants.TAG_dsig_Signature);
 
         X509SecurityTokenImpl x509SecurityToken = getX509Token(WSSecurityTokenConstants.X509V3Token);
-        x509SecurityToken.addTokenUsage(WSSecurityTokenConstants.TokenUsage_MainSignature);
+        x509SecurityToken.addTokenUsage(WSSecurityTokenConstants.TOKENUSAGE_MAIN_SIGNATURE);
         x509SecurityToken.setElementPath(bstPath);
 
         AbstractInboundSecurityToken ekSecurityToken = new AbstractInboundSecurityToken(

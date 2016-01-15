@@ -73,7 +73,7 @@ public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityTok
 
     @Override
     public WSSecurityTokenConstants.TokenType getTokenType() {
-        return WSSecurityTokenConstants.KerberosToken;
+        return WSSecurityTokenConstants.KERBEROS_TOKEN;
     }
 
     protected byte[] getTGTSessionKey() throws WSSecurityException {
