@@ -109,10 +109,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <targetJdk>1.7</targetJdk>
+        <buildtools.dir>${basedir}/build-tools</buildtools.dir>
     </properties>
 
     <modules>
-        <module>build-tools</module>
         <module>parent</module>
         <module>bindings</module>
         <module>policy</module>
@@ -132,7 +132,7 @@
                 <version>3.5</version>
                 <configuration>
                     <rulesets>
-                        <ruleset>wss4j-pmd-ruleset.xml</ruleset>
+                        <ruleset>${buildtools.dir}/wss4j-pmd-ruleset.xml</ruleset>
                     </rulesets>
                     <sourceEncoding>UTF-8</sourceEncoding>
                     <failOnViolation>true</failOnViolation>
@@ -144,13 +144,6 @@
                         <excludeRoot>${basedir}/src/main/generated</excludeRoot>
                     </excludeRoots>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.wss4j</groupId>
-                        <artifactId>build-tools</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                </dependencies>
                 <executions>
                     <execution>
                         <id>validate</id>
@@ -167,18 +160,11 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>2.15</version>
                 <configuration>
-                    <configLocation>wss4j-checkstyle.xml</configLocation>
+                    <configLocation>${buildtools.dir}/wss4j-checkstyle.xml</configLocation>
                     <includeTestSourceDirectory>false</includeTestSourceDirectory>
                     <encoding>UTF-8</encoding>
                     <failOnViolation>true</failOnViolation>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.wss4j</groupId>
-                        <artifactId>build-tools</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                </dependencies>
                 <executions>
                     <execution>
                        <id>validate</id>
@@ -424,6 +410,28 @@
                     </plugins>
                 </pluginManagement>
             </build>
+        </profile>
+        <profile>
+            <id>activate-buildtools-in-module</id>
+            <activation>
+                <file>
+                    <exists>${basedir}/../build-tools/wss4j-checkstyle.xml</exists>
+                </file>
+            </activation>
+            <properties>
+                <buildtools.dir>${basedir}/../build-tools</buildtools.dir>
+            </properties>
+        </profile>
+        <profile>
+            <id>activate-buildtools-in-submodule</id>
+            <activation>
+                <file>
+                    <exists>${basedir}/../../build-tools/wss4j-checkstyle.xml</exists>
+                </file>
+            </activation>
+            <properties>
+                <buildtools.dir>${basedir}/../../build-tools</buildtools.dir>
+            </properties>
         </profile>
 
     </profiles>
