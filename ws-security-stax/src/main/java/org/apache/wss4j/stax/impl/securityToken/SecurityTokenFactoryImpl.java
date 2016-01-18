@@ -143,181 +143,26 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
             final X509DataType x509DataType
                     = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_dsig_X509Data);
             if (x509DataType != null) {
-                //Issuer Serial
-                X509IssuerSerialType x509IssuerSerialType = XMLSecurityUtils.getQNameType(
-                        x509DataType.getX509IssuerSerialOrX509SKIOrX509SubjectName(), WSSConstants.TAG_dsig_X509IssuerSerial);
-                if (x509IssuerSerialType != null) {
-                    //first look if the token is included in the message (necessary for TokenInclusion policy)...
-                    List<SecurityTokenProvider<? extends InboundSecurityToken>> securityTokenProviders =
-                            inboundSecurityContext.getRegisteredSecurityTokenProviders();
-                    for (int i = 0; i < securityTokenProviders.size(); i++) {
-                        SecurityTokenProvider<? extends InboundSecurityToken> tokenProvider = securityTokenProviders.get(i);
-                        InboundSecurityToken inboundSecurityToken = tokenProvider.getSecurityToken();
-                        if (inboundSecurityToken instanceof X509SecurityToken) {
-                            X509SecurityToken x509SecurityToken = (X509SecurityToken) inboundSecurityToken;
-
-                            final X509Certificate x509Certificate = x509SecurityToken.getX509Certificates()[0];
-                            Principal principal = new X500Principal(x509IssuerSerialType.getX509IssuerName());
-                            if (x509Certificate.getSerialNumber().compareTo(x509IssuerSerialType.getX509SerialNumber()) == 0 
-                                && x509Certificate.getIssuerX500Principal().equals(principal)) {
-                                return createSecurityTokenProxy(inboundSecurityToken,
-                                        WSSecurityTokenConstants.KeyIdentifier_IssuerSerial);
-                            }
-                        }
-                    }
-                    //...then if none is found create a new SecurityToken instance
-                    return new X509IssuerSerialTokenImpl(
-                            (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler, x509IssuerSerialType,
-                            securityTokenReferenceType.getId(), securityProperties);
-                }
-
-                //Subject Key Identifier
-                byte[] skiBytes =
-                        XMLSecurityUtils.getQNameType(
-                                x509DataType.getX509IssuerSerialOrX509SKIOrX509SubjectName(),
-                                XMLSecurityConstants.TAG_dsig_X509SKI
-                        );
-                if (skiBytes != null) {
-                    return new X509SKISecurityTokenImpl(
-                            (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler, skiBytes,
-                            securityTokenReferenceType.getId(), securityProperties);
-                }
-
-                //X509Certificate
-                byte[] x509CertificateBytes = XMLSecurityUtils.getQNameType(
-                        x509DataType.getX509IssuerSerialOrX509SKIOrX509SubjectName(), WSSConstants.TAG_dsig_X509Certificate);
-                if (x509CertificateBytes != null) {
-                    return new X509V3SecurityTokenImpl(
-                            (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler,
-                            x509CertificateBytes, securityTokenReferenceType.getId(), securityProperties);
+                InboundSecurityToken securityToken = 
+                    getSecurityToken(x509DataType, securityTokenReferenceType.getId(), crypto, callbackHandler,
+                                     inboundSecurityContext, securityProperties);
+                if (securityToken != null) {
+                    return securityToken;
                 }
             }
 
             String tokenType =
                     XMLSecurityUtils.getQNameAttribute(
-                        securityTokenReferenceType.getOtherAttributes(),
-                        WSSConstants.ATT_WSSE11_TOKEN_TYPE);
+                        securityTokenReferenceType.getOtherAttributes(), WSSConstants.ATT_WSSE11_TOKEN_TYPE);
 
             final KeyIdentifierType keyIdentifierType
                     = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_WSSE_KEY_IDENTIFIER);
             if (keyIdentifierType != null) {
-                String valueType = keyIdentifierType.getValueType();
-                if (valueType == null) {
-                    ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3054);
-                }
-                String encodingType = keyIdentifierType.getEncodingType();
-
-                byte[] binaryContent = null;
-                if (WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(encodingType)) {
-                    binaryContent = Base64.decodeBase64(keyIdentifierType.getValue());
-                } else if (!WSSConstants.NS_SAML10_TYPE.equals(valueType) && !WSSConstants.NS_SAML20_TYPE.equals(valueType)) {
-                    if (encodingType == null) {
-                        ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3070);
-                    } else {
-                        ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3071);
-                    }
-                } else if (encodingType != null
-                        && (WSSConstants.NS_SAML10_TYPE.equals(valueType) || WSSConstants.NS_SAML20_TYPE.equals(valueType))) {
-                    ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6604);
-                }
-
-                if (WSSConstants.NS_X509_V3_TYPE.equals(valueType)) {
-                    return new X509V3SecurityTokenImpl(
-                            (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler,
-                            binaryContent, securityTokenReferenceType.getId(), securityProperties);
-                } else if (WSSConstants.NS_X509_SKI.equals(valueType)) {
-                    return new X509SKISecurityTokenImpl(
-                            (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler, binaryContent,
-                            securityTokenReferenceType.getId(), securityProperties);
-                } else if (WSSConstants.NS_THUMBPRINT.equals(valueType)) {
-                    try {
-                        MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
-                        //first look if the token is included in the message (necessary for TokenInclusion policy)...
-                        List<SecurityTokenProvider<? extends InboundSecurityToken>> securityTokenProviders =
-                                inboundSecurityContext.getRegisteredSecurityTokenProviders();
-                        for (int i = 0; i < securityTokenProviders.size(); i++) {
-                            SecurityTokenProvider<? extends InboundSecurityToken> tokenProvider = securityTokenProviders.get(i);
-                            InboundSecurityToken inboundSecurityToken = tokenProvider.getSecurityToken();
-                            if (inboundSecurityToken instanceof X509SecurityToken) {
-                                X509SecurityToken x509SecurityToken = (X509SecurityToken)inboundSecurityToken;
-                                byte[] tokenDigest = messageDigest.digest(x509SecurityToken.getX509Certificates()[0].getEncoded());
-
-                                if (Arrays.equals(tokenDigest, binaryContent)) {
-                                    return createSecurityTokenProxy(inboundSecurityToken,
-                                            WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER);
-                                }
-                            }
-                        }
-                    } catch (NoSuchAlgorithmException e) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-                    } catch (CertificateEncodingException e) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN);
-                    }
-
-                    //...then if none is found create a new SecurityToken instance
-                    return new X509ThumbprintSHA1SecurityTokenImpl(
-                            (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler, binaryContent,
-                            securityTokenReferenceType.getId(), securityProperties);
-                } else if (WSSConstants.NS_ENCRYPTED_KEY_SHA1.equals(valueType)) {
-                    return new EncryptedKeySha1SecurityTokenImpl(
-                            (WSInboundSecurityContext) inboundSecurityContext, callbackHandler, keyIdentifierType.getValue(),
-                            securityTokenReferenceType.getId());
-                } else if (WSSConstants.NS_SAML10_TYPE.equals(valueType) || WSSConstants.NS_SAML20_TYPE.equals(valueType)) {
-                    if (WSSConstants.NS_SAML20_TYPE.equals(valueType) && !WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE.equals(tokenType)) {
-                        ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6617);
-                    } else if (WSSConstants.NS_SAML10_TYPE.equals(valueType) 
-                        && !WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE.equals(tokenType)) {
-                        ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6611);
-                    }
-                    SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider =
-                            inboundSecurityContext.getSecurityTokenProvider(keyIdentifierType.getValue());
-                    if (securityTokenProvider != null) {
-                        return createSecurityTokenProxy(securityTokenProvider.getSecurityToken(),
-                            WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
-                    }
-
-                    // Delegate to a CallbackHandler, in case the token is not in the request
-                    return new SamlSecurityTokenImpl((WSInboundSecurityContext) inboundSecurityContext,
-                                                     keyIdentifierType.getValue(),
-                                                     WSSecurityTokenConstants.KEYIDENTIFIER_EXTERNAL_REFERENCE,
-                                                     securityProperties);
-                } else if (WSSConstants.NS_KERBEROS5_AP_REQ_SHA1.equals(valueType)) {
-                    SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider =
-                            inboundSecurityContext.getSecurityTokenProvider(keyIdentifierType.getValue());
-                    if (securityTokenProvider != null) {
-                        return createSecurityTokenProxy(securityTokenProvider.getSecurityToken(),
-                                WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
-                    }
-
-                    try {
-                        //ok we have to find the token via digesting...
-                        MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
-                        List<SecurityTokenProvider<? extends InboundSecurityToken>> securityTokenProviders =
-                                inboundSecurityContext.getRegisteredSecurityTokenProviders();
-                        for (int i = 0; i < securityTokenProviders.size(); i++) {
-                            SecurityTokenProvider<? extends InboundSecurityToken> tokenProvider = securityTokenProviders.get(i);
-                            InboundSecurityToken inboundSecurityToken = tokenProvider.getSecurityToken();
-                            if (inboundSecurityToken instanceof KerberosServiceSecurityToken) {
-                                KerberosServiceSecurityToken kerberosSecurityToken = 
-                                    (KerberosServiceSecurityToken)inboundSecurityToken;
-                                byte[] tokenDigest = messageDigest.digest(kerberosSecurityToken.getBinaryContent());
-                                if (Arrays.equals(tokenDigest, binaryContent)) {
-                                    return createSecurityTokenProxy(inboundSecurityToken,
-                                            WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER);
-                                }
-                            }
-                        }
-                    } catch (NoSuchAlgorithmException e) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-                    }
-
-                    // Finally, just delegate to a Callback as per EncryptedKeySHA1
-                    return new EncryptedKeySha1SecurityTokenImpl(
-                            (WSInboundSecurityContext) inboundSecurityContext, callbackHandler,
-                            keyIdentifierType.getValue(), securityTokenReferenceType.getId());
-                } else {
-                    //we do enforce BSP compliance here but will fail anyway since we cannot identify the referenced token
-                    ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3063);
+                InboundSecurityToken securityToken = 
+                    getSecurityToken(keyIdentifierType, securityTokenReferenceType.getId(), tokenType, crypto, 
+                                     callbackHandler, inboundSecurityContext, securityProperties);
+                if (securityToken != null) {
+                    return securityToken;
                 }
             }
 
@@ -325,90 +170,7 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                     = XMLSecurityUtils.getQNameType(securityTokenReferenceType.getAny(), WSSConstants.TAG_WSSE_REFERENCE);
             if (referenceType != null) {
                 //We do not check for BSP.R3023, BSP.R3022, BSP.R3066, BSP.R3067, BSP.R3024, BSP.R3064, BSP.R3211, BSP.R3059
-
-                String uri = referenceType.getURI();
-                if (uri == null) {
-                    //we do enforce BSP compliance here but will fail anyway since we cannot identify the referenced token
-                    ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3062);
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "badReferenceURI");
-                }
-                boolean included = true;
-                if (!uri.startsWith("#")) {
-                    included = false;
-                    // Delegate to a CallbackHandler, in case the token is not in the request
-                    try {
-                        return new ExternalSecurityTokenImpl((WSInboundSecurityContext) inboundSecurityContext,
-                                                     uri,
-                                                     WSSecurityTokenConstants.KEYIDENTIFIER_EXTERNAL_REFERENCE,
-                                                     securityProperties, false);
-                    } catch (WSSecurityException ex) { //NOPMD
-                        // just continue
-                    }
-                    ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R5204);
-                }
-                uri = WSSUtils.dropReferenceMarker(uri);
-                //referenced BST:*/
-                //we have to search BST somewhere in the doc. First we will check for a BST already processed and
-                //stored in the context. Otherwise we will abort now.
-
-                //prevent recursive key reference DOS:
-                Integer invokeCount = inboundSecurityContext.<Integer>get("" + Thread.currentThread().hashCode());
-                if (invokeCount == null) {
-                    invokeCount = 0;
-                }
-                invokeCount++;
-                if (invokeCount == 10) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN);
-                }
-                inboundSecurityContext.put("" + Thread.currentThread().hashCode(), invokeCount);
-
-                SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider =
-                        inboundSecurityContext.getSecurityTokenProvider(uri);
-                if (securityTokenProvider == null) {
-                    // Delegate to a CallbackHandler, in case the token is not in the request
-                    return new ExternalSecurityTokenImpl((WSInboundSecurityContext) inboundSecurityContext,
-                                                     uri,
-                                                     WSSecurityTokenConstants.KEYIDENTIFIER_EXTERNAL_REFERENCE,
-                                                     securityProperties, included);
-                }
-                if (securityTokenProvider.getSecurityToken() instanceof SecurityTokenReference) {
-                    ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3057);
-                } else if (securityTokenProvider.getSecurityToken() instanceof X509PKIPathv1SecurityTokenImpl) {
-                    String valueType = referenceType.getValueType();
-                    if (!WSSConstants.NS_X509_PKIPATH_V1.equals(valueType)) {
-                        ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3058);
-                    }
-                    if (!WSSConstants.NS_X509_PKIPATH_V1.equals(tokenType)) {
-                        ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R5215);
-                    }
-                } else if (securityTokenProvider.getSecurityToken() instanceof X509SecurityToken) {
-                    String valueType = referenceType.getValueType();
-                    if (!WSSConstants.NS_X509_V3_TYPE.equals(valueType)) {
-                        ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3058);
-                    }
-                } else if (securityTokenProvider.getSecurityToken() instanceof UsernameSecurityToken) {
-                    String valueType = referenceType.getValueType();
-                    if (!WSSConstants.NS_USERNAMETOKEN_PROFILE_USERNAME_TOKEN.equals(valueType)) {
-                        ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R4214);
-                    }
-                } else if (securityTokenProvider.getSecurityToken() instanceof SamlSecurityToken) {
-                    WSSecurityTokenConstants.TokenType samlTokenType = securityTokenProvider.getSecurityToken().getTokenType();
-                    if (WSSecurityTokenConstants.SAML_20_TOKEN.equals(samlTokenType)) {
-                        String valueType = referenceType.getValueType();
-                        if (valueType != null && !"".equals(valueType)) {
-                            ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6614);
-                        }
-                        if (!WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE.equals(tokenType)) {
-                            ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6617);
-                        }
-                    } else if (WSSecurityTokenConstants.SAML_10_TOKEN.equals(samlTokenType) 
-                        && !WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE.equals(tokenType)) {
-                        ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6611);
-                    }
-                }
-
-                return createSecurityTokenProxy(securityTokenProvider.getSecurityToken(),
-                        WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
+                return getSecurityToken(referenceType, tokenType, inboundSecurityContext, securityProperties);
             }
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "noKeyinfo");
         } finally {
@@ -416,6 +178,286 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
         }
     }
 
+    private static InboundSecurityToken getSecurityToken(X509DataType x509DataType,
+                                                         String securityTokenReferenceId,
+                                                         Crypto crypto,
+                                                         final CallbackHandler callbackHandler, 
+                                                         InboundSecurityContext inboundSecurityContext,
+                                                         WSSSecurityProperties securityProperties) 
+                                                             throws XMLSecurityException {
+        //Issuer Serial
+        X509IssuerSerialType x509IssuerSerialType = XMLSecurityUtils.getQNameType(
+                x509DataType.getX509IssuerSerialOrX509SKIOrX509SubjectName(), WSSConstants.TAG_dsig_X509IssuerSerial);
+        if (x509IssuerSerialType != null) {
+            //first look if the token is included in the message (necessary for TokenInclusion policy)...
+            List<SecurityTokenProvider<? extends InboundSecurityToken>> securityTokenProviders =
+                    inboundSecurityContext.getRegisteredSecurityTokenProviders();
+            for (int i = 0; i < securityTokenProviders.size(); i++) {
+                SecurityTokenProvider<? extends InboundSecurityToken> tokenProvider = securityTokenProviders.get(i);
+                InboundSecurityToken inboundSecurityToken = tokenProvider.getSecurityToken();
+                if (inboundSecurityToken instanceof X509SecurityToken) {
+                    X509SecurityToken x509SecurityToken = (X509SecurityToken) inboundSecurityToken;
+
+                    final X509Certificate x509Certificate = x509SecurityToken.getX509Certificates()[0];
+                    Principal principal = new X500Principal(x509IssuerSerialType.getX509IssuerName());
+                    if (x509Certificate.getSerialNumber().compareTo(x509IssuerSerialType.getX509SerialNumber()) == 0 
+                        && x509Certificate.getIssuerX500Principal().equals(principal)) {
+                        return createSecurityTokenProxy(inboundSecurityToken,
+                                WSSecurityTokenConstants.KeyIdentifier_IssuerSerial);
+                    }
+                }
+            }
+            //...then if none is found create a new SecurityToken instance
+            return new X509IssuerSerialTokenImpl(
+                    (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler, x509IssuerSerialType,
+                    securityTokenReferenceId, securityProperties);
+        }
+
+        //Subject Key Identifier
+        byte[] skiBytes =
+                XMLSecurityUtils.getQNameType(
+                        x509DataType.getX509IssuerSerialOrX509SKIOrX509SubjectName(),
+                        XMLSecurityConstants.TAG_dsig_X509SKI
+                );
+        if (skiBytes != null) {
+            return new X509SKISecurityTokenImpl(
+                    (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler, skiBytes,
+                    securityTokenReferenceId, securityProperties);
+        }
+
+        //X509Certificate
+        byte[] x509CertificateBytes = XMLSecurityUtils.getQNameType(
+                x509DataType.getX509IssuerSerialOrX509SKIOrX509SubjectName(), WSSConstants.TAG_dsig_X509Certificate);
+        if (x509CertificateBytes != null) {
+            return new X509V3SecurityTokenImpl(
+                    (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler,
+                    x509CertificateBytes, securityTokenReferenceId, securityProperties);
+        }
+        
+        return null;
+    }
+    
+    private static InboundSecurityToken getSecurityToken(KeyIdentifierType keyIdentifierType,
+                                                         String securityTokenReferenceId,
+                                                         String tokenType,
+                                                         Crypto crypto,
+                                                         final CallbackHandler callbackHandler, 
+                                                         InboundSecurityContext inboundSecurityContext,
+                                                         WSSSecurityProperties securityProperties) 
+                                                             throws XMLSecurityException {
+        String valueType = keyIdentifierType.getValueType();
+        if (valueType == null) {
+            ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3054);
+        }
+        String encodingType = keyIdentifierType.getEncodingType();
+
+        byte[] binaryContent = null;
+        if (WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(encodingType)) {
+            binaryContent = Base64.decodeBase64(keyIdentifierType.getValue());
+        } else if (!WSSConstants.NS_SAML10_TYPE.equals(valueType) && !WSSConstants.NS_SAML20_TYPE.equals(valueType)) {
+            if (encodingType == null) {
+                ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3070);
+            } else {
+                ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3071);
+            }
+        } else if (encodingType != null
+                && (WSSConstants.NS_SAML10_TYPE.equals(valueType) || WSSConstants.NS_SAML20_TYPE.equals(valueType))) {
+            ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6604);
+        }
+
+        if (WSSConstants.NS_X509_V3_TYPE.equals(valueType)) {
+            return new X509V3SecurityTokenImpl(
+                    (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler,
+                    binaryContent, securityTokenReferenceId, securityProperties);
+        } else if (WSSConstants.NS_X509_SKI.equals(valueType)) {
+            return new X509SKISecurityTokenImpl(
+                    (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler, binaryContent,
+                    securityTokenReferenceId, securityProperties);
+        } else if (WSSConstants.NS_THUMBPRINT.equals(valueType)) {
+            try {
+                MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
+                //first look if the token is included in the message (necessary for TokenInclusion policy)...
+                List<SecurityTokenProvider<? extends InboundSecurityToken>> securityTokenProviders =
+                        inboundSecurityContext.getRegisteredSecurityTokenProviders();
+                for (int i = 0; i < securityTokenProviders.size(); i++) {
+                    SecurityTokenProvider<? extends InboundSecurityToken> tokenProvider = securityTokenProviders.get(i);
+                    InboundSecurityToken inboundSecurityToken = tokenProvider.getSecurityToken();
+                    if (inboundSecurityToken instanceof X509SecurityToken) {
+                        X509SecurityToken x509SecurityToken = (X509SecurityToken)inboundSecurityToken;
+                        byte[] tokenDigest = messageDigest.digest(x509SecurityToken.getX509Certificates()[0].getEncoded());
+
+                        if (Arrays.equals(tokenDigest, binaryContent)) {
+                            return createSecurityTokenProxy(inboundSecurityToken,
+                                    WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER);
+                        }
+                    }
+                }
+            } catch (NoSuchAlgorithmException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+            } catch (CertificateEncodingException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN);
+            }
+
+            //...then if none is found create a new SecurityToken instance
+            return new X509ThumbprintSHA1SecurityTokenImpl(
+                    (WSInboundSecurityContext) inboundSecurityContext, crypto, callbackHandler, binaryContent,
+                    securityTokenReferenceId, securityProperties);
+        } else if (WSSConstants.NS_ENCRYPTED_KEY_SHA1.equals(valueType)) {
+            return new EncryptedKeySha1SecurityTokenImpl(
+                    (WSInboundSecurityContext) inboundSecurityContext, callbackHandler, keyIdentifierType.getValue(),
+                    securityTokenReferenceId);
+        } else if (WSSConstants.NS_SAML10_TYPE.equals(valueType) || WSSConstants.NS_SAML20_TYPE.equals(valueType)) {
+            if (WSSConstants.NS_SAML20_TYPE.equals(valueType) && !WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE.equals(tokenType)) {
+                ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6617);
+            } else if (WSSConstants.NS_SAML10_TYPE.equals(valueType) 
+                && !WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE.equals(tokenType)) {
+                ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6611);
+            }
+            SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider =
+                    inboundSecurityContext.getSecurityTokenProvider(keyIdentifierType.getValue());
+            if (securityTokenProvider != null) {
+                return createSecurityTokenProxy(securityTokenProvider.getSecurityToken(),
+                    WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
+            }
+
+            // Delegate to a CallbackHandler, in case the token is not in the request
+            return new SamlSecurityTokenImpl((WSInboundSecurityContext) inboundSecurityContext,
+                                             keyIdentifierType.getValue(),
+                                             WSSecurityTokenConstants.KEYIDENTIFIER_EXTERNAL_REFERENCE,
+                                             securityProperties);
+        } else if (WSSConstants.NS_KERBEROS5_AP_REQ_SHA1.equals(valueType)) {
+            SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider =
+                    inboundSecurityContext.getSecurityTokenProvider(keyIdentifierType.getValue());
+            if (securityTokenProvider != null) {
+                return createSecurityTokenProxy(securityTokenProvider.getSecurityToken(),
+                        WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
+            }
+
+            try {
+                //ok we have to find the token via digesting...
+                MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
+                List<SecurityTokenProvider<? extends InboundSecurityToken>> securityTokenProviders =
+                        inboundSecurityContext.getRegisteredSecurityTokenProviders();
+                for (int i = 0; i < securityTokenProviders.size(); i++) {
+                    SecurityTokenProvider<? extends InboundSecurityToken> tokenProvider = securityTokenProviders.get(i);
+                    InboundSecurityToken inboundSecurityToken = tokenProvider.getSecurityToken();
+                    if (inboundSecurityToken instanceof KerberosServiceSecurityToken) {
+                        KerberosServiceSecurityToken kerberosSecurityToken = 
+                            (KerberosServiceSecurityToken)inboundSecurityToken;
+                        byte[] tokenDigest = messageDigest.digest(kerberosSecurityToken.getBinaryContent());
+                        if (Arrays.equals(tokenDigest, binaryContent)) {
+                            return createSecurityTokenProxy(inboundSecurityToken,
+                                    WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER);
+                        }
+                    }
+                }
+            } catch (NoSuchAlgorithmException e) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+            }
+
+            // Finally, just delegate to a Callback as per EncryptedKeySHA1
+            return new EncryptedKeySha1SecurityTokenImpl(
+                    (WSInboundSecurityContext) inboundSecurityContext, callbackHandler,
+                    keyIdentifierType.getValue(), securityTokenReferenceId);
+        } else {
+            //we do enforce BSP compliance here but will fail anyway since we cannot identify the referenced token
+            ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3063);
+        }
+        
+        return null;
+    }
+    
+    private static InboundSecurityToken getSecurityToken(org.apache.wss4j.binding.wss10.ReferenceType referenceType,
+                                                         String tokenType,
+                                                         InboundSecurityContext inboundSecurityContext,
+                                                         WSSSecurityProperties securityProperties) 
+                                                             throws XMLSecurityException {
+        String uri = referenceType.getURI();
+        if (uri == null) {
+            //we do enforce BSP compliance here but will fail anyway since we cannot identify the referenced token
+            ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3062);
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY, "badReferenceURI");
+        }
+        boolean included = true;
+        if (!uri.startsWith("#")) {
+            included = false;
+            // Delegate to a CallbackHandler, in case the token is not in the request
+            try {
+                return new ExternalSecurityTokenImpl((WSInboundSecurityContext) inboundSecurityContext,
+                                             uri,
+                                             WSSecurityTokenConstants.KEYIDENTIFIER_EXTERNAL_REFERENCE,
+                                             securityProperties, false);
+            } catch (WSSecurityException ex) { //NOPMD
+                // just continue
+            }
+            ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R5204);
+        }
+        uri = WSSUtils.dropReferenceMarker(uri);
+        //referenced BST:*/
+        //we have to search BST somewhere in the doc. First we will check for a BST already processed and
+        //stored in the context. Otherwise we will abort now.
+
+        //prevent recursive key reference DOS:
+        Integer invokeCount = inboundSecurityContext.<Integer>get("" + Thread.currentThread().hashCode());
+        if (invokeCount == null) {
+            invokeCount = 0;
+        }
+        invokeCount++;
+        if (invokeCount == 10) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN);
+        }
+        inboundSecurityContext.put("" + Thread.currentThread().hashCode(), invokeCount);
+
+        SecurityTokenProvider<? extends InboundSecurityToken> securityTokenProvider =
+                inboundSecurityContext.getSecurityTokenProvider(uri);
+        if (securityTokenProvider == null) {
+            // Delegate to a CallbackHandler, in case the token is not in the request
+            return new ExternalSecurityTokenImpl((WSInboundSecurityContext) inboundSecurityContext,
+                                             uri,
+                                             WSSecurityTokenConstants.KEYIDENTIFIER_EXTERNAL_REFERENCE,
+                                             securityProperties, included);
+        }
+        if (securityTokenProvider.getSecurityToken() instanceof SecurityTokenReference) {
+            ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3057);
+        } else if (securityTokenProvider.getSecurityToken() instanceof X509PKIPathv1SecurityTokenImpl) {
+            String valueType = referenceType.getValueType();
+            if (!WSSConstants.NS_X509_PKIPATH_V1.equals(valueType)) {
+                ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3058);
+            }
+            if (!WSSConstants.NS_X509_PKIPATH_V1.equals(tokenType)) {
+                ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R5215);
+            }
+        } else if (securityTokenProvider.getSecurityToken() instanceof X509SecurityToken) {
+            String valueType = referenceType.getValueType();
+            if (!WSSConstants.NS_X509_V3_TYPE.equals(valueType)) {
+                ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R3058);
+            }
+        } else if (securityTokenProvider.getSecurityToken() instanceof UsernameSecurityToken) {
+            String valueType = referenceType.getValueType();
+            if (!WSSConstants.NS_USERNAMETOKEN_PROFILE_USERNAME_TOKEN.equals(valueType)) {
+                ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R4214);
+            }
+        } else if (securityTokenProvider.getSecurityToken() instanceof SamlSecurityToken) {
+            WSSecurityTokenConstants.TokenType samlTokenType = securityTokenProvider.getSecurityToken().getTokenType();
+            if (WSSecurityTokenConstants.SAML_20_TOKEN.equals(samlTokenType)) {
+                String valueType = referenceType.getValueType();
+                if (valueType != null && !"".equals(valueType)) {
+                    ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6614);
+                }
+                if (!WSSConstants.NS_SAML20_TOKEN_PROFILE_TYPE.equals(tokenType)) {
+                    ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6617);
+                }
+            } else if (WSSecurityTokenConstants.SAML_10_TOKEN.equals(samlTokenType) 
+                && !WSSConstants.NS_SAML11_TOKEN_PROFILE_TYPE.equals(tokenType)) {
+                ((WSInboundSecurityContext) inboundSecurityContext).handleBSPRule(BSPRule.R6611);
+            }
+        }
+        
+
+        return createSecurityTokenProxy(securityTokenProvider.getSecurityToken(),
+                WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
+    }
+    
     public static InboundSecurityToken getSecurityToken(KeyValueType keyValueType, final Crypto crypto,
                                                  final CallbackHandler callbackHandler, SecurityContext securityContext,
                                                  WSSSecurityProperties securityProperties)
