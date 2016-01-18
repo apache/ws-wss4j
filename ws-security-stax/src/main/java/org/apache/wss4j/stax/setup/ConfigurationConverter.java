@@ -507,48 +507,10 @@ public final class ConfigurationConverter {
         properties.setSignatureCanonicalizationAlgorithm(sigC14nAlgo);
 
         Object sigParts = config.get(ConfigurationConstants.SIGNATURE_PARTS);
-        if (sigParts != null) {
-            if (sigParts instanceof String) {
-                List<SecurePart> parts = new ArrayList<>();
-                splitEncParts((String)sigParts, parts, WSSConstants.NS_SOAP11);
-                for (SecurePart part : parts) {
-                    part.setDigestMethod(sigDigestAlgo);
-                    properties.addSignaturePart(part);
-                }
-            } else if (sigParts instanceof List<?>) {
-                List<?> sigPartsList = (List<?>)sigParts;
-                for (Object obj : sigPartsList) {
-                    if (obj instanceof SecurePart) {
-                        SecurePart securePart = (SecurePart)obj;
-                        securePart.setDigestMethod(sigDigestAlgo);
-                        properties.addSignaturePart(securePart);
-                    }
-                }
-            }
-        }
+        configureParts(sigParts, properties, sigDigestAlgo, true, true);
 
         sigParts = config.get(ConfigurationConstants.OPTIONAL_SIGNATURE_PARTS);
-        if (sigParts != null) {
-            if (sigParts instanceof String) {
-                List<SecurePart> parts = new ArrayList<>();
-                splitEncParts((String)sigParts, parts, WSSConstants.NS_SOAP11);
-                for (SecurePart part : parts) {
-                    part.setRequired(false);
-                    part.setDigestMethod(sigDigestAlgo);
-                    properties.addSignaturePart(part);
-                }
-            } else if (sigParts instanceof List<?>) {
-                List<?> sigPartsList = (List<?>)sigParts;
-                for (Object obj : sigPartsList) {
-                    if (obj instanceof SecurePart) {
-                        SecurePart securePart = (SecurePart)obj;
-                        securePart.setDigestMethod(sigDigestAlgo);
-                        securePart.setRequired(false);
-                        properties.addSignaturePart(securePart);
-                    }
-                }
-            }
-        }
+        configureParts(sigParts, properties, sigDigestAlgo, false, true);
 
         String iterations = getString(ConfigurationConstants.DERIVED_KEY_ITERATIONS, config);
         if (iterations != null) {
@@ -564,44 +526,10 @@ public final class ConfigurationConverter {
         }
 
         Object encParts = config.get(ConfigurationConstants.ENCRYPTION_PARTS);
-        if (encParts != null) {
-            if (encParts instanceof String) {
-                List<SecurePart> parts = new ArrayList<>();
-                splitEncParts((String)encParts, parts, WSSConstants.NS_SOAP11);
-                for (SecurePart part : parts) {
-                    properties.addEncryptionPart(part);
-                }
-            } else if (encParts instanceof List<?>) {
-                List<?> encPartsList = (List<?>)encParts;
-                for (Object obj : encPartsList) {
-                    if (obj instanceof SecurePart) {
-                        SecurePart securePart = (SecurePart)obj;
-                        properties.addEncryptionPart(securePart);
-                    }
-                }
-            }
-        }
+        configureParts(encParts, properties, null, true, false);
 
         encParts = config.get(ConfigurationConstants.OPTIONAL_ENCRYPTION_PARTS);
-        if (encParts != null) {
-            if (encParts instanceof String) {
-                List<SecurePart> parts = new ArrayList<>();
-                splitEncParts((String)encParts, parts, WSSConstants.NS_SOAP11);
-                for (SecurePart part : parts) {
-                    part.setRequired(false);
-                    properties.addEncryptionPart(part);
-                }
-            } else if (encParts instanceof List<?>) {
-                List<?> encPartsList = (List<?>)encParts;
-                for (Object obj : encPartsList) {
-                    if (obj instanceof SecurePart) {
-                        SecurePart securePart = (SecurePart)obj;
-                        securePart.setRequired(false);
-                        properties.addEncryptionPart(securePart);
-                    }
-                }
-            }
-        }
+        configureParts(encParts, properties, null, false, false);
 
         String encSymcAlgo = getString(ConfigurationConstants.ENC_SYM_ALGO, config);
         properties.setEncryptionSymAlgorithm(encSymcAlgo);
@@ -690,6 +618,39 @@ public final class ConfigurationConverter {
             convertKeyIdentifier(derivedKeyIdentifier);
         if (convertedDerivedKeyIdentifier != null) {
             properties.setDerivedKeyKeyIdentifier(convertedDerivedKeyIdentifier);
+        }
+    }
+    
+    private static void configureParts(Object secureParts, WSSSecurityProperties properties,
+                                       String digestAlgo, boolean required, boolean signature) {
+        if (secureParts != null) {
+            if (secureParts instanceof String) {
+                List<SecurePart> parts = new ArrayList<>();
+                splitEncParts((String)secureParts, parts, WSSConstants.NS_SOAP11);
+                for (SecurePart part : parts) {
+                    part.setRequired(required);
+                    if (signature) {
+                        part.setDigestMethod(digestAlgo);
+                        properties.addSignaturePart(part);
+                    } else {
+                        properties.addEncryptionPart(part);
+                    }
+                }
+            } else if (secureParts instanceof List<?>) {
+                List<?> sigPartsList = (List<?>)secureParts;
+                for (Object obj : sigPartsList) {
+                    if (obj instanceof SecurePart) {
+                        SecurePart securePart = (SecurePart)obj;
+                        securePart.setRequired(required);
+                        if (signature) {
+                            securePart.setDigestMethod(digestAlgo);
+                            properties.addSignaturePart(securePart);
+                        } else {
+                            properties.addEncryptionPart(securePart);
+                        }
+                    }
+                }
+            }
         }
     }
 

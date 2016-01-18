@@ -99,7 +99,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
         if (WSSecurityEventConstants.OPERATION.equals(securityEvent.getSecurityEventType())) {
             operationSecurityEventOccured = true;
 
-            identifySecurityTokenDepenedenciesAndUsage(securityEventQueue);
+            identifySecurityTokenDependenciesAndUsage(securityEventQueue);
 
             Iterator<SecurityEvent> securityEventIterator = securityEventQueue.descendingIterator();
             while (securityEventIterator.hasNext()) {
@@ -138,7 +138,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
         }
     }
 
-    private void identifySecurityTokenDepenedenciesAndUsage(
+    private void identifySecurityTokenDependenciesAndUsage(
             Deque<SecurityEvent> securityEventDeque) throws XMLSecurityException {
 
         List<TokenSecurityEvent<? extends InboundSecurityToken>> messageSignatureTokens = Collections.emptyList();
