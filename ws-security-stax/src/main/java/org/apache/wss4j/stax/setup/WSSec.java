@@ -186,60 +186,9 @@ public class WSSec {
                     securityProperties.setTimestampTTL(300);
                 }
             } else if (WSSConstants.SIGNATURE.equals(action)) {
-                if (!WSSConstants.NS_XMLDSIG_HMACSHA1.equals(securityProperties.getSignatureAlgorithm())) {
-                    if (securityProperties.getSignatureKeyStore() == null
-                        && securityProperties.getSignatureCryptoProperties() == null
-                        && securityProperties.getSignatureCrypto() == null) {
-                        throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureKeyStoreNotSet");
-                    }
-                    if (securityProperties.getSignatureUser() == null) {
-                        throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noSignatureUser");
-                    }
-                    if (securityProperties.getCallbackHandler() == null) {
-                        throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
-                    }
-                }
-                if (securityProperties.getSignatureAlgorithm() == null) {
-                    securityProperties.setSignatureAlgorithm(WSSConstants.NS_XMLDSIG_RSASHA1);
-                }
-                if (securityProperties.getSignatureDigestAlgorithm() == null) {
-                    securityProperties.setSignatureDigestAlgorithm(WSSConstants.NS_XMLDSIG_SHA1);
-                }
-                if (securityProperties.getSignatureCanonicalizationAlgorithm() == null) {
-                    securityProperties.setSignatureCanonicalizationAlgorithm(WSSConstants.NS_C14N_EXCL);
-                }
-                if (securityProperties.getSignatureKeyIdentifier() == null) {
-                    securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_IssuerSerial);
-                }
-                checkDefaultSecureParts(true, securityProperties);
+                checkOutboundSignatureProperties(securityProperties);
             } else if (WSSConstants.ENCRYPT.equals(action)) {
-                if (securityProperties.getEncryptionUseThisCertificate() == null
-                        && securityProperties.getEncryptionKeyStore() == null
-                        && securityProperties.getEncryptionCryptoProperties() == null
-                        && !securityProperties.isUseReqSigCertForEncryption()
-                        && securityProperties.isEncryptSymmetricEncryptionKey()
-                        && securityProperties.getEncryptionCrypto() == null) {
-                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "encryptionKeyStoreNotSet");
-                }
-                if (securityProperties.getEncryptionUser() == null
-                        && securityProperties.getEncryptionUseThisCertificate() == null
-                        && !securityProperties.isUseReqSigCertForEncryption()
-                        && securityProperties.isEncryptSymmetricEncryptionKey()) {
-                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noEncryptionUser");
-                }
-                if (securityProperties.getEncryptionSymAlgorithm() == null) {
-                    securityProperties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES256);
-                }
-                if (securityProperties.getEncryptionKeyTransportAlgorithm() == null) {
-                    //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-1_5 :
-                    //"RSA-OAEP is RECOMMENDED for the transport of AES keys"
-                    //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-oaep-mgf1p
-                    securityProperties.setEncryptionKeyTransportAlgorithm(WSSConstants.NS_XENC_RSAOAEPMGF1P);
-                }
-                if (securityProperties.getEncryptionKeyIdentifier() == null) {
-                    securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_IssuerSerial);
-                }
-                checkDefaultSecureParts(false, securityProperties);
+                checkOutboundEncryptionProperties(securityProperties);
             } else if (WSSConstants.USERNAMETOKEN.equals(action)) {
                 if (securityProperties.getTokenUser() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noTokenUser");
@@ -273,83 +222,9 @@ public class WSSec {
                 }
                 checkDefaultSecureParts(true, securityProperties);
             } else if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
-                if (securityProperties.getCallbackHandler() == null) {
-                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
-                }
-                if (securityProperties.getSignatureAlgorithm() == null) {
-                    securityProperties.setSignatureAlgorithm(WSSConstants.NS_XMLDSIG_HMACSHA1);
-                }
-                if (securityProperties.getSignatureDigestAlgorithm() == null) {
-                    securityProperties.setSignatureDigestAlgorithm(WSSConstants.NS_XMLDSIG_SHA1);
-                }
-                if (securityProperties.getSignatureCanonicalizationAlgorithm() == null) {
-                    securityProperties.setSignatureCanonicalizationAlgorithm(WSSConstants.NS_C14N_EXCL);
-                }
-                if (securityProperties.getSignatureKeyIdentifier() == null) {
-                    securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
-                }
-                if (securityProperties.getEncryptionSymAlgorithm() == null) {
-                    securityProperties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES256);
-                }
-                if (securityProperties.getEncryptionKeyTransportAlgorithm() == null) {
-                    //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-1_5 :
-                    //"RSA-OAEP is RECOMMENDED for the transport of AES keys"
-                    //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-oaep-mgf1p
-                    securityProperties.setEncryptionKeyTransportAlgorithm(WSSConstants.NS_XENC_RSAOAEPMGF1P);
-                }
-                if (securityProperties.getEncryptionKeyIdentifier() == null) {
-                    securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier);
-                }
-                if (securityProperties.getDerivedKeyKeyIdentifier() == null) {
-                    securityProperties.setDerivedKeyKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier);
-                }
-                if (securityProperties.getDerivedKeyTokenReference() == null) {
-                    securityProperties.setDerivedKeyTokenReference(WSSConstants.DerivedKeyTokenReference.DirectReference);
-                }
-                if (securityProperties.getDerivedKeyTokenReference() != WSSConstants.DerivedKeyTokenReference.DirectReference) {
-                    securityProperties.setDerivedKeyKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
-                }
-                checkDefaultSecureParts(true, securityProperties);
+                checkOutboundSignatureDerivedProperties(securityProperties);
             } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
-                if (securityProperties.getCallbackHandler() == null) {
-                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
-                }
-                if (securityProperties.getEncryptionUseThisCertificate() == null
-                        && securityProperties.getEncryptionKeyStore() == null
-                        && securityProperties.getEncryptionCryptoProperties() == null
-                        && !securityProperties.isUseReqSigCertForEncryption()
-                        && securityProperties.isEncryptSymmetricEncryptionKey()
-                        && securityProperties.getEncryptionCrypto() == null) {
-                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "encryptionKeyStoreNotSet");
-                }
-                if (securityProperties.getEncryptionUser() == null
-                        && securityProperties.getEncryptionUseThisCertificate() == null
-                        && !securityProperties.isUseReqSigCertForEncryption()
-                        && securityProperties.isEncryptSymmetricEncryptionKey()) {
-                    throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noEncryptionUser");
-                }
-                if (securityProperties.getEncryptionSymAlgorithm() == null) {
-                    securityProperties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES256);
-                }
-                if (securityProperties.getEncryptionKeyTransportAlgorithm() == null) {
-                    //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-1_5 :
-                    //"RSA-OAEP is RECOMMENDED for the transport of AES keys"
-                    //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-oaep-mgf1p
-                    securityProperties.setEncryptionKeyTransportAlgorithm(WSSConstants.NS_XENC_RSAOAEPMGF1P);
-                }
-                if (securityProperties.getEncryptionKeyIdentifier() == null) {
-                    securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier);
-                }
-                if (securityProperties.getDerivedKeyKeyIdentifier() == null) {
-                    securityProperties.setDerivedKeyKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier);
-                }
-                if (securityProperties.getDerivedKeyTokenReference() == null) {
-                    securityProperties.setDerivedKeyTokenReference(WSSConstants.DerivedKeyTokenReference.EncryptedKey);
-                }
-                if (securityProperties.getDerivedKeyTokenReference() != WSSConstants.DerivedKeyTokenReference.DirectReference) {
-                    securityProperties.setDerivedKeyKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
-                }
-                checkDefaultSecureParts(false, securityProperties);
+                checkOutboundEncryptionDerivedProperties(securityProperties);
             } else if (WSSConstants.SAML_TOKEN_SIGNED.equals(action)) {
                 if (securityProperties.getCallbackHandler() == null) {
                     throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
@@ -404,6 +279,147 @@ public class WSSec {
             }
         }
         return new WSSSecurityProperties(securityProperties);
+    }
+    
+    private static void checkOutboundSignatureProperties(WSSSecurityProperties securityProperties) throws WSSConfigurationException {
+        if (!WSSConstants.NS_XMLDSIG_HMACSHA1.equals(securityProperties.getSignatureAlgorithm())) {
+            if (securityProperties.getSignatureKeyStore() == null
+                && securityProperties.getSignatureCryptoProperties() == null
+                && securityProperties.getSignatureCrypto() == null) {
+                throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "signatureKeyStoreNotSet");
+            }
+            if (securityProperties.getSignatureUser() == null) {
+                throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noSignatureUser");
+            }
+            if (securityProperties.getCallbackHandler() == null) {
+                throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
+            }
+        }
+        if (securityProperties.getSignatureAlgorithm() == null) {
+            securityProperties.setSignatureAlgorithm(WSSConstants.NS_XMLDSIG_RSASHA1);
+        }
+        if (securityProperties.getSignatureDigestAlgorithm() == null) {
+            securityProperties.setSignatureDigestAlgorithm(WSSConstants.NS_XMLDSIG_SHA1);
+        }
+        if (securityProperties.getSignatureCanonicalizationAlgorithm() == null) {
+            securityProperties.setSignatureCanonicalizationAlgorithm(WSSConstants.NS_C14N_EXCL);
+        }
+        if (securityProperties.getSignatureKeyIdentifier() == null) {
+            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_IssuerSerial);
+        }
+        checkDefaultSecureParts(true, securityProperties);
+    }
+    
+    private static void checkOutboundSignatureDerivedProperties(WSSSecurityProperties securityProperties) throws WSSConfigurationException {
+        if (securityProperties.getCallbackHandler() == null) {
+            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
+        }
+        if (securityProperties.getSignatureAlgorithm() == null) {
+            securityProperties.setSignatureAlgorithm(WSSConstants.NS_XMLDSIG_HMACSHA1);
+        }
+        if (securityProperties.getSignatureDigestAlgorithm() == null) {
+            securityProperties.setSignatureDigestAlgorithm(WSSConstants.NS_XMLDSIG_SHA1);
+        }
+        if (securityProperties.getSignatureCanonicalizationAlgorithm() == null) {
+            securityProperties.setSignatureCanonicalizationAlgorithm(WSSConstants.NS_C14N_EXCL);
+        }
+        if (securityProperties.getSignatureKeyIdentifier() == null) {
+            securityProperties.setSignatureKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
+        }
+        if (securityProperties.getEncryptionSymAlgorithm() == null) {
+            securityProperties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES256);
+        }
+        if (securityProperties.getEncryptionKeyTransportAlgorithm() == null) {
+            //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-1_5 :
+            //"RSA-OAEP is RECOMMENDED for the transport of AES keys"
+            //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-oaep-mgf1p
+            securityProperties.setEncryptionKeyTransportAlgorithm(WSSConstants.NS_XENC_RSAOAEPMGF1P);
+        }
+        if (securityProperties.getEncryptionKeyIdentifier() == null) {
+            securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier);
+        }
+        if (securityProperties.getDerivedKeyKeyIdentifier() == null) {
+            securityProperties.setDerivedKeyKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier);
+        }
+        if (securityProperties.getDerivedKeyTokenReference() == null) {
+            securityProperties.setDerivedKeyTokenReference(WSSConstants.DerivedKeyTokenReference.DirectReference);
+        }
+        if (securityProperties.getDerivedKeyTokenReference() != WSSConstants.DerivedKeyTokenReference.DirectReference) {
+            securityProperties.setDerivedKeyKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
+        }
+        checkDefaultSecureParts(true, securityProperties);
+    }
+    
+    private static void checkOutboundEncryptionProperties(WSSSecurityProperties securityProperties) throws WSSConfigurationException {
+        if (securityProperties.getEncryptionUseThisCertificate() == null
+            && securityProperties.getEncryptionKeyStore() == null
+            && securityProperties.getEncryptionCryptoProperties() == null
+            && !securityProperties.isUseReqSigCertForEncryption()
+            && securityProperties.isEncryptSymmetricEncryptionKey()
+            && securityProperties.getEncryptionCrypto() == null) {
+            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "encryptionKeyStoreNotSet");
+        }
+        if (securityProperties.getEncryptionUser() == null
+            && securityProperties.getEncryptionUseThisCertificate() == null
+            && !securityProperties.isUseReqSigCertForEncryption()
+            && securityProperties.isEncryptSymmetricEncryptionKey()) {
+            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noEncryptionUser");
+        }
+        if (securityProperties.getEncryptionSymAlgorithm() == null) {
+            securityProperties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES256);
+        }
+        if (securityProperties.getEncryptionKeyTransportAlgorithm() == null) {
+            //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-1_5 :
+            //"RSA-OAEP is RECOMMENDED for the transport of AES keys"
+            //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-oaep-mgf1p
+            securityProperties.setEncryptionKeyTransportAlgorithm(WSSConstants.NS_XENC_RSAOAEPMGF1P);
+        }
+        if (securityProperties.getEncryptionKeyIdentifier() == null) {
+            securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_IssuerSerial);
+        }
+        checkDefaultSecureParts(false, securityProperties);
+    }
+    
+    private static void checkOutboundEncryptionDerivedProperties(WSSSecurityProperties securityProperties) throws WSSConfigurationException {
+        if (securityProperties.getCallbackHandler() == null) {
+            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
+        }
+        if (securityProperties.getEncryptionUseThisCertificate() == null
+                && securityProperties.getEncryptionKeyStore() == null
+                && securityProperties.getEncryptionCryptoProperties() == null
+                && !securityProperties.isUseReqSigCertForEncryption()
+                && securityProperties.isEncryptSymmetricEncryptionKey()
+                && securityProperties.getEncryptionCrypto() == null) {
+            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "encryptionKeyStoreNotSet");
+        }
+        if (securityProperties.getEncryptionUser() == null
+                && securityProperties.getEncryptionUseThisCertificate() == null
+                && !securityProperties.isUseReqSigCertForEncryption()
+                && securityProperties.isEncryptSymmetricEncryptionKey()) {
+            throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noEncryptionUser");
+        }
+        if (securityProperties.getEncryptionSymAlgorithm() == null) {
+            securityProperties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC_AES256);
+        }
+        if (securityProperties.getEncryptionKeyTransportAlgorithm() == null) {
+            //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-1_5 :
+            //"RSA-OAEP is RECOMMENDED for the transport of AES keys"
+            //@see http://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-oaep-mgf1p
+            securityProperties.setEncryptionKeyTransportAlgorithm(WSSConstants.NS_XENC_RSAOAEPMGF1P);
+        }
+        if (securityProperties.getEncryptionKeyIdentifier() == null) {
+            securityProperties.setEncryptionKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier);
+        }
+        if (securityProperties.getDerivedKeyKeyIdentifier() == null) {
+            securityProperties.setDerivedKeyKeyIdentifier(WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier);
+        }
+        if (securityProperties.getDerivedKeyTokenReference() == null) {
+            securityProperties.setDerivedKeyTokenReference(WSSConstants.DerivedKeyTokenReference.EncryptedKey);
+        }
+        if (securityProperties.getDerivedKeyTokenReference() != WSSConstants.DerivedKeyTokenReference.DirectReference) {
+            securityProperties.setDerivedKeyKeyIdentifier(WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
+        }
+        checkDefaultSecureParts(false, securityProperties);
     }
 
     private static void checkDefaultSecureParts(boolean signature, WSSSecurityProperties securityProperties) {
