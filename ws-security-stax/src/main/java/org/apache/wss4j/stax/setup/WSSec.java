@@ -380,7 +380,8 @@ public class WSSec {
         checkDefaultSecureParts(false, securityProperties);
     }
     
-    private static void checkOutboundEncryptionDerivedProperties(WSSSecurityProperties securityProperties) throws WSSConfigurationException {
+    private static void checkOutboundEncryptionDerivedProperties(WSSSecurityProperties securityProperties) 
+        throws WSSConfigurationException {
         if (securityProperties.getCallbackHandler() == null) {
             throw new WSSConfigurationException(WSSConfigurationException.ErrorCode.FAILURE, "noCallback");
         }
