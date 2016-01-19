@@ -155,7 +155,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
                 finalSAMLTokenOutputProcessor = new FinalSAMLTokenOutputProcessor(null, samlAssertionWrapper,
                         securityTokenReferenceId, senderVouches, includeSTR);
 
-                SAMLSecurityTokenProvider securityTokenProvider = 
+                final SAMLSecurityTokenProvider securityTokenProvider = 
                     new SAMLSecurityTokenProvider(samlKeyInfo, samlCallback, tokenId, ref,
                                                   finalSAMLTokenOutputProcessor);
 
