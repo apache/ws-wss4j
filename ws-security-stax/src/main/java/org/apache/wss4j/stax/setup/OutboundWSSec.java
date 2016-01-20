@@ -174,199 +174,26 @@ public class OutboundWSSec {
         try {
             final SecurityHeaderOutputProcessor securityHeaderOutputProcessor = new SecurityHeaderOutputProcessor();
             initializeOutputProcessor(outputProcessorChain, securityHeaderOutputProcessor, null);
-            //todo some combinations are not possible atm: eg Action.SIGNATURE and Action.USERNAMETOKEN_SIGNED
-            //todo they use the same signature parts
-            boolean signatureAction = false;
-            boolean encryptionAction = false;
-            boolean signedSAML = false;
-            boolean kerberos = false;
-            boolean signatureKerberos = false;
-            boolean encryptionKerberos = false;
-            boolean derivedSignature = false;
-            boolean derivedEncryption = false;
-
-            // Check to see whether we have a derived key signature, but not encryption, using
-            // an encrypted key reference (as we only want one encrypted key here...)
-            boolean derivedSignatureButNotDerivedEncryption = false;
-            if (securityProperties.getDerivedKeyTokenReference() == WSSConstants.DerivedKeyTokenReference.EncryptedKey) {
-                for (XMLSecurityConstants.Action action : securityProperties.getActions()) {
-                    if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
-                        derivedSignatureButNotDerivedEncryption = true;
-                    } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
-                        derivedSignatureButNotDerivedEncryption = false;
-                        break;
-                    }
-                }
-            }
-
-            for (XMLSecurityConstants.Action action : securityProperties.getActions()) {
-                if (WSSConstants.TIMESTAMP.equals(action)) {
-                    final TimestampOutputProcessor timestampOutputProcessor = new TimestampOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, timestampOutputProcessor, action);
-
-                } else if (WSSConstants.SIGNATURE.equals(action)) {
-                    signatureAction = true;
-                    final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
-                        new BinarySecurityTokenOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
-
-                    final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
-
-                } else if (WSSConstants.ENCRYPT.equals(action)) {
-                    encryptionAction = true;
-
-                    EncryptedKeyOutputProcessor encryptedKeyOutputProcessor = null;
-                    if (securityProperties.isEncryptSymmetricEncryptionKey()) {
-                        final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
-                            new BinarySecurityTokenOutputProcessor();
-                        initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
-
-                        encryptedKeyOutputProcessor = new EncryptedKeyOutputProcessor();
-                        initializeOutputProcessor(outputProcessorChain, encryptedKeyOutputProcessor, action);
-                    }
-
-                    final EncryptOutputProcessor encryptOutputProcessor = new EncryptOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, encryptOutputProcessor, action);
-
-                    if (encryptedKeyOutputProcessor == null) {
-                        final ReferenceListOutputProcessor referenceListOutputProcessor = new ReferenceListOutputProcessor();
-                        referenceListOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
-                        initializeOutputProcessor(outputProcessorChain, referenceListOutputProcessor, action);
-                    }
-
-                } else if (WSSConstants.USERNAMETOKEN.equals(action)) {
-                    final UsernameTokenOutputProcessor usernameTokenOutputProcessor = new UsernameTokenOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, usernameTokenOutputProcessor, action);
-
-                } else if (WSSConstants.USERNAMETOKEN_SIGNED.equals(action)) {
-                    final UsernameTokenOutputProcessor usernameTokenOutputProcessor = new UsernameTokenOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, usernameTokenOutputProcessor, action);
-
-                    final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
-
-                } else if (WSSConstants.SIGNATURE_CONFIRMATION.equals(action)) {
-                    final SignatureConfirmationOutputProcessor signatureConfirmationOutputProcessor =
-                            new SignatureConfirmationOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, signatureConfirmationOutputProcessor, action);
-
-                } else if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
-                    if (securityProperties.getDerivedKeyTokenReference() == WSSConstants.DerivedKeyTokenReference.EncryptedKey) {
-                        if (derivedSignatureButNotDerivedEncryption) {
-                            final EncryptedKeyOutputProcessor encryptedKeyOutputProcessor = new EncryptedKeyOutputProcessor();
-                            initializeOutputProcessor(outputProcessorChain, encryptedKeyOutputProcessor, action);
-                        }
-                        encryptionAction = true;
-                        derivedEncryption = true;
-                    } else if (securityProperties.getDerivedKeyTokenReference() 
-                        == WSSConstants.DerivedKeyTokenReference.SecurityContextToken) {
-                        final SecurityContextTokenOutputProcessor securityContextTokenOutputProcessor =
-                                new SecurityContextTokenOutputProcessor();
-                        initializeOutputProcessor(outputProcessorChain, securityContextTokenOutputProcessor, action);
-                        signatureAction = true;
-                        derivedSignature = true;
-                    } else {
-                        signatureAction = true;
-                        derivedSignature = true;
-                    }
-
-                    final DerivedKeyTokenOutputProcessor derivedKeyTokenOutputProcessor = new DerivedKeyTokenOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, derivedKeyTokenOutputProcessor, action);
-
-                    final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
-
-                } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
-                    encryptionAction = true;
-                    derivedEncryption = true;
-
-                    EncryptedKeyOutputProcessor encryptedKeyOutputProcessor = null;
-
-                    if (securityProperties.getDerivedKeyTokenReference() == WSSConstants.DerivedKeyTokenReference.EncryptedKey) {
-                        encryptedKeyOutputProcessor = new EncryptedKeyOutputProcessor();
-                        initializeOutputProcessor(outputProcessorChain, encryptedKeyOutputProcessor, action);
-
-                    } else if (securityProperties.getDerivedKeyTokenReference() 
-                        == WSSConstants.DerivedKeyTokenReference.SecurityContextToken) {
-                        final SecurityContextTokenOutputProcessor securityContextTokenOutputProcessor =
-                                new SecurityContextTokenOutputProcessor();
-                        initializeOutputProcessor(outputProcessorChain, securityContextTokenOutputProcessor, action);
-                    }
-                    final DerivedKeyTokenOutputProcessor derivedKeyTokenOutputProcessor = new DerivedKeyTokenOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, derivedKeyTokenOutputProcessor, action);
-
-                    final EncryptOutputProcessor encryptOutputProcessor = new EncryptOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, encryptOutputProcessor, action);
-
-                    if (encryptedKeyOutputProcessor == null) {
-                        final ReferenceListOutputProcessor referenceListOutputProcessor = new ReferenceListOutputProcessor();
-                        referenceListOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
-                        initializeOutputProcessor(outputProcessorChain, referenceListOutputProcessor, action);
-                    }
-                } else if (WSSConstants.SAML_TOKEN_SIGNED.equals(action)) {
-                    signatureAction = true;
-                    signedSAML = true;
-                    final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
-                        new BinarySecurityTokenOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
-
-                    final SAMLTokenOutputProcessor samlTokenOutputProcessor = new SAMLTokenOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, samlTokenOutputProcessor, action);
-
-                    final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
-
-                } else if (WSSConstants.SAML_TOKEN_UNSIGNED.equals(action)) {
-                    final SAMLTokenOutputProcessor samlTokenOutputProcessor = new SAMLTokenOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, samlTokenOutputProcessor, action);
-                } else if (WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN.equals(action)) {
-                    kerberos = true;
-                    signatureKerberos = true;
-                    final BinarySecurityTokenOutputProcessor kerberosTokenOutputProcessor =
-                            new BinarySecurityTokenOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, kerberosTokenOutputProcessor, action);
-
-                    final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
-                } else if (WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN.equals(action)) {
-                    kerberos = true;
-                    encryptionKerberos = true;
-                    final BinarySecurityTokenOutputProcessor kerberosTokenOutputProcessor =
-                            new BinarySecurityTokenOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, kerberosTokenOutputProcessor, action);
-
-                    final EncryptOutputProcessor encryptOutputProcessor = new EncryptOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, encryptOutputProcessor, action);
-                } else if (WSSConstants.KERBEROS_TOKEN.equals(action)) {
-                    kerberos = true;
-                    final BinarySecurityTokenOutputProcessor kerberosTokenOutputProcessor =
-                        new BinarySecurityTokenOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, kerberosTokenOutputProcessor, action);
-                } else if (WSSConstants.CUSTOM_TOKEN.equals(action)) {
-                    final CustomTokenOutputProcessor unknownTokenOutputProcessor =
-                        new CustomTokenOutputProcessor();
-                    initializeOutputProcessor(outputProcessorChain, unknownTokenOutputProcessor, action);
-                }
-            }
-
+            
+            ConfiguredAction configuredAction = configureActions(outputProcessorChain);
+            
             // Set up appropriate keys
-            if (signatureAction) {
-                setupSignatureKey(outputProcessorChain, securityProperties, signedSAML);
+            if (configuredAction.signatureAction) {
+                setupSignatureKey(outputProcessorChain, securityProperties, configuredAction.signedSAML);
             }
-            if (encryptionAction) {
+            if (configuredAction.encryptionAction) {
                 setupEncryptionKey(outputProcessorChain, securityProperties);
             }
-            if (kerberos) {
+            if (configuredAction.kerberos) {
                 setupKerberosKey(outputProcessorChain, securityProperties,
-                                 signatureKerberos, encryptionKerberos);
+                                 configuredAction.signatureKerberos, configuredAction.encryptionKerberos);
             }
-            if (derivedSignature) {
+            if (configuredAction.derivedSignature) {
                 String id =
                     outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE);
                 setDerivedIdentifier(outputProcessorChain, id);
             }
-            if (derivedEncryption) {
+            if (configuredAction.derivedEncryption) {
                 String id =
                     outputProcessorChain.getSecurityContext().get(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTED_KEY);
                 if (id == null) {
@@ -736,5 +563,190 @@ public class OutboundWSSec {
                 outputProcessorChain.getSecurityContext().put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SECURITYCONTEXTTOKEN, id);
                 break;
             }
+    }
+    
+    private ConfiguredAction configureActions(OutputProcessorChainImpl outputProcessorChain) throws XMLSecurityException {
+        ConfiguredAction configuredAction = new ConfiguredAction();
+        
+        //todo some combinations are not possible atm: eg Action.SIGNATURE and Action.USERNAMETOKEN_SIGNED
+        //todo they use the same signature parts
+
+        // Check to see whether we have a derived key signature, but not encryption, using
+        // an encrypted key reference (as we only want one encrypted key here...)
+        boolean derivedSignatureButNotDerivedEncryption = false;
+        if (securityProperties.getDerivedKeyTokenReference() == WSSConstants.DerivedKeyTokenReference.EncryptedKey) {
+            for (XMLSecurityConstants.Action action : securityProperties.getActions()) {
+                if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
+                    derivedSignatureButNotDerivedEncryption = true;
+                } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
+                    derivedSignatureButNotDerivedEncryption = false;
+                    break;
+                }
+            }
+        }
+
+        for (XMLSecurityConstants.Action action : securityProperties.getActions()) {
+            if (WSSConstants.TIMESTAMP.equals(action)) {
+                final TimestampOutputProcessor timestampOutputProcessor = new TimestampOutputProcessor();
+                initializeOutputProcessor(outputProcessorChain, timestampOutputProcessor, action);
+
+            } else if (WSSConstants.SIGNATURE.equals(action)) {
+                configuredAction.signatureAction = true;
+                final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
+                    new BinarySecurityTokenOutputProcessor();
+                initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
+
+                final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
+                initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
+
+            } else if (WSSConstants.ENCRYPT.equals(action)) {
+                configuredAction.encryptionAction = true;
+
+                EncryptedKeyOutputProcessor encryptedKeyOutputProcessor = null;
+                if (securityProperties.isEncryptSymmetricEncryptionKey()) {
+                    final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
+                        new BinarySecurityTokenOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
+
+                    encryptedKeyOutputProcessor = new EncryptedKeyOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, encryptedKeyOutputProcessor, action);
+                }
+
+                final EncryptOutputProcessor encryptOutputProcessor = new EncryptOutputProcessor();
+                initializeOutputProcessor(outputProcessorChain, encryptOutputProcessor, action);
+
+                if (encryptedKeyOutputProcessor == null) {
+                    final ReferenceListOutputProcessor referenceListOutputProcessor = new ReferenceListOutputProcessor();
+                    referenceListOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
+                    initializeOutputProcessor(outputProcessorChain, referenceListOutputProcessor, action);
+                }
+
+            } else if (WSSConstants.USERNAMETOKEN.equals(action)) {
+                final UsernameTokenOutputProcessor usernameTokenOutputProcessor = new UsernameTokenOutputProcessor();
+                initializeOutputProcessor(outputProcessorChain, usernameTokenOutputProcessor, action);
+
+            } else if (WSSConstants.USERNAMETOKEN_SIGNED.equals(action)) {
+                final UsernameTokenOutputProcessor usernameTokenOutputProcessor = new UsernameTokenOutputProcessor();
+                initializeOutputProcessor(outputProcessorChain, usernameTokenOutputProcessor, action);
+
+                final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
+                initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
+
+            } else if (WSSConstants.SIGNATURE_CONFIRMATION.equals(action)) {
+                final SignatureConfirmationOutputProcessor signatureConfirmationOutputProcessor =
+                        new SignatureConfirmationOutputProcessor();
+                initializeOutputProcessor(outputProcessorChain, signatureConfirmationOutputProcessor, action);
+
+            } else if (WSSConstants.SIGNATURE_WITH_DERIVED_KEY.equals(action)) {
+                if (securityProperties.getDerivedKeyTokenReference() == WSSConstants.DerivedKeyTokenReference.EncryptedKey) {
+                    if (derivedSignatureButNotDerivedEncryption) {
+                        final EncryptedKeyOutputProcessor encryptedKeyOutputProcessor = new EncryptedKeyOutputProcessor();
+                        initializeOutputProcessor(outputProcessorChain, encryptedKeyOutputProcessor, action);
+                    }
+                    configuredAction.encryptionAction = true;
+                    configuredAction.derivedEncryption = true;
+                } else if (securityProperties.getDerivedKeyTokenReference() 
+                    == WSSConstants.DerivedKeyTokenReference.SecurityContextToken) {
+                    final SecurityContextTokenOutputProcessor securityContextTokenOutputProcessor =
+                            new SecurityContextTokenOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, securityContextTokenOutputProcessor, action);
+                    configuredAction.signatureAction = true;
+                    configuredAction.derivedSignature = true;
+                } else {
+                    configuredAction.signatureAction = true;
+                    configuredAction.derivedSignature = true;
+                }
+
+                final DerivedKeyTokenOutputProcessor derivedKeyTokenOutputProcessor = new DerivedKeyTokenOutputProcessor();
+                initializeOutputProcessor(outputProcessorChain, derivedKeyTokenOutputProcessor, action);
+
+                final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
+                initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
+
+            } else if (WSSConstants.ENCRYPT_WITH_DERIVED_KEY.equals(action)) {
+                configuredAction.encryptionAction = true;
+                configuredAction.derivedEncryption = true;
+
+                EncryptedKeyOutputProcessor encryptedKeyOutputProcessor = null;
+
+                if (securityProperties.getDerivedKeyTokenReference() == WSSConstants.DerivedKeyTokenReference.EncryptedKey) {
+                    encryptedKeyOutputProcessor = new EncryptedKeyOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, encryptedKeyOutputProcessor, action);
+
+                } else if (securityProperties.getDerivedKeyTokenReference() 
+                    == WSSConstants.DerivedKeyTokenReference.SecurityContextToken) {
+                    final SecurityContextTokenOutputProcessor securityContextTokenOutputProcessor =
+                            new SecurityContextTokenOutputProcessor();
+                    initializeOutputProcessor(outputProcessorChain, securityContextTokenOutputProcessor, action);
+                }
+                final DerivedKeyTokenOutputProcessor derivedKeyTokenOutputProcessor = new DerivedKeyTokenOutputProcessor();
+                initializeOutputProcessor(outputProcessorChain, derivedKeyTokenOutputProcessor, action);
+
+                final EncryptOutputProcessor encryptOutputProcessor = new EncryptOutputProcessor();
+                initializeOutputProcessor(outputProcessorChain, encryptOutputProcessor, action);
+
+                if (encryptedKeyOutputProcessor == null) {
+                    final ReferenceListOutputProcessor referenceListOutputProcessor = new ReferenceListOutputProcessor();
+                    referenceListOutputProcessor.addAfterProcessor(EncryptEndingOutputProcessor.class.getName());
+                    initializeOutputProcessor(outputProcessorChain, referenceListOutputProcessor, action);
+                }
+            } else if (WSSConstants.SAML_TOKEN_SIGNED.equals(action)) {
+                configuredAction.signatureAction = true;
+                configuredAction.signedSAML = true;
+                final BinarySecurityTokenOutputProcessor binarySecurityTokenOutputProcessor =
+                    new BinarySecurityTokenOutputProcessor();
+                initializeOutputProcessor(outputProcessorChain, binarySecurityTokenOutputProcessor, action);
+
+                final SAMLTokenOutputProcessor samlTokenOutputProcessor = new SAMLTokenOutputProcessor();
+                initializeOutputProcessor(outputProcessorChain, samlTokenOutputProcessor, action);
+
+                final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
+                initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
+
+            } else if (WSSConstants.SAML_TOKEN_UNSIGNED.equals(action)) {
+                final SAMLTokenOutputProcessor samlTokenOutputProcessor = new SAMLTokenOutputProcessor();
+                initializeOutputProcessor(outputProcessorChain, samlTokenOutputProcessor, action);
+            } else if (WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN.equals(action)) {
+                configuredAction.kerberos = true;
+                configuredAction.signatureKerberos = true;
+                final BinarySecurityTokenOutputProcessor kerberosTokenOutputProcessor =
+                        new BinarySecurityTokenOutputProcessor();
+                initializeOutputProcessor(outputProcessorChain, kerberosTokenOutputProcessor, action);
+
+                final WSSSignatureOutputProcessor signatureOutputProcessor = new WSSSignatureOutputProcessor();
+                initializeOutputProcessor(outputProcessorChain, signatureOutputProcessor, action);
+            } else if (WSSConstants.ENCRYPT_WITH_KERBEROS_TOKEN.equals(action)) {
+                configuredAction.kerberos = true;
+                configuredAction.encryptionKerberos = true;
+                final BinarySecurityTokenOutputProcessor kerberosTokenOutputProcessor =
+                        new BinarySecurityTokenOutputProcessor();
+                initializeOutputProcessor(outputProcessorChain, kerberosTokenOutputProcessor, action);
+
+                final EncryptOutputProcessor encryptOutputProcessor = new EncryptOutputProcessor();
+                initializeOutputProcessor(outputProcessorChain, encryptOutputProcessor, action);
+            } else if (WSSConstants.KERBEROS_TOKEN.equals(action)) {
+                configuredAction.kerberos = true;
+                final BinarySecurityTokenOutputProcessor kerberosTokenOutputProcessor =
+                    new BinarySecurityTokenOutputProcessor();
+                initializeOutputProcessor(outputProcessorChain, kerberosTokenOutputProcessor, action);
+            } else if (WSSConstants.CUSTOM_TOKEN.equals(action)) {
+                final CustomTokenOutputProcessor unknownTokenOutputProcessor =
+                    new CustomTokenOutputProcessor();
+                initializeOutputProcessor(outputProcessorChain, unknownTokenOutputProcessor, action);
+            }
+        }
+        
+        return configuredAction;
+    }
+    
+    private static class ConfiguredAction {
+        boolean signatureAction = false;
+        boolean encryptionAction = false;
+        boolean signedSAML = false;
+        boolean kerberos = false;
+        boolean signatureKerberos = false;
+        boolean encryptionKerberos = false;
+        boolean derivedSignature = false;
+        boolean derivedEncryption = false;
     }
 }
