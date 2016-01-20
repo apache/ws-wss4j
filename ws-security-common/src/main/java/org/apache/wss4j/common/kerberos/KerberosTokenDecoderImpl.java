@@ -160,7 +160,7 @@ public class KerberosTokenDecoderImpl implements KerberosTokenDecoder {
 
     private KerberosKey getKrbKey(Subject sub, int keyType) {
         Set<Object> creds = sub.getPrivateCredentials(Object.class);
-        for (Iterator<Object> i = creds.iterator(); i.hasNext(); ) {
+        for (Iterator<Object> i = creds.iterator(); i.hasNext();) {
             Object cred = i.next();
             if (cred instanceof KerberosKey) {
                 KerberosKey key = (KerberosKey) cred;

@@ -112,7 +112,7 @@ public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityTok
                                                    service,
                                                    contextAndServiceNameCallback.isUsernameServiceNameForm(),
                                                    false);
-            KerberosServiceContext krbServiceCtx= null;
+            KerberosServiceContext krbServiceCtx = null;
             try {
                 krbServiceCtx = Subject.doAs(subject, action);
             } catch (PrivilegedActionException e) {
@@ -132,18 +132,18 @@ public class KerberosServiceSecurityTokenImpl extends AbstractInboundSecurityTok
 
             if (null != sessionKey) {
                 return new KerberosTokenDecoder() {
-                    public void setToken(byte[] token) {}
-                    public void setSubject(Subject subject) {}
+                    public void setToken(byte[] token) { }
+                    public void setSubject(Subject subject) { }
                     public byte[] getSessionKey() throws KerberosTokenDecoderException {
                         return sessionKey.getEncoded();
                     }
-                    public void clear() {}
+                    public void clear() { }
                 };
             } else {
                 KerberosTokenDecoder kerberosTokenDecoder = new KerberosTokenDecoderImpl();
                 kerberosTokenDecoder.setToken(binaryContent);
                 kerberosTokenDecoder.setSubject(subject);
-                return kerberosTokenDecoder;            	
+                return kerberosTokenDecoder;
             }
         } catch (LoginException | UnsupportedCallbackException | IOException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
