@@ -31,6 +31,7 @@ import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 import org.apache.xml.security.stax.securityToken.SecurityToken;
+import org.apache.xml.security.stax.securityToken.SecurityTokenConstants.KeyIdentifier;
 import org.apache.wss4j.stax.securityEvent.KerberosTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 
@@ -84,8 +85,9 @@ public class KerberosTokenAssertionState extends TokenAssertionState {
 
         String namespace = getAssertion().getName().getNamespaceURI();
         if (kerberosToken.isRequireKeyIdentifierReference()) {
-            if (!WSSecurityTokenConstants.KEYIDENTIFIER_EMBEDDED_KEY_IDENTIFIER_REF.equals(kerberosServiceSecurityToken.getKeyIdentifier())) {
-                setErrorMessage("Policy enforces KeyIdentifierReference but we got " + kerberosServiceSecurityToken.getKeyIdentifier());
+            KeyIdentifier kerberosKeyIdentifier = kerberosServiceSecurityToken.getKeyIdentifier();
+            if (!WSSecurityTokenConstants.KEYIDENTIFIER_EMBEDDED_KEY_IDENTIFIER_REF.equals(kerberosKeyIdentifier)) {
+                setErrorMessage("Policy enforces KeyIdentifierReference but we got " + kerberosKeyIdentifier);
                 getPolicyAsserter().unassertPolicy(new QName(namespace, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE),
                                                  getErrorMessage());
                 return false;
