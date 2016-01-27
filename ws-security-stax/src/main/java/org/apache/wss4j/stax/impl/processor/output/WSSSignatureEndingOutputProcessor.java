@@ -226,8 +226,7 @@ public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOu
 
                     if (getSecurityProperties().isAddExcC14NInclusivePrefixes()
                             && !WSSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(transform)
-                            && !WSSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(transform))
-                    {
+                            && !WSSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(transform)) {
                         attributes = new ArrayList<>(1);
                         attributes.add(createAttribute(XMLSecurityConstants.ATT_NULL_PrefixList, 
                                                        signaturePartDef.getInclusiveNamespacesPrefixes()));

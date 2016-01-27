@@ -357,7 +357,7 @@ public class WSDocInfo {
         private final String idNamespace;
         private final Element token;
 
-        public TokenValue(String idName, String idNamespace, Element token) {
+        TokenValue(String idName, String idNamespace, Element token) {
             this.idName = idName;
             this.idNamespace = idNamespace;
             this.token = token;

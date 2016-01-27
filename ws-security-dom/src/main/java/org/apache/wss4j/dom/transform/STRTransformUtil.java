@@ -57,8 +57,7 @@ public final class STRTransformUtil {
      *             cert
      */
     public static Element dereferenceSTR(Document doc,
-            SecurityTokenReference secRef, WSDocInfo wsDocInfo) throws WSSecurityException
-    {
+            SecurityTokenReference secRef, WSDocInfo wsDocInfo) throws WSSecurityException {
         //
         // First case: direct reference, according to chap 7.2 of OASIS WS
         // specification (main document). Only in this case return a true

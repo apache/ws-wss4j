@@ -117,7 +117,7 @@ public class WSSecurityException extends XMLSecurityException {
 
         private QName qName;
 
-        private ErrorCode(QName qName) {
+        ErrorCode(QName qName) {
             this.qName = qName;
         }
 
