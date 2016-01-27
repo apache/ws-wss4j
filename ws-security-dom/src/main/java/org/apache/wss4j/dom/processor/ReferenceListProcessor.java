@@ -49,7 +49,7 @@ import org.apache.wss4j.dom.str.STRParserParameters;
 import org.apache.wss4j.dom.str.STRParserResult;
 import org.apache.wss4j.dom.str.SecurityTokenRefSTRParser;
 import org.apache.wss4j.dom.util.EncryptionUtils;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.dom.util.SignatureUtils;
 import org.apache.wss4j.dom.util.X509Util;
 
 public class ReferenceListProcessor implements Processor {
@@ -133,7 +133,7 @@ public class ReferenceListProcessor implements Processor {
         if (encryptedDataElement != null && data.isRequireSignedEncryptedDataElements()) {
             List<WSSecurityEngineResult> signedResults =
                 wsDocInfo.getResultsByTag(WSConstants.SIGN);
-            WSSecurityUtil.verifySignedElement(encryptedDataElement, signedResults);
+            SignatureUtils.verifySignedElement(encryptedDataElement, signedResults);
         }
         //
         // Prepare the SecretKey object to decrypt EncryptedData

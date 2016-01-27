@@ -23,11 +23,8 @@ import org.apache.wss4j.dom.SOAP11Constants;
 import org.apache.wss4j.dom.SOAP12Constants;
 import org.apache.wss4j.dom.SOAPConstants;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSDataRef;
-import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.callback.CallbackLookup;
 import org.apache.wss4j.dom.engine.WSSConfig;
-import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
@@ -526,50 +523,6 @@ public final class WSSecurityUtil {
                     "empty", new Object[] {"Error in generating nonce of length " + length}
             );
         }
-    }
-
-    public static void verifySignedElement(Element elem, WSDocInfo wsDocInfo)
-        throws WSSecurityException {
-        verifySignedElement(elem, wsDocInfo.getResultsByTag(WSConstants.SIGN));
-    }
-
-    public static void verifySignedElement(Element elem, List<WSSecurityEngineResult> signedResults)
-        throws WSSecurityException {
-        if (signedResults != null) {
-            for (WSSecurityEngineResult signedResult : signedResults) {
-                @SuppressWarnings("unchecked")
-                List<WSDataRef> dataRefs =
-                    (List<WSDataRef>)signedResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
-                if (dataRefs != null) {
-                    for (WSDataRef dataRef : dataRefs) {
-                        if (isElementOrAncestorSigned(elem, dataRef.getProtectedElement())) {
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-
-        throw new WSSecurityException(
-            WSSecurityException.ErrorCode.FAILED_CHECK, "elementNotSigned",
-            new Object[] {elem});
-    }
-
-    /**
-     * Does the current element or some ancestor of it correspond to the known "signedElement"?
-     */
-    private static boolean isElementOrAncestorSigned(Element elem, Element signedElement)
-        throws WSSecurityException {
-        final Element envelope = elem.getOwnerDocument().getDocumentElement();
-        Node cur = elem;
-        while (!cur.isSameNode(envelope)) {
-            if (cur.getNodeType() == Node.ELEMENT_NODE && cur.equals(signedElement)) {
-                return true;
-            }
-            cur = cur.getParentNode();
-        }
-
-        return false;
     }
 
     public static byte[] getBytesFromAttachment(
