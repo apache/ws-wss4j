@@ -189,7 +189,7 @@ public enum BSPRule {
 
     private final String msg;
 
-    private BSPRule(String msg) {
+    BSPRule(String msg) {
         this.msg = msg;
     }
 

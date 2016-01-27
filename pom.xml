@@ -157,10 +157,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.15</version>
+                <version>2.17</version>
                 <configuration>
                     <configLocation>${buildtools.dir}/wss4j-checkstyle.xml</configLocation>
                     <includeTestSourceDirectory>false</includeTestSourceDirectory>
+                    <includeTestResources>false</includeTestResources>
                     <encoding>UTF-8</encoding>
                     <failOnViolation>true</failOnViolation>
                 </configuration>

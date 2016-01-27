@@ -289,7 +289,7 @@ public class WSSSignatureOutputProcessor extends AbstractSignatureOutputProcesso
 
     class InternalWSSSignatureOutputProcessor extends InternalSignatureOutputProcessor {
 
-        public InternalWSSSignatureOutputProcessor(SignaturePartDef signaturePartDef, XMLSecStartElement xmlSecStartElement) 
+        InternalWSSSignatureOutputProcessor(SignaturePartDef signaturePartDef, XMLSecStartElement xmlSecStartElement) 
             throws XMLSecurityException {
             super(signaturePartDef, xmlSecStartElement);
             this.addBeforeProcessor(InternalWSSSignatureOutputProcessor.class.getName());

@@ -67,7 +67,7 @@ public class EHCacheReplayCache implements ReplayCache {
 
     private static class RefCountCache extends Cache {
         private AtomicInteger count = new AtomicInteger();
-        public RefCountCache(CacheConfiguration cc) {
+        RefCountCache(CacheConfiguration cc) {
             super(cc);
         }
         public int incrementAndGet() {

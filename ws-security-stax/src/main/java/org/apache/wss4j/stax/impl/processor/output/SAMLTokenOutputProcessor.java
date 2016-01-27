@@ -331,7 +331,7 @@ public class SAMLTokenOutputProcessor extends AbstractOutputProcessor {
         private Element ref;
         private FinalSAMLTokenOutputProcessor finalSAMLTokenOutputProcessor;
         
-        public SAMLSecurityTokenProvider(SAMLKeyInfo samlKeyInfo, SAMLCallback samlCallback, String tokenId,
+        SAMLSecurityTokenProvider(SAMLKeyInfo samlKeyInfo, SAMLCallback samlCallback, String tokenId,
                                          Element ref, FinalSAMLTokenOutputProcessor finalSAMLTokenOutputProcessor) {
             this.samlKeyInfo = samlKeyInfo;
             this.samlCallback = samlCallback;
