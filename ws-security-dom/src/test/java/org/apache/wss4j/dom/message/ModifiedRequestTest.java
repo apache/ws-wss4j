@@ -46,6 +46,7 @@ import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.saml.WSSecSignatureSAML;
+import org.apache.wss4j.dom.util.SignatureUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.junit.Test;
@@ -207,7 +208,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         List<WSSecurityEngineResult> signedResults =
             results.getActionResults().get(WSConstants.SIGN);
         try {
-            WSSecurityUtil.verifySignedElement((Element)valueNode, signedResults);
+            SignatureUtils.verifySignedElement((Element)valueNode, signedResults);
             fail("Failure expected on the required element not being signed");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_CHECK);

@@ -43,11 +43,10 @@ import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.callback.DOMCallbackLookup;
 import org.apache.wss4j.dom.transform.AttachmentTransformParameterSpec;
 import org.apache.wss4j.dom.transform.STRTransform;
+import org.apache.wss4j.dom.util.SignatureUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 
 /**
  * This is the base class for WS Security messages that are used for signature generation or
@@ -287,48 +286,7 @@ public class WSSecSignatureBase extends WSSecBase {
      * Get the List of inclusive prefixes from the DOM Element argument
      */
     public List<String> getInclusivePrefixes(Element target, boolean excludeVisible) {
-        List<String> result = new ArrayList<>();
-        Node parent = target;
-        while (parent.getParentNode() != null 
-            && !(Node.DOCUMENT_NODE == parent.getParentNode().getNodeType())) {
-            parent = parent.getParentNode();
-            NamedNodeMap attributes = parent.getAttributes();
-            for (int i = 0; i < attributes.getLength(); i++) {
-                Node attribute = attributes.item(i);
-                if (WSConstants.XMLNS_NS.equals(attribute.getNamespaceURI())) {
-                    if ("xmlns".equals(attribute.getNodeName())) {
-                        result.add("#default");
-                    } else {
-                        result.add(attribute.getLocalName());
-                    }
-                }
-            }
-        }
-
-        if (excludeVisible) {
-            NamedNodeMap attributes = target.getAttributes();
-            for (int i = 0; i < attributes.getLength(); i++) {
-                Node attribute = attributes.item(i);
-                if (WSConstants.XMLNS_NS.equals(attribute.getNamespaceURI())) {
-                    if ("xmlns".equals(attribute.getNodeName())) {
-                        result.remove("#default");
-                    } else {
-                        result.remove(attribute.getLocalName());
-                    }
-                }
-                if (attribute.getPrefix() != null) {
-                    result.remove(attribute.getPrefix());
-                }
-            }
-
-            if (target.getPrefix() == null) {
-                result.remove("#default");
-            } else {
-                result.remove(target.getPrefix());
-            }
-        }
-
-        return result;
+        return SignatureUtils.getInclusivePrefixes(target, excludeVisible);
     }
 
     /**
