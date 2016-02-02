@@ -21,6 +21,7 @@ package org.apache.wss4j.stax.impl.processor.output;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.security.spec.AlgorithmParameterSpec;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
@@ -45,6 +45,8 @@ import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.utils.WSSUtils;
+import org.apache.xml.security.algorithms.JCEMapper;
+import org.apache.xml.security.encryption.XMLCipherUtil;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.config.JCEAlgorithmMapper;
 import org.apache.xml.security.stax.config.TransformerAlgorithmMapper;
@@ -263,15 +265,13 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
                 Cipher cipher = null;
                 try {
                     cipher = Cipher.getInstance(jceAlgorithm);
+                    
+                    int ivLen = JCEMapper.getIVLengthFromURI(encryptionSymAlgorithm) / 8;
+                    byte[] iv = XMLSecurityConstants.generateBytes(ivLen);
+                    AlgorithmParameterSpec paramSpec = 
+                        XMLCipherUtil.constructBlockCipherParameters(encryptionSymAlgorithm, iv, this.getClass());
+                    cipher.init(Cipher.ENCRYPT_MODE, encryptionPartDef.getSymmetricKey(), paramSpec);
 
-                    // The Spec mandates a 96-bit IV for GCM algorithms
-                    if ("AES/GCM/NoPadding".equals(cipher.getAlgorithm())) {
-                        byte[] temp = XMLSecurityConstants.generateBytes(12);
-                        IvParameterSpec ivParameterSpec = new IvParameterSpec(temp);
-                        cipher.init(Cipher.ENCRYPT_MODE, encryptionPartDef.getSymmetricKey(), ivParameterSpec);
-                    } else {
-                        cipher.init(Cipher.ENCRYPT_MODE, encryptionPartDef.getSymmetricKey());
-                    }
                 } catch (Exception e) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
                 }
