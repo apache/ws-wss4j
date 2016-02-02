@@ -478,6 +478,78 @@ public class AttachmentTest extends AbstractTestBase {
         Map<String, String> attHeaders = responseAttachment.getHeaders();
         Assert.assertEquals(6, attHeaders.size());
     }
+    
+    @Test
+    public void testXMLAttachmentContentEncryptionGCM() throws Exception {
+
+        final String attachmentId = UUID.randomUUID().toString();
+        final Attachment attachment = new Attachment();
+        attachment.setMimeType("text/xml");
+        attachment.addHeaders(getHeaders(attachmentId));
+        attachment.setId(attachmentId);
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        AttachmentCallbackHandler attachmentCallbackHandler =
+            new AttachmentCallbackHandler(Collections.singletonList(attachment));
+        List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
+            actions.add(WSSConstants.ENCRYPT);
+            securityProperties.setActions(actions);
+            securityProperties.loadEncryptionKeystore(this.getClass().getClassLoader().getResource("transmitter.jks"), "default".toCharArray());
+            securityProperties.setEncryptionUser("receiver");
+            securityProperties.addEncryptionPart(new SecurePart(new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"), SecurePart.Modifier.Content));
+            securityProperties.addEncryptionPart(new SecurePart("cid:Attachments", SecurePart.Modifier.Content));
+            securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
+            securityProperties.setEncryptionSymAlgorithm(WSSConstants.NS_XENC11_AES128_GCM);
+
+            OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
+            XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
+            xmlStreamWriter.close();
+
+            Document securedDoc = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            
+            NodeList references = securedDoc.getElementsByTagNameNS(WSConstants.ENC_NS, "DataReference");
+            Assert.assertEquals(2, references.getLength());
+            NodeList cipherReferences = securedDoc.getElementsByTagNameNS(WSConstants.ENC_NS, "CipherReference");
+            Assert.assertEquals(1, cipherReferences.getLength());
+            NodeList encDatas = securedDoc.getElementsByTagNameNS(WSConstants.ENC_NS, "EncryptedData");
+            Assert.assertEquals(2, encDatas.getLength());
+
+            NodeList securityHeaderElement = securedDoc.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
+            Assert.assertEquals(1, securityHeaderElement.getLength());
+            NodeList childs = securityHeaderElement.item(0).getChildNodes();
+            Assert.assertEquals(2, childs.getLength());
+            Assert.assertEquals(childs.item(0).getLocalName(), "EncryptedKey");
+            Assert.assertEquals(childs.item(1).getLocalName(), "EncryptedData");
+        }
+
+        attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
+        {
+            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+            securityProperties.loadDecryptionKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
+            securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+            securityProperties.setAttachmentCallbackHandler(attachmentCallbackHandler);
+
+            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
+            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
+            StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
+        }
+
+        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
+
+        byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
+        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        Assert.assertEquals("text/xml", responseAttachment.getMimeType());
+
+        Map<String, String> attHeaders = responseAttachment.getHeaders();
+        Assert.assertEquals(6, attHeaders.size());
+    }
 
     @Test
     public void testInvalidXMLAttachmentContentEncryption() throws Exception {
@@ -1251,4 +1323,5 @@ public class AttachmentTest extends AbstractTestBase {
             }
         }
     }
+    
 }

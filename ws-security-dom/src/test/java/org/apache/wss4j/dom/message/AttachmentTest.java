@@ -420,6 +420,68 @@ public class AttachmentTest extends org.junit.Assert {
     }
 
     @org.junit.Test
+    public void testXMLAttachmentContentEncryptionGCM() throws Exception {
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecEncrypt encrypt = new WSSecEncrypt();
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        encrypt.setSymmetricEncAlgorithm(WSConstants.AES_128_GCM);
+
+        WSSecHeader secHeader = new WSSecHeader();
+        secHeader.insertSecurityHeader(doc);
+
+        List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+        parts.add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
+        parts.add(new WSEncryptionPart("cid:Attachments", "Content"));
+        encrypt.setParts(parts);
+
+        String attachmentId = UUID.randomUUID().toString();
+        final Attachment attachment = new Attachment();
+        attachment.setMimeType("text/xml");
+        attachment.addHeaders(getHeaders(attachmentId));
+        attachment.setId(attachmentId);
+        attachment.setSourceStream(new ByteArrayInputStream(SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+
+        AttachmentCallbackHandler attachmentCallbackHandler =
+            new AttachmentCallbackHandler(Collections.singletonList(attachment));
+        encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
+        List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
+
+        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+
+        if (LOG.isDebugEnabled()) {
+            String outputString = XMLUtils.PrettyDocumentToString(encryptedDoc);
+            LOG.debug(outputString);
+        }
+
+        NodeList references = doc.getElementsByTagNameNS(WSConstants.ENC_NS, "DataReference");
+        Assert.assertEquals(2, references.getLength());
+        NodeList cipherReferences = doc.getElementsByTagNameNS(WSConstants.ENC_NS, "CipherReference");
+        Assert.assertEquals(1, cipherReferences.getLength());
+        NodeList encDatas = doc.getElementsByTagNameNS(WSConstants.ENC_NS, "EncryptedData");
+        Assert.assertEquals(2, encDatas.getLength());
+
+        NodeList securityHeaderElement = doc.getElementsByTagNameNS(WSConstants.WSSE_NS, "Security");
+        Assert.assertEquals(1, securityHeaderElement.getLength());
+        NodeList childs = securityHeaderElement.item(0).getChildNodes();
+        Assert.assertEquals(2, childs.getLength());
+        Assert.assertEquals(childs.item(0).getLocalName(), "EncryptedKey");
+        Assert.assertEquals(childs.item(1).getLocalName(), "EncryptedData");
+
+        attachmentCallbackHandler = new AttachmentCallbackHandler(encryptedAttachments);
+        verify(encryptedDoc, attachmentCallbackHandler);
+
+        Assert.assertFalse(attachmentCallbackHandler.getResponseAttachments().isEmpty());
+        Attachment responseAttachment = attachmentCallbackHandler.getResponseAttachments().get(0);
+        byte[] attachmentBytes = readInputStream(responseAttachment.getSourceStream());
+        Assert.assertTrue(Arrays.equals(attachmentBytes, SOAPUtil.SAMPLE_SOAP_MSG.getBytes("UTF-8")));
+        Assert.assertEquals("text/xml", responseAttachment.getMimeType());
+
+        Map<String, String> attHeaders = responseAttachment.getHeaders();
+        Assert.assertEquals(6, attHeaders.size());
+    }
+    
+    @org.junit.Test
     public void testInvalidXMLAttachmentContentEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecEncrypt encrypt = new WSSecEncrypt();

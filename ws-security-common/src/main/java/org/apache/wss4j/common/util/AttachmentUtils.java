@@ -20,12 +20,12 @@ package org.apache.wss4j.common.util;
 
 import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.algorithms.JCEMapper;
+import org.apache.xml.security.encryption.XMLCipherUtil;
 import org.apache.xml.security.stax.impl.util.MultiInputStream;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
-import javax.crypto.spec.IvParameterSpec;
 import javax.mail.internet.MimeUtility;
 
 import java.io.*;
@@ -33,6 +33,7 @@ import java.net.URLDecoder;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.spec.AlgorithmParameterSpec;
 import java.util.*;
 
 public final class AttachmentUtils {
@@ -484,20 +485,19 @@ public final class AttachmentUtils {
             private boolean firstRead = true;
 
             private void initCipher() throws IOException {
-                // For now, we only work with Block ciphers, so this will work.
-                // This should probably be put into the JCE mapper.
-                int ivLen = cipher.getBlockSize();
-                if (XMLCipher.AES_128_GCM.equals(encAlgo) || XMLCipher.AES_192_GCM.equals(encAlgo) || XMLCipher.AES_256_GCM.equals(encAlgo)) {
-                    ivLen = 12;
-                }
-
+                int ivLen = JCEMapper.getIVLengthFromURI(encAlgo) / 8;
                 byte[] ivBytes = new byte[ivLen];
-                int read = 0;
-                while ((read += super.in.read(ivBytes, read, ivLen - read)) != ivLen) ; //NOPMD
-                IvParameterSpec iv = new IvParameterSpec(ivBytes);
+
+                int read = super.in.read(ivBytes, 0, ivLen);
+                while (read != ivLen) {
+                    read += super.in.read(ivBytes, read, ivLen - read);
+                }
+                
+                AlgorithmParameterSpec paramSpec = 
+                    XMLCipherUtil.constructBlockCipherParameters(encAlgo, ivBytes, AttachmentUtils.class);
 
                 try {
-                    cipher.init(Cipher.DECRYPT_MODE, key, iv);
+                    cipher.init(Cipher.DECRYPT_MODE, key, paramSpec);
                 } catch (InvalidKeyException e) {
                     throw new IOException(e);
                 } catch (InvalidAlgorithmParameterException e) {

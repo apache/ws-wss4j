@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.message;
 
 import java.security.cert.X509Certificate;
+import java.security.spec.AlgorithmParameterSpec;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +31,6 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -63,8 +63,10 @@ import org.apache.xml.security.encryption.AbstractSerializer;
 import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.TransformSerializer;
 import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.encryption.XMLCipherUtil;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.keys.KeyInfo;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.utils.Base64;
 import org.apache.xml.security.utils.EncryptionConstants;
 
@@ -654,17 +656,13 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         String jceAlgorithm = JCEMapper.translateURItoJCEID(encryptionAlgorithm);
         try {
             Cipher cipher = Cipher.getInstance(jceAlgorithm);
+            
+            int ivLen = JCEMapper.getIVLengthFromURI(encryptionAlgorithm) / 8;
+            byte[] iv = XMLSecurityConstants.generateBytes(ivLen);
+            AlgorithmParameterSpec paramSpec = 
+                XMLCipherUtil.constructBlockCipherParameters(encryptionAlgorithm, iv, WSSecEncrypt.class);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey, paramSpec);
 
-            // The Spec mandates a 96-bit IV for GCM algorithms
-            if (XMLCipher.AES_128_GCM.equals(encryptionAlgorithm)
-                || XMLCipher.AES_192_GCM.equals(encryptionAlgorithm)
-                || XMLCipher.AES_256_GCM.equals(encryptionAlgorithm)) {
-                byte[] iv = WSSecurityUtil.generateNonce(12);
-                IvParameterSpec paramSpec = new IvParameterSpec(iv);
-                cipher.init(Cipher.ENCRYPT_MODE, secretKey, paramSpec);
-            } else {
-                cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-            }
             return cipher;
         } catch (Exception e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, e);
