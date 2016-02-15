@@ -193,6 +193,7 @@ public class SignatureProcessor implements Processor {
         if ((certs == null || certs.length == 0 || certs[0] == null)
             && secretKey == null
             && publicKey == null) {
+            LOG.debug("No certificates or keys were found with which to validate the signature");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
         }
 
