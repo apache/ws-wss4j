@@ -120,7 +120,8 @@ public final class WSSecurityUtil {
         ) {
             if (Node.ELEMENT_NODE == currentChild.getNodeType()
                 && WSConstants.WSSE_LN.equals(currentChild.getLocalName())
-                && WSConstants.WSSE_NS.equals(currentChild.getNamespaceURI())) {
+                && (WSConstants.WSSE_NS.equals(currentChild.getNamespaceURI())
+                    || WSConstants.OLD_WSSE_NS.equals(currentChild.getNamespaceURI()))) {
 
                 Element elem = (Element)currentChild;
                 Attr attr = elem.getAttributeNodeNS(soapNamespace, actorLocal);
