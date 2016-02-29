@@ -468,7 +468,7 @@ public class Merlin extends CryptoBase {
                             );
                     } catch (Exception ex) {
                         LOG.debug("The keystore provider '" + keyStoreProvider + "' does not support X.509 because \""
-                                + ex.getMessage() + "\". As next your JVM's default provider is tried out!", ex);
+                                + ex.getMessage() + "\". The JVM default provider will be tried out next", ex);
                         //Ignore, we'll just use the default since they didn't specify one.
                         //Hopefully that will work for them.
                     }
