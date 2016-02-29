@@ -317,7 +317,6 @@ public class Merlin extends CryptoBase {
         }
     }
 
-
     /**
      * Load a KeyStore object as an InputStream, using the ClassLoader and location arguments
      */
@@ -468,7 +467,8 @@ public class Merlin extends CryptoBase {
                                 "X.509", mapKeystoreProviderToCertProvider(keyStoreProvider)
                             );
                     } catch (Exception ex) {
-                        LOG.debug(ex.getMessage(), ex);
+                        LOG.debug("The keystore provider '" + keyStoreProvider + "' does not support X.509 because \""
+                                + ex.getMessage() + "\". As next your JVM's default provider is tried out!", ex);
                         //Ignore, we'll just use the default since they didn't specify one.
                         //Hopefully that will work for them.
                     }
