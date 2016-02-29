@@ -93,7 +93,7 @@ public class WSSecEncryptedKey extends WSSecBase {
     /**
      * Algorithm used to encrypt the ephemeral key
      */
-    private String keyEncAlgo = WSConstants.KEYTRANSPORT_RSAOEP;
+    private String keyEncAlgo = WSConstants.KEYTRANSPORT_RSAOAEP;
 
     /**
      * Algorithm to be used with the ephemeral key
@@ -247,15 +247,15 @@ public class WSSecEncryptedKey extends WSSecBase {
         Cipher cipher = KeyUtils.getCipherInstance(keyEncAlgo);
         try {
             OAEPParameterSpec oaepParameterSpec = null;
-            if (WSConstants.KEYTRANSPORT_RSAOEP.equals(keyEncAlgo)
-                    || WSConstants.KEYTRANSPORT_RSAOEP_XENC11.equals(keyEncAlgo)) {
+            if (WSConstants.KEYTRANSPORT_RSAOAEP.equals(keyEncAlgo)
+                    || WSConstants.KEYTRANSPORT_RSAOAEP_XENC11.equals(keyEncAlgo)) {
                 String jceDigestAlgorithm = "SHA-1";
                 if (digestAlgo != null) {
                     jceDigestAlgorithm = JCEMapper.translateURItoJCEID(digestAlgo);
                 }
 
                 MGF1ParameterSpec mgf1ParameterSpec = new MGF1ParameterSpec("SHA-1");
-                if (WSConstants.KEYTRANSPORT_RSAOEP_XENC11.equals(keyEncAlgo)) {
+                if (WSConstants.KEYTRANSPORT_RSAOAEP_XENC11.equals(keyEncAlgo)) {
                     if (WSConstants.MGF_SHA224.equals(mgfAlgo)) {
                         mgf1ParameterSpec = new MGF1ParameterSpec("SHA-224");
                     } else if (WSConstants.MGF_SHA256.equals(mgfAlgo)) {
@@ -709,7 +709,7 @@ public class WSSecEncryptedKey extends WSSecBase {
             digestElement.setAttributeNS(null, "Algorithm", digestAlgo);
             encryptionMethod.appendChild(digestElement);
         }
-        if (WSConstants.KEYTRANSPORT_RSAOEP_XENC11.equals(keyEncAlgo) && mgfAlgo != null) {
+        if (WSConstants.KEYTRANSPORT_RSAOAEP_XENC11.equals(keyEncAlgo) && mgfAlgo != null) {
             Element mgfElement =
                 doc.createElementNS(WSConstants.ENC11_NS, WSConstants.ENC11_PREFIX + ":MGF");
             mgfElement.setAttributeNS(null, "Algorithm", mgfAlgo);

@@ -294,8 +294,8 @@ public class EncryptedKeyProcessor implements Processor {
         Cipher cipher = KeyUtils.getCipherInstance(encryptedKeyTransportMethod);
         try {
             OAEPParameterSpec oaepParameterSpec = null;
-            if (WSConstants.KEYTRANSPORT_RSAOEP.equals(encryptedKeyTransportMethod)
-                || WSConstants.KEYTRANSPORT_RSAOEP_XENC11.equals(encryptedKeyTransportMethod)) {
+            if (WSConstants.KEYTRANSPORT_RSAOAEP.equals(encryptedKeyTransportMethod)
+                || WSConstants.KEYTRANSPORT_RSAOAEP_XENC11.equals(encryptedKeyTransportMethod)) {
                 // Get the DigestMethod if it exists
                 String digestAlgorithm = EncryptionUtils.getDigestAlgorithm(encryptedKeyElement);
                 String jceDigestAlgorithm = "SHA-1";
@@ -304,7 +304,7 @@ public class EncryptedKeyProcessor implements Processor {
                 }
 
                 MGF1ParameterSpec mgfParameterSpec = new MGF1ParameterSpec("SHA-1");
-                if (WSConstants.KEYTRANSPORT_RSAOEP_XENC11.equals(encryptedKeyTransportMethod)) {
+                if (WSConstants.KEYTRANSPORT_RSAOAEP_XENC11.equals(encryptedKeyTransportMethod)) {
                     String mgfAlgorithm = EncryptionUtils.getMGFAlgorithm(encryptedKeyElement);
                     if (WSConstants.MGF_SHA224.equals(mgfAlgorithm)) {
                         mgfParameterSpec = new MGF1ParameterSpec("SHA-224");
@@ -618,8 +618,8 @@ public class EncryptedKeyProcessor implements Processor {
 
         // EncryptionAlgorithm must be RSA15, or RSAOEP.
         if (!(WSConstants.KEYTRANSPORT_RSA15.equals(encAlgo)
-            || WSConstants.KEYTRANSPORT_RSAOEP.equals(encAlgo)
-            || WSConstants.KEYTRANSPORT_RSAOEP_XENC11.equals(encAlgo))) {
+            || WSConstants.KEYTRANSPORT_RSAOAEP.equals(encAlgo)
+            || WSConstants.KEYTRANSPORT_RSAOAEP_XENC11.equals(encAlgo))) {
             bspEnforcer.handleBSPRule(BSPRule.R5621);
         }
     }

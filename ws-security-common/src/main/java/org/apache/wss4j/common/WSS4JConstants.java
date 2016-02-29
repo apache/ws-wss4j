@@ -104,9 +104,9 @@ public class WSS4JConstants {
 
     public static final String KEYTRANSPORT_RSA15 =
         "http://www.w3.org/2001/04/xmlenc#rsa-1_5";
-    public static final String KEYTRANSPORT_RSAOEP =
+    public static final String KEYTRANSPORT_RSAOAEP =
         "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p";
-    public static final String KEYTRANSPORT_RSAOEP_XENC11 =
+    public static final String KEYTRANSPORT_RSAOAEP_XENC11 =
         "http://www.w3.org/2009/xmlenc11#rsa-oaep";
     public static final String TRIPLE_DES =
         "http://www.w3.org/2001/04/xmlenc#tripledes-cbc";

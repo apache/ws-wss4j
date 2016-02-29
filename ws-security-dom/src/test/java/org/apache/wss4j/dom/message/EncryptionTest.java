@@ -192,7 +192,7 @@ public class EncryptionTest extends org.junit.Assert {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
-        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOEP);
+        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
@@ -225,7 +225,7 @@ public class EncryptionTest extends org.junit.Assert {
     public void testEncryptionDecryptionPublicKey() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
-        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOEP);
+        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
@@ -670,7 +670,7 @@ public class EncryptionTest extends org.junit.Assert {
     public void testEncryptionDecryptionOAEPSHA256() throws Exception {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("wss40");
-        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOEP);
+        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP);
         builder.setDigestAlgorithm(WSConstants.SHA256);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -702,7 +702,7 @@ public class EncryptionTest extends org.junit.Assert {
         WSSecEncrypt builder = new WSSecEncrypt();
         builder.setUserInfo("regexp");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOEP);
+        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();

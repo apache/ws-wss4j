@@ -127,7 +127,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_192_GCM);
-        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOEP_XENC11);
+        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP_XENC11);
         builder.setDigestAlgorithm(WSConstants.SHA256);
         builder.setMGFAlgorithm(WSConstants.MGF_SHA256);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
