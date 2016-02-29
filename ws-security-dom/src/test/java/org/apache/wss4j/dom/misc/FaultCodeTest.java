@@ -101,7 +101,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
             fail("Failure expected on an unsupported algorithm");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM);
-            assertEquals("unsupported key transport encryption algorithm: No such algorithm: Bad Algorithm", ex.getMessage());
+            assertEquals("unsupported key transport encryption algorithm: No such algorithm: \"Bad Algorithm\"", ex.getMessage());
             QName faultCode = new QName(WSConstants.WSSE_NS, "UnsupportedAlgorithm");
             assertTrue(ex.getFaultCode().equals(faultCode));
         }

@@ -136,7 +136,7 @@ public final class KeyUtils {
         } catch (NoSuchPaddingException ex) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex, "unsupportedKeyTransp",
-                new Object[] {"No such padding: " + cipherAlgo});
+                new Object[] {"No such padding: \"" + cipherAlgo + "\""});
         } catch (NoSuchAlgorithmException ex) {
             // Check to see if an RSA OAEP MGF-1 with SHA-1 algorithm was requested
             // Some JDKs don't support RSA/ECB/OAEPPadding
@@ -146,17 +146,17 @@ public final class KeyUtils {
                 } catch (Exception e) {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, e, "unsupportedKeyTransp",
-                        new Object[] {"No such algorithm: " + cipherAlgo});
+                        new Object[] {"No such algorithm: \"" + cipherAlgo + "\""});
                 }
             } else {
                 throw new WSSecurityException(
                     WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex, "unsupportedKeyTransp",
-                    new Object[] {"No such algorithm: " + cipherAlgo});
+                    new Object[] {"No such algorithm: \"" + cipherAlgo + "\""});
             }
         } catch (NoSuchProviderException ex) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex, "unsupportedKeyTransp",
-                new Object[] {"No such provider " + JCEMapper.getProviderId() + " for: " + cipherAlgo});
+                new Object[] {"No such provider " + JCEMapper.getProviderId() + " for: \"" + cipherAlgo + "\""});
         }
     }
 
