@@ -278,7 +278,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
     private AlgorithmSuite createAlgorithmSuite() {
         AlgorithmSuite algorithmSuite = new AlgorithmSuite();
         algorithmSuite.setMinimumAsymmetricKeyLength(512);
-        algorithmSuite.addKeyWrapAlgorithm(WSConstants.KEYTRANSPORT_RSAOEP);
+        algorithmSuite.addKeyWrapAlgorithm(WSConstants.KEYTRANSPORT_RSAOAEP);
         algorithmSuite.addEncryptionMethod(WSConstants.TRIPLE_DES);
 
         return algorithmSuite;

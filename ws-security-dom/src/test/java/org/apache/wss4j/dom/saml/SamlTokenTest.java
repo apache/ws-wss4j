@@ -750,7 +750,7 @@ public class SamlTokenTest extends org.junit.Assert {
         assertTrue(certs != null && certs.length > 0 && certs[0] != null);
 
         encryptElement(doc, assertionElement, WSConstants.AES_128, secretKey,
-                WSConstants.KEYTRANSPORT_RSAOEP, certs[0], false, true);
+                WSConstants.KEYTRANSPORT_RSAOAEP, certs[0], false, true);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -839,7 +839,7 @@ public class SamlTokenTest extends org.junit.Assert {
             (Element)encryptedAssertionElement.getElementsByTagNameNS(WSConstants.ENC_NS, "EncryptedData").item(0);
         encryptedData.setAttributeNS(null, "Id", id);
 
-        XMLCipher newCipher = XMLCipher.getInstance(WSConstants.KEYTRANSPORT_RSAOEP);
+        XMLCipher newCipher = XMLCipher.getInstance(WSConstants.KEYTRANSPORT_RSAOAEP);
         newCipher.init(XMLCipher.WRAP_MODE, certs[0].getPublicKey());
         EncryptedKey encryptedKey = newCipher.encryptKey(doc, secretKey);
 
@@ -927,7 +927,7 @@ public class SamlTokenTest extends org.junit.Assert {
         assertTrue(certs != null && certs.length > 0 && certs[0] != null);
 
         encryptElement(doc, assertionElement, WSConstants.AES_128, secretKey,
-                WSConstants.KEYTRANSPORT_RSAOEP, certs[0], false, false);
+                WSConstants.KEYTRANSPORT_RSAOAEP, certs[0], false, false);
 
         if (LOG.isDebugEnabled()) {
             String outputString =

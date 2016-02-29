@@ -913,7 +913,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             assertTrue(certs != null && certs.length > 0 && certs[0] != null);
 
             encryptElement(doc, assertionElement, WSConstants.AES_128, secretKey,
-                    WSConstants.KEYTRANSPORT_RSAOEP, certs[0], false);
+                    WSConstants.KEYTRANSPORT_RSAOAEP, certs[0], false);
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
