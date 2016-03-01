@@ -19,24 +19,25 @@
 
 package org.apache.wss4j.common.util;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.xml.security.algorithms.JCEMapper;
+import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.utils.JavaUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.xml.security.algorithms.JCEMapper;
-import org.apache.xml.security.encryption.XMLCipher;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 
 public final class KeyUtils {
     private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(KeyUtils.class);
     private static final int MAX_SYMMETRIC_KEY_SIZE = 1024;
+    public static final String RSA_ECB_OAEPWITH_SHA1_AND_MGF1_PADDING = "RSA/ECB/OAEPWithSHA1AndMGF1Padding";
 
     /**
      * A cached MessageDigest object
@@ -50,7 +51,7 @@ public final class KeyUtils {
     /**
      * Returns the length of the key in # of bytes
      *
-     * @param algorithm
+     * @param algorithm the URI of the algorithm. See http://www.w3.org/TR/xmlenc-core1/
      * @return the key length
      */
     public static int getKeyLength(String algorithm) throws WSSecurityException {
@@ -118,45 +119,86 @@ public final class KeyUtils {
         }
     }
 
-
     /**
      * Translate the "cipherAlgo" URI to a JCE ID, and return a javax.crypto.Cipher instance
      * of this type.
+     * @param cipherAlgo The cipher in it's WSS URI form,
+     *                   ref. https://www.w3.org/TR/xmlenc-core1/#sec-Algorithms
      */
     public static Cipher getCipherInstance(String cipherAlgo)
         throws WSSecurityException {
-        try {
-            String keyAlgorithm = JCEMapper.translateURItoJCEID(cipherAlgo);
-            String provider = JCEMapper.getProviderId();
+        return getCipherInstance(cipherAlgo, null);
+    }
 
+    /**
+     * Translate the "cipherAlgo" URI to a JCE ID, and request a javax.crypto.Cipher instance
+     * of this type from the given provider.
+     *
+     * @param cipherAlgo The cipher in it's WSS URI form, ref. https://www.w3.org/TR/xmlenc-core1/#sec-Algorithms
+     * @param provider   The provider which shall instantiate the cipher.
+     */
+    public static Cipher getCipherInstance(String cipherAlgo, String provider)
+            throws WSSecurityException {
+        String keyAlgorithm = JCEMapper.translateURItoJCEID(cipherAlgo);
+        if (keyAlgorithm == null) {
+            throw new WSSecurityException(
+                    WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, "unsupportedKeyTransp",
+                    new Object[]{"No such algorithm: \"" + cipherAlgo + "\""});
+        }
+
+        if (provider == null) {
+            provider = JCEMapper.getProviderId();
+        } else {
+            JavaUtils.checkRegisterPermission();
+        }
+
+        try {
             if (provider == null) {
                 return Cipher.getInstance(keyAlgorithm);
+            } else {
+                return Cipher.getInstance(keyAlgorithm, provider);
             }
-            return Cipher.getInstance(keyAlgorithm, provider);
-        } catch (NoSuchPaddingException ex) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex, "unsupportedKeyTransp",
-                new Object[] {"No such padding: \"" + cipherAlgo + "\""});
-        } catch (NoSuchAlgorithmException ex) {
-            // Check to see if an RSA OAEP MGF-1 with SHA-1 algorithm was requested
-            // Some JDKs don't support RSA/ECB/OAEPPadding
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
             if (XMLCipher.RSA_OAEP.equals(cipherAlgo)) {
+                // Check to see if an RSA OAEP MGF-1 with SHA-1 algorithm was requested
+                // Some JCE implementations don't support RSA/ECB/OAEPPadding (e.g. nCipherKM of Thales)
                 try {
-                    return Cipher.getInstance("RSA/ECB/OAEPWithSHA1AndMGF1Padding");
-                } catch (Exception e) {
+                    if (provider == null) {
+                        return Cipher.getInstance(RSA_ECB_OAEPWITH_SHA1_AND_MGF1_PADDING);
+                    } else {
+                        return Cipher.getInstance(RSA_ECB_OAEPWITH_SHA1_AND_MGF1_PADDING, provider);
+                    }
+                } catch (NoSuchProviderException ex1) {
+                    throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex1, "unsupportedKeyTransp",
+                        new Object[]{
+                            "No such provider \"" + JCEMapper.getProviderId() + "\" for \""
+                                + RSA_ECB_OAEPWITH_SHA1_AND_MGF1_PADDING + "\""
+                        });
+                } catch (NoSuchPaddingException ex1) {
                     throw new WSSecurityException(
                         WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, e, "unsupportedKeyTransp",
-                        new Object[] {"No such algorithm: \"" + cipherAlgo + "\""});
+                        new Object[]{"No such padding: \"" + RSA_ECB_OAEPWITH_SHA1_AND_MGF1_PADDING + "\""});
+                } catch (NoSuchAlgorithmException ex1) {
+                    throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, e, "unsupportedKeyTransp",
+                        new Object[]{"No such algorithm: \"" + RSA_ECB_OAEPWITH_SHA1_AND_MGF1_PADDING + "\""});
                 }
             } else {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex, "unsupportedKeyTransp",
-                    new Object[] {"No such algorithm: \"" + cipherAlgo + "\""});
+                if (e instanceof NoSuchAlgorithmException) {
+                    throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, e, "unsupportedKeyTransp",
+                        new Object[]{"No such algorithm: \"" + keyAlgorithm + "\""});
+                } else {
+                    throw new WSSecurityException(
+                        WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, e, "unsupportedKeyTransp",
+                        new Object[]{"No such padding: \"" + keyAlgorithm + "\""});
+                }
             }
         } catch (NoSuchProviderException ex) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex, "unsupportedKeyTransp",
-                new Object[] {"No such provider " + JCEMapper.getProviderId() + " for: \"" + cipherAlgo + "\""});
+                new Object[]{"No such provider \"" + JCEMapper.getProviderId() + "\" for \"" + keyAlgorithm + "\""});
         }
     }
 
