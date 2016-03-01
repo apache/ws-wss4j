@@ -291,7 +291,8 @@ public class EncryptedKeyProcessor implements Processor {
         if (data.getDecCrypto() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noDecCryptoFile");
         }
-        Cipher cipher = KeyUtils.getCipherInstance(encryptedKeyTransportMethod);
+        String cryptoProvider = data.getDecCrypto().getCryptoProvider();
+        Cipher cipher = KeyUtils.getCipherInstance(encryptedKeyTransportMethod, cryptoProvider);
         try {
             OAEPParameterSpec oaepParameterSpec = null;
             if (WSConstants.KEYTRANSPORT_RSAOAEP.equals(encryptedKeyTransportMethod)
@@ -328,6 +329,7 @@ public class EncryptedKeyProcessor implements Processor {
                         jceDigestAlgorithm, "MGF1", mgfParameterSpec, pSource
                     );
             }
+
             if (oaepParameterSpec == null) {
                 cipher.init(Cipher.UNWRAP_MODE, privateKey);
             } else {
