@@ -44,9 +44,21 @@ public interface Crypto {
 
     /**
      * Set the crypto provider associated with this implementation
-     * @param provider the crypto provider to set
+     * @param provider the crypto provider name to set
      */
     void setCryptoProvider(String provider);
+
+    /**
+     * Get the crypto provider used for truststore operation associated with this implementation.
+     * @return a crypto provider name
+     */
+    String getTrustProvider();
+
+    /**
+     * Set the crypto provider used for truststore operations associated with this implementation
+     * @param provider the name of the provider
+     */
+    void setTrustProvider(String provider);
 
     /**
      * Retrieves the identifier name of the default certificate. This should be the certificate
