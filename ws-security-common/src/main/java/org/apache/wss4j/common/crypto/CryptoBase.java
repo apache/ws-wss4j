@@ -63,6 +63,7 @@ public abstract class CryptoBase implements Crypto {
     protected CertificateFactory certificateFactory;
     private String defaultAlias;
     private String cryptoProvider;
+    private String trustProvider;
 
     static {
         Constructor<?> cons = null;
@@ -95,6 +96,22 @@ public abstract class CryptoBase implements Crypto {
      */
     public void setCryptoProvider(String provider) {
         cryptoProvider = provider;
+    }
+
+    /**
+     * Set the crypto provider used for truststore operations associated with this implementation
+     * @param provider the name of the provider
+     */
+    public void setTrustProvider(String provider) {
+        trustProvider = provider;
+    }
+
+    /**
+     * Get the crypto provider used for truststore operation associated with this implementation.
+     * @return a crypto provider name
+     */
+    public String getTrustProvider() {
+        return trustProvider;
     }
 
     /**

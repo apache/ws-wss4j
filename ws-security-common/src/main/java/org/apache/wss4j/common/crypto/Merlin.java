@@ -106,6 +106,7 @@ public class Merlin extends CryptoBase {
     public static final String TRUSTSTORE_FILE = "truststore.file";
     public static final String TRUSTSTORE_PASSWORD = "truststore.password";
     public static final String TRUSTSTORE_TYPE = "truststore.type";
+    public static final String TRUSTSTORE_PROVIDER = "truststore.provider";
 
     /*
      * CRL configuration
@@ -177,9 +178,13 @@ public class Merlin extends CryptoBase {
         //
         // Load the provider(s)
         //
-        String provider = properties.getProperty(prefix + CRYPTO_KEYSTORE_PROVIDER);
-        if (provider != null) {
-            provider = provider.trim();
+        String keystoreProvider = this.properties.getProperty(prefix + CRYPTO_KEYSTORE_PROVIDER);
+        if (keystoreProvider != null) {
+            keystoreProvider = keystoreProvider.trim();
+
+            if (keystoreProvider.length() == 0) {
+                keystoreProvider = null;
+            }
         }
         String certProvider = properties.getProperty(prefix + CRYPTO_CERT_PROVIDER);
         if (certProvider != null) {
@@ -210,7 +215,7 @@ public class Merlin extends CryptoBase {
                 if (type != null) {
                     type = type.trim();
                 }
-                keystore = load(is, passwd, provider, type);
+                keystore = load(is, passwd, keystoreProvider, type);
                 if (DO_DEBUG) {
                     LOG.debug(
                         "The KeyStore " + keyStoreLocation + " of type " + type
@@ -231,6 +236,21 @@ public class Merlin extends CryptoBase {
         //
         // Load the TrustStore
         //
+        String trustProvider = this.properties.getProperty(prefix + TRUSTSTORE_PROVIDER);
+        if (trustProvider != null) {
+            trustProvider = trustProvider.trim();
+
+            if (trustProvider.length() == 0) {
+                trustProvider = null;
+            } else {
+                setTrustProvider(trustProvider);
+            }
+        } else if (keystoreProvider != null) {
+            // Fallback to keystore provider for compatibility reason
+            trustProvider = keystoreProvider;
+            setTrustProvider(trustProvider);
+        }
+
         String trustStoreLocation = properties.getProperty(prefix + TRUSTSTORE_FILE);
         if (trustStoreLocation != null) {
             trustStoreLocation = trustStoreLocation.trim();
@@ -245,7 +265,7 @@ public class Merlin extends CryptoBase {
                 if (type != null) {
                     type = type.trim();
                 }
-                truststore = load(is, passwd, provider, type);
+                truststore = load(is, passwd, trustProvider, type);
                 if (DO_DEBUG) {
                     LOG.debug(
                         "The TrustStore " + trustStoreLocation + " of type " + type
@@ -278,6 +298,7 @@ public class Merlin extends CryptoBase {
                 }
             }
         }
+
         //
         // Load the CRL file
         //
@@ -289,7 +310,7 @@ public class Merlin extends CryptoBase {
                 CertificateFactory cf = getCertificateFactory();
                 X509CRL crl = (X509CRL)cf.generateCRL(is);
 
-                if (provider == null || provider.length() == 0) {
+                if (keystoreProvider == null || keystoreProvider.length() == 0) {
                     crlCertStore =
                         CertStore.getInstance(
                             "Collection",
@@ -300,7 +321,7 @@ public class Merlin extends CryptoBase {
                         CertStore.getInstance(
                             "Collection",
                             new CollectionCertStoreParameters(Collections.singletonList(crl)),
-                            provider
+                                keystoreProvider
                         );
                 }
                 if (DO_DEBUG) {
