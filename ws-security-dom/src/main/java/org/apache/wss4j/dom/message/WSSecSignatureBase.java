@@ -133,7 +133,9 @@ public class WSSecSignatureBase extends WSSecBase {
                         }
                         if (addInclusivePrefixes) {
                             List<String> prefixes = getInclusivePrefixes(element);
-                            transformSpec = new ExcC14NParameterSpec(prefixes);
+                            if (!prefixes.isEmpty()) {
+                                transformSpec = new ExcC14NParameterSpec(prefixes);
+                            }
                         }
                         transform =
                             signatureFactory.newTransform(
@@ -180,7 +182,9 @@ public class WSSecSignatureBase extends WSSecBase {
                         TransformParameterSpec transformSpec = null;
                         if (addInclusivePrefixes) {
                             List<String> prefixes = getInclusivePrefixes(elementToSign);
-                            transformSpec = new ExcC14NParameterSpec(prefixes);
+                            if (!prefixes.isEmpty()) {
+                                transformSpec = new ExcC14NParameterSpec(prefixes);
+                            }
                         }
                         Transform transform =
                             signatureFactory.newTransform(
