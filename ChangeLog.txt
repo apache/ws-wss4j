@@ -5,6 +5,34 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.1.5
+=============
+
+Bug
+
+    [WSS-560] - NullPointerException in WSSecEncrypt when encrypted header element has attributes
+    [WSS-562] - Support processing EncryptedAssertions that contain EncryptedKey children
+    [WSS-563] - Cannot decrypt non XML conform attachements
+    [WSS-564] - Allow WS-SecurityPolicy 1.1 tokens to have an optional policy element
+    [WSS-565] - Support the ability to create and process EncryptedKeys that reference a PublicKey
+    [WSS-566] - AES_128_GCM does not work for attachments
+    [WSS-567] - processSecurityHeadaers does not work for 1.1 namespace
+
+Improvement
+
+    [WSS-561] - No way to set SAML Issuer Format Value
+    [WSS-569] - Improvements to error messages
+    [WSS-570] - Typo in the constant name for "RSAOAEP"
+
+New Feature
+
+    [WSS-571] - Truststore Provider
+
+Wish
+
+    [WSS-573] - Ignore IntelliJ user files
+
+
 Release 2.1.4
 =============
 
