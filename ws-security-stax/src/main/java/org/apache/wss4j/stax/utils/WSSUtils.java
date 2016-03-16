@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -257,12 +258,12 @@ public class WSSUtils extends XMLSecurityUtils {
                 abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, encodedCert);
             } else {
                 try {
-                    CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+                    CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509", "BC");
                     List<X509Certificate> certificates = Arrays.asList(x509Certificates);
                     String encodedCert = 
                         new Base64(76, new byte[]{'\n'}).encodeToString(certificateFactory.generateCertPath(certificates).getEncoded());
                     abstractOutputProcessor.createCharactersAndOutputAsEvent(outputProcessorChain, encodedCert);
-                } catch (CertificateException e) {
+                } catch (CertificateException | NoSuchProviderException e) {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
                 }
             }

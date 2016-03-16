@@ -39,7 +39,11 @@ import org.ietf.jgss.Oid;
  * Key Distribution Center.
  */
 public class KerberosClientExceptionAction implements PrivilegedExceptionAction<KerberosContext> {
-    private static final boolean IS_IBM_VENDOR = System.getProperty("java.vendor").startsWith("IBM");
+    private static final String JAVA_VERSION = System.getProperty("java.version");
+    private static final boolean IS_JAVA_5_OR_6 = JAVA_VERSION.startsWith("1.5") || JAVA_VERSION.startsWith("1.6");
+    private static final boolean IS_ORACLE_JAVA_VENDOR = System.getProperty("java.vendor").startsWith("Oracle");
+    private static final boolean IS_IBM_JAVA_VENDOR = System.getProperty("java.vendor").startsWith("IBM");
+    private static final boolean IS_HP_JAVA_VENDOR = System.getProperty("java.vendor").startsWith("Hewlett-Packard");
 
     private static final String SUN_JGSS_INQUIRE_TYPE_CLASS = "com.sun.security.jgss.InquireType";
     private static final String SUN_JGSS_EXT_GSSCTX_CLASS = "com.sun.security.jgss.ExtendedGSSContext";
@@ -113,27 +117,27 @@ public class KerberosClientExceptionAction implements PrivilegedExceptionAction<
         krbCtx.setGssContext(secContext);
         krbCtx.setKerberosToken(returnedToken);
 
-        try {
-            @SuppressWarnings("rawtypes")
-            Class inquireType = Class.forName(IS_IBM_VENDOR ? IBM_JGSS_INQUIRE_TYPE_CLASS 
-                : SUN_JGSS_INQUIRE_TYPE_CLASS);
+        if (!IS_JAVA_5_OR_6 && (IS_ORACLE_JAVA_VENDOR || IS_IBM_JAVA_VENDOR  || IS_HP_JAVA_VENDOR)) {
+            try {
+                @SuppressWarnings("rawtypes")
+                Class inquireType = Class.forName(IS_IBM_JAVA_VENDOR ? IBM_JGSS_INQUIRE_TYPE_CLASS : SUN_JGSS_INQUIRE_TYPE_CLASS);
 
-            @SuppressWarnings("rawtypes")
-            Class extendedGSSContext = Class.forName(IS_IBM_VENDOR ? IBM_JGSS_EXT_GSSCTX_CLASS 
-                : SUN_JGSS_EXT_GSSCTX_CLASS);
+                @SuppressWarnings("rawtypes")
+                Class extendedGSSContext = Class.forName(IS_IBM_JAVA_VENDOR ? IBM_JGSS_EXT_GSSCTX_CLASS : SUN_JGSS_EXT_GSSCTX_CLASS);
 
-            @SuppressWarnings("unchecked")
-            Method inquireSecContext = extendedGSSContext.getMethod("inquireSecContext", inquireType);
+                @SuppressWarnings("unchecked")
+                Method inquireSecContext = extendedGSSContext.getMethod("inquireSecContext", inquireType);
 
-            @SuppressWarnings("unchecked")
-            Key key = (Key) inquireSecContext.invoke(secContext, Enum.valueOf(inquireType, "KRB5_GET_SESSION_KEY"));
+                @SuppressWarnings("unchecked")
+                Key key = (Key) inquireSecContext.invoke(secContext, Enum.valueOf(inquireType, "KRB5_GET_SESSION_KEY"));
 
-            krbCtx.setSecretKey(key);
-        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException
-            | InvocationTargetException e) {
-            throw new WSSecurityException(
-                ErrorCode.FAILURE, e, "kerberosServiceTicketError"
-            );
+                krbCtx.setSecretKey(key);
+            } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException
+                | InvocationTargetException e) {
+                throw new WSSecurityException(
+                    ErrorCode.FAILURE, e, "kerberosServiceTicketError"
+                );
+            }
         }
 
         return krbCtx;

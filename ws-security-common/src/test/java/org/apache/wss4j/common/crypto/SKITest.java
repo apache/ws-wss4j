@@ -21,12 +21,10 @@ package org.apache.wss4j.common.crypto;
 
 import java.io.InputStream;
 import java.security.KeyStore;
-import java.security.Security;
 import java.security.cert.X509Certificate;
 
 import org.apache.wss4j.common.util.Loader;
 import org.apache.xml.security.utils.Base64;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Test;
 
 /**
@@ -80,14 +78,8 @@ public class SKITest extends org.junit.Assert {
 
     @Test
     public void testBouncyCastlePKCS12() throws Exception {
-        try {
-            Security.addProvider(new BouncyCastleProvider());
-
-            // Load the keystore
-            Crypto crypto = CryptoFactory.getInstance("alice_bouncycastle.properties");
-            assertNotNull(crypto);
-        } finally {
-            Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
-        }
+        // Load the keystore
+        Crypto crypto = CryptoFactory.getInstance("alice_bouncycastle.properties");
+        assertNotNull(crypto);
     }
 }

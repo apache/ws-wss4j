@@ -32,7 +32,6 @@ import org.apache.wss4j.dom.message.WSSecEncrypt;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.WSSecSignature;
 import org.apache.xml.security.utils.Base64;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
@@ -41,7 +40,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.security.Security;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
@@ -182,32 +180,26 @@ public class CryptoProviderTest extends org.junit.Assert {
                 + "UyZ50HRroKJx1PPCE+OTO5JYPNQB2rauK63RHGGC94mY2ySCE2KP/yaWhkDJ60X2JKgnTLKUZxLP"
                 + "9IioeHVeUzGIccIicoiZR5kqaiqoEk82V81R+VA="
             );
+        CertificateFactory factory =
+            CertificateFactory.getInstance("X.509", "BC");
+        X509Certificate cert =
+            (X509Certificate)factory.generateCertificate(
+                new ByteArrayInputStream(certBytes)
+            );
 
-        try {
-            Security.addProvider(new BouncyCastleProvider());
-            CertificateFactory factory =
-                CertificateFactory.getInstance("X.509", "BC");
-            X509Certificate cert =
-                (X509Certificate)factory.generateCertificate(
-                    new ByteArrayInputStream(certBytes)
-                );
+        WSSecEncrypt encrypt = new WSSecEncrypt();
+        encrypt.setUseThisCert(cert);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
 
-            WSSecEncrypt encrypt = new WSSecEncrypt();
-            encrypt.setUseThisCert(cert);
-            Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-            WSSecHeader secHeader = new WSSecHeader(doc);
-            secHeader.insertSecurityHeader();
-            Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
-
-            if (LOG.isDebugEnabled()) {
-                String outputString =
-                    XMLUtils.prettyDocumentToString(encryptedDoc);
-                LOG.debug(outputString);
-            }
-            verify(encryptedDoc);
-        } finally {
-            Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
+        if (LOG.isDebugEnabled()) {
+            String outputString =
+                XMLUtils.prettyDocumentToString(encryptedDoc);
+            LOG.debug(outputString);
         }
+        verify(encryptedDoc);
 
     }
 
@@ -237,37 +229,32 @@ public class CryptoProviderTest extends org.junit.Assert {
                 + "HapMIIWiJRclIAiA8Hnb0Sv/puuHYD4G4NWFdiVjRord90eZJe40NMGruRmlqIRIGGKCv+wv3E6U"
                 + "x1cWW862f5H9Eyrcocke2P+3GNAGy83vghA="
             );
+        CertificateFactory factory =
+            CertificateFactory.getInstance("X.509", "BC");
+        X509Certificate cert =
+            (X509Certificate)factory.generateCertificate(
+                new ByteArrayInputStream(certBytes)
+            );
 
-        try {
-            Security.addProvider(new BouncyCastleProvider());
-            CertificateFactory factory =
-                CertificateFactory.getInstance("X.509", "BC");
-            X509Certificate cert =
-                (X509Certificate)factory.generateCertificate(
-                    new ByteArrayInputStream(certBytes)
-                );
+        WSSecEncrypt encrypt = new WSSecEncrypt();
+        encrypt.setUseThisCert(cert);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
 
-            WSSecEncrypt encrypt = new WSSecEncrypt();
-            encrypt.setUseThisCert(cert);
-            Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-            WSSecHeader secHeader = new WSSecHeader(doc);
-            secHeader.insertSecurityHeader();
-            Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
-
-            if (LOG.isDebugEnabled()) {
-                String outputString =
-                    XMLUtils.prettyDocumentToString(encryptedDoc);
-                LOG.debug(outputString);
-            }
-            try {
-                verify(encryptedDoc);
-                fail("Failure expected on encryption with a key that does not exist in the keystore");
-            } catch (WSSecurityException ex) {
-                assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
-            }
-        } finally {
-            Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
+        if (LOG.isDebugEnabled()) {
+            String outputString =
+                XMLUtils.prettyDocumentToString(encryptedDoc);
+            LOG.debug(outputString);
         }
+        try {
+            verify(encryptedDoc);
+            fail("Failure expected on encryption with a key that does not exist in the keystore");
+        } catch (WSSecurityException ex) {
+            assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
+        }
+
     }
 
     /**

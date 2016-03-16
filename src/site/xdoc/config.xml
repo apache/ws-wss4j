@@ -114,10 +114,6 @@ TrustStore properties:
 <td>${PREFIX}.merlin.truststore.type</td>
 <td>The truststore type. Defaults to: java.security.KeyStore.getDefaultType().</td>
 </tr>
-<tr>
-<td>${PREFIX}.merlin.truststore.provider</td>
-<td><b>WSS4J 2.1.5</b> The provider used to load truststores. By default it's the same as the keystore provider. Set to an empty value to force use of the JRE's default provider.</td>
-</tr>
 </table>
  
 </subsection>
