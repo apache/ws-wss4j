@@ -5,6 +5,23 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.0.7
+=============
+
+Bug
+
+    [WSS-560] - NullPointerException in WSSecEncrypt when encrypted header element has attributes
+    [WSS-562] - Support processing EncryptedAssertions that contain EncryptedKey children
+    [WSS-563] - Cannot decrypt non XML conform attachements
+    [WSS-564] - Allow WS-SecurityPolicy 1.1 tokens to have an optional policy element
+    [WSS-566] - AES_128_GCM does not work for attachments
+    [WSS-567] - processSecurityHeadaers does not work for 1.1 namespace
+
+Improvement
+
+    [WSS-561] - No way to set SAML Issuer Format Value
+
+
 Release 2.0.6
 =============
 
