@@ -40,6 +40,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WSSConfig;
+import org.apache.wss4j.dom.WSSecurityEngine;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.handler.RequestData;
@@ -119,7 +120,7 @@ public class EncryptedDataProcessor implements Processor {
             encrKeyResults = new ArrayList<WSSecurityEngineResult>();
         } else if (encryptedKeyElement != null && request.getWssConfig() != null) {
             WSSConfig wssConfig = request.getWssConfig();
-            Processor encrKeyProc = wssConfig.getProcessor(WSConstants.ENCRYPTED_KEY);
+            Processor encrKeyProc = wssConfig.getProcessor(WSSecurityEngine.ENCRYPTED_KEY);
             encrKeyResults = encrKeyProc.handleToken(encryptedKeyElement, request, wsDocInfo);
             byte[] symmKey = 
                 (byte[])encrKeyResults.get(0).get(WSSecurityEngineResult.TAG_SECRET);
