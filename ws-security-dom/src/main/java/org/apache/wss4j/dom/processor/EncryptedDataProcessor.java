@@ -117,8 +117,9 @@ public class EncryptedDataProcessor implements Processor {
             principal = strParser.getPrincipal();
             key = KeyUtils.prepareSecretKey(symEncAlgo, secretKey);
             encrKeyResults = new ArrayList<WSSecurityEngineResult>();
-        } else if (encryptedKeyElement != null) {
-            EncryptedKeyProcessor encrKeyProc = new EncryptedKeyProcessor();
+        } else if (encryptedKeyElement != null && request.getWssConfig() != null) {
+            WSSConfig wssConfig = request.getWssConfig();
+            Processor encrKeyProc = wssConfig.getProcessor(WSConstants.ENCRYPTED_KEY);
             encrKeyResults = encrKeyProc.handleToken(encryptedKeyElement, request, wsDocInfo);
             byte[] symmKey = 
                 (byte[])encrKeyResults.get(0).get(WSSecurityEngineResult.TAG_SECRET);
