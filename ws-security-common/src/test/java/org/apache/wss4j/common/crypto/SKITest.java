@@ -44,6 +44,7 @@ public class SKITest extends org.junit.Assert {
         ClassLoader loader = Loader.getClassLoader(SKITest.class);
         InputStream input = Merlin.loadInputStream(loader, "keys/wss40_server.jks");
         keyStore.load(input, "security".toCharArray());
+        input.close();
         ((Merlin)crypto).setKeyStore(keyStore);
 
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
@@ -64,6 +65,7 @@ public class SKITest extends org.junit.Assert {
         ClassLoader loader = Loader.getClassLoader(SKITest.class);
         InputStream input = Merlin.loadInputStream(loader, "keys/rsa2048.jks");
         keyStore.load(input, "password".toCharArray());
+        input.close();
         ((Merlin)crypto).setKeyStore(keyStore);
 
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);

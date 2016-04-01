@@ -19,6 +19,7 @@
 package org.apache.wss4j.stax.test.saml;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -85,7 +86,10 @@ public class SAMLCallbackHandlerImpl implements CallbackHandler {
             try {
                 SAMLCallback samlCallback = (SAMLCallback) callbacks[0];
                 KeyStore keyStore = KeyStore.getInstance("jks");
-                keyStore.load(this.getClass().getClassLoader().getResourceAsStream("saml/issuer.jks"), "default".toCharArray());
+                InputStream input = this.getClass().getClassLoader().getResourceAsStream("saml/issuer.jks");
+                keyStore.load(input, "default".toCharArray());
+                input.close();
+                
                 Merlin crypto = new Merlin();
                 crypto.setKeyStore(keyStore);
                 samlCallback.setIssuerCrypto(crypto);

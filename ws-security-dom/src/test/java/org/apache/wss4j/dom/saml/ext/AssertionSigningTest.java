@@ -80,6 +80,7 @@ public class AssertionSigningTest extends Assert {
         InputStream input = Merlin.loadInputStream(loader,
                 "keys/client_keystore.jks");
         keyStore.load(input, "password".toCharArray());
+        input.close();
         ((Merlin) issuerCrypto).setKeyStore(keyStore);
 
         dbf = DocumentBuilderFactory.newInstance();

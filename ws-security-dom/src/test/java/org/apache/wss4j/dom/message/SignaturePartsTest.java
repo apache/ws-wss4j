@@ -277,6 +277,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         ClassLoader loader = Loader.getClassLoader(SignedSamlTokenHOKTest.class);
         InputStream input = Merlin.loadInputStream(loader, "keys/wss40_server.jks");
         keyStore.load(input, "security".toCharArray());
+        input.close();
         ((Merlin)issuerCrypto).setKeyStore(keyStore);
 
         Crypto userCrypto = CryptoFactory.getInstance("wss40.properties");
@@ -322,6 +323,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
         input = Merlin.loadInputStream(loader, "keys/wss40CA.jks");
         trustStore.load(input, "security".toCharArray());
+        input.close();
         ((Merlin)trustCrypto).setTrustStore(trustStore);
 
         WSHandlerResult results =

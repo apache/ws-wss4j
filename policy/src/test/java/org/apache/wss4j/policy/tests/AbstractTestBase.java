@@ -57,16 +57,18 @@ public abstract class AbstractTestBase extends org.junit.Assert {
     }
 
     protected String loadPolicyFile(String classpathResource) throws Exception {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(classpathResource), StandardCharsets.UTF_8));
-        StringWriter writer = new StringWriter();
-        char[] buf = new char[1024];
-        int n;
-        while ((n = bufferedReader.read(buf)) != -1) {
-            writer.write(buf, 0, n);
+        try (InputStreamReader isReader = new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(classpathResource), StandardCharsets.UTF_8);
+            BufferedReader bufferedReader = new BufferedReader(isReader);
+            StringWriter writer = new StringWriter()) {
+            char[] buf = new char[1024];
+            int n;
+            while ((n = bufferedReader.read(buf)) != -1) {
+                writer.write(buf, 0, n);
+            }
+            writer.close();
+            bufferedReader.close();
+            return writer.toString();
         }
-        writer.close();
-        bufferedReader.close();
-        return writer.toString();
     }
 
     protected Policy loadPolicy(String policy) throws Exception {
