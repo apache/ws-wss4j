@@ -104,6 +104,7 @@ public class SignatureAKITest extends org.junit.Assert {
         ClassLoader loader = Loader.getClassLoader(SignatureAKITest.class);
         InputStream input = Merlin.loadInputStream(loader, "keys/wss40CADupl.jks");
         keyStore.load(input, "security".toCharArray());
+        input.close();
         caCrypto.setKeyStore(keyStore);
 
         WSHandlerResult results = verify(signedDoc, caCrypto);

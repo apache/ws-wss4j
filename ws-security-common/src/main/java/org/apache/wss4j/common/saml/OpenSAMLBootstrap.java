@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.common.saml;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.opensaml.core.config.Configuration;
@@ -90,6 +91,11 @@ public final class OpenSAMLBootstrap {
                 }
                 if (ins != null) {
                     configurator.load(ins);
+                    try {
+                        ins.close();
+                    } catch (IOException ex) { //NOPMD
+                        // Do nothing
+                    }
                 }
             }
         } finally {

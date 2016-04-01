@@ -18,6 +18,7 @@
  */
 package org.apache.wss4j.stax.test;
 
+import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -723,7 +724,9 @@ public class InboundWSSecurityContextImplTest {
     private X509SecurityTokenImpl getX509Token(WSSecurityTokenConstants.TokenType tokenType) throws Exception {
 
         final KeyStore keyStore = KeyStore.getInstance("jks");
-        keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
+        InputStream input = this.getClass().getClassLoader().getResourceAsStream("transmitter.jks");
+        keyStore.load(input, "default".toCharArray());
+        input.close();
 
         X509SecurityTokenImpl x509SecurityToken =
                 new X509SecurityTokenImpl(tokenType, null, null, null, IDGenerator.generateID(null),
