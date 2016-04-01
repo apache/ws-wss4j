@@ -18,6 +18,16 @@
  */
 package org.apache.wss4j.stax.test;
 
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
 import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
@@ -44,15 +54,6 @@ import org.apache.xml.security.stax.securityEvent.*;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import javax.xml.namespace.QName;
-
-import java.security.KeyStore;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 
 public class InboundWSSecurityContextImplTest {
 
@@ -711,7 +712,9 @@ public class InboundWSSecurityContextImplTest {
     private X509SecurityTokenImpl getX509Token(WSSecurityTokenConstants.TokenType tokenType) throws Exception {
 
         final KeyStore keyStore = KeyStore.getInstance("jks");
-        keyStore.load(this.getClass().getClassLoader().getResourceAsStream("transmitter.jks"), "default".toCharArray());
+        InputStream input = this.getClass().getClassLoader().getResourceAsStream("transmitter.jks");
+        keyStore.load(input, "default".toCharArray());
+        input.close();
 
         X509SecurityTokenImpl x509SecurityToken =
                 new X509SecurityTokenImpl(tokenType, null, null, null, IDGenerator.generateID(null),

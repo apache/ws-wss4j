@@ -80,6 +80,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         ClassLoader loader = Loader.getClassLoader(SignedSamlTokenHOKTest.class);
         InputStream input = Merlin.loadInputStream(loader, "keys/wss40_server.jks");
         keyStore.load(input, "security".toCharArray());
+        input.close();
         ((Merlin)issuerCrypto).setKeyStore(keyStore);
         
         // Load the server truststore
@@ -87,6 +88,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
         input = Merlin.loadInputStream(loader, "keys/wss40CA.jks");
         trustStore.load(input, "security".toCharArray());
+        input.close();
         ((Merlin)trustCrypto).setTrustStore(trustStore);
     }
     

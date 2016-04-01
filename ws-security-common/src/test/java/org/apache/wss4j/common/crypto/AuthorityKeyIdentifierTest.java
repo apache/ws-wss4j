@@ -100,7 +100,8 @@ public class AuthorityKeyIdentifierTest extends org.junit.Assert {
         ClassLoader loader = Loader.getClassLoader(AuthorityKeyIdentifierTest.class);
         InputStream input = Merlin.loadInputStream(loader, path);
         keyStore.load(input, password.toCharArray());
-        
+        input.close();
+
         return keyStore;
     }
 }

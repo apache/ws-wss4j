@@ -106,7 +106,14 @@ public final class OpenSAMLBootstrap extends DefaultBootstrap {
                 //some are from us
                 ins = OpenSAMLBootstrap.class.getResourceAsStream(config);
             }
-            configurator.load(ins);
+            if (ins != null) {
+                configurator.load(ins);
+                try {
+                    ins.close();
+                } catch (java.io.IOException ex) { //NOPMD
+                    // complete
+                }
+            }
         }
     }
     
