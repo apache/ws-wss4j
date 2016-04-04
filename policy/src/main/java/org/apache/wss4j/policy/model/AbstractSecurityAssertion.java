@@ -168,10 +168,12 @@ public abstract class AbstractSecurityAssertion implements Assertion {
 
     public boolean isAsserted(Map<QName, List<AssertionState>> assertionStatesMap) {
         List<AssertionState> assertionStateList = assertionStatesMap.get(getName());
-        for (int i = 0; i < assertionStateList.size(); i++) {
-            AssertionState assertionState = assertionStateList.get(i);
-            if (assertionState.getAssertion() == this && !assertionState.isAsserted()) {
-                return false;
+        if (assertionStateList != null) {
+            for (int i = 0; i < assertionStateList.size(); i++) {
+                AssertionState assertionState = assertionStateList.get(i);
+                if (assertionState.getAssertion() == this && !assertionState.isAsserted()) {
+                    return false;
+                }
             }
         }
         return true;
