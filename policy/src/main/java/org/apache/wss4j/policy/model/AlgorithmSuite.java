@@ -217,6 +217,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         private int maximumAsymmetricKeyLength;
         private String mgfAlgo;
         private String ns;
+        private String encryptionDigest;
 
         public AlgorithmSuiteType(String name, String digest, String encryption, String symmetricKeyWrap, String asymmetricKeyWrap,
                            String encryptionKeyDerivation, String signatureKeyDerivation, int encryptionDerivedKeyLength,
@@ -320,6 +321,14 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
         
         public String getMGFAlgo() {
             return mgfAlgo;
+        }
+        
+        public void setEncryptionDigest(String encryptionDigest) {
+            this.encryptionDigest = encryptionDigest;
+        }
+        
+        public String getEncryptionDigest() {
+            return encryptionDigest;
         }
     }
 
