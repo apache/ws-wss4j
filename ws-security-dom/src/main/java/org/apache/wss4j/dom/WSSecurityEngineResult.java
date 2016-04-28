@@ -21,7 +21,6 @@ package org.apache.wss4j.dom;
 
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.token.BinarySecurity;
-import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.message.token.SignatureConfirmation;
 import org.apache.wss4j.dom.message.token.Timestamp;
