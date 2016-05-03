@@ -39,9 +39,9 @@ The current stable release is Apache WSS4J 2.1.5:
 </p>
 <p>
 <a href="http://www.apache.org/dyn/closer.lua/ws/wss4j/2.1.5/wss4j-2.1.5-source-release.zip">wss4j-2.1.5-source-release.zip</a>
-(<a href="http://www.apache.org/dist/ws/wss4j/2.1.5/wss4j-2.1.5-source-release.zip.asc">PGP</a>)
-(<a href="http://www.apache.org/dist/ws/wss4j/2.1.5/wss4j-2.1.5-source-release.zip.md5">MD5</a>)
-(<a href="http://www.apache.org/dist/ws/wss4j/2.1.5/wss4j-2.1.5-source-release.zip.sha1">SHA1</a>)
+(<a href="https://www.apache.org/dist/ws/wss4j/2.1.5/wss4j-2.1.5-source-release.zip.asc">PGP</a>)
+(<a href="https://www.apache.org/dist/ws/wss4j/2.1.5/wss4j-2.1.5-source-release.zip.md5">MD5</a>)
+(<a href="https://www.apache.org/dist/ws/wss4j/2.1.5/wss4j-2.1.5-source-release.zip.sha1">SHA1</a>)
 </p>
 </li>
 <li>
@@ -50,9 +50,9 @@ The current stable release of the older 2.0.x branch is Apache WSS4J 2.0.7:
 </p>
 <p>
 <a href="http://www.apache.org/dyn/closer.lua/ws/wss4j/2.0.7/wss4j-2.0.7-source-release.zip">wss4j-2.0.7-source-release.zip</a>
-(<a href="http://www.apache.org/dist/ws/wss4j/2.0.7/wss4j-2.0.7-source-release.zip.asc">PGP</a>)
-(<a href="http://www.apache.org/dist/ws/wss4j/2.0.7/wss4j-2.0.7-source-release.zip.md5">MD5</a>)
-(<a href="http://www.apache.org/dist/ws/wss4j/2.0.7/wss4j-2.0.7-source-release.zip.sha1">SHA1</a>)
+(<a href="https://www.apache.org/dist/ws/wss4j/2.0.7/wss4j-2.0.7-source-release.zip.asc">PGP</a>)
+(<a href="https://www.apache.org/dist/ws/wss4j/2.0.7/wss4j-2.0.7-source-release.zip.md5">MD5</a>)
+(<a href="https://www.apache.org/dist/ws/wss4j/2.0.7/wss4j-2.0.7-source-release.zip.sha1">SHA1</a>)
 </p>
 </li>
 <li>
@@ -61,20 +61,43 @@ The older branch release is Apache WSS4J 1.6.19:
 </p>
 <p>
 <a href="http://www.apache.org/dyn/closer.lua/ws/wss4j/1.6.19/wss4j-bin-1.6.19.zip">wss4j-bin-1.6.19.zip</a>
-(<a href="http://www.apache.org/dist/ws/wss4j/1.6.19/wss4j-bin-1.6.19.zip.asc">
+(<a href="https://www.apache.org/dist/ws/wss4j/1.6.19/wss4j-bin-1.6.19.zip.asc">
 PGP</a>)
-(<a href="http://www.apache.org/dist/ws/wss4j/1.6.19/wss4j-bin-1.6.19.zip.md5">
+(<a href="https://www.apache.org/dist/ws/wss4j/1.6.19/wss4j-bin-1.6.19.zip.md5">
 MD5</a>)
 </p>
 <p>
 <a href="http://www.apache.org/dyn/closer.lua/ws/wss4j/1.6.19/wss4j-src-1.6.19.zip">wss4j-src-1.6.19.zip</a>
-(<a href="http://www.apache.org/dist/ws/wss4j/1.6.19/wss4j-src-1.6.19.zip.asc">
+(<a href="https://www.apache.org/dist/ws/wss4j/1.6.19/wss4j-src-1.6.19.zip.asc">
 PGP</a>)
-(<a href="http://www.apache.org/dist/ws/wss4j/1.6.19/wss4j-src-1.6.19.zip.md5">
+(<a href="https://www.apache.org/dist/ws/wss4j/1.6.19/wss4j-src-1.6.19.zip.md5">
 MD5</a>)
 </p>
 </li>
 </ul>
+</subsection>
+<subsection name="Verifying Releases">
+<p>
+When downloading from a mirror please check the SHA1/MD5 checksums as well
+as verifying the OpenPGP compatible signature available from the main Apache
+site. The <a href="https://www.apache.org/dist/ws/wss4j/KEYS">KEYS</a> file
+contains the public keys used for signing the release. It is recommended that a
+web of trust is used to confirm the identity of these keys.
+</p>
+<p>
+You can check the OpenPGP compatible signature with GnuPG via:
+<ul>
+<li>gpg --import KEYS</li>
+<li>gpg --verify wss4j-*-source-release.zip.asc</li>
+</ul>
+</p>
+<p>
+You can check the SHA1/MD5 digests with:
+<ul>
+<li>md5sum wss4j-*-source-release.zip (and compare output to wss4j-*-source.release.zip.md5)</li>
+<li>sha1sum wss4j-*-source-release.zip (and compare output to wss4j-*-source.release.zip.sha1)</li>
+</ul>
+</p>
 </subsection>
 <subsection name="Archive of old releases">
 <p>
