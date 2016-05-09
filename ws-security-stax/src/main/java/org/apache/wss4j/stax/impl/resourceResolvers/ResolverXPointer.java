@@ -18,10 +18,12 @@
  */
 package org.apache.wss4j.stax.impl.resourceResolvers;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.events.Attribute;
 
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.xml.security.stax.ext.ResourceResolver;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 
 public class ResolverXPointer extends org.apache.xml.security.stax.impl.resourceResolvers.ResolverXPointer {
@@ -38,9 +40,14 @@ public class ResolverXPointer extends org.apache.xml.security.stax.impl.resource
     public ResourceResolver newInstance(String uri, String baseURI) {
         return new ResolverXPointer(uri);
     }
-
+    
     @Override
     public boolean matches(XMLSecStartElement xmlSecStartElement) {
+        return matches(xmlSecStartElement, XMLSecurityConstants.ATT_NULL_Id);
+    }
+
+    @Override
+    public boolean matches(XMLSecStartElement xmlSecStartElement, QName idAttributeNS) {
         //when id is null we have #xpointer(/) and then we just return true for the first start-element
         if (getId() == null) {
             if (!isRootNodeOccured()) {
@@ -54,6 +61,6 @@ public class ResolverXPointer extends org.apache.xml.security.stax.impl.resource
         if (attribute != null && attribute.getValue().equals(getId())) {
             return true;
         }
-        return super.matches(xmlSecStartElement);
+        return super.matches(xmlSecStartElement, idAttributeNS);
     }
 }

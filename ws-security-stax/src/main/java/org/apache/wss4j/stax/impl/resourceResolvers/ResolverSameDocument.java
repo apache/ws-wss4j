@@ -19,9 +19,11 @@
 package org.apache.wss4j.stax.impl.resourceResolvers;
 
 import org.apache.xml.security.stax.ext.ResourceResolver;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.stax.XMLSecStartElement;
 import org.apache.wss4j.stax.ext.WSSConstants;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.events.Attribute;
 
 public class ResolverSameDocument extends org.apache.xml.security.stax.impl.resourceResolvers.ResolverSameDocument {
@@ -38,9 +40,13 @@ public class ResolverSameDocument extends org.apache.xml.security.stax.impl.reso
     public ResourceResolver newInstance(String uri, String baseURI) {
         return new ResolverSameDocument(uri);
     }
-
+    
     @Override
     public boolean matches(XMLSecStartElement xmlSecStartElement) {
+        return matches(xmlSecStartElement, XMLSecurityConstants.ATT_NULL_Id);
+    }
+    
+    public boolean matches(XMLSecStartElement xmlSecStartElement, QName idAttributeNS) {
         Attribute attribute = xmlSecStartElement.getAttributeByName(WSSConstants.ATT_WSU_ID);
         if (attribute != null && attribute.getValue().equals(getId())) {
             return true;
@@ -55,6 +61,7 @@ public class ResolverSameDocument extends org.apache.xml.security.stax.impl.reso
         if (attribute != null && attribute.getValue().equals(getId())) {
             return true;
         }
-        return super.matches(xmlSecStartElement);
+        return super.matches(xmlSecStartElement, idAttributeNS);
     }
+    
 }
