@@ -100,6 +100,10 @@ public class PolicyEnforcerFactory {
 
     protected static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(PolicyEnforcerFactory.class);
+    // CHECKSTYLE:OFF
+    @Deprecated
+    protected static final org.slf4j.Logger log = LOG;
+    // CHECKSTYLE:ON
 
     private final List<AssertionBuilder<Element>> assertionBuilders;
 

@@ -38,5 +38,24 @@ public abstract class WSSecurityEventConstants extends SecurityEventConstants {
     public static final Event HTTPS_TOKEN = new Event("HttpsToken");
     public static final Event DERIVED_KEY_TOKEN = new Event("DerivedKeyToken");
     public static final Event SIGNATURE_CONFIRMATION = new Event("SignatureConfirmation");
+    
+    // CHECKSTYLE:OFF
+    @Deprecated public static final Event NoSecurity = new Event("NoSecurity");
+    @Deprecated public static final Event Operation = new Event("Operation");
+    @Deprecated public static final Event Timestamp = new Event("Timestamp");
+    @Deprecated public static final Event SignedPart = new Event("SignedPart");
+    @Deprecated public static final Event EncryptedPart = new Event("EncryptedPart");
+    @Deprecated public static final Event RequiredElement = new Event("RequiredElement");
+    @Deprecated public static final Event RequiredPart = new Event("RequiredPart");
+    @Deprecated public static final Event IssuedToken = new Event("IssuedToken");
+    @Deprecated public static final Event KerberosToken = new Event("KerberosToken");
+    @Deprecated public static final Event SamlToken = new Event("SamlToken");
+    @Deprecated public static final Event SecurityContextToken = new Event("SecurityContextToken");
+    @Deprecated public static final Event RelToken = new Event("RelToken");
+    @Deprecated public static final Event UsernameToken = new Event("UsernameToken");
+    @Deprecated public static final Event HttpsToken = new Event("HttpsToken");
+    @Deprecated public static final Event DerivedKeyToken = new Event("DerivedKeyToken");
+    @Deprecated public static final Event SignatureConfirmation = new Event("SignatureConfirmation");
+    // CHECKSTYLE:ON
 
 }

@@ -44,6 +44,12 @@ public class RsaKeyValueSecurityTokenImpl
     private Crypto crypto;
     private WSSSecurityProperties securityProperties;
     private Principal principal;
+    
+    @Deprecated
+    public RsaKeyValueSecurityTokenImpl(
+        RSAKeyValueType rsaKeyValueType, WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto) {
+        this(rsaKeyValueType, wsInboundSecurityContext, crypto, null, new WSSSecurityProperties());
+    }
 
     public RsaKeyValueSecurityTokenImpl(
             RSAKeyValueType rsaKeyValueType, WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto,

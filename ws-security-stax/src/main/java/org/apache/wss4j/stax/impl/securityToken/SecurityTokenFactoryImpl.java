@@ -458,6 +458,14 @@ public class SecurityTokenFactoryImpl extends SecurityTokenFactory {
                 WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE);
     }
     
+    @Deprecated
+    public static InboundSecurityToken getSecurityToken(KeyValueType keyValueType, final Crypto crypto,
+                                                       final CallbackHandler callbackHandler, SecurityContext securityContext)
+                  throws XMLSecurityException {
+        return getSecurityToken(keyValueType, crypto, callbackHandler, securityContext,
+                                new WSSSecurityProperties());
+    }
+    
     public static InboundSecurityToken getSecurityToken(KeyValueType keyValueType, final Crypto crypto,
                                                  final CallbackHandler callbackHandler, SecurityContext securityContext,
                                                  WSSSecurityProperties securityProperties)

@@ -192,6 +192,28 @@ public final class SAML2ComponentBuilder {
         issuer.setNameQualifier(issuerQualifier);
         return issuer;
     }
+    
+    /**
+     * Create an Issuer object
+     *
+     * @param issuerValue of type String
+     * @return an Issuer object
+     */
+    @SuppressWarnings("unchecked")
+    @Deprecated
+    public static Issuer createIssuer(String issuerValue) {
+        if (issuerBuilder == null) {
+            issuerBuilder = (SAMLObjectBuilder<Issuer>) 
+                builderFactory.getBuilder(Issuer.DEFAULT_ELEMENT_NAME);
+            
+        }
+        Issuer issuer = issuerBuilder.buildObject();
+        //
+        // The SAML authority that is making the claim(s) in the assertion. The issuer SHOULD 
+        // be unambiguous to the intended relying parties.
+        issuer.setValue(issuerValue);
+        return issuer;
+    }
 
     /**
      * Create a Conditions object

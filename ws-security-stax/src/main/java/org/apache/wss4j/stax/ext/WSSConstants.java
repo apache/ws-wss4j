@@ -282,4 +282,103 @@ public class WSSConstants extends XMLSecurityConstants {
         WSSE_SECURITY_HEADER_PATH.add(WSSConstants.TAG_WSSE_SECURITY);
 
     }
+    
+    // CHECKSTYLE:OFF
+    @Deprecated public static final String TAG_soap_Envelope_LocalName = "Envelope";
+    @Deprecated public static final String TAG_soap_Header_LocalName = "Header";
+    @Deprecated public static final String TAG_soap_Body_LocalName = "Body";
+
+    @Deprecated public static final QName TAG_soap11_Envelope = new QName(NS_SOAP11, TAG_soap_Envelope_LocalName, PREFIX_SOAPENV);
+    @Deprecated public static final QName TAG_soap11_Header = new QName(NS_SOAP11, TAG_soap_Header_LocalName, PREFIX_SOAPENV);
+    @Deprecated public static final QName TAG_soap11_Body = new QName(NS_SOAP11, TAG_soap_Body_LocalName, PREFIX_SOAPENV);
+    @Deprecated public static final QName ATT_soap11_Actor = new QName(NS_SOAP11, "actor", PREFIX_SOAPENV);
+    @Deprecated public static final QName ATT_soap11_MustUnderstand = new QName(NS_SOAP11, "mustUnderstand", PREFIX_SOAPENV);
+
+    @Deprecated public static final QName TAG_soap12_Envelope = new QName(NS_SOAP12, TAG_soap_Envelope_LocalName, PREFIX_SOAPENV);
+    @Deprecated public static final QName TAG_soap12_Header = new QName(NS_SOAP12, TAG_soap_Header_LocalName, PREFIX_SOAPENV);
+    @Deprecated public static final QName TAG_soap12_Body = new QName(NS_SOAP12, TAG_soap_Body_LocalName, PREFIX_SOAPENV);
+    @Deprecated public static final QName ATT_soap12_Role = new QName(NS_SOAP12, "role", PREFIX_SOAPENV);
+    @Deprecated public static final QName ATT_soap12_MustUnderstand = new QName(NS_SOAP12, "mustUnderstand", PREFIX_SOAPENV);
+    
+    @Deprecated public static final QName TAG_wsse_Security = new QName(NS_WSSE10, "Security", PREFIX_WSSE);
+
+    @Deprecated public static final QName TAG_wsse_SecurityTokenReference = new QName(NS_WSSE10, "SecurityTokenReference", PREFIX_WSSE);
+    @Deprecated public static final QName TAG_wsse_Reference = new QName(NS_WSSE10, "Reference", PREFIX_WSSE);
+    @Deprecated public static final QName ATT_wsse_Usage = new QName(NS_WSSE10, "Usage", PREFIX_WSSE);
+    @Deprecated public static final QName ATT_wsse11_TokenType = new QName(NS_WSSE11, "TokenType", PREFIX_WSSE11);
+
+    @Deprecated public static final QName TAG_wsse_KeyIdentifier = new QName(NS_WSSE10, "KeyIdentifier", PREFIX_WSSE);
+    @Deprecated public static final QName ATT_NULL_EncodingType = new QName(null, "EncodingType");
+    @Deprecated public static final QName ATT_NULL_ValueType = new QName(null, "ValueType");
+
+    @Deprecated public static final QName TAG_wsse_BinarySecurityToken = new QName(NS_WSSE10, "BinarySecurityToken", PREFIX_WSSE);
+    @Deprecated public static final QName ATT_wsu_Id = new QName(NS_WSU10, "Id", PREFIX_WSU);
+
+    @Deprecated public static final QName TAG_wsse11_EncryptedHeader = new QName(NS_WSSE11, "EncryptedHeader", PREFIX_WSSE11);
+
+    @Deprecated public static final QName TAG_wsse_TransformationParameters = new QName(NS_WSSE10, "TransformationParameters", PREFIX_WSSE);
+
+    @Deprecated public static final QName TAG_wsu_Timestamp = new QName(NS_WSU10, "Timestamp", PREFIX_WSU);
+    @Deprecated public static final QName TAG_wsu_Created = new QName(NS_WSU10, "Created", PREFIX_WSU);
+    @Deprecated public static final QName TAG_wsu_Expires = new QName(NS_WSU10, "Expires", PREFIX_WSU);
+    
+    @Deprecated public static final QName TAG_wsse_UsernameToken = new QName(NS_WSSE10, "UsernameToken", PREFIX_WSSE);
+    @Deprecated public static final QName TAG_wsse_Username = new QName(NS_WSSE10, "Username", PREFIX_WSSE);
+    @Deprecated public static final QName TAG_wsse_Password = new QName(NS_WSSE10, "Password", PREFIX_WSSE);
+    @Deprecated public static final QName TAG_wsse_Nonce = new QName(NS_WSSE10, "Nonce", PREFIX_WSSE);
+    @Deprecated public static final QName TAG_wsse11_Salt = new QName(NS_WSSE11, "Salt", PREFIX_WSSE11);
+    @Deprecated public static final QName TAG_wsse11_Iteration = new QName(NS_WSSE11, "Iteration", PREFIX_WSSE11);
+
+    @Deprecated public static final QName TAG_wsse11_SignatureConfirmation = new QName(NS_WSSE11, "SignatureConfirmation", PREFIX_WSSE11);
+    @Deprecated public static final QName ATT_NULL_Value = new QName(null, "Value");
+    @Deprecated public static final QName TAG_wst_BinarySecret = new QName(NS_WST, "BinarySecret");
+    @Deprecated public static final QName TAG_wst0512_BinarySecret = new QName(NS_WST_05_12, "BinarySecret");
+    
+    @Deprecated public static final QName TAG_saml_Assertion = new QName(NS_SAML, "Assertion");
+    @Deprecated public static final QName TAG_saml2_Assertion = new QName(NS_SAML2, "Assertion");
+    @Deprecated public static final QName TAG_saml2_EncryptedAssertion = new QName(NS_SAML2, "EncryptedAssertion");
+    @Deprecated public static final String NS_GSS_Kerberos5_AP_REQ = NS_KERBEROS11_TOKEN_PROFILE + "GSS_Kerberosv5_AP_REQ";
+    @Deprecated public static final String NS_GSS_Kerberos5_AP_REQ1510 = NS_KERBEROS11_TOKEN_PROFILE + "GSS_Kerberosv5_AP_REQ1510";
+    @Deprecated public static final String NS_GSS_Kerberos5_AP_REQ4120 = NS_KERBEROS11_TOKEN_PROFILE + "GSS_Kerberosv5_AP_REQ4120";
+    @Deprecated public static final String NS_Kerberos5_AP_REQ = NS_KERBEROS11_TOKEN_PROFILE + "Kerberosv5_AP_REQ";
+    @Deprecated public static final String NS_Kerberos5_AP_REQ_SHA1 = NS_KERBEROS11_TOKEN_PROFILE + "Kerberosv5APREQSHA1";
+    @Deprecated public static final String NS_Kerberos5_AP_REQ1510 = NS_KERBEROS11_TOKEN_PROFILE + "Kerberosv5_AP_REQ1510";
+    @Deprecated public static final String NS_Kerberos5_AP_REQ4120 = NS_KERBEROS11_TOKEN_PROFILE + "Kerberosv5_AP_REQ4120";
+    @Deprecated public static final String NS_X509PKIPathv1 = NS_X509TOKEN_PROFILE + "#X509PKIPathv1";
+    @Deprecated public static final String NS_X509SubjectKeyIdentifier = NS_X509TOKEN_PROFILE + "#X509SubjectKeyIdentifier";
+
+    @Deprecated public static final QName ATT_NULL_AssertionID = new QName(null, "AssertionID");
+    
+    @Deprecated public static final QName TAG_wsc0502_SecurityContextToken = new QName(NS_WSC_05_02, "SecurityContextToken", PREFIX_WSC);
+    @Deprecated public static final QName TAG_wsc0512_SecurityContextToken = new QName(NS_WSC_05_12, "SecurityContextToken", PREFIX_WSC);
+    @Deprecated public static final QName TAG_wsc0502_Identifier = new QName(NS_WSC_05_02, "Identifier", PREFIX_WSC);
+    @Deprecated public static final QName TAG_wsc0512_Identifier = new QName(NS_WSC_05_12, "Identifier", PREFIX_WSC);
+
+    @Deprecated public static final QName TAG_wsc0502_DerivedKeyToken = new QName(NS_WSC_05_02, "DerivedKeyToken", PREFIX_WSC);
+    @Deprecated public static final QName TAG_wsc0512_DerivedKeyToken = new QName(NS_WSC_05_12, "DerivedKeyToken", PREFIX_WSC);
+    @Deprecated public static final QName TAG_wsc0502_Properties = new QName(NS_WSC_05_02, "Properties", PREFIX_WSC);
+    @Deprecated public static final QName TAG_wsc0512_Properties = new QName(NS_WSC_05_12, "Properties", PREFIX_WSC);
+    @Deprecated public static final QName TAG_wsc0502_Length = new QName(NS_WSC_05_02, "Length", PREFIX_WSC);
+    @Deprecated public static final QName TAG_wsc0512_Length = new QName(NS_WSC_05_12, "Length", PREFIX_WSC);
+    @Deprecated public static final QName TAG_wsc0502_Generation = new QName(NS_WSC_05_02, "Generation", PREFIX_WSC);
+    @Deprecated public static final QName TAG_wsc0512_Generation = new QName(NS_WSC_05_12, "Generation", PREFIX_WSC);
+    @Deprecated public static final QName TAG_wsc0502_Offset = new QName(NS_WSC_05_02, "Offset", PREFIX_WSC);
+    @Deprecated public static final QName TAG_wsc0512_Offset = new QName(NS_WSC_05_12, "Offset", PREFIX_WSC);
+    @Deprecated public static final QName TAG_wsc0502_Label = new QName(NS_WSC_05_02, "Label", PREFIX_WSC);
+    @Deprecated public static final QName TAG_wsc0512_Label = new QName(NS_WSC_05_12, "Label", PREFIX_WSC);
+    @Deprecated public static final QName TAG_wsc0502_Nonce = new QName(NS_WSC_05_02, "Nonce", PREFIX_WSC);
+    @Deprecated public static final QName TAG_wsc0512_Nonce = new QName(NS_WSC_05_12, "Nonce", PREFIX_WSC);
+    @Deprecated public static final String NS_USERNAMETOKEN_PROFILE_UsernameToken = NS_USERNAMETOKEN_PROFILE11 + "#UsernameToken";
+    
+    @Deprecated public static final String WS_SecureConversation_DEFAULT_LABEL = "WS-SecureConversation";
+    @Deprecated public static final String SOAPMESSAGE_NS10_STRTransform = NS10_SOAPMESSAGE_SECURITY + "#STR-Transform";
+
+    @Deprecated public static final AlgorithmUsage Comp_Key = new AlgorithmUsage("Comp_Key");
+    @Deprecated public static final AlgorithmUsage Enc_KD = new AlgorithmUsage("Enc_KD");
+    @Deprecated public static final AlgorithmUsage Sig_KD = new AlgorithmUsage("Sig_KD");
+    @Deprecated public static final AlgorithmUsage Soap_Norm = new AlgorithmUsage("Soap_Norm");
+    @Deprecated public static final AlgorithmUsage STR_Trans = new AlgorithmUsage("STR_Trans");
+    @Deprecated public static final AlgorithmUsage XPath = new AlgorithmUsage("XPath");
+    
+    // CHECKSTYLE:ON
 }

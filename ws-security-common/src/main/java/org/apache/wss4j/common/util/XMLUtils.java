@@ -492,4 +492,23 @@ public final class XMLUtils {
         return foundElement;
     }
 
+    // CHECKSTYLE:OFF
+    @Deprecated
+    public static String PrettyDocumentToString(Document doc) throws IOException, TransformerException {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            ElementToStream(doc.getDocumentElement(), baos);
+            return new String(baos.toByteArray());
+        }
+    }
+
+    @Deprecated
+    public static void ElementToStream(Element element, OutputStream out) 
+        throws TransformerException {
+        DOMSource source = new DOMSource(element);
+        StreamResult result = new StreamResult(out);
+        TransformerFactory transFactory = TransformerFactory.newInstance();
+        Transformer transformer = transFactory.newTransformer();
+        transformer.transform(source, result);
+    }
+    // CHECKSTYLE:ON
 }

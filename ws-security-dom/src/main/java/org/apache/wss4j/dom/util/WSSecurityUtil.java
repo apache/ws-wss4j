@@ -23,8 +23,10 @@ import org.apache.wss4j.dom.SOAP11Constants;
 import org.apache.wss4j.dom.SOAP12Constants;
 import org.apache.wss4j.dom.SOAPConstants;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.callback.CallbackLookup;
 import org.apache.wss4j.dom.engine.WSSConfig;
+import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
@@ -594,5 +596,17 @@ public final class WSSecurityUtil {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
 
+    }
+    
+    @Deprecated
+    public static void verifySignedElement(Element elem, WSDocInfo wsDocInfo)
+        throws WSSecurityException {
+        SignatureUtils.verifySignedElement(elem, wsDocInfo);
+    }
+    
+    @Deprecated
+    public static void verifySignedElement(Element elem, List<WSSecurityEngineResult> signedResults)
+        throws WSSecurityException {
+        SignatureUtils.verifySignedElement(elem, signedResults);
     }
 }

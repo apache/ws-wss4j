@@ -45,6 +45,13 @@ public class ECKeyValueSecurityTokenImpl
     private WSSSecurityProperties securityProperties;
     private Principal principal;
 
+    @Deprecated
+    public ECKeyValueSecurityTokenImpl(
+        ECKeyValueType ecKeyValueType, WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto) 
+        throws XMLSecurityException {
+        this(ecKeyValueType, wsInboundSecurityContext, crypto, null, new WSSSecurityProperties());
+    }
+
     public ECKeyValueSecurityTokenImpl(
             ECKeyValueType ecKeyValueType, WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto,
             CallbackHandler callbackHandler, WSSSecurityProperties securityProperties)

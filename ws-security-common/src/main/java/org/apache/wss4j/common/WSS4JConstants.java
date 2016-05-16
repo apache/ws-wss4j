@@ -261,4 +261,11 @@ public class WSS4JConstants {
         URI_SOAP11_ENV,
         URI_SOAP12_ENV,
     };
+    
+    // CHECKSTYLE:OFF
+    @Deprecated
+    public static final String KEYTRANSPORT_RSAOEP = KEYTRANSPORT_RSAOAEP;
+    @Deprecated
+    public static final String KEYTRANSPORT_RSAOEP_XENC11 = KEYTRANSPORT_RSAOAEP_XENC11;
+    // CHECKSTYLE:ON
 }

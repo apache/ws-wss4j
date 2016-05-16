@@ -32,6 +32,10 @@ import java.util.*;
 public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyContainingAssertion {
 
     protected static final Map<String, AlgorithmSuiteType> ALGORITHM_SUITE_TYPES = new HashMap<>();
+    // CHECKSTYLE:OFF
+    @Deprecated
+    protected static final Map<String, AlgorithmSuiteType> algorithmSuiteTypes = ALGORITHM_SUITE_TYPES;
+    // CHECKSTYLE:ON
 
     private static final int MAX_SKL = 256;
     private static final int MIN_AKL = 1024;

@@ -65,4 +65,37 @@ public class WSSecurityTokenConstants extends SecurityTokenConstants {
     public static final TokenType KERBEROS_TOKEN = new TokenType("KerberosToken");
     public static final TokenType SPNEGO_CONTEXT_TOKEN = new TokenType("SpnegoContextToken");
     public static final TokenType REL_TOKEN = new TokenType("RelToken");
+   
+    // CHECKSTYLE:OFF
+    @Deprecated public static final TokenUsage TokenUsage_MainSignature = new TokenUsage("MainSignature");
+    @Deprecated public static final TokenUsage TokenUsage_MainEncryption = new TokenUsage("MainEncryption");
+    @Deprecated public static final TokenUsage TokenUsage_SupportingTokens = new TokenUsage("SupportingTokens");
+    @Deprecated public static final TokenUsage TokenUsage_SignedSupportingTokens = new TokenUsage("SignedSupportingTokens");
+    @Deprecated public static final TokenUsage TokenUsage_EndorsingSupportingTokens = new TokenUsage("EndorsingSupportingTokens");
+    @Deprecated public static final TokenUsage TokenUsage_SignedEndorsingSupportingTokens = new TokenUsage("SignedEndorsingSupportingTokens");
+    @Deprecated public static final TokenUsage TokenUsage_SignedEncryptedSupportingTokens = new TokenUsage("SignedEncryptedSupportingTokens");
+    @Deprecated public static final TokenUsage TokenUsage_EncryptedSupportingTokens = new TokenUsage("EncryptedSupportingTokens");
+    @Deprecated public static final TokenUsage TokenUsage_EndorsingEncryptedSupportingTokens = new TokenUsage("EndorsingEncryptedSupportingTokens");
+    @Deprecated public static final TokenUsage TokenUsage_SignedEndorsingEncryptedSupportingTokens = new TokenUsage("SignedEndorsingEncryptedSupportingTokens");
+
+    @Deprecated public static final KeyIdentifier KeyIdentifier_SecurityTokenDirectReference = new KeyIdentifier("SecurityTokenDirectReference");
+    @Deprecated public static final KeyIdentifier KeyIdentifier_ThumbprintIdentifier = new KeyIdentifier("ThumbprintIdentifier");
+    @Deprecated public static final KeyIdentifier KeyIdentifier_EncryptedKeySha1Identifier = new KeyIdentifier("EncryptedKeySha1Identifier");
+    @Deprecated public static final KeyIdentifier KeyIdentifier_KerberosSha1Identifier = new KeyIdentifier("KerberosSha1Identifier");
+    @Deprecated public static final KeyIdentifier KeyIdentifier_EmbeddedKeyIdentifierRef = new KeyIdentifier("EmbeddedKeyIdentifierRef");
+    @Deprecated public static final KeyIdentifier KeyIdentifier_UsernameTokenReference = new KeyIdentifier("UsernameTokenReference");
+    @Deprecated public static final KeyIdentifier KeyIdentifier_ExternalReference = new KeyIdentifier("ExternalReference");
+
+    @Deprecated public static final TokenType UsernameToken = new TokenType("UsernameToken");
+    @Deprecated public static final TokenType SecurityContextToken = new TokenType("SecurityContextToken");
+    @Deprecated public static final TokenType Saml10Token = new TokenType("Saml10Token");
+    @Deprecated public static final TokenType Saml11Token = new TokenType("Saml11Token");
+    @Deprecated public static final TokenType Saml20Token = new TokenType("Saml20Token");
+    @Deprecated public static final TokenType IssuedToken = new TokenType("IssuedToken");
+    @Deprecated public static final TokenType SecureConversationToken = new TokenType("SecureConversationToken");
+    @Deprecated public static final TokenType HttpsToken = new TokenType("HttpsToken");
+    @Deprecated public static final TokenType KerberosToken = new TokenType("KerberosToken");
+    @Deprecated public static final TokenType SpnegoContextToken = new TokenType("SpnegoContextToken");
+    @Deprecated public static final TokenType RelToken = new TokenType("RelToken");
+    // CHECKSTYLE:ON
 }

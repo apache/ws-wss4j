@@ -58,10 +58,15 @@ import org.apache.xml.security.utils.resolver.ResourceResolver;
 public final class WSSConfig {
 
     public static final DatatypeFactory DATATYPE_FACTORY;
+    // CHECKSTYLE:OFF
+    @Deprecated
+    public static final DatatypeFactory datatypeFactory;
+    // CHECKSTYLE:ON
 
     static {
         try {
             DATATYPE_FACTORY = DatatypeFactory.newInstance();
+            datatypeFactory = DATATYPE_FACTORY;
         } catch (DatatypeConfigurationException e) {
             throw new RuntimeException(e);
         }

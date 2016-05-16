@@ -44,6 +44,12 @@ public class DsaKeyValueSecurityTokenImpl
     private Crypto crypto;
     private WSSSecurityProperties securityProperties;
     private Principal principal;
+    
+    @Deprecated
+    public DsaKeyValueSecurityTokenImpl(
+        DSAKeyValueType dsaKeyValueType, WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto) {
+        this(dsaKeyValueType, wsInboundSecurityContext, crypto, null, new WSSSecurityProperties());
+    }
 
     public DsaKeyValueSecurityTokenImpl(
             DSAKeyValueType dsaKeyValueType, WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto,
