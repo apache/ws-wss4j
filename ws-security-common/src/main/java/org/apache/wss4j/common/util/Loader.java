@@ -30,13 +30,9 @@ import java.security.PrivilegedAction;
  * Load resources (or images) from various sources.
  * <p/>
  */
-public final class Loader {
+public class Loader {
     private static final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(Loader.class);
-
-    private Loader() {
-        // complete
-    }
 
     /**
      * This method will search for <code>resource</code> in different

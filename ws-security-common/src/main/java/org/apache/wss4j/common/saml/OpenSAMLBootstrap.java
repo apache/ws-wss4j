@@ -30,7 +30,7 @@ import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 /**
  * This class intializes the Opensaml library.
  */
-public final class OpenSAMLBootstrap {
+public class OpenSAMLBootstrap {
 
     /** List of default configuration files. */
     private static final String[] XML_CONFIGS = {
@@ -65,10 +65,6 @@ public final class OpenSAMLBootstrap {
         "/xacml3-saml2-profile-config.xml",
         "/saml2-xacml2-profile.xml",
     };
-
-    private OpenSAMLBootstrap() {
-        // complete
-    }
 
     /**
      * Initializes the OpenSAML library, loading default configurations.
