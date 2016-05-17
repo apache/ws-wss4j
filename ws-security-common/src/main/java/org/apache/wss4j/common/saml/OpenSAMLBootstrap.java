@@ -36,7 +36,7 @@ import org.opensaml.xml.parse.XMLParserException;
  * This class intializes the Opensaml library. It is necessary to override DefaultBootstrap
  * to avoid instantiating Velocity, which we do not need in WSS4J.
  */
-public final class OpenSAMLBootstrap extends DefaultBootstrap {
+public class OpenSAMLBootstrap extends DefaultBootstrap {
     
     /** List of default XMLTooling configuration files. */
     private static final String[] xmlToolingConfigs = { 
@@ -74,11 +74,7 @@ public final class OpenSAMLBootstrap extends DefaultBootstrap {
         "/wsaddressing-config.xml",
         "/wssecurity-config.xml",
     };
-    
-    private OpenSAMLBootstrap() {
-        // complete
-    }
-    
+
     /**
      * Initializes the OpenSAML library, loading default configurations.
      * 

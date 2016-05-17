@@ -39,8 +39,8 @@ public class EHCacheReplayCache implements ReplayCache {
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
     protected Ehcache cache;
     protected CacheManager cacheManager;
-    private long ttl = DEFAULT_TTL;
-    
+    protected long ttl = DEFAULT_TTL;
+
     public EHCacheReplayCache(String key, URL configFileURL) {
         this(key, EHCacheManagerHolder.getCacheManager("", configFileURL));
     }
