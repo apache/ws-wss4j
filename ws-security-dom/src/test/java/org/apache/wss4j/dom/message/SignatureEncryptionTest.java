@@ -63,6 +63,17 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         +       "</add>"
         +   "</SOAP-ENV:Body>"
         + "</SOAP-ENV:Envelope>";
+    public static final String SAMPLE_SOAP12_FAULT_MSG =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+        + "<s:Envelope "
+        +   "xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" "
+        +   "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+        +   "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
+        +   "<s:Body>"
+        +   "<Fault xmlns=\"http://www.w3.org/2003/05/soap-envelope\"><Code><Value>Receiver</Value></Code><Reason>"
+        +   "<Text xml:lang=\"en\">Error Message.</Text></Reason></Fault>"
+        +   "</s:Body>"
+        + "</s:Envelope>";
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
@@ -444,6 +455,25 @@ public class SignatureEncryptionTest extends org.junit.Assert {
 
         WSSecurityEngine newEngine = new WSSecurityEngine();
         newEngine.processSecurityHeader(doc, reqData);
+    }
+    
+    @Test
+    public void testSigningEncryptionSOAP12Fault() throws Exception {
+        WSSecEncrypt encrypt = new WSSecEncrypt();
+        WSSecSignature sign = new WSSecSignature();
+        encrypt.setUserInfo("wss40");
+        sign.setUserInfo("wss40", "security");
+        LOG.info("Before Encryption....");
+        Document doc = SOAPUtil.toSOAPPart(SAMPLE_SOAP12_FAULT_MSG);
+
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+
+        Document signedDoc = sign.build(doc, crypto, secHeader);
+        Document encryptedSignedDoc = encrypt.build(signedDoc, crypto, secHeader);
+        
+        LOG.info("After Encryption....");
+        verify(encryptedSignedDoc);
     }
 
     /**
