@@ -64,10 +64,10 @@ public class ReferenceType {
 
     @XmlAttribute(name = "URI")
     @XmlSchemaType(name = "anyURI")
-    private String uri;
+    protected String uri;
     @XmlAttribute(name = "ValueType")
     @XmlSchemaType(name = "anyURI")
-    private String valueType;
+    protected String valueType;
     @XmlAnyAttribute
     private Map<QName, String> otherAttributes = new HashMap<QName, String>();
 

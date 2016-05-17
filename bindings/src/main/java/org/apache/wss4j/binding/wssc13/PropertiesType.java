@@ -64,7 +64,7 @@ public class PropertiesType
 {
 
     @XmlAnyElement(lax = true)
-    private List<Object> any;
+    protected List<Object> any;
 
     /**
      * Gets the value of the any property.

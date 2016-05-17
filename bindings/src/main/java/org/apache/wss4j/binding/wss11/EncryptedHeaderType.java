@@ -70,24 +70,24 @@ import org.apache.xml.security.binding.xmlenc.EncryptedDataType;
 public class EncryptedHeaderType {
 
     @XmlElement(name = "EncryptedData", namespace = "http://www.w3.org/2001/04/xmlenc#", required = true)
-    private EncryptedDataType encryptedData;
+    protected EncryptedDataType encryptedData;
     @XmlAttribute(name = "Id", namespace = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     @XmlSchemaType(name = "ID")
-    private String id;
+    protected String id;
     @XmlAttribute(name = "mustUnderstand", namespace = "http://schemas.xmlsoap.org/soap/envelope/")
-    private Boolean mustUnderstand11;
+    protected Boolean mustUnderstand11;
     @XmlAttribute(name = "actor", namespace = "http://schemas.xmlsoap.org/soap/envelope/")
     @XmlSchemaType(name = "anyURI")
-    private String actor;
+    protected String actor;
     @XmlAttribute(name = "mustUnderstand", namespace = "http://www.w3.org/2003/05/soap-envelope")
-    private Boolean mustUnderstand12;
+    protected Boolean mustUnderstand12;
     @XmlAttribute(name = "role", namespace = "http://www.w3.org/2003/05/soap-envelope")
     @XmlSchemaType(name = "anyURI")
-    private String role;
+    protected String role;
     @XmlAttribute(name = "relay", namespace = "http://www.w3.org/2003/05/soap-envelope")
-    private Boolean relay;
+    protected Boolean relay;
 
     /**
      * Gets the value of the encryptedData property.

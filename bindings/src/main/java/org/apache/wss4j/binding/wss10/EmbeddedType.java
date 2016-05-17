@@ -71,10 +71,10 @@ import org.w3c.dom.Element;
 public class EmbeddedType {
 
     @XmlAnyElement(lax = true)
-    private List<Object> any;
+    protected List<Object> any;
     @XmlAttribute(name = "ValueType")
     @XmlSchemaType(name = "anyURI")
-    private String valueType;
+    protected String valueType;
     @XmlAnyAttribute
     private Map<QName, String> otherAttributes = new HashMap<QName, String>();
 

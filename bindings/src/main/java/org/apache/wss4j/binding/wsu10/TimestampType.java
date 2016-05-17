@@ -83,16 +83,16 @@ import org.w3c.dom.Element;
 public class TimestampType {
 
     @XmlElement(name = "Created")
-    private AttributedDateTime created;
+    protected AttributedDateTime created;
     @XmlElement(name = "Expires")
-    private AttributedDateTime expires;
+    protected AttributedDateTime expires;
     @XmlAnyElement(lax = true)
-    private List<Object> any;
+    protected List<Object> any;
     @XmlAttribute(name = "Id", namespace = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     @XmlSchemaType(name = "ID")
-    private String id;
+    protected String id;
     @XmlAnyAttribute
     private Map<QName, String> otherAttributes = new HashMap<QName, String>();
 

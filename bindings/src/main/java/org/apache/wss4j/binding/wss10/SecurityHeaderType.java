@@ -68,7 +68,7 @@ import org.w3c.dom.Element;
 public class SecurityHeaderType {
 
     @XmlAnyElement(lax = true)
-    private List<Object> any;
+    protected List<Object> any;
     @XmlAnyAttribute
     private Map<QName, String> otherAttributes = new HashMap<QName, String>();
 

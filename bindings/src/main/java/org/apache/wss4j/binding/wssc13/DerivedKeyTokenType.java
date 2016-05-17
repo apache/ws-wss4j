@@ -86,30 +86,30 @@ public class DerivedKeyTokenType
 {
 
     @XmlElement(name = "SecurityTokenReference", namespace = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd")
-    private SecurityTokenReferenceType securityTokenReference;
+    protected SecurityTokenReferenceType securityTokenReference;
     @XmlElement(name = "Properties")
-    private PropertiesType properties;
+    protected PropertiesType properties;
     @XmlElement(name = "Generation")
     @XmlSchemaType(name = "unsignedLong")
-    private BigInteger generation;
+    protected BigInteger generation;
     @XmlElement(name = "Offset")
     @XmlSchemaType(name = "unsignedLong")
-    private BigInteger offset;
+    protected BigInteger offset;
     @XmlElement(name = "Length")
     @XmlSchemaType(name = "unsignedLong")
-    private BigInteger length;
+    protected BigInteger length;
     @XmlElement(name = "Label")
-    private String label;
+    protected String label;
     @XmlElement(name = "Nonce")
-    private byte[] nonce;
+    protected byte[] nonce;
     @XmlAttribute(name = "Id", namespace = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     @XmlSchemaType(name = "ID")
-    private String id;
+    protected String id;
     @XmlAttribute(name = "Algorithm")
     @XmlSchemaType(name = "anyURI")
-    private String algorithm;
+    protected String algorithm;
 
     /**
      * Gets the value of the securityTokenReference property.
