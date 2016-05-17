@@ -61,7 +61,7 @@ public class BinarySecurityTokenType
 
     @XmlAttribute(name = "ValueType")
     @XmlSchemaType(name = "anyURI")
-    private String valueType;
+    protected String valueType;
 
     /**
      * Gets the value of the valueType property.

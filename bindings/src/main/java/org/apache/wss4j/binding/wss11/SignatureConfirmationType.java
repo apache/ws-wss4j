@@ -62,9 +62,9 @@ public class SignatureConfirmationType {
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     @XmlSchemaType(name = "ID")
-    private String id;
+    protected String id;
     @XmlAttribute(name = "Value", required = true)
-    private byte[] value;
+    protected byte[] value;
 
     /**
      * Gets the value of the id property.

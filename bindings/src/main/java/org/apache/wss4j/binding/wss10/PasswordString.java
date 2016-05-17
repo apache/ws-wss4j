@@ -61,7 +61,7 @@ public class PasswordString
 
     @XmlAttribute(name = "Type")
     @XmlSchemaType(name = "anyURI")
-    private String type;
+    protected String type;
 
     /**
      * Gets the value of the type property.

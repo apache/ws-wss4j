@@ -50,6 +50,11 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
 
         parseNestedPolicy(nestedPolicy, this);
     }
+    
+    @Deprecated
+    public SupportingTokens(SPConstants.SPVersion version, SupportingTokenType supportingTokenType, Policy nestedPolicy) {
+        this(version, supportingTokenType.getName(), nestedPolicy);
+    }
 
     @Override
     public QName getName() {
@@ -217,4 +222,18 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
         return false;
     }
 
+    @Deprecated
+    public SupportingTokenType getSupportingTokenType() {
+        if (supportingTokenType != null) {
+            return super.getVersion().getSPConstants().getSupportingTokenType(supportingTokenType);
+        }
+        return null;
+    }
+
+    @Deprecated
+    protected void setSupportingTokenType(SupportingTokenType supportingTokenType) {
+        if (supportingTokenType != null) {
+            this.supportingTokenType = supportingTokenType.getName();
+        }
+    }
 }

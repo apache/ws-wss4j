@@ -19,6 +19,9 @@
 package org.apache.wss4j.policy;
 
 import javax.xml.namespace.QName;
+
+import org.apache.wss4j.policy.model.SupportingTokenType;
+
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -688,4 +691,7 @@ public abstract class SPConstants {
     public abstract QName getMustSupportRefEncryptedKey();
 
     public abstract QName getRequireSignatureConfirmation();
+    
+    @Deprecated
+    public abstract SupportingTokenType getSupportingTokenType(QName name);
 }

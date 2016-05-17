@@ -18,7 +18,13 @@
  */
 package org.apache.wss4j.policy;
 
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.namespace.QName;
+
+import org.apache.wss4j.policy.model.SupportingTokenType;
 
 public class SP11Constants extends SPConstants {
 
@@ -781,5 +787,41 @@ public class SP11Constants extends SPConstants {
     @Override
     public QName getRequireSignatureConfirmation() {
         return REQUIRE_SIGNATURE_CONFIRMATION;
+    }
+    
+    public enum SupportingTokenTypes implements SupportingTokenType {
+        SupportingTokens(SUPPORTING_TOKENS),
+        SignedSupportingTokens(SIGNED_SUPPORTING_TOKENS),
+        EndorsingSupportingTokens(ENDORSING_SUPPORTING_TOKENS),
+        SignedEndorsingSupportingTokens(SIGNED_ENDORSING_SUPPORTING_TOKENS);
+
+        private static final Map<QName, SupportingTokenTypes> LOOKUP = new HashMap<>();
+
+        static {
+            for (SupportingTokenTypes u : EnumSet.allOf(SupportingTokenTypes.class)) {
+                LOOKUP.put(u.getName(), u);
+            }
+        }
+
+        public static SupportingTokenTypes lookUp(QName name) {
+            return LOOKUP.get(name);
+        }
+
+        private final QName name;
+
+        SupportingTokenTypes(QName name) {
+            this.name = name;
+        }
+
+        @Override
+        public QName getName() {
+            return name;
+        }
+    }
+
+    @Override
+    @Deprecated
+    public SupportingTokenType getSupportingTokenType(QName name) {
+        return SupportingTokenTypes.lookUp(name);
     }
 }

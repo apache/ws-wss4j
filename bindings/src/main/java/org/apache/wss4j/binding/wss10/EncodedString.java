@@ -66,7 +66,7 @@ public class EncodedString
 
     @XmlAttribute(name = "EncodingType")
     @XmlSchemaType(name = "anyURI")
-    private String encodingType;
+    protected String encodingType;
 
     /**
      * Gets the value of the encodingType property.
