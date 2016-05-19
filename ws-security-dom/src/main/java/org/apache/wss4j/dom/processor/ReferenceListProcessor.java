@@ -201,7 +201,8 @@ public class ReferenceListProcessor implements Processor {
 
         return
             EncryptionUtils.decryptEncryptedData(
-                doc, dataRefURI, encryptedDataElement, symmetricKey, symEncAlgo, data.getAttachmentCallbackHandler()
+                doc, dataRefURI, encryptedDataElement, symmetricKey, symEncAlgo, data.getAttachmentCallbackHandler(),
+                data.getEncryptionSerializer()
             );
     }
 

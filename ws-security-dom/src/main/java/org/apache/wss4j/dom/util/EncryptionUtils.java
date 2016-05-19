@@ -30,6 +30,7 @@ import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.callback.CallbackLookup;
 import org.apache.xml.security.algorithms.JCEMapper;
+import org.apache.xml.security.encryption.Serializer;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.exceptions.Base64DecodingException;
@@ -99,7 +100,6 @@ public final class EncryptionUtils {
         return encryptedDataElement;
     }
 
-
     /**
      * Decrypt the EncryptedData argument using a SecretKey.
      * @param doc The (document) owner of EncryptedData
@@ -118,6 +118,30 @@ public final class EncryptionUtils {
         SecretKey symmetricKey,
         String symEncAlgo,
         CallbackHandler attachmentCallbackHandler
+    ) throws WSSecurityException {
+        return decryptEncryptedData(doc, dataRefURI, encData, symmetricKey, 
+                                    symEncAlgo, attachmentCallbackHandler, null);
+        
+    }
+    /**
+     * Decrypt the EncryptedData argument using a SecretKey.
+     * @param doc The (document) owner of EncryptedData
+     * @param dataRefURI The URI of EncryptedData
+     * @param encData The EncryptedData element
+     * @param symmetricKey The SecretKey with which to decrypt EncryptedData
+     * @param symEncAlgo The symmetric encryption algorithm to use
+     * @param attachmentCallbackHandler The CallbackHandler from which to get attachments
+     * @throws WSSecurityException
+     */
+    public static WSDataRef
+    decryptEncryptedData(
+        Document doc,
+        String dataRefURI,
+        Element encData,
+        SecretKey symmetricKey,
+        String symEncAlgo,
+        CallbackHandler attachmentCallbackHandler,
+        Serializer encryptionSerializer
     ) throws WSSecurityException {
 
         // See if it is an attachment, and handle that differently
@@ -159,6 +183,9 @@ public final class EncryptionUtils {
         XMLCipher xmlCipher = null;
         try {
             xmlCipher = XMLCipher.getInstance(symEncAlgo);
+            if (encryptionSerializer != null) {
+                xmlCipher.setSerializer(encryptionSerializer);
+            }
             xmlCipher.setSecureValidation(true);
             xmlCipher.init(XMLCipher.DECRYPT_MODE, symmetricKey);
         } catch (XMLEncryptionException ex) {

@@ -165,7 +165,7 @@ public class EncryptedDataProcessor implements Processor {
 
         WSDataRef dataRef = EncryptionUtils.decryptEncryptedData(
                 elem.getOwnerDocument(), encryptedDataId, elem, key, symEncAlgo,
-                request.getAttachmentCallbackHandler());
+                request.getAttachmentCallbackHandler(), request.getEncryptionSerializer());
 
         WSSecurityEngineResult result =
                 new WSSecurityEngineResult(WSConstants.ENCR, Collections.singletonList(dataRef));
