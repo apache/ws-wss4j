@@ -46,6 +46,7 @@ import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.Validator;
+import org.apache.xml.security.encryption.Serializer;
 import org.apache.xml.security.utils.Base64;
 
 /**
@@ -94,6 +95,7 @@ public class RequestData {
     private final List<String> audienceRestrictions = new ArrayList<>();
     private boolean requireTimestampExpires;
     private boolean storeBytesInAttachment;
+    private Serializer encryptionSerializer;
 
     /**
      * Whether to add an InclusiveNamespaces PrefixList as a CanonicalizationMethod
@@ -771,5 +773,13 @@ public class RequestData {
 
     public void setExpandXopIncludeForSignature(boolean expandXopIncludeForSignature) {
         this.expandXopIncludeForSignature = expandXopIncludeForSignature;
+    }
+
+    public Serializer getEncryptionSerializer() {
+        return encryptionSerializer;
+    }
+
+    public void setEncryptionSerializer(Serializer encryptionSerializer) {
+        this.encryptionSerializer = encryptionSerializer;
     }
 }
