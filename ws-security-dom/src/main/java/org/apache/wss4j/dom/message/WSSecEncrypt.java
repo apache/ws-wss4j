@@ -57,6 +57,7 @@ import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.encryption.AbstractSerializer;
 import org.apache.xml.security.encryption.EncryptedData;
+import org.apache.xml.security.encryption.Serializer;
 import org.apache.xml.security.encryption.TransformSerializer;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLCipherUtil;
@@ -104,6 +105,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     private boolean embedEncryptedKey;
 
     private List<Element> attachmentEncryptedDataElements;
+    
+    private Serializer encryptionSerializer;
 
     public WSSecEncrypt() {
         super();
@@ -352,6 +355,24 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 doc, idAllocator, keyInfo, secretKey, encryptionAlgorithm,
                 references, callbackLookup, null, null, false);
     }
+    
+    public static List<String> doEncryption(
+         Document doc,
+         WsuIdAllocator idAllocator,
+         KeyInfo keyInfo,
+         SecretKey secretKey,
+         String encryptionAlgorithm,
+         List<WSEncryptionPart> references,
+         CallbackLookup callbackLookup,
+         CallbackHandler attachmentCallbackHandler,
+         List<Element> attachmentEncryptedDataElements,
+         boolean storeBytesInAttachment
+    ) throws WSSecurityException {
+        return doEncryption(
+                            doc, idAllocator, keyInfo, secretKey, encryptionAlgorithm,
+                            references, callbackLookup, attachmentCallbackHandler, 
+                            attachmentEncryptedDataElements, storeBytesInAttachment, null);
+    }
 
     public static List<String> doEncryption(
             Document doc,
@@ -363,7 +384,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             CallbackLookup callbackLookup,
             CallbackHandler attachmentCallbackHandler,
             List<Element> attachmentEncryptedDataElements,
-            boolean storeBytesInAttachment
+            boolean storeBytesInAttachment,
+            Serializer encryptionSerializer
     ) throws WSSecurityException {
 
         XMLCipher xmlCipher = null;
@@ -373,6 +395,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex
             );
+        }
+        if (encryptionSerializer != null) {
+            xmlCipher.setSerializer(encryptionSerializer);
         }
 
         List<String> encDataRef = new ArrayList<>();
@@ -873,6 +898,14 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
     public List<Element> getAttachmentEncryptedDataElements() {
         return attachmentEncryptedDataElements;
+    }
+
+    public Serializer getEncryptionSerializer() {
+        return encryptionSerializer;
+    }
+
+    public void setEncryptionSerializer(Serializer encryptionSerializer) {
+        this.encryptionSerializer = encryptionSerializer;
     }
 
 }

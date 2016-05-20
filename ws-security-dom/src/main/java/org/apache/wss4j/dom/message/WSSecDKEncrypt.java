@@ -32,6 +32,7 @@ import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.xml.security.encryption.Serializer;
 import org.apache.xml.security.keys.KeyInfo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -47,6 +48,8 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     private int derivedKeyLength = -1;
 
     private List<Element> attachmentEncryptedDataElements;
+    
+    private Serializer encryptionSerializer;
 
     public WSSecDKEncrypt() {
         super();
@@ -129,7 +132,8 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         List<String> encDataRefs =
             WSSecEncrypt.doEncryption(
                 document, getIdAllocator(), keyInfo, key, symEncAlgo, references, callbackLookup,
-                attachmentCallbackHandler, attachmentEncryptedDataElements, storeBytesInAttachment
+                attachmentCallbackHandler, attachmentEncryptedDataElements, storeBytesInAttachment,
+                encryptionSerializer
             );
         if (dataRef == null) {
             dataRef =
@@ -207,5 +211,13 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
     public List<Element> getAttachmentEncryptedDataElements() {
         return attachmentEncryptedDataElements;
+    }
+
+    public Serializer getEncryptionSerializer() {
+        return encryptionSerializer;
+    }
+
+    public void setEncryptionSerializer(Serializer encryptionSerializer) {
+        this.encryptionSerializer = encryptionSerializer;
     }
 }
