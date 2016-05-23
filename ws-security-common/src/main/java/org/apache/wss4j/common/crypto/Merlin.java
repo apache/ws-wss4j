@@ -996,6 +996,7 @@ public class Merlin extends CryptoBase {
         BigInteger serialNumber,
         KeyStore store
     ) throws WSSecurityException {
+        LOG.debug("Searching keystore for cert with issuer {} and serial {}", issuerRDN, serialNumber);
         try {
             for (Enumeration<String> e = store.aliases(); e.hasMoreElements();) {
                 String alias = e.nextElement();
@@ -1010,10 +1011,13 @@ public class Merlin extends CryptoBase {
 
                 if (certs != null && certs.length > 0 && certs[0] instanceof X509Certificate) {
                     X509Certificate x509cert = (X509Certificate) certs[0];
+                    LOG.debug("Keystore alias {} has issuer {} and serial {}", alias, 
+                              x509cert.getIssuerX500Principal().getName(), x509cert.getSerialNumber());
                     if (x509cert.getSerialNumber().compareTo(serialNumber) == 0) {
                         Object certName =
                             createBCX509Name(x509cert.getIssuerX500Principal().getName());
                         if (certName.equals(issuerRDN)) {
+                            LOG.debug("Issuer Serial match found using keystore alias {}", alias);
                             return certs;
                         }
                     }
@@ -1024,6 +1028,8 @@ public class Merlin extends CryptoBase {
                 WSSecurityException.ErrorCode.FAILURE, e, "keystore"
             );
         }
+        
+        LOG.debug("No issuer serial match found in keystore");
         return new Certificate[]{};
     }
 
@@ -1073,6 +1079,7 @@ public class Merlin extends CryptoBase {
         KeyStore store,
         MessageDigest sha
     ) throws WSSecurityException {
+        LOG.debug("Searching keystore for cert using a SHA-1 thumbprint");
         try {
             for (Enumeration<String> e = store.aliases(); e.hasMoreElements();) {
                 String alias = e.nextElement();
@@ -1097,6 +1104,7 @@ public class Merlin extends CryptoBase {
                     byte[] data = sha.digest();
 
                     if (Arrays.equals(data, thumbprint)) {
+                        LOG.debug("Thumbprint match found using keystore alias {}", alias);
                         return certs;
                     }
                 }
@@ -1106,6 +1114,8 @@ public class Merlin extends CryptoBase {
                 WSSecurityException.ErrorCode.FAILURE, e, "keystore"
             );
         }
+        
+        LOG.debug("No thumbprint match found in keystore");
         return new Certificate[]{};
     }
 
@@ -1144,6 +1154,7 @@ public class Merlin extends CryptoBase {
         byte[] skiBytes,
         KeyStore store
     ) throws WSSecurityException {
+        LOG.debug("Searching keystore for cert using Subject Key Identifier bytes");
         try {
             for (Enumeration<String> e = store.aliases(); e.hasMoreElements();) {
                 String alias = e.nextElement();
@@ -1160,6 +1171,7 @@ public class Merlin extends CryptoBase {
                     X509Certificate x509cert = (X509Certificate) certs[0];
                     byte[] data = getSKIBytesFromCert(x509cert);
                     if (data.length == skiBytes.length && Arrays.equals(data, skiBytes)) {
+                        LOG.debug("SKI match found using keystore alias {}", alias);
                         return certs;
                     }
                 }
@@ -1169,6 +1181,8 @@ public class Merlin extends CryptoBase {
                 WSSecurityException.ErrorCode.FAILURE, e, "keystore"
             );
         }
+        
+        LOG.debug("No SKI match found in keystore");
         return new Certificate[]{};
     }
 
@@ -1263,6 +1277,7 @@ public class Merlin extends CryptoBase {
         if (keyStoreToSearch == null) {
             return false;
         }
+        LOG.debug("Searching keystore for public key {}", publicKey);
         try {
             for (Enumeration<String> e = keyStoreToSearch.aliases(); e.hasMoreElements();) {
                 String alias = e.nextElement();
@@ -1277,12 +1292,15 @@ public class Merlin extends CryptoBase {
 
                 if (certs != null && certs.length > 0 && certs[0] instanceof X509Certificate
                     && publicKey.equals(((X509Certificate)certs[0]).getPublicKey())) {
+                    LOG.debug("PublicKey match found using keystore alias {}", alias);
                     return true;
                 }
             }
         } catch (KeyStoreException e) {
             return false;
         }
+        
+        LOG.debug("No PublicKey match found in keystore");
         return false;
     }
 
@@ -1295,6 +1313,7 @@ public class Merlin extends CryptoBase {
      */
     private Certificate[] getCertificates(Object subjectRDN, KeyStore store)
         throws WSSecurityException {
+        LOG.debug("Searching keystore for cert with Subject {}", subjectRDN);
         try {
             for (Enumeration<String> e = store.aliases(); e.hasMoreElements();) {
                 String alias = e.nextElement();
@@ -1311,6 +1330,7 @@ public class Merlin extends CryptoBase {
                     Object certName = createBCX509Name(foundRDN.getName());
 
                     if (subjectRDN.equals(certName)) {
+                        LOG.debug("Subject certificate match found using keystore alias {}", alias);
                         return certs;
                     }
                 }
@@ -1320,6 +1340,8 @@ public class Merlin extends CryptoBase {
                 WSSecurityException.ErrorCode.FAILURE, e, "keystore"
             );
         }
+        
+        LOG.debug("No Subject match found in keystore");
         return new Certificate[]{};
     }
 
