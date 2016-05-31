@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.validate;
 
 import java.io.IOException;
+import java.util.Base64;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -29,8 +30,6 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.UsernameToken;
-import org.apache.xml.security.exceptions.Base64DecodingException;
-import org.apache.xml.security.utils.Base64;
 
 /**
  * This class validates a processed UsernameToken, extracted from the Credential passed to
@@ -178,13 +177,8 @@ public class UsernameTokenValidator implements Validator {
         if (usernameToken.isHashed()) {
             String passDigest;
             if (passwordsAreEncoded) {
-                try {
-                    passDigest = UsernameToken.doPasswordDigest(nonce, createdTime, Base64.decode(origPassword));
-                } catch (Base64DecodingException e) {
-                    throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILURE, e, "decoding.general"
-                    );
-                }
+                passDigest = UsernameToken.doPasswordDigest(nonce, createdTime, 
+                                                            Base64.getMimeDecoder().decode(origPassword));
             } else {
                 passDigest = UsernameToken.doPasswordDigest(nonce, createdTime, origPassword);
             }

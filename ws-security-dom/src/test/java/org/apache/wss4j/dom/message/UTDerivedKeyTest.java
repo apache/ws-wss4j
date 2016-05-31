@@ -22,6 +22,7 @@ package org.apache.wss4j.dom.message;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -45,7 +46,6 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.xml.security.utils.Base64;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
@@ -108,7 +108,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         assertTrue(derivedKey.length == 20);
 
         // "c2VjdXJpdHk=" is the Base64 encoding of "security"
-        derivedKey = UsernameTokenUtil.generateDerivedKey(Base64.decode("c2VjdXJpdHk="), salt, 500);
+        derivedKey = UsernameTokenUtil.generateDerivedKey(Base64.getMimeDecoder().decode("c2VjdXJpdHk="), salt, 500);
         assertTrue(derivedKey.length == 20);
     }
 
@@ -121,9 +121,9 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         // The SHA-1 of the password is known as a password equivalent in the UsernameToken specification.
         byte[] passwordHash = MessageDigest.getInstance("SHA-1").digest(password.getBytes(StandardCharsets.UTF_8));
 
-        byte[] salt = Base64.decode("LKpycbfgRzwDnBz6kkhAAQ==");
+        byte[] salt = Base64.getMimeDecoder().decode("LKpycbfgRzwDnBz6kkhAAQ==");
         int iteration = 1049;
-        byte[] expectedDerivedKey = Base64.decode("C7Ll/OY4TECb6hZuMMiX/5hzszo=");
+        byte[] expectedDerivedKey = Base64.getMimeDecoder().decode("C7Ll/OY4TECb6hZuMMiX/5hzszo=");
         byte[] derivedKey = UsernameTokenUtil.generateDerivedKey(passwordHash, salt, iteration);
         assertTrue("the derived key is not as expected", Arrays.equals(expectedDerivedKey, derivedKey));
     }
@@ -190,7 +190,8 @@ public class UTDerivedKeyTest extends org.junit.Assert {
 
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordsAreEncoded(true);
-        builder.setUserInfo("bob", Base64.encode(MessageDigest.getInstance("SHA-1").digest("security".getBytes(StandardCharsets.UTF_8))));
+        builder.setUserInfo("bob", 
+                            Base64.getMimeEncoder().encodeToString(MessageDigest.getInstance("SHA-1").digest("security".getBytes(StandardCharsets.UTF_8))));
         builder.addDerivedKey(false, null, 1000);
         builder.prepare(doc);
 
@@ -391,7 +392,8 @@ public class UTDerivedKeyTest extends org.junit.Assert {
 
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordsAreEncoded(true);
-        builder.setUserInfo("bob", Base64.encode(MessageDigest.getInstance("SHA-1").digest("security".getBytes(StandardCharsets.UTF_8))));
+        builder.setUserInfo("bob", 
+                            Base64.getMimeEncoder().encodeToString(MessageDigest.getInstance("SHA-1").digest("security".getBytes(StandardCharsets.UTF_8))));
         builder.addDerivedKey(true, null, 1000);
         builder.prepare(doc);
 

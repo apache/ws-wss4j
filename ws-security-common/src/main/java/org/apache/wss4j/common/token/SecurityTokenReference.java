@@ -23,6 +23,7 @@ import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Base64;
 
 import javax.xml.namespace.QName;
 
@@ -40,8 +41,6 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.xml.security.exceptions.Base64DecodingException;
-import org.apache.xml.security.utils.Base64;
 
 /**
  * Security Token Reference.
@@ -192,7 +191,7 @@ public class SecurityTokenReference {
                 WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, e, "encodeError"
             );
         }
-        Text text = doc.createTextNode(Base64.encode(data));
+        Text text = doc.createTextNode(Base64.getMimeEncoder().encodeToString(data));
 
         createKeyIdentifier(doc, X509_V3_TYPE, text, true);
     }
@@ -225,7 +224,7 @@ public class SecurityTokenReference {
         }
         byte[] data = skiCrypto.getSKIBytesFromCert(cert);
 
-        Text text = doc.createTextNode(Base64.encode(data));
+        Text text = doc.createTextNode(Base64.getMimeEncoder().encodeToString(data));
         createKeyIdentifier(doc, SKI_URI, text, true);
     }
 
@@ -251,7 +250,7 @@ public class SecurityTokenReference {
         }
         try {
             byte[] encodedBytes = KeyUtils.generateDigest(encodedCert);
-            Text text = doc.createTextNode(Base64.encode(encodedBytes));
+            Text text = doc.createTextNode(Base64.getMimeEncoder().encodeToString(encodedBytes));
             createKeyIdentifier(doc, THUMB_URI, text, true);
         } catch (WSSecurityException e1) {
             throw new WSSecurityException(
@@ -335,14 +334,8 @@ public class SecurityTokenReference {
         } else if (THUMB_URI.equals(value)) {
             String text = XMLUtils.getElementText(getFirstElement());
             if (text != null) {
-                byte[] thumb;
-                try {
-                    thumb = Base64.decode(text);
-                } catch (Base64DecodingException e) {
-                    throw new WSSecurityException(
-                        WSSecurityException.ErrorCode.FAILURE, e, "decoding.general"
-                    );
-                }
+                byte[] thumb = Base64.getMimeDecoder().decode(text);
+
                 CryptoType cryptoType = new CryptoType(CryptoType.TYPE.THUMBPRINT_SHA1);
                 cryptoType.setBytes(thumb);
                 X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
@@ -404,12 +397,7 @@ public class SecurityTokenReference {
         }
         String text = XMLUtils.getElementText(getFirstElement());
         if (text != null) {
-            try {
-                skiBytes = Base64.decode(text);
-            } catch (Exception e) {
-                LOG.debug(e.getMessage(), e);
-                return null;
-            }
+            skiBytes = Base64.getMimeDecoder().decode(text);
         }
         return skiBytes;
     }

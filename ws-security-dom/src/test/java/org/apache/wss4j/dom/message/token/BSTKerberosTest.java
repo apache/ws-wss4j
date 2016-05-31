@@ -42,7 +42,6 @@ import org.apache.wss4j.dom.message.WSSecTimestamp;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
-import org.apache.xml.security.utils.Base64;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
@@ -52,6 +51,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.xml.crypto.dsig.SignatureMethod;
 
 import java.util.Arrays;
+import java.util.Base64;
 
 /**
  * This is a test for the Kerberos Token Profile 1.1
@@ -318,7 +318,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         sign.setCustomTokenValueType(WSConstants.WSS_KRB_KI_VALUE_TYPE);
 
         byte[] digestBytes = KeyUtils.generateDigest(keyData);
-        sign.setCustomTokenId(Base64.encode(digestBytes));
+        sign.setCustomTokenId(Base64.getMimeEncoder().encodeToString(digestBytes));
         sign.setSecretKey(keyData);
 
         Document signedDoc = sign.build(doc, crypto, secHeader);
@@ -398,7 +398,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         builder.setCustomReferenceValue(WSConstants.WSS_KRB_KI_VALUE_TYPE);
 
         byte[] digestBytes = KeyUtils.generateDigest(keyData);
-        builder.setEncKeyId(Base64.encode(digestBytes));
+        builder.setEncKeyId(Base64.getMimeEncoder().encodeToString(digestBytes));
 
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
 

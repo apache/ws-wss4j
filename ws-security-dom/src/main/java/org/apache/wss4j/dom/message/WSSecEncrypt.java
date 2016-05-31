@@ -22,6 +22,7 @@ package org.apache.wss4j.dom.message;
 import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +65,6 @@ import org.apache.xml.security.encryption.XMLCipherUtil;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.utils.Base64;
 import org.apache.xml.security.utils.EncryptionConstants;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -766,7 +766,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 secToken.setKeyIdentifierEncKeySHA1(customReferenceValue);
             } else {
                 byte[] encodedBytes = KeyUtils.generateDigest(encryptedEphemeralKey);
-                secToken.setKeyIdentifierEncKeySHA1(Base64.encode(encodedBytes));
+                secToken.setKeyIdentifierEncKeySHA1(Base64.getMimeEncoder().encodeToString(encodedBytes));
             }
             secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
             keyInfo.addUnknownElement(secToken.getElement());
@@ -820,7 +820,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 secToken.setKeyIdentifierEncKeySHA1(customReferenceValue);
             } else {
                 byte[] encodedBytes = KeyUtils.generateDigest(encryptedEphemeralKey);
-                secToken.setKeyIdentifierEncKeySHA1(Base64.encode(encodedBytes));
+                secToken.setKeyIdentifierEncKeySHA1(Base64.getMimeEncoder().encodeToString(encodedBytes));
             }
             secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
             keyInfo.addUnknownElement(secToken.getElement());

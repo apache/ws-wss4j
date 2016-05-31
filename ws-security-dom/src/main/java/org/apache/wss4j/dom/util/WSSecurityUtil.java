@@ -35,7 +35,6 @@ import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
-import org.apache.xml.security.utils.Base64;
 import org.apache.xml.security.utils.JavaUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -50,6 +49,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
@@ -385,7 +385,7 @@ public final class WSSecurityUtil {
      * @return a Text node containing the base64 encoded data
      */
     public static Text createBase64EncodedTextNode(Document doc, byte[] data) {
-        return doc.createTextNode(Base64.encode(data));
+        return doc.createTextNode(Base64.getMimeEncoder().encodeToString(data));
     }
 
     public static SOAPConstants getSOAPConstants(Element startElement) {

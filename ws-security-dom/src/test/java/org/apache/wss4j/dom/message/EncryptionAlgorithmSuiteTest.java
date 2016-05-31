@@ -19,6 +19,8 @@
 
 package org.apache.wss4j.dom.message;
 
+import java.util.Base64;
+
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
@@ -38,7 +40,6 @@ import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.xml.security.utils.Base64;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -239,7 +240,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
         }
 
         byte[] encodedBytes = KeyUtils.generateDigest(keyData);
-        String identifier = Base64.encode(encodedBytes);
+        String identifier = Base64.getMimeEncoder().encodeToString(encodedBytes);
         SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
 

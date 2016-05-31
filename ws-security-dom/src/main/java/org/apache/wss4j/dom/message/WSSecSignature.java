@@ -22,6 +22,7 @@ package org.apache.wss4j.dom.message;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 import java.util.List;
 
 import javax.xml.crypto.XMLStructure;
@@ -58,7 +59,6 @@ import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.dom.transform.STRTransform;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -240,7 +240,7 @@ public class WSSecSignature extends WSSecSignatureBase {
                     secRef.setKeyIdentifierEncKeySHA1(encrKeySha1value);
                 } else {
                     byte[] digestBytes = KeyUtils.generateDigest(secretKey);
-                    secRef.setKeyIdentifierEncKeySHA1(Base64.encode(digestBytes));
+                    secRef.setKeyIdentifierEncKeySHA1(Base64.getMimeEncoder().encodeToString(digestBytes));
                 }
                 secRef.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
                 break;

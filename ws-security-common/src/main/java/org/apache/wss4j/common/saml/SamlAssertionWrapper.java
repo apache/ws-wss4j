@@ -22,6 +22,7 @@ package org.apache.wss4j.common.saml;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -33,9 +34,7 @@ import org.apache.wss4j.common.saml.builder.SAML1ComponentBuilder;
 import org.apache.wss4j.common.saml.builder.SAML2ComponentBuilder;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.InetAddressUtils;
-import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
-import org.apache.xml.security.utils.Base64;
 import org.apache.xml.security.utils.XMLUtils;
 import org.joda.time.DateTime;
 import org.opensaml.core.xml.XMLObject;
@@ -750,13 +749,8 @@ public class SamlAssertionWrapper {
                 Element signatureValueElement =
                     XMLUtils.getNextElement(signedInfoElem.getNextSibling());
                 if (signatureValueElement != null) {
-                    try {
-                        return Base64.decode(signatureValueElement);
-                    } catch (Base64DecodingException ex) {
-                        throw new WSSecurityException(
-                            WSSecurityException.ErrorCode.FAILURE, ex, "invalidSAMLsecurity"
-                        );
-                    }
+                    String base64Input = XMLUtils.getFullTextChildrenFromElement(signatureValueElement);
+                    return Base64.getMimeDecoder().decode(base64Input);
                 }
             }
         }

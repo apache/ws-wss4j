@@ -28,6 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import javax.crypto.SecretKey;
@@ -85,7 +86,6 @@ import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
-import org.apache.xml.security.utils.Base64;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -463,7 +463,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         sign.setSecretKey(keyData);
 
         byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
-        sign.setCustomTokenId(Base64.encode(digestBytes));
+        sign.setCustomTokenId(Base64.getMimeEncoder().encodeToString(digestBytes));
 
         Document signedDoc = sign.build(doc, null, secHeader);
 
@@ -684,7 +684,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         builder.setCustomReferenceValue(WSConstants.WSS_KRB_KI_VALUE_TYPE);
 
         byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
-        builder.setEncKeyId(Base64.encode(digestBytes));
+        builder.setEncKeyId(Base64.getMimeEncoder().encodeToString(digestBytes));
 
         Document encryptedDoc = builder.build(doc, null, secHeader);
 
@@ -933,7 +933,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             sign.setSecretKey(keyData);
 
             byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
-            sign.setCustomTokenId(Base64.encode(digestBytes));
+            sign.setCustomTokenId(Base64.getMimeEncoder().encodeToString(digestBytes));
 
             sign.build(doc, null, secHeader);
 
@@ -1195,7 +1195,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             builder.setCustomReferenceValue(WSConstants.WSS_KRB_KI_VALUE_TYPE);
 
             byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
-            builder.setEncKeyId(Base64.encode(digestBytes));
+            builder.setEncKeyId(Base64.getMimeEncoder().encodeToString(digestBytes));
 
             builder.build(doc, null, secHeader);
 

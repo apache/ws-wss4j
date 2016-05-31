@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.text.DateFormat;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 
@@ -50,7 +51,6 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
-import org.apache.xml.security.utils.Base64;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -178,7 +178,8 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
     public void testUsernameTokenWithEncodedPassword() throws Exception {
         WSSecUsernameToken builder = new WSSecUsernameToken();
         builder.setPasswordsAreEncoded(true);
-        builder.setUserInfo("wernerd", Base64.encode(MessageDigest.getInstance("SHA-1").digest("verySecret".getBytes(StandardCharsets.UTF_8))));
+        builder.setUserInfo("wernerd", 
+                            Base64.getMimeEncoder().encodeToString(MessageDigest.getInstance("SHA-1").digest("verySecret".getBytes(StandardCharsets.UTF_8))));
         LOG.info("Before adding UsernameToken PW Digest....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
@@ -462,7 +463,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         MessageDigest sha = MessageDigest.getInstance("MD5");
         sha.reset();
         sha.update(password);
-        String passwdDigest = Base64.encode(sha.digest());
+        String passwdDigest = Base64.getMimeEncoder().encodeToString(sha.digest());
 
         builder.setUserInfo("wernerd", passwdDigest);
         LOG.info("Before adding UsernameToken PW Text....");

@@ -23,6 +23,7 @@ import java.security.Principal;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -51,8 +52,6 @@ import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.processor.Processor;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
-import org.apache.xml.security.exceptions.Base64DecodingException;
-import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Element;
 
 /**
@@ -217,17 +216,10 @@ public class SignatureSTRParser implements STRParser {
                         if (certs != null) {
                             try {
                                 byte[] digest = KeyUtils.generateDigest(certs[0].getEncoded());
-                                try {
-                                    if (Arrays.equals(Base64.decode(kiValue), digest)) {
-                                        parserResult.setPrincipal(
-                                            (Principal)bstResult.get(WSSecurityEngineResult.TAG_PRINCIPAL));
-                                        foundCerts = certs;
-                                        break;
-                                    }
-                                } catch (Base64DecodingException e) {
-                                    throw new WSSecurityException(
-                                        WSSecurityException.ErrorCode.FAILURE, e, "decoding.general"
-                                    );
+                                if (Arrays.equals(Base64.getMimeDecoder().decode(kiValue), digest)) {
+                                    parserResult.setPrincipal((Principal)bstResult.get(WSSecurityEngineResult.TAG_PRINCIPAL));
+                                    foundCerts = certs;
+                                    break;
                                 }
                             } catch (CertificateEncodingException ex) {
                                 throw new WSSecurityException(

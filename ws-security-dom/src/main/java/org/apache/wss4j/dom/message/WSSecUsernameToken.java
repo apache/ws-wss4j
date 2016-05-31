@@ -20,14 +20,15 @@
 package org.apache.wss4j.dom.message;
 
 import org.apache.wss4j.dom.WSConstants;
+
+import java.util.Base64;
+
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.UsernameTokenUtil;
 import org.apache.wss4j.common.util.WSCurrentTimeSource;
 import org.apache.wss4j.common.util.WSTimeSource;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.xml.security.exceptions.Base64DecodingException;
-import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -115,13 +116,7 @@ public class WSSecUsernameToken extends WSSecBase {
             return null;
         }
         if (passwordsAreEncoded) {
-            try {
-                return UsernameTokenUtil.generateDerivedKey(Base64.decode(password), saltValue, iteration);
-            } catch (Base64DecodingException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, e, "decoding.general"
-                );
-            }
+            return UsernameTokenUtil.generateDerivedKey(Base64.getMimeDecoder().decode(password), saltValue, iteration);
         } else {
             return UsernameTokenUtil.generateDerivedKey(password, saltValue, iteration);
         }

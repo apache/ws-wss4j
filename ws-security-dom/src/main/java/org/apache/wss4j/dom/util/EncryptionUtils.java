@@ -33,8 +33,6 @@ import org.apache.xml.security.algorithms.JCEMapper;
 import org.apache.xml.security.encryption.Serializer;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
-import org.apache.xml.security.exceptions.Base64DecodingException;
-import org.apache.xml.security.utils.Base64;
 import org.apache.xml.security.utils.JavaUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -56,6 +54,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.List;
 
 public final class EncryptionUtils {
@@ -553,16 +552,10 @@ public final class EncryptionUtils {
      * @throws WSSecurityException
      */
     public static byte[] getDecodedBase64EncodedData(Element element) throws WSSecurityException {
-        try {
-            String text = XMLUtils.getElementText(element);
-            if (text == null) {
-                return null;
-            }
-            return Base64.decode(text);
-        } catch (Base64DecodingException e) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.FAILURE, e, "decoding.general"
-            );
+        String text = XMLUtils.getElementText(element);
+        if (text == null) {
+            return null;
         }
+        return Base64.getMimeDecoder().decode(text);
     }
 }

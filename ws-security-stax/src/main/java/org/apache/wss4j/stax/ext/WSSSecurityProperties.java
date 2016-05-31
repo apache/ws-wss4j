@@ -25,6 +25,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.X509CRL;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,7 +49,6 @@ import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.validate.Validator;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
-import org.apache.xml.security.utils.Base64;
 
 /**
  * Main configuration class to supply keys etc.
@@ -746,7 +746,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         byte[] nonceValue;
         try {
             nonceValue = WSSConstants.generateBytes(10);
-            String cacheKey = key + Base64.encode(nonceValue);
+            String cacheKey = key + Base64.getEncoder().encodeToString(nonceValue);
             return replayCacheFactory.newReplayCache(cacheKey, null);
         } catch (XMLSecurityException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);

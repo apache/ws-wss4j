@@ -21,6 +21,7 @@ package org.apache.wss4j.dom.message.token;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -38,7 +39,6 @@ import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -554,7 +554,7 @@ public class DerivedKeyToken {
                 labelBytes = label.getBytes(StandardCharsets.UTF_8);
             }
 
-            byte[] nonce = Base64.decode(getNonce());
+            byte[] nonce = Base64.getMimeDecoder().decode(getNonce());
             byte[] seed = new byte[labelBytes.length + nonce.length];
             System.arraycopy(labelBytes, 0, seed, 0, labelBytes.length);
             System.arraycopy(nonce, 0, seed, labelBytes.length, nonce.length);

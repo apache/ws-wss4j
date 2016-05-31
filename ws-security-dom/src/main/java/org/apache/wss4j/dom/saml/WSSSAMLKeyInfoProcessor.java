@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.saml;
 
 import java.security.Principal;
+import java.util.Base64;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -43,7 +44,6 @@ import org.apache.wss4j.dom.str.STRParser;
 import org.apache.wss4j.dom.str.STRParserParameters;
 import org.apache.wss4j.dom.str.STRParserResult;
 import org.apache.wss4j.dom.str.SignatureSTRParser;
-import org.apache.xml.security.utils.Base64;
 
 /**
  * This interface allows the user to plug in custom ways of processing a SAML KeyInfo.
@@ -90,12 +90,7 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
                     return new SAMLKeyInfo(secret);
                 } else if (el.equals(BINARY_SECRET) || el.equals(BINARY_SECRET_05_12)) {
                     Text txt = (Text)node.getFirstChild();
-                    try {
-                        return new SAMLKeyInfo(Base64.decode(txt.getData()));
-                    } catch (Exception e) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e,
-                                "decoding.general");
-                    }
+                    return new SAMLKeyInfo(Base64.getMimeDecoder().decode(txt.getData()));
                 } else if (SecurityTokenReference.STR_QNAME.equals(el)) {
                     STRParserParameters parameters = new STRParserParameters();
                     parameters.setData(data);

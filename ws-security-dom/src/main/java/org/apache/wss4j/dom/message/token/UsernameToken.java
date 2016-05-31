@@ -25,6 +25,7 @@ import java.security.Principal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -51,8 +52,6 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
-import org.apache.xml.security.exceptions.Base64DecodingException;
-import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -312,7 +311,7 @@ public class UsernameToken {
             return;
         }
         elementNonce = doc.createElementNS(WSConstants.WSSE_NS, "wsse:" + WSConstants.NONCE_LN);
-        elementNonce.appendChild(doc.createTextNode(Base64.encode(nonceValue)));
+        elementNonce.appendChild(doc.createTextNode(Base64.getMimeEncoder().encodeToString(nonceValue)));
         elementNonce.setAttributeNS(null, "EncodingType", BASE64_ENCODING);
         element.appendChild(elementNonce);
     }
@@ -368,7 +367,7 @@ public class UsernameToken {
                 WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX + ":" + WSConstants.SALT_LN
             );
         XMLUtils.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
-        elementSalt.appendChild(doc.createTextNode(Base64.encode(saltValue)));
+        elementSalt.appendChild(doc.createTextNode(Base64.getMimeEncoder().encodeToString(saltValue)));
         element.appendChild(elementSalt);
         return saltValue;
     }
@@ -466,13 +465,7 @@ public class UsernameToken {
     public byte[] getSalt() throws WSSecurityException {
         String salt = XMLUtils.getElementText(elementSalt);
         if (salt != null) {
-            try {
-                return Base64.decode(salt);
-            } catch (Base64DecodingException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, e, "decoding.general"
-                );
-            }
+            return Base64.getMimeDecoder().decode(salt);
         }
         return null;
     }
@@ -532,7 +525,7 @@ public class UsernameToken {
         try {
             if (hashed) {
                 if (passwordsAreEncoded) {
-                    node.setData(doPasswordDigest(getNonce(), getCreated(), Base64.decode(pwd)));
+                    node.setData(doPasswordDigest(getNonce(), getCreated(), Base64.getMimeDecoder().decode(pwd)));
                 } else {
                     node.setData(doPasswordDigest(getNonce(), getCreated(), pwd));
                 }
@@ -593,7 +586,7 @@ public class UsernameToken {
     public static String doPasswordDigest(String nonce, String created, byte[] password) {
         String passwdDigest = null;
         try {
-            byte[] b1 = nonce != null ? Base64.decode(nonce) : new byte[0];
+            byte[] b1 = nonce != null ? Base64.getMimeDecoder().decode(nonce) : new byte[0];
             byte[] b2 = created != null ? created.getBytes(StandardCharsets.UTF_8) : new byte[0];
             byte[] b3 = password;
             byte[] b4 = new byte[b1.length + b2.length + b3.length];
@@ -607,7 +600,7 @@ public class UsernameToken {
             System.arraycopy(b3, 0, b4, offset, b3.length);
 
             byte[] digestBytes = KeyUtils.generateDigest(b4);
-            passwdDigest = Base64.encode(digestBytes);
+            passwdDigest = Base64.getMimeEncoder().encodeToString(digestBytes);
         } catch (Exception e) {
             if (DO_DEBUG) {
                 LOG.debug(e.getMessage(), e);
@@ -708,13 +701,7 @@ public class UsernameToken {
         int iteration = getIteration();
         byte[] salt = getSalt();
         if (passwordsAreEncoded) {
-            try {
-                return UsernameTokenUtil.generateDerivedKey(Base64.decode(rawPassword), salt, iteration);
-            } catch (Base64DecodingException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, e, "decoding.general"
-                );
-            }
+            return UsernameTokenUtil.generateDerivedKey(Base64.getMimeDecoder().decode(rawPassword), salt, iteration);
         } else {
             return UsernameTokenUtil.generateDerivedKey(rawPassword, salt, iteration);
         }
@@ -738,18 +725,15 @@ public class UsernameToken {
      * Create a WSUsernameTokenPrincipal from this UsernameToken object
      */
     public Principal createPrincipal() throws WSSecurityException {
-        try {
-            WSUsernameTokenPrincipalImpl principal =
-                new WSUsernameTokenPrincipalImpl(getName(), isHashed());
-            principal.setNonce(Base64.decode(getNonce()));
-            principal.setPassword(getPassword());
-            principal.setCreatedTime(getCreated());
-            return principal;
-        } catch (Base64DecodingException e) {
-            throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, e, "decoding.general"
-            );
+        WSUsernameTokenPrincipalImpl principal =
+            new WSUsernameTokenPrincipalImpl(getName(), isHashed());
+        String nonce = getNonce();
+        if (nonce != null) {
+            principal.setNonce(Base64.getMimeDecoder().decode(nonce));
         }
+        principal.setPassword(getPassword());
+        principal.setCreatedTime(getCreated());
+        return principal;
     }
 
     /**

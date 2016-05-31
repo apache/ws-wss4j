@@ -21,6 +21,7 @@ package org.apache.wss4j.dom.handler;
 
 import java.security.cert.Certificate;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -47,7 +48,6 @@ import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.Validator;
 import org.apache.xml.security.encryption.Serializer;
-import org.apache.xml.security.utils.Base64;
 
 /**
  * This class holds per request data.
@@ -429,7 +429,7 @@ public class RequestData {
 
     private synchronized ReplayCache createCache(String key) throws WSSecurityException {
         ReplayCacheFactory replayCacheFactory = ReplayCacheFactory.newInstance();
-        String cacheKey = key + Base64.encode(WSSecurityUtil.generateNonce(10));
+        String cacheKey = key + Base64.getEncoder().encodeToString(WSSecurityUtil.generateNonce(10));
         return replayCacheFactory.newReplayCache(cacheKey, null);
     }
 

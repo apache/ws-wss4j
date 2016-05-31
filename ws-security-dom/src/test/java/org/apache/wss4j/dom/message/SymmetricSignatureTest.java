@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.message;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.Collections;
 
 import javax.crypto.KeyGenerator;
@@ -45,7 +46,6 @@ import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
-import org.apache.xml.security.utils.Base64;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -107,7 +107,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         Document signedDoc = sign.build(doc, crypto, secHeader);
 
         byte[] encodedBytes = KeyUtils.generateDigest(keyData);
-        String identifier = Base64.encode(encodedBytes);
+        String identifier = Base64.getMimeEncoder().encodeToString(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
 
         if (LOG.isDebugEnabled()) {

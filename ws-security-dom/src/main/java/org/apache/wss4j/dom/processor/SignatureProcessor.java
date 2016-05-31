@@ -28,6 +28,7 @@ import java.security.spec.AlgorithmParameterSpec;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +84,6 @@ import org.apache.wss4j.dom.util.X509Util;
 import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.Validator;
-import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -436,7 +436,7 @@ public class SignatureProcessor implements Processor {
                     if (xopURI != null) {
                         // Store the bytes in the attachment to calculate the signature
                         byte[] attachmentBytes = WSSecurityUtil.getBytesFromAttachment(xopURI, data);
-                        String encodedBytes = Base64.encode(attachmentBytes);
+                        String encodedBytes = Base64.getMimeEncoder().encodeToString(attachmentBytes);
 
                         Node newCipherValueChild =
                             includeElement.getOwnerDocument().createTextNode(encodedBytes);

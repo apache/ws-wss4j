@@ -20,6 +20,7 @@
 package org.apache.wss4j.dom.message.token;
 
 import java.util.Arrays;
+import java.util.Base64;
 
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
@@ -27,8 +28,6 @@ import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.xml.security.exceptions.Base64DecodingException;
-import org.apache.xml.security.utils.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -60,13 +59,7 @@ public class SignatureConfirmation {
 
         String sv = element.getAttributeNS(null, SC_VALUE_ATTR);
         if (sv != null) {
-            try {
-                signatureValue = Base64.decode(sv);
-            } catch (Base64DecodingException e) {
-                throw new WSSecurityException(
-                    WSSecurityException.ErrorCode.FAILURE, e, "decoding.general"
-                );
-            }
+            signatureValue = Base64.getMimeDecoder().decode(sv);
         }
     }
 
@@ -86,7 +79,7 @@ public class SignatureConfirmation {
             );
         XMLUtils.setNamespace(element, WSConstants.WSSE11_NS, WSConstants.WSSE11_PREFIX);
         if (signVal != null) {
-            String sv = Base64.encode(signVal);
+            String sv = Base64.getMimeEncoder().encodeToString(signVal);
             element.setAttributeNS(null, SC_VALUE_ATTR, sv);
         }
     }

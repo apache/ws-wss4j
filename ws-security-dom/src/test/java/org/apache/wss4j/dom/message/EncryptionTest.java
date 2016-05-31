@@ -21,6 +21,7 @@ package org.apache.wss4j.dom.message;
 
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 
 import javax.crypto.KeyGenerator;
@@ -53,7 +54,6 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.str.STRParser.REFERENCE_TYPE;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.xml.security.utils.Base64;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -386,7 +386,7 @@ public class EncryptionTest extends org.junit.Assert {
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
 
         byte[] encodedBytes = KeyUtils.generateDigest(keyData);
-        String identifier = Base64.encode(encodedBytes);
+        String identifier = Base64.getMimeEncoder().encodeToString(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
 
         String outputString =
@@ -421,7 +421,7 @@ public class EncryptionTest extends org.junit.Assert {
         Document encryptedDoc = builder.build(doc, crypto, secHeader);
 
         byte[] encodedBytes = KeyUtils.generateDigest(keyData);
-        String identifier = Base64.encode(encodedBytes);
+        String identifier = Base64.getMimeEncoder().encodeToString(encodedBytes);
         secretKeyCallbackHandler.addSecretKey(identifier, keyData);
 
         String outputString =
