@@ -182,7 +182,7 @@ public final class ThreadLocalSecurityProvider extends Provider {
         if (p != null) {
             return p.getServices();
         } else {
-            return null;
+            return Collections.emptySet();
         }
     }
 
