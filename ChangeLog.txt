@@ -5,6 +5,19 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.0.8
+=============
+
+Bug
+
+    [WSS-576] - No message with ID "SECURITY_ERROR" found in resource bundle
+    [WSS-580] - ThreadLocalSecurityProvider returns null instead of empty collection
+
+New Feature
+
+    [WSS-575] - Support for Digest other than sha1 in xenc:EncryptionMethod
+
+
 Release 2.0.7
 =============
 
