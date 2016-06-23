@@ -35,24 +35,24 @@ LICENSE.txt and NOTICE.txt files contained in each release artifact.
 <ul>
 <li>
 <p>
-The current stable release is Apache WSS4J 2.1.5:
+The current stable release is Apache WSS4J 2.1.6:
 </p>
 <p>
-<a href="http://www.apache.org/dyn/closer.lua/ws/wss4j/2.1.5/wss4j-2.1.5-source-release.zip">wss4j-2.1.5-source-release.zip</a>
-(<a href="https://www.apache.org/dist/ws/wss4j/2.1.5/wss4j-2.1.5-source-release.zip.asc">PGP</a>)
-(<a href="https://www.apache.org/dist/ws/wss4j/2.1.5/wss4j-2.1.5-source-release.zip.md5">MD5</a>)
-(<a href="https://www.apache.org/dist/ws/wss4j/2.1.5/wss4j-2.1.5-source-release.zip.sha1">SHA1</a>)
+<a href="http://www.apache.org/dyn/closer.lua/ws/wss4j/2.1.6/wss4j-2.1.6-source-release.zip">wss4j-2.1.6-source-release.zip</a>
+(<a href="https://www.apache.org/dist/ws/wss4j/2.1.6/wss4j-2.1.6-source-release.zip.asc">PGP</a>)
+(<a href="https://www.apache.org/dist/ws/wss4j/2.1.6/wss4j-2.1.6-source-release.zip.md5">MD5</a>)
+(<a href="https://www.apache.org/dist/ws/wss4j/2.1.6/wss4j-2.1.6-source-release.zip.sha1">SHA1</a>)
 </p>
 </li>
 <li>
 <p>
-The current stable release of the older 2.0.x branch is Apache WSS4J 2.0.7:
+The current stable release of the older 2.0.x branch is Apache WSS4J 2.0.8:
 </p>
 <p>
-<a href="http://www.apache.org/dyn/closer.lua/ws/wss4j/2.0.7/wss4j-2.0.7-source-release.zip">wss4j-2.0.7-source-release.zip</a>
-(<a href="https://www.apache.org/dist/ws/wss4j/2.0.7/wss4j-2.0.7-source-release.zip.asc">PGP</a>)
-(<a href="https://www.apache.org/dist/ws/wss4j/2.0.7/wss4j-2.0.7-source-release.zip.md5">MD5</a>)
-(<a href="https://www.apache.org/dist/ws/wss4j/2.0.7/wss4j-2.0.7-source-release.zip.sha1">SHA1</a>)
+<a href="http://www.apache.org/dyn/closer.lua/ws/wss4j/2.0.8/wss4j-2.0.7-source-release.zip">wss4j-2.0.7-source-release.zip</a>
+(<a href="https://www.apache.org/dist/ws/wss4j/2.0.8/wss4j-2.0.7-source-release.zip.asc">PGP</a>)
+(<a href="https://www.apache.org/dist/ws/wss4j/2.0.8/wss4j-2.0.7-source-release.zip.md5">MD5</a>)
+(<a href="https://www.apache.org/dist/ws/wss4j/2.0.8/wss4j-2.0.7-source-release.zip.sha1">SHA1</a>)
 </p>
 </li>
 <li>
