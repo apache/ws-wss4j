@@ -1074,8 +1074,8 @@ public abstract class WSHandler {
                                                        getPasswordEncryptor(requestData));
                     cryptos.put(refId, crypto);
                 } else if (obj instanceof Crypto) {
+                    // No need to cache this as it's already loaded
                     crypto = (Crypto)obj;
-                    cryptos.put(refId, crypto);
                 }
             }
             if (crypto == null) {
