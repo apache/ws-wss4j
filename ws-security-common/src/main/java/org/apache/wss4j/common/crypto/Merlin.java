@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.Key;
@@ -345,7 +346,17 @@ public class Merlin extends CryptoBase {
         throws WSSecurityException, IOException {
         InputStream is = null;
         if (location != null) {
-            java.net.URL url = Loader.getResource(loader, location);
+            java.net.URL url = null;
+            // First see if it's a URL
+            try {
+                url = new java.net.URL(location);
+            } catch (MalformedURLException ex) { //NOPMD
+                // skip
+            }
+            // If not a URL, then try to load the resource
+            if (url == null) {
+                url = Loader.getResource(loader, location);
+            }
             if (url != null) {
                 is = url.openStream();
             }
