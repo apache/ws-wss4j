@@ -80,12 +80,9 @@ public class RequestData {
     private AlgorithmSuite samlAlgorithmSuite;
     private boolean disableBSPEnforcement;
     private boolean allowRSA15KeyTransportAlgorithm;
-    private boolean addUsernameTokenNonce;
-    private boolean addUsernameTokenCreated;
     private Certificate[] tlsCerts;
     private boolean enableTimestampReplayCache = true;
     private boolean enableNonceReplayCache = true;
-    private boolean enableSamlOneTimeUseReplayCache = true;
     private PasswordEncryptor passwordEncryptor;
     private String derivedKeyTokenReference;
     private boolean use200512Namespace = true;
@@ -550,22 +547,6 @@ public class RequestData {
         this.allowRSA15KeyTransportAlgorithm = allowRSA15KeyTransportAlgorithm;
     }
 
-    public boolean isAddUsernameTokenNonce() {
-        return addUsernameTokenNonce;
-    }
-
-    public void setAddUsernameTokenNonce(boolean addUsernameTokenNonce) {
-        this.addUsernameTokenNonce = addUsernameTokenNonce;
-    }
-
-    public boolean isAddUsernameTokenCreated() {
-        return addUsernameTokenCreated;
-    }
-
-    public void setAddUsernameTokenCreated(boolean addUsernameTokenCreated) {
-        this.addUsernameTokenCreated = addUsernameTokenCreated;
-    }
-
     public Certificate[] getTlsCerts() {
         return tlsCerts;
     }
@@ -580,16 +561,6 @@ public class RequestData {
 
     public void setPasswordEncryptor(PasswordEncryptor passwordEncryptor) {
         this.passwordEncryptor = passwordEncryptor;
-    }
-
-    @Deprecated
-    public boolean isEnableSamlOneTimeUseReplayCache() {
-        return enableSamlOneTimeUseReplayCache;
-    }
-
-    @Deprecated
-    public void setEnableSamlOneTimeUseReplayCache(boolean enableSamlOneTimeUseReplayCache) {
-        this.enableSamlOneTimeUseReplayCache = enableSamlOneTimeUseReplayCache;
     }
 
     public SignatureActionToken getSignatureToken() {

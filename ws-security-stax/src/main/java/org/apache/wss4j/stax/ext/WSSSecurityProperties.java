@@ -108,9 +108,6 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private ReplayCache timestampReplayCache;
     private ReplayCache nonceReplayCache;
     private ReplayCache samlOneTimeUseReplayCache;
-    private boolean enableTimestampReplayCache = true;
-    private boolean enableNonceReplayCache = true;
-    private boolean enableSamlOneTimeUseReplayCache = true;
     private boolean validateSamlSubjectConfirmation = true;
     private Collection<Pattern> subjectDNPatterns = new ArrayList<>();
     private List<String> audienceRestrictions = new ArrayList<>();
@@ -164,9 +161,6 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.timestampReplayCache = wssSecurityProperties.timestampReplayCache;
         this.nonceReplayCache = wssSecurityProperties.nonceReplayCache;
         this.samlOneTimeUseReplayCache = wssSecurityProperties.samlOneTimeUseReplayCache;
-        this.enableTimestampReplayCache = wssSecurityProperties.enableTimestampReplayCache;
-        this.enableNonceReplayCache = wssSecurityProperties.enableNonceReplayCache;
-        this.enableSamlOneTimeUseReplayCache = wssSecurityProperties.enableSamlOneTimeUseReplayCache;
         this.allowRSA15KeyTransportAlgorithm = wssSecurityProperties.allowRSA15KeyTransportAlgorithm;
         this.derivedKeyIterations = wssSecurityProperties.derivedKeyIterations;
         this.useDerivedKeyForMAC = wssSecurityProperties.useDerivedKeyForMAC;
@@ -850,36 +844,6 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
 
     public void setIncludeEncryptionToken(boolean includeEncryptionToken) {
         this.includeEncryptionToken = includeEncryptionToken;
-    }
-
-    @Deprecated
-    public boolean isEnableTimestampReplayCache() {
-        return enableTimestampReplayCache;
-    }
-
-    @Deprecated
-    public void setEnableTimestampReplayCache(boolean enableTimestampReplayCache) {
-        this.enableTimestampReplayCache = enableTimestampReplayCache;
-    }
-
-    @Deprecated
-    public boolean isEnableNonceReplayCache() {
-        return enableNonceReplayCache;
-    }
-
-    @Deprecated
-    public void setEnableNonceReplayCache(boolean enableNonceReplayCache) {
-        this.enableNonceReplayCache = enableNonceReplayCache;
-    }
-
-    @Deprecated
-    public boolean isEnableSamlOneTimeUseReplayCache() {
-        return enableSamlOneTimeUseReplayCache;
-    }
-
-    @Deprecated
-    public void setEnableSamlOneTimeUseReplayCache(boolean enableSamlOneTimeUseReplayCache) {
-        this.enableSamlOneTimeUseReplayCache = enableSamlOneTimeUseReplayCache;
     }
 
     public boolean isEncryptSymmetricEncryptionKey() {
