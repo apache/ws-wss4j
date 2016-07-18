@@ -80,9 +80,9 @@ public class RequestData {
     private AlgorithmSuite samlAlgorithmSuite;
     private boolean disableBSPEnforcement;
     private boolean allowRSA15KeyTransportAlgorithm;
+    private boolean addUsernameTokenNonce;
+    private boolean addUsernameTokenCreated;
     private Certificate[] tlsCerts;
-    private boolean enableTimestampReplayCache = true;
-    private boolean enableNonceReplayCache = true;
     private PasswordEncryptor passwordEncryptor;
     private String derivedKeyTokenReference;
     private boolean use200512Namespace = true;
@@ -190,26 +190,6 @@ public class RequestData {
     private boolean validateSamlSubjectConfirmation = true;
 
     private boolean expandXopIncludeForSignature = true;
-
-    @Deprecated
-    public boolean isEnableTimestampReplayCache() {
-        return enableTimestampReplayCache;
-    }
-
-    @Deprecated
-    public void setEnableTimestampReplayCache(boolean enableTimestampReplayCache) {
-        this.enableTimestampReplayCache = enableTimestampReplayCache;
-    }
-
-    @Deprecated
-    public boolean isEnableNonceReplayCache() {
-        return enableNonceReplayCache;
-    }
-
-    @Deprecated
-    public void setEnableNonceReplayCache(boolean enableNonceReplayCache) {
-        this.enableNonceReplayCache = enableNonceReplayCache;
-    }
 
     public Object getMsgContext() {
         return msgContext;
@@ -737,5 +717,21 @@ public class RequestData {
 
     public void setEncryptionSerializer(Serializer encryptionSerializer) {
         this.encryptionSerializer = encryptionSerializer;
+    }
+
+    public boolean isAddUsernameTokenCreated() {
+        return addUsernameTokenCreated;
+    }
+
+    public void setAddUsernameTokenCreated(boolean addUsernameTokenCreated) {
+        this.addUsernameTokenCreated = addUsernameTokenCreated;
+    }
+
+    public boolean isAddUsernameTokenNonce() {
+        return addUsernameTokenNonce;
+    }
+
+    public void setAddUsernameTokenNonce(boolean addUsernameTokenNonce) {
+        this.addUsernameTokenNonce = addUsernameTokenNonce;
     }
 }
