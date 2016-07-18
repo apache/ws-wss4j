@@ -37,6 +37,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.wss4j.common.ConfigurationConstants;
+import org.apache.wss4j.common.cache.ReplayCache;
+import org.apache.wss4j.common.cache.ReplayCacheFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
@@ -50,8 +52,10 @@ import org.apache.wss4j.stax.securityEvent.UsernameTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.wss4j.stax.test.utils.XmlReaderToWriter;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
+import org.apache.xml.security.utils.Base64;
 import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -263,6 +267,8 @@ public class UsernameTokenTest extends AbstractTestBase {
 
         WSSSecurityProperties securityProperties = new WSSSecurityProperties();
         securityProperties.setCallbackHandler(new CallbackHandlerImpl());
+        ReplayCache replayCache = createCache("wss4j.nonce.cache-");
+        securityProperties.setNonceReplayCache(replayCache);
         InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
         XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(req.getBytes())));
         StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
@@ -274,6 +280,8 @@ public class UsernameTokenTest extends AbstractTestBase {
         } catch (XMLStreamException e) {
             Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.FAILED_AUTHENTICATION);
         }
+        
+        replayCache.close();
     }
     
     /**
@@ -825,6 +833,18 @@ public class UsernameTokenTest extends AbstractTestBase {
             NodeList nodeList = document.getElementsByTagNameNS(WSSConstants.TAG_wsse_UsernameToken.getNamespaceURI(), WSSConstants.TAG_wsse_UsernameToken.getLocalPart());
             Assert.assertEquals(nodeList.getLength(), 1);
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_wsse_Security.getLocalPart());
+        }
+    }
+    
+    private ReplayCache createCache(String key) throws WSSecurityException {
+        ReplayCacheFactory replayCacheFactory = ReplayCacheFactory.newInstance();
+        byte[] nonceValue;
+        try {
+            nonceValue = WSSConstants.generateBytes(10);
+            String cacheKey = key + Base64.encode(nonceValue);
+            return replayCacheFactory.newReplayCache(cacheKey, null);
+        } catch (XMLSecurityException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
         }
     }
 }

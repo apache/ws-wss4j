@@ -39,16 +39,13 @@ import javax.xml.namespace.QName;
 
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.cache.ReplayCache;
-import org.apache.wss4j.common.cache.ReplayCacheFactory;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.Merlin;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
 import org.apache.wss4j.stax.validate.Validator;
-import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
-import org.apache.xml.security.utils.Base64;
 
 /**
  * Main configuration class to supply keys etc.
@@ -734,23 +731,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      * @throws WSSecurityException 
      */
     public ReplayCache getTimestampReplayCache() throws WSSecurityException {
-        if (enableTimestampReplayCache && timestampReplayCache == null) {
-            timestampReplayCache = createCache("wss4j.timestamp.cache-");
-        }
-        
         return timestampReplayCache;
-    }
-    
-    private synchronized ReplayCache createCache(String key) throws WSSecurityException {
-        ReplayCacheFactory replayCacheFactory = ReplayCacheFactory.newInstance();
-        byte[] nonceValue;
-        try {
-            nonceValue = WSSConstants.generateBytes(10);
-            String cacheKey = key + Base64.encode(nonceValue);
-            return replayCacheFactory.newReplayCache(cacheKey, null);
-        } catch (XMLSecurityException e) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
-        }
     }
     
     /**
@@ -765,10 +746,6 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      * @throws WSSecurityException 
      */
     public ReplayCache getNonceReplayCache() throws WSSecurityException {
-        if (enableNonceReplayCache && nonceReplayCache == null) {
-            nonceReplayCache = createCache("wss4j.nonce.cache-");
-        }
-        
         return nonceReplayCache;
     }
     
@@ -784,10 +761,6 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
      * @throws WSSecurityException 
      */
     public ReplayCache getSamlOneTimeUseReplayCache() throws WSSecurityException {
-        if (enableSamlOneTimeUseReplayCache && samlOneTimeUseReplayCache == null) {
-            samlOneTimeUseReplayCache = createCache("wss4j.saml.one.time.use.cache-");
-        }
-        
         return samlOneTimeUseReplayCache;
     }
 
@@ -879,26 +852,32 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.includeEncryptionToken = includeEncryptionToken;
     }
 
+    @Deprecated
     public boolean isEnableTimestampReplayCache() {
         return enableTimestampReplayCache;
     }
 
+    @Deprecated
     public void setEnableTimestampReplayCache(boolean enableTimestampReplayCache) {
         this.enableTimestampReplayCache = enableTimestampReplayCache;
     }
 
+    @Deprecated
     public boolean isEnableNonceReplayCache() {
         return enableNonceReplayCache;
     }
 
+    @Deprecated
     public void setEnableNonceReplayCache(boolean enableNonceReplayCache) {
         this.enableNonceReplayCache = enableNonceReplayCache;
     }
-    
+
+    @Deprecated
     public boolean isEnableSamlOneTimeUseReplayCache() {
         return enableSamlOneTimeUseReplayCache;
     }
 
+    @Deprecated
     public void setEnableSamlOneTimeUseReplayCache(boolean enableSamlOneTimeUseReplayCache) {
         this.enableSamlOneTimeUseReplayCache = enableSamlOneTimeUseReplayCache;
     }

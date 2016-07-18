@@ -29,6 +29,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.wss4j.common.cache.ReplayCache;
+import org.apache.wss4j.common.cache.ReplayCacheFactory;
+import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.dom.WSConstants;
@@ -45,8 +47,21 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+import org.apache.xml.security.utils.Base64;
 
 public class ReplayTest extends AbstractTestBase {
+    
+    private ReplayCache createCache(String key) throws WSSecurityException {
+        ReplayCacheFactory replayCacheFactory = ReplayCacheFactory.newInstance();
+        byte[] nonceValue;
+        try {
+            nonceValue = WSSConstants.generateBytes(10);
+            String cacheKey = key + Base64.encode(nonceValue);
+            return replayCacheFactory.newReplayCache(cacheKey, null);
+        } catch (XMLSecurityException e) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
+        }
+    }
 
     @Test
     public void testReplayedTimestamp() throws Exception {
@@ -68,10 +83,10 @@ public class ReplayTest extends AbstractTestBase {
         }
 
         //done signature; now test sig-verification:
-        ReplayCache replayCache = null;
+        ReplayCache replayCache = createCache("wss4j.timestamp.cache-");
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            replayCache = securityProperties.getTimestampReplayCache();
+            securityProperties.setTimestampReplayCache(replayCache);
             securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
@@ -100,6 +115,8 @@ public class ReplayTest extends AbstractTestBase {
                 org.junit.Assert.assertEquals("The message has expired", e.getCause().getMessage());
             }
         }
+        
+        replayCache.close();
     }
     
     @Test
@@ -121,10 +138,10 @@ public class ReplayTest extends AbstractTestBase {
         }
 
         //done UsernameToken; now test verification:
-        ReplayCache replayCache = null;
+        ReplayCache replayCache = createCache("wss4j.nonce.cache-");
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            replayCache = securityProperties.getNonceReplayCache();
+            securityProperties.setNonceReplayCache(replayCache);
             securityProperties.setCallbackHandler(new CallbackHandlerImpl());
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
@@ -152,6 +169,8 @@ public class ReplayTest extends AbstractTestBase {
                 org.junit.Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
             }
         }
+        
+        replayCache.close();
     }
     
     /**
@@ -185,7 +204,7 @@ public class ReplayTest extends AbstractTestBase {
         }
 
         // process SAML Token
-        ReplayCache replayCache = null;
+        ReplayCache replayCache = createCache("wss4j.saml.one.time.use.cache-");
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             
@@ -194,7 +213,8 @@ public class ReplayTest extends AbstractTestBase {
             securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
             securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
             
-            replayCache = securityProperties.getSamlOneTimeUseReplayCache();
+            securityProperties.setSamlOneTimeUseReplayCache(replayCache);
+
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -218,6 +238,8 @@ public class ReplayTest extends AbstractTestBase {
             Document document = StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
             Assert.assertNotNull(document);
         }
+        
+        replayCache.close();
     }
     
     /**
@@ -250,7 +272,7 @@ public class ReplayTest extends AbstractTestBase {
         }
 
         // process SAML Token
-        ReplayCache replayCache = null;
+        ReplayCache replayCache = createCache("wss4j.saml.one.time.use.cache-");
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
             
@@ -259,7 +281,8 @@ public class ReplayTest extends AbstractTestBase {
             securityProperties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
             securityProperties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
             
-            replayCache = securityProperties.getSamlOneTimeUseReplayCache();
+            securityProperties.setSamlOneTimeUseReplayCache(replayCache);
+
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
 
@@ -287,6 +310,8 @@ public class ReplayTest extends AbstractTestBase {
                 org.junit.Assert.assertTrue(e.getCause() instanceof XMLSecurityException);
             }
         }
+        
+        replayCache.close();
     }
     
 }

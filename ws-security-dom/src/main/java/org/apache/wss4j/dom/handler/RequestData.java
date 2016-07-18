@@ -34,7 +34,6 @@ import org.apache.wss4j.common.EncryptionActionToken;
 import org.apache.wss4j.common.SignatureActionToken;
 import org.apache.wss4j.common.bsp.BSPRule;
 import org.apache.wss4j.common.cache.ReplayCache;
-import org.apache.wss4j.common.cache.ReplayCacheFactory;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
@@ -45,9 +44,7 @@ import org.apache.wss4j.dom.WSSConfig;
 import org.apache.wss4j.dom.bsp.BSPEnforcer;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.token.UsernameToken;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.Validator;
-import org.apache.xml.security.utils.Base64;
 
 /**
  * This class holds per request data.
@@ -137,18 +134,22 @@ public class RequestData {
         expandXopIncludeForSignature = true;
     }
 
+    @Deprecated
     public boolean isEnableTimestampReplayCache() {
         return enableTimestampReplayCache;
     }
 
+    @Deprecated
     public void setEnableTimestampReplayCache(boolean enableTimestampReplayCache) {
         this.enableTimestampReplayCache = enableTimestampReplayCache;
     }
 
+    @Deprecated
     public boolean isEnableNonceReplayCache() {
         return enableNonceReplayCache;
     }
 
+    @Deprecated
     public void setEnableNonceReplayCache(boolean enableNonceReplayCache) {
         this.enableNonceReplayCache = enableNonceReplayCache;
     }
@@ -368,17 +369,7 @@ public class RequestData {
      * @throws WSSecurityException 
      */
     public ReplayCache getTimestampReplayCache() throws WSSecurityException {
-        if (enableTimestampReplayCache && timestampReplayCache == null) {
-            timestampReplayCache = createCache("wss4j.timestamp.cache-");
-        }
-        
         return timestampReplayCache;
-    }
-    
-    private synchronized ReplayCache createCache(String key) throws WSSecurityException {
-        ReplayCacheFactory replayCacheFactory = ReplayCacheFactory.newInstance();
-        String cacheKey = key + Base64.encode(WSSecurityUtil.generateNonce(10));
-        return replayCacheFactory.newReplayCache(cacheKey, null);
     }
     
     /**
@@ -393,10 +384,6 @@ public class RequestData {
      * @throws WSSecurityException 
      */
     public ReplayCache getNonceReplayCache() throws WSSecurityException {
-        if (enableNonceReplayCache && nonceReplayCache == null) {
-            nonceReplayCache = createCache("wss4j.nonce.cache-");
-        }
-        
         return nonceReplayCache;
     }
     
@@ -412,10 +399,6 @@ public class RequestData {
      * @throws WSSecurityException 
      */
     public ReplayCache getSamlOneTimeUseReplayCache() throws WSSecurityException {
-        if (enableSamlOneTimeUseReplayCache && samlOneTimeUseReplayCache == null) {
-            samlOneTimeUseReplayCache = createCache("wss4j.saml.one.time.use.cache-");
-        }
-        
         return samlOneTimeUseReplayCache;
     }
     
@@ -547,10 +530,12 @@ public class RequestData {
         this.passwordEncryptor = passwordEncryptor;
     }
 
+    @Deprecated
     public boolean isEnableSamlOneTimeUseReplayCache() {
         return enableSamlOneTimeUseReplayCache;
     }
 
+    @Deprecated
     public void setEnableSamlOneTimeUseReplayCache(boolean enableSamlOneTimeUseReplayCache) {
         this.enableSamlOneTimeUseReplayCache = enableSamlOneTimeUseReplayCache;
     }

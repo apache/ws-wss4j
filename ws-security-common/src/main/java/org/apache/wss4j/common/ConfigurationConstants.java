@@ -507,24 +507,7 @@ public class ConfigurationConstants {
     public static final String INCLUDE_ENCRYPTION_TOKEN = "includeEncryptionToken";
     
     /**
-     * Whether to cache UsernameToken nonces. The default value is "true".
-     */
-    public static final String ENABLE_NONCE_CACHE = "enableNonceCache";
-    
-    /**
-     * Whether to cache Timestamp Created Strings (these are only cached in conjunction with a message 
-     * Signature). The default value is "true".
-     */
-    public static final String ENABLE_TIMESTAMP_CACHE = "enableTimestampCache";
-    
-    /**
-     * Whether to cache SAML2 Token Identifiers, if the token contains a "OneTimeUse" Condition.
-     * The default value is "true".
-     */
-    public static final String ENABLE_SAML_ONE_TIME_USE_CACHE = "enableSamlOneTimeUseCache";
-    
-    /**
-     * Whether to use the "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512" 
+     * Whether to use the "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512"
      * namespace for SecureConversation + Derived Keys. If set to "false", it will use the
      * namespace "http://schemas.xmlsoap.org/ws/2005/02/sc".
      * 
