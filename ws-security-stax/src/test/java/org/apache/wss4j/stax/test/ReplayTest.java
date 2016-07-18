@@ -21,7 +21,6 @@ package org.apache.wss4j.stax.test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.Base64;
 import java.util.Properties;
 
 import javax.xml.stream.XMLStreamException;
@@ -44,6 +43,7 @@ import org.apache.wss4j.stax.test.saml.SAML2CallbackHandler;
 import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.wss4j.stax.validate.SamlTokenValidatorImpl;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.utils.Base64;
 import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -56,7 +56,7 @@ public class ReplayTest extends AbstractTestBase {
         byte[] nonceValue;
         try {
             nonceValue = WSSConstants.generateBytes(10);
-            String cacheKey = key + Base64.getEncoder().encodeToString(nonceValue);
+            String cacheKey = key + Base64.encode(nonceValue);
             return replayCacheFactory.newReplayCache(cacheKey, null);
         } catch (XMLSecurityException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e);
