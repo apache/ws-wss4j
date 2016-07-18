@@ -49,6 +49,7 @@ import java.security.cert.PKIXParameters;
 import java.security.cert.TrustAnchor;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -808,16 +809,23 @@ public class Merlin extends CryptoBase {
         // SECOND step - Search for the issuer cert (chain) of the transmitted certificate in the
         // keystore or the truststore
         //
-        X509Certificate[] x509certs = certs;
+        List<Certificate[]> foundIssuingCertChains = null;
         String issuerString = certs[0].getIssuerX500Principal().getName();
         if (certs.length == 1) {
-            CryptoType cryptoType = new CryptoType(CryptoType.TYPE.SUBJECT_DN);
-            cryptoType.setSubjectDN(issuerString);
-            X509Certificate[] foundCerts = getX509Certificates(cryptoType);
+            
+            Object subject = convertSubjectToPrincipal(issuerString);
 
-            // If the certs have not been found, the issuer is not in the keystore/truststore
-            // As a direct result, do not trust the transmitted certificate
-            if (foundCerts == null || foundCerts.length < 1) {
+            if (keystore != null) {
+                foundIssuingCertChains = getCertificates(subject, keystore);
+            }
+
+            //If we can't find the issuer in the keystore then look at the truststore
+            if ((foundIssuingCertChains == null || foundIssuingCertChains.isEmpty()) && truststore != null) {
+                foundIssuingCertChains = getCertificates(subject, truststore);
+            }
+
+            if (foundIssuingCertChains == null || foundIssuingCertChains.isEmpty() 
+                || foundIssuingCertChains.get(0).length < 1) {
                 String subjectString = certs[0].getSubjectX500Principal().getName();
                 if (LOG.isDebugEnabled()) {
                     LOG.debug(
@@ -829,14 +837,6 @@ public class Merlin extends CryptoBase {
                     WSSecurityException.ErrorCode.FAILURE, "certpath", new Object[] {"No trusted certs found"}
                 );
             }
-
-            //
-            // Form a certificate chain from the transmitted certificate
-            // and the certificate(s) of the issuer from the keystore/truststore
-            //
-            x509certs = new X509Certificate[foundCerts.length + 1];
-            x509certs[0] = certs[0];
-            System.arraycopy(foundCerts, 0, x509certs, 1, foundCerts.length);
         }
 
         //
@@ -850,10 +850,6 @@ public class Merlin extends CryptoBase {
         }
 
         try {
-            // Generate cert path
-            List<X509Certificate> certList = Arrays.asList(x509certs);
-            CertPath path = getCertificateFactory().generateCertPath(certList);
-
             Set<TrustAnchor> set = new HashSet<>();
             if (truststore != null) {
                 Enumeration<String> truststoreAliases = truststore.aliases();
@@ -898,7 +894,38 @@ public class Merlin extends CryptoBase {
             }
 
             PKIXParameters param = createPKIXParameters(set, enableRevocation);
-            validator.validate(path, param);
+            
+            // Generate cert path
+            if (foundIssuingCertChains != null && !foundIssuingCertChains.isEmpty()) {
+                java.security.cert.CertPathValidatorException validatorException = null;
+                // Try each potential issuing cert path for a match
+                for (Certificate[] foundCertChain : foundIssuingCertChains) {
+                    X509Certificate[] x509certs = new X509Certificate[foundCertChain.length + 1];
+                    x509certs[0] = certs[0];
+                    System.arraycopy(foundCertChain, 0, x509certs, 1, foundCertChain.length);
+                    
+                    List<X509Certificate> certList = Arrays.asList(certs);
+                    CertPath path = getCertificateFactory().generateCertPath(certList);
+                    
+                    try {
+                        validator.validate(path, param);
+                        // We have a valid cert path at this point so break
+                        validatorException = null;
+                        break;
+                    } catch (java.security.cert.CertPathValidatorException e) {
+                        validatorException = e;
+                    }
+                }
+                
+                if (validatorException != null) {
+                    throw validatorException;
+                }
+            } else {
+                List<X509Certificate> certList = Arrays.asList(certs);
+                CertPath path = getCertificateFactory().generateCertPath(certList);
+                
+                validator.validate(path, param);
+            }
         } catch (NoSuchProviderException | NoSuchAlgorithmException
             | CertificateException | InvalidAlgorithmParameterException
             | java.security.cert.CertPathValidatorException
@@ -1205,6 +1232,27 @@ public class Merlin extends CryptoBase {
      * @throws WSSecurityException
      */
     private X509Certificate[] getX509CertificatesSubjectDN(String subjectDN) throws WSSecurityException {
+        Object subject = convertSubjectToPrincipal(subjectDN);
+
+        List<Certificate[]> certs = null;
+        if (keystore != null) {
+            certs = getCertificates(subject, keystore);
+        }
+
+        //If we can't find the issuer in the keystore then look at the truststore
+        if ((certs == null || certs.isEmpty()) && truststore != null) {
+            certs = getCertificates(subject, truststore);
+        }
+
+        if (certs == null || certs.isEmpty()) {
+            return null;
+        }
+
+        // We just choose the first entry
+        return Arrays.copyOf(certs.get(0), certs.get(0).length, X509Certificate[].class);
+    }
+    
+    private Object convertSubjectToPrincipal(String subjectDN) {
         //
         // Convert the subject DN to a java X500Principal object first. This is to ensure
         // interop with a DN constructed from .NET, where e.g. it uses "S" instead of "ST".
@@ -1220,22 +1268,8 @@ public class Merlin extends CryptoBase {
         } catch (java.lang.IllegalArgumentException ex) {
             subject = createBCX509Name(subjectDN);
         }
-
-        Certificate[] certs = null;
-        if (keystore != null) {
-            certs = getCertificates(subject, keystore);
-        }
-
-        //If we can't find the issuer in the keystore then look at the truststore
-        if ((certs == null || certs.length == 0) && truststore != null) {
-            certs = getCertificates(subject, truststore);
-        }
-
-        if (certs == null || certs.length == 0) {
-            return null;
-        }
-
-        return Arrays.copyOf(certs, certs.length, X509Certificate[].class);
+        
+        return subject;
     }
 
     /**
@@ -1316,15 +1350,17 @@ public class Merlin extends CryptoBase {
     }
 
     /**
-     * Get an X509 Certificate (chain) of the X500Principal argument in the supplied KeyStore
+     * Get an X509 Certificate (chain) of the X500Principal argument in the supplied KeyStore. If multiple
+     * certs match the Subject DN, then multiple cert chains are returned.
      * @param subjectRDN either an X500Principal or a BouncyCastle X509Name instance.
      * @param store The KeyStore
      * @return an X509 Certificate (chain)
      * @throws WSSecurityException
      */
-    private Certificate[] getCertificates(Object subjectRDN, KeyStore store)
+    private List<Certificate[]> getCertificates(Object subjectRDN, KeyStore store)
         throws WSSecurityException {
         LOG.debug("Searching keystore for cert with Subject {}", subjectRDN);
+        List<Certificate[]> foundCerts = new ArrayList<>();
         try {
             for (Enumeration<String> e = store.aliases(); e.hasMoreElements();) {
                 String alias = e.nextElement();
@@ -1342,7 +1378,7 @@ public class Merlin extends CryptoBase {
 
                     if (subjectRDN.equals(certName)) {
                         LOG.debug("Subject certificate match found using keystore alias {}", alias);
-                        return certs;
+                        foundCerts.add(certs);
                     }
                 }
             }
@@ -1352,8 +1388,10 @@ public class Merlin extends CryptoBase {
             );
         }
         
-        LOG.debug("No Subject match found in keystore");
-        return new Certificate[]{};
+        if (foundCerts.isEmpty()) {
+            LOG.debug("No Subject match found in keystore");
+        }
+        return foundCerts;
     }
 
     private static String createKeyStoreErrorMessage(KeyStore keystore) throws KeyStoreException {
