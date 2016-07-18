@@ -19,6 +19,12 @@
 package org.apache.wss4j.dom.common;
 
 import java.io.File;
+import java.util.Base64;
+
+import org.apache.wss4j.common.cache.ReplayCache;
+import org.apache.wss4j.common.cache.ReplayCacheFactory;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 /**
  * A utility class for security tests
@@ -43,4 +49,9 @@ public final class SecurityTestUtil {
         }
     }
 
+    public static ReplayCache createCache(String key) throws WSSecurityException {
+        ReplayCacheFactory replayCacheFactory = ReplayCacheFactory.newInstance();
+        String cacheKey = key + Base64.getEncoder().encodeToString(WSSecurityUtil.generateNonce(10));
+        return replayCacheFactory.newReplayCache(cacheKey, null);
+    }
 }

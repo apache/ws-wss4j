@@ -33,6 +33,7 @@ import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.cache.MemoryReplayCache;
+import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -101,7 +102,7 @@ public class ReplayTest extends org.junit.Assert {
                 XMLUtils.prettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
-
+        
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);
@@ -152,11 +153,13 @@ public class ReplayTest extends org.junit.Assert {
                 XMLUtils.prettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
-
+        
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);
         data.setCallbackHandler(callbackHandler);
+        ReplayCache replayCache = SecurityTestUtil.createCache("wss4j.timestamp.cache-");
+        data.setTimestampReplayCache(replayCache);
 
         // Successfully verify timestamp
         verify(createdDoc, wssConfig, data);
@@ -168,6 +171,8 @@ public class ReplayTest extends org.junit.Assert {
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
+        
+        replayCache.close();
     }
 
     @Test
@@ -197,7 +202,7 @@ public class ReplayTest extends org.junit.Assert {
                 XMLUtils.prettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
-
+        
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);
@@ -243,12 +248,14 @@ public class ReplayTest extends org.junit.Assert {
                 XMLUtils.prettyDocumentToString(createdDoc);
             LOG.debug(outputString);
         }
-
+        
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);
         data.setCallbackHandler(callbackHandler);
-
+        ReplayCache replayCache = SecurityTestUtil.createCache("wss4j.timestamp.cache-");
+        data.setTimestampReplayCache(replayCache);
+        
         // Successfully verify timestamp
         verify(createdDoc, wssConfig, data);
 
@@ -259,6 +266,8 @@ public class ReplayTest extends org.junit.Assert {
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
+        
+        replayCache.close();
     }
 
     @Test
@@ -349,6 +358,8 @@ public class ReplayTest extends org.junit.Assert {
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);
         data.setCallbackHandler(callbackHandler);
+        ReplayCache replayCache = SecurityTestUtil.createCache("wss4j.timestamp.cache-");
+        data.setTimestampReplayCache(replayCache);
 
         // Successfully verify timestamp
         verify(createdDoc, wssConfig, data);
@@ -360,6 +371,8 @@ public class ReplayTest extends org.junit.Assert {
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
+        
+        replayCache.close();
     }
 
     @Test
@@ -416,6 +429,8 @@ public class ReplayTest extends org.junit.Assert {
         RequestData data = new RequestData();
         data.setCallbackHandler(new UsernamePasswordCallbackHandler());
         data.setWssConfig(wssConfig);
+        ReplayCache replayCache = SecurityTestUtil.createCache("wss4j.nonce.cache-");
+        data.setNonceReplayCache(replayCache);
 
         // Successfully verify UsernameToken
         verify(signedDoc, wssConfig, data);
@@ -427,6 +442,8 @@ public class ReplayTest extends org.junit.Assert {
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
+        
+        replayCache.close();
     }
 
     /**
@@ -473,12 +490,16 @@ public class ReplayTest extends org.junit.Assert {
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);
         data.setCallbackHandler(callbackHandler);
+        ReplayCache replayCache = SecurityTestUtil.createCache("wss4j.saml.one.time.use.cache-");
+        data.setSamlOneTimeUseReplayCache(replayCache);
 
         // Successfully verify SAML Token
         verify(unsignedDoc, wssConfig, data);
 
         // Now try again - this should work fine as well
         verify(unsignedDoc, wssConfig, data);
+        
+        replayCache.close();
     }
 
     /**
@@ -526,6 +547,8 @@ public class ReplayTest extends org.junit.Assert {
         RequestData data = new RequestData();
         data.setWssConfig(wssConfig);
         data.setCallbackHandler(callbackHandler);
+        ReplayCache replayCache = SecurityTestUtil.createCache("wss4j.saml.one.time.use.cache-");
+        data.setSamlOneTimeUseReplayCache(replayCache);
 
         // Successfully verify SAML Token
         verify(unsignedDoc, wssConfig, data);
@@ -537,6 +560,8 @@ public class ReplayTest extends org.junit.Assert {
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);
         }
+        
+        replayCache.close();
     }
 
     /**
