@@ -585,23 +585,6 @@ not (for IssuerSerial, Thumbprint, SKI cases). Default is "false"</td>
 not (for IssuerSerial, Thumbprint, SKI cases). Default is "false"</td>
 </tr>
 <tr>
-<td><b>WSS4J 2.0.0</b> ENABLE_NONCE_CACHE</td>
-<td>enableNonceCache</td>
-<td>Whether to cache UsernameToken nonces. Default is "true"</td>
-</tr>
-<tr>
-<td><b>WSS4J 2.0.0</b> ENABLE_TIMESTAMP_CACHE</td>
-<td>enableTimestampCache</td>
-<td>Whether to cache Timestamp Created Strings (these are only cached in
-conjunction with a message Signature). Default is "true"</td>
-</tr>
-<tr>
-<td><b>WSS4J 2.0.0</b> ENABLE_SAML_ONE_TIME_USE_CACHE</td>
-<td>enableSamlOneTimeUseCache</td>
-<td>Whether to cache SAML2 Token Identifiers, if the token contains a
-"OneTimeUse" Condition. Default is "true". </td>
-</tr>
-<tr>
 <td><b>WSS4J 2.0.0</b> USE_2005_12_NAMESPACE</td>
 <td>use200512Namespace</td>
 <td>Whether to use the 2005/12 namespace for SecureConveration + DerivedKeys,

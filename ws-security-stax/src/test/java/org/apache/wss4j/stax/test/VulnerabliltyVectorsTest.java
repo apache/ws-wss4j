@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
@@ -42,9 +41,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.setup.InboundWSSec;
 import org.apache.wss4j.stax.setup.WSSec;
-import org.apache.wss4j.stax.test.utils.StAX2DOM;
 import org.apache.xml.security.stax.config.Init;
 import org.apache.xml.security.stax.config.TransformerAlgorithmMapper;
 import org.junit.Assert;
@@ -268,44 +265,6 @@ public class VulnerabliltyVectorsTest extends AbstractTestBase {
         }
     }
     */
-
-    @Test
-    public void testReplayAttackInbound() throws Exception {
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        {
-            InputStream sourceDocument = this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml");
-            String action = WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE;
-            Properties properties = new Properties();
-            properties.setProperty(WSHandlerConstants.SIGNATURE_PARTS, "{Element}{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp;{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
-            Document securedDocument = doOutboundSecurityWithWSS4J(sourceDocument, action, properties);
-
-            //some test that we can really sure we get what we want from WSS4J
-            NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
-            Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
-
-            javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
-            transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
-        }
-
-        //done signature; now test sig-verification:
-        {
-            WSSSecurityProperties securityProperties = new WSSSecurityProperties();
-            securityProperties.loadSignatureVerificationKeystore(this.getClass().getClassLoader().getResource("receiver.jks"), "default".toCharArray());
-            InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties, false, true);
-            XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
-
-            StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-
-            try {
-                xmlStreamReader = wsSecIn.processInMessage(xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(baos.toByteArray())));
-                StAX2DOM.readDoc(documentBuilderFactory.newDocumentBuilder(), xmlStreamReader);
-                Assert.fail("Expected XMLStreamException");
-            } catch (XMLStreamException e) {
-                Assert.assertEquals(((WSSecurityException) e.getCause()).getFaultCode(), WSSecurityException.MESSAGE_EXPIRED);
-            }
-        }
-    }
 
     @Test
     public void testMaximumAllowedReferencesPerManifest() throws Exception {

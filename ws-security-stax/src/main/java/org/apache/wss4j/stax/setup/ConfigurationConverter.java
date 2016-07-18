@@ -452,18 +452,6 @@ public final class ConfigurationConverter {
             decodeBooleanConfigValue(ConfigurationConstants.INCLUDE_ENCRYPTION_TOKEN, false, config);
         properties.setIncludeEncryptionToken(includeEncryptionToken);
 
-        boolean enableTimestampCache =
-            decodeBooleanConfigValue(ConfigurationConstants.ENABLE_TIMESTAMP_CACHE, true, config);
-        properties.setEnableTimestampReplayCache(enableTimestampCache);
-
-        boolean enableNonceCache =
-            decodeBooleanConfigValue(ConfigurationConstants.ENABLE_NONCE_CACHE, true, config);
-        properties.setEnableNonceReplayCache(enableNonceCache);
-
-        boolean enableSamlOneTimeUseCache =
-            decodeBooleanConfigValue(ConfigurationConstants.ENABLE_SAML_ONE_TIME_USE_CACHE, true, config);
-        properties.setEnableSamlOneTimeUseReplayCache(enableSamlOneTimeUseCache);
-
         boolean encryptSymmetricEncryptionKey =
             decodeBooleanConfigValue(ConfigurationConstants.ENC_SYM_ENC_KEY, true, config);
         properties.setEncryptSymmetricEncryptionKey(encryptSymmetricEncryptionKey);
