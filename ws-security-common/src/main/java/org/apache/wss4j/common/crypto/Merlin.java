@@ -1280,6 +1280,9 @@ public class Merlin extends CryptoBase {
      * @return an X509 Certificate (chain) that corresponds to the identifier
      */
     private X509Certificate[] getX509Certificates(String identifier) throws WSSecurityException {
+        if (identifier == null) {
+            return null;
+        }
         Certificate[] certs = null;
         try {
             if (keystore != null) {
