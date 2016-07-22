@@ -5,6 +5,19 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.1.7
+=============
+
+Bug
+
+    [WSS-582] - Don't cache Crypto key references in WSHandler
+    [WSS-583] - crypto.verifyTrust can fail when the DN of the issuer is more than once in the truststore
+
+Improvement
+
+    [WSS-584] - Don't create ReplayCache instances internally
+
+
 Release 2.1.6
 =============
 
