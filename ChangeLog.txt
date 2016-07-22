@@ -5,6 +5,18 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.0.9
+=============
+
+Bug
+
+    [WSS-582] - Don't cache Crypto key references in WSHandler
+
+Improvement
+
+    [WSS-584] - Don't create ReplayCache instances internally
+
+
 Release 2.0.8
 =============
 
