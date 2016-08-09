@@ -504,7 +504,10 @@ public class SamlAssertionWrapper {
         // prepare to sign the SAML token
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias(issuerKeyName);
-        X509Certificate[] issuerCerts = issuerCrypto.getX509Certificates(cryptoType);
+        X509Certificate[] issuerCerts = null;
+        if (issuerCrypto != null) {
+            issuerCerts = issuerCrypto.getX509Certificates(cryptoType);
+        }
         if (issuerCerts == null || issuerCerts.length == 0) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                 new Object[] {"No issuer certs were found to sign the SAML Assertion using issuer name: "
