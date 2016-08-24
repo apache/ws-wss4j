@@ -43,8 +43,9 @@ public class KerberosClientExceptionAction implements PrivilegedExceptionAction<
     private static final boolean isJava5Or6 = javaVersion.startsWith("1.5") || javaVersion.startsWith("1.6");
     private static final boolean isOracleJavaVendor = System.getProperty("java.vendor").startsWith("Oracle");
     private static final boolean isIBMJavaVendor = System.getProperty("java.vendor").startsWith("IBM");
-    private static final boolean isHPJavaVendor = System.getProperty("java.vendor").startsWith("Hewlett-Packard");
-	
+    private static final boolean isHPJavaVendor = System.getProperty("java.vendor").startsWith("Hewlett-Packard")
+        || System.getProperty("java.vendor").startsWith("Hewlett Packard");
+
     private static final String SUN_JGSS_INQUIRE_TYPE_CLASS = "com.sun.security.jgss.InquireType";
     private static final String SUN_JGSS_EXT_GSSCTX_CLASS = "com.sun.security.jgss.ExtendedGSSContext";
 
