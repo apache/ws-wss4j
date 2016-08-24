@@ -45,7 +45,6 @@ import org.apache.wss4j.binding.wss10.ObjectFactory;
 import org.apache.wss4j.binding.wss10.SecurityTokenReferenceType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
-import org.apache.wss4j.common.saml.SAMLUtil;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
@@ -182,49 +181,14 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         }
 
         if (holderOfKey) {
+            int subjectKeyInfoIndex = getSubjectKeyInfoIndex(eventQueue);
+            if (subjectKeyInfoIndex < 0) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "noKeyInSAMLToken");
+            }
 
-            // First try to get the credential from a CallbackHandler
-            final byte[] subjectSecretKey = SAMLUtil.getSecretKeyFromCallbackHandler(
-                    samlAssertionWrapper.getId(), wssSecurityProperties.getCallbackHandler());
-
-            if (subjectSecretKey != null && subjectSecretKey.length > 0) {
-
-                subjectSecurityToken = new AbstractInboundSecurityToken(
-                        wsInboundSecurityContext, IDGenerator.generateID(null),
-                        WSSecurityTokenConstants.KeyIdentifier_NoKeyInfo, true) {
-                    @Override
-                    public WSSecurityTokenConstants.TokenType getTokenType() {
-                        return WSSecurityTokenConstants.DefaultToken;
-                    }
-
-                    @Override
-                    public boolean isAsymmetric() throws XMLSecurityException {
-                        return false;
-                    }
-
-                    @Override
-                    protected Key getKey(String algorithmURI, XMLSecurityConstants.AlgorithmUsage
-                            algorithmUsage, String correlationID) throws XMLSecurityException {
-
-                        Key key = super.getKey(algorithmURI, algorithmUsage, correlationID);
-                        if (key == null) {
-                            String algoFamily = JCEAlgorithmMapper.getJCEKeyAlgorithmFromURI(algorithmURI);
-                            key = new SecretKeySpec(subjectSecretKey, algoFamily);
-                            setSecretKey(algorithmURI, key);
-                        }
-                        return key;
-                    }
-                };
-            } else {
-                int subjectKeyInfoIndex = getSubjectKeyInfoIndex(eventQueue);
-                if (subjectKeyInfoIndex < 0) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "noKeyInSAMLToken");
-                }
-
-                subjectSecurityToken = parseKeyInfo(inputProcessorChain, securityProperties, eventQueue, subjectKeyInfoIndex);
-                if (subjectSecurityToken == null) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "noKeyInSAMLToken");
-                }
+            subjectSecurityToken = parseKeyInfo(inputProcessorChain, securityProperties, eventQueue, subjectKeyInfoIndex);
+            if (subjectSecurityToken == null) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "noKeyInSAMLToken");
             }
         } else {
             subjectSecurityToken = null;

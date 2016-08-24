@@ -25,7 +25,6 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.crypto.XMLStructure;
@@ -37,7 +36,6 @@ import javax.xml.crypto.dsig.keyinfo.X509IssuerSerial;
 
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
-import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.opensaml.saml.saml2.core.SubjectConfirmationData;
@@ -47,9 +45,6 @@ import org.w3c.dom.Element;
  * Utility methods for SAML stuff
  */
 public final class SAMLUtil {
-
-    private static final org.slf4j.Logger LOG =
-        org.slf4j.LoggerFactory.getLogger(SAMLUtil.class);
 
     private static final String SIG_NS = "http://www.w3.org/2000/09/xmldsig#";
 
@@ -87,29 +82,6 @@ public final class SAMLUtil {
     }
 
     /**
-     * Try to get the secret key from a CallbackHandler implementation
-     * @param cb a CallbackHandler implementation
-     * @return An array of bytes corresponding to the secret key (can be null)
-     */
-    public static byte[] getSecretKeyFromCallbackHandler(
-        String id,
-        CallbackHandler cb
-    ) {
-        if (cb != null) {
-            WSPasswordCallback pwcb =
-                new WSPasswordCallback(id, WSPasswordCallback.SECRET_KEY);
-            try {
-                cb.handle(new Callback[]{pwcb});
-            } catch (Exception e1) {
-                LOG.debug("Error in retrieving secret key from CallbackHandler: " + e1.getMessage());
-                return null;
-            }
-            return pwcb.getKey();
-        }
-        return null;
-    }
-
-    /**
      * Get the SAMLKeyInfo object corresponding to the credential stored in the Subject of a
      * SAML 1.1 assertion
      * @param assertion The SAML 1.1 assertion
@@ -125,12 +97,6 @@ public final class SAMLUtil {
         Crypto sigCrypto,
         CallbackHandler callbackHandler
     ) throws WSSecurityException {
-        // First try to get the credential from a CallbackHandler
-        byte[] key = getSecretKeyFromCallbackHandler(assertion.getID(), callbackHandler);
-        if (key != null && key.length > 0) {
-            return new SAMLKeyInfo(key);
-        }
-
         for (org.opensaml.saml.saml1.core.Statement stmt : assertion.getStatements()) {
             org.opensaml.saml.saml1.core.Subject samlSubject = null;
             if (stmt instanceof org.opensaml.saml.saml1.core.AttributeStatement) {
@@ -178,12 +144,6 @@ public final class SAMLUtil {
         Crypto sigCrypto,
         CallbackHandler callbackHandler
     ) throws WSSecurityException {
-        // First try to get the credential from a CallbackHandler
-        byte[] key = getSecretKeyFromCallbackHandler(assertion.getID(), callbackHandler);
-        if (key != null && key.length > 0) {
-            return new SAMLKeyInfo(key);
-        }
-
         org.opensaml.saml.saml2.core.Subject samlSubject = assertion.getSubject();
         if (samlSubject != null) {
             List<org.opensaml.saml.saml2.core.SubjectConfirmation> subjectConfList =
