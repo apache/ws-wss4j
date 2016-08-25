@@ -50,7 +50,6 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
-import org.apache.wss4j.stax.impl.securityToken.SamlSecurityTokenImpl;
 import org.apache.wss4j.stax.securityEvent.SamlTokenSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.SignedPartSecurityEvent;
 import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
@@ -235,15 +234,8 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
         final TokenContext tokenContext = 
             new TokenContext(wssSecurityProperties, wsInboundSecurityContext, xmlSecEvents, elementPath);
 
-        //jdk 1.6 compiler bug? http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6302954
-        //type parameters of <T>T cannot be determined; no unique maximal instance exists for type variable T with
-        // upper bounds org.apache.wss4j.stax.securityToken.SamlSecurityToken,
-        // org.apache.wss4j.stax.securityToken.SamlSecurityToken,
-        // org.apache.xml.security.stax.ext.securityToken.InboundSecurityToken
-        //works fine on jdk 1.7
         final SamlSecurityToken samlSecurityToken =
-                samlTokenValidator.</*fake @see above*/SamlSecurityTokenImpl>
-                        validate(samlAssertionWrapper, subjectSecurityToken, tokenContext);
+                samlTokenValidator.validate(samlAssertionWrapper, subjectSecurityToken, tokenContext);
 
         SecurityTokenProvider<InboundSecurityToken> subjectSecurityTokenProvider =
                 new SecurityTokenProvider<InboundSecurityToken>() {
