@@ -30,7 +30,6 @@ import org.apache.wss4j.stax.ext.WSInboundSecurityContext;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.UsernameSecurityToken;
-import org.apache.wss4j.stax.impl.securityToken.UsernameSecurityTokenImpl;
 import org.apache.wss4j.stax.securityEvent.UsernameTokenSecurityEvent;
 import org.apache.wss4j.stax.validate.TokenContext;
 import org.apache.wss4j.stax.validate.UsernameTokenValidator;
@@ -109,15 +108,8 @@ public class UsernameTokenInputHandler extends AbstractInputSecurityHeaderHandle
         if (usernameTokenValidator == null) {
             usernameTokenValidator = new UsernameTokenValidatorImpl();
         }
-        //jdk 1.6 compiler bug? http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6302954
-        //type parameters of <T>T cannot be determined; no unique maximal instance exists for type variable T with
-        // upper bounds org.apache.wss4j.stax.securityToken.UsernameSecurityToken,
-        // org.apache.wss4j.stax.securityToken.UsernameSecurityToken,
-        // org.apache.xml.security.stax.ext.securityToken.InboundSecurityToken
-        //works fine on jdk 1.7
         final UsernameSecurityToken usernameSecurityToken =
-                usernameTokenValidator.</*fake @see above*/UsernameSecurityTokenImpl>
-                        validate(usernameTokenType, tokenContext);
+                usernameTokenValidator.validate(usernameTokenType, tokenContext);
 
         SecurityTokenProvider<InboundSecurityToken> securityTokenProvider =
                 new SecurityTokenProvider<InboundSecurityToken>() {
