@@ -90,7 +90,7 @@ public final class EHCacheManagerHolder {
         return cc;
     }
 
-    public static CacheManager getCacheManager(String confName, URL configFileURL) {
+    public static synchronized CacheManager getCacheManager(String confName, URL configFileURL) {
         CacheManager cacheManager = null;
         if (configFileURL == null) {
             //using the default
@@ -147,7 +147,7 @@ public final class EHCacheManagerHolder {
     }
 
 
-    public static void releaseCacheManger(CacheManager cacheManager) {
+    public static synchronized void releaseCacheManger(CacheManager cacheManager) {
         AtomicInteger a = COUNTS.get(cacheManager.getName());
         if (a == null) {
             return;
