@@ -459,6 +459,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
     private String symmetricSignature = SPConstants.HMAC_SHA1;
     private String asymmetricSignature = SPConstants.RSA_SHA1;
     private String computedKey = SPConstants.P_SHA1;
+    private String firstInvalidAlgorithmSuite;
 
     public AlgorithmSuite(SPConstants.SPVersion version, Policy nestedPolicy) {
         super(version);
@@ -518,6 +519,8 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
                     newAlgorithmSuiteType.setNamespace(getVersion().getNamespace());
                     algorithmSuite.setAlgorithmSuiteType(newAlgorithmSuiteType);
                     continue;
+                } else {
+                    firstInvalidAlgorithmSuite = assertionName;
                 }
                 C14NType c14NType = C14NType.lookUp(assertionName);
                 if (c14NType != null) {
@@ -618,5 +621,10 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
     public void setAsymmetricSignature(String asymmetricSignature) {
         this.asymmetricSignature = asymmetricSignature;
     }
+
+    public String getFirstInvalidAlgorithmSuite() {
+        return firstInvalidAlgorithmSuite;
+    }
+
 }
 
