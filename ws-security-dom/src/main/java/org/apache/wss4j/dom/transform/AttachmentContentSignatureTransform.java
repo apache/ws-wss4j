@@ -176,15 +176,11 @@ public class AttachmentContentSignatureTransform extends TransformService {
             }
 
             String mimeType = attachment.getMimeType();
-            String lowerCaseMimeType = null;
-            if (mimeType != null) {
-                lowerCaseMimeType = mimeType.toLowerCase();
-            }
 
-            if (lowerCaseMimeType != null
-                && (lowerCaseMimeType.startsWith("text/xml")
-                    || lowerCaseMimeType.startsWith("application/xml")
-                    || lowerCaseMimeType.matches("(application|image)/.*\\+xml.*"))) {
+            if (mimeType != null
+                && (mimeType.matches("(?i)(text/xml).*")
+                    || mimeType.matches("(?i)(application/xml).*")
+                    || mimeType.matches("(?i)(application|image)/.*\\+xml.*"))) {
                 /* 5.4.2:
                  * Content of an XML Content-Type MUST be XML canonicalized using
                  * Exclusive XML Canonicalization without comments,as specified by
@@ -201,7 +197,7 @@ public class AttachmentContentSignatureTransform extends TransformService {
                 XMLSignatureInput xmlSignatureInput = new XMLSignatureInput(inputStream);
                 canon.canonicalizeXPathNodeSet(xmlSignatureInput.getNodeSet());
 
-            } else if (lowerCaseMimeType != null && lowerCaseMimeType.startsWith("text/")) {
+            } else if (mimeType != null && mimeType.matches("(?i)(text/).*")) {
                 CRLFOutputStream crlfOutputStream = new CRLFOutputStream(outputStream);
                 int numBytes;
                 byte[] buf = new byte[8192];
