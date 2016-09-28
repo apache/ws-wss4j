@@ -23,6 +23,7 @@ Click on the links below for more information about migrating to various
 new versions of WSS4J.
 </p>
 <ul>
+<li><a href="wss4j22.html">WSS4J 2.2.0 Migration Guide</a></li>
 <li><a href="wss4j21.html">WSS4J 2.1.0 Migration Guide</a></li>
 <li><a href="wss4j20.html">WSS4J 2.0.0 Migration Guide</a></li>
 <li><a href="newfeatures20.html">WSS4J 2.0.0 New Features</a></li>
