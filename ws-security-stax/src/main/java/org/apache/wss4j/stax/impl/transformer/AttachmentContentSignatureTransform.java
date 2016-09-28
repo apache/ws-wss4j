@@ -74,15 +74,10 @@ public class AttachmentContentSignatureTransform extends TransformIdentity {
     @Override
     public void transform(InputStream inputStream) throws XMLStreamException {
         String mimeType = getAttachment().getMimeType();
-        String lowerCaseMimeType = null;
-        if (mimeType != null) {
-            lowerCaseMimeType = mimeType.toLowerCase();
-        }
-        
-        if (lowerCaseMimeType != null 
-            && (lowerCaseMimeType.startsWith("text/xml")
-                || lowerCaseMimeType.startsWith("application/xml")
-                || lowerCaseMimeType.matches("(application|image)/.*\\+xml.*"))) {
+        if (mimeType != null
+            && (mimeType.matches("(?i)(text/xml).*")
+                || mimeType.matches("(?i)(application/xml).*")
+                || mimeType.matches("(?i)(application|image)/.*\\+xml.*"))) {
             /* 5.4.2:
              * Content of an XML Content-Type MUST be XML canonicalized using
              * Exclusive XML Canonicalization without comments,as specified by
@@ -102,7 +97,7 @@ public class AttachmentContentSignatureTransform extends TransformIdentity {
             }
             canon.transform(inputStream);
 
-        } else if (lowerCaseMimeType != null && lowerCaseMimeType.startsWith("text/")) {
+        } else if (mimeType != null && mimeType.matches("(?i)(text/).*")) {
             CRLFOutputStream crlfOutputStream = new CRLFOutputStream(getOutputStream());
             try {
                 setOutputStream(crlfOutputStream);

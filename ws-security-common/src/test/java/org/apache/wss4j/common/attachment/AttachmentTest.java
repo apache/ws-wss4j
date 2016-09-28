@@ -22,6 +22,16 @@ import org.junit.Assert;
 import org.apache.wss4j.common.util.AttachmentUtils;
 
 public class AttachmentTest {
+    
+    @org.junit.Test
+    public void testMatch() {
+        Assert.assertTrue("text/xml".matches("(?i)(text/xml).*"));
+        Assert.assertTrue("TEXT/XML".matches("(?i)(text/xml).*"));
+        Assert.assertTrue("application/xml".matches("(?i)(application/xml).*"));
+        Assert.assertTrue("APPLICATION/XML".matches("(?i)(application/xml).*"));
+        Assert.assertTrue("text/plain".matches("(?i)(text/).*"));
+        Assert.assertTrue("TEXT/PLAIN".matches("(?i)(text/).*"));
+    }
 
     @org.junit.Test
     public void testMimeHeaderUncomment_1() throws Exception {
