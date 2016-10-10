@@ -19,7 +19,6 @@
 
 package org.apache.wss4j.dom.message.token;
 
-import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Base64;
 import java.util.HashMap;
@@ -32,8 +31,7 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
 import org.apache.wss4j.common.derivedKey.ConversationConstants;
-import org.apache.wss4j.common.derivedKey.AlgoFactory;
-import org.apache.wss4j.common.derivedKey.DerivationAlgorithm;
+import org.apache.wss4j.common.derivedKey.DerivedKeyUtils;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.DOM2Writer;
@@ -543,28 +541,8 @@ public class DerivedKeyToken {
      */
     public byte[] deriveKey(int length, byte[] secret) throws WSSecurityException {
         try {
-            DerivationAlgorithm algo = AlgoFactory.getInstance(getAlgorithm());
-            byte[] labelBytes = null;
-            String label = getLabel();
-            if (label == null || label.length() == 0) {
-                String defaultLabel = ConversationConstants.DEFAULT_LABEL
-                    + ConversationConstants.DEFAULT_LABEL;
-                labelBytes = defaultLabel.getBytes(StandardCharsets.UTF_8);
-            } else {
-                labelBytes = label.getBytes(StandardCharsets.UTF_8);
-            }
-
             byte[] nonce = Base64.getMimeDecoder().decode(getNonce());
-            byte[] seed = new byte[labelBytes.length + nonce.length];
-            System.arraycopy(labelBytes, 0, seed, 0, labelBytes.length);
-            System.arraycopy(nonce, 0, seed, labelBytes.length, nonce.length);
-
-            int keyLength = length;
-            if (keyLength <= 0) {
-                keyLength = getLength();
-            }
-            return algo.createKey(secret, seed, getOffset(), keyLength);
-
+            return DerivedKeyUtils.deriveKey(getAlgorithm(), getLabel(), length, secret, nonce, getOffset());
         } catch (Exception e) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, e
