@@ -99,11 +99,12 @@ public class XmlSchemaDateFormat extends DateFormat {
 
             // parse optional milliseconds
             if (src != null) {
-                if (index < src.length() && src.charAt(index) == '.') {
+                int srcLength = src.length();
+                if (index < srcLength && src.charAt(index) == '.') {
                     int milliseconds = 0;
                     int start = ++index;
 
-                    while (index < src.length()
+                    while (index < srcLength
                             && Character.isDigit(src.charAt(index))) {
                         index++;
                     }
@@ -128,7 +129,7 @@ public class XmlSchemaDateFormat extends DateFormat {
                 }
 
                 // parse optional timezone
-                if (index + 5 < src.length()
+                if (index + 5 < srcLength
                         && (src.charAt(index) == '+' || src.charAt(index) == '-')) {
                     validateCharIsDigit(src, parsePos, index + 1, "EXPECTED_NUMERAL");
                     validateCharIsDigit(src, parsePos, index + 2, "EXPECTED_NUMERAL");
@@ -151,11 +152,11 @@ public class XmlSchemaDateFormat extends DateFormat {
                     index += 6;
                 }
 
-                if (index < src.length() && src.charAt(index) == 'Z') {
+                if (index < srcLength && src.charAt(index) == 'Z') {
                     index++;
                 }
 
-                if (index < src.length()) {
+                if (index < srcLength) {
                     handleParseError(parsePos, "TOO_MANY_CHARS");
                 }
             }

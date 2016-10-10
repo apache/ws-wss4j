@@ -185,8 +185,8 @@ public final class AttachmentUtils {
     public static String unfoldWhitespace(String text) {
         int count = 0;
         char[] chars = text.toCharArray();
-        for (int i = 0; i < chars.length; i++) {
-            if (SPACE != chars[i] && HTAB != chars[i]) {
+        for (char character : chars) {
+            if (SPACE != character && HTAB != character) {
                 break;
             }
             count++;
@@ -195,15 +195,16 @@ public final class AttachmentUtils {
     }
 
     //removes any CRLF followed by a whitespace
-    public static String unfold(String text) {
+    public static String unfold(final String text) {
 
-        if (text.length() < 3) {
+        int length = text.length();
+        if (length < 3) {
             return text;
         }
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (int i = 0; i < text.length() - 2; i++) {
+        for (int i = 0; i < length - 2; i++) {
             char ch1 = text.charAt(i);
             final char ch2 = text.charAt(i + 1);
             final char ch3 = text.charAt(i + 2);
@@ -211,15 +212,15 @@ public final class AttachmentUtils {
             if (CARRIAGE_RETURN == ch1 && LINEFEED == ch2 && (SPACE == ch3 || HTAB == ch3)) {
 
                 i += 2;
-                if (i >= text.length() - 3) {
-                    for (i++; i < text.length(); i++) { //NOPMD
+                if (i >= length - 3) {
+                    for (i++; i < length; i++) { //NOPMD
                         stringBuilder.append(text.charAt(i));
                     }
                 }
                 continue;
             }
             stringBuilder.append(ch1);
-            if (i == text.length() - 3) {
+            if (i == length - 3) {
                 stringBuilder.append(ch2);
                 stringBuilder.append(ch3);
             }
@@ -352,9 +353,10 @@ public final class AttachmentUtils {
         }
     }
 
-    public static String unquoteInnerText(String text) {
+    public static String unquoteInnerText(final String text) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < text.length() - 1; i++) {
+        int length = text.length();
+        for (int i = 0; i < length - 1; i++) {
             char c = text.charAt(i);
             char c1 = text.charAt(i + 1);
             if (i == 0 && DOUBLE_QUOTE == c) {
@@ -362,7 +364,7 @@ public final class AttachmentUtils {
                 continue;
             }
             if (BACKSLASH == c && (DOUBLE_QUOTE == c1 || BACKSLASH == c1)) {
-                if (i != 0 && i != text.length() - 2) {
+                if (i != 0 && i != length - 2) {
                     stringBuilder.append(c);
                 }
                 stringBuilder.append(c1);
@@ -375,7 +377,7 @@ public final class AttachmentUtils {
                 i++;
             } else {
                 stringBuilder.append(c);
-                if (i == text.length() - 2 && DOUBLE_QUOTE == c1) {
+                if (i == length - 2 && DOUBLE_QUOTE == c1) {
                     stringBuilder.append(c1);
                 }
             }
@@ -386,17 +388,18 @@ public final class AttachmentUtils {
     /*
      * Removes any comment outside quoted text. Comments are enclosed between ()
      */
-    public static String uncomment(String text) {
+    public static String uncomment(final String text) {
         StringBuilder stringBuilder = new StringBuilder();
 
         int inComment = 0;
+        int length = text.length();
         outer:
-        for (int i = 0; i < text.length(); i++) {
+        for (int i = 0; i < length; i++) {
             char ch = text.charAt(i);
 
             if (DOUBLE_QUOTE == ch) {
                 stringBuilder.append(ch);
-                for (i++; i < text.length(); i++) { //NOPMD
+                for (i++; i < length; i++) { //NOPMD
                     ch = text.charAt(i);
                     stringBuilder.append(ch);
                     if (DOUBLE_QUOTE == ch) {
@@ -406,7 +409,7 @@ public final class AttachmentUtils {
             }
             if (LEFT_PARENTHESIS == ch) {
                 inComment++;
-                for (i++; i < text.length(); i++) { //NOPMD
+                for (i++; i < length; i++) { //NOPMD
                     ch = text.charAt(i);
                     if (LEFT_PARENTHESIS == ch) {
                         inComment++;

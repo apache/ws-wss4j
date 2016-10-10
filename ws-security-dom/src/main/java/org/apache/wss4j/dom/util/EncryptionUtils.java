@@ -435,7 +435,8 @@ public final class EncryptionUtils {
             && !(Node.DOCUMENT_NODE == parent.getParentNode().getNodeType())) {
             parent = parent.getParentNode();
             NamedNodeMap attributes = parent.getAttributes();
-            for (int i = 0; i < attributes.getLength(); i++) {
+            int length = attributes.getLength();
+            for (int i = 0; i < length; i++) {
                 Node attribute = attributes.item(i);
                 String attrDef = "xmlns:" + attribute.getLocalName();
                 if (WSConstants.XMLNS_NS.equals(attribute.getNamespaceURI()) && !prefix.toString().contains(attrDef)) {

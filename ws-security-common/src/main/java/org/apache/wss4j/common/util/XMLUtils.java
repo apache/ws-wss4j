@@ -207,7 +207,8 @@ public final class XMLUtils {
     public static String getPrefixNS(String uri, Node e) {
         while (e != null && e.getNodeType() == Element.ELEMENT_NODE) {
             NamedNodeMap attrs = e.getAttributes();
-            for (int n = 0; n < attrs.getLength(); n++) {
+            int length = attrs.getLength();
+            for (int n = 0; n < length; n++) {
                 Attr a = (Attr) attrs.item(n);
                 String name = a.getName();
                 if (name.startsWith("xmlns:") && a.getNodeValue().equals(uri)) {
