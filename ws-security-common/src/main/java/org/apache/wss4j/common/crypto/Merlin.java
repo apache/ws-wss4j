@@ -52,7 +52,6 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -118,6 +117,7 @@ public class Merlin extends CryptoBase {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(Merlin.class);
     private static final boolean DO_DEBUG = LOG.isDebugEnabled();
+    private static final String COMMA_SEPARATOR = ",";
 
     protected Properties properties;
     protected KeyStore keystore;
@@ -304,39 +304,57 @@ public class Merlin extends CryptoBase {
         //
         // Load the CRL file
         //
-        String crlLocation = properties.getProperty(prefix + X509_CRL_FILE);
-        if (crlLocation != null) {
-            crlLocation = crlLocation.trim();
-
-            try (InputStream is = loadInputStream(loader, crlLocation)) {
-                CertificateFactory cf = getCertificateFactory();
-                X509CRL crl = (X509CRL)cf.generateCRL(is);
-
+        String crlLocations = properties.getProperty(prefix + X509_CRL_FILE);
+        if (crlLocations != null) {
+            String[] splittedCrlsLocations = crlLocations.split(COMMA_SEPARATOR);
+            List<X509CRL> crls = new ArrayList();
+            for (int i = 0; i < splittedCrlsLocations.length; i++) {
+                String crlLocation = splittedCrlsLocations[i];
+                crlLocation = crlLocation.trim();
+                InputStream is = loadInputStream(loader, crlLocation);
+                try {
+                    CertificateFactory cf = getCertificateFactory();
+                    X509CRL crl = (X509CRL)cf.generateCRL(is);
+                    crls.add(crl);
+                } catch (Exception e) {
+                    if (DO_DEBUG) {
+                        LOG.debug(e.getMessage(), e);
+                    }
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,e, "ioError00");
+                } finally {
+                    if (is != null) {
+                        is.close();
+                    }
+                }
+            }
+            try {
                 if (keystoreProvider == null || keystoreProvider.length() == 0) {
                     crlCertStore =
-                        CertStore.getInstance(
-                            "Collection",
-                            new CollectionCertStoreParameters(Collections.singletonList(crl))
-                        );
+                            CertStore.getInstance(
+                                    "Collection",
+                                    new CollectionCertStoreParameters(crls)
+                            );
+
                 } else {
                     crlCertStore =
-                        CertStore.getInstance(
-                            "Collection",
-                            new CollectionCertStoreParameters(Collections.singletonList(crl)),
-                                keystoreProvider
-                        );
-                }
-                if (DO_DEBUG) {
-                    LOG.debug(
-                        "The CRL " + crlLocation + " has been loaded"
-                    );
+                            CertStore.getInstance(
+                                    "Collection",
+                                    new CollectionCertStoreParameters(crls),
+                                    keystoreProvider
+                            );
                 }
             } catch (Exception e) {
                 if (DO_DEBUG) {
                     LOG.debug(e.getMessage(), e);
                 }
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "failedCredentialLoad");
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,e, "ioError00");
             }
+            if (DO_DEBUG) {
+                LOG.debug(
+                        "The CRL " + crlLocations + " has been loaded"
+                );
+            }
+
         }
     }
 
