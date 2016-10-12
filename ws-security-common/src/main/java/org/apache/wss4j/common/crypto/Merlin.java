@@ -302,17 +302,14 @@ public class Merlin extends CryptoBase {
         }
 
         //
-        // Load the CRL file
+        // Load the CRL file(s)
         //
         String crlLocations = properties.getProperty(prefix + X509_CRL_FILE);
         if (crlLocations != null) {
             String[] splittedCrlsLocations = crlLocations.split(COMMA_SEPARATOR);
-            List<X509CRL> crls = new ArrayList();
-            for (int i = 0; i < splittedCrlsLocations.length; i++) {
-                String crlLocation = splittedCrlsLocations[i];
-                crlLocation = crlLocation.trim();
-                InputStream is = loadInputStream(loader, crlLocation);
-                try {
+            List<X509CRL> crls = new ArrayList<>(splittedCrlsLocations.length);
+            for (String crlLocation : splittedCrlsLocations) {
+                try (InputStream is = loadInputStream(loader, crlLocation.trim())) {
                     CertificateFactory cf = getCertificateFactory();
                     X509CRL crl = (X509CRL)cf.generateCRL(is);
                     crls.add(crl);
@@ -321,10 +318,6 @@ public class Merlin extends CryptoBase {
                         LOG.debug(e.getMessage(), e);
                     }
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,e, "ioError00");
-                } finally {
-                    if (is != null) {
-                        is.close();
-                    }
                 }
             }
             try {
@@ -351,7 +344,7 @@ public class Merlin extends CryptoBase {
             }
             if (DO_DEBUG) {
                 LOG.debug(
-                        "The CRL " + crlLocations + " has been loaded"
+                        "The CRL files " + crlLocations + " have been loaded"
                 );
             }
 
