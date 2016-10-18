@@ -119,7 +119,7 @@ public abstract class X509SecurityTokenImpl
                 subjectCertConstraints = securityProperties.getSubjectCertConstraints();
                 issuerCertConstraints = securityProperties.getIssuerDNConstraints();
             }
-            getCrypto().verifyTrust(x509Certificates, enableRevocation, subjectCertConstraints,issuerCertConstraints);
+            getCrypto().verifyTrust(x509Certificates, enableRevocation, subjectCertConstraints, issuerCertConstraints);
         }
     }
 

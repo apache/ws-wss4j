@@ -20,6 +20,7 @@ package org.apache.wss4j.stax.setup;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -535,37 +536,15 @@ public final class ConfigurationConverter {
         String certConstraints =
             getString(ConfigurationConstants.SIG_SUBJECT_CERT_CONSTRAINTS, config);
         if (certConstraints != null) {
-            String[] certConstraintsList = certConstraints.split(",");
-            if (certConstraintsList != null) {
-                Collection<Pattern> subjectCertConstraints =
-                    new ArrayList<>(certConstraintsList.length);
-                for (String certConstraint : certConstraintsList) {
-                    try {
-                        subjectCertConstraints.add(Pattern.compile(certConstraint.trim()));
-                    } catch (PatternSyntaxException ex) {
-                        LOG.error(ex.getMessage(), ex);
-                    }
-                }
-                properties.setSubjectCertConstraints(subjectCertConstraints);
-            }
+            Collection<Pattern> subjectCertConstraints = getCertConstraints(certConstraints);
+            properties.setSubjectCertConstraints(subjectCertConstraints);
         }
         // Subject Cert Constraints
         String issuerCertConstraintsString =
-                getString(ConfigurationConstants.SIG_ISSUER_CERT_CONSTRAINTS, config);
+            getString(ConfigurationConstants.SIG_ISSUER_CERT_CONSTRAINTS, config);
         if (issuerCertConstraintsString != null) {
-            String[] certConstraintsList = issuerCertConstraintsString.split(",");
-            if (certConstraintsList != null) {
-                Collection<Pattern> issuerCertConstraints =
-                        new ArrayList<>(certConstraintsList.length);
-                for (String certConstraint : certConstraintsList) {
-                    try {
-                        issuerCertConstraints.add(Pattern.compile(certConstraint.trim()));
-                    } catch (PatternSyntaxException ex) {
-                        LOG.error(ex.getMessage(), ex);
-                    }
-                }
-                properties.setSubjectCertConstraints(issuerCertConstraints);
-            }
+            Collection<Pattern> issuerCertConstraints = getCertConstraints(certConstraints);
+            properties.setIssuerDNConstraints(issuerCertConstraints);
         }
 
         properties.setUtTTL(decodeTimeToLive(config, false));
@@ -625,6 +604,24 @@ public final class ConfigurationConverter {
         if (convertedDerivedKeyIdentifier != null) {
             properties.setDerivedKeyKeyIdentifier(convertedDerivedKeyIdentifier);
         }
+    }
+    
+    private static Collection<Pattern> getCertConstraints(String certConstraints) {
+        String[] certConstraintsList = certConstraints.split(",");
+        if (certConstraintsList != null && certConstraintsList.length > 0) {
+            Collection<Pattern> certConstraintsCollection =
+                new ArrayList<>(certConstraintsList.length);
+            for (String certConstraint : certConstraintsList) {
+                try {
+                    certConstraintsCollection.add(Pattern.compile(certConstraint.trim()));
+                } catch (PatternSyntaxException ex) {
+                    LOG.error(ex.getMessage(), ex);
+                }
+            }
+            
+            return certConstraintsCollection;
+        }
+        return Collections.emptyList();
     }
     
     private static void configureParts(Object secureParts, WSSSecurityProperties properties,

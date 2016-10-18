@@ -80,7 +80,7 @@ public class EncryptionAction implements Action {
             cryptoType.setAlias(encryptionToken.getUser());
             X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
             if (certs != null && certs.length > 0) {
-                crypto.verifyTrust(certs, enableRevocation, null);
+                crypto.verifyTrust(certs, enableRevocation, null, null);
             }
         }
         if (encryptionToken.getParts().size() > 0) {

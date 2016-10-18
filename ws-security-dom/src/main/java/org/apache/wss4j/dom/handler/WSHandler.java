@@ -1318,45 +1318,40 @@ public abstract class WSHandler {
         String certConstraints =
             getString(WSHandlerConstants.SIG_SUBJECT_CERT_CONSTRAINTS, reqData.getMsgContext());
         if (certConstraints != null) {
-            String[] certConstraintsList = certConstraints.split(",");
-            if (certConstraintsList != null) {
-                Collection<Pattern> subjectCertConstraints =
-                    new ArrayList<>(certConstraintsList.length);
-                for (String certConstraint : certConstraintsList) {
-                    try {
-                        subjectCertConstraints.add(Pattern.compile(certConstraint.trim()));
-                    } catch (PatternSyntaxException ex) {
-                        LOG.debug(ex.getMessage(), ex);
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
-                    }
-                }
-                reqData.setSubjectCertConstraints(subjectCertConstraints);
-            }
+            Collection<Pattern> subjectCertConstraints = getCertConstraints(certConstraints);
+            reqData.setSubjectCertConstraints(subjectCertConstraints);
         }
         String issuerCertConstraintsStringValue =
-                    getString(WSHandlerConstants.SIG_ISSUER_CERT_CONSTRAINTS, reqData.getMsgContext());
-                if (issuerCertConstraintsStringValue != null) {
-                    String[] issuerCertConstraintsList = issuerCertConstraintsStringValue.split(",");
-                    if (issuerCertConstraintsList != null) {
-                        Collection<Pattern> issuerCertConstraints =
-                            new ArrayList<>(issuerCertConstraintsList.length);
-                        for (String certConstraint : issuerCertConstraintsList) {
-                            try {
-                                issuerCertConstraints.add(Pattern.compile(certConstraint.trim()));
-                            } catch (PatternSyntaxException ex) {
-                                LOG.debug(ex.getMessage(), ex);
-                                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
-                            }
-                        }
-                        reqData.setIssuerDNPatterns(issuerCertConstraints);
-                    }
-                }
+            getString(WSHandlerConstants.SIG_ISSUER_CERT_CONSTRAINTS, reqData.getMsgContext());
+        if (issuerCertConstraintsStringValue != null) {
+            Collection<Pattern> issuerCertConstraints = getCertConstraints(issuerCertConstraintsStringValue);
+            reqData.setIssuerDNPatterns(issuerCertConstraints);
+        }
 
         boolean expandXOP =
             decodeBooleanConfigValue(
                 reqData.getMsgContext(), WSHandlerConstants.EXPAND_XOP_INCLUDE_FOR_SIGNATURE, true
             );
         reqData.setExpandXopIncludeForSignature(expandXOP);
+    }
+    
+    private Collection<Pattern> getCertConstraints(String certConstraints) throws WSSecurityException {
+        String[] certConstraintsList = certConstraints.split(",");
+        if (certConstraintsList != null && certConstraintsList.length > 0) {
+            Collection<Pattern> certConstraintsCollection =
+                new ArrayList<>(certConstraintsList.length);
+            for (String certConstraint : certConstraintsList) {
+                try {
+                    certConstraintsCollection.add(Pattern.compile(certConstraint.trim()));
+                } catch (PatternSyntaxException ex) {
+                    LOG.debug(ex.getMessage(), ex);
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
+                }
+            }
+            
+            return certConstraintsCollection;
+        }
+        return Collections.emptyList();
     }
 
     /*
