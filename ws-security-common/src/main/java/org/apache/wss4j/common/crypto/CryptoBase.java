@@ -318,25 +318,60 @@ public abstract class CryptoBase implements Crypto {
      *              has to match ONE of the subject cert constraints (not all).
      */
     protected boolean
-    matches(
+    matchesSubjectDnPattern(
         final X509Certificate cert, final Collection<Pattern> subjectDNPatterns
     ) {
-        if (subjectDNPatterns == null || subjectDNPatterns.isEmpty()) {
-            LOG.warn("No Subject DN Certificate Constraints were defined. This could be a security issue");
-            return true;
+
+        if (cert == null) {
+            LOG.debug("The certificate is null so no constraints matching was possible");
+            return false;
         }
-        if (!subjectDNPatterns.isEmpty()) {
+        String subjectName = cert.getSubjectX500Principal().getName();
+        return matchesName(subjectName,subjectDNPatterns);
+    }
+
+    /**
+     * @return      true if the certificate's Issuer DN matches the constraints defined in the
+     *              subject DNConstraints; false, otherwise. The certificate subject DN only
+     *              has to match ONE of the subject cert constraints (not all).
+     */
+    protected boolean
+    matchesIssuerDnPattern(
+            final X509Certificate cert, final Collection<Pattern> issuerDNPatterns
+    ) {
+
             if (cert == null) {
                 LOG.debug("The certificate is null so no constraints matching was possible");
                 return false;
             }
-            String subjectName = cert.getSubjectX500Principal().getName();
+        String issuerDn = cert.getIssuerDN().getName();
+        return matchesName(issuerDn,issuerDNPatterns);
+    }
+
+    /**
+     * @return      true if the provided name matches the constraints defined in the
+     *              subject DNConstraints; false, otherwise. The certificate subject DN only
+     *              has to match ONE of the subject cert constraints (not all).
+     */
+    protected boolean
+    matchesName(
+            final String name, final Collection<Pattern> patterns
+    ) {
+        if (patterns == null || patterns.isEmpty()) {
+            LOG.warn("No Subject DN Certificate Constraints were defined. This could be a security issue");
+            return true;
+        }
+        if (!patterns.isEmpty()) {
+            if (name == null || name.isEmpty()) {
+                LOG.debug("The name is null so no constraints matching was possible");
+                return false;
+            }
             boolean subjectMatch = false;
-            for (Pattern subjectDNPattern : subjectDNPatterns) {
-                final Matcher matcher = subjectDNPattern.matcher(subjectName);
+            for (Pattern subjectDNPattern : patterns) {
+                final Matcher matcher = subjectDNPattern.matcher(name);
                 if (matcher.matches()) {
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("Subject DN " + subjectName + " matches with pattern " + subjectDNPattern);
+                        LOG.debug("Name " + name + " matches with pattern " + subjectDNPattern);
                     }
                     subjectMatch = true;
                     break;

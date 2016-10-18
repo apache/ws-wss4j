@@ -113,11 +113,13 @@ public abstract class X509SecurityTokenImpl
         if (x509Certificates != null && x509Certificates.length > 0) {
             boolean enableRevocation = false;
             Collection<Pattern> subjectCertConstraints = null;
+            Collection<Pattern> issuerCertConstraints = null;
             if (securityProperties != null) {
                 enableRevocation = securityProperties.isEnableRevocation();
                 subjectCertConstraints = securityProperties.getSubjectCertConstraints();
+                issuerCertConstraints = securityProperties.getIssuerDNConstraints();
             }
-            getCrypto().verifyTrust(x509Certificates, enableRevocation, subjectCertConstraints);
+            getCrypto().verifyTrust(x509Certificates, enableRevocation, subjectCertConstraints,issuerCertConstraints);
         }
     }
 

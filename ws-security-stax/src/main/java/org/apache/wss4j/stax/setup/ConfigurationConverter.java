@@ -549,6 +549,24 @@ public final class ConfigurationConverter {
                 properties.setSubjectCertConstraints(subjectCertConstraints);
             }
         }
+        // Subject Cert Constraints
+        String issuerCertConstraintsString =
+                getString(ConfigurationConstants.SIG_ISSUER_CERT_CONSTRAINTS, config);
+        if (issuerCertConstraintsString != null) {
+            String[] certConstraintsList = issuerCertConstraintsString.split(",");
+            if (certConstraintsList != null) {
+                Collection<Pattern> issuerCertConstraints =
+                        new ArrayList<>(certConstraintsList.length);
+                for (String certConstraint : certConstraintsList) {
+                    try {
+                        issuerCertConstraints.add(Pattern.compile(certConstraint.trim()));
+                    } catch (PatternSyntaxException ex) {
+                        LOG.error(ex.getMessage(), ex);
+                    }
+                }
+                properties.setSubjectCertConstraints(issuerCertConstraints);
+            }
+        }
 
         properties.setUtTTL(decodeTimeToLive(config, false));
         properties.setUtFutureTTL(decodeFutureTimeToLive(config, false));

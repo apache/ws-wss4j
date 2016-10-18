@@ -206,11 +206,14 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
             if (x509Certificates != null && x509Certificates.length > 0) {
                 boolean enableRevocation = false;
                 Collection<Pattern> subjectCertConstraints = null;
+                Collection<Pattern> issuerCertConstraints = null;
                 if (securityProperties != null) {
                     enableRevocation = securityProperties.isEnableRevocation();
                     subjectCertConstraints = securityProperties.getSubjectCertConstraints();
+                    issuerCertConstraints = securityProperties.getIssuerDNConstraints();
+
                 }
-                crypto.verifyTrust(x509Certificates, enableRevocation, subjectCertConstraints);
+                crypto.verifyTrust(x509Certificates, enableRevocation, subjectCertConstraints,issuerCertConstraints);
             }
             PublicKey publicKey = getPublicKey();
             if (publicKey != null) {

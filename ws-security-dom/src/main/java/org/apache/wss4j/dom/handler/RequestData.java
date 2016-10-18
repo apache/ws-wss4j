@@ -73,6 +73,7 @@ public class RequestData {
     private ReplayCache nonceReplayCache;
     private ReplayCache samlOneTimeUseReplayCache;
     private Collection<Pattern> subjectDNPatterns = new ArrayList<>();
+    private Collection<Pattern> issuerDNPatterns = new ArrayList<>();
     private final List<BSPRule> ignoredBSPRules = new LinkedList<>();
     private boolean appendSignatureAfterTimestamp;
     private int originalSignatureActionPosition;
@@ -445,6 +446,21 @@ public class RequestData {
      */
     public Collection<Pattern> getSubjectCertConstraints() {
         return subjectDNPatterns;
+    }
+
+    /**
+     * Get the Signature Issuer DN Cert Constraints
+     * @return
+     */
+    public Collection<Pattern> getIssuerDNPatterns() {
+        return issuerDNPatterns;
+    }
+    /**
+     * Set the Signature Issuer DN Cert Constraints
+     *
+     */
+    public void setIssuerDNPatterns(Collection<Pattern> issuerDNPatterns) {
+        this.issuerDNPatterns = issuerDNPatterns;
     }
 
     /**

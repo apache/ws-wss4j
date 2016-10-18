@@ -817,6 +817,14 @@ public class ConfigurationConstants {
     public static final String SIG_SUBJECT_CERT_CONSTRAINTS = "sigSubjectCertConstraints";
 
     /**
+     * This configuration tag is a comma separated String of regular expressions which
+     * will be applied to the issuer DN of the certificate used for signature
+     * validation, after trust verification of the certificate chain associated with the
+     * certificate.
+     */
+    public static final String SIG_ISSUER_CERT_CONSTRAINTS = "sigIssuerCertConstraints";
+
+    /**
      * Time-To-Live is the time difference between creation and expiry time in
      * seconds in the WSS Timestamp. After this time the SOAP request is
      * invalid (at least the security data shall be treated this way).

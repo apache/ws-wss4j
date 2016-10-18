@@ -110,6 +110,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     private ReplayCache samlOneTimeUseReplayCache;
     private boolean validateSamlSubjectConfirmation = true;
     private Collection<Pattern> subjectDNPatterns = new ArrayList<>();
+    private Collection<Pattern> issuerDNPatterns = new ArrayList<>();
     private List<String> audienceRestrictions = new ArrayList<>();
     private boolean requireTimestampExpires;
 
@@ -169,6 +170,7 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
         this.validateSamlSubjectConfirmation = wssSecurityProperties.validateSamlSubjectConfirmation;
         this.encryptSymmetricEncrytionKey = wssSecurityProperties.encryptSymmetricEncrytionKey;
         this.subjectDNPatterns = wssSecurityProperties.subjectDNPatterns;
+        this.issuerDNPatterns = wssSecurityProperties.issuerDNPatterns;
         this.attachmentCallbackHandler = wssSecurityProperties.attachmentCallbackHandler;
         this.msgContext = wssSecurityProperties.msgContext;
         this.audienceRestrictions = wssSecurityProperties.audienceRestrictions;
@@ -869,6 +871,20 @@ public class WSSSecurityProperties extends XMLSecurityProperties {
     public Collection<Pattern> getSubjectCertConstraints() {
         return subjectDNPatterns;
     }
+    /**
+     * Set the Signature Issuer Cert Constraints
+     */
+    public void setIssuerDNConstraints(Collection<Pattern> issuerDNPatterns) {
+        this.issuerDNPatterns = issuerDNPatterns;
+    }
+    /**
+     * Get the Signature Issuer Cert Constraints
+     */
+    public Collection<Pattern> getIssuerDNConstraints() {
+        return issuerDNPatterns;
+    }
+
+
 
     /**
      * Set the Audience Restrictions

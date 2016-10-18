@@ -217,6 +217,21 @@ public interface Crypto {
     ) throws WSSecurityException;
 
     /**
+     * Evaluate whether a given certificate chain should be trusted.
+     *
+     * @param certs Certificate chain to validate
+     * @param enableRevocation whether to enable CRL verification or not
+     * @param subjectCertConstraints A set of constraints on the Subject DN of the certificates
+     * @param issuerCertConstraints A set of constraints on the Issuer DN of the certificates
+     * @throws WSSecurityException if the certificate chain is invalid
+     */
+    void verifyTrust(
+            X509Certificate[] certs, boolean enableRevocation,
+            Collection<Pattern> subjectCertConstraints,Collection<Pattern> issuerCertConstraints
+    ) throws WSSecurityException;
+
+
+    /**
      * Evaluate whether a given public key should be trusted directly (located
      *
      * @param certs Certificate chain to validate
