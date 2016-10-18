@@ -295,6 +295,11 @@ public abstract class CryptoBase implements Crypto {
         }
         return certs;
     }
+    
+    @Override
+    public void verifyDirectTrust(X509Certificate[] certs) throws WSSecurityException {
+        verifyTrust(certs, true, null);
+    }
 
     protected Object createBCX509Name(String s) {
         if (BC_509CLASS_CONS != null) {
@@ -326,23 +331,6 @@ public abstract class CryptoBase implements Crypto {
             return true;
         }
         return matchesName(subjectName, subjectDNPatterns);
-    }
-
-    /**
-     * @return      true if the certificate's Issuer DN matches the constraints defined in the
-     *              subject DNConstraints; false, otherwise. The certificate subject DN only
-     *              has to match ONE of the subject cert constraints (not all).
-     */
-    protected boolean
-    matchesIssuerDnPattern(
-        final X509Certificate cert, final Collection<Pattern> issuerDNPatterns
-    ) {
-        if (cert == null) {
-            LOG.debug("The certificate is null so no constraints matching was possible");
-            return false;
-        }
-        String issuerDn = cert.getIssuerDN().getName();
-        return matchesName(issuerDn, issuerDNPatterns);
     }
 
     /**

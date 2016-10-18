@@ -119,8 +119,63 @@ public abstract class X509SecurityTokenImpl
                 subjectCertConstraints = securityProperties.getSubjectCertConstraints();
                 issuerCertConstraints = securityProperties.getIssuerDNConstraints();
             }
-            getCrypto().verifyTrust(x509Certificates, enableRevocation, subjectCertConstraints, issuerCertConstraints);
+            getCrypto().verifyTrust(x509Certificates, enableRevocation, subjectCertConstraints);
+            
+            // Now verify Issuer DN constraints
+            if (!matchesIssuerDnPattern(x509Certificates[0], issuerCertConstraints)) {
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+            }
         }
+    }
+    
+    /**
+     * @return      true if the certificate's Issuer DN matches the constraints defined in the
+     *              subject DNConstraints; false, otherwise. The certificate subject DN only
+     *              has to match ONE of the subject cert constraints (not all).
+     */
+    protected boolean
+    matchesIssuerDnPattern(
+        final X509Certificate cert, final Collection<Pattern> issuerDNPatterns
+    ) {
+        if (cert == null) {
+            LOG.debug("The certificate is null so no constraints matching was possible");
+            return false;
+        }
+        String issuerDn = cert.getIssuerDN().getName();
+        return matchesName(issuerDn, issuerDNPatterns);
+    }
+    
+    /**
+     * @return      true if the provided name matches the constraints defined in the
+     *              subject DNConstraints; false, otherwise. The certificate (subject) DN only
+     *              has to match ONE of the (subject) cert constraints (not all).
+     */
+    private boolean
+    matchesName(
+        final String name, final Collection<Pattern> patterns
+    ) {
+        if (patterns != null && !patterns.isEmpty()) {
+            if (name == null || name.isEmpty()) {
+                LOG.debug("The name is null so no constraints matching was possible");
+                return false;
+            }
+            boolean subjectMatch = false;
+            for (Pattern subjectDNPattern : patterns) {
+                final Matcher matcher = subjectDNPattern.matcher(name);
+                if (matcher.matches()) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Name " + name + " matches with pattern " + subjectDNPattern);
+                    }
+                    subjectMatch = true;
+                    break;
+                }
+            }
+            if (!subjectMatch) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

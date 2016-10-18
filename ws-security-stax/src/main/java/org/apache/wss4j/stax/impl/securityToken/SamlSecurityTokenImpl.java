@@ -26,6 +26,7 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -56,6 +57,9 @@ import org.opensaml.saml.common.SAMLVersion;
 
 public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implements SamlSecurityToken {
 
+    private static final transient org.slf4j.Logger LOG =
+        org.slf4j.LoggerFactory.getLogger(SamlSecurityTokenImpl.class);
+                                          
     private final SamlAssertionWrapper samlAssertionWrapper;
     private InboundSecurityToken subjectSecurityToken;
     private Crypto crypto;
@@ -212,13 +216,68 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
                     issuerCertConstraints = securityProperties.getIssuerDNConstraints();
 
                 }
-                crypto.verifyTrust(x509Certificates, enableRevocation, subjectCertConstraints, issuerCertConstraints);
+                crypto.verifyTrust(x509Certificates, enableRevocation, subjectCertConstraints);
+                
+                // Now verify Issuer DN constraints
+                if (!matchesIssuerDnPattern(x509Certificates[0], issuerCertConstraints)) {
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+                }
             }
             PublicKey publicKey = getPublicKey();
             if (publicKey != null) {
                 crypto.verifyTrust(publicKey);
             }
         }
+    }
+    
+    /**
+     * @return      true if the certificate's Issuer DN matches the constraints defined in the
+     *              subject DNConstraints; false, otherwise. The certificate subject DN only
+     *              has to match ONE of the subject cert constraints (not all).
+     */
+    protected boolean
+    matchesIssuerDnPattern(
+        final X509Certificate cert, final Collection<Pattern> issuerDNPatterns
+    ) {
+        if (cert == null) {
+            LOG.debug("The certificate is null so no constraints matching was possible");
+            return false;
+        }
+        String issuerDn = cert.getIssuerDN().getName();
+        return matchesName(issuerDn, issuerDNPatterns);
+    }
+    
+    /**
+     * @return      true if the provided name matches the constraints defined in the
+     *              subject DNConstraints; false, otherwise. The certificate (subject) DN only
+     *              has to match ONE of the (subject) cert constraints (not all).
+     */
+    private boolean
+    matchesName(
+        final String name, final Collection<Pattern> patterns
+    ) {
+        if (patterns != null && !patterns.isEmpty()) {
+            if (name == null || name.isEmpty()) {
+                LOG.debug("The name is null so no constraints matching was possible");
+                return false;
+            }
+            boolean subjectMatch = false;
+            for (Pattern subjectDNPattern : patterns) {
+                final Matcher matcher = subjectDNPattern.matcher(name);
+                if (matcher.matches()) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Name " + name + " matches with pattern " + subjectDNPattern);
+                    }
+                    subjectMatch = true;
+                    break;
+                }
+            }
+            if (!subjectMatch) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override

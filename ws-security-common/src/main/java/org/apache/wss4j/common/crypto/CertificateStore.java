@@ -157,7 +157,7 @@ public class CertificateStore extends CryptoBase {
      * @param subjectCertConstraints A set of constraints on the Subject DN of the certificates
      * @throws WSSecurityException if the certificate chain is invalid
      */
-    protected void verifyTrust(
+    public void verifyTrust(
         X509Certificate[] certs,
         boolean enableRevocation,
         Collection<Pattern> subjectCertConstraints
@@ -269,15 +269,6 @@ public class CertificateStore extends CryptoBase {
 
         // Finally check Cert Constraints
         if (!matchesSubjectDnPattern(certs[0], subjectCertConstraints)) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
-        }
-    }
-
-    @Override
-    public void verifyTrust(X509Certificate[] certs, boolean enableRevocation, Collection<Pattern> subjectCertConstraints,
-                            Collection<Pattern> issuerCertConstraints) throws WSSecurityException {
-        verifyTrust(certs, enableRevocation, subjectCertConstraints);
-        if (!matchesIssuerDnPattern(certs[0], issuerCertConstraints)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
     }

@@ -81,7 +81,7 @@ public class MerlinAKI extends Merlin {
      * @throws WSSecurityException if the certificate chain is invalid
      */
     @Override
-    protected void verifyTrust(
+    public void verifyTrust(
         X509Certificate[] certs,
         boolean enableRevocation,
         Collection<Pattern> subjectCertConstraints
