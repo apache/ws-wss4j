@@ -779,7 +779,7 @@ public class Merlin extends CryptoBase {
      *
      * @throws WSSecurityException if the certificate chain is invalid
      */
-    public void verifyTrust(
+    protected void verifyTrust(
         X509Certificate[] certs,
         boolean enableRevocation,
         Collection<Pattern> subjectCertConstraints
@@ -953,9 +953,10 @@ public class Merlin extends CryptoBase {
     }   
 
     @Override
-    public void verifyTrust(X509Certificate[] certs, boolean enableRevocation, Collection<Pattern> subjectCertConstraints,
+    public void verifyTrust(X509Certificate[] certs, boolean enableRevocation, 
+                            Collection<Pattern> subjectCertConstraints,
                             Collection<Pattern> issuerCertConstraints) throws WSSecurityException {
-        verifyTrust(certs,enableRevocation,subjectCertConstraints);
+        verifyTrust(certs, enableRevocation, subjectCertConstraints);
         if (!matchesIssuerDnPattern(certs[0], issuerCertConstraints)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }

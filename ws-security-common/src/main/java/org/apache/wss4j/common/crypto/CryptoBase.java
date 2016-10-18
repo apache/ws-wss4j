@@ -296,11 +296,6 @@ public abstract class CryptoBase implements Crypto {
         return certs;
     }
 
-    @Override
-    public void verifyDirectTrust(X509Certificate[] certs) throws WSSecurityException {
-        verifyTrust(certs, true, null);
-    }
-
     protected Object createBCX509Name(String s) {
         if (BC_509CLASS_CONS != null) {
              try {
@@ -321,13 +316,16 @@ public abstract class CryptoBase implements Crypto {
     matchesSubjectDnPattern(
         final X509Certificate cert, final Collection<Pattern> subjectDNPatterns
     ) {
-
         if (cert == null) {
             LOG.debug("The certificate is null so no constraints matching was possible");
             return false;
         }
         String subjectName = cert.getSubjectX500Principal().getName();
-        return matchesName(subjectName,subjectDNPatterns);
+        if (subjectDNPatterns == null || subjectDNPatterns.isEmpty()) {
+            LOG.warn("No Subject DN Certificate Constraints were defined. This could be a security issue");
+            return true;
+        }
+        return matchesName(subjectName, subjectDNPatterns);
     }
 
     /**
@@ -337,31 +335,26 @@ public abstract class CryptoBase implements Crypto {
      */
     protected boolean
     matchesIssuerDnPattern(
-            final X509Certificate cert, final Collection<Pattern> issuerDNPatterns
+        final X509Certificate cert, final Collection<Pattern> issuerDNPatterns
     ) {
-
-            if (cert == null) {
-                LOG.debug("The certificate is null so no constraints matching was possible");
-                return false;
-            }
+        if (cert == null) {
+            LOG.debug("The certificate is null so no constraints matching was possible");
+            return false;
+        }
         String issuerDn = cert.getIssuerDN().getName();
-        return matchesName(issuerDn,issuerDNPatterns);
+        return matchesName(issuerDn, issuerDNPatterns);
     }
 
     /**
      * @return      true if the provided name matches the constraints defined in the
-     *              subject DNConstraints; false, otherwise. The certificate subject DN only
-     *              has to match ONE of the subject cert constraints (not all).
+     *              subject DNConstraints; false, otherwise. The certificate (subject) DN only
+     *              has to match ONE of the (subject) cert constraints (not all).
      */
     protected boolean
     matchesName(
-            final String name, final Collection<Pattern> patterns
+        final String name, final Collection<Pattern> patterns
     ) {
-        if (patterns == null || patterns.isEmpty()) {
-            LOG.warn("No Subject DN Certificate Constraints were defined. This could be a security issue");
-            return true;
-        }
-        if (!patterns.isEmpty()) {
+        if (patterns != null && !patterns.isEmpty()) {
             if (name == null || name.isEmpty()) {
                 LOG.debug("The name is null so no constraints matching was possible");
                 return false;

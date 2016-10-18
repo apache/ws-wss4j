@@ -405,7 +405,7 @@ public class OutboundWSSec {
         // Check for Revocation
         if (securityProperties.isEnableRevocation() && x509Certificates != null) {
             Crypto crypto = securityProperties.getEncryptionCrypto();
-            crypto.verifyTrust(x509Certificates, true, null);
+            crypto.verifyTrust(x509Certificates, true, null, null);
         }
 
         // Create a new outbound EncryptedKey token for the cert

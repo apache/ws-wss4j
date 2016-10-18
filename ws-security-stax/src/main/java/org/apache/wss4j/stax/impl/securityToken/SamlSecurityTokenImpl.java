@@ -212,7 +212,7 @@ public class SamlSecurityTokenImpl extends AbstractInboundSecurityToken implemen
                     issuerCertConstraints = securityProperties.getIssuerDNConstraints();
 
                 }
-                crypto.verifyTrust(x509Certificates, enableRevocation, subjectCertConstraints,issuerCertConstraints);
+                crypto.verifyTrust(x509Certificates, enableRevocation, subjectCertConstraints, issuerCertConstraints);
             }
             PublicKey publicKey = getPublicKey();
             if (publicKey != null) {
