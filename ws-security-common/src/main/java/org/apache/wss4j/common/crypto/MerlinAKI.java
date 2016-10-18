@@ -227,7 +227,7 @@ public class MerlinAKI extends Merlin {
         }
 
         // Finally check Cert Constraints
-        if (!matches(certs[0], subjectCertConstraints)) {
+        if (!matchesSubjectDnPattern(certs[0], subjectCertConstraints)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
     }

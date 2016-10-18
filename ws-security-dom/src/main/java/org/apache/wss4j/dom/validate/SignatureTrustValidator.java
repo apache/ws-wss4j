@@ -105,7 +105,8 @@ public class SignatureTrustValidator implements Validator {
         // certificate was really signed by the issuer stated in the certificate
         //
         Collection<Pattern> subjectCertConstraints = data.getSubjectCertConstraints();
-        crypto.verifyTrust(certificates, enableRevocation, subjectCertConstraints);
+        Collection<Pattern> issuerCertConstraints = data.getIssuerDNPatterns();
+        crypto.verifyTrust(certificates, enableRevocation, subjectCertConstraints,issuerCertConstraints);
         if (LOG.isDebugEnabled()) {
             String subjectString = certificates[0].getSubjectX500Principal().getName();
             LOG.debug(

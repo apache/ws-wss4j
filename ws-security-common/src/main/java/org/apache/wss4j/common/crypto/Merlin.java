@@ -947,7 +947,16 @@ public class Merlin extends CryptoBase {
         }
 
         // Finally check Cert Constraints
-        if (!matches(certs[0], subjectCertConstraints)) {
+        if (!matchesSubjectDnPattern(certs[0], subjectCertConstraints)) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
+        }
+    }   
+
+    @Override
+    public void verifyTrust(X509Certificate[] certs, boolean enableRevocation, Collection<Pattern> subjectCertConstraints,
+                            Collection<Pattern> issuerCertConstraints) throws WSSecurityException {
+        verifyTrust(certs,enableRevocation,subjectCertConstraints);
+        if (!matchesIssuerDnPattern(certs[0], issuerCertConstraints)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
         }
     }
