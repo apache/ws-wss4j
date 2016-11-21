@@ -102,7 +102,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     private boolean embedEncryptedKey;
 
     private List<Element> attachmentEncryptedDataElements;
- 
+    
+    private WSSecHeader securityHeader;
+
     public WSSecEncrypt() {
         super();
     }
@@ -209,6 +211,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     public Document build(Document doc, Crypto crypto, WSSecHeader secHeader)
         throws WSSecurityException {
         doDebug = LOG.isDebugEnabled();
+        securityHeader = secHeader;
 
         prepare(doc, crypto);
         
@@ -284,7 +287,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         SecretKeySpec secretKeySpec = new SecretKeySpec(symmetricKey.getEncoded(), symmetricKey.getAlgorithm());
         List<String> encDataRefs = 
             doEncryption(
-                document, getWsConfig(), keyInfo, secretKeySpec, symEncAlgo, references, callbackLookup,
+                document, securityHeader, getWsConfig(), keyInfo, secretKeySpec, symEncAlgo, references, callbackLookup,
                     attachmentCallbackHandler, attachmentEncryptedDataElements, storeBytesInAttachment
             );
         if (encDataRefs.isEmpty()) {
@@ -365,6 +368,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      */
     public static List<String> doEncryption(
         Document doc,
+        WSSecHeader securityHeader,
         WSSConfig config,
         KeyInfo keyInfo,
         SecretKey secretKey,
@@ -373,12 +377,13 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         CallbackLookup callbackLookup
     ) throws WSSecurityException {
         return doEncryption(
-                doc, config, keyInfo, secretKey, encryptionAlgorithm,
+                doc, securityHeader, config, keyInfo, secretKey, encryptionAlgorithm,
                 references, callbackLookup, null, null, false);
     }
 
     public static List<String> doEncryption(
             Document doc,
+            WSSecHeader securityHeader,
             WSSConfig config,
             KeyInfo keyInfo,
             SecretKey secretKey,
@@ -431,7 +436,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 for (Element elementToEncrypt : elementsToEncrypt) {
                     try {
                         String id = 
-                            encryptElementInAttachment(doc, config, keyInfo, secretKey, encryptionAlgorithm,
+                            encryptElementInAttachment(doc, securityHeader, config, keyInfo, secretKey, encryptionAlgorithm,
                                           attachmentCallbackHandler, encPart, elementToEncrypt);
                         encPart.setEncId(id);
                         encDataRef.add("#" + id);
@@ -444,7 +449,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             } else {
                 for (Element elementToEncrypt : elementsToEncrypt) {
                     String id = 
-                        encryptElement(doc, elementToEncrypt, encPart.getEncModifier(), config, xmlCipher,
+                        encryptElement(doc, securityHeader, elementToEncrypt, encPart.getEncModifier(), config, xmlCipher,
                                        secretKey, keyInfo);
                     encPart.setEncId(id);
                     encDataRef.add("#" + id);
@@ -463,6 +468,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     
     private static String encryptElementInAttachment(
         Document doc,
+        WSSecHeader securityHeader,
         WSSConfig config,
         KeyInfo keyInfo,
         SecretKey secretKey,
@@ -482,7 +488,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         
         if ("Header".equals(encryptionPart.getEncModifier()) 
             && elementToEncrypt.getParentNode().equals(WSSecurityUtil.getSOAPHeader(doc))) {
-            createEncryptedHeaderElement(doc, elementToEncrypt, config);
+            createEncryptedHeaderElement(doc, securityHeader, elementToEncrypt, config);
         }
 
         Element encryptedData =
@@ -674,6 +680,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      */
     private static String encryptElement(
         Document doc,
+        WSSecHeader securityHeader,
         Element elementToEncrypt,
         String modifier,
         WSSConfig config,
@@ -691,7 +698,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         try {
             if ("Header".equals(modifier) 
                 && elementToEncrypt.getParentNode().equals(WSSecurityUtil.getSOAPHeader(doc))) {
-                createEncryptedHeaderElement(doc, elementToEncrypt, config);
+                createEncryptedHeaderElement(doc, securityHeader, elementToEncrypt, config);
             }
             
             xmlCipher.init(XMLCipher.ENCRYPT_MODE, secretKey);
@@ -709,6 +716,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     
     private static void createEncryptedHeaderElement(
         Document doc,
+        WSSecHeader securityHeader,
         Element elementToEncrypt,
         WSSConfig config
     ) {
@@ -723,6 +731,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         elem.setAttributeNS(
             WSConstants.WSU_NS, wsuPrefix + ":Id", headerId
         );
+
         //
         // Add the EncryptedHeader node to the element to be encrypted's parent
         // (i.e. the SOAP header). Add the element to be encrypted to the Encrypted
@@ -732,22 +741,25 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         elementToEncrypt = (Element)parent.replaceChild(elem, elementToEncrypt);
         elem.appendChild(elementToEncrypt);
         
-        NamedNodeMap map = elementToEncrypt.getAttributes();
-        for (int i = 0; i < map.getLength(); i++) {
-            Attr attr = (Attr)map.item(i);
-            if (WSConstants.URI_SOAP11_ENV.equals(attr.getNamespaceURI())
-                || WSConstants.URI_SOAP12_ENV.equals(attr.getNamespaceURI())) {
-                String soapEnvPrefix = 
-                    WSSecurityUtil.setNamespace(
-                        elem, attr.getNamespaceURI(), WSConstants.DEFAULT_SOAP_PREFIX
+        if (securityHeader != null) {
+            NamedNodeMap map = securityHeader.getSecurityHeader().getAttributes();
+            for (int i = 0; i < map.getLength(); i++) {
+                Attr attr = (Attr)map.item(i);
+                if (WSConstants.URI_SOAP11_ENV.equals(attr.getNamespaceURI())
+                    || WSConstants.URI_SOAP12_ENV.equals(attr.getNamespaceURI())) {
+                    String soapEnvPrefix = 
+                        WSSecurityUtil.setNamespace(
+                            elem, attr.getNamespaceURI(), WSConstants.DEFAULT_SOAP_PREFIX
+                        );
+                    elem.setAttributeNS(
+                        attr.getNamespaceURI(), 
+                        soapEnvPrefix + ":" + attr.getLocalName(), 
+                        attr.getValue()
                     );
-                elem.setAttributeNS(
-                    attr.getNamespaceURI(), 
-                    soapEnvPrefix + ":" + attr.getLocalName(), 
-                    attr.getValue()
-                );
+                }
             }
         }
+
     }
     
     /**

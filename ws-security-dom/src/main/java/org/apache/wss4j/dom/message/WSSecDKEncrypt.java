@@ -48,6 +48,8 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
     private List<Element> attachmentEncryptedDataElements;
     
+    private WSSecHeader securityHeader;
+
     public WSSecDKEncrypt() {
         super();
     }
@@ -64,6 +66,8 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     }
 
     public Document build(Document doc, WSSecHeader secHeader) throws WSSecurityException {
+
+        securityHeader = secHeader;
         
         //
         // Setup the encrypted key
@@ -136,7 +140,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
         List<String> encDataRefs = 
             WSSecEncrypt.doEncryption(
-                document, getWsConfig(), keyInfo, key, symEncAlgo, references, callbackLookup, attachmentCallbackHandler, attachmentEncryptedDataElements, storeBytesInAttachment
+                document, securityHeader, getWsConfig(), keyInfo, key, symEncAlgo, references, callbackLookup, attachmentCallbackHandler, attachmentEncryptedDataElements, storeBytesInAttachment
             );
         if (dataRef == null) {
             dataRef = 
