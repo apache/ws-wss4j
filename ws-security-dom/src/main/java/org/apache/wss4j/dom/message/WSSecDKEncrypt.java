@@ -105,7 +105,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         return encryptForExternalRef(null, getParts(), secHeader);
     }
     
-    public Element encryptForExternalRef(Element dataRef, List<WSEncryptionPart> references) {
+    public Element encryptForExternalRef(Element dataRef, List<WSEncryptionPart> references) throws WSSecurityException {
         return encryptForExternalRef(dataRef, references, null);
     }
 
