@@ -34,7 +34,7 @@
     <properties>
         <apacheds.version>2.0.0-M23</apacheds.version>
         <bcprov.version>1.55</bcprov.version>
-        <commons.compress.version>1.4.1</commons.compress.version>
+        <commons.compress.version>1.9</commons.compress.version>
         <ehcache.version>2.10.3</ehcache.version>
         <geronimo.javamail.version>1.7.1</geronimo.javamail.version>
         <jasypt.version>1.9.2</jasypt.version>
@@ -46,6 +46,7 @@
         <woodstox.core.asl.version>4.4.1</woodstox.core.asl.version>
         <wsdl4j.version>1.6.3</wsdl4j.version>
         <xalan.version>2.7.2</xalan.version>
+        <xz.version>1.5</xz.version>
         <xmlsec.version>2.0.7</xmlsec.version>
         <xmlunit.version>1.6</xmlunit.version>
         
@@ -148,6 +149,11 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
                 <version>${commons.compress.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.tukaani</groupId>
+                <artifactId>xz</artifactId>
+                <version>${xz.version}</version>
             </dependency>
 
         </dependencies>
