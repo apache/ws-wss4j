@@ -103,8 +103,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
     private List<Element> attachmentEncryptedDataElements;
     
-    private WSSecHeader securityHeader;
-
     public WSSecEncrypt() {
         super();
     }
@@ -211,7 +209,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     public Document build(Document doc, Crypto crypto, WSSecHeader secHeader)
         throws WSSecurityException {
         doDebug = LOG.isDebugEnabled();
-        securityHeader = secHeader;
 
         prepare(doc, crypto);
         
@@ -235,7 +232,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             LOG.debug("Beginning Encryption...");
         }
         
-        Element refs = encryptForRef(null, parts);
+        Element refs = encryptForRef(null, parts, secHeader);
 
         addAttachmentEncryptedDataElements(secHeader);
         if (encryptedKeyElement != null) {
@@ -254,6 +251,13 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         return doc;
     }
     
+    public Element encryptForRef(
+        Element dataRef,
+        List<WSEncryptionPart> references
+    ) throws WSSecurityException {
+        return encryptForRef(dataRef, references, null);
+    }
+
     /**
      * Encrypt one or more parts or elements of the message.
      * 
@@ -272,12 +276,14 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * 
      * @param dataRef A <code>xenc:Reference</code> element or <code>null</code>
      * @param references A list containing WSEncryptionPart objects
+     * @param secHeader The WSSecHeader instance
      * @return Returns the updated <code>xenc:Reference</code> element
      * @throws WSSecurityException
      */
     public Element encryptForRef(
-        Element dataRef, 
-        List<WSEncryptionPart> references
+        Element dataRef,
+        List<WSEncryptionPart> references,
+        WSSecHeader secHeader
     ) throws WSSecurityException {
 
         KeyInfo keyInfo = createKeyInfo();
