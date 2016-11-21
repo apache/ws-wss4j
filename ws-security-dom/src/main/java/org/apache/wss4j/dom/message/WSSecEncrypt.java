@@ -108,8 +108,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     
     private Serializer encryptionSerializer;
     
-    private WSSecHeader securityHeader;
-
     public WSSecEncrypt() {
         super();
     }
@@ -200,7 +198,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     public Document build(Document doc, Crypto crypto, WSSecHeader secHeader)
         throws WSSecurityException {
         doDebug = LOG.isDebugEnabled();
-        securityHeader = secHeader;
 
         prepare(doc, crypto);
 
@@ -208,7 +205,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             LOG.debug("Beginning Encryption...");
         }
 
-        Element refs = encrypt();
+        Element refs = encrypt(secHeader);
 
         addAttachmentEncryptedDataElements(secHeader);
         if (getEncryptedKeyElement() != null) {
@@ -226,11 +223,22 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     }
 
     public Element encrypt() throws WSSecurityException {
+        return encrypt(null);
+    }
+    
+    public Element encrypt(WSSecHeader secHeader) throws WSSecurityException {
         if (getParts().isEmpty()) {
             getParts().add(WSSecurityUtil.getDefaultEncryptionPart(document));
         }
 
-        return encryptForRef(null, getParts());
+        return encryptForRef(null, getParts(), secHeader);
+    }
+    
+    public Element encryptForRef(
+        Element dataRef,
+        List<WSEncryptionPart> references
+    ) throws WSSecurityException {
+        return encryptForRef(dataRef, references, null);
     }
 
     /**
@@ -251,12 +259,14 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      *
      * @param dataRef A <code>xenc:Reference</code> element or <code>null</code>
      * @param references A list containing WSEncryptionPart objects
+     * @param secHeader The WSSecHeader instance
      * @return Returns the updated <code>xenc:Reference</code> element
      * @throws WSSecurityException
      */
     public Element encryptForRef(
         Element dataRef,
-        List<WSEncryptionPart> references
+        List<WSEncryptionPart> references,
+        WSSecHeader secHeader
     ) throws WSSecurityException {
         KeyInfo keyInfo = createKeyInfo();
         //the sun/oracle jce provider doesn't like a foreign SecretKey impl.
@@ -265,7 +275,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         SecretKeySpec secretKeySpec = new SecretKeySpec(symmetricKey.getEncoded(), symmetricKey.getAlgorithm());
         List<String> encDataRefs =
             doEncryption(
-                document, securityHeader, getIdAllocator(), keyInfo, secretKeySpec, getSymmetricEncAlgorithm(), references,
+                document, secHeader, getIdAllocator(), keyInfo, secretKeySpec, getSymmetricEncAlgorithm(), references,
                     callbackLookup, attachmentCallbackHandler, attachmentEncryptedDataElements,
                     storeBytesInAttachment
             );
@@ -699,7 +709,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         String xencEncryptedDataId = idAllocator.createId("ED-", elementToEncrypt);
         try {
             if ("Header".equals(modifier)
-                && elementToEncrypt.getParentNode().equals(securityHeader.getSecurityHeader().getParentNode())) {
+                && elementToEncrypt.getParentNode().equals(WSSecurityUtil.getSOAPHeader(doc))) {
                 createEncryptedHeaderElement(doc, securityHeader, elementToEncrypt, idAllocator);
             }
 

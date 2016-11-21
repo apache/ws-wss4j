@@ -51,8 +51,6 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     
     private Serializer encryptionSerializer;
     
-    private WSSecHeader securityHeader;
-
     public WSSecDKEncrypt() {
         super();
     }
@@ -66,8 +64,6 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
     public Document build(Document doc, WSSecHeader secHeader) throws WSSecurityException {
 
-        securityHeader = secHeader;
-        
         //
         // Setup the encrypted key
         //
@@ -77,7 +73,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         //
         prependDKElementToHeader(secHeader);
 
-        Element externRefList = encrypt();
+        Element externRefList = encrypt(secHeader);
 
         addAttachmentEncryptedDataElements(secHeader);
 
@@ -98,11 +94,19 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     }
 
     public Element encrypt() throws WSSecurityException {
+        return encrypt(null);
+    }
+    
+    public Element encrypt(WSSecHeader secHeader) throws WSSecurityException {
         if (getParts().isEmpty()) {
             getParts().add(WSSecurityUtil.getDefaultEncryptionPart(document));
         }
 
-        return encryptForExternalRef(null, getParts());
+        return encryptForExternalRef(null, getParts(), secHeader);
+    }
+    
+    public Element encryptForExternalRef(Element dataRef, List<WSEncryptionPart> references) {
+        return encryptForExternalRef(dataRef, references);
     }
 
     /**
@@ -123,10 +127,11 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
      *
      * @param dataRef A <code>xenc:Reference</code> element or <code>null</code>
      * @param references A list containing WSEncryptionPart objects
+     * @param secHeader the security header element to hold the encrypted key element.
      * @return Returns the updated <code>xenc:Reference</code> element
      * @throws WSSecurityException
      */
-    public Element encryptForExternalRef(Element dataRef, List<WSEncryptionPart> references)
+    public Element encryptForExternalRef(Element dataRef, List<WSEncryptionPart> references, WSSecHeader secHeader)
         throws WSSecurityException {
 
         KeyInfo keyInfo = createKeyInfo();
@@ -135,7 +140,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
         List<String> encDataRefs =
             WSSecEncrypt.doEncryption(
-                document, securityHeader, getIdAllocator(), keyInfo, key, symEncAlgo, references, callbackLookup,
+                document, secHeader, getIdAllocator(), keyInfo, key, symEncAlgo, references, callbackLookup,
                 attachmentCallbackHandler, attachmentEncryptedDataElements, storeBytesInAttachment,
                 encryptionSerializer
             );
