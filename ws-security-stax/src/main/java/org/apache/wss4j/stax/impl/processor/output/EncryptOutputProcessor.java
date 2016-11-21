@@ -352,16 +352,25 @@ public class EncryptOutputProcessor extends AbstractEncryptOutputProcessor {
 
                 List<XMLSecAttribute> attributes = new ArrayList<>(1);
 
-                @SuppressWarnings("unchecked")
-                Iterator<Attribute> attributeIterator = getXmlSecStartElement().getAttributes();
-                while (attributeIterator.hasNext()) {
-                    Attribute attribute = attributeIterator.next();
-                    if (!attribute.isNamespace() 
-                        && (WSSConstants.NS_SOAP11.equals(attribute.getName().getNamespaceURI()) 
-                            || WSSConstants.NS_SOAP12.equals(attribute.getName().getNamespaceURI()))) {
-                        attributes.add(createAttribute(attribute.getName(), attribute.getValue()));
+                final String actor = ((WSSSecurityProperties) getSecurityProperties()).getActor();
+                final String soapMessageVersion = WSSUtils.getSOAPMessageVersionNamespace(xmlSecStartElement);
+                if (actor != null && !actor.isEmpty()) {
+                    if (WSSConstants.NS_SOAP11.equals(soapMessageVersion)) {
+                        attributes.add(createAttribute(WSSConstants.ATT_SOAP11_ACTOR, actor));
+                    } else {
+                        attributes.add(createAttribute(WSSConstants.ATT_SOAP12_ROLE, actor));
                     }
                 }
+                
+                boolean mustUnderstand = ((WSSSecurityProperties) getSecurityProperties()).isMustUnderstand();
+                if (mustUnderstand) {
+                    if (WSSConstants.NS_SOAP11.equals(soapMessageVersion)) {
+                        attributes.add(createAttribute(WSSConstants.ATT_SOAP11_MUST_UNDERSTAND, "1"));
+                    } else {
+                        attributes.add(createAttribute(WSSConstants.ATT_SOAP12_MUST_UNDERSTAND, "true"));
+                    }
+                }
+                
                 createStartElementAndOutputAsEvent(outputProcessorChain, WSSConstants.TAG_wsse11_EncryptedHeader, true, attributes);
             }
 
