@@ -141,7 +141,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
         List<String> encDataRefs = 
             WSSecEncrypt.doEncryption(
-                document, securityHeader, getWsConfig(), keyInfo, key, symEncAlgo, references, callbackLookup, attachmentCallbackHandler, attachmentEncryptedDataElements, storeBytesInAttachment
+                document, secHeader, getWsConfig(), keyInfo, key, symEncAlgo, references, callbackLookup, attachmentCallbackHandler, attachmentEncryptedDataElements, storeBytesInAttachment
             );
         if (dataRef == null) {
             dataRef = 

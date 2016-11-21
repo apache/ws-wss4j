@@ -293,7 +293,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         SecretKeySpec secretKeySpec = new SecretKeySpec(symmetricKey.getEncoded(), symmetricKey.getAlgorithm());
         List<String> encDataRefs = 
             doEncryption(
-                document, securityHeader, getWsConfig(), keyInfo, secretKeySpec, symEncAlgo, references, callbackLookup,
+                document, secHeader, getWsConfig(), keyInfo, secretKeySpec, symEncAlgo, references, callbackLookup,
                     attachmentCallbackHandler, attachmentEncryptedDataElements, storeBytesInAttachment
             );
         if (encDataRefs.isEmpty()) {
