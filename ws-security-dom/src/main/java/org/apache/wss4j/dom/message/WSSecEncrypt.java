@@ -107,6 +107,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     private List<Element> attachmentEncryptedDataElements;
     
     private Serializer encryptionSerializer;
+    
+    private WSSecHeader securityHeader;
 
     public WSSecEncrypt() {
         super();
@@ -198,6 +200,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     public Document build(Document doc, Crypto crypto, WSSecHeader secHeader)
         throws WSSecurityException {
         doDebug = LOG.isDebugEnabled();
+        securityHeader = secHeader;
 
         prepare(doc, crypto);
 
@@ -262,7 +265,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         SecretKeySpec secretKeySpec = new SecretKeySpec(symmetricKey.getEncoded(), symmetricKey.getAlgorithm());
         List<String> encDataRefs =
             doEncryption(
-                document, getIdAllocator(), keyInfo, secretKeySpec, getSymmetricEncAlgorithm(), references,
+                document, securityHeader, getIdAllocator(), keyInfo, secretKeySpec, getSymmetricEncAlgorithm(), references,
                     callbackLookup, attachmentCallbackHandler, attachmentEncryptedDataElements,
                     storeBytesInAttachment
             );
@@ -344,6 +347,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      */
     public static List<String> doEncryption(
         Document doc,
+        WSSecHeader securityHeader,
         WsuIdAllocator idAllocator,
         KeyInfo keyInfo,
         SecretKey secretKey,
@@ -352,12 +356,13 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         CallbackLookup callbackLookup
     ) throws WSSecurityException {
         return doEncryption(
-                doc, idAllocator, keyInfo, secretKey, encryptionAlgorithm,
+                doc, securityHeader, idAllocator, keyInfo, secretKey, encryptionAlgorithm,
                 references, callbackLookup, null, null, false);
     }
     
     public static List<String> doEncryption(
          Document doc,
+         WSSecHeader securityHeader,
          WsuIdAllocator idAllocator,
          KeyInfo keyInfo,
          SecretKey secretKey,
@@ -369,13 +374,14 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
          boolean storeBytesInAttachment
     ) throws WSSecurityException {
         return doEncryption(
-                            doc, idAllocator, keyInfo, secretKey, encryptionAlgorithm,
+                            doc, securityHeader, idAllocator, keyInfo, secretKey, encryptionAlgorithm,
                             references, callbackLookup, attachmentCallbackHandler, 
                             attachmentEncryptedDataElements, storeBytesInAttachment, null);
     }
 
     public static List<String> doEncryption(
             Document doc,
+            WSSecHeader securityHeader,
             WsuIdAllocator idAllocator,
             KeyInfo keyInfo,
             SecretKey secretKey,
@@ -432,8 +438,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 for (Element elementToEncrypt : elementsToEncrypt) {
                     try {
                         String id =
-                            encryptElementInAttachment(doc, idAllocator, keyInfo, secretKey, encryptionAlgorithm,
-                                          attachmentCallbackHandler, encPart, elementToEncrypt);
+                            encryptElementInAttachment(doc, securityHeader, idAllocator, keyInfo, secretKey, 
+                                                       encryptionAlgorithm, attachmentCallbackHandler, encPart, elementToEncrypt);
                         encPart.setEncId(id);
                         encDataRef.add("#" + id);
                     } catch (Exception ex) {
@@ -445,8 +451,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             } else {
                 for (Element elementToEncrypt : elementsToEncrypt) {
                     String id =
-                        encryptElement(doc, elementToEncrypt, encPart.getEncModifier(), idAllocator, xmlCipher,
-                                       secretKey, keyInfo);
+                        encryptElement(doc, securityHeader, elementToEncrypt, encPart.getEncModifier(), idAllocator, 
+                                       xmlCipher, secretKey, keyInfo);
                     encPart.setEncId(id);
                     encDataRef.add("#" + id);
                 }
@@ -464,6 +470,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
     private static String encryptElementInAttachment(
         Document doc,
+        WSSecHeader securityHeader,
         WsuIdAllocator idAllocator,
         KeyInfo keyInfo,
         SecretKey secretKey,
@@ -483,7 +490,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
         if ("Header".equals(encryptionPart.getEncModifier())
             && elementToEncrypt.getParentNode().equals(WSSecurityUtil.getSOAPHeader(doc))) {
-            createEncryptedHeaderElement(doc, elementToEncrypt, idAllocator);
+            createEncryptedHeaderElement(doc, securityHeader, elementToEncrypt, idAllocator);
         }
 
         Element encryptedData =
@@ -676,6 +683,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      */
     private static String encryptElement(
         Document doc,
+        WSSecHeader securityHeader,
         Element elementToEncrypt,
         String modifier,
         WsuIdAllocator idAllocator,
@@ -691,8 +699,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         String xencEncryptedDataId = idAllocator.createId("ED-", elementToEncrypt);
         try {
             if ("Header".equals(modifier)
-                && elementToEncrypt.getParentNode().equals(WSSecurityUtil.getSOAPHeader(doc))) {
-                createEncryptedHeaderElement(doc, elementToEncrypt, idAllocator);
+                && elementToEncrypt.getParentNode().equals(securityHeader.getSecurityHeader().getParentNode())) {
+                createEncryptedHeaderElement(doc, securityHeader, elementToEncrypt, idAllocator);
             }
 
             xmlCipher.init(XMLCipher.ENCRYPT_MODE, secretKey);
@@ -710,6 +718,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
     private static void createEncryptedHeaderElement(
         Document doc,
+        WSSecHeader securityHeader,
         Element elementToEncrypt,
         WsuIdAllocator idAllocator
     ) {
@@ -724,6 +733,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         elem.setAttributeNS(
             WSConstants.WSU_NS, wsuPrefix + ":Id", headerId
         );
+
         //
         // Add the EncryptedHeader node to the element to be encrypted's parent
         // (i.e. the SOAP header). Add the element to be encrypted to the Encrypted
@@ -733,22 +743,25 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         elementToEncrypt = (Element)parent.replaceChild(elem, elementToEncrypt);
         elem.appendChild(elementToEncrypt);
 
-        NamedNodeMap map = elementToEncrypt.getAttributes();
-        for (int i = 0; i < map.getLength(); i++) {
-            Attr attr = (Attr)map.item(i);
-            if (WSConstants.URI_SOAP11_ENV.equals(attr.getNamespaceURI())
-                || WSConstants.URI_SOAP12_ENV.equals(attr.getNamespaceURI())) {
-                String soapEnvPrefix =
-                    XMLUtils.setNamespace(
-                        elem, attr.getNamespaceURI(), WSConstants.DEFAULT_SOAP_PREFIX
+        if (securityHeader != null) {
+            NamedNodeMap map = securityHeader.getSecurityHeader().getAttributes();
+            for (int i = 0; i < map.getLength(); i++) {
+                Attr attr = (Attr)map.item(i);
+                if (WSConstants.URI_SOAP11_ENV.equals(attr.getNamespaceURI())
+                    || WSConstants.URI_SOAP12_ENV.equals(attr.getNamespaceURI())) {
+                    String soapEnvPrefix =
+                        XMLUtils.setNamespace(
+                            elem, attr.getNamespaceURI(), WSConstants.DEFAULT_SOAP_PREFIX
+                        );
+                    elem.setAttributeNS(
+                        attr.getNamespaceURI(),
+                        soapEnvPrefix + ":" + attr.getLocalName(),
+                        attr.getValue()
                     );
-                elem.setAttributeNS(
-                    attr.getNamespaceURI(),
-                    soapEnvPrefix + ":" + attr.getLocalName(),
-                    attr.getValue()
-                );
+                }
             }
         }
+
     }
 
     /**
