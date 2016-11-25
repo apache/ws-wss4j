@@ -1183,7 +1183,7 @@ public abstract class WSHandler {
         int doAction
     ) throws WSSecurityException {
 
-        int reason = WSPasswordCallback.UNKNOWN;
+        int reason;
 
         switch (doAction) {
         case WSConstants.UT:
@@ -1202,6 +1202,8 @@ public abstract class WSHandler {
         case WSConstants.DKT_ENCR:
             reason = WSPasswordCallback.SECRET_KEY;
             break;
+        default:
+            reason = WSPasswordCallback.UNKNOWN;
         }
         return new WSPasswordCallback(username, reason);
     }

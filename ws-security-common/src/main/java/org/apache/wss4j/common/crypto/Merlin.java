@@ -664,7 +664,7 @@ public class Merlin extends CryptoBase {
         String identifier = getIdentifier(certificate, keystore);
         if (identifier == null) {
             try {
-                String msg = "Cannot find key for alias: [" + identifier + "]";
+                String msg = "Cannot find key for certificate";
                 String logMsg = createKeyStoreErrorMessage(keystore);
                 LOG.error(msg + logMsg);
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
@@ -703,7 +703,7 @@ public class Merlin extends CryptoBase {
         String identifier = getIdentifier(publicKey, keystore);
         if (identifier == null) {
             try {
-                String msg = "Cannot find key for alias: [" + identifier + "]";
+                String msg = "Cannot find key for corresponding public key";
                 String logMsg = createKeyStoreErrorMessage(keystore);
                 LOG.error(msg + logMsg);
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",

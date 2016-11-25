@@ -99,7 +99,7 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
 
             wsSign.prepare();
 
-            List<javax.xml.crypto.dsig.Reference> referenceList = wsSign.addReferencesToSign(parts);
+            List<javax.xml.crypto.dsig.Reference> referenceList = wsSign.addReferencesToSign(wsSign.getParts());
 
             // Put the DerivedKeyToken Element in the right place in the security header
             Node nextSibling = null;
