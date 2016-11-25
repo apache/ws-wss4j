@@ -62,18 +62,18 @@ public class SKISignatureTest extends org.junit.Assert {
      */
     @Test
     public void testX509SignatureDSA_SKI() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("wss40DSA", "security");
         builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
         builder.setSignatureAlgorithm(WSConstants.DSA);
 
         LOG.info("Before SigningDSA_SKIDirect....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with DSA_SKI key identifier:");
@@ -106,17 +106,17 @@ public class SKISignatureTest extends org.junit.Assert {
      */
     @Test
     public void testX509SignatureDSA_Autodetect() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("wss40DSA", "security");
         builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
 
         LOG.info("Before SigningDSA_Autodetect....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with DSA_Autodetect:");
@@ -140,17 +140,17 @@ public class SKISignatureTest extends org.junit.Assert {
      */
     @Test
     public void testX509SignatureRSA_Autodetect() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("wss40", "security");
         builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
 
         LOG.info("Before SigningRSA_Autodetect....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with RSA Autodetect:");

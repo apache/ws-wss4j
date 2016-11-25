@@ -101,6 +101,10 @@ public class WSSecHeader {
     public Element getSecurityHeaderElement() {
         return securityHeader;
     }
+    
+    public void setSecurityHeaderElement(Element securityHeaderElement) {
+        this.securityHeader = securityHeaderElement;
+    }
 
     /**
      * Returns whether the security header is empty

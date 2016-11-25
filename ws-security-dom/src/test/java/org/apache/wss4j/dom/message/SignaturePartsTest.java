@@ -99,14 +99,13 @@ public class SignaturePartsTest extends org.junit.Assert {
     @SuppressWarnings("unchecked")
     @Test
     public void testSOAPHeader() throws Exception {
-        WSSecSignature sign = new WSSecSignature();
-        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignature sign = new WSSecSignature(secHeader);
+        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -115,7 +114,7 @@ public class SignaturePartsTest extends org.junit.Assert {
                 "");
         sign.getParts().add(encP);
 
-        Document signedDoc = sign.build(doc, crypto, secHeader);
+        Document signedDoc = sign.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -157,14 +156,13 @@ public class SignaturePartsTest extends org.junit.Assert {
 
     @Test
     public void testOptionalSOAPHeaderPresent() throws Exception {
-        WSSecSignature sign = new WSSecSignature();
-        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignature sign = new WSSecSignature(secHeader);
+        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -182,7 +180,7 @@ public class SignaturePartsTest extends org.junit.Assert {
             );
         sign.getParts().add(encP);
 
-        Document signedDoc = sign.build(doc, crypto, secHeader);
+        Document signedDoc = sign.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -195,14 +193,13 @@ public class SignaturePartsTest extends org.junit.Assert {
 
     @Test
     public void testOptionalSOAPHeaderNotPresent() throws Exception {
-        WSSecSignature sign = new WSSecSignature();
-        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignature sign = new WSSecSignature(secHeader);
+        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -220,7 +217,7 @@ public class SignaturePartsTest extends org.junit.Assert {
             );
         sign.getParts().add(encP);
 
-        Document signedDoc = sign.build(doc, crypto, secHeader);
+        Document signedDoc = sign.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -233,14 +230,13 @@ public class SignaturePartsTest extends org.junit.Assert {
 
     @Test
     public void testRequiredSOAPHeaderNotPresent() throws Exception {
-        WSSecSignature sign = new WSSecSignature();
-        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignature sign = new WSSecSignature(secHeader);
+        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -258,7 +254,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         sign.getParts().add(encP);
 
         try {
-            sign.build(doc, crypto, secHeader);
+            sign.build(doc, crypto);
             fail("Failure expected on not signing a required element");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_SIGNATURE);
@@ -293,14 +289,14 @@ public class SignaturePartsTest extends org.junit.Assert {
 
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
         samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
-
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
-        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        wsSign.setUserInfo("wss40", "security");
-
+        
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
+        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        wsSign.setUserInfo("wss40", "security");
 
         WSEncryptionPart encP =
             new WSEncryptionPart("STRTransform", "", "Element");
@@ -309,7 +305,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         //
         // set up for keyHolder
         //
-        Document signedDoc = wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
+        Document signedDoc = wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML message (key holder):");
@@ -352,14 +348,13 @@ public class SignaturePartsTest extends org.junit.Assert {
      */
     @Test
     public void testBadLocalname() throws Exception {
-        WSSecSignature sign = new WSSecSignature();
-        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignature sign = new WSSecSignature(secHeader);
+        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -369,7 +364,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         sign.getParts().add(encP);
 
         try {
-            sign.build(doc, crypto, secHeader);
+            sign.build(doc, crypto);
             fail("Failure expected on a bad localname");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_SIGNATURE);
@@ -381,14 +376,13 @@ public class SignaturePartsTest extends org.junit.Assert {
      */
     @Test
     public void testBadNamespace() throws Exception {
-        WSSecSignature sign = new WSSecSignature();
-        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignature sign = new WSSecSignature(secHeader);
+        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -398,7 +392,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         sign.getParts().add(encP);
 
         try {
-            sign.build(doc, crypto, secHeader);
+            sign.build(doc, crypto);
             fail("Failure expected on a bad namespace");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_SIGNATURE);
@@ -410,16 +404,16 @@ public class SignaturePartsTest extends org.junit.Assert {
      */
     @Test
     public void testSOAPHeaderAndBody() throws Exception {
-        WSSecSignature sign = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         SOAPConstants soapConstants =
             WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -434,7 +428,7 @@ public class SignaturePartsTest extends org.junit.Assert {
                 "");
         sign.getParts().add(encP2);
 
-        Document signedDoc = sign.build(doc, crypto, secHeader);
+        Document signedDoc = sign.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -480,16 +474,16 @@ public class SignaturePartsTest extends org.junit.Assert {
      */
     @Test
     public void testSignaturePartDOMElement() throws Exception {
-        WSSecSignature sign = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         SOAPConstants soapConstants =
             WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
 
         // Give wrong names to make sure it's picking up the element
         WSEncryptionPart encP =
@@ -502,7 +496,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         encP.setElement(bodyElement);
         sign.getParts().add(encP);
 
-        Document signedDoc = sign.build(doc, crypto, secHeader);
+        Document signedDoc = sign.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -531,12 +525,12 @@ public class SignaturePartsTest extends org.junit.Assert {
     @Test
     public void testMultipleElements() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG_MULTIPLE);
-        WSSecSignature sign = new WSSecSignature();
-        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignature sign = new WSSecSignature(secHeader);
+        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -545,7 +539,7 @@ public class SignaturePartsTest extends org.junit.Assert {
                 "");
         sign.getParts().add(encP);
 
-        Document signedDoc = sign.build(doc, crypto, secHeader);
+        Document signedDoc = sign.build(doc, crypto);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);

@@ -70,15 +70,16 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
 
     @Test
     public void testSignature() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setSignatureAlgorithm(WSConstants.RSA_SHA1);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -104,16 +105,17 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
     @Test
     public void testSignatureMethodDSA() throws Exception {
         Crypto dsaCrypto = CryptoFactory.getInstance("wss40.properties");
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
-        WSSecSignature builder = new WSSecSignature();
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("wss40DSA", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setSignatureAlgorithm(WSConstants.DSA);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, dsaCrypto, secHeader);
+        Document signedDoc = builder.build(doc, dsaCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -142,16 +144,17 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         keyGen.init(128);
         SecretKey key = keyGen.generateKey();
         byte[] keyData = key.getEncoded();
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
-        WSSecSignature builder = new WSSecSignature();
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
         builder.setSecretKey(keyData);
         builder.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -205,16 +208,17 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
 
     @Test
     public void testC14nMethod() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setSignatureAlgorithm(WSConstants.RSA_SHA1);
         builder.setSigCanonicalization(WSConstants.C14N_EXCL_WITH_COMMENTS);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -238,16 +242,17 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
 
     @Test
     public void testDigestMethod() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setSignatureAlgorithm(WSConstants.RSA_SHA1);
         builder.setDigestAlgo(WSConstants.SHA256);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =

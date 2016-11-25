@@ -64,10 +64,13 @@ public class STRSignatureTest extends org.junit.Assert {
      */
     @Test
     public void testX509SignatureDirectSTR() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("wss40", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("wss40", "security");
 
         //
         // Set up to sign body and use STRTransform to sign
@@ -90,10 +93,7 @@ public class STRSignatureTest extends org.junit.Assert {
 
         LOG.info("Before Signing STR DirectReference....");
 
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with STR DirectReference key identifier:");
@@ -112,13 +112,13 @@ public class STRSignatureTest extends org.junit.Assert {
      */
     @Test
     public void testWSS96() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("wss40", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("wss40", "security");
 
         //
         // Set up to sign body and use STRTransform to sign
@@ -137,15 +137,15 @@ public class STRSignatureTest extends org.junit.Assert {
                 "Content");
         builder.getParts().add(encP);
 
-        WSSecTimestamp timestamp = new WSSecTimestamp();
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(600);
-        timestamp.build(doc, secHeader);
+        timestamp.build(doc);
         builder.getParts().add(new WSEncryptionPart(timestamp.getId()));
 
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         LOG.info("Before Signing STR DirectReference....");
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with STR DirectReference key identifier:");
@@ -169,11 +169,13 @@ public class STRSignatureTest extends org.junit.Assert {
      */
     @Test
     public void testX509SignatureISSTR() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("wss40", "security");
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("wss40", "security");
 
         //
         // Set up to sign body and use STRTransform to sign
@@ -196,10 +198,7 @@ public class STRSignatureTest extends org.junit.Assert {
 
         LOG.info("Before Signing STR IS....");
 
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with STR IssuerSerial key identifier:");
@@ -222,10 +221,13 @@ public class STRSignatureTest extends org.junit.Assert {
      */
     @Test
     public void testX509SignatureSKISTR() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("wss40", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("wss40", "security");
 
         //
         // Set up to sign body and use STRTransform to sign
@@ -248,10 +250,7 @@ public class STRSignatureTest extends org.junit.Assert {
 
         LOG.info("Before Signing STR SKI....");
 
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with STR SKI key identifier:");

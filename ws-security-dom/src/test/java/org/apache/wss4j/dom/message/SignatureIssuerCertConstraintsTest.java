@@ -65,14 +65,15 @@ public class SignatureIssuerCertConstraintsTest extends org.junit.Assert {
      */
     @Test
     public void testBSTSignature() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("wss40", "security");
-        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("wss40", "security");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with BST key identifier:");
@@ -99,15 +100,16 @@ public class SignatureIssuerCertConstraintsTest extends org.junit.Assert {
      */
     @Test
     public void testBSTSignaturePKIPath() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("wss40", "security");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setUseSingleCertificate(false);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with BST key identifier:");

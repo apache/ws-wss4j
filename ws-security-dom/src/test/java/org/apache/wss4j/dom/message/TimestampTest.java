@@ -69,9 +69,9 @@ public class TimestampTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecTimestamp timestamp = new WSSecTimestamp();
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(300);
-        Document createdDoc = timestamp.build(doc, secHeader);
+        Document createdDoc = timestamp.build(doc);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -107,9 +107,9 @@ public class TimestampTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecTimestamp timestamp = new WSSecTimestamp();
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(0);
-        Document createdDoc = timestamp.build(doc, secHeader);
+        Document createdDoc = timestamp.build(doc);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -137,9 +137,9 @@ public class TimestampTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecTimestamp timestamp = new WSSecTimestamp();
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(0);
-        Document createdDoc = timestamp.build(doc, secHeader);
+        Document createdDoc = timestamp.build(doc);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -184,9 +184,9 @@ public class TimestampTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecTimestamp timestamp = new WSSecTimestamp();
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(-1);
-        Document createdDoc = timestamp.build(doc, secHeader);
+        Document createdDoc = timestamp.build(doc);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -214,8 +214,8 @@ public class TimestampTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecTimestamp timestamp = new WSSecTimestamp();
-        Document createdDoc = timestamp.build(doc, secHeader);
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
+        Document createdDoc = timestamp.build(doc);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -266,7 +266,7 @@ public class TimestampTest extends org.junit.Assert {
         elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
         timestampElement.appendChild(elementCreated);
 
-        secHeader.getSecurityHeader().appendChild(timestampElement);
+        secHeader.getSecurityHeaderElement().appendChild(timestampElement);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -314,7 +314,7 @@ public class TimestampTest extends org.junit.Assert {
         elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
         timestampElement.appendChild(elementCreated);
 
-        secHeader.getSecurityHeader().appendChild(timestampElement);
+        secHeader.getSecurityHeaderElement().appendChild(timestampElement);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -370,7 +370,7 @@ public class TimestampTest extends org.junit.Assert {
         elementExpires.appendChild(doc.createTextNode(zulu.format(expiresDate)));
         timestampElement.appendChild(elementExpires);
 
-        secHeader.getSecurityHeader().appendChild(timestampElement);
+        secHeader.getSecurityHeaderElement().appendChild(timestampElement);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -398,13 +398,13 @@ public class TimestampTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecTimestamp timestamp = new WSSecTimestamp();
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(300);
-        Document createdDoc = timestamp.build(doc, secHeader);
+        Document createdDoc = timestamp.build(doc);
 
-        timestamp = new WSSecTimestamp();
+        timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(60);
-        createdDoc = timestamp.build(doc, secHeader);
+        createdDoc = timestamp.build(doc);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -451,7 +451,7 @@ public class TimestampTest extends org.junit.Assert {
         timestampElement.appendChild(elementCreated);
         timestampElement.appendChild(elementCreated.cloneNode(true));
 
-        secHeader.getSecurityHeader().appendChild(timestampElement);
+        secHeader.getSecurityHeaderElement().appendChild(timestampElement);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -498,7 +498,7 @@ public class TimestampTest extends org.junit.Assert {
         elementCreated.appendChild(doc.createTextNode(zulu.format(createdDate)));
         timestampElement.appendChild(elementCreated);
 
-        secHeader.getSecurityHeader().appendChild(timestampElement);
+        secHeader.getSecurityHeaderElement().appendChild(timestampElement);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -558,7 +558,7 @@ public class TimestampTest extends org.junit.Assert {
         timestampElement.appendChild(elementExpires);
         timestampElement.appendChild(elementExpires.cloneNode(true));
 
-        secHeader.getSecurityHeader().appendChild(timestampElement);
+        secHeader.getSecurityHeaderElement().appendChild(timestampElement);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -612,7 +612,7 @@ public class TimestampTest extends org.junit.Assert {
         elementExpires.appendChild(doc.createTextNode(zulu.format(new Date())));
         timestampElement.appendChild(elementExpires);
 
-        secHeader.getSecurityHeader().appendChild(timestampElement);
+        secHeader.getSecurityHeaderElement().appendChild(timestampElement);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -656,7 +656,7 @@ public class TimestampTest extends org.junit.Assert {
         elementCreated.appendChild(doc.createTextNode("2011-02-08T13:13:84.535Z"));
         timestampElement.appendChild(elementCreated);
 
-        secHeader.getSecurityHeader().appendChild(timestampElement);
+        secHeader.getSecurityHeaderElement().appendChild(timestampElement);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -706,7 +706,7 @@ public class TimestampTest extends org.junit.Assert {
         elementCreated.setAttributeNS(null, "ValueType", WSConstants.WSS_SAML_KI_VALUE_TYPE);
         timestampElement.appendChild(elementCreated);
 
-        secHeader.getSecurityHeader().appendChild(timestampElement);
+        secHeader.getSecurityHeaderElement().appendChild(timestampElement);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -770,7 +770,7 @@ public class TimestampTest extends org.junit.Assert {
             );
         timestampElement.appendChild(elementCustom);
 
-        secHeader.getSecurityHeader().appendChild(timestampElement);
+        secHeader.getSecurityHeaderElement().appendChild(timestampElement);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -801,7 +801,7 @@ public class TimestampTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecTimestamp timestamp = new WSSecTimestamp();
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(300);
 
         WSTimeSource spoofedTimeSource = new WSTimeSource() {
@@ -815,7 +815,7 @@ public class TimestampTest extends org.junit.Assert {
         };
         timestamp.setWsTimeSource(spoofedTimeSource);
 
-        Document createdDoc = timestamp.build(doc, secHeader);
+        Document createdDoc = timestamp.build(doc);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -841,10 +841,10 @@ public class TimestampTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecTimestamp timestamp = new WSSecTimestamp();
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setPrecisionInMilliSeconds(false);
         timestamp.setTimeToLive(300);
-        Document createdDoc = timestamp.build(doc, secHeader);
+        Document createdDoc = timestamp.build(doc);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -872,9 +872,9 @@ public class TimestampTest extends org.junit.Assert {
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
 
-            WSSecTimestamp timestamp = new WSSecTimestamp();
+            WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
             timestamp.setTimeToLive(300);
-            Document createdDoc = timestamp.build(doc, secHeader);
+            Document createdDoc = timestamp.build(doc);
 
             //
             // Do some processing

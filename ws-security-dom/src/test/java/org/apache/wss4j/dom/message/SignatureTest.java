@@ -82,14 +82,16 @@ public class SignatureTest extends org.junit.Assert {
      */
     @Test
     public void testX509SignatureIS() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        LOG.info("Before Signing IS....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        LOG.info("Before Signing IS....");
+
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
@@ -111,15 +113,17 @@ public class SignatureTest extends org.junit.Assert {
 
     @Test
     public void testX509SignatureISAttached() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setIncludeSignatureToken(true);
         LOG.info("Before Signing IS....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
@@ -148,13 +152,15 @@ public class SignatureTest extends org.junit.Assert {
      */
     @Test
     public void testDoubleX509SignatureIS() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
-        Document signedDoc1 = builder.build(signedDoc, crypto, secHeader);
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+
+        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc1 = builder.build(signedDoc, crypto);
         verify(signedDoc1);
     }
 
@@ -166,13 +172,14 @@ public class SignatureTest extends org.junit.Assert {
      */
     @Test
     public void testIssuerSerialSignature() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        LOG.info("Before Signing....");
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -192,14 +199,15 @@ public class SignatureTest extends org.junit.Assert {
      */
     @Test
     public void testSignatureInclusiveC14N() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setSigCanonicalization(WSConstants.C14N_OMIT_COMMENTS);
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setSigCanonicalization(WSConstants.C14N_OMIT_COMMENTS);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        LOG.info("Before Signing....");
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -233,14 +241,15 @@ public class SignatureTest extends org.junit.Assert {
      */
     @Test
     public void testSignatureInclusivePrefixes() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setAddInclusivePrefixes(true);
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setAddInclusivePrefixes(true);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        LOG.info("Before Signing....");
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -260,14 +269,15 @@ public class SignatureTest extends org.junit.Assert {
      */
     @Test
     public void testBSTSignature() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        LOG.info("Before Signing....");
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -295,17 +305,18 @@ public class SignatureTest extends org.junit.Assert {
      */
     @Test
     public void testBSTPKIPathSignature() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("wss40", "security");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setUseSingleCertificate(false);
         LOG.info("Before Signing....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
 
         Crypto pkiCrypto = CryptoFactory.getInstance("wss40.properties");
-        Document signedDoc = builder.build(doc, pkiCrypto, secHeader);
+        Document signedDoc = builder.build(doc, pkiCrypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After PKI Signing....");
@@ -325,14 +336,16 @@ public class SignatureTest extends org.junit.Assert {
      */
     @Test
     public void testX509Signature() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        builder.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
-        LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
+        LOG.info("Before Signing....");
+        
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -363,16 +376,16 @@ public class SignatureTest extends org.junit.Assert {
      */
     @Test
     public void testX509SignatureThumb() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
         LOG.info("Before Signing ThumbprintSHA1....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with ThumbprintSHA1 key identifier:");
@@ -395,17 +408,17 @@ public class SignatureTest extends org.junit.Assert {
 
     @Test
     public void testX509SignatureThumbAttached() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
         builder.setIncludeSignatureToken(true);
         LOG.info("Before Signing ThumbprintSHA1....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with ThumbprintSHA1 key identifier:");
@@ -435,16 +448,16 @@ public class SignatureTest extends org.junit.Assert {
      */
     @Test
     public void testDoubleX509SignatureThumb() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
 
-        Document signedDoc = builder.build(doc, crypto, secHeader);
-        Document signedDoc1 = builder.build(signedDoc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc1 = builder.build(signedDoc, crypto);
         verify(signedDoc1);
     }
 
@@ -458,16 +471,17 @@ public class SignatureTest extends org.junit.Assert {
      */
     @Test
     public void testValidModifiedSignature() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        LOG.info("Before Signing....");
 
-        WSSecTimestamp timestamp = new WSSecTimestamp();
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(300);
-        Document createdDoc = timestamp.build(doc, secHeader);
+        Document createdDoc = timestamp.build(doc);
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -476,8 +490,8 @@ public class SignatureTest extends org.junit.Assert {
                 "");
         builder.getParts().add(encP);
 
-        Document signedDoc = builder.build(createdDoc, crypto, secHeader);
-        Element secHeaderElement = secHeader.getSecurityHeader();
+        Document signedDoc = builder.build(createdDoc, crypto);
+        Element secHeaderElement = secHeader.getSecurityHeaderElement();
         Node timestampNode =
             secHeaderElement.getElementsByTagNameNS(WSConstants.WSU_NS, "Timestamp").item(0);
         ((Element)timestampNode).setAttributeNS(
@@ -502,16 +516,18 @@ public class SignatureTest extends org.junit.Assert {
      */
     @Test
     public void testX509SignatureSha256() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
         builder.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
         LOG.info("Before Signing IS....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
@@ -578,13 +594,14 @@ public class SignatureTest extends org.junit.Assert {
      */
     @Test
     public void testWSS234() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        LOG.info("Before Signing....");
+        Document signedDoc = builder.build(doc, crypto);
 
         // Add a comment node as the first node element
         Node firstChild = signedDoc.getFirstChild();
@@ -613,11 +630,11 @@ public class SignatureTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecTimestamp timestamp = new WSSecTimestamp();
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(300);
-        Document createdDoc = timestamp.build(doc, secHeader);
+        Document createdDoc = timestamp.build(doc);
 
-        WSSecSignature builder = new WSSecSignature();
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
         WSEncryptionPart encP =
@@ -627,10 +644,10 @@ public class SignatureTest extends org.junit.Assert {
                 "");
         builder.getParts().add(encP);
 
-        builder.prepare(createdDoc, crypto, secHeader);
+        builder.prepare(createdDoc, crypto);
 
         List<javax.xml.crypto.dsig.Reference> referenceList =
-            builder.addReferencesToSign(builder.getParts(), secHeader);
+            builder.addReferencesToSign(builder.getParts());
 
         builder.computeSignature(referenceList, false, null);
 
@@ -652,16 +669,17 @@ public class SignatureTest extends org.junit.Assert {
      */
     @Test
     public void testWSS283() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         Element secHeaderElement = secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+
         Node textNode = doc.createTextNode("This is a text node");
         secHeaderElement.appendChild(textNode);
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with text node:");
@@ -678,13 +696,14 @@ public class SignatureTest extends org.junit.Assert {
      */
     @Test
     public void testCustomSTR() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        LOG.info("Before Signing IS....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        LOG.info("Before Signing IS....");
 
         SecurityTokenReference secRef = new SecurityTokenReference(doc);
         Reference ref = new Reference(doc);
@@ -692,7 +711,7 @@ public class SignatureTest extends org.junit.Assert {
         secRef.setReference(ref);
         builder.setSecurityTokenReference(secRef);
 
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -710,15 +729,16 @@ public class SignatureTest extends org.junit.Assert {
     @Test
     public void testX509SignatureDefaultPassword() throws Exception {
         Crypto passwordCrypto = CryptoFactory.getInstance("alice.properties");
-
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo(passwordCrypto.getDefaultX509Identifier(), null);
-        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        LOG.info("Before Signing IS....");
+        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, passwordCrypto, secHeader);
+
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo(passwordCrypto.getDefaultX509Identifier(), null);
+        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        LOG.info("Before Signing IS....");
+        Document signedDoc = builder.build(doc, passwordCrypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
@@ -898,13 +918,14 @@ public class SignatureTest extends org.junit.Assert {
 
     @Test
     public void testCommentInSOAPBody() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        LOG.info("Before Signing....");
+        Document signedDoc = builder.build(doc, crypto);
 
         // Add a comment node
         Element body = WSSecurityUtil.findBodyElement(signedDoc);

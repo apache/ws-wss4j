@@ -100,17 +100,17 @@ public class SignatureEncryptionTest extends org.junit.Assert {
      */
     @Test
     public void testEncryptionSigning() throws Exception {
-        WSSecEncrypt encrypt = new WSSecEncrypt();
-        WSSecSignature sign = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+        WSSecSignature sign = new WSSecSignature(secHeader);
         encrypt.setUserInfo("wss40");
         sign.setUserInfo("wss40", "security");
         LOG.info("Before Encryption....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        Document encryptedDoc = encrypt.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Encryption....");
@@ -119,7 +119,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
 
-        Document encryptedSignedDoc = sign.build(encryptedDoc, crypto, secHeader);
+        Document encryptedSignedDoc = sign.build(encryptedDoc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -142,15 +142,15 @@ public class SignatureEncryptionTest extends org.junit.Assert {
     @SuppressWarnings("unchecked")
     @Test
     public void testEncryptionElementSigning() throws Exception {
-        WSSecEncrypt encrypt = new WSSecEncrypt();
-        WSSecSignature sign = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+        WSSecSignature sign = new WSSecSignature(secHeader);
         encrypt.setUserInfo("wss40");
         sign.setUserInfo("wss40", "security");
         LOG.info("Before Encryption....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
-
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
 
         WSEncryptionPart part =
             new WSEncryptionPart(
@@ -159,7 +159,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
                     "Element");
         encrypt.getParts().add(part);
 
-        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        Document encryptedDoc = encrypt.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Encryption....");
@@ -175,7 +175,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
                     "Element");
         sign.getParts().add(signPart);
 
-        Document encryptedSignedDoc = sign.build(encryptedDoc, crypto, secHeader);
+        Document encryptedSignedDoc = sign.build(encryptedDoc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -228,18 +228,18 @@ public class SignatureEncryptionTest extends org.junit.Assert {
      */
     @Test
     public void testSigningEncryption() throws Exception {
-        WSSecEncrypt encrypt = new WSSecEncrypt();
-        WSSecSignature sign = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+        WSSecSignature sign = new WSSecSignature(secHeader);
         encrypt.setUserInfo("wss40");
         sign.setUserInfo("wss40", "security");
         LOG.info("Before Encryption....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        Document signedDoc = sign.build(doc, crypto, secHeader);
-        Document encryptedSignedDoc = encrypt.build(signedDoc, crypto, secHeader);
+        Document signedDoc = sign.build(doc, crypto);
+        Document encryptedSignedDoc = encrypt.build(signedDoc, crypto);
         LOG.info("After Encryption....");
         verify(encryptedSignedDoc);
     }
@@ -252,12 +252,15 @@ public class SignatureEncryptionTest extends org.junit.Assert {
      */
     @Test
     public void testWSS198() throws Exception {
-        WSSecEncrypt encrypt = new WSSecEncrypt();
-        WSSecSignature sign = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+        WSSecSignature sign = new WSSecSignature(secHeader);
         encrypt.setUserInfo("wss40");
         sign.setUserInfo("wss40", "security");
         LOG.info("Before Encryption....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -266,11 +269,8 @@ public class SignatureEncryptionTest extends org.junit.Assert {
                 "");
         encrypt.getParts().add(encP);
 
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        Document signedDoc = sign.build(doc, crypto, secHeader);
-        Document encryptedSignedDoc = encrypt.build(signedDoc, crypto, secHeader);
+        Document signedDoc = sign.build(doc, crypto);
+        Document encryptedSignedDoc = encrypt.build(signedDoc, crypto);
         LOG.info("WSS198");
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -291,23 +291,23 @@ public class SignatureEncryptionTest extends org.junit.Assert {
      */
     @Test
     public void testSigningEncryptionIS3DES() throws Exception {
-        WSSecEncrypt encrypt = new WSSecEncrypt();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         encrypt.setUserInfo("wss40");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         encrypt.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
 
-        WSSecSignature sign = new WSSecSignature();
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss40", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         LOG.info("Before Sign/Encryption....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        Document signedDoc = sign.build(doc, crypto, secHeader);
-        Document encryptedSignedDoc = encrypt.build(signedDoc, crypto, secHeader);
+        Document signedDoc = sign.build(doc, crypto);
+        Document encryptedSignedDoc = encrypt.build(signedDoc, crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed and encrypted message with IssuerSerial key identifier (both), 3DES:");
             String outputString =
@@ -333,28 +333,28 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
+        WSSecEncryptedKey encrKey = new WSSecEncryptedKey(secHeader);
         encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         encrKey.setUserInfo("wss40", "security");
         encrKey.setSymmetricEncAlgorithm(WSConstants.AES_192);
         encrKey.prepare(doc, crypto);
 
-        WSSecEncrypt encrypt = new WSSecEncrypt();
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         encrypt.setEncKeyId(encrKey.getId());
         encrypt.setEphemeralKey(encrKey.getEphemeralKey());
         encrypt.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         encrypt.setEncryptSymmKey(false);
         encrypt.setEncryptedKeyElement(encrKey.getEncryptedKeyElement());
 
-        WSSecSignature sign = new WSSecSignature();
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setCustomTokenId(encrKey.getId());
         sign.setSecretKey(encrKey.getEphemeralKey());
         sign.setCustomTokenValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
 
-        Document signedDoc = sign.build(doc, crypto, secHeader);
-        Document encryptedSignedDoc = encrypt.build(signedDoc, crypto, secHeader);
+        Document signedDoc = sign.build(doc, crypto);
+        Document encryptedSignedDoc = encrypt.build(signedDoc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed and encrypted message with IssuerSerial key identifier (both), 3DES:");
@@ -459,18 +459,18 @@ public class SignatureEncryptionTest extends org.junit.Assert {
     
     @Test
     public void testSigningEncryptionSOAP12Fault() throws Exception {
-        WSSecEncrypt encrypt = new WSSecEncrypt();
-        WSSecSignature sign = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+        WSSecSignature sign = new WSSecSignature(secHeader);
         encrypt.setUserInfo("wss40");
         sign.setUserInfo("wss40", "security");
         LOG.info("Before Encryption....");
-        Document doc = SOAPUtil.toSOAPPart(SAMPLE_SOAP12_FAULT_MSG);
 
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        Document signedDoc = sign.build(doc, crypto, secHeader);
-        Document encryptedSignedDoc = encrypt.build(signedDoc, crypto, secHeader);
+        Document signedDoc = sign.build(doc, crypto);
+        Document encryptedSignedDoc = encrypt.build(signedDoc, crypto);
         
         LOG.info("After Encryption....");
         verify(encryptedSignedDoc);
