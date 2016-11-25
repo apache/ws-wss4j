@@ -319,4 +319,28 @@ public class KerberosSecurity extends BinarySecurity {
         return false;
     }
 
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof KerberosSecurity)) {
+            return false;
+        }
+        
+        KerberosSecurity that = (KerberosSecurity)object;
+        if (secretKey != null && !secretKey.equals(that.secretKey)) {
+            return false;
+        } else if (secretKey == null && that.secretKey != null) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int hashCode = 17;
+        if (secretKey != null) {
+            hashCode *= 31 + secretKey.hashCode();
+        }
+        return hashCode *= 31 + super.hashCode();
+    }
 }

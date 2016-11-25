@@ -1,5 +1,5 @@
 /**
- * Licensed to the Apache Software Foundation (ASF) under one
+L * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
  * regarding copyright ownership. The ASF licenses this file
@@ -128,7 +128,7 @@ public final class XMLUtils {
     public static String prettyDocumentToString(Document doc) throws IOException, TransformerException {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             elementToStream(doc.getDocumentElement(), baos);
-            return new String(baos.toByteArray());
+            return new String(baos.toByteArray(), "UTF-8");
         }
     }
 

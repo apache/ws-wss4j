@@ -176,7 +176,9 @@ public class EncryptedDataProcessor implements Processor {
         wsDocInfo.addTokenElement(elem);
 
         List<WSSecurityEngineResult> completeResults = new LinkedList<>();
-        completeResults.addAll(encrKeyResults);
+        if (encrKeyResults != null) {
+            completeResults.addAll(encrKeyResults);
+        }
         completeResults.add(result);
 
         WSSConfig wssConfig = request.getWssConfig();
