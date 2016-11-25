@@ -247,7 +247,10 @@ public class Timestamp {
      * @return the "created" time
      */
     public Date getCreated() {
-        return createdDate;
+        if (createdDate != null) {
+            return new Date(createdDate.getTime());
+        }
+        return null;
     }
 
     /**
@@ -256,7 +259,10 @@ public class Timestamp {
      * @return the "expires" time
      */
     public Date getExpires() {
-        return expiresDate;
+        if (expiresDate != null) {
+            return new Date(expiresDate.getTime());
+        }
+        return null;
     }
 
     /**

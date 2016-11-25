@@ -429,7 +429,10 @@ public class UsernameToken {
      * @return the Created Date
      */
     public Date getCreatedDate() {
-       return createdDate;
+        if (createdDate != null) {
+            return new Date(createdDate.getTime());
+        }
+        return null;
     }
 
     /**
