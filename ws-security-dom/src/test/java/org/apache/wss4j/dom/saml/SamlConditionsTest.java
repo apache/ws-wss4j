@@ -154,13 +154,13 @@ public class SamlConditionsTest extends org.junit.Assert {
         issueInstant = issueInstant.plusMinutes(60);
         samlAssertion.getSaml2().setIssueInstant(issueInstant);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion (sender vouches):");
@@ -192,13 +192,13 @@ public class SamlConditionsTest extends org.junit.Assert {
         samlAssertion.getSaml2().setIssueInstant(issueInstant);
         samlAssertion.getSaml2().getConditions().setNotOnOrAfter(null);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion (sender vouches):");
@@ -233,13 +233,13 @@ public class SamlConditionsTest extends org.junit.Assert {
         issueInstant = issueInstant.minusMinutes(31);
         samlAssertion.getSaml2().setIssueInstant(issueInstant);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion (sender vouches):");
@@ -266,13 +266,13 @@ public class SamlConditionsTest extends org.junit.Assert {
         samlAssertion.getSaml1().setIssueInstant(issueInstant);
         samlAssertion.getSaml1().getConditions().setNotOnOrAfter(null);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1 Authn Assertion (sender vouches):");
@@ -347,13 +347,13 @@ public class SamlConditionsTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -391,13 +391,13 @@ public class SamlConditionsTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -434,13 +434,13 @@ public class SamlConditionsTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -474,13 +474,13 @@ public class SamlConditionsTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -534,13 +534,13 @@ public class SamlConditionsTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -602,13 +602,13 @@ public class SamlConditionsTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -647,13 +647,13 @@ public class SamlConditionsTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -719,13 +719,13 @@ public class SamlConditionsTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(samlCallbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             String outputString =

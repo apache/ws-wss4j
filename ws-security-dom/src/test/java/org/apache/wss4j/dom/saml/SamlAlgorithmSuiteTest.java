@@ -75,13 +75,13 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
 
         samlAssertion.signAssertion("16c73ab6-b892-458f-abf5-2f875f74882e", "security", crypto, false);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-
-        Document signedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
+        Document signedDoc = wsSign.build(doc, samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -119,13 +119,13 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
 
         samlAssertion.signAssertion("wss40DSA", "security", dsaCrypto, false);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document signedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document signedDoc = wsSign.build(doc, samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -162,13 +162,14 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
             "16c73ab6-b892-458f-abf5-2f875f74882e", "security", crypto, false,
             WSConstants.C14N_EXCL_WITH_COMMENTS, WSConstants.RSA_SHA1);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document signedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document signedDoc = wsSign.build(doc, samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             String outputString =

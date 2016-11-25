@@ -116,16 +116,16 @@ public class SamlNegativeTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
-        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
+        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document signedDoc =
             wsSign.build(
-                doc, null, samlAssertion, userCrypto, "wss40", "security", secHeader
+                doc, null, samlAssertion, userCrypto, "wss40", "security"
             );
 
         //
@@ -170,13 +170,13 @@ public class SamlNegativeTest extends org.junit.Assert {
 
         samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document signedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document signedDoc = wsSign.build(doc, samlAssertion);
 
         //
         // Modify the assertion
@@ -222,13 +222,13 @@ public class SamlNegativeTest extends org.junit.Assert {
 
         samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document signedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document signedDoc = wsSign.build(doc, samlAssertion);
         //
         // Modify the assertion
         //
@@ -273,8 +273,8 @@ public class SamlNegativeTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-        Document signedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
+        Document signedDoc = wsSign.build(doc, samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -316,8 +316,8 @@ public class SamlNegativeTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-        Document signedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
+        Document signedDoc = wsSign.build(doc, samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -354,18 +354,18 @@ public class SamlNegativeTest extends org.junit.Assert {
             CryptoFactory.getInstance("crypto.properties"), false
         );
 
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setUserInfo("wss40", "security");
         wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
         wsSign.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
         Document signedDoc =
-            wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
+            wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);

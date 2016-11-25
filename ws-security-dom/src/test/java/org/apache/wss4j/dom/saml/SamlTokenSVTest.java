@@ -85,17 +85,17 @@ public class SamlTokenSVTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
-        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
+        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document signedDoc =
             wsSign.build(
                 doc, null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
-                "security", secHeader
+                "security"
             );
 
         if (LOG.isDebugEnabled()) {
@@ -145,17 +145,17 @@ public class SamlTokenSVTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
-        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
+        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document signedDoc =
             wsSign.build(
                 doc, null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
-                "security", secHeader
+                "security"
             );
 
         if (LOG.isDebugEnabled()) {
@@ -205,17 +205,17 @@ public class SamlTokenSVTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
-        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
+        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document signedDoc =
             wsSign.build(
                 doc, null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
-                "security", secHeader
+                "security"
             );
 
         if (LOG.isDebugEnabled()) {
@@ -265,17 +265,17 @@ public class SamlTokenSVTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
-        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
+        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document signedDoc =
             wsSign.build(
                 doc, null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
-                "security", secHeader
+                "security"
             );
 
         if (LOG.isDebugEnabled()) {
@@ -327,18 +327,17 @@ public class SamlTokenSVTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
-        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
+        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document signedDoc =
             wsSign.build(
                 doc, null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
-                "security", secHeader
+                "security"
             );
         //
         // Now verify it but first call Handler#doReceiverAction

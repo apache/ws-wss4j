@@ -95,7 +95,7 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
 
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        secHeader.getSecurityHeader().appendChild(assertionElement);
+        secHeader.getSecurityHeaderElement().appendChild(assertionElement);
 
         // Sign
         signAssertion(doc, assertionElement);
@@ -136,7 +136,7 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
 
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        secHeader.getSecurityHeader().appendChild(assertionElement);
+        secHeader.getSecurityHeaderElement().appendChild(assertionElement);
 
         // Sign
         signAssertion(doc, assertionElement);
@@ -174,9 +174,9 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
 
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        secHeader.getSecurityHeader().appendChild(assertionElement);
+        secHeader.getSecurityHeaderElement().appendChild(assertionElement);
 
-        WSSecSignature sign = new WSSecSignature();
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
@@ -188,7 +188,7 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
         encP.setRequired(false);
         sign.getParts().add(encP);
 
-        Document signedDoc = sign.build(doc, crypto, secHeader);
+        Document signedDoc = sign.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(doc);

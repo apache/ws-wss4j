@@ -164,13 +164,13 @@ public class SamlAuthnTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(samlCallbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
+
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
