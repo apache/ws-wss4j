@@ -35,8 +35,8 @@ public class WSSecSignatureConfirmation extends WSSecBase {
 
     private byte[] signatureValue;
 
-    public WSSecSignatureConfirmation() {
-        super();
+    public WSSecSignatureConfirmation(WSSecHeader securityHeader) {
+        super(securityHeader);
     }
 
     /**
@@ -70,11 +70,10 @@ public class WSSecSignatureConfirmation extends WSSecBase {
      * The method can be called any time after <code>prepare()</code>.
      * This allows to insert the SignatureConfirmation element at any position in the
      * Security header.
-     *
-     * @param secHeader The security header that holds the Signature element.
      */
-    public void prependToHeader(WSSecHeader secHeader) {
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), sc.getElement());
+    public void prependToHeader() {
+        Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
+        WSSecurityUtil.prependChildElement(securityHeaderElement, sc.getElement());
     }
 
     /**
@@ -85,15 +84,14 @@ public class WSSecSignatureConfirmation extends WSSecBase {
      *
      * @param doc The SOAP envelope as W3C document
      * @param sigVal the Signature value. This will be the content of the "Value" attribute.
-     * @param secHeader The security header that holds the Signature element.
      * @return Document with SignatureConfirmation added
      */
-    public Document build(Document doc, byte[] sigVal, WSSecHeader secHeader) {
+    public Document build(Document doc, byte[] sigVal) {
         LOG.debug("Begin add signature confirmation...");
 
         signatureValue = sigVal;
         prepare(doc);
-        prependToHeader(secHeader);
+        prependToHeader();
 
         return doc;
     }

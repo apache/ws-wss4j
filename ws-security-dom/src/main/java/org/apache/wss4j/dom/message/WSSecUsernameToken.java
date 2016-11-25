@@ -53,8 +53,8 @@ public class WSSecUsernameToken extends WSSecBase {
     private boolean precisionInMilliSeconds = true;
     private WSTimeSource wsTimeSource = new WSCurrentTimeSource();
 
-    public WSSecUsernameToken() {
-        super();
+    public WSSecUsernameToken(WSSecHeader securityHeader) {
+        super(securityHeader);
     }
 
     /**
@@ -189,11 +189,10 @@ public class WSSecUsernameToken extends WSSecBase {
      * The method can be called any time after <code>prepare()</code>.
      * This allows to insert the UsernameToken element at any position in the
      * Security header.
-     *
-     * @param secHeader The security header that holds the Signature element.
      */
-    public void prependToHeader(WSSecHeader secHeader) {
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), ut.getElement());
+    public void prependToHeader() {
+        Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
+        WSSecurityUtil.prependChildElement(securityHeaderElement, ut.getElement());
     }
 
     /**
@@ -203,12 +202,10 @@ public class WSSecUsernameToken extends WSSecBase {
      * The method can be called any time after <code>prepare()</code>.
      * This allows to insert the UsernameToken element at any position in the
      * Security header.
-     *
-     * @param secHeader The security header that holds the Signature element.
      */
-    public void appendToHeader(WSSecHeader secHeader) {
-        Element secHeaderElement = secHeader.getSecurityHeader();
-        secHeaderElement.appendChild(ut.getElement());
+    public void appendToHeader() {
+        Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
+        securityHeaderElement.appendChild(ut.getElement());
     }
 
     /**
@@ -220,14 +217,13 @@ public class WSSecUsernameToken extends WSSecBase {
      * <code>wsse:Security</code> header.
      *
      * @param doc The SOAP envelope as W3C document
-     * @param secHeader The security header inside the SOAP envelope
      * @return Document with UsernameToken added
      */
-    public Document build(Document doc, WSSecHeader secHeader) {
+    public Document build(Document doc) {
         LOG.debug("Begin add username token...");
 
         prepare(doc);
-        prependToHeader(secHeader);
+        prependToHeader();
 
         return doc;
     }

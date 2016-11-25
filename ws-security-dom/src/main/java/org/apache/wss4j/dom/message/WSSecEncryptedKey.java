@@ -147,8 +147,8 @@ public class WSSecEncryptedKey extends WSSecBase {
     private boolean includeEncryptionToken;
     private Element customEKKeyInfoElement;
 
-    public WSSecEncryptedKey() {
-        super();
+    public WSSecEncryptedKey(WSSecHeader securityHeader) {
+        super(securityHeader);
     }
 
     /**
@@ -737,11 +737,10 @@ public class WSSecEncryptedKey extends WSSecBase {
      * The method can be called any time after <code>prepare()</code>. This
      * allows to insert the EncryptedKey element at any position in the Security
      * header.
-     *
-     * @param secHeader The security header that holds the Signature element.
      */
-    public void prependToHeader(WSSecHeader secHeader) {
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), encryptedKeyElement);
+    public void prependToHeader() {
+        Element secHeaderElement = getSecurityHeader().getSecurityHeaderElement();
+        WSSecurityUtil.prependChildElement(secHeaderElement, encryptedKeyElement);
     }
 
     /**
@@ -751,11 +750,9 @@ public class WSSecEncryptedKey extends WSSecBase {
      * The method can be called any time after <code>prepare()</code>. This
      * allows to insert the EncryptedKey element at any position in the Security
      * header.
-     *
-     * @param secHeader The security header that holds the Signature element.
      */
-    public void appendToHeader(WSSecHeader secHeader) {
-        Element secHeaderElement = secHeader.getSecurityHeader();
+    public void appendToHeader() {
+        Element secHeaderElement = getSecurityHeader().getSecurityHeaderElement();
         secHeaderElement.appendChild(encryptedKeyElement);
     }
 
@@ -765,14 +762,11 @@ public class WSSecEncryptedKey extends WSSecBase {
      *
      * The method can be called any time after <code>prepare()</code>. This
      * allows to insert the BST element at any position in the Security header.
-     *
-     * @param secHeader The security header that holds the BST element.
      */
-    public void prependBSTElementToHeader(WSSecHeader secHeader) {
+    public void prependBSTElementToHeader() {
         if (bstToken != null && !bstAddedToSecurityHeader) {
-            WSSecurityUtil.prependChildElement(
-                secHeader.getSecurityHeader(), bstToken.getElement()
-            );
+            Element secHeaderElement = getSecurityHeader().getSecurityHeaderElement();
+            WSSecurityUtil.prependChildElement(secHeaderElement, bstToken.getElement());
             bstAddedToSecurityHeader = true;
         }
     }
@@ -783,12 +777,10 @@ public class WSSecEncryptedKey extends WSSecBase {
      *
      * The method can be called any time after <code>prepare()</code>. This
      * allows to insert the BST element at any position in the Security header.
-     *
-     * @param secHeader The security header that holds the BST element.
      */
-    public void appendBSTElementToHeader(WSSecHeader secHeader) {
+    public void appendBSTElementToHeader() {
         if (bstToken != null && !bstAddedToSecurityHeader) {
-            Element secHeaderElement = secHeader.getSecurityHeader();
+            Element secHeaderElement = getSecurityHeader().getSecurityHeaderElement();
             secHeaderElement.appendChild(bstToken.getElement());
             bstAddedToSecurityHeader = true;
         }

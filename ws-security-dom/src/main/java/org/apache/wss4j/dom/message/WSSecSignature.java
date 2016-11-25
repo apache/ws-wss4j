@@ -102,14 +102,13 @@ public class WSSecSignature extends WSSecSignatureBase {
     private Crypto crypto;
     private String digestAlgo = WSConstants.SHA1;
     private X509Certificate useThisCert;
-    private Element securityHeader;
     private boolean useCustomSecRef;
     private boolean bstAddedToSecurityHeader;
     private boolean includeSignatureToken;
     private boolean addInclusivePrefixes = true;
 
-    public WSSecSignature() {
-        super();
+    public WSSecSignature(WSSecHeader securityHeader) {
+        super(securityHeader);
         init();
     }
 
@@ -135,11 +134,9 @@ public class WSSecSignature extends WSSecSignatureBase {
      *
      * @param doc The SOAP envelope as <code>Document</code>
      * @param cr An instance of the Crypto API to handle keystore and certificates
-     * @param secHeader The security header that will hold the Signature. This is used
-     *                   to construct namespace prefixes for Signature. This method
      * @throws WSSecurityException
      */
-    public void prepare(Document doc, Crypto cr, WSSecHeader secHeader)
+    public void prepare(Document doc, Crypto cr)
         throws WSSecurityException {
         //
         // Gather some info about the document to process and store it for
@@ -149,7 +146,6 @@ public class WSSecSignature extends WSSecSignatureBase {
         document = doc;
         wsDocInfo = new WSDocInfo(doc);
         wsDocInfo.setCrypto(cr);
-        securityHeader = secHeader.getSecurityHeader();
 
         //
         // At first get the security token (certificate) according to the parameters.
@@ -159,8 +155,9 @@ public class WSSecSignature extends WSSecSignatureBase {
         try {
             C14NMethodParameterSpec c14nSpec = null;
             if (addInclusivePrefixes && canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
+                Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
                 List<String> prefixes =
-                    getInclusivePrefixes(secHeader.getSecurityHeader(), false);
+                    getInclusivePrefixes(securityHeaderElement, false);
                 c14nSpec = new ExcC14NParameterSpec(prefixes);
             }
 
@@ -344,16 +341,13 @@ public class WSSecSignature extends WSSecSignatureBase {
      * This is a convenience method and for backward compatibility. The method
      * creates a Signature and puts it into the Security header. It does so by
      * calling the single functions in order to perform a <i>one shot signature</i>.
-     * This method is compatible with the build method of the previous version
-     * with the exception of the additional WSSecHeader parameter.
      *
      * @param doc The unsigned SOAP envelope as <code>Document</code>
      * @param cr An instance of the Crypto API to handle keystore and certificates
-     * @param secHeader the security header element to hold the encrypted key element.
      * @return A signed SOAP envelope as <code>Document</code>
      * @throws WSSecurityException
      */
-    public Document build(Document doc, Crypto cr, WSSecHeader secHeader)
+    public Document build(Document doc, Crypto cr)
         throws WSSecurityException {
         doDebug = LOG.isDebugEnabled();
 
@@ -361,7 +355,7 @@ public class WSSecSignature extends WSSecSignatureBase {
             LOG.debug("Beginning signing...");
         }
 
-        prepare(doc, cr, secHeader);
+        prepare(doc, cr);
         if (getParts().isEmpty()) {
             getParts().add(WSSecurityUtil.getDefaultEncryptionPart(document));
         } else {
@@ -372,8 +366,7 @@ public class WSSecSignature extends WSSecSignatureBase {
             }
         }
 
-        List<javax.xml.crypto.dsig.Reference> referenceList =
-            addReferencesToSign(getParts(), secHeader);
+        List<javax.xml.crypto.dsig.Reference> referenceList = addReferencesToSign(getParts());
 
         computeSignature(referenceList);
 
@@ -382,7 +375,7 @@ public class WSSecSignature extends WSSecSignatureBase {
         // strict layout rules.
         //
         if (bstToken != null) {
-            prependBSTElementToHeader(secHeader);
+            prependBSTElementToHeader();
         }
 
         return doc;
@@ -393,12 +386,10 @@ public class WSSecSignature extends WSSecSignatureBase {
      * This method adds references to the Signature.
      *
      * @param references The list of references to sign
-     * @param secHeader The Security Header
      * @throws WSSecurityException
      */
     public List<javax.xml.crypto.dsig.Reference> addReferencesToSign(
-        List<WSEncryptionPart> references,
-        WSSecHeader secHeader
+        List<WSEncryptionPart> references
     ) throws WSSecurityException {
         return
             addReferencesToSign(
@@ -406,7 +397,6 @@ public class WSSecSignature extends WSSecSignatureBase {
                 references,
                 wsDocInfo,
                 signatureFactory,
-                secHeader,
                 addInclusivePrefixes,
                 digestAlgo
             );
@@ -418,9 +408,10 @@ public class WSSecSignature extends WSSecSignatureBase {
      * @return The DOM Element of the signature.
      */
     public Element getSignatureElement() {
+        Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
         return
             XMLUtils.getDirectChildElement(
-                securityHeader, WSConstants.SIG_LN, WSConstants.SIG_NS
+                securityHeaderElement, WSConstants.SIG_LN, WSConstants.SIG_NS
             );
     }
 
@@ -477,24 +468,22 @@ public class WSSecSignature extends WSSecSignatureBase {
      * The method can be called any time after <code>prepare()</code>.
      * This allows to insert the BST element at any position in the Security
      * header.
-     *
-     * @param secHeader The security header
      */
-    public void prependBSTElementToHeader(WSSecHeader secHeader) {
+    public void prependBSTElementToHeader() {
         if (bstToken != null && !bstAddedToSecurityHeader) {
-            WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bstToken);
+            Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
+            WSSecurityUtil.prependChildElement(securityHeaderElement, bstToken);
             bstAddedToSecurityHeader = true;
         }
     }
 
     /**
      * Append the BinarySecurityToken to the security header.
-     * @param secHeader The security header
      */
-    public void appendBSTElementToHeader(WSSecHeader secHeader) {
+    public void appendBSTElementToHeader() {
         if (bstToken != null && !bstAddedToSecurityHeader) {
-            Element secHeaderElement = secHeader.getSecurityHeader();
-            secHeaderElement.appendChild(bstToken);
+            Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
+            securityHeaderElement.appendChild(bstToken);
             bstAddedToSecurityHeader = true;
         }
     }
@@ -556,21 +545,22 @@ public class WSSecSignature extends WSSecSignatureBase {
             // Figure out where to insert the signature element
             //
             XMLSignContext signContext = null;
+            Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
             if (prepend) {
                 if (siblingElement == null) {
-                    Node child = securityHeader.getFirstChild();
+                    Node child = securityHeaderElement.getFirstChild();
                     while (child != null && child.getNodeType() != Node.ELEMENT_NODE) {
                         child = child.getNextSibling();
                     }
                     siblingElement = (Element)child;
                 }
                 if (siblingElement == null) {
-                    signContext = new DOMSignContext(key, securityHeader);
+                    signContext = new DOMSignContext(key, securityHeaderElement);
                 } else {
-                    signContext = new DOMSignContext(key, securityHeader, siblingElement);
+                    signContext = new DOMSignContext(key, securityHeaderElement, siblingElement);
                 }
             } else {
-                signContext = new DOMSignContext(key, securityHeader);
+                signContext = new DOMSignContext(key, securityHeaderElement);
             }
 
             signContext.putNamespacePrefix(WSConstants.SIG_NS, WSConstants.SIG_PREFIX);
@@ -780,7 +770,7 @@ public class WSSecSignature extends WSSecSignatureBase {
 
     /**
      * @return the URI associated with the SecurityTokenReference
-     * (must be called after {@link #prepare(Document, Crypto, WSSecHeader)}
+     * (must be called after {@link #prepare(Document, Crypto)}
      */
     public String getSecurityTokenReferenceURI() {
         return strUri;

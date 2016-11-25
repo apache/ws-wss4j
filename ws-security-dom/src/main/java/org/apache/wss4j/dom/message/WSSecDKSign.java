@@ -73,12 +73,11 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     private XMLSignature sig;
     private KeyInfo keyInfo;
     private CanonicalizationMethod c14nMethod;
-    private Element securityHeader;
     private int derivedKeyLength = -1;
     private boolean addInclusivePrefixes = true;
 
-    public WSSecDKSign() {
-        super();
+    public WSSecDKSign(WSSecHeader securityHeader) {
+        super(securityHeader);
         init();
     }
 
@@ -92,9 +91,9 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         }
     }
 
-    public Document build(Document doc, WSSecHeader secHeader) throws WSSecurityException {
+    public Document build(Document doc) throws WSSecurityException {
 
-        prepare(doc, secHeader);
+        prepare(doc);
         if (getParts().isEmpty()) {
             getParts().add(WSSecurityUtil.getDefaultEncryptionPart(document));
         } else {
@@ -105,29 +104,28 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
             }
         }
 
-        List<javax.xml.crypto.dsig.Reference> referenceList =
-            addReferencesToSign(getParts(), secHeader);
+        List<javax.xml.crypto.dsig.Reference> referenceList = addReferencesToSign(getParts());
         computeSignature(referenceList);
 
         //
         // prepend elements in the right order to the security header
         //
-        prependDKElementToHeader(secHeader);
+        prependDKElementToHeader();
 
         return doc;
     }
 
-    public void prepare(Document doc, WSSecHeader secHeader) throws WSSecurityException {
+    public void prepare(Document doc) throws WSSecurityException {
         super.prepare(doc);
         wsDocInfo = new WSDocInfo(doc);
-        securityHeader = secHeader.getSecurityHeader();
         sig = null;
 
         try {
             C14NMethodParameterSpec c14nSpec = null;
             if (addInclusivePrefixes && canonAlgo.equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
+                Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
                 List<String> prefixes =
-                    getInclusivePrefixes(secHeader.getSecurityHeader(), false);
+                    getInclusivePrefixes(securityHeaderElement, false);
                 c14nSpec = new ExcC14NParameterSpec(prefixes);
             }
 
@@ -169,9 +167,10 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
      * @return The DOM Element of the signature.
      */
     public Element getSignatureElement() {
+        Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
         return
             XMLUtils.getDirectChildElement(
-                securityHeader, WSConstants.SIG_LN, WSConstants.SIG_NS
+                securityHeaderElement, WSConstants.SIG_LN, WSConstants.SIG_NS
             );
     }
 
@@ -179,12 +178,10 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
      * This method adds references to the Signature.
      *
      * @param references The list of references to sign
-     * @param secHeader The Security Header
      * @throws WSSecurityException
      */
     public List<javax.xml.crypto.dsig.Reference> addReferencesToSign(
-        List<WSEncryptionPart> references,
-        WSSecHeader secHeader
+        List<WSEncryptionPart> references
     ) throws WSSecurityException {
         return
             addReferencesToSign(
@@ -192,7 +189,6 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
                 references,
                 wsDocInfo,
                 signatureFactory,
-                secHeader,
                 addInclusivePrefixes,
                 digestAlgo
             );
@@ -245,17 +241,18 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
             // Figure out where to insert the signature element
             //
             XMLSignContext signContext = null;
+            Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
             if (prepend) {
                 if (siblingElement == null) {
-                    siblingElement = (Element)securityHeader.getFirstChild();
+                    siblingElement = (Element)securityHeaderElement.getFirstChild();
                 }
                 if (siblingElement == null) {
-                    signContext = new DOMSignContext(key, securityHeader);
+                    signContext = new DOMSignContext(key, securityHeaderElement);
                 } else {
-                    signContext = new DOMSignContext(key, securityHeader, siblingElement);
+                    signContext = new DOMSignContext(key, securityHeaderElement, siblingElement);
                 }
             } else {
-                signContext = new DOMSignContext(key, securityHeader);
+                signContext = new DOMSignContext(key, securityHeaderElement);
             }
 
             signContext.putNamespacePrefix(WSConstants.SIG_NS, WSConstants.SIG_PREFIX);

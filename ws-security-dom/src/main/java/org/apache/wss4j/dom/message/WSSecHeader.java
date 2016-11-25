@@ -98,7 +98,7 @@ public class WSSecHeader {
      *
      * @return The security header element.
      */
-    public Element getSecurityHeader() {
+    public Element getSecurityHeaderElement() {
         return securityHeader;
     }
 

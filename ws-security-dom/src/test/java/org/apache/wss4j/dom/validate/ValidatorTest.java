@@ -78,9 +78,9 @@ public class ValidatorTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecTimestamp timestamp = new WSSecTimestamp();
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(-1);
-        Document createdDoc = timestamp.build(doc, secHeader);
+        Document createdDoc = timestamp.build(doc);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -107,16 +107,16 @@ public class ValidatorTest extends org.junit.Assert {
      */
     @Test
     public void testUntrustedSignature() throws Exception {
-        WSSecSignature sign = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss40", "security");
         sign.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
         Crypto crypto = CryptoFactory.getInstance("wss40.properties");
-        Document signedDoc = sign.build(doc, crypto, secHeader);
+        Document signedDoc = sign.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -151,14 +151,15 @@ public class ValidatorTest extends org.junit.Assert {
      */
     @Test
     public void testUsernameTokenBadText() throws Exception {
-        WSSecUsernameToken builder = new WSSecUsernameToken();
-        builder.setPasswordType(WSConstants.PASSWORD_TEXT);
-        builder.setUserInfo("wernerd", "verySecre");
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, secHeader);
+        
+        WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
+        builder.setPasswordType(WSConstants.PASSWORD_TEXT);
+        builder.setUserInfo("wernerd", "verySecre");
+
+        Document signedDoc = builder.build(doc);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -198,7 +199,7 @@ public class ValidatorTest extends org.junit.Assert {
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         bst.setX509Certificate(certs[0]);
 
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("BST output");
@@ -235,13 +236,14 @@ public class ValidatorTest extends org.junit.Assert {
      */
     @Test
     public void testValidatedBSTSignature() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, CryptoFactory.getInstance(), secHeader);
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        Document signedDoc = builder.build(doc, CryptoFactory.getInstance());
 
         if (LOG.isDebugEnabled()) {
             String outputString =

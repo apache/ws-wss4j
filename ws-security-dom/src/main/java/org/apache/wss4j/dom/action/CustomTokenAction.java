@@ -63,7 +63,7 @@ public class CustomTokenAction implements Action {
             );
         }
 
-        Element securityHeader = reqData.getSecHeader().getSecurityHeader();
+        Element securityHeader = reqData.getSecHeader().getSecurityHeaderElement();
         securityHeader.appendChild(securityHeader.getOwnerDocument().adoptNode(customToken));
     }
 }

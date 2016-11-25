@@ -26,6 +26,7 @@ import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Builder class to add a <code>wsc:SecurityContextToken</code> into the
@@ -57,11 +58,10 @@ public class WSSecSecurityContextToken {
 
     private int wscVersion = ConversationConstants.DEFAULT_VERSION;
     private WSSConfig wssConfig;
+    private final WSSecHeader securityHeader;
 
-    public WSSecSecurityContextToken() {
-    }
-
-    public WSSecSecurityContextToken(WSSConfig config) {
+    public WSSecSecurityContextToken(WSSecHeader securityHeader, WSSConfig config) {
+        this.securityHeader = securityHeader;
         wssConfig = config;
     }
 
@@ -83,9 +83,10 @@ public class WSSecSecurityContextToken {
         sct.setID(sctId);
     }
 
-    public void prependSCTElementToHeader(Document doc, WSSecHeader secHeader)
+    public void prependSCTElementToHeader(Document doc)
         throws WSSecurityException {
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), sct.getElement());
+        Element secHeaderElement = securityHeader.getSecurityHeaderElement();
+        WSSecurityUtil.prependChildElement(secHeaderElement, sct.getElement());
     }
 
     /**

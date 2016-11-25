@@ -51,8 +51,8 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     
     private Serializer encryptionSerializer;
     
-    public WSSecDKEncrypt() {
-        super();
+    public WSSecDKEncrypt(WSSecHeader securityHeader) {
+        super(securityHeader);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         attachmentEncryptedDataElements = new ArrayList<>();
     }
 
-    public Document build(Document doc, WSSecHeader secHeader) throws WSSecurityException {
+    public Document build(Document doc) throws WSSecurityException {
 
         //
         // Setup the encrypted key
@@ -71,44 +71,35 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         //
         // prepend elements in the right order to the security header
         //
-        prependDKElementToHeader(secHeader);
+        prependDKElementToHeader();
 
-        Element externRefList = encrypt(secHeader);
+        Element externRefList = encrypt();
 
-        addAttachmentEncryptedDataElements(secHeader);
+        addAttachmentEncryptedDataElements();
 
-        addExternalRefElement(externRefList, secHeader);
+        addExternalRefElement(externRefList);
 
         return doc;
     }
 
-    public void addAttachmentEncryptedDataElements(WSSecHeader secHeader) {
+    public void addAttachmentEncryptedDataElements() {
         if (attachmentEncryptedDataElements != null) {
             for (int i = 0; i < attachmentEncryptedDataElements.size(); i++) {
                 Element encryptedData = attachmentEncryptedDataElements.get(i);
-                WSSecurityUtil.prependChildElement(
-                        secHeader.getSecurityHeader(), encryptedData
-                );
+                Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
+                WSSecurityUtil.prependChildElement(securityHeaderElement, encryptedData);
             }
         }
     }
 
     public Element encrypt() throws WSSecurityException {
-        return encrypt(null);
-    }
-    
-    public Element encrypt(WSSecHeader secHeader) throws WSSecurityException {
         if (getParts().isEmpty()) {
             getParts().add(WSSecurityUtil.getDefaultEncryptionPart(document));
         }
 
-        return encryptForExternalRef(null, getParts(), secHeader);
+        return encryptForExternalRef(null, getParts());
     }
     
-    public Element encryptForExternalRef(Element dataRef, List<WSEncryptionPart> references) throws WSSecurityException {
-        return encryptForExternalRef(dataRef, references, null);
-    }
-
     /**
      * Encrypt one or more parts or elements of the message (external).
      *
@@ -127,11 +118,10 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
      *
      * @param dataRef A <code>xenc:Reference</code> element or <code>null</code>
      * @param references A list containing WSEncryptionPart objects
-     * @param secHeader the security header element to hold the encrypted key element.
      * @return Returns the updated <code>xenc:Reference</code> element
      * @throws WSSecurityException
      */
-    public Element encryptForExternalRef(Element dataRef, List<WSEncryptionPart> references, WSSecHeader secHeader)
+    public Element encryptForExternalRef(Element dataRef, List<WSEncryptionPart> references)
         throws WSSecurityException {
 
         KeyInfo keyInfo = createKeyInfo();
@@ -140,7 +130,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
         List<String> encDataRefs =
             WSSecEncrypt.doEncryption(
-                document, secHeader, getIdAllocator(), keyInfo, key, symEncAlgo, references, callbackLookup,
+                document, getSecurityHeader(), getIdAllocator(), keyInfo, key, symEncAlgo, references, callbackLookup,
                 attachmentCallbackHandler, attachmentEncryptedDataElements, storeBytesInAttachment,
                 encryptionSerializer
             );
@@ -186,17 +176,17 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
      * reference element in the SecurityHeader.
      *
      * @param referenceList The external <code>enc:Reference</code> element
-     * @param secHeader The security header.
      */
-    public void addExternalRefElement(Element referenceList, WSSecHeader secHeader) {
+    public void addExternalRefElement(Element referenceList) {
         if (referenceList != null) {
             Node node = getdktElement().getNextSibling();
+            Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
             if (node != null && Node.ELEMENT_NODE == node.getNodeType()) {
-                secHeader.getSecurityHeader().insertBefore(referenceList, node);
+                securityHeaderElement.insertBefore(referenceList, node);
             } else {
                 // If (at this moment) DerivedKeyToken is the LAST element of
                 // the security header
-                secHeader.getSecurityHeader().appendChild(referenceList);
+                securityHeaderElement.appendChild(referenceList);
             }
         }
     }

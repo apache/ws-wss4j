@@ -90,7 +90,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         bst.setValueType(AP_REQ);
         bst.setEncodingType(BASE64_NS);
         bst.setToken("12345678".getBytes());
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -119,9 +119,9 @@ public class BSTKerberosTest extends org.junit.Assert {
         bst.setEncodingType(BASE64_NS);
         bst.setToken("12345678".getBytes());
         bst.setID("Id-" + bst.hashCode());
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
-        WSSecSignature sign = new WSSecSignature();
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
@@ -129,7 +129,7 @@ public class BSTKerberosTest extends org.junit.Assert {
             new WSEncryptionPart(bst.getID());
         sign.getParts().add(encP);
 
-        Document signedDoc = sign.build(doc, crypto, secHeader);
+        Document signedDoc = sign.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -155,20 +155,20 @@ public class BSTKerberosTest extends org.junit.Assert {
         bst.setEncodingType(BASE64_NS);
         bst.setToken("12345678".getBytes());
         bst.setID("Id-" + bst.hashCode());
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
-        WSSecTimestamp timestamp = new WSSecTimestamp();
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(600);
-        timestamp.build(doc, secHeader);
+        timestamp.build(doc);
 
-        WSSecSignature sign = new WSSecSignature();
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         sign.getParts().add(new WSEncryptionPart(bst.getID()));
         sign.getParts().add(new WSEncryptionPart(timestamp.getId()));
 
-        Document signedDoc = sign.build(doc, crypto, secHeader);
+        Document signedDoc = sign.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -193,7 +193,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         bst.setValueType(AP_REQ);
         bst.setEncodingType(BASE64_NS);
         bst.setToken("12345678".getBytes());
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -227,7 +227,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         bst.setValueType(AP_REQ);
         bst.setEncodingType(BASE64_NS);
         bst.setToken("12345678".getBytes());
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -271,16 +271,16 @@ public class BSTKerberosTest extends org.junit.Assert {
 
         bst.setToken(keyData);
         bst.setID("Id-" + bst.hashCode());
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
-        WSSecSignature sign = new WSSecSignature();
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setCustomTokenValueType(AP_REQ);
         sign.setCustomTokenId(bst.getID());
         sign.setSecretKey(keyData);
 
-        Document signedDoc = sign.build(doc, crypto, secHeader);
+        Document signedDoc = sign.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -310,9 +310,9 @@ public class BSTKerberosTest extends org.junit.Assert {
 
         bst.setToken(keyData);
         bst.setID("Id-" + bst.hashCode());
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
-        WSSecSignature sign = new WSSecSignature();
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
         sign.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
         sign.setCustomTokenValueType(WSConstants.WSS_KRB_KI_VALUE_TYPE);
@@ -321,7 +321,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         sign.setCustomTokenId(Base64.getMimeEncoder().encodeToString(digestBytes));
         sign.setSecretKey(keyData);
 
-        Document signedDoc = sign.build(doc, crypto, secHeader);
+        Document signedDoc = sign.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -351,15 +351,15 @@ public class BSTKerberosTest extends org.junit.Assert {
 
         bst.setToken(keyData);
         bst.setID("Id-" + bst.hashCode());
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
-        WSSecEncrypt builder = new WSSecEncrypt();
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         builder.setSymmetricKey(key);
         builder.setEncryptSymmKey(false);
         builder.setCustomReferenceValue(AP_REQ);
         builder.setEncKeyId(bst.getID());
-        Document encryptedDoc = builder.build(doc, crypto, secHeader);
+        Document encryptedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -389,9 +389,9 @@ public class BSTKerberosTest extends org.junit.Assert {
 
         bst.setToken(keyData);
         bst.setID("Id-" + bst.hashCode());
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
-        WSSecEncrypt builder = new WSSecEncrypt();
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         builder.setSymmetricKey(key);
         builder.setEncryptSymmKey(false);
@@ -400,7 +400,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         byte[] digestBytes = KeyUtils.generateDigest(keyData);
         builder.setEncKeyId(Base64.getMimeEncoder().encodeToString(digestBytes));
 
-        Document encryptedDoc = builder.build(doc, crypto, secHeader);
+        Document encryptedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =

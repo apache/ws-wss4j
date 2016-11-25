@@ -59,7 +59,7 @@ public class UsernameTokenSignedAction implements Action {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noUser");
         }
 
-        WSSecUsernameToken builder = new WSSecUsernameToken();
+        WSSecUsernameToken builder = new WSSecUsernameToken(reqData.getSecHeader());
         builder.setIdAllocator(reqData.getWssConfig().getIdAllocator());
         builder.setPrecisionInMilliSeconds(reqData.isPrecisionInMilliSeconds());
         builder.setWsTimeSource(reqData.getWssConfig().getCurrentTime());
@@ -97,7 +97,7 @@ public class UsernameTokenSignedAction implements Action {
             signatureToken = reqData.getSignatureToken();
         }
 
-        WSSecSignature sign = new WSSecSignature();
+        WSSecSignature sign = new WSSecSignature(reqData.getSecHeader());
         sign.setIdAllocator(reqData.getWssConfig().getIdAllocator());
         sign.setAddInclusivePrefixes(reqData.isAddInclusivePrefixes());
 
@@ -115,7 +115,7 @@ public class UsernameTokenSignedAction implements Action {
             sign.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         }
 
-        sign.prepare(doc, null, reqData.getSecHeader());
+        sign.prepare(doc, null);
 
         // prepend in this order: first the Signature Element and then the
         // UsernameToken Element. This way the server gets the UsernameToken
@@ -130,8 +130,7 @@ public class UsernameTokenSignedAction implements Action {
             parts = new ArrayList<>(1);
             parts.add(WSSecurityUtil.getDefaultEncryptionPart(doc));
         }
-        List<javax.xml.crypto.dsig.Reference> referenceList =
-            sign.addReferencesToSign(parts, reqData.getSecHeader());
+        List<javax.xml.crypto.dsig.Reference> referenceList = sign.addReferencesToSign(parts);
 
         try {
             sign.computeSignature(referenceList);
@@ -141,6 +140,6 @@ public class UsernameTokenSignedAction implements Action {
                     "empty", new Object[] {"WSHandler: Error during UsernameTokenSignature"}
             );
         }
-        builder.prependToHeader(reqData.getSecHeader());
+        builder.prependToHeader();
     }
 }

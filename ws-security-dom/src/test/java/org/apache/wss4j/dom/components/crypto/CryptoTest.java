@@ -95,13 +95,13 @@ public class CryptoTest extends org.junit.Assert {
      */
     @Test
     public void testDynamicCrypto() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("wss40", "security");
-        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("wss40", "security");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         // Load the keystore
         Crypto crypto = new Merlin();
@@ -111,7 +111,7 @@ public class CryptoTest extends org.junit.Assert {
         keyStore.load(input, "security".toCharArray());
         input.close();
         ((Merlin)crypto).setKeyStore(keyStore);
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         // Load the truststore
         Crypto processCrypto = new Merlin();

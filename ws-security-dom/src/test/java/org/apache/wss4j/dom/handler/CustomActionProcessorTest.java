@@ -67,14 +67,15 @@ public class CustomActionProcessorTest extends org.junit.Assert {
     @Test
     public void
     testCustomUserProcessor() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        LOG.info("Before Signing IS....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        LOG.info("Before Signing IS....");
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
@@ -112,14 +113,15 @@ public class CustomActionProcessorTest extends org.junit.Assert {
     @Test
     public void
     testCustomUserProcessorObject() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        LOG.info("Before Signing IS....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        LOG.info("Before Signing IS....");
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");

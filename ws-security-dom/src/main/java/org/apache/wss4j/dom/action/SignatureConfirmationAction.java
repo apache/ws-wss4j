@@ -57,7 +57,7 @@ public class SignatureConfirmationAction implements Action {
         //
         // prepare a SignatureConfirmation token
         //
-        WSSecSignatureConfirmation wsc = new WSSecSignatureConfirmation();
+        WSSecSignatureConfirmation wsc = new WSSecSignatureConfirmation(reqData.getSecHeader());
         wsc.setIdAllocator(reqData.getWssConfig().getIdAllocator());
         SignatureActionToken signatureToken = (SignatureActionToken)actionToken;
         if (signatureToken == null) {
@@ -81,7 +81,7 @@ public class SignatureConfirmationAction implements Action {
                         || WSConstants.ST_SIGNED == resultAction.intValue()
                         || WSConstants.UT_SIGN == resultAction.intValue())) {
                     byte[] sigVal = (byte[]) result.get(WSSecurityEngineResult.TAG_SIGNATURE_VALUE);
-                    wsc.build(doc, sigVal, reqData.getSecHeader());
+                    wsc.build(doc, sigVal);
                     signatureParts.add(new WSEncryptionPart(wsc.getId()));
                     signatureAdded = true;
                 }
@@ -89,7 +89,7 @@ public class SignatureConfirmationAction implements Action {
         }
 
         if (!signatureAdded) {
-            wsc.build(doc, null, reqData.getSecHeader());
+            wsc.build(doc, null);
             signatureParts.add(new WSEncryptionPart(wsc.getId()));
         }
         handler.setProperty(

@@ -77,12 +77,13 @@ public class PrincipalTest extends org.junit.Assert {
      */
     @Test
     public void testUsernameToken() throws Exception {
-        WSSecUsernameToken builder = new WSSecUsernameToken();
-        builder.setUserInfo("wernerd", "verySecret");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, secHeader);
+        
+        WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
+        builder.setUserInfo("wernerd", "verySecret");
+        Document signedDoc = builder.build(doc);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -109,12 +110,13 @@ public class PrincipalTest extends org.junit.Assert {
      */
     @Test
     public void testTransformedUsernameToken() throws Exception {
-        WSSecUsernameToken builder = new WSSecUsernameToken();
-        builder.setUserInfo("wernerd", "verySecret");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, secHeader);
+        
+        WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
+        builder.setUserInfo("wernerd", "verySecret");
+        Document signedDoc = builder.build(doc);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -143,14 +145,14 @@ public class PrincipalTest extends org.junit.Assert {
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
+        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
+
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -187,13 +189,13 @@ public class PrincipalTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -231,13 +233,13 @@ public class PrincipalTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -280,7 +282,7 @@ public class PrincipalTest extends org.junit.Assert {
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         bst.setX509Certificate(certs[0]);
 
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         if (LOG.isDebugEnabled()) {
             String outputString =

@@ -37,7 +37,7 @@ public class SAMLTokenUnsignedAction implements Action {
     public void execute(WSHandler handler, SecurityActionToken actionToken,
                         Document doc, RequestData reqData)
             throws WSSecurityException {
-        WSSecSAMLToken builder = new WSSecSAMLToken();
+        WSSecSAMLToken builder = new WSSecSAMLToken(reqData.getSecHeader());
         builder.setIdAllocator(reqData.getWssConfig().getIdAllocator());
 
         CallbackHandler samlCallbackHandler =
@@ -68,6 +68,6 @@ public class SAMLTokenUnsignedAction implements Action {
         }
 
         // add the SAMLAssertion Token to the SOAP Envelope
-        builder.build(doc, samlAssertion, reqData.getSecHeader());
+        builder.build(doc, samlAssertion);
     }
 }

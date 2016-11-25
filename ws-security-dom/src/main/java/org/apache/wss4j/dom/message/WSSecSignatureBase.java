@@ -57,8 +57,8 @@ public class WSSecSignatureBase extends WSSecBase {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSecSignatureBase.class);
 
-    public WSSecSignatureBase() {
-        super();
+    public WSSecSignatureBase(WSSecHeader securityHeader) {
+        super(securityHeader);
     }
 
     /**
@@ -68,7 +68,6 @@ public class WSSecSignatureBase extends WSSecBase {
      * @param references The list of references to sign
      * @param wsDocInfo The WSDocInfo object to store protection elements in
      * @param signatureFactory The XMLSignature object
-     * @param secHeader The Security Header
      * @param addInclusivePrefixes Whether to add inclusive prefixes or not
      * @param digestAlgo The digest algorithm to use
      * @throws WSSecurityException
@@ -78,7 +77,6 @@ public class WSSecSignatureBase extends WSSecBase {
         List<WSEncryptionPart> references,
         WSDocInfo wsDocInfo,
         XMLSignatureFactory signatureFactory,
-        WSSecHeader secHeader,
         boolean addInclusivePrefixes,
         String digestAlgo
     ) throws WSSecurityException {

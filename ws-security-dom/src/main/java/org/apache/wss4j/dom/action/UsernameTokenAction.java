@@ -50,7 +50,7 @@ public class UsernameTokenAction implements Action {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noUser");
         }
 
-        WSSecUsernameToken builder = new WSSecUsernameToken();
+        WSSecUsernameToken builder = new WSSecUsernameToken(reqData.getSecHeader());
         builder.setIdAllocator(reqData.getWssConfig().getIdAllocator());
         builder.setPrecisionInMilliSeconds(reqData.isPrecisionInMilliSeconds());
         builder.setWsTimeSource(reqData.getWssConfig().getCurrentTime());
@@ -66,6 +66,6 @@ public class UsernameTokenAction implements Action {
             builder.addCreated();
         }
 
-        builder.build(doc, reqData.getSecHeader());
+        builder.build(doc);
     }
 }

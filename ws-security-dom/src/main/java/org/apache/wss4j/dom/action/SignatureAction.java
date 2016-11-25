@@ -57,7 +57,7 @@ public class SignatureAction implements Action {
 
         WSPasswordCallback passwordCallback =
             handler.getPasswordCB(signatureToken.getUser(), WSConstants.SIGN, callbackHandler, reqData);
-        WSSecSignature wsSign = new WSSecSignature();
+        WSSecSignature wsSign = new WSSecSignature(reqData.getSecHeader());
         wsSign.setIdAllocator(reqData.getWssConfig().getIdAllocator());
         wsSign.setAddInclusivePrefixes(reqData.isAddInclusivePrefixes());
 
@@ -101,7 +101,7 @@ public class SignatureAction implements Action {
         wsSign.setStoreBytesInAttachment(reqData.isStoreBytesInAttachment());
 
         try {
-            wsSign.prepare(doc, signatureToken.getCrypto(), reqData.getSecHeader());
+            wsSign.prepare(doc, signatureToken.getCrypto());
 
             Element siblingElementToPrepend = null;
             boolean signBST = false;
@@ -115,7 +115,7 @@ public class SignatureAction implements Action {
                         reqData.getOriginalSignatureActionPosition();
                     // Need to figure out where to put the Signature Element in the header
                     if (originalSignatureActionIndex > 0) {
-                        Element secHeader = reqData.getSecHeader().getSecurityHeader();
+                        Element secHeader = reqData.getSecHeader().getSecurityHeaderElement();
                         Node lastChild = secHeader.getLastChild();
                         int count = 0;
                         while (lastChild != null && count < originalSignatureActionIndex) {
@@ -135,7 +135,7 @@ public class SignatureAction implements Action {
             }
 
             if (signBST) {
-                wsSign.prependBSTElementToHeader(reqData.getSecHeader());
+                wsSign.prependBSTElementToHeader();
             }
 
             List<WSEncryptionPart> parts = signatureToken.getParts();
@@ -144,8 +144,7 @@ public class SignatureAction implements Action {
                 parts.add(WSSecurityUtil.getDefaultEncryptionPart(doc));
             }
 
-            List<javax.xml.crypto.dsig.Reference> referenceList =
-                wsSign.addReferencesToSign(parts, reqData.getSecHeader());
+            List<javax.xml.crypto.dsig.Reference> referenceList = wsSign.addReferencesToSign(parts);
 
             if (signBST 
                 || reqData.isAppendSignatureAfterTimestamp() && siblingElementToPrepend == null) {
@@ -155,7 +154,7 @@ public class SignatureAction implements Action {
             }
 
             if (!signBST) {
-                wsSign.prependBSTElementToHeader(reqData.getSecHeader());
+                wsSign.prependBSTElementToHeader();
             }
             reqData.getSignatureValues().add(wsSign.getSignatureValue());
         } catch (WSSecurityException e) {

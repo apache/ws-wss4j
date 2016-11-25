@@ -30,13 +30,14 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.WSSecDerivedKeyBase;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
+import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
 
 public abstract class AbstractDerivedAction {
 
     protected Node findEncryptedKeySibling(RequestData reqData) {
-        Element secHeader = reqData.getSecHeader().getSecurityHeader();
+        Element secHeader = reqData.getSecHeader().getSecurityHeaderElement();
         return findSibling(secHeader, WSConstants.ENC_NS, "EncryptedKey");
     }
 
@@ -45,7 +46,7 @@ public abstract class AbstractDerivedAction {
         if (!reqData.isUse200512Namespace()) {
             namespace = ConversationConstants.WSC_NS_05_02;
         }
-        Element secHeader = reqData.getSecHeader().getSecurityHeader();
+        Element secHeader = reqData.getSecHeader().getSecurityHeaderElement();
         return findSibling(secHeader, namespace, "SecurityContextToken");
     }
 
@@ -103,6 +104,7 @@ public abstract class AbstractDerivedAction {
     }
 
     protected Element setupEKReference(WSSecDerivedKeyBase derivedKeyBase,
+                                       WSSecHeader securityHeader,
                                         WSPasswordCallback passwordCallback,
                                         SignatureEncryptionActionToken actionToken,
                                         SignatureEncryptionActionToken previousActionToken,
@@ -120,7 +122,7 @@ public abstract class AbstractDerivedAction {
             derivedKeyBase.setExternalKey(ek, tokenIdentifier);
             return null;
         } else {
-            WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
+            WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(securityHeader);
             encrKeyBuilder.setUserInfo(actionToken.getUser());
             if (actionToken.getDerivedKeyIdentifier() != 0) {
                 encrKeyBuilder.setKeyIdentifierType(actionToken.getDerivedKeyIdentifier());

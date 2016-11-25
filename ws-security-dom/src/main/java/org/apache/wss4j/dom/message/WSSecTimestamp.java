@@ -42,8 +42,8 @@ public class WSSecTimestamp extends WSSecBase {
     private boolean precisionInMilliSeconds = true;
     private WSTimeSource wsTimeSource = new WSCurrentTimeSource();
 
-    public WSSecTimestamp() {
-        super();
+    public WSSecTimestamp(WSSecHeader securityHeader) {
+        super(securityHeader);
     }
 
     /**
@@ -80,11 +80,10 @@ public class WSSecTimestamp extends WSSecBase {
      * The method can be called any time after <code>prepare()</code>. This
      * allows to insert the Timestamp element at any position in the Security
      * header.
-     *
-     * @param secHeader The security header that holds the Signature element.
      */
-    public void prependToHeader(WSSecHeader secHeader) {
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), ts.getElement());
+    public void prependToHeader() {
+        Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
+        WSSecurityUtil.prependChildElement(securityHeaderElement, ts.getElement());
     }
 
     /**
@@ -94,15 +93,14 @@ public class WSSecTimestamp extends WSSecBase {
      * <code>wsse:Security</code> header.
      *
      * @param doc The SOAP envelope as W3C document
-     * @param secHeader The security header that hold this Timestamp
      * @return Document with Timestamp added
      * @throws Exception
      */
-    public Document build(Document doc, WSSecHeader secHeader) {
+    public Document build(Document doc) {
         LOG.debug("Begin add timestamp...");
 
         prepare(doc);
-        prependToHeader(secHeader);
+        prependToHeader();
 
         return doc;
     }

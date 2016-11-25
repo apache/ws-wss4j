@@ -286,7 +286,7 @@ public class SignatureConfirmationTest extends org.junit.Assert {
         byte[] randomBytes = WSSecurityUtil.generateNonce(20);
         SignatureConfirmation sigConf = new SignatureConfirmation(doc, randomBytes);
         Element sigConfElement = sigConf.getElement();
-        secHeader.getSecurityHeader().appendChild(sigConfElement);
+        secHeader.getSecurityHeaderElement().appendChild(sigConfElement);
 
         if (LOG.isDebugEnabled()) {
             String outputString =

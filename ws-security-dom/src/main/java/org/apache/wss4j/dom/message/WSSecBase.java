@@ -50,9 +50,14 @@ public class WSSecBase {
 
     private WsuIdAllocator idAllocator;
     private final List<WSEncryptionPart> parts = new ArrayList<>();
+    private final WSSecHeader securityHeader;
 
-
-    public WSSecBase() {
+    public WSSecBase(WSSecHeader securityHeader) {
+        this.securityHeader = securityHeader;
+    }
+    
+    public WSSecHeader getSecurityHeader() {
+        return securityHeader;
     }
 
     /**

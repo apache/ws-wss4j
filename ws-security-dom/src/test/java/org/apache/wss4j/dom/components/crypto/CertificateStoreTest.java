@@ -76,15 +76,15 @@ public class CertificateStoreTest extends org.junit.Assert {
      */
     @Test
     public void testSignatureDirectReference() throws Exception {
-        WSSecSignature sign = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss40", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document signedDoc = sign.build(doc, senderCrypto, secHeader);
+        Document signedDoc = sign.build(doc, senderCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -108,15 +108,15 @@ public class CertificateStoreTest extends org.junit.Assert {
      */
     @Test
     public void testSignatureX509() throws Exception {
-        WSSecSignature sign = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss40", "security");
         sign.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document signedDoc = sign.build(doc, senderCrypto, secHeader);
+        Document signedDoc = sign.build(doc, senderCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -146,15 +146,15 @@ public class CertificateStoreTest extends org.junit.Assert {
      */
     @Test
     public void testSignatureIssuerSerial() throws Exception {
-        WSSecSignature sign = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss40", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document signedDoc = sign.build(doc, senderCrypto, secHeader);
+        Document signedDoc = sign.build(doc, senderCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -180,15 +180,15 @@ public class CertificateStoreTest extends org.junit.Assert {
      */
     @Test
     public void testSignatureThumbprint() throws Exception {
-        WSSecSignature sign = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss40", "security");
         sign.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document signedDoc = sign.build(doc, senderCrypto, secHeader);
+        Document signedDoc = sign.build(doc, senderCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -214,15 +214,15 @@ public class CertificateStoreTest extends org.junit.Assert {
      */
     @Test
     public void testSignatureSKI() throws Exception {
-        WSSecSignature sign = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss40", "security");
         sign.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document signedDoc = sign.build(doc, senderCrypto, secHeader);
+        Document signedDoc = sign.build(doc, senderCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -249,15 +249,15 @@ public class CertificateStoreTest extends org.junit.Assert {
      */
     @Test
     public void testSignatureDirectReferenceUntrusted() throws Exception {
-        WSSecSignature sign = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document signedDoc = sign.build(doc, CryptoFactory.getInstance(), secHeader);
+        Document signedDoc = sign.build(doc, CryptoFactory.getInstance());
 
         if (LOG.isDebugEnabled()) {
             String outputString =

@@ -59,7 +59,7 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
 
         WSPasswordCallback passwordCallback =
             handler.getPasswordCB(signatureToken.getUser(), WSConstants.DKT_SIGN, callbackHandler, reqData);
-        WSSecDKSign wsSign = new WSSecDKSign();
+        WSSecDKSign wsSign = new WSSecDKSign(reqData.getSecHeader());
         wsSign.setIdAllocator(reqData.getWssConfig().getIdAllocator());
         wsSign.setAddInclusivePrefixes(reqData.isAddInclusivePrefixes());
 
@@ -97,10 +97,9 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
                 wsSign.getParts().add(WSSecurityUtil.getDefaultEncryptionPart(doc));
             }
 
-            wsSign.prepare(doc, reqData.getSecHeader());
+            wsSign.prepare(doc);
 
-            List<javax.xml.crypto.dsig.Reference> referenceList =
-                wsSign.addReferencesToSign(parts, reqData.getSecHeader());
+            List<javax.xml.crypto.dsig.Reference> referenceList = wsSign.addReferencesToSign(parts);
 
             // Put the DerivedKeyToken Element in the right place in the security header
             Node nextSibling = null;
@@ -119,14 +118,14 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
             }
 
             if (nextSibling == null) {
-                wsSign.prependDKElementToHeader(reqData.getSecHeader());
+                wsSign.prependDKElementToHeader();
             } else {
-                reqData.getSecHeader().getSecurityHeader().insertBefore(
+                reqData.getSecHeader().getSecurityHeaderElement().insertBefore(
                     wsSign.getdktElement(), wsSign.getSignatureElement());
             }
 
             if (tokenElement != null) {
-                WSSecurityUtil.prependChildElement(reqData.getSecHeader().getSecurityHeader(), tokenElement);
+                WSSecurityUtil.prependChildElement(reqData.getSecHeader().getSecurityHeaderElement(), tokenElement);
             }
 
             reqData.getSignatureValues().add(wsSign.getSignatureValue());
@@ -144,7 +143,7 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
         String derivedKeyTokenReference = signatureToken.getDerivedKeyTokenReference();
 
         if ("EncryptedKey".equals(derivedKeyTokenReference)) {
-            return setupEKReference(wsSign, passwordCallback, signatureToken, reqData.getEncryptionToken(),
+            return setupEKReference(wsSign, reqData.getSecHeader(), passwordCallback, signatureToken, reqData.getEncryptionToken(),
                                      reqData.isUse200512Namespace(), doc, null, null);
         } else if ("SecurityContextToken".equals(derivedKeyTokenReference)) {
             return setupSCTReference(wsSign, passwordCallback, signatureToken, reqData.getEncryptionToken(),

@@ -41,8 +41,8 @@ public class WSSecSAMLToken extends WSSecBase {
 
     private Element samlElement;
 
-    public WSSecSAMLToken() {
-        super();
+    public WSSecSAMLToken(WSSecHeader securityHeader) {
+        super(securityHeader);
     }
 
     /**
@@ -70,14 +70,13 @@ public class WSSecSAMLToken extends WSSecBase {
      * This allows to insert the SAML assertion at any position in the
      * Security header.
      *
-     * @param secHeader
-     *            The security header that holds the Signature element.
      */
-    public void prependToHeader(WSSecHeader secHeader) {
+    public void prependToHeader() {
         try {
             Element element = getElement();
             if (element != null) {
-                WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), element);
+                Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
+                WSSecurityUtil.prependChildElement(securityHeaderElement, element);
             }
         } catch (WSSecurityException ex) {
             throw new RuntimeException(ex.toString(), ex);
@@ -120,11 +119,11 @@ public class WSSecSAMLToken extends WSSecBase {
      * @param samlAssertion TODO
      * @return Document with UsernameToken added
      */
-    public Document build(Document doc, SamlAssertionWrapper samlAssertion, WSSecHeader secHeader) {
+    public Document build(Document doc, SamlAssertionWrapper samlAssertion) {
         LOG.debug("Begin add SAMLAssertion token...");
 
         prepare(doc, samlAssertion);
-        prependToHeader(secHeader);
+        prependToHeader();
 
         return doc;
     }

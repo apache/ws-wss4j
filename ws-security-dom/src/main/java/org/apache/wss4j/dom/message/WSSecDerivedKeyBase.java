@@ -104,8 +104,8 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
     private X509Certificate useThisCert;
     private Crypto crypto;
 
-    public WSSecDerivedKeyBase() {
-        super();
+    public WSSecDerivedKeyBase(WSSecHeader securityHeader) {
+        super(securityHeader);
         setKeyIdentifierType(0);
     }
 
@@ -303,18 +303,15 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
      * The method can be called any time after <code>prepare()</code>. This
      * allows to insert the DerivedKey element at any position in the Security
      * header.
-     *
-     * @param secHeader The security header that holds the Signature element.
      */
-    public void prependDKElementToHeader(WSSecHeader secHeader) {
-        WSSecurityUtil.prependChildElement(
-            secHeader.getSecurityHeader(), dkt.getElement()
-        );
+    public void prependDKElementToHeader() {
+        Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
+        WSSecurityUtil.prependChildElement(securityHeaderElement, dkt.getElement());
     }
 
-    public void appendDKElementToHeader(WSSecHeader secHeader) {
-        Element secHeaderElement = secHeader.getSecurityHeader();
-        secHeaderElement.appendChild(dkt.getElement());
+    public void appendDKElementToHeader() {
+        Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
+        securityHeaderElement.appendChild(dkt.getElement());
     }
 
     /**

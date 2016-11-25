@@ -84,7 +84,7 @@ public class SAMLTokenSignedAction implements Action {
                 samlCallback.getSignatureDigestAlgorithm()
             );
         }
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(reqData.getSecHeader());
         wsSign.setIdAllocator(reqData.getWssConfig().getIdAllocator());
         wsSign.setAddInclusivePrefixes(reqData.isAddInclusivePrefixes());
 
@@ -126,8 +126,7 @@ public class SAMLTokenSignedAction implements Action {
                     samlAssertion,
                     samlCallback.getIssuerCrypto(),
                     samlCallback.getIssuerKeyName(),
-                    samlCallback.getIssuerKeyPassword(),
-                    reqData.getSecHeader());
+                    samlCallback.getIssuerKeyPassword());
             reqData.getSignatureValues().add(wsSign.getSignatureValue());
         } catch (WSSecurityException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "empty",

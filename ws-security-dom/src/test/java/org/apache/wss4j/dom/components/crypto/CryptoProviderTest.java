@@ -81,13 +81,14 @@ public class CryptoProviderTest extends org.junit.Assert {
     @Test
     public void testSignatureOID() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecSignature sign = new WSSecSignature();
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss86", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document signedDoc = sign.build(doc, crypto, secHeader);
+        Document signedDoc = sign.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -104,13 +105,14 @@ public class CryptoProviderTest extends org.junit.Assert {
     @Test
     public void testSignatureEmailAddress() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecSignature sign = new WSSecSignature();
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss86", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document signedDoc = sign.build(doc, crypto, secHeader);
+        Document signedDoc = sign.build(doc, crypto);
 
         String outputString = XMLUtils.prettyDocumentToString(signedDoc);
         outputString =
@@ -131,13 +133,14 @@ public class CryptoProviderTest extends org.junit.Assert {
     @Test
     public void testSignatureOtherEmailAddress() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecSignature sign = new WSSecSignature();
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss86", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document signedDoc = sign.build(doc, crypto, secHeader);
+        Document signedDoc = sign.build(doc, crypto);
 
         String outputString = XMLUtils.prettyDocumentToString(signedDoc);
         outputString =
@@ -192,12 +195,13 @@ public class CryptoProviderTest extends org.junit.Assert {
                     new ByteArrayInputStream(certBytes)
                 );
 
-            WSSecEncrypt encrypt = new WSSecEncrypt();
-            encrypt.setUseThisCert(cert);
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
-            Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+            
+            WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+            encrypt.setUseThisCert(cert);
+            Document encryptedDoc = encrypt.build(doc, crypto);
 
             if (LOG.isDebugEnabled()) {
                 String outputString =
@@ -247,12 +251,13 @@ public class CryptoProviderTest extends org.junit.Assert {
                     new ByteArrayInputStream(certBytes)
                 );
 
-            WSSecEncrypt encrypt = new WSSecEncrypt();
-            encrypt.setUseThisCert(cert);
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
-            Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+            
+            WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+            encrypt.setUseThisCert(cert);
+            Document encryptedDoc = encrypt.build(doc, crypto);
 
             if (LOG.isDebugEnabled()) {
                 String outputString =

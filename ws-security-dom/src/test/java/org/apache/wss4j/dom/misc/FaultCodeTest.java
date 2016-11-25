@@ -70,13 +70,14 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
      */
     @Test
     public void testFailedCheck() throws Exception {
-        WSSecEncrypt builder = new WSSecEncrypt();
-        builder.setUserInfo("wss40", "security");
-        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document encryptedDoc = builder.build(doc, crypto, secHeader);
+        
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
+        builder.setUserInfo("wss40", "security");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        Document encryptedDoc = builder.build(doc, crypto);
 
         try {
             verify(encryptedDoc);
@@ -113,13 +114,14 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
      */
     @Test
     public void testMessageExpired() throws Exception {
-        WSSecTimestamp builder = new WSSecTimestamp();
-        builder.setTimeToLive(-1);
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document timestampedDoc = builder.build(doc, secHeader);
+        
+        WSSecTimestamp builder = new WSSecTimestamp(secHeader);
+        builder.setTimeToLive(-1);
+
+        Document timestampedDoc = builder.build(doc);
 
         try {
             verify(timestampedDoc);
@@ -138,15 +140,16 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
      */
     @Test
     public void testFailedAuthentication() throws Exception {
-        WSSecUsernameToken builder = new WSSecUsernameToken();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.addCreated();
         builder.addNonce();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document timestampedDoc = builder.build(doc, secHeader);
+        Document timestampedDoc = builder.build(doc);
 
         try {
             verify(timestampedDoc);
@@ -165,15 +168,16 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
      */
     @Test
     public void testInvalidSecurityToken() throws Exception {
-        WSSecUsernameToken builder = new WSSecUsernameToken();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.addCreated();
         builder.addNonce();
         builder.setUserInfo(null, "security");
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        builder.build(doc, secHeader);
+        builder.build(doc);
 
         try {
             new UsernameToken(doc.getDocumentElement(), false, new BSPEnforcer());

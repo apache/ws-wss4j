@@ -81,12 +81,13 @@ public class EncryptedKeyDataRefTest extends org.junit.Assert {
     @Test
     public void testDataRefEncryptedKeyProcessor() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecEncrypt builder = new WSSecEncrypt();
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
         LOG.info("Before Encryption Triple DES....");
 
         /*
@@ -120,9 +121,9 @@ public class EncryptedKeyDataRefTest extends org.junit.Assert {
          * now add (prepend) the EncryptedKey element, then a
          * BinarySecurityToken if one was setup during prepare
          */
-        builder.prependToHeader(secHeader);
+        builder.prependToHeader();
 
-        builder.prependBSTElementToHeader(secHeader);
+        builder.prependBSTElementToHeader();
 
         Document encryptedDoc = doc;
         LOG.info("After Encryption Triple DES....");

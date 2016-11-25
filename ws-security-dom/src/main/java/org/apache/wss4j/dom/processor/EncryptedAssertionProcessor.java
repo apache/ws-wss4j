@@ -83,6 +83,7 @@ public class EncryptedAssertionProcessor implements Processor {
         // at this point. Process it accordingly.
         if (!completeResults.isEmpty()) {
             for (WSSecurityEngineResult r : completeResults) {
+                @SuppressWarnings("unchecked")
                 List<WSDataRef> dataRefs =
                     (List<WSDataRef>)r.get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
                 if (dataRefs != null) {

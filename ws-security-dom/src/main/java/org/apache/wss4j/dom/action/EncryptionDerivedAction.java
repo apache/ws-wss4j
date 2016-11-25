@@ -58,7 +58,7 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
 
         WSPasswordCallback passwordCallback =
             handler.getPasswordCB(encryptionToken.getUser(), WSConstants.DKT_ENCR, callbackHandler, reqData);
-        WSSecDKEncrypt wsEncrypt = new WSSecDKEncrypt();
+        WSSecDKEncrypt wsEncrypt = new WSSecDKEncrypt(reqData.getSecHeader());
         wsEncrypt.setIdAllocator(reqData.getWssConfig().getIdAllocator());
 
         if (encryptionToken.getKeyIdentifierId() != 0) {
@@ -107,17 +107,17 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
                 nextSibling = findSCTSibling(reqData);
             }
             if (nextSibling == null) {
-                wsEncrypt.prependDKElementToHeader(reqData.getSecHeader());
+                wsEncrypt.prependDKElementToHeader();
             } else {
-                reqData.getSecHeader().getSecurityHeader().insertBefore(
+                reqData.getSecHeader().getSecurityHeaderElement().insertBefore(
                     wsEncrypt.getdktElement(), nextSibling);
             }
 
             // Add the ReferenceList to the security header
-            wsEncrypt.addExternalRefElement(externRefList, reqData.getSecHeader());
+            wsEncrypt.addExternalRefElement(externRefList);
 
             if (tokenElement != null) {
-                WSSecurityUtil.prependChildElement(reqData.getSecHeader().getSecurityHeader(), tokenElement);
+                WSSecurityUtil.prependChildElement(reqData.getSecHeader().getSecurityHeaderElement(), tokenElement);
             }
 
         } catch (WSSecurityException e) {
@@ -137,7 +137,7 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
             return setupSCTReference(wsEncrypt, passwordCallback, encryptionToken, reqData.getSignatureToken(),
                                      reqData.isUse200512Namespace(), doc);
         } else {
-            return setupEKReference(wsEncrypt, passwordCallback, encryptionToken, reqData.getSignatureToken(),
+            return setupEKReference(wsEncrypt, reqData.getSecHeader(), passwordCallback, encryptionToken, reqData.getSignatureToken(),
                                      reqData.isUse200512Namespace(), doc, encryptionToken.getKeyTransportAlgorithm(),
                                      encryptionToken.getMgfAlgorithm());
         }

@@ -212,7 +212,7 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
             Document doc = docBuilder.newDocument();
 
             // Create an Encrypted Key
-            WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
+            WSSecEncryptedKey encrKey = new WSSecEncryptedKey(null);
             encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
             encrKey.setUseThisCert(certs[0]);
             encrKey.prepare(doc, null);

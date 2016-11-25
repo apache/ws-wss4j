@@ -75,7 +75,7 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         bst.setX509Certificate(certs[0]);
 
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("BST output");
@@ -116,7 +116,7 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         bst.setX509Certificates(certs, crypto);
 
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("PKIPath output");
@@ -150,7 +150,7 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
         BinarySecurity bst = new BinarySecurity(doc);
         bst.setToken("12435677".getBytes());
 
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Custom Token output");
@@ -175,7 +175,7 @@ public class BinarySecurityTokenTest extends org.junit.Assert {
         bst.setValueType("http://custom_value_Type");
         secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         WSHandlerResult results =
             secEngine.processSecurityHeader(doc, null, null, crypto);

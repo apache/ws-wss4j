@@ -64,7 +64,7 @@ public class CustomTokenTest extends org.junit.Assert {
         dbf.setNamespaceAware(true);
         Document timestampDoc = dbf.newDocumentBuilder().newDocument();
 
-        WSSecTimestamp timestamp = new WSSecTimestamp();
+        WSSecTimestamp timestamp = new WSSecTimestamp(null);
         timestamp.setTimeToLive(300);
         timestamp.prepare(timestampDoc);
         Element timestampElement = timestamp.getElement();

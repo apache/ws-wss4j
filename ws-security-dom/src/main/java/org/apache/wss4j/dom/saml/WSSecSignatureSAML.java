@@ -76,8 +76,8 @@ public class WSSecSignatureSAML extends WSSecSignature {
     /**
      * Constructor.
      */
-    public WSSecSignatureSAML() {
-        super();
+    public WSSecSignatureSAML(WSSecHeader securityHeader) {
+        super(securityHeader);
         doDebug = LOG.isDebugEnabled();
     }
 
@@ -101,17 +101,15 @@ public class WSSecSignatureSAML extends WSSecSignature {
      *            Private key to use in case of "sender-Vouches"
      * @param iKeyPW
      *            Password for issuer private key
-     * @param secHeader
-     *            The Security header
      * @return A signed SOAP envelope as <code>Document</code>
      * @throws WSSecurityException
      */
     public Document build(
         Document doc, Crypto uCrypto, SamlAssertionWrapper samlAssertion,
-        Crypto iCrypto, String iKeyName, String iKeyPW, WSSecHeader secHeader
+        Crypto iCrypto, String iKeyName, String iKeyPW
     ) throws WSSecurityException {
 
-        prepare(doc, uCrypto, samlAssertion, iCrypto, iKeyName, iKeyPW, secHeader);
+        prepare(doc, uCrypto, samlAssertion, iCrypto, iKeyName, iKeyPW);
 
         if (getParts().isEmpty()) {
             getParts().add(WSSecurityUtil.getDefaultEncryptionPart(doc));
@@ -136,15 +134,14 @@ public class WSSecSignatureSAML extends WSSecSignature {
             getParts().add(encP);
         }
 
-        List<javax.xml.crypto.dsig.Reference> referenceList =
-            addReferencesToSign(getParts(), secHeader);
+        List<javax.xml.crypto.dsig.Reference> referenceList = addReferencesToSign(getParts());
 
-        prependSAMLElementsToHeader(secHeader);
+        prependSAMLElementsToHeader();
 
         if (senderVouches) {
-            computeSignature(referenceList, secHeader, secRefSaml.getElement());
+            computeSignature(referenceList, secRefSaml.getElement());
         } else {
-            computeSignature(referenceList, secHeader, samlToken);
+            computeSignature(referenceList, samlToken);
         }
 
         //
@@ -152,7 +149,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         // strict layout rules.
         //
         if (bstToken != null) {
-            prependBSTElementToHeader(secHeader);
+            prependBSTElementToHeader();
         }
 
         return doc;
@@ -182,13 +179,11 @@ public class WSSecSignatureSAML extends WSSecSignature {
      *            Private key to use in case of "sender-Vouches"
      * @param iKeyPW
      *            Password for issuer private key
-     * @param secHeader
-     *            The Security header
      * @throws WSSecurityException
      */
     public void prepare(
         Document doc, Crypto uCrypto, SamlAssertionWrapper samlAssertion, Crypto iCrypto,
-        String iKeyName, String iKeyPW, WSSecHeader secHeader
+        String iKeyName, String iKeyPW
     ) throws WSSecurityException {
 
         if (doDebug) {
@@ -301,8 +296,8 @@ public class WSSecSignatureSAML extends WSSecSignature {
         try {
             C14NMethodParameterSpec c14nSpec = null;
             if (isAddInclusivePrefixes() && getSigCanonicalization().equals(WSConstants.C14N_EXCL_OMIT_COMMENTS)) {
-                List<String> prefixes =
-                    getInclusivePrefixes(secHeader.getSecurityHeader(), false);
+                Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
+                List<String> prefixes = getInclusivePrefixes(securityHeaderElement, false);
                 c14nSpec = new ExcC14NParameterSpec(prefixes);
             }
 
@@ -471,18 +466,14 @@ public class WSSecSignatureSAML extends WSSecSignature {
      *
      * This methods first prepends the SAML security reference if mode is
      * <code>senderVouches</code>, then the SAML token itself,
-     *
-     * @param secHeader
-     *            The security header that holds the BST element.
      */
-    public void prependSAMLElementsToHeader(WSSecHeader secHeader) {
+    public void prependSAMLElementsToHeader() {
+        Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
         if (senderVouches) {
-            WSSecurityUtil.prependChildElement(
-                secHeader.getSecurityHeader(), secRefSaml.getElement()
-            );
+            WSSecurityUtil.prependChildElement(securityHeaderElement, secRefSaml.getElement());
         }
 
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), samlToken);
+        WSSecurityUtil.prependChildElement(securityHeaderElement, samlToken);
     }
 
 
@@ -497,7 +488,6 @@ public class WSSecSignatureSAML extends WSSecSignature {
      */
     public void computeSignature(
         List<javax.xml.crypto.dsig.Reference> referenceList,
-        WSSecHeader secHeader,
         Element siblingElement
     ) throws WSSecurityException {
         try {
@@ -521,7 +511,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                     getIdAllocator().createId("SIG-", null),
                     null);
 
-            Element securityHeaderElement = secHeader.getSecurityHeader();
+            Element securityHeaderElement = getSecurityHeader().getSecurityHeaderElement();
             //
             // Prepend the signature element to the security header (after the assertion)
             //

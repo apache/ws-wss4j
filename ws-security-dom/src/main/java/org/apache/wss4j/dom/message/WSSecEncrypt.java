@@ -108,8 +108,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     
     private Serializer encryptionSerializer;
     
-    public WSSecEncrypt() {
-        super();
+    public WSSecEncrypt(WSSecHeader securityHeader) {
+        super(securityHeader);
     }
 
     /**
@@ -185,17 +185,14 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      *
      * This is a convenience method and for backward compatibility. The method
      * calls the single function methods in order to perform a <i>one shot
-     * encryption</i>. This method is compatible with the build method of the
-     * previous version with the exception of the additional WSSecHeader
-     * parameter.
+     * encryption</i>. 
      *
      * @param doc the SOAP envelope as <code>Document</code> with plain text Body
      * @param crypto an instance of the Crypto API to handle keystore and Certificates
-     * @param secHeader the security header element to hold the encrypted key element.
      * @return the SOAP envelope with encrypted Body as <code>Document</code>
      * @throws WSSecurityException
      */
-    public Document build(Document doc, Crypto crypto, WSSecHeader secHeader)
+    public Document build(Document doc, Crypto crypto)
         throws WSSecurityException {
         doDebug = LOG.isDebugEnabled();
 
@@ -205,17 +202,17 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             LOG.debug("Beginning Encryption...");
         }
 
-        Element refs = encrypt(secHeader);
+        Element refs = encrypt();
 
-        addAttachmentEncryptedDataElements(secHeader);
+        addAttachmentEncryptedDataElements();
         if (getEncryptedKeyElement() != null) {
             addInternalRefElement(refs);
-            prependToHeader(secHeader);
+            prependToHeader();
         } else {
-            addExternalRefElement(refs, secHeader);
+            addExternalRefElement(refs);
         }
 
-        prependBSTElementToHeader(secHeader);
+        prependBSTElementToHeader();
 
         clean();
         LOG.debug("Encryption complete.");
@@ -223,24 +220,13 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     }
 
     public Element encrypt() throws WSSecurityException {
-        return encrypt(null);
-    }
-    
-    public Element encrypt(WSSecHeader secHeader) throws WSSecurityException {
         if (getParts().isEmpty()) {
             getParts().add(WSSecurityUtil.getDefaultEncryptionPart(document));
         }
 
-        return encryptForRef(null, getParts(), secHeader);
+        return encryptForRef(null, getParts());
     }
     
-    public Element encryptForRef(
-        Element dataRef,
-        List<WSEncryptionPart> references
-    ) throws WSSecurityException {
-        return encryptForRef(dataRef, references, null);
-    }
-
     /**
      * Encrypt one or more parts or elements of the message.
      *
@@ -259,14 +245,12 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      *
      * @param dataRef A <code>xenc:Reference</code> element or <code>null</code>
      * @param references A list containing WSEncryptionPart objects
-     * @param secHeader The WSSecHeader instance
      * @return Returns the updated <code>xenc:Reference</code> element
      * @throws WSSecurityException
      */
     public Element encryptForRef(
         Element dataRef,
-        List<WSEncryptionPart> references,
-        WSSecHeader secHeader
+        List<WSEncryptionPart> references
     ) throws WSSecurityException {
         KeyInfo keyInfo = createKeyInfo();
         //the sun/oracle jce provider doesn't like a foreign SecretKey impl.
@@ -275,9 +259,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         SecretKeySpec secretKeySpec = new SecretKeySpec(symmetricKey.getEncoded(), symmetricKey.getAlgorithm());
         List<String> encDataRefs =
             doEncryption(
-                document, secHeader, getIdAllocator(), keyInfo, secretKeySpec, getSymmetricEncAlgorithm(), references,
-                    callbackLookup, attachmentCallbackHandler, attachmentEncryptedDataElements,
-                    storeBytesInAttachment
+                document, getSecurityHeader(), getIdAllocator(), keyInfo, secretKeySpec, getSymmetricEncAlgorithm(), 
+                references, callbackLookup, attachmentCallbackHandler, attachmentEncryptedDataElements,
+                storeBytesInAttachment
             );
         if (encDataRefs.isEmpty()) {
             return null;
@@ -325,21 +309,20 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * reference element in the SecurityHeader.
      *
      * @param dataRef The external <code>enc:Reference</code> element
-     * @param secHeader The security header.
      */
-    public void addExternalRefElement(Element dataRef, WSSecHeader secHeader) {
+    public void addExternalRefElement(Element dataRef) {
         if (dataRef != null) {
-            WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), dataRef);
+            Element secHeaderElement = getSecurityHeader().getSecurityHeaderElement();
+            WSSecurityUtil.prependChildElement(secHeaderElement, dataRef);
         }
     }
 
-    public void addAttachmentEncryptedDataElements(WSSecHeader secHeader) {
+    public void addAttachmentEncryptedDataElements() {
         if (attachmentEncryptedDataElements != null) {
             for (int i = 0; i < attachmentEncryptedDataElements.size(); i++) {
                 Element encryptedData = attachmentEncryptedDataElements.get(i);
-                WSSecurityUtil.prependChildElement(
-                        secHeader.getSecurityHeader(), encryptedData
-                );
+                Element secHeaderElement = getSecurityHeader().getSecurityHeaderElement();
+                WSSecurityUtil.prependChildElement(secHeaderElement, encryptedData);
             }
         }
     }
@@ -754,7 +737,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         elem.appendChild(elementToEncrypt);
 
         if (securityHeader != null) {
-            NamedNodeMap map = securityHeader.getSecurityHeader().getAttributes();
+            NamedNodeMap map = securityHeader.getSecurityHeaderElement().getAttributes();
             for (int i = 0; i < map.getLength(); i++) {
                 Attr attr = (Attr)map.item(i);
                 if (WSConstants.URI_SOAP11_ENV.equals(attr.getNamespaceURI())
