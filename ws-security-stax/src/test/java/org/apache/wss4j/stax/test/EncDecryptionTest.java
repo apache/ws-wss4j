@@ -1568,11 +1568,11 @@ public class EncDecryptionTest extends AbstractTestBase {
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
 
-            WSSecEncrypt builder = new WSSecEncrypt();
+            WSSecEncrypt builder = new WSSecEncrypt(secHeader);
             builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
             builder.setSymmetricKey(key);
             builder.setEncryptSymmKey(false);
-            Document securedDocument = builder.build(doc, null, secHeader);
+            Document securedDocument = builder.build(doc, null);
 
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Body/xenc:EncryptedData/dsig:KeyInfo/wsse:SecurityTokenReference/wsse:KeyIdentifier[@ValueType='http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1#EncryptedKeySHA1']");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
@@ -2560,10 +2560,10 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
-            Element securityHeaderElement = secHeader.getSecurityHeader();
+            Element securityHeaderElement = secHeader.getSecurityHeaderElement();
             securityHeaderElement.appendChild(doc.getElementsByTagNameNS("http://schemas.xmlsoap.org/wsdl/", "definitions").item(0));
 
-            WSSecEncrypt builder = new WSSecEncrypt();
+            WSSecEncrypt builder = new WSSecEncrypt(secHeader);
             builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
             builder.setUserInfo("receiver");
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
@@ -2574,8 +2574,8 @@ public class EncDecryptionTest extends AbstractTestBase {
             encryptionParts.add(encP);
             Element ref = builder.encryptForRef(null, encryptionParts);
             ref.removeChild(ref.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#", "DataReference").item(0));
-            builder.addExternalRefElement(ref, secHeader);
-            builder.prependToHeader(secHeader);
+            builder.addExternalRefElement(ref);
+            builder.prependToHeader();
 
             Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
@@ -2604,10 +2604,10 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
-            Element securityHeaderElement = secHeader.getSecurityHeader();
+            Element securityHeaderElement = secHeader.getSecurityHeaderElement();
             securityHeaderElement.appendChild(doc.getElementsByTagNameNS("http://schemas.xmlsoap.org/wsdl/", "definitions").item(0));
 
-            WSSecEncrypt builder = new WSSecEncrypt();
+            WSSecEncrypt builder = new WSSecEncrypt(secHeader);
             builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
             builder.setUserInfo("receiver");
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
@@ -2617,8 +2617,8 @@ public class EncDecryptionTest extends AbstractTestBase {
             List<WSEncryptionPart> encryptionParts = new ArrayList<WSEncryptionPart>();
             encryptionParts.add(encP);
             Element ref = builder.encryptForRef(null, encryptionParts);
-            builder.addExternalRefElement(ref, secHeader);
-            builder.prependToHeader(secHeader);
+            builder.addExternalRefElement(ref);
+            builder.prependToHeader();
 
             Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
@@ -2647,10 +2647,10 @@ public class EncDecryptionTest extends AbstractTestBase {
 
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
-            Element securityHeaderElement = secHeader.getSecurityHeader();
+            Element securityHeaderElement = secHeader.getSecurityHeaderElement();
             securityHeaderElement.appendChild(doc.getElementsByTagNameNS("http://schemas.xmlsoap.org/wsdl/", "definitions").item(0));
 
-            WSSecEncrypt builder = new WSSecEncrypt();
+            WSSecEncrypt builder = new WSSecEncrypt(secHeader);
             builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
             builder.setUserInfo("receiver");
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
@@ -2660,7 +2660,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             List<WSEncryptionPart> encryptionParts = new ArrayList<WSEncryptionPart>();
             encryptionParts.add(encP);
             Element ref = builder.encryptForRef(null, encryptionParts);
-            builder.prependToHeader(secHeader);
+            builder.prependToHeader();
             //builder.addExternalRefElement(ref, secHeader);
             securityHeaderElement.appendChild(ref);
 

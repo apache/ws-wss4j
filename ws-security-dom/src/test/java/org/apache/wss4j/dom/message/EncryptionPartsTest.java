@@ -180,7 +180,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
 
     @Test
     public void testOptionalSOAPHeaderNotPresent() throws Exception {
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         
@@ -217,7 +217,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
 
     @Test
     public void testRequiredSOAPHeaderNotPresent() throws Exception {
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         

@@ -236,7 +236,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             }
         };
         bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -378,9 +378,9 @@ public class KerberosTest extends AbstractLdapTestUnit {
         };
         bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
         bst.setID("Id-" + bst.hashCode());
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
-        WSSecSignature sign = new WSSecSignature();
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setCustomTokenId(bst.getID());
@@ -389,7 +389,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         SecretKey secretKey = bst.getSecretKey();
         sign.setSecretKey(secretKey.getEncoded());
 
-        Document signedDoc = sign.build(doc, null, secHeader);
+        Document signedDoc = sign.build(doc, null);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -453,7 +453,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
         bst.setID("Id-" + bst.hashCode());
 
-        WSSecSignature sign = new WSSecSignature();
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
         sign.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
         sign.setCustomTokenValueType(WSConstants.WSS_KRB_KI_VALUE_TYPE);
@@ -465,9 +465,9 @@ public class KerberosTest extends AbstractLdapTestUnit {
         byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
         sign.setCustomTokenId(Base64.getMimeEncoder().encodeToString(digestBytes));
 
-        Document signedDoc = sign.build(doc, null, secHeader);
+        Document signedDoc = sign.build(doc, null);
 
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -530,9 +530,9 @@ public class KerberosTest extends AbstractLdapTestUnit {
         };
         bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
         bst.setID("Id-" + bst.hashCode());
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
-        WSSecEncrypt builder = new WSSecEncrypt();
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         SecretKey secretKey = bst.getSecretKey();
         builder.setSymmetricKey(secretKey);
@@ -540,7 +540,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         builder.setCustomReferenceValue(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
         builder.setEncKeyId(bst.getID());
 
-        Document encryptedDoc = builder.build(doc, null, secHeader);
+        Document encryptedDoc = builder.build(doc, null);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -603,7 +603,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
         bst.setID("Id-" + bst.hashCode());
 
-        WSSecEncrypt builder = new WSSecEncrypt();
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         SecretKey secretKey = bst.getSecretKey();
         builder.setSymmetricKey(secretKey);
@@ -611,9 +611,9 @@ public class KerberosTest extends AbstractLdapTestUnit {
         builder.setCustomReferenceValue(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
         builder.setEncKeyId(bst.getID());
 
-        Document encryptedDoc = builder.build(doc, null, secHeader);
+        Document encryptedDoc = builder.build(doc, null);
 
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -676,7 +676,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
         bst.setID("Id-" + bst.hashCode());
 
-        WSSecEncrypt builder = new WSSecEncrypt();
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         SecretKey secretKey = bst.getSecretKey();
         builder.setSymmetricKey(secretKey);
@@ -686,9 +686,9 @@ public class KerberosTest extends AbstractLdapTestUnit {
         byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
         builder.setEncKeyId(Base64.getMimeEncoder().encodeToString(digestBytes));
 
-        Document encryptedDoc = builder.build(doc, null, secHeader);
+        Document encryptedDoc = builder.build(doc, null);
 
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -830,7 +830,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
             bst.setID("Id-" + bst.hashCode());
 
-            WSSecSignature sign = new WSSecSignature();
+            WSSecSignature sign = new WSSecSignature(secHeader);
             sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
             sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
             sign.setCustomTokenId(bst.getID());
@@ -839,8 +839,8 @@ public class KerberosTest extends AbstractLdapTestUnit {
             SecretKey secretKey = bst.getSecretKey();
             sign.setSecretKey(secretKey.getEncoded());
 
-            sign.build(doc, null, secHeader);
-            WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+            sign.build(doc, null);
+            WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
@@ -923,7 +923,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
             bst.setID("Id-" + bst.hashCode());
 
-            WSSecSignature sign = new WSSecSignature();
+            WSSecSignature sign = new WSSecSignature(secHeader);
             sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
             sign.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
             sign.setCustomTokenValueType(WSConstants.WSS_KRB_KI_VALUE_TYPE);
@@ -935,9 +935,9 @@ public class KerberosTest extends AbstractLdapTestUnit {
             byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
             sign.setCustomTokenId(Base64.getMimeEncoder().encodeToString(digestBytes));
 
-            sign.build(doc, null, secHeader);
+            sign.build(doc, null);
 
-            WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+            WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
@@ -1096,15 +1096,15 @@ public class KerberosTest extends AbstractLdapTestUnit {
             bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
             bst.setID("Id-" + bst.hashCode());
 
-            WSSecEncrypt builder = new WSSecEncrypt();
+            WSSecEncrypt builder = new WSSecEncrypt(secHeader);
             builder.setSymmetricEncAlgorithm(WSConstants.AES_256);
             SecretKey secretKey = bst.getSecretKey();
             builder.setSymmetricKey(secretKey);
             builder.setEncryptSymmKey(false);
             builder.setCustomReferenceValue(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
             builder.setEncKeyId(bst.getID());
-            builder.build(doc, null, secHeader);
-            WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+            builder.build(doc, null);
+            WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
@@ -1187,7 +1187,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             bst.retrieveServiceTicket("alice", callbackHandler, "bob@service.ws.apache.org");
             bst.setID("Id-" + bst.hashCode());
 
-            WSSecEncrypt builder = new WSSecEncrypt();
+            WSSecEncrypt builder = new WSSecEncrypt(secHeader);
             builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             SecretKey secretKey = bst.getSecretKey();
             builder.setSymmetricKey(secretKey);
@@ -1197,9 +1197,9 @@ public class KerberosTest extends AbstractLdapTestUnit {
             byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
             builder.setEncKeyId(Base64.getMimeEncoder().encodeToString(digestBytes));
 
-            builder.build(doc, null, secHeader);
+            builder.build(doc, null);
 
-            WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+            WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));

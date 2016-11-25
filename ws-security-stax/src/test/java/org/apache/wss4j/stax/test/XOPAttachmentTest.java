@@ -113,12 +113,12 @@ public class XOPAttachmentTest extends AbstractTestBase {
     }
 
     private List<Attachment> createEncryptedBodyInAttachment(Document doc) throws Exception {
-        WSSecEncrypt encrypt = new WSSecEncrypt();
-        encrypt.setUserInfo("receiver", "default");
-        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+        encrypt.setUserInfo("receiver", "default");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
         encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Content"));
@@ -138,7 +138,7 @@ public class XOPAttachmentTest extends AbstractTestBase {
         sigProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.file", "transmitter.jks");
         sigProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.password", "default");
         Crypto crypto = new Merlin(sigProperties, this.getClass().getClassLoader(), null);
-        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        Document encryptedDoc = encrypt.build(doc, crypto);
 
         // Find the SOAP Body + replace with a xop:Include to the attachment!
         Element soapBody = WSSecurityUtil.findBodyElement(encryptedDoc);

@@ -139,6 +139,12 @@ public class EncryptionTest extends org.junit.Assert {
          * This tests if several runs of different algorithms on same builder/cipher
          * setup are ok.
          */
+        doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        builder = new WSSecEncrypt(secHeader);
+        builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         builder.setSymmetricKey(null);
@@ -149,9 +155,6 @@ public class EncryptionTest extends org.junit.Assert {
             );
         builder.getParts().add(encP);
 
-        doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
         LOG.info("Before Encryption AES 128/RSA-15....");
         encryptedDoc = builder.build(doc, crypto);
         LOG.info("After Encryption AES 128/RSA-15....");

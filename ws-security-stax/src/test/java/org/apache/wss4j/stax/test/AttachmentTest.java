@@ -634,12 +634,12 @@ public class AttachmentTest extends AbstractTestBase {
     public void testXMLAttachmentContentEncryptionExternalReferenceList() throws Exception {
 
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecEncrypt encrypt = new WSSecEncrypt();
-        encrypt.setUserInfo("receiver", "default");
-        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+        encrypt.setUserInfo("receiver", "default");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
         encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Content"));
@@ -658,9 +658,9 @@ public class AttachmentTest extends AbstractTestBase {
 
         encrypt.prepare(doc, CryptoFactory.getInstance("transmitter-crypto.properties"));
         Element refs = encrypt.encrypt();
-        encrypt.addAttachmentEncryptedDataElements(secHeader);
-        encrypt.addExternalRefElement(refs, secHeader);
-        encrypt.prependToHeader(secHeader);
+        encrypt.addAttachmentEncryptedDataElements();
+        encrypt.addExternalRefElement(refs);
+        encrypt.prependToHeader();
 
         NodeList references = doc.getElementsByTagNameNS(WSConstants.ENC_NS, "DataReference");
         Assert.assertEquals(2, references.getLength());

@@ -365,10 +365,10 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             WSSecHeader secHeader = new WSSecHeader(doc);
             Node assertionNode = samlAssertion.toDOM(doc);
             secHeader.insertSecurityHeader();
-            secHeader.getSecurityHeader().appendChild(assertionNode);
+            secHeader.getSecurityHeaderElement().appendChild(assertionNode);
 
             // Encrypt the SOAP body
-            WSSecEncrypt builder = new WSSecEncrypt();
+            WSSecEncrypt builder = new WSSecEncrypt(secHeader);
             builder.setUserInfo("receiver");
             builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
             builder.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
@@ -386,7 +386,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             parts.add(encP);
             Element refElement = builder.encryptForRef(null, parts);
             builder.addInternalRefElement(refElement);
-            builder.appendToHeader(secHeader);
+            builder.appendToHeader();
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
@@ -450,10 +450,10 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
              WSSecHeader secHeader = new WSSecHeader(doc);
              Node assertionNode = samlAssertion.toDOM(doc);
              secHeader.insertSecurityHeader();
-             secHeader.getSecurityHeader().appendChild(assertionNode);
+             secHeader.getSecurityHeaderElement().appendChild(assertionNode);
 
              // Encrypt the SOAP body
-             WSSecEncrypt builder = new WSSecEncrypt();
+             WSSecEncrypt builder = new WSSecEncrypt(secHeader);
              builder.setUserInfo("receiver");
              builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
              builder.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
@@ -471,7 +471,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
              parts.add(encP);
              Element refElement = builder.encryptForRef(null, parts);
              builder.addInternalRefElement(refElement);
-             builder.appendToHeader(secHeader);
+             builder.appendToHeader();
 
              javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
              transformer.transform(new DOMSource(doc), new StreamResult(baos));
@@ -803,18 +803,18 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
 
             Crypto issuerCrypto = CryptoFactory.getInstance("saml/samlissuer.properties");
             samlAssertion.signAssertion("samlissuer", "default", issuerCrypto, false);
-
-            WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
-            wsSign.setUserInfo("transmitter", "default");
-            wsSign.setUseDirectReferenceToAssertion(true);
-            wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-
+            
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
 
+            WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
+            wsSign.setUserInfo("transmitter", "default");
+            wsSign.setUseDirectReferenceToAssertion(true);
+            wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+
             Crypto userCrypto = CryptoFactory.getInstance("transmitter-crypto.properties");
-            Document securedDocument = wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
+            Document securedDocument = wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());

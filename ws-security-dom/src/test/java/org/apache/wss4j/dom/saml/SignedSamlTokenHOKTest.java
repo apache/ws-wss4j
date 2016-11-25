@@ -110,18 +110,18 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
 
         samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setUserInfo("wss40", "security");
         wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
         wsSign.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
         Document signedDoc =
-            wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
+            wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -181,18 +181,19 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
         byte[] ephemeralKey = callbackHandler.getEphemeralKey();
 
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setUserInfo("wss40", "security");
         wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
         wsSign.setSignatureAlgorithm(WSConstants.HMAC_SHA256);
         wsSign.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
         wsSign.setSecretKey(ephemeralKey);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
         Document signedDoc =
-            wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
+            wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -243,18 +244,18 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
 
         samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setUserInfo("wss40", "security");
         wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
         wsSign.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
         Document signedDoc =
-            wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
+            wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -305,19 +306,19 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
         byte[] ephemeralKey = callbackHandler.getEphemeralKey();
 
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setUserInfo("wss40", "security");
         wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
         wsSign.setSignatureAlgorithm(WSConstants.HMAC_SHA256);
         wsSign.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
         wsSign.setSecretKey(ephemeralKey);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
         Document signedDoc =
-            wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
+            wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -370,18 +371,18 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
 
         samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setUserInfo("wss40", "security");
         wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
         wsSign.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
         Document signedDoc =
-            wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
+            wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -431,18 +432,18 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
 
         samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setUserInfo("wss40", "security");
         wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
         wsSign.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
         Document signedDoc =
-            wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
+            wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -492,18 +493,18 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
 
         samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setUserInfo("wss40", "security");
         wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
         wsSign.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
         Document signedDoc =
-            wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
+            wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -558,18 +559,18 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
 
         samlAssertion.signAssertion("wss40_server", "security", issuerCrypto, false);
 
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
         wsSign.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
         Document signedDoc =
-            wsSign.build(doc, crypto, samlAssertion, null, null, null, secHeader);
+            wsSign.build(doc, crypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -634,18 +635,18 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
 
         byte[] ephemeralKey = callbackHandler.getEphemeralKey();
 
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setUserInfo("wss40", "security");
         wsSign.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
         wsSign.setSignatureAlgorithm(WSConstants.HMAC_SHA256);
         wsSign.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
         wsSign.setSecretKey(ephemeralKey);
 
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
         Document signedDoc =
-            wsSign.build(doc, userCrypto, samlAssertion, null, null, null, secHeader);
+            wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);

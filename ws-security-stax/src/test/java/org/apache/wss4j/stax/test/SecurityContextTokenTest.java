@@ -146,7 +146,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
 
-            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.setWscVersion(version);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
             sctBuilder.prepare(doc, crypto);
@@ -158,13 +158,13 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             String tokenId = sctBuilder.getSctId();
 
             // Derived key encryption
-            WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+            WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
             encrBuilder.setWscVersion(version);
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             encrBuilder.setExternalKey(tempSecret, tokenId);
-            encrBuilder.build(doc, secHeader);
+            encrBuilder.build(doc);
 
-            sctBuilder.prependSCTElementToHeader(doc, secHeader);
+            sctBuilder.prependSCTElementToHeader(doc);
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
@@ -356,7 +356,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
 
-            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.setWscVersion(version);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
             sctBuilder.prepare(doc, crypto);
@@ -368,13 +368,13 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             String tokenId = sctBuilder.getSctId();
 
             // Derived key signature
-            WSSecDKSign sigBuilder = new WSSecDKSign();
+            WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
             sigBuilder.setWscVersion(version);
             sigBuilder.setExternalKey(tempSecret, tokenId);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-            sigBuilder.build(doc, secHeader);
+            sigBuilder.build(doc);
 
-            sctBuilder.prependSCTElementToHeader(doc, secHeader);
+            sctBuilder.prependSCTElementToHeader(doc);
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
@@ -539,7 +539,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
 
-            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.setWscVersion(version);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
             sctBuilder.prepare(doc, crypto);
@@ -549,14 +549,14 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             callbackHandler.addSecretKey(sctBuilder.getIdentifier(), tempSecret);
 
             // Derived key signature
-            WSSecDKSign sigBuilder = new WSSecDKSign();
+            WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
             sigBuilder.setWscVersion(version);
             sigBuilder.setExternalKey(tempSecret, sctBuilder.getIdentifier());
             sigBuilder.setTokenIdDirectId(true);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-            sigBuilder.build(doc, secHeader);
+            sigBuilder.build(doc);
 
-            sctBuilder.prependSCTElementToHeader(doc, secHeader);
+            sctBuilder.prependSCTElementToHeader(doc);
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
@@ -586,7 +586,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
 
-            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.setWscVersion(version);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
             sctBuilder.prepare(doc, crypto);
@@ -598,7 +598,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             String tokenId = sctBuilder.getSctId();
 
             // Derived key signature
-            WSSecDKSign sigBuilder = new WSSecDKSign();
+            WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
             sigBuilder.setWscVersion(version);
             if (version == ConversationConstants.VERSION_05_12) {
                 sigBuilder.setCustomValueType(WSConstants.WSC_SCT_05_12);
@@ -607,10 +607,10 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             }
             sigBuilder.setExternalKey(tempSecret, tokenId);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-            sigBuilder.build(doc, secHeader);
+            sigBuilder.build(doc);
 
             // Derived key encryption
-            WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+            WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
             encrBuilder.setWscVersion(version);
             if (version == ConversationConstants.VERSION_05_12) {
                 encrBuilder.setCustomValueType(WSConstants.WSC_SCT_05_12);
@@ -619,9 +619,9 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             }
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             encrBuilder.setExternalKey(tempSecret, tokenId);
-            encrBuilder.build(doc, secHeader);
+            encrBuilder.build(doc);
 
-            sctBuilder.prependSCTElementToHeader(doc, secHeader);
+            sctBuilder.prependSCTElementToHeader(doc);
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
@@ -809,7 +809,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
 
-            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.setWscVersion(version);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
             sctBuilder.prepare(doc, crypto);
@@ -821,7 +821,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             String tokenId = sctBuilder.getSctId();
 
             // Derived key encryption
-            WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+            WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
             encrBuilder.setWscVersion(version);
             if (version == ConversationConstants.VERSION_05_12) {
                 encrBuilder.setCustomValueType(WSConstants.WSC_SCT_05_12);
@@ -830,10 +830,10 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             }
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             encrBuilder.setExternalKey(tempSecret, tokenId);
-            encrBuilder.build(doc, secHeader);
+            encrBuilder.build(doc);
 
             // Derived key signature
-            WSSecDKSign sigBuilder = new WSSecDKSign();
+            WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
             sigBuilder.setWscVersion(version);
             if (version == ConversationConstants.VERSION_05_12) {
                 sigBuilder.setCustomValueType(WSConstants.WSC_SCT_05_12);
@@ -842,9 +842,9 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             }
             sigBuilder.setExternalKey(tempSecret, tokenId);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-            sigBuilder.build(doc, secHeader);
+            sigBuilder.build(doc);
 
-            sctBuilder.prependSCTElementToHeader(doc, secHeader);
+            sctBuilder.prependSCTElementToHeader(doc);
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
@@ -1033,7 +1033,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
 
-            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.setWscVersion(version);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
             sctBuilder.prepare(doc, crypto);
@@ -1044,15 +1044,15 @@ public class SecurityContextTokenTest extends AbstractTestBase {
 
             String tokenId = sctBuilder.getSctId();
 
-            WSSecSignature builder = new WSSecSignature();
+            WSSecSignature builder = new WSSecSignature(secHeader);
             builder.setSecretKey(tempSecret);
             builder.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
             builder.setCustomTokenValueType(WSConstants.WSC_SCT);
             builder.setCustomTokenId(tokenId);
             builder.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
-            builder.build(doc, crypto, secHeader);
+            builder.build(doc, crypto);
 
-            sctBuilder.prependSCTElementToHeader(doc, secHeader);
+            sctBuilder.prependSCTElementToHeader(doc);
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));

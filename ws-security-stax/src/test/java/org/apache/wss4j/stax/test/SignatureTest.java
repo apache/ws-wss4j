@@ -1164,12 +1164,12 @@ public class SignatureTest extends AbstractTestBase {
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
 
-            WSSecSignature sign = new WSSecSignature();
+            WSSecSignature sign = new WSSecSignature(secHeader);
             sign.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
             sign.setSecretKey(key.getEncoded());
             sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
 
-            Document securedDocument = sign.build(doc, null, secHeader);
+            Document securedDocument = sign.build(doc, null);
 
             //some test that we can really sure we get what we want from WSS4J
             XPathExpression xPathExpression =

@@ -888,11 +888,11 @@ public class SAMLTokenTest extends AbstractTestBase {
             SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
             SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-            WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
             Document doc = SOAPUtil.toSOAPPart(sourceDocument);
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
+            
+            WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
             wsSign.prepare(doc, samlAssertion);
 
@@ -901,7 +901,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             Element encryptedAssertionElement =
                 doc.createElementNS(WSConstants.SAML2_NS, WSConstants.ENCRYPED_ASSERTION_LN);
             encryptedAssertionElement.appendChild(assertionElement);
-            secHeader.getSecurityHeader().appendChild(encryptedAssertionElement);
+            secHeader.getSecurityHeaderElement().appendChild(encryptedAssertionElement);
 
             // Encrypt the Assertion
             KeyGenerator keygen = KeyGenerator.getInstance("AES");

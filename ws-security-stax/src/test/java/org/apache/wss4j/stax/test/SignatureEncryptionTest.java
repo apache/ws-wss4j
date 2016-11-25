@@ -392,15 +392,15 @@ public class SignatureEncryptionTest extends AbstractTestBase {
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
 
-            WSSecSignature sign = new WSSecSignature();
+            WSSecSignature sign = new WSSecSignature(secHeader);
             sign.setUserInfo("transmitter", "default");
             sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
 
-            sign.build(doc, crypto, secHeader);
+            sign.build(doc, crypto);
 
-            WSSecEncrypt builder = new WSSecEncrypt();
+            WSSecEncrypt builder = new WSSecEncrypt(secHeader);
             builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
             builder.setUserInfo("receiver");
             builder.prepare(doc, crypto);
@@ -412,8 +412,8 @@ public class SignatureEncryptionTest extends AbstractTestBase {
             encryptionParts.add(def);
             Element ref = builder.encryptForRef(null, encryptionParts);
             ref.removeChild(ref.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#", "DataReference").item(0));
-            builder.addExternalRefElement(ref, secHeader);
-            builder.prependToHeader(secHeader);
+            builder.addExternalRefElement(ref);
+            builder.prependToHeader();
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));

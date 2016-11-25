@@ -87,14 +87,14 @@ public class SamlTokenDerivedTest extends AbstractTestBase {
                     createSamlSTR(doc, samlAssertion, WSSConfig.getNewInstance());
             Element samlTokenElement = samlAssertion.toDOM(doc);
             Element secRefElement = secRefSaml.getElement();
-            secHeader.getSecurityHeader().appendChild(samlTokenElement);
-            secHeader.getSecurityHeader().appendChild(secRefElement);
+            secHeader.getSecurityHeaderElement().appendChild(samlTokenElement);
+            secHeader.getSecurityHeaderElement().appendChild(secRefElement);
 
             //
             // Create a Derived Key object for signature
             //
-            WSSecDKSign sigBuilder = createDKSign(doc, secRefSaml);
-            Document securedDocument = sigBuilder.build(doc, secHeader);
+            WSSecDKSign sigBuilder = createDKSign(doc, secRefSaml, secHeader);
+            Document securedDocument = sigBuilder.build(doc);
 
             //todo remove the following lines when the header ordering no longer does matter...
             /*Node firstChild = secHeader.getSecurityHeader().getFirstChild();
@@ -171,7 +171,8 @@ public class SamlTokenDerivedTest extends AbstractTestBase {
      */
     private WSSecDKSign createDKSign(
             Document doc,
-            SecurityTokenReference secRefSaml
+            SecurityTokenReference secRefSaml,
+            WSSecHeader secHeader
     ) throws WSSecurityException {
         SecurityTokenReference secToken = new SecurityTokenReference(doc);
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
@@ -180,7 +181,7 @@ public class SamlTokenDerivedTest extends AbstractTestBase {
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         secToken.setKeyIdentifierThumb(certs[0]);
 
-        WSSecDKSign sigBuilder = new WSSecDKSign();
+        WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
         java.security.Key key =
                 crypto.getPrivateKey("transmitter", "default");
         sigBuilder.setExternalKey(key.getEncoded(), secToken.getElement());

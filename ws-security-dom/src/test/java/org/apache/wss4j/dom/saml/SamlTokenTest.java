@@ -336,13 +336,13 @@ public class SamlTokenTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -377,13 +377,13 @@ public class SamlTokenTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -418,13 +418,13 @@ public class SamlTokenTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -460,13 +460,13 @@ public class SamlTokenTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -500,14 +500,14 @@ public class SamlTokenTest extends org.junit.Assert {
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
+        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
+
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -543,13 +543,13 @@ public class SamlTokenTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -604,13 +604,13 @@ public class SamlTokenTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Attr Assertion (sender vouches):");
@@ -684,13 +684,13 @@ public class SamlTokenTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -724,11 +724,11 @@ public class SamlTokenTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
         wsSign.prepare(doc, samlAssertion);
 
@@ -737,7 +737,7 @@ public class SamlTokenTest extends org.junit.Assert {
         Element encryptedAssertionElement =
             doc.createElementNS(WSConstants.SAML2_NS, WSConstants.ENCRYPED_ASSERTION_LN);
         encryptedAssertionElement.appendChild(assertionElement);
-        secHeader.getSecurityHeader().appendChild(encryptedAssertionElement);
+        secHeader.getSecurityHeaderElement().appendChild(encryptedAssertionElement);
 
         // Encrypt the Assertion
         KeyGenerator keygen = KeyGenerator.getInstance("AES");
@@ -788,11 +788,11 @@ public class SamlTokenTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
         wsSign.prepare(doc, samlAssertion);
 
@@ -801,7 +801,7 @@ public class SamlTokenTest extends org.junit.Assert {
         Element encryptedAssertionElement =
             doc.createElementNS(WSConstants.SAML2_NS, WSConstants.ENCRYPED_ASSERTION_LN);
         encryptedAssertionElement.appendChild(assertionElement);
-        secHeader.getSecurityHeader().appendChild(encryptedAssertionElement);
+        secHeader.getSecurityHeaderElement().appendChild(encryptedAssertionElement);
 
         // Encrypt the Assertion
         KeyGenerator keygen = KeyGenerator.getInstance("AES");
@@ -901,11 +901,11 @@ public class SamlTokenTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
         wsSign.prepare(doc, samlAssertion);
 
@@ -914,7 +914,7 @@ public class SamlTokenTest extends org.junit.Assert {
         Element encryptedAssertionElement =
             doc.createElementNS(WSConstants.SAML2_NS, WSConstants.ENCRYPED_ASSERTION_LN);
         encryptedAssertionElement.appendChild(assertionElement);
-        secHeader.getSecurityHeader().appendChild(encryptedAssertionElement);
+        secHeader.getSecurityHeaderElement().appendChild(encryptedAssertionElement);
 
         // Encrypt the Assertion
         KeyGenerator keygen = KeyGenerator.getInstance("AES");
@@ -1025,13 +1025,13 @@ public class SamlTokenTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         WSSConfig config = WSSConfig.getNewInstance();
         SamlAssertionValidator assertionValidator = new SamlAssertionValidator();
@@ -1053,13 +1053,13 @@ public class SamlTokenTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        wsSign = new WSSecSAMLToken();
-
         doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        wsSign = new WSSecSAMLToken(secHeader);
 
-        unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        unsignedDoc = wsSign.build(doc, samlAssertion);
         try {
             newEngine.processSecurityHeader(unsignedDoc, null, null, null);
             fail("Failure expected on an incorrect subject confirmation method");
@@ -1079,13 +1079,13 @@ public class SamlTokenTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         WSSecurityEngine newEngine = new WSSecurityEngine();
         try {
@@ -1121,13 +1121,13 @@ public class SamlTokenTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         WSSecurityEngine newEngine = new WSSecurityEngine();
         try {
@@ -1176,12 +1176,12 @@ public class SamlTokenTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -1216,13 +1216,13 @@ public class SamlTokenTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         String outputString = XMLUtils.prettyDocumentToString(unsignedDoc);
         // assertTrue(outputString.contains("j\u00f6e") && outputString.contains("j\u00f6an"));
@@ -1256,13 +1256,13 @@ public class SamlTokenTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -1346,13 +1346,13 @@ public class SamlTokenTest extends org.junit.Assert {
         SAMLUtil.doSAMLCallback(samlCallbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
 
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             String outputString =

@@ -483,13 +483,13 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             Crypto crypto = CryptoFactory.getInstance("saml/saml-signed.properties");
             samlAssertion.signAssertion("transmitter", "default", crypto, false);
 
-            WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
+            
+            WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-            Document securedDocument = wsSign.build(doc, samlAssertion, secHeader);
+            Document securedDocument = wsSign.build(doc, samlAssertion);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
@@ -983,13 +983,13 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             Crypto crypto = CryptoFactory.getInstance("saml/saml-signed.properties");
             samlAssertion.signAssertion("transmitter", "default", crypto, false);
 
-            WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
             Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
+            
+            WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-            Document securedDocument = wsSign.build(doc, samlAssertion, secHeader);
+            Document securedDocument = wsSign.build(doc, samlAssertion);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
