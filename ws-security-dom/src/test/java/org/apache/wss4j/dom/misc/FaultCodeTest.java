@@ -77,7 +77,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
         WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setUserInfo("wss40", "security");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        Document encryptedDoc = builder.build(doc, crypto);
+        Document encryptedDoc = builder.build(crypto);
 
         try {
             verify(encryptedDoc);
@@ -121,7 +121,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
         WSSecTimestamp builder = new WSSecTimestamp(secHeader);
         builder.setTimeToLive(-1);
 
-        Document timestampedDoc = builder.build(doc);
+        Document timestampedDoc = builder.build();
 
         try {
             verify(timestampedDoc);
@@ -149,7 +149,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
         builder.addNonce();
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
-        Document timestampedDoc = builder.build(doc);
+        Document timestampedDoc = builder.build();
 
         try {
             verify(timestampedDoc);
@@ -177,7 +177,7 @@ public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
         builder.addNonce();
         builder.setUserInfo(null, "security");
 
-        builder.build(doc);
+        builder.build();
 
         try {
             new UsernameToken(doc.getDocumentElement(), false, new BSPEnforcer());

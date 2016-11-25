@@ -149,7 +149,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.setWscVersion(version);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
-            sctBuilder.prepare(doc, crypto);
+            sctBuilder.prepare(crypto);
 
             // Store the secret
             SecretKeyCallbackHandler callbackHandler = new SecretKeyCallbackHandler();
@@ -162,9 +162,9 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             encrBuilder.setWscVersion(version);
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             encrBuilder.setExternalKey(tempSecret, tokenId);
-            encrBuilder.build(doc);
+            encrBuilder.build();
 
-            sctBuilder.prependSCTElementToHeader(doc);
+            sctBuilder.prependSCTElementToHeader();
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
@@ -359,7 +359,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.setWscVersion(version);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
-            sctBuilder.prepare(doc, crypto);
+            sctBuilder.prepare(crypto);
 
             // Store the secret
             SecretKeyCallbackHandler callbackHandler = new SecretKeyCallbackHandler();
@@ -372,9 +372,9 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             sigBuilder.setWscVersion(version);
             sigBuilder.setExternalKey(tempSecret, tokenId);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-            sigBuilder.build(doc);
+            sigBuilder.build();
 
-            sctBuilder.prependSCTElementToHeader(doc);
+            sctBuilder.prependSCTElementToHeader();
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
@@ -542,7 +542,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.setWscVersion(version);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
-            sctBuilder.prepare(doc, crypto);
+            sctBuilder.prepare(crypto);
 
             // Store the secret
             SecretKeyCallbackHandler callbackHandler = new SecretKeyCallbackHandler();
@@ -554,9 +554,9 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             sigBuilder.setExternalKey(tempSecret, sctBuilder.getIdentifier());
             sigBuilder.setTokenIdDirectId(true);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-            sigBuilder.build(doc);
+            sigBuilder.build();
 
-            sctBuilder.prependSCTElementToHeader(doc);
+            sctBuilder.prependSCTElementToHeader();
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
@@ -589,7 +589,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.setWscVersion(version);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
-            sctBuilder.prepare(doc, crypto);
+            sctBuilder.prepare(crypto);
 
             // Store the secret
             SecretKeyCallbackHandler callbackHandler = new SecretKeyCallbackHandler();
@@ -607,7 +607,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             }
             sigBuilder.setExternalKey(tempSecret, tokenId);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-            sigBuilder.build(doc);
+            sigBuilder.build();
 
             // Derived key encryption
             WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
@@ -619,9 +619,9 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             }
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             encrBuilder.setExternalKey(tempSecret, tokenId);
-            encrBuilder.build(doc);
+            encrBuilder.build();
 
-            sctBuilder.prependSCTElementToHeader(doc);
+            sctBuilder.prependSCTElementToHeader();
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
@@ -812,7 +812,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.setWscVersion(version);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
-            sctBuilder.prepare(doc, crypto);
+            sctBuilder.prepare(crypto);
 
             // Store the secret
             SecretKeyCallbackHandler callbackHandler = new SecretKeyCallbackHandler();
@@ -830,7 +830,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             }
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             encrBuilder.setExternalKey(tempSecret, tokenId);
-            encrBuilder.build(doc);
+            encrBuilder.build();
 
             // Derived key signature
             WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
@@ -842,9 +842,9 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             }
             sigBuilder.setExternalKey(tempSecret, tokenId);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-            sigBuilder.build(doc);
+            sigBuilder.build();
 
-            sctBuilder.prependSCTElementToHeader(doc);
+            sctBuilder.prependSCTElementToHeader();
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));
@@ -1036,7 +1036,7 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.setWscVersion(version);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
-            sctBuilder.prepare(doc, crypto);
+            sctBuilder.prepare(crypto);
 
             // Store the secret
             SecretKeyCallbackHandler callbackHandler = new SecretKeyCallbackHandler();
@@ -1050,9 +1050,9 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             builder.setCustomTokenValueType(WSConstants.WSC_SCT);
             builder.setCustomTokenId(tokenId);
             builder.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
-            builder.build(doc, crypto);
+            builder.build(crypto);
 
-            sctBuilder.prependSCTElementToHeader(doc);
+            sctBuilder.prependSCTElementToHeader();
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
             transformer.transform(new DOMSource(doc), new StreamResult(baos));

@@ -107,7 +107,7 @@ public class SignedBSTTest extends org.junit.Assert {
 
         sign.setCustomTokenId(bst.getID());
         sign.setCustomTokenValueType(bst.getValueType());
-        sign.prepare(doc, crypto);
+        sign.prepare(crypto);
 
         List<javax.xml.crypto.dsig.Reference> referenceList =
             sign.addReferencesToSign(sign.getParts());

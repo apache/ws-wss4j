@@ -41,8 +41,7 @@ import org.w3c.dom.Node;
 
 public class SignatureDerivedAction extends AbstractDerivedAction implements Action {
 
-    public void execute(WSHandler handler, SecurityActionToken actionToken,
-                        Document doc, RequestData reqData)
+    public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
             throws WSSecurityException {
         CallbackHandler callbackHandler = reqData.getCallbackHandler();
         if (callbackHandler == null) {
@@ -84,6 +83,7 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
             wsSign.setDerivedKeyLength(signatureToken.getDerivedKeyLength());
         }
 
+        Document doc = reqData.getSecHeader().getSecurityHeaderElement().getOwnerDocument();
         Element tokenElement =
             setupTokenReference(reqData, signatureToken, wsSign, passwordCallback, doc);
         wsSign.setAttachmentCallbackHandler(reqData.getAttachmentCallbackHandler());
@@ -97,7 +97,7 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
                 wsSign.getParts().add(WSSecurityUtil.getDefaultEncryptionPart(doc));
             }
 
-            wsSign.prepare(doc);
+            wsSign.prepare();
 
             List<javax.xml.crypto.dsig.Reference> referenceList = wsSign.addReferencesToSign(parts);
 

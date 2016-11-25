@@ -110,7 +110,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
                 "");
         builder.getParts().add(encP);
 
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         //
         // Replace the signed element with a modified element, and move the original
@@ -165,7 +165,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
                 "");
         builder.getParts().add(encP);
 
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         //
         // Replace the signed element with a modified element, and move the original
@@ -240,8 +240,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
 
         Document signedDoc =
             wsSign.build(
-                doc, null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
-                "security"
+                 null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e", "security"
             );
         Element assertionElement = (Element) samlAssertion.getElement().cloneNode(true);
         assertionElement.removeChild(assertionElement.getFirstChild());
@@ -275,7 +274,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
 
         WSSecUsernameToken usernameToken = new WSSecUsernameToken(secHeader);
         usernameToken.setUserInfo("wss86", "security");
-        Document createdDoc = usernameToken.build(doc);
+        usernameToken.build();
 
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -287,7 +286,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
                 "");
         builder.getParts().add(encP);
 
-        builder.prepare(createdDoc, crypto);
+        builder.prepare(crypto);
 
         List<javax.xml.crypto.dsig.Reference> referenceList =
             builder.addReferencesToSign(builder.getParts());
@@ -330,7 +329,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
 
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
-        Document encryptedDoc = builder.build(doc, wssCrypto);
+        Document encryptedDoc = builder.build(wssCrypto);
 
         Element body = WSSecurityUtil.findBodyElement(doc);
         Element encryptionMethod =
@@ -367,7 +366,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
 
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
-        Document encryptedDoc = builder.build(doc, wssCrypto);
+        Document encryptedDoc = builder.build(wssCrypto);
 
         Element body = WSSecurityUtil.findBodyElement(doc);
         Element cipherValue =
@@ -419,7 +418,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
 
         WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(300);
-        timestamp.build(doc);
+        timestamp.build();
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -428,7 +427,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
                 "");
         builder.getParts().add(encP);
 
-        Document encryptedDoc = builder.build(doc, wssCrypto);
+        Document encryptedDoc = builder.build(wssCrypto);
 
         Element securityHeader =
             WSSecurityUtil.getSecurityHeader(encryptedDoc, "");
@@ -479,7 +478,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
 
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
-        Document encryptedDoc = builder.build(doc, wssCrypto);
+        Document encryptedDoc = builder.build(wssCrypto);
 
         Element encryptedKey =
             XMLUtils.findElement(doc.getDocumentElement(), "EncryptedKey", WSConstants.ENC_NS);
@@ -529,7 +528,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
 
         WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(300);
-        Document createdDoc = timestamp.build(doc);
+        timestamp.build();
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -538,7 +537,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
                 "");
         builder.getParts().add(encP);
 
-        Document signedDoc = builder.build(createdDoc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         // Modify the Created text of the Timestamp element
         Element timestampElement = timestamp.getElement();
@@ -581,7 +580,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         builder.setUserInfo("wss40", "security");
 
         Crypto wss40Crypto = CryptoFactory.getInstance("wss40.properties");
-        Document signedDoc = builder.build(doc, wss40Crypto);
+        Document signedDoc = builder.build(wss40Crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -609,7 +608,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         // Modify the Signature element
         Element signatureElement = builder.getSignatureElement();

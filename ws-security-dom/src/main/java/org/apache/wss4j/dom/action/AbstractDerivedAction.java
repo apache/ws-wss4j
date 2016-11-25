@@ -140,7 +140,7 @@ public abstract class AbstractDerivedAction {
                 encrKeyBuilder.setMGFAlgorithm(mgfAlgorithm);
             }
 
-            encrKeyBuilder.prepare(doc, actionToken.getCrypto());
+            encrKeyBuilder.prepare(actionToken.getCrypto());
 
             byte[] ek = encrKeyBuilder.getEphemeralKey();
             String tokenIdentifier = encrKeyBuilder.getId();

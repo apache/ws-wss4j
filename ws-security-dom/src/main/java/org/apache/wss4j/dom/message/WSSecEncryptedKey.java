@@ -73,8 +73,6 @@ public class WSSecEncryptedKey extends WSSecBase {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSecEncryptedKey.class);
 
-    protected Document document;
-
     /**
      * Encrypted bytes of the ephemeral key
      */
@@ -150,6 +148,10 @@ public class WSSecEncryptedKey extends WSSecBase {
     public WSSecEncryptedKey(WSSecHeader securityHeader) {
         super(securityHeader);
     }
+    
+    public WSSecEncryptedKey(Document doc) {
+        super(doc);
+    }
 
     /**
      * Set the user name to get the encryption certificate.
@@ -186,13 +188,10 @@ public class WSSecEncryptedKey extends WSSecBase {
      * Prepare the ephemeralKey and the tokens required to be added to the
      * security header
      *
-     * @param doc The SOAP envelope as <code>Document</code>
      * @param crypto An instance of the Crypto API to handle keystore and certificates
      * @throws WSSecurityException
      */
-    public void prepare(Document doc, Crypto crypto) throws WSSecurityException {
-
-        document = doc;
+    public void prepare(Crypto crypto) throws WSSecurityException {
 
         //
         // Set up the symmetric key
@@ -323,16 +322,16 @@ public class WSSecEncryptedKey extends WSSecBase {
         // 4) Create the CipherValue element structure and insert the encrypted
         // session key
         //
-        encryptedKeyElement = createEncryptedKey(document, keyEncAlgo);
+        encryptedKeyElement = createEncryptedKey(getDocument(), keyEncAlgo);
         if (encKeyId == null || "".equals(encKeyId)) {
             encKeyId = IDGenerator.generateID("EK-");
         }
         encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);
 
         if (customEKKeyInfoElement != null) {
-            encryptedKeyElement.appendChild(document.adoptNode(customEKKeyInfoElement));
+            encryptedKeyElement.appendChild(getDocument().adoptNode(customEKKeyInfoElement));
         } else {
-            SecurityTokenReference secToken = new SecurityTokenReference(document);
+            SecurityTokenReference secToken = new SecurityTokenReference(getDocument());
 
             switch (keyIdentifierType) {
             case WSConstants.X509_KEY_IDENTIFIER:
@@ -365,9 +364,9 @@ public class WSSecEncryptedKey extends WSSecBase {
                 java.math.BigInteger serialNumber = remoteCert.getSerialNumber();
                 DOMX509IssuerSerial domIssuerSerial =
                     new DOMX509IssuerSerial(
-                        document, issuer, serialNumber
+                        getDocument(), issuer, serialNumber
                     );
-                DOMX509Data domX509Data = new DOMX509Data(document, domIssuerSerial);
+                DOMX509Data domX509Data = new DOMX509Data(getDocument(), domIssuerSerial);
                 secToken.setUnknownElement(domX509Data.getElement());
 
                 if (includeEncryptionToken) {
@@ -376,10 +375,10 @@ public class WSSecEncryptedKey extends WSSecBase {
                 break;
 
             case WSConstants.BST_DIRECT_REFERENCE:
-                Reference ref = new Reference(document);
+                Reference ref = new Reference(getDocument());
                 String certUri = IDGenerator.generateID(null);
                 ref.setURI("#" + certUri);
-                bstToken = new X509Security(document);
+                bstToken = new X509Security(getDocument());
                 ((X509Security) bstToken).setX509Certificate(remoteCert);
                 bstToken.setID(certUri);
                 ref.setValueType(bstToken.getValueType());
@@ -387,7 +386,7 @@ public class WSSecEncryptedKey extends WSSecBase {
                 break;
 
             case WSConstants.CUSTOM_SYMM_SIGNING :
-                Reference refCust = new Reference(document);
+                Reference refCust = new Reference(getDocument());
                 if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
                     secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
                     refCust.setValueType(customEKTokenValueType);
@@ -404,7 +403,7 @@ public class WSSecEncryptedKey extends WSSecBase {
                 break;
 
             case WSConstants.CUSTOM_SYMM_SIGNING_DIRECT :
-                Reference refCustd = new Reference(document);
+                Reference refCustd = new Reference(getDocument());
                 if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
                     secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
                     refCustd.setValueType(customEKTokenValueType);
@@ -437,7 +436,7 @@ public class WSSecEncryptedKey extends WSSecBase {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unsupportedKeyId");
             }
             Element keyInfoElement =
-                document.createElementNS(
+                getDocument().createElementNS(
                     WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
                 );
             keyInfoElement.setAttributeNS(
@@ -447,14 +446,14 @@ public class WSSecEncryptedKey extends WSSecBase {
             encryptedKeyElement.appendChild(keyInfoElement);
         }
 
-        Element xencCipherValue = createCipherValue(document, encryptedKeyElement);
+        Element xencCipherValue = createCipherValue(getDocument(), encryptedKeyElement);
         if (storeBytesInAttachment) {
-            final String attachmentId = getIdAllocator().createId("", document);
-            WSSecurityUtil.storeBytesInAttachment(xencCipherValue, document, attachmentId,
+            final String attachmentId = getIdAllocator().createId("", getDocument());
+            WSSecurityUtil.storeBytesInAttachment(xencCipherValue, getDocument(), attachmentId,
                                                   encryptedEphemeralKey, attachmentCallbackHandler);
         } else {
             Text keyText =
-                WSSecurityUtil.createBase64EncodedTextNode(document, encryptedEphemeralKey);
+                WSSecurityUtil.createBase64EncodedTextNode(getDocument(), encryptedEphemeralKey);
             xencCipherValue.appendChild(keyText);
         }
     }
@@ -474,21 +473,21 @@ public class WSSecEncryptedKey extends WSSecBase {
         // 4) Create the CipherValue element structure and insert the encrypted
         // session key
         //
-        encryptedKeyElement = createEncryptedKey(document, keyEncAlgo);
+        encryptedKeyElement = createEncryptedKey(getDocument(), keyEncAlgo);
         if (encKeyId == null || "".equals(encKeyId)) {
             encKeyId = IDGenerator.generateID("EK-");
         }
         encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);
 
         if (customEKKeyInfoElement != null) {
-            encryptedKeyElement.appendChild(document.adoptNode(customEKKeyInfoElement));
+            encryptedKeyElement.appendChild(getDocument().adoptNode(customEKKeyInfoElement));
         } else {
             SecurityTokenReference secToken = null;
             
             switch (keyIdentifierType) {
             case WSConstants.CUSTOM_SYMM_SIGNING :
-                secToken = new SecurityTokenReference(document);
-                Reference refCust = new Reference(document);
+                secToken = new SecurityTokenReference(getDocument());
+                Reference refCust = new Reference(getDocument());
                 if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
                     secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
                     refCust.setValueType(customEKTokenValueType);
@@ -505,8 +504,8 @@ public class WSSecEncryptedKey extends WSSecBase {
                 break;
 
             case WSConstants.CUSTOM_SYMM_SIGNING_DIRECT :
-                secToken = new SecurityTokenReference(document);
-                Reference refCustd = new Reference(document);
+                secToken = new SecurityTokenReference(getDocument());
+                Reference refCustd = new Reference(getDocument());
                 if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
                     secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
                     refCustd.setValueType(customEKTokenValueType);
@@ -523,7 +522,7 @@ public class WSSecEncryptedKey extends WSSecBase {
                 break;
 
             case WSConstants.CUSTOM_KEY_IDENTIFIER:
-                secToken = new SecurityTokenReference(document);
+                secToken = new SecurityTokenReference(getDocument());
                 secToken.setKeyIdentifier(customEKTokenValueType, customEKTokenId);
                 if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
                     secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
@@ -564,7 +563,7 @@ public class WSSecEncryptedKey extends WSSecBase {
             
             if (secToken != null) {
                 Element keyInfoElement =
-                    document.createElementNS(
+                    getDocument().createElementNS(
                         WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
                     );
                 keyInfoElement.setAttributeNS(
@@ -575,36 +574,36 @@ public class WSSecEncryptedKey extends WSSecBase {
             }
         }
 
-        Element xencCipherValue = createCipherValue(document, encryptedKeyElement);
+        Element xencCipherValue = createCipherValue(getDocument(), encryptedKeyElement);
         if (storeBytesInAttachment) {
-            final String attachmentId = getIdAllocator().createId("", document);
-            WSSecurityUtil.storeBytesInAttachment(xencCipherValue, document, attachmentId,
+            final String attachmentId = getIdAllocator().createId("", getDocument());
+            WSSecurityUtil.storeBytesInAttachment(xencCipherValue, getDocument(), attachmentId,
                                                   encryptedEphemeralKey, attachmentCallbackHandler);
         } else {
             Text keyText =
-                WSSecurityUtil.createBase64EncodedTextNode(document, encryptedEphemeralKey);
+                WSSecurityUtil.createBase64EncodedTextNode(getDocument(), encryptedEphemeralKey);
             xencCipherValue.appendChild(keyText);
         }
     }
 
     protected void prepareInternal(SecretKey secretKey) throws WSSecurityException {
-        encryptedKeyElement = createEncryptedKey(document, keyEncAlgo);
+        encryptedKeyElement = createEncryptedKey(getDocument(), keyEncAlgo);
         if (encKeyId == null || "".equals(encKeyId)) {
             encKeyId = IDGenerator.generateID("EK-");
         }
         encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);
 
         if (customEKKeyInfoElement != null) {
-            encryptedKeyElement.appendChild(document.adoptNode(customEKKeyInfoElement));
+            encryptedKeyElement.appendChild(getDocument().adoptNode(customEKKeyInfoElement));
         } else if (keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING
             || keyIdentifierType == WSConstants.CUSTOM_SYMM_SIGNING_DIRECT
             || keyIdentifierType == WSConstants.CUSTOM_KEY_IDENTIFIER) {
-            SecurityTokenReference secToken = new SecurityTokenReference(document);
+            SecurityTokenReference secToken = new SecurityTokenReference(getDocument());
 
             switch (keyIdentifierType) {
 
                 case WSConstants.CUSTOM_SYMM_SIGNING :
-                    Reference refCust = new Reference(document);
+                    Reference refCust = new Reference(getDocument());
                     if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
                         secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
                         refCust.setValueType(customEKTokenValueType);
@@ -621,7 +620,7 @@ public class WSSecEncryptedKey extends WSSecBase {
                     break;
 
                 case WSConstants.CUSTOM_SYMM_SIGNING_DIRECT :
-                    Reference refCustd = new Reference(document);
+                    Reference refCustd = new Reference(getDocument());
                     if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customEKTokenValueType)) {
                         secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
                         refCustd.setValueType(customEKTokenValueType);
@@ -654,7 +653,7 @@ public class WSSecEncryptedKey extends WSSecBase {
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unsupportedKeyId");
             }
             Element keyInfoElement =
-                document.createElementNS(
+                getDocument().createElementNS(
                     WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
                 );
             keyInfoElement.setAttributeNS(
@@ -664,14 +663,14 @@ public class WSSecEncryptedKey extends WSSecBase {
             encryptedKeyElement.appendChild(keyInfoElement);
         }
 
-        Element xencCipherValue = createCipherValue(document, encryptedKeyElement);
+        Element xencCipherValue = createCipherValue(getDocument(), encryptedKeyElement);
         if (storeBytesInAttachment) {
-            final String attachmentId = getIdAllocator().createId("", document);
-            WSSecurityUtil.storeBytesInAttachment(xencCipherValue, document, attachmentId,
+            final String attachmentId = getIdAllocator().createId("", getDocument());
+            WSSecurityUtil.storeBytesInAttachment(xencCipherValue, getDocument(), attachmentId,
                                                   encryptedEphemeralKey, attachmentCallbackHandler);
         } else {
             Text keyText =
-                WSSecurityUtil.createBase64EncodedTextNode(document, encryptedEphemeralKey);
+                WSSecurityUtil.createBase64EncodedTextNode(getDocument(), encryptedEphemeralKey);
             xencCipherValue.appendChild(keyText);
         }
     }
@@ -680,7 +679,7 @@ public class WSSecEncryptedKey extends WSSecBase {
      * Add a BinarySecurityToken
      */
     private void addBST(X509Certificate cert) throws WSSecurityException {
-        bstToken = new X509Security(document);
+        bstToken = new X509Security(getDocument());
         ((X509Security) bstToken).setX509Certificate(cert);
 
         bstAddedToSecurityHeader = false;
@@ -874,13 +873,6 @@ public class WSSecEncryptedKey extends WSSecBase {
         }
 
         return bstToken.getID();
-    }
-
-    /**
-     * @param document The document to set.
-     */
-    public void setDocument(Document document) {
-        this.document = document;
     }
 
     /**

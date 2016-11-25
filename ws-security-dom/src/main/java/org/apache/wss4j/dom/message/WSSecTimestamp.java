@@ -45,6 +45,10 @@ public class WSSecTimestamp extends WSSecBase {
     public WSSecTimestamp(WSSecHeader securityHeader) {
         super(securityHeader);
     }
+    
+    public WSSecTimestamp(Document doc) {
+        super(doc);
+    }
 
     /**
      * Set the time to live. This is the time difference in seconds between the
@@ -64,11 +68,9 @@ public class WSSecTimestamp extends WSSecBase {
      * relevant information was set. Before calling <code>prepare()</code> the
      * parameter such as <code>timeToLive</code> can be set if the default
      * value is not suitable.
-     *
-     * @param doc The SOAP envelope as W3C document
      */
-    public void prepare(Document doc) {
-        ts = new Timestamp(precisionInMilliSeconds, doc, wsTimeSource, timeToLive);
+    public void prepare() {
+        ts = new Timestamp(precisionInMilliSeconds, getDocument(), wsTimeSource, timeToLive);
         String tsId = getIdAllocator().createId("TS-", ts);
         ts.setID(tsId);
     }
@@ -92,17 +94,16 @@ public class WSSecTimestamp extends WSSecBase {
      * A complete <code>Timestamp</code> is constructed and added to the
      * <code>wsse:Security</code> header.
      *
-     * @param doc The SOAP envelope as W3C document
      * @return Document with Timestamp added
      * @throws Exception
      */
-    public Document build(Document doc) {
+    public Document build() {
         LOG.debug("Begin add timestamp...");
 
-        prepare(doc);
+        prepare();
         prependToHeader();
 
-        return doc;
+        return getDocument();
     }
 
     /**

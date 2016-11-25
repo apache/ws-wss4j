@@ -109,7 +109,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
                 "");
         encrypt.getParts().add(encP);
 
-        Document encryptedDoc = encrypt.build(doc, crypto);
+        Document encryptedDoc = encrypt.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -167,7 +167,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
             );
         encrypt.getParts().add(encP);
 
-        Document encryptedDoc = encrypt.build(doc, crypto);
+        Document encryptedDoc = encrypt.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -204,7 +204,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
             );
         encrypt.getParts().add(encP);
 
-        Document encryptedDoc = encrypt.build(doc, crypto);
+        Document encryptedDoc = encrypt.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -241,7 +241,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         encrypt.getParts().add(encP);
 
         try {
-            encrypt.build(doc, crypto);
+            encrypt.build(crypto);
             fail("Failure expected on not encrypting a required element");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
@@ -270,7 +270,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
                 "Header");
         encrypt.getParts().add(encP);
 
-        Document encryptedDoc = encrypt.build(doc, crypto);
+        Document encryptedDoc = encrypt.build(crypto);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -318,7 +318,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
                 "Header");
         encrypt.getParts().add(encP);
 
-        Document encryptedDoc = encrypt.build(doc, crypto);
+        Document encryptedDoc = encrypt.build(crypto);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -366,7 +366,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         encrypt.getParts().add(encP);
 
         try {
-            encrypt.build(doc, crypto);
+            encrypt.build(crypto);
             fail("Failure expected on a bad localname");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
@@ -395,7 +395,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         encrypt.getParts().add(encP);
 
         try {
-            encrypt.build(doc, crypto);
+            encrypt.build(crypto);
             fail("Failure expected on a bad namespace");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILURE);
@@ -432,7 +432,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
                 "");
         encrypt.getParts().add(encP2);
 
-        Document encryptedDoc = encrypt.build(doc, crypto);
+        Document encryptedDoc = encrypt.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -499,7 +499,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
         encP.setElement(bodyElement);
         encrypt.getParts().add(encP);
 
-        Document encryptedDoc = encrypt.build(doc, crypto);
+        Document encryptedDoc = encrypt.build(crypto);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -542,7 +542,7 @@ public class EncryptionPartsTest extends org.junit.Assert {
                 "");
         encrypt.getParts().add(encP);
 
-        Document encryptedDoc = encrypt.build(doc, crypto);
+        Document encryptedDoc = encrypt.build(crypto);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);

@@ -140,7 +140,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("bob", "security");
         builder.addDerivedKey(false, null, 1000);
-        builder.prepare(doc);
+        builder.prepare();
 
         byte[] derivedKey = builder.getDerivedKey();
         assertTrue(derivedKey.length == 20);
@@ -154,7 +154,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         encrBuilder.setExternalKey(derivedKey, tokenIdentifier);
         encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
-        Document encryptedDoc = encrBuilder.build(doc);
+        Document encryptedDoc = encrBuilder.build();
 
         builder.prependToHeader();
 
@@ -193,7 +193,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         builder.setUserInfo("bob", 
                             Base64.getMimeEncoder().encodeToString(MessageDigest.getInstance("SHA-1").digest("security".getBytes(StandardCharsets.UTF_8))));
         builder.addDerivedKey(false, null, 1000);
-        builder.prepare(doc);
+        builder.prepare();
 
         byte[] derivedKey = builder.getDerivedKey();
         assertTrue(derivedKey.length == 20);
@@ -206,7 +206,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         encrBuilder.setExternalKey(derivedKey, tokenIdentifier);
         encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
-        Document encryptedDoc = encrBuilder.build(doc);
+        Document encryptedDoc = encrBuilder.build();
 
         builder.prependToHeader();
 
@@ -243,7 +243,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("bob", "security");
         builder.addDerivedKey(false, null, 1000);
-        builder.prepare(doc);
+        builder.prepare();
 
         byte[] derivedKey = builder.getDerivedKey();
         derivedKey[5] = 'z';
@@ -259,7 +259,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         encrBuilder.setExternalKey(derivedKey, tokenIdentifier);
         encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
-        Document encryptedDoc = encrBuilder.build(doc);
+        Document encryptedDoc = encrBuilder.build();
 
         builder.prependToHeader();
 
@@ -295,7 +295,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("colm", "security");
         builder.addDerivedKey(false, null, 1000);
-        builder.prepare(doc);
+        builder.prepare();
 
         byte[] derivedKey = builder.getDerivedKey();
         assertTrue(derivedKey.length == 20);
@@ -309,7 +309,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         encrBuilder.setExternalKey(derivedKey, tokenIdentifier);
         encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
-        Document encryptedDoc = encrBuilder.build(doc);
+        Document encryptedDoc = encrBuilder.build();
 
         builder.prependToHeader();
 
@@ -344,7 +344,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("bob", "security");
         builder.addDerivedKey(true, null, 1000);
-        builder.prepare(doc);
+        builder.prepare();
 
         byte[] derivedKey = builder.getDerivedKey();
         assertTrue(derivedKey.length == 20);
@@ -358,7 +358,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         sigBuilder.setExternalKey(derivedKey, tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         sigBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
-        Document signedDoc = sigBuilder.build(doc);
+        Document signedDoc = sigBuilder.build();
 
         builder.prependToHeader();
 
@@ -395,7 +395,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         builder.setUserInfo("bob", 
                             Base64.getMimeEncoder().encodeToString(MessageDigest.getInstance("SHA-1").digest("security".getBytes(StandardCharsets.UTF_8))));
         builder.addDerivedKey(true, null, 1000);
-        builder.prepare(doc);
+        builder.prepare();
 
         byte[] derivedKey = builder.getDerivedKey();
         assertTrue(derivedKey.length == 20);
@@ -409,7 +409,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         sigBuilder.setExternalKey(derivedKey, tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         sigBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
-        Document signedDoc = sigBuilder.build(doc);
+        Document signedDoc = sigBuilder.build();
 
         builder.prependToHeader();
 
@@ -453,7 +453,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("bob", "security");
         builder.addDerivedKey(true, null, 1000);
-        builder.prepare(doc);
+        builder.prepare();
 
         byte[] derivedKey = builder.getDerivedKey();
         if (derivedKey[5] != 12) {
@@ -472,7 +472,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         sigBuilder.setExternalKey(derivedKey, tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         sigBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
-        Document signedDoc = sigBuilder.build(doc);
+        Document signedDoc = sigBuilder.build();
 
         builder.prependToHeader();
 
@@ -503,7 +503,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("colm", "security");
         builder.addDerivedKey(true, null, 1000);
-        builder.prepare(doc);
+        builder.prepare();
 
         byte[] derivedKey = builder.getDerivedKey();
         assertTrue(derivedKey.length == 20);
@@ -517,7 +517,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         sigBuilder.setExternalKey(derivedKey, tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         sigBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
-        Document signedDoc = sigBuilder.build(doc);
+        Document signedDoc = sigBuilder.build();
 
         builder.prependToHeader();
 
@@ -562,7 +562,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         encrBuilder.setExternalKey(derivedKey, usernameToken.getID());
         encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
-        Document encryptedDoc = encrBuilder.build(doc);
+        Document encryptedDoc = encrBuilder.build();
 
         WSSecurityUtil.prependChildElement(
             secHeader.getSecurityHeaderElement(), usernameToken.getElement()
@@ -611,7 +611,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         encrBuilder.setExternalKey(derivedKey, usernameToken.getID());
         encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
-        Document encryptedDoc = encrBuilder.build(doc);
+        Document encryptedDoc = encrBuilder.build();
 
         WSSecurityUtil.prependChildElement(
             secHeader.getSecurityHeaderElement(), usernameToken.getElement()
@@ -661,7 +661,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         encrBuilder.setExternalKey(derivedKey, usernameToken.getID());
         encrBuilder.setCustomValueType(WSConstants.WSS_USERNAME_TOKEN_VALUE_TYPE);
-        Document encryptedDoc = encrBuilder.build(doc);
+        Document encryptedDoc = encrBuilder.build();
 
         WSSecurityUtil.prependChildElement(
             secHeader.getSecurityHeaderElement(), usernameToken.getElement()
@@ -710,7 +710,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("bob", "security");
         builder.addDerivedKey(false, null, 1000);
-        builder.prepare(doc);
+        builder.prepare();
 
         byte[] derivedKey = builder.getDerivedKey();
         assertTrue(derivedKey.length == 20);
@@ -724,7 +724,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         encrBuilder.setExternalKey(derivedKey, tokenIdentifier);
         encrBuilder.setCustomValueType(WSConstants.WSS_SAML_TOKEN_TYPE);
-        Document encryptedDoc = encrBuilder.build(doc);
+        Document encryptedDoc = encrBuilder.build();
 
         builder.prependToHeader();
 
@@ -773,7 +773,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("bob", "security");
         builder.addDerivedKey(false, null, 1000);
-        builder.prepare(doc);
+        builder.prepare();
 
         byte[] derivedKey = builder.getDerivedKey();
         assertTrue(derivedKey.length == 20);
@@ -792,7 +792,7 @@ public class UTDerivedKeyTest extends org.junit.Assert {
         );
         encrBuilder.setExternalKey(derivedKey, strEncKey.getElement());
 
-        Document encryptedDoc = encrBuilder.build(doc);
+        Document encryptedDoc = encrBuilder.build();
 
         builder.prependToHeader();
 

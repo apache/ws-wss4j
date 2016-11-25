@@ -28,12 +28,10 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
-import org.w3c.dom.Document;
 
 public class UsernameTokenAction implements Action {
 
-    public void execute(WSHandler handler, SecurityActionToken actionToken,
-                        Document doc, RequestData reqData)
+    public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
         throws WSSecurityException {
         String username = reqData.getUsername();
         String password = null;
@@ -66,6 +64,6 @@ public class UsernameTokenAction implements Action {
             builder.addCreated();
         }
 
-        builder.build(doc);
+        builder.build();
     }
 }

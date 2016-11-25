@@ -51,9 +51,24 @@ public class WSSecBase {
     private WsuIdAllocator idAllocator;
     private final List<WSEncryptionPart> parts = new ArrayList<>();
     private final WSSecHeader securityHeader;
+    private final Document doc;
 
     public WSSecBase(WSSecHeader securityHeader) {
         this.securityHeader = securityHeader;
+        if (securityHeader != null && securityHeader.getSecurityHeaderElement() != null) {
+            doc = securityHeader.getSecurityHeaderElement().getOwnerDocument();
+        } else {
+            doc = null;
+        }
+    }
+    
+    public WSSecBase(Document doc) {
+        this.doc = doc;
+        securityHeader = new WSSecHeader(doc);
+    }
+    
+    protected Document getDocument() {
+        return doc;
     }
     
     public WSSecHeader getSecurityHeader() {

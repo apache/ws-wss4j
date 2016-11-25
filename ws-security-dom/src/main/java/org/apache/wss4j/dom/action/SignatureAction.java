@@ -39,8 +39,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 public class SignatureAction implements Action {
-    public void execute(WSHandler handler, SecurityActionToken actionToken,
-                        Document doc, RequestData reqData)
+    public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
             throws WSSecurityException {
         CallbackHandler callbackHandler = reqData.getCallbackHandler();
         if (callbackHandler == null) {
@@ -101,7 +100,7 @@ public class SignatureAction implements Action {
         wsSign.setStoreBytesInAttachment(reqData.isStoreBytesInAttachment());
 
         try {
-            wsSign.prepare(doc, signatureToken.getCrypto());
+            wsSign.prepare(signatureToken.getCrypto());
 
             Element siblingElementToPrepend = null;
             boolean signBST = false;
@@ -141,6 +140,7 @@ public class SignatureAction implements Action {
             List<WSEncryptionPart> parts = signatureToken.getParts();
             if (parts == null || parts.isEmpty()) {
                 parts = new ArrayList<>(1);
+                Document doc = reqData.getSecHeader().getSecurityHeaderElement().getOwnerDocument();
                 parts.add(WSSecurityUtil.getDefaultEncryptionPart(doc));
             }
 

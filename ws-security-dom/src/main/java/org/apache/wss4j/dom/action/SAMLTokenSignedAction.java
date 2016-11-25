@@ -34,15 +34,13 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.saml.WSSecSignatureSAML;
-import org.w3c.dom.Document;
 
 public class SAMLTokenSignedAction implements Action {
 
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SAMLTokenSignedAction.class);
 
-    public void execute(WSHandler handler, SecurityActionToken actionToken,
-                        Document doc, RequestData reqData)
+    public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
             throws WSSecurityException {
         Crypto crypto = null;
 
@@ -121,7 +119,6 @@ public class SAMLTokenSignedAction implements Action {
 
         try {
             wsSign.build(
-                    doc,
                     crypto,
                     samlAssertion,
                     samlCallback.getIssuerCrypto(),

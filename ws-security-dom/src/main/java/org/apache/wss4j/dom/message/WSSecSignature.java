@@ -84,7 +84,6 @@ public class WSSecSignature extends WSSecSignatureBase {
     protected CanonicalizationMethod c14nMethod;
     protected XMLSignature sig;
     protected byte[] secretKey;
-    protected Document document;
     protected WSDocInfo wsDocInfo;
     protected String strUri;
     protected Element bstToken;
@@ -111,6 +110,11 @@ public class WSSecSignature extends WSSecSignatureBase {
         super(securityHeader);
         init();
     }
+    
+    public WSSecSignature(Document doc) {
+        super(doc);
+        init();
+    }
 
     private void init() {
         // Try to install the Santuario Provider - fall back to the JDK provider if this does
@@ -132,19 +136,17 @@ public class WSSecSignature extends WSSecSignatureBase {
      * This method does not add the Signature element to the security header.
      * See <code>prependSignatureElementToHeader()</code> method.
      *
-     * @param doc The SOAP envelope as <code>Document</code>
      * @param cr An instance of the Crypto API to handle keystore and certificates
      * @throws WSSecurityException
      */
-    public void prepare(Document doc, Crypto cr)
+    public void prepare(Crypto cr)
         throws WSSecurityException {
         //
         // Gather some info about the document to process and store it for
         // retrieval
         //
         crypto = cr;
-        document = doc;
-        wsDocInfo = new WSDocInfo(doc);
+        wsDocInfo = new WSDocInfo(getDocument());
         wsDocInfo.setCrypto(cr);
 
         //
@@ -171,7 +173,7 @@ public class WSSecSignature extends WSSecSignatureBase {
 
         keyInfoUri = getIdAllocator().createSecureId("KI-", keyInfo);
         if (!useCustomSecRef) {
-            secRef = new SecurityTokenReference(doc);
+            secRef = new SecurityTokenReference(getDocument());
             strUri = getIdAllocator().createSecureId("STR-", secRef);
             secRef.addWSSENamespace();
             secRef.addWSUNamespace();
@@ -186,7 +188,7 @@ public class WSSecSignature extends WSSecSignatureBase {
             //
             switch (keyIdentifierType) {
             case WSConstants.BST_DIRECT_REFERENCE:
-                Reference ref = new Reference(document);
+                Reference ref = new Reference(getDocument());
                 ref.setURI("#" + certUri);
 
                 addBST(certs);
@@ -203,8 +205,8 @@ public class WSSecSignature extends WSSecSignatureBase {
                 String issuer = certs[0].getIssuerX500Principal().getName();
                 java.math.BigInteger serialNumber = certs[0].getSerialNumber();
                 DOMX509IssuerSerial domIssuerSerial =
-                    new DOMX509IssuerSerial(doc, issuer, serialNumber);
-                DOMX509Data domX509Data = new DOMX509Data(doc, domIssuerSerial);
+                    new DOMX509IssuerSerial(getDocument(), issuer, serialNumber);
+                DOMX509Data domX509Data = new DOMX509Data(getDocument(), domIssuerSerial);
                 secRef.setUnknownElement(domX509Data.getElement());
 
                 if (includeSignatureToken) {
@@ -243,7 +245,7 @@ public class WSSecSignature extends WSSecSignatureBase {
                 break;
 
             case WSConstants.CUSTOM_SYMM_SIGNING :
-                Reference refCust = new Reference(document);
+                Reference refCust = new Reference(getDocument());
                 if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customTokenValueType)) {
                     secRef.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
                     refCust.setValueType(customTokenValueType);
@@ -263,7 +265,7 @@ public class WSSecSignature extends WSSecSignatureBase {
                 break;
 
             case WSConstants.CUSTOM_SYMM_SIGNING_DIRECT :
-                Reference refCustd = new Reference(document);
+                Reference refCustd = new Reference(getDocument());
                 if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customTokenValueType)) {
                     secRef.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
                     refCustd.setValueType(customTokenValueType);
@@ -342,12 +344,11 @@ public class WSSecSignature extends WSSecSignatureBase {
      * creates a Signature and puts it into the Security header. It does so by
      * calling the single functions in order to perform a <i>one shot signature</i>.
      *
-     * @param doc The unsigned SOAP envelope as <code>Document</code>
      * @param cr An instance of the Crypto API to handle keystore and certificates
      * @return A signed SOAP envelope as <code>Document</code>
      * @throws WSSecurityException
      */
-    public Document build(Document doc, Crypto cr)
+    public Document build(Crypto cr)
         throws WSSecurityException {
         doDebug = LOG.isDebugEnabled();
 
@@ -355,9 +356,9 @@ public class WSSecSignature extends WSSecSignatureBase {
             LOG.debug("Beginning signing...");
         }
 
-        prepare(doc, cr);
+        prepare(cr);
         if (getParts().isEmpty()) {
-            getParts().add(WSSecurityUtil.getDefaultEncryptionPart(document));
+            getParts().add(WSSecurityUtil.getDefaultEncryptionPart(getDocument()));
         } else {
             for (WSEncryptionPart part : getParts()) {
                 if (part.getId() == null && "STRTransform".equals(part.getName())) {
@@ -378,7 +379,7 @@ public class WSSecSignature extends WSSecSignatureBase {
             prependBSTElementToHeader();
         }
 
-        return doc;
+        return getDocument();
     }
 
 
@@ -393,7 +394,7 @@ public class WSSecSignature extends WSSecSignatureBase {
     ) throws WSSecurityException {
         return
             addReferencesToSign(
-                document,
+                getDocument(),
                 references,
                 wsDocInfo,
                 signatureFactory,
@@ -421,7 +422,7 @@ public class WSSecSignature extends WSSecSignatureBase {
     private void addBST(X509Certificate[] certs) throws WSSecurityException {
         if (storeBytesInAttachment) {
             bstToken =
-                document.createElementNS(WSS4JConstants.WSSE_NS, "wsse:BinarySecurityToken");
+                getDocument().createElementNS(WSS4JConstants.WSSE_NS, "wsse:BinarySecurityToken");
             bstToken.setAttributeNS(null, "EncodingType", WSS4JConstants.BASE64_ENCODING);
             bstToken.setAttributeNS(WSS4JConstants.WSU_NS, WSS4JConstants.WSU_PREFIX + ":Id", certUri);
 
@@ -440,17 +441,17 @@ public class WSSecSignature extends WSSecSignatureBase {
                 }
             }
 
-            final String attachmentId = getIdAllocator().createId("", document);
-            WSSecurityUtil.storeBytesInAttachment(bstToken, document, attachmentId,
+            final String attachmentId = getIdAllocator().createId("", getDocument());
+            WSSecurityUtil.storeBytesInAttachment(bstToken, getDocument(), attachmentId,
                                                   certBytes, attachmentCallbackHandler);
             wsDocInfo.addTokenElement(bstToken, false);
         } else {
             BinarySecurity binarySecurity = null;
             if (!useSingleCert) {
-                binarySecurity = new PKIPathSecurity(document);
+                binarySecurity = new PKIPathSecurity(getDocument());
                 ((PKIPathSecurity) binarySecurity).setX509Certificates(certs, crypto);
             } else {
-                binarySecurity = new X509Security(document);
+                binarySecurity = new X509Security(getDocument());
                 ((X509Security) binarySecurity).setX509Certificate(certs[0]);
             }
             binarySecurity.setID(certUri);

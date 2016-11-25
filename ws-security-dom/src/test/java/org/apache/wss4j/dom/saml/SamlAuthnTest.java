@@ -170,7 +170,7 @@ public class SamlAuthnTest extends org.junit.Assert {
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion);
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             String outputString =

@@ -75,7 +75,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         LOG.info("Before Signing IS....");
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
@@ -121,7 +121,7 @@ public class CustomActionProcessorTest extends org.junit.Assert {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         LOG.info("Before Signing IS....");
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");

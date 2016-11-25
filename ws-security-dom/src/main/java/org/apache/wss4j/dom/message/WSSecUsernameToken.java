@@ -56,6 +56,10 @@ public class WSSecUsernameToken extends WSSecBase {
     public WSSecUsernameToken(WSSecHeader securityHeader) {
         super(securityHeader);
     }
+    
+    public WSSecUsernameToken(Document doc) {
+        super(doc);
+    }
 
     /**
      * Defines how to construct the password element of the
@@ -160,24 +164,22 @@ public class WSSecUsernameToken extends WSSecBase {
      * <code>prepare()</code> all parameters such as user, password,
      * passwordType etc. must be set. A complete <code>UsernameToken</code> is
      * constructed.
-     *
-     * @param doc The SOAP envelope as W3C document
      */
-    public void prepare(Document doc) {
-        ut = new UsernameToken(precisionInMilliSeconds, doc, wsTimeSource, passwordType);
+    public void prepare() {
+        ut = new UsernameToken(precisionInMilliSeconds, getDocument(), wsTimeSource, passwordType);
         ut.setPasswordsAreEncoded(passwordsAreEncoded);
         ut.setName(user);
         if (useDerivedKey) {
-            saltValue = ut.addSalt(doc, saltValue, useMac);
-            ut.addIteration(doc, iteration);
+            saltValue = ut.addSalt(getDocument(), saltValue, useMac);
+            ut.addIteration(getDocument(), iteration);
         } else {
             ut.setPassword(password);
         }
         if (nonce) {
-            ut.addNonce(doc);
+            ut.addNonce(getDocument());
         }
         if (created) {
-            ut.addCreated(precisionInMilliSeconds, wsTimeSource, doc);
+            ut.addCreated(precisionInMilliSeconds, wsTimeSource, getDocument());
         }
         ut.setID(getIdAllocator().createId("UsernameToken-", ut));
     }
@@ -216,16 +218,15 @@ public class WSSecUsernameToken extends WSSecBase {
      * <code>UsernameToken</code> is constructed and added to the
      * <code>wsse:Security</code> header.
      *
-     * @param doc The SOAP envelope as W3C document
      * @return Document with UsernameToken added
      */
-    public Document build(Document doc) {
+    public Document build() {
         LOG.debug("Begin add username token...");
 
-        prepare(doc);
+        prepare();
         prependToHeader();
 
-        return doc;
+        return getDocument();
     }
 
     /**

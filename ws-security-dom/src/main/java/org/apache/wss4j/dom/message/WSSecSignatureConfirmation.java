@@ -38,6 +38,10 @@ public class WSSecSignatureConfirmation extends WSSecBase {
     public WSSecSignatureConfirmation(WSSecHeader securityHeader) {
         super(securityHeader);
     }
+    
+    public WSSecSignatureConfirmation(Document doc) {
+        super(doc);
+    }
 
     /**
      * Set the Signature value to store in this SignatureConfirmation.
@@ -55,11 +59,9 @@ public class WSSecSignatureConfirmation extends WSSecBase {
      * The method prepares and initializes a WSSec SignatureConfirmation structure after
      * the relevant information was set. Before calling <code>prepare()</code> the
      * filed <code>signatureValue</code> must be set
-     *
-     * @param doc The SOAP envelope as W3C document
      */
-    public void prepare(Document doc) {
-        sc = new SignatureConfirmation(doc, signatureValue);
+    public void prepare() {
+        sc = new SignatureConfirmation(getDocument(), signatureValue);
         sc.setID(getIdAllocator().createId("SC-", sc));
     }
 
@@ -82,18 +84,17 @@ public class WSSecSignatureConfirmation extends WSSecBase {
      * A complete <code>SignatureConfirmation</code> is constructed and added
      * to the <code>wsse:Security</code> header.
      *
-     * @param doc The SOAP envelope as W3C document
      * @param sigVal the Signature value. This will be the content of the "Value" attribute.
      * @return Document with SignatureConfirmation added
      */
-    public Document build(Document doc, byte[] sigVal) {
+    public Document build(byte[] sigVal) {
         LOG.debug("Begin add signature confirmation...");
 
         signatureValue = sigVal;
-        prepare(doc);
+        prepare();
         prependToHeader();
 
-        return doc;
+        return getDocument();
     }
 
     /**

@@ -79,7 +79,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setSignatureAlgorithm(WSConstants.RSA_SHA1);
 
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -115,7 +115,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setSignatureAlgorithm(WSConstants.DSA);
 
-        Document signedDoc = builder.build(doc, dsaCrypto);
+        Document signedDoc = builder.build(dsaCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -154,7 +154,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         builder.setSecretKey(keyData);
         builder.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
 
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -218,7 +218,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         builder.setSignatureAlgorithm(WSConstants.RSA_SHA1);
         builder.setSigCanonicalization(WSConstants.C14N_EXCL_WITH_COMMENTS);
 
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -252,7 +252,7 @@ public class SignatureAlgorithmSuiteTest extends org.junit.Assert {
         builder.setSignatureAlgorithm(WSConstants.RSA_SHA1);
         builder.setDigestAlgo(WSConstants.SHA256);
 
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =

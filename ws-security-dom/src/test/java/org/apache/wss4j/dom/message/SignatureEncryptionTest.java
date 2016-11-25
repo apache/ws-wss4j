@@ -110,7 +110,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         sign.setUserInfo("wss40", "security");
         LOG.info("Before Encryption....");
 
-        Document encryptedDoc = encrypt.build(doc, crypto);
+        Document encryptedDoc = encrypt.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Encryption....");
@@ -119,7 +119,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
 
-        Document encryptedSignedDoc = sign.build(encryptedDoc, crypto);
+        Document encryptedSignedDoc = sign.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -159,7 +159,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
                     "Element");
         encrypt.getParts().add(part);
 
-        Document encryptedDoc = encrypt.build(doc, crypto);
+        Document encryptedDoc = encrypt.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Encryption....");
@@ -175,7 +175,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
                     "Element");
         sign.getParts().add(signPart);
 
-        Document encryptedSignedDoc = sign.build(encryptedDoc, crypto);
+        Document encryptedSignedDoc = sign.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -238,8 +238,8 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         sign.setUserInfo("wss40", "security");
         LOG.info("Before Encryption....");
 
-        Document signedDoc = sign.build(doc, crypto);
-        Document encryptedSignedDoc = encrypt.build(signedDoc, crypto);
+        sign.build(crypto);
+        Document encryptedSignedDoc = encrypt.build(crypto);
         LOG.info("After Encryption....");
         verify(encryptedSignedDoc);
     }
@@ -269,8 +269,8 @@ public class SignatureEncryptionTest extends org.junit.Assert {
                 "");
         encrypt.getParts().add(encP);
 
-        Document signedDoc = sign.build(doc, crypto);
-        Document encryptedSignedDoc = encrypt.build(signedDoc, crypto);
+        sign.build(crypto);
+        Document encryptedSignedDoc = encrypt.build(crypto);
         LOG.info("WSS198");
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -306,8 +306,8 @@ public class SignatureEncryptionTest extends org.junit.Assert {
 
         LOG.info("Before Sign/Encryption....");
 
-        Document signedDoc = sign.build(doc, crypto);
-        Document encryptedSignedDoc = encrypt.build(signedDoc, crypto);
+        sign.build(crypto);
+        Document encryptedSignedDoc = encrypt.build(crypto);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed and encrypted message with IssuerSerial key identifier (both), 3DES:");
             String outputString =
@@ -337,7 +337,7 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         encrKey.setUserInfo("wss40", "security");
         encrKey.setSymmetricEncAlgorithm(WSConstants.AES_192);
-        encrKey.prepare(doc, crypto);
+        encrKey.prepare(crypto);
 
         WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         encrypt.setEncKeyId(encrKey.getId());
@@ -353,8 +353,8 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         sign.setCustomTokenValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
 
-        Document signedDoc = sign.build(doc, crypto);
-        Document encryptedSignedDoc = encrypt.build(signedDoc, crypto);
+        sign.build(crypto);
+        Document encryptedSignedDoc = encrypt.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed and encrypted message with IssuerSerial key identifier (both), 3DES:");
@@ -469,8 +469,8 @@ public class SignatureEncryptionTest extends org.junit.Assert {
         sign.setUserInfo("wss40", "security");
         LOG.info("Before Encryption....");
 
-        Document signedDoc = sign.build(doc, crypto);
-        Document encryptedSignedDoc = encrypt.build(signedDoc, crypto);
+        sign.build(crypto);
+        Document encryptedSignedDoc = encrypt.build(crypto);
         
         LOG.info("After Encryption....");
         verify(encryptedSignedDoc);

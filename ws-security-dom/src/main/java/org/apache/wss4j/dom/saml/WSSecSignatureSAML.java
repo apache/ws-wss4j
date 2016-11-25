@@ -80,6 +80,11 @@ public class WSSecSignatureSAML extends WSSecSignature {
         super(securityHeader);
         doDebug = LOG.isDebugEnabled();
     }
+    
+    public WSSecSignatureSAML(Document doc) {
+        super(doc);
+        doDebug = LOG.isDebugEnabled();
+    }
 
     /**
      * Builds a signed soap envelope with SAML token.
@@ -88,8 +93,6 @@ public class WSSecSignatureSAML extends WSSecSignature {
      * defined parameters for certificate handling the signature elements are
      * constructed and inserted into the <code>wsse:Signature</code>
      *
-     * @param doc
-     *            The unsigned SOAP envelope as <code>Document</code>
      * @param uCrypto
      *            The user's Crypto instance
      * @param samlAssertion
@@ -105,14 +108,14 @@ public class WSSecSignatureSAML extends WSSecSignature {
      * @throws WSSecurityException
      */
     public Document build(
-        Document doc, Crypto uCrypto, SamlAssertionWrapper samlAssertion,
+        Crypto uCrypto, SamlAssertionWrapper samlAssertion,
         Crypto iCrypto, String iKeyName, String iKeyPW
     ) throws WSSecurityException {
 
-        prepare(doc, uCrypto, samlAssertion, iCrypto, iKeyName, iKeyPW);
+        prepare(uCrypto, samlAssertion, iCrypto, iKeyName, iKeyPW);
 
         if (getParts().isEmpty()) {
-            getParts().add(WSSecurityUtil.getDefaultEncryptionPart(doc));
+            getParts().add(WSSecurityUtil.getDefaultEncryptionPart(getDocument()));
         } else {
             for (WSEncryptionPart part : getParts()) {
                 if ("STRTransform".equals(part.getName()) && part.getId() == null) {
@@ -127,7 +130,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         //
         if (secRefID != null) {
             String soapNamespace =
-                WSSecurityUtil.getSOAPNamespace(doc.getDocumentElement());
+                WSSecurityUtil.getSOAPNamespace(getDocument().getDocumentElement());
             WSEncryptionPart encP =
                 new WSEncryptionPart("STRTransform", soapNamespace, "Content");
             encP.setId(secRefID);
@@ -152,7 +155,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
             prependBSTElementToHeader();
         }
 
-        return doc;
+        return getDocument();
     }
 
     /**
@@ -166,8 +169,6 @@ public class WSSecSignatureSAML extends WSSecSignature {
      * This method does not add the Signature element to the security header.
      * See <code>prependSignatureElementToHeader()</code> method.
      *
-     * @param doc
-     *            The SOAP envelope as <code>Document</code>
      * @param uCrypto
      *            The user's Crypto instance
      * @param samlAssertion
@@ -182,7 +183,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
      * @throws WSSecurityException
      */
     public void prepare(
-        Document doc, Crypto uCrypto, SamlAssertionWrapper samlAssertion, Crypto iCrypto,
+        Crypto uCrypto, SamlAssertionWrapper samlAssertion, Crypto iCrypto,
         String iKeyName, String iKeyPW
     ) throws WSSecurityException {
 
@@ -192,11 +193,10 @@ public class WSSecSignatureSAML extends WSSecSignature {
 
         userCrypto = uCrypto;
         issuerCrypto = iCrypto;
-        document = doc;
         issuerKeyName = iKeyName;
         issuerKeyPW = iKeyPW;
 
-        samlToken = samlAssertion.toDOM(doc);
+        samlToken = samlAssertion.toDOM(getDocument());
 
         //
         // Get some information about the SAML token content. This controls how
@@ -216,7 +216,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         // Gather some info about the document to process and store it for
         // retrieval
         //
-        wsDocInfo = new WSDocInfo(doc);
+        wsDocInfo = new WSDocInfo(getDocument());
 
 
         X509Certificate[] certs = null;
@@ -311,7 +311,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         }
 
         keyInfoUri = getIdAllocator().createSecureId("KeyId-", keyInfo);
-        SecurityTokenReference secRef = new SecurityTokenReference(doc);
+        SecurityTokenReference secRef = new SecurityTokenReference(getDocument());
         strUri = getIdAllocator().createSecureId("STRId-", secRef);
         secRef.setID(strUri);
         setSecurityTokenReference(secRef);
@@ -330,12 +330,12 @@ public class WSSecSignatureSAML extends WSSecSignature {
         //
         try {
             if (senderVouches) {
-                secRefSaml = new SecurityTokenReference(doc);
+                secRefSaml = new SecurityTokenReference(getDocument());
                 secRefID = getIdAllocator().createSecureId("STRSAMLId-", secRefSaml);
                 secRefSaml.setID(secRefID);
 
                 if (useDirectReferenceToAssertion) {
-                    Reference ref = new Reference(doc);
+                    Reference ref = new Reference(getDocument());
                     ref.setURI("#" + samlAssertion.getId());
                     if (samlAssertion.getSaml1() != null) {
                         ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
@@ -345,7 +345,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                     }
                     secRefSaml.setReference(ref);
                 } else {
-                    Element keyId = doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
+                    Element keyId = getDocument().createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
                     String valueType = null;
                     if (samlAssertion.getSaml1() != null) {
                         valueType = WSConstants.WSS_SAML_KI_VALUE_TYPE;
@@ -357,7 +357,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                     keyId.setAttributeNS(
                         null, "ValueType", valueType
                     );
-                    keyId.appendChild(doc.createTextNode(samlAssertion.getId()));
+                    keyId.appendChild(getDocument().createTextNode(samlAssertion.getId()));
                     Element elem = secRefSaml.getElement();
                     elem.appendChild(keyId);
                 }
@@ -370,22 +370,21 @@ public class WSSecSignatureSAML extends WSSecSignature {
         }
 
         X509Certificate cert = certs != null ? certs[0] : null;
-        configureKeyInfo(doc, secRef, cert, iCrypto != null ? iCrypto : uCrypto, 
-            samlAssertion);
+        configureKeyInfo(secRef, cert, iCrypto != null ? iCrypto : uCrypto, samlAssertion);
 
         wsDocInfo.addTokenElement(samlToken, false);
     }
     
     private void configureKeyInfo(
-        Document doc, SecurityTokenReference secRef, X509Certificate cert,
+        SecurityTokenReference secRef, X509Certificate cert,
         Crypto crypto, SamlAssertionWrapper samlAssertion
     ) throws WSSecurityException {
         if (senderVouches) {
             switch (keyIdentifierType) {
             case WSConstants.BST_DIRECT_REFERENCE:
-                Reference ref = new Reference(doc);
+                Reference ref = new Reference(getDocument());
                 ref.setURI("#" + certUri);
-                BinarySecurity binarySecurity = new X509Security(doc);
+                BinarySecurity binarySecurity = new X509Security(getDocument());
                 ((X509Security) binarySecurity).setX509Certificate(cert);
                 binarySecurity.setID(certUri);
                 bstToken = binarySecurity.getElement();
@@ -410,8 +409,8 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 final String issuer = cert.getIssuerDN().getName();
                 final java.math.BigInteger serialNumber = cert.getSerialNumber();
                 final DOMX509IssuerSerial domIssuerSerial =
-                        new DOMX509IssuerSerial(document, issuer, serialNumber);
-                final DOMX509Data domX509Data = new DOMX509Data(document, domIssuerSerial);
+                        new DOMX509IssuerSerial(getDocument(), issuer, serialNumber);
+                final DOMX509Data domX509Data = new DOMX509Data(getDocument(), domIssuerSerial);
                 secRef.setUnknownElement(domX509Data.getElement());
                 break;
 
@@ -421,7 +420,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 );
             }
         } else if (useDirectReferenceToAssertion) {
-            Reference ref = new Reference(doc);
+            Reference ref = new Reference(getDocument());
             ref.setURI("#" + samlAssertion.getId());
             if (samlAssertion.getSaml1() != null) {
                 ref.setValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
@@ -431,7 +430,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
             }
             secRef.setReference(ref);
         } else {
-            Element keyId = doc.createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
+            Element keyId = getDocument().createElementNS(WSConstants.WSSE_NS, "wsse:KeyIdentifier");
             String valueType = null;
             if (samlAssertion.getSaml1() != null) {
                 valueType = WSConstants.WSS_SAML_KI_VALUE_TYPE;
@@ -443,7 +442,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
             keyId.setAttributeNS(
                 null, "ValueType", valueType
             );
-            keyId.appendChild(doc.createTextNode(samlAssertion.getId()));
+            keyId.appendChild(getDocument().createTextNode(samlAssertion.getId()));
             Element elem = secRef.getElement();
             elem.appendChild(keyId);
         }

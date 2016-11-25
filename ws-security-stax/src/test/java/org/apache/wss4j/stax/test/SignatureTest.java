@@ -1169,7 +1169,7 @@ public class SignatureTest extends AbstractTestBase {
             sign.setSecretKey(key.getEncoded());
             sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
 
-            Document securedDocument = sign.build(doc, null);
+            Document securedDocument = sign.build(null);
 
             //some test that we can really sure we get what we want from WSS4J
             XPathExpression xPathExpression =

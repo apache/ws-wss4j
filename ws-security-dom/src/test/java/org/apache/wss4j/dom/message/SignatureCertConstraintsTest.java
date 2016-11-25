@@ -73,7 +73,7 @@ public class SignatureCertConstraintsTest extends org.junit.Assert {
         builder.setUserInfo("wss40", "security");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with BST key identifier:");
@@ -109,7 +109,7 @@ public class SignatureCertConstraintsTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setUseSingleCertificate(false);
 
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with BST key identifier:");

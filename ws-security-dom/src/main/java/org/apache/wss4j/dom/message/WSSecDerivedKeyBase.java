@@ -49,8 +49,6 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSecDerivedKeyBase.class);
 
-    protected Document document;
-
     /**
      * DerivedKeyToken of this builder
      */
@@ -106,6 +104,11 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
 
     public WSSecDerivedKeyBase(WSSecHeader securityHeader) {
         super(securityHeader);
+        setKeyIdentifierType(0);
+    }
+    
+    public WSSecDerivedKeyBase(Document doc) {
+        super(doc);
         setKeyIdentifierType(0);
     }
 
@@ -187,12 +190,9 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
      * This method does not add any element to the security header. This must be
      * done explicitly.
      *
-     * @param doc The unsigned SOAP envelope as <code>Document</code>
      * @throws WSSecurityException
      */
-    public void prepare(Document doc) throws WSSecurityException {
-
-        document = doc;
+    public void prepare() throws WSSecurityException {
 
         // Create the derived keys
         // At this point figure out the key length according to the symencAlgo
@@ -218,7 +218,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
         derivedKeyBytes = algo.createKey(ephemeralKey, seed, offset, length);
 
         // Add the DKTs
-        dkt = new DerivedKeyToken(wscVersion, document);
+        dkt = new DerivedKeyToken(wscVersion, getDocument());
         dktId = getIdAllocator().createId("DK-", dkt);
 
         dkt.setOffset(offset);
@@ -227,7 +227,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
         dkt.setID(dktId);
 
         if (strElem == null) {
-            SecurityTokenReference secRef = new SecurityTokenReference(document);
+            SecurityTokenReference secRef = new SecurityTokenReference(getDocument());
             String strUri = getIdAllocator().createSecureId("STR-", secRef);
             secRef.setID(strUri);
 
@@ -258,7 +258,7 @@ public abstract class WSSecDerivedKeyBase extends WSSecSignatureBase {
                 }
                 break;
             default:
-                Reference ref = new Reference(document);
+                Reference ref = new Reference(getDocument());
 
                 if (tokenIdDirectId) {
                     ref.setURI(tokenIdentifier);

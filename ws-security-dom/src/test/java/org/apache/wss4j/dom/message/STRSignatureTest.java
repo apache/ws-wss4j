@@ -93,7 +93,7 @@ public class STRSignatureTest extends org.junit.Assert {
 
         LOG.info("Before Signing STR DirectReference....");
 
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with STR DirectReference key identifier:");
@@ -139,13 +139,13 @@ public class STRSignatureTest extends org.junit.Assert {
 
         WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(600);
-        timestamp.build(doc);
+        timestamp.build();
         builder.getParts().add(new WSEncryptionPart(timestamp.getId()));
 
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         LOG.info("Before Signing STR DirectReference....");
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with STR DirectReference key identifier:");
@@ -198,7 +198,7 @@ public class STRSignatureTest extends org.junit.Assert {
 
         LOG.info("Before Signing STR IS....");
 
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with STR IssuerSerial key identifier:");
@@ -250,7 +250,7 @@ public class STRSignatureTest extends org.junit.Assert {
 
         LOG.info("Before Signing STR SKI....");
 
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with STR SKI key identifier:");

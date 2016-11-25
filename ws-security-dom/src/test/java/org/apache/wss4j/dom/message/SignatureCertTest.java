@@ -101,7 +101,7 @@ public class SignatureCertTest extends org.junit.Assert {
         sign.setUserInfo("wss40", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -139,7 +139,7 @@ public class SignatureCertTest extends org.junit.Assert {
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         sign.setUseSingleCertificate(false);
 
-        Document signedDoc = sign.build(doc, clientCrypto);
+        Document signedDoc = sign.build(clientCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -177,7 +177,7 @@ public class SignatureCertTest extends org.junit.Assert {
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         sign.setUseSingleCertificate(false);
 
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -215,7 +215,7 @@ public class SignatureCertTest extends org.junit.Assert {
         sign.setUserInfo("wss40", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -247,7 +247,7 @@ public class SignatureCertTest extends org.junit.Assert {
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document signedDoc =
-            sign.build(doc, CryptoFactory.getInstance("wss40badca.properties"));
+            sign.build(CryptoFactory.getInstance("wss40badca.properties"));
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -325,7 +325,7 @@ public class SignatureCertTest extends org.junit.Assert {
         sign.setUserInfo("wss40exp", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
-        Document signedDoc = sign.build(doc, clientCrypto);
+        Document signedDoc = sign.build(clientCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -364,7 +364,7 @@ public class SignatureCertTest extends org.junit.Assert {
         sign.setUserInfo("wss40exp", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
-        Document signedDoc = sign.build(doc, clientCrypto);
+        Document signedDoc = sign.build(clientCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =

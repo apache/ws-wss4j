@@ -894,7 +894,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             
             WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-            wsSign.prepare(doc, samlAssertion);
+            wsSign.prepare(samlAssertion);
 
             // Get the Element + add it to the security header as an EncryptedAssertion
             Element assertionElement = wsSign.getElement();

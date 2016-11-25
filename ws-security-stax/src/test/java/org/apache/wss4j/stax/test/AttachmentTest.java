@@ -656,7 +656,7 @@ public class AttachmentTest extends AbstractTestBase {
 
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
-        encrypt.prepare(doc, CryptoFactory.getInstance("transmitter-crypto.properties"));
+        encrypt.prepare(CryptoFactory.getInstance("transmitter-crypto.properties"));
         Element refs = encrypt.encrypt();
         encrypt.addAttachmentEncryptedDataElements();
         encrypt.addExternalRefElement(refs);

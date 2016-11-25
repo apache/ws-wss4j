@@ -94,7 +94,7 @@ public class SamlTokenDerivedTest extends AbstractTestBase {
             // Create a Derived Key object for signature
             //
             WSSecDKSign sigBuilder = createDKSign(doc, secRefSaml, secHeader);
-            Document securedDocument = sigBuilder.build(doc);
+            Document securedDocument = sigBuilder.build();
 
             //todo remove the following lines when the header ordering no longer does matter...
             /*Node firstChild = secHeader.getSecurityHeader().getFirstChild();

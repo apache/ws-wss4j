@@ -138,13 +138,13 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
             sctBuilder.setWscVersion(version);
-            sctBuilder.prepare(doc, crypto);
+            sctBuilder.prepare(crypto);
 
             //EncryptedKey
             WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
             encrKeyBuilder.setUserInfo("receiver");
             encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-            encrKeyBuilder.prepare(doc, crypto);
+            encrKeyBuilder.prepare(crypto);
 
             //Key information from the EncryptedKey
             byte[] ek = encrKeyBuilder.getEphemeralKey();
@@ -155,7 +155,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             encrBuilder.setWscVersion(version);
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
             encrBuilder.setExternalKey(ek, tokenIdentifier);
-            encrBuilder.build(doc);
+            encrBuilder.build();
 
             encrKeyBuilder.prependToHeader();
             encrKeyBuilder.prependBSTElementToHeader();
@@ -339,13 +339,13 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.setWscVersion(version);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
-            sctBuilder.prepare(doc, crypto);
+            sctBuilder.prepare(crypto);
 
             //EncryptedKey
             WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
             encrKeyBuilder.setUserInfo("receiver");
             encrKeyBuilder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-            encrKeyBuilder.prepare(doc, crypto);
+            encrKeyBuilder.prepare(crypto);
 
             //Key information from the EncryptedKey
             byte[] ek = encrKeyBuilder.getEphemeralKey();
@@ -356,7 +356,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             encrBuilder.setWscVersion(version);
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             encrBuilder.setExternalKey(ek, tokenIdentifier);
-            encrBuilder.build(doc);
+            encrBuilder.build();
 
             encrKeyBuilder.prependToHeader();
             encrKeyBuilder.prependBSTElementToHeader();
@@ -469,7 +469,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             encrKeyBuilder.setUserInfo("receiver");
             encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
-            encrKeyBuilder.prepare(doc, crypto);
+            encrKeyBuilder.prepare(crypto);
 
             //Key information from the EncryptedKey
             byte[] ek = encrKeyBuilder.getEphemeralKey();
@@ -480,7 +480,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             sigBuilder.setWscVersion(version);
             sigBuilder.setExternalKey(ek, tokenIdentifier);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-            sigBuilder.build(doc);
+            sigBuilder.build();
 
             encrKeyBuilder.prependToHeader();
             encrKeyBuilder.prependBSTElementToHeader();
@@ -612,7 +612,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             java.security.Key key = crypto.getPrivateKey("transmitter", "default");
             sigBuilder.setExternalKey(key.getEncoded(), secToken.getElement());
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-            sigBuilder.build(doc);
+            sigBuilder.build();
 
             sigBuilder.prependDKElementToHeader();
 
@@ -743,7 +743,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             java.security.Key key = crypto.getPrivateKey("transmitter", "default");
             sigBuilder.setExternalKey(key.getEncoded(), secToken.getElement());
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-            sigBuilder.build(doc);
+            sigBuilder.build();
 
             sigBuilder.prependDKElementToHeader();
 
@@ -867,7 +867,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
             encrKeyBuilder.setUserInfo("receiver");
             encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-            encrKeyBuilder.prepare(doc, crypto);
+            encrKeyBuilder.prepare(crypto);
 
             //Key information from the EncryptedKey
             byte[] ek = encrKeyBuilder.getEphemeralKey();
@@ -878,14 +878,14 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             sigBuilder.setWscVersion(version);
             sigBuilder.setExternalKey(ek, tokenIdentifier);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-            Document signedDoc = sigBuilder.build(doc);
+            sigBuilder.build();
 
             //Derived key signature
             WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
             encrBuilder.setWscVersion(version);
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             encrBuilder.setExternalKey(ek, tokenIdentifier);
-            encrBuilder.build(signedDoc);
+            encrBuilder.build();
 
             encrKeyBuilder.prependToHeader();
             encrKeyBuilder.prependBSTElementToHeader();
@@ -990,7 +990,7 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
             encrKeyBuilder.setUserInfo("receiver");
             encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-            encrKeyBuilder.prepare(doc, crypto);
+            encrKeyBuilder.prepare(crypto);
 
             //Key information from the EncryptedKey
             byte[] ek = encrKeyBuilder.getEphemeralKey();
@@ -1001,14 +1001,14 @@ public class DerivedKeyTokenTest extends AbstractTestBase {
             encrBuilder.setWscVersion(version);
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             encrBuilder.setExternalKey(ek, tokenIdentifier);
-            encrBuilder.build(doc);
+            encrBuilder.build();
 
             //Derived key encryption
             WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
             sigBuilder.setWscVersion(version);
             sigBuilder.setExternalKey(ek, tokenIdentifier);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-            sigBuilder.build(doc);
+            sigBuilder.build();
 
             encrKeyBuilder.prependToHeader();
             encrKeyBuilder.prependBSTElementToHeader();

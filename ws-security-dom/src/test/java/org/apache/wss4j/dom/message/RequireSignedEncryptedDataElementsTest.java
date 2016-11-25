@@ -297,7 +297,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         LOG.info("Before Encryption....");
 
-        Document encryptedDoc = encrypt.build(doc, crypto);
+        Document encryptedDoc = encrypt.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Encryption....");
@@ -306,7 +306,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
 
-        Document encryptedSignedDoc = sign.build(encryptedDoc, crypto);
+        Document encryptedSignedDoc = sign.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -328,7 +328,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         LOG.info("Before Encryption....");
 
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -337,7 +337,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
 
-        Document encryptedDoc = encrypt.build(signedDoc, crypto);
+        Document encryptedDoc = encrypt.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Encryption....");

@@ -342,7 +342,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion);
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -383,7 +383,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion);
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -424,7 +424,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion);
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -466,7 +466,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion);
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -507,7 +507,7 @@ public class SamlTokenTest extends org.junit.Assert {
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion);
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -549,7 +549,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion);
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -610,7 +610,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion);
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Attr Assertion (sender vouches):");
@@ -690,7 +690,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion);
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -730,7 +730,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        wsSign.prepare(doc, samlAssertion);
+        wsSign.prepare(samlAssertion);
 
         // Get the Element + add it to the security header as an EncryptedAssertion
         Element assertionElement = wsSign.getElement();
@@ -794,7 +794,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        wsSign.prepare(doc, samlAssertion);
+        wsSign.prepare(samlAssertion);
 
         // Get the Element + add it to the security header as an EncryptedAssertion
         Element assertionElement = wsSign.getElement();
@@ -907,7 +907,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        wsSign.prepare(doc, samlAssertion);
+        wsSign.prepare(samlAssertion);
 
         // Get the Element + add it to the security header as an EncryptedAssertion
         Element assertionElement = wsSign.getElement();
@@ -1031,7 +1031,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion);
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         WSSConfig config = WSSConfig.getNewInstance();
         SamlAssertionValidator assertionValidator = new SamlAssertionValidator();
@@ -1059,7 +1059,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         wsSign = new WSSecSAMLToken(secHeader);
 
-        unsignedDoc = wsSign.build(doc, samlAssertion);
+        unsignedDoc = wsSign.build(samlAssertion);
         try {
             newEngine.processSecurityHeader(unsignedDoc, null, null, null);
             fail("Failure expected on an incorrect subject confirmation method");
@@ -1085,7 +1085,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion);
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         WSSecurityEngine newEngine = new WSSecurityEngine();
         try {
@@ -1127,7 +1127,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion);
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         WSSecurityEngine newEngine = new WSSecurityEngine();
         try {
@@ -1181,7 +1181,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion);
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -1222,7 +1222,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion);
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         String outputString = XMLUtils.prettyDocumentToString(unsignedDoc);
         // assertTrue(outputString.contains("j\u00f6e") && outputString.contains("j\u00f6an"));
@@ -1262,7 +1262,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion);
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -1352,7 +1352,7 @@ public class SamlTokenTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion);
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             String outputString =

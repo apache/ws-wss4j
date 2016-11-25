@@ -88,7 +88,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document signedDoc = wsSign.build(doc, samlAssertion);
+        Document signedDoc = wsSign.build(samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authn Assertion (holder-of-key):");
@@ -129,7 +129,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document signedDoc = wsSign.build(doc, samlAssertion);
+        Document signedDoc = wsSign.build(samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Attr Assertion (holder-of-key):");
@@ -180,7 +180,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion);
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Authn Assertion (holder-of-key):");
@@ -220,7 +220,7 @@ public class SamlTokenHOKTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion);
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 2 Attr Assertion (holder-of-key):");

@@ -389,7 +389,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         SecretKey secretKey = bst.getSecretKey();
         sign.setSecretKey(secretKey.getEncoded());
 
-        Document signedDoc = sign.build(doc, null);
+        Document signedDoc = sign.build(null);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -465,7 +465,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
         sign.setCustomTokenId(Base64.getMimeEncoder().encodeToString(digestBytes));
 
-        Document signedDoc = sign.build(doc, null);
+        Document signedDoc = sign.build(null);
 
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
@@ -540,7 +540,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         builder.setCustomReferenceValue(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
         builder.setEncKeyId(bst.getID());
 
-        Document encryptedDoc = builder.build(doc, null);
+        Document encryptedDoc = builder.build(null);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -611,7 +611,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         builder.setCustomReferenceValue(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
         builder.setEncKeyId(bst.getID());
 
-        Document encryptedDoc = builder.build(doc, null);
+        Document encryptedDoc = builder.build(null);
 
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
@@ -686,7 +686,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
         byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
         builder.setEncKeyId(Base64.getMimeEncoder().encodeToString(digestBytes));
 
-        Document encryptedDoc = builder.build(doc, null);
+        Document encryptedDoc = builder.build(null);
 
         WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
@@ -839,7 +839,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             SecretKey secretKey = bst.getSecretKey();
             sign.setSecretKey(secretKey.getEncoded());
 
-            sign.build(doc, null);
+            sign.build(null);
             WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
@@ -935,7 +935,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
             sign.setCustomTokenId(Base64.getMimeEncoder().encodeToString(digestBytes));
 
-            sign.build(doc, null);
+            sign.build(null);
 
             WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
@@ -1103,7 +1103,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             builder.setEncryptSymmKey(false);
             builder.setCustomReferenceValue(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
             builder.setEncKeyId(bst.getID());
-            builder.build(doc, null);
+            builder.build(null);
             WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
             javax.xml.transform.Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
@@ -1197,7 +1197,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             byte[] digestBytes = KeyUtils.generateDigest(bst.getToken());
             builder.setEncKeyId(Base64.getMimeEncoder().encodeToString(digestBytes));
 
-            builder.build(doc, null);
+            builder.build(null);
 
             WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 

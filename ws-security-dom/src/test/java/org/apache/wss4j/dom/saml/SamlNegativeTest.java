@@ -125,7 +125,7 @@ public class SamlNegativeTest extends org.junit.Assert {
 
         Document signedDoc =
             wsSign.build(
-                doc, null, samlAssertion, userCrypto, "wss40", "security"
+                null, samlAssertion, userCrypto, "wss40", "security"
             );
 
         //
@@ -176,7 +176,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document signedDoc = wsSign.build(doc, samlAssertion);
+        Document signedDoc = wsSign.build(samlAssertion);
 
         //
         // Modify the assertion
@@ -228,7 +228,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document signedDoc = wsSign.build(doc, samlAssertion);
+        Document signedDoc = wsSign.build(samlAssertion);
         //
         // Modify the assertion
         //
@@ -274,7 +274,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         secHeader.insertSecurityHeader();
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
-        Document signedDoc = wsSign.build(doc, samlAssertion);
+        Document signedDoc = wsSign.build(samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -317,7 +317,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         secHeader.insertSecurityHeader();
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
-        Document signedDoc = wsSign.build(doc, samlAssertion);
+        Document signedDoc = wsSign.build(samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -365,7 +365,7 @@ public class SamlNegativeTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document signedDoc =
-            wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
+            wsSign.build(userCrypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);

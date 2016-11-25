@@ -73,7 +73,7 @@ public class SKISignatureTest extends org.junit.Assert {
 
         LOG.info("Before SigningDSA_SKIDirect....");
 
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with DSA_SKI key identifier:");
@@ -116,7 +116,7 @@ public class SKISignatureTest extends org.junit.Assert {
 
         LOG.info("Before SigningDSA_Autodetect....");
 
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with DSA_Autodetect:");
@@ -150,7 +150,7 @@ public class SKISignatureTest extends org.junit.Assert {
 
         LOG.info("Before SigningRSA_Autodetect....");
 
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with RSA Autodetect:");

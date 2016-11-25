@@ -121,7 +121,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document signedDoc =
-            wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
+            wsSign.build(userCrypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -193,7 +193,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         wsSign.setSecretKey(ephemeralKey);
 
         Document signedDoc =
-            wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
+            wsSign.build(userCrypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -255,7 +255,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document signedDoc =
-            wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
+            wsSign.build(userCrypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -318,7 +318,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         wsSign.setSecretKey(ephemeralKey);
 
         Document signedDoc =
-            wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
+            wsSign.build(userCrypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -382,7 +382,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document signedDoc =
-            wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
+            wsSign.build(userCrypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -443,7 +443,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document signedDoc =
-            wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
+            wsSign.build(userCrypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -504,7 +504,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document signedDoc =
-            wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
+            wsSign.build(userCrypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -570,7 +570,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document signedDoc =
-            wsSign.build(doc, crypto, samlAssertion, null, null, null);
+            wsSign.build(crypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -646,7 +646,7 @@ public class SignedSamlTokenHOKTest extends org.junit.Assert {
         wsSign.setSecretKey(ephemeralKey);
 
         Document signedDoc =
-            wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
+            wsSign.build(userCrypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);

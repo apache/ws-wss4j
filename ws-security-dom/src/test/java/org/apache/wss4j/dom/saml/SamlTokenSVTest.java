@@ -94,7 +94,7 @@ public class SamlTokenSVTest extends org.junit.Assert {
 
         Document signedDoc =
             wsSign.build(
-                doc, null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
+                null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
                 "security"
             );
 
@@ -154,7 +154,7 @@ public class SamlTokenSVTest extends org.junit.Assert {
 
         Document signedDoc =
             wsSign.build(
-                doc, null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
+                null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
                 "security"
             );
 
@@ -214,7 +214,7 @@ public class SamlTokenSVTest extends org.junit.Assert {
 
         Document signedDoc =
             wsSign.build(
-                doc, null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
+                null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
                 "security"
             );
 
@@ -274,7 +274,7 @@ public class SamlTokenSVTest extends org.junit.Assert {
 
         Document signedDoc =
             wsSign.build(
-                doc, null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
+                null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
                 "security"
             );
 
@@ -336,7 +336,7 @@ public class SamlTokenSVTest extends org.junit.Assert {
 
         Document signedDoc =
             wsSign.build(
-                doc, null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
+                null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
                 "security"
             );
         //

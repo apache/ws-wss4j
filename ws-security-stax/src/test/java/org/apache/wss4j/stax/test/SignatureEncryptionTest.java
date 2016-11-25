@@ -398,12 +398,12 @@ public class SignatureEncryptionTest extends AbstractTestBase {
 
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
 
-            sign.build(doc, crypto);
+            sign.build( crypto);
 
             WSSecEncrypt builder = new WSSecEncrypt(secHeader);
             builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
             builder.setUserInfo("receiver");
-            builder.prepare(doc, crypto);
+            builder.prepare(crypto);
 
             WSEncryptionPart bst = new WSEncryptionPart("BinarySecurityToken", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Element");
             WSEncryptionPart def = new WSEncryptionPart("definitions", "http://schemas.xmlsoap.org/wsdl/", "Element");

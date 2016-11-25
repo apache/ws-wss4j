@@ -104,7 +104,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         sign.setSecretKey(keyData);
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
 
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
 
         byte[] encodedBytes = KeyUtils.generateDigest(keyData);
         String identifier = Base64.getMimeEncoder().encodeToString(encodedBytes);
@@ -136,7 +136,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         encrKey.setUserInfo("wss40", "security");
         encrKey.setSymmetricEncAlgorithm(WSConstants.AES_192);
-        encrKey.prepare(doc, crypto);
+        encrKey.prepare(crypto);
 
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
@@ -145,7 +145,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
         sign.setCustomTokenValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
 
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
         encrKey.prependToHeader();
 
         if (LOG.isDebugEnabled()) {
@@ -177,7 +177,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         encrKey.setUserInfo("wss40", "security");
         encrKey.setSymmetricEncAlgorithm(WSConstants.AES_192);
-        encrKey.prepare(doc, crypto);
+        encrKey.prepare(crypto);
 
         WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         encrypt.setEncKeyId(encrKey.getId());
@@ -193,8 +193,8 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         sign.setSecretKey(encrKey.getEphemeralKey());
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
 
-        Document signedDoc = sign.build(doc, crypto);
-        Document encryptedSignedDoc = encrypt.build(signedDoc, crypto);
+        sign.build(crypto);
+        Document encryptedSignedDoc = encrypt.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed and encrypted message with IssuerSerial key identifier (both), 3DES:");

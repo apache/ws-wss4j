@@ -30,7 +30,6 @@ import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.WSSecSignatureConfirmation;
-import org.w3c.dom.Document;
 
 import java.util.List;
 
@@ -39,8 +38,7 @@ public class SignatureConfirmationAction implements Action {
         org.slf4j.LoggerFactory.getLogger(SignatureConfirmationAction.class);
 
     @SuppressWarnings("unchecked")
-    public void execute(WSHandler handler, SecurityActionToken actionToken,
-                        Document doc, RequestData reqData)
+    public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
             throws WSSecurityException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Perform Signature confirmation");
@@ -81,7 +79,7 @@ public class SignatureConfirmationAction implements Action {
                         || WSConstants.ST_SIGNED == resultAction.intValue()
                         || WSConstants.UT_SIGN == resultAction.intValue())) {
                     byte[] sigVal = (byte[]) result.get(WSSecurityEngineResult.TAG_SIGNATURE_VALUE);
-                    wsc.build(doc, sigVal);
+                    wsc.build(sigVal);
                     signatureParts.add(new WSEncryptionPart(wsc.getId()));
                     signatureAdded = true;
                 }
@@ -89,7 +87,7 @@ public class SignatureConfirmationAction implements Action {
         }
 
         if (!signatureAdded) {
-            wsc.build(doc, null);
+            wsc.build(null);
             signatureParts.add(new WSEncryptionPart(wsc.getId()));
         }
         handler.setProperty(

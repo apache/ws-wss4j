@@ -91,7 +91,7 @@ public class SignatureTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         LOG.info("Before Signing IS....");
 
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
@@ -123,7 +123,7 @@ public class SignatureTest extends org.junit.Assert {
         builder.setIncludeSignatureToken(true);
         LOG.info("Before Signing IS....");
         
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
@@ -159,8 +159,8 @@ public class SignatureTest extends org.junit.Assert {
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
-        Document signedDoc = builder.build(doc, crypto);
-        Document signedDoc1 = builder.build(signedDoc, crypto);
+        builder.build(crypto);
+        Document signedDoc1 = builder.build(crypto);
         verify(signedDoc1);
     }
 
@@ -179,7 +179,7 @@ public class SignatureTest extends org.junit.Assert {
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         LOG.info("Before Signing....");
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -207,7 +207,7 @@ public class SignatureTest extends org.junit.Assert {
         builder.setSigCanonicalization(WSConstants.C14N_OMIT_COMMENTS);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         LOG.info("Before Signing....");
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -249,7 +249,7 @@ public class SignatureTest extends org.junit.Assert {
         builder.setAddInclusivePrefixes(true);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         LOG.info("Before Signing....");
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -277,7 +277,7 @@ public class SignatureTest extends org.junit.Assert {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         LOG.info("Before Signing....");
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -316,7 +316,7 @@ public class SignatureTest extends org.junit.Assert {
         LOG.info("Before Signing....");
 
         Crypto pkiCrypto = CryptoFactory.getInstance("wss40.properties");
-        Document signedDoc = builder.build(doc, pkiCrypto);
+        Document signedDoc = builder.build(pkiCrypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After PKI Signing....");
@@ -345,7 +345,7 @@ public class SignatureTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
         LOG.info("Before Signing....");
         
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -385,7 +385,7 @@ public class SignatureTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
         LOG.info("Before Signing ThumbprintSHA1....");
 
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with ThumbprintSHA1 key identifier:");
@@ -418,7 +418,7 @@ public class SignatureTest extends org.junit.Assert {
         builder.setIncludeSignatureToken(true);
         LOG.info("Before Signing ThumbprintSHA1....");
 
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with ThumbprintSHA1 key identifier:");
@@ -456,8 +456,8 @@ public class SignatureTest extends org.junit.Assert {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
 
-        Document signedDoc = builder.build(doc, crypto);
-        Document signedDoc1 = builder.build(signedDoc, crypto);
+        builder.build(crypto);
+        Document signedDoc1 = builder.build(crypto);
         verify(signedDoc1);
     }
 
@@ -481,7 +481,7 @@ public class SignatureTest extends org.junit.Assert {
 
         WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(300);
-        Document createdDoc = timestamp.build(doc);
+        timestamp.build();
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -490,7 +490,7 @@ public class SignatureTest extends org.junit.Assert {
                 "");
         builder.getParts().add(encP);
 
-        Document signedDoc = builder.build(createdDoc, crypto);
+        Document signedDoc = builder.build(crypto);
         Element secHeaderElement = secHeader.getSecurityHeaderElement();
         Node timestampNode =
             secHeaderElement.getElementsByTagNameNS(WSConstants.WSU_NS, "Timestamp").item(0);
@@ -527,7 +527,7 @@ public class SignatureTest extends org.junit.Assert {
         builder.setDigestAlgo("http://www.w3.org/2001/04/xmlenc#sha256");
         LOG.info("Before Signing IS....");
 
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
@@ -601,7 +601,7 @@ public class SignatureTest extends org.junit.Assert {
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         LOG.info("Before Signing....");
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         // Add a comment node as the first node element
         Node firstChild = signedDoc.getFirstChild();
@@ -632,7 +632,7 @@ public class SignatureTest extends org.junit.Assert {
 
         WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(300);
-        Document createdDoc = timestamp.build(doc);
+        timestamp.build();
 
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -644,7 +644,7 @@ public class SignatureTest extends org.junit.Assert {
                 "");
         builder.getParts().add(encP);
 
-        builder.prepare(createdDoc, crypto);
+        builder.prepare(crypto);
 
         List<javax.xml.crypto.dsig.Reference> referenceList =
             builder.addReferencesToSign(builder.getParts());
@@ -679,7 +679,7 @@ public class SignatureTest extends org.junit.Assert {
 
         Node textNode = doc.createTextNode("This is a text node");
         secHeaderElement.appendChild(textNode);
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with text node:");
@@ -711,7 +711,7 @@ public class SignatureTest extends org.junit.Assert {
         secRef.setReference(ref);
         builder.setSecurityTokenReference(secRef);
 
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -738,7 +738,7 @@ public class SignatureTest extends org.junit.Assert {
         builder.setUserInfo(passwordCrypto.getDefaultX509Identifier(), null);
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         LOG.info("Before Signing IS....");
-        Document signedDoc = builder.build(doc, passwordCrypto);
+        Document signedDoc = builder.build(passwordCrypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message with IssuerSerial key identifier:");
@@ -925,7 +925,7 @@ public class SignatureTest extends org.junit.Assert {
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         LOG.info("Before Signing....");
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         // Add a comment node
         Element body = WSSecurityUtil.findBodyElement(signedDoc);

@@ -30,12 +30,10 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.WSSecSAMLToken;
-import org.w3c.dom.Document;
 
 public class SAMLTokenUnsignedAction implements Action {
 
-    public void execute(WSHandler handler, SecurityActionToken actionToken,
-                        Document doc, RequestData reqData)
+    public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
             throws WSSecurityException {
         WSSecSAMLToken builder = new WSSecSAMLToken(reqData.getSecHeader());
         builder.setIdAllocator(reqData.getWssConfig().getIdAllocator());
@@ -68,6 +66,6 @@ public class SAMLTokenUnsignedAction implements Action {
         }
 
         // add the SAMLAssertion Token to the SOAP Envelope
-        builder.build(doc, samlAssertion);
+        builder.build(samlAssertion);
     }
 }

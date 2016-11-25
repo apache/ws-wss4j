@@ -70,7 +70,7 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("wss40", "security");
         builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -114,7 +114,7 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         builder.setUserInfo("wss86", "security");
         builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
         Document signedDoc =
-            builder.build(doc, CryptoFactory.getInstance("wss86.properties"));
+            builder.build(CryptoFactory.getInstance("wss86.properties"));
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -149,7 +149,7 @@ public class SignatureKeyValueTest extends org.junit.Assert {
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("wss40DSA", "security");
         builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);

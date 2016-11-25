@@ -376,7 +376,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             builder.setCustomEKTokenId(samlAssertion.getId());
 
             Crypto userCrypto = CryptoFactory.getInstance("receiver-crypto.properties");
-            builder.prepare(doc, userCrypto);
+            builder.prepare(userCrypto);
 
             List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
             WSEncryptionPart encP =
@@ -461,7 +461,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
              builder.setCustomEKTokenId(samlAssertion.getId());
 
              Crypto userCrypto = CryptoFactory.getInstance("receiver-crypto.properties");
-             builder.prepare(doc, userCrypto);
+             builder.prepare(userCrypto);
 
              List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
              WSEncryptionPart encP =
@@ -814,7 +814,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
             Crypto userCrypto = CryptoFactory.getInstance("transmitter-crypto.properties");
-            Document securedDocument = wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
+            Document securedDocument = wsSign.build(userCrypto, samlAssertion, null, null, null);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());

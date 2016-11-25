@@ -34,7 +34,6 @@ public class CustomAction implements Action {
     execute(
         WSHandler handler,
         SecurityActionToken action,
-        org.w3c.dom.Document doc,
         RequestData reqData
     ) throws WSSecurityException {
         //

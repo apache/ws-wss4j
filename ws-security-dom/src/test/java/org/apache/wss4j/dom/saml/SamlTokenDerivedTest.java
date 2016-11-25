@@ -106,7 +106,7 @@ public class SamlTokenDerivedTest extends org.junit.Assert {
         // Create a Derived Key object for signature
         //
         WSSecDKSign sigBuilder = createDKSign(doc, secRefSaml, secHeader);
-        Document signedDoc = sigBuilder.build(doc);
+        Document signedDoc = sigBuilder.build();
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authn Assertion Derived (sender vouches):");

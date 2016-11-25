@@ -114,7 +114,7 @@ public class SignaturePartsTest extends org.junit.Assert {
                 "");
         sign.getParts().add(encP);
 
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -180,7 +180,7 @@ public class SignaturePartsTest extends org.junit.Assert {
             );
         sign.getParts().add(encP);
 
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -217,7 +217,7 @@ public class SignaturePartsTest extends org.junit.Assert {
             );
         sign.getParts().add(encP);
 
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -254,7 +254,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         sign.getParts().add(encP);
 
         try {
-            sign.build(doc, crypto);
+            sign.build(crypto);
             fail("Failure expected on not signing a required element");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_SIGNATURE);
@@ -305,7 +305,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         //
         // set up for keyHolder
         //
-        Document signedDoc = wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
+        Document signedDoc = wsSign.build(userCrypto, samlAssertion, null, null, null);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed SAML message (key holder):");
@@ -364,7 +364,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         sign.getParts().add(encP);
 
         try {
-            sign.build(doc, crypto);
+            sign.build(crypto);
             fail("Failure expected on a bad localname");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_SIGNATURE);
@@ -392,7 +392,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         sign.getParts().add(encP);
 
         try {
-            sign.build(doc, crypto);
+            sign.build(crypto);
             fail("Failure expected on a bad namespace");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.FAILED_SIGNATURE);
@@ -428,7 +428,7 @@ public class SignaturePartsTest extends org.junit.Assert {
                 "");
         sign.getParts().add(encP2);
 
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -496,7 +496,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         encP.setElement(bodyElement);
         sign.getParts().add(encP);
 
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -539,7 +539,7 @@ public class SignaturePartsTest extends org.junit.Assert {
                 "");
         sign.getParts().add(encP);
 
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);

@@ -80,6 +80,11 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         super(securityHeader);
         init();
     }
+    
+    public WSSecDKSign(Document doc) {
+        super(doc);
+        init();
+    }
 
     private void init() {
         // Try to install the Santuario Provider - fall back to the JDK provider if this does
@@ -91,11 +96,11 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         }
     }
 
-    public Document build(Document doc) throws WSSecurityException {
+    public Document build() throws WSSecurityException {
 
-        prepare(doc);
+        prepare();
         if (getParts().isEmpty()) {
-            getParts().add(WSSecurityUtil.getDefaultEncryptionPart(document));
+            getParts().add(WSSecurityUtil.getDefaultEncryptionPart(getDocument()));
         } else {
             for (WSEncryptionPart part : getParts()) {
                 if ("STRTransform".equals(part.getName()) && part.getId() == null) {
@@ -112,12 +117,12 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
         //
         prependDKElementToHeader();
 
-        return doc;
+        return getDocument();
     }
 
-    public void prepare(Document doc) throws WSSecurityException {
-        super.prepare(doc);
-        wsDocInfo = new WSDocInfo(doc);
+    public void prepare() throws WSSecurityException {
+        super.prepare();
+        wsDocInfo = new WSDocInfo(getDocument());
         sig = null;
 
         try {
@@ -139,11 +144,11 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
 
         keyInfoUri = getIdAllocator().createSecureId("KI-", keyInfo);
 
-        secRef = new SecurityTokenReference(doc);
+        secRef = new SecurityTokenReference(getDocument());
         strUri = getIdAllocator().createSecureId("STR-", secRef);
         secRef.setID(strUri);
 
-        Reference ref = new Reference(document);
+        Reference ref = new Reference(getDocument());
         ref.setURI("#" + getId());
         String ns =
             ConversationConstants.getWSCNs(getWscVersion())
@@ -185,7 +190,7 @@ public class WSSecDKSign extends WSSecDerivedKeyBase {
     ) throws WSSecurityException {
         return
             addReferencesToSign(
-                document,
+                getDocument(),
                 references,
                 wsDocInfo,
                 signatureFactory,

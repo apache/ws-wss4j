@@ -54,20 +54,24 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
     public WSSecDKEncrypt(WSSecHeader securityHeader) {
         super(securityHeader);
     }
+    
+    public WSSecDKEncrypt(Document doc) {
+        super(doc);
+    }
 
     @Override
-    public void prepare(Document doc) throws WSSecurityException {
-        super.prepare(doc);
+    public void prepare() throws WSSecurityException {
+        super.prepare();
 
         attachmentEncryptedDataElements = new ArrayList<>();
     }
 
-    public Document build(Document doc) throws WSSecurityException {
+    public Document build() throws WSSecurityException {
 
         //
         // Setup the encrypted key
         //
-        prepare(doc);
+        prepare();
         //
         // prepend elements in the right order to the security header
         //
@@ -79,7 +83,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
         addExternalRefElement(externRefList);
 
-        return doc;
+        return getDocument();
     }
 
     public void addAttachmentEncryptedDataElements() {
@@ -94,7 +98,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
     public Element encrypt() throws WSSecurityException {
         if (getParts().isEmpty()) {
-            getParts().add(WSSecurityUtil.getDefaultEncryptionPart(document));
+            getParts().add(WSSecurityUtil.getDefaultEncryptionPart(getDocument()));
         }
 
         return encryptForExternalRef(null, getParts());
@@ -130,17 +134,17 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
 
         List<String> encDataRefs =
             WSSecEncrypt.doEncryption(
-                document, getSecurityHeader(), getIdAllocator(), keyInfo, key, symEncAlgo, references, callbackLookup,
+                getDocument(), getSecurityHeader(), getIdAllocator(), keyInfo, key, symEncAlgo, references, callbackLookup,
                 attachmentCallbackHandler, attachmentEncryptedDataElements, storeBytesInAttachment,
                 encryptionSerializer
             );
         if (dataRef == null) {
             dataRef =
-                document.createElementNS(
+                getDocument().createElementNS(
                     WSConstants.ENC_NS, WSConstants.ENC_PREFIX + ":ReferenceList"
                 );
         }
-        return WSSecEncrypt.createDataRefList(document, dataRef, encDataRefs);
+        return WSSecEncrypt.createDataRefList(getDocument(), dataRef, encDataRefs);
     }
 
     /**
@@ -148,10 +152,10 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
      * @throws ConversationException
      */
     private KeyInfo createKeyInfo() throws WSSecurityException {
-        KeyInfo keyInfo = new KeyInfo(document);
-        SecurityTokenReference secToken = new SecurityTokenReference(document);
+        KeyInfo keyInfo = new KeyInfo(getDocument());
+        SecurityTokenReference secToken = new SecurityTokenReference(getDocument());
         secToken.addWSSENamespace();
-        Reference ref = new Reference(document);
+        Reference ref = new Reference(getDocument());
         ref.setURI("#" + getId());
         String ns =
             ConversationConstants.getWSCNs(getWscVersion())

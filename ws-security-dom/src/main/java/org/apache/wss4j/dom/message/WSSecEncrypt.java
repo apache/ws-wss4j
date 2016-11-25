@@ -111,6 +111,10 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
     public WSSecEncrypt(WSSecHeader securityHeader) {
         super(securityHeader);
     }
+    
+    public WSSecEncrypt(Document doc) {
+        super(doc);
+    }
 
     /**
      * Initialize a WSSec Encrypt.
@@ -122,12 +126,10 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * This method does not add any element to the security header. This must be
      * done explicitly.
      *
-     * @param doc The SOAP envelope as <code>Document</code>
      * @param crypto An instance of the Crypto API to handle keystore and certificates
      * @throws WSSecurityException
      */
-    public void prepare(Document doc, Crypto crypto) throws WSSecurityException {
-        document = doc;
+    public void prepare(Crypto crypto) throws WSSecurityException {
         attachmentEncryptedDataElements = new ArrayList<>();
 
         //
@@ -187,16 +189,15 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      * calls the single function methods in order to perform a <i>one shot
      * encryption</i>. 
      *
-     * @param doc the SOAP envelope as <code>Document</code> with plain text Body
      * @param crypto an instance of the Crypto API to handle keystore and Certificates
      * @return the SOAP envelope with encrypted Body as <code>Document</code>
      * @throws WSSecurityException
      */
-    public Document build(Document doc, Crypto crypto)
+    public Document build(Crypto crypto)
         throws WSSecurityException {
         doDebug = LOG.isDebugEnabled();
 
-        prepare(doc, crypto);
+        prepare(crypto);
 
         if (doDebug) {
             LOG.debug("Beginning Encryption...");
@@ -216,12 +217,12 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
         clean();
         LOG.debug("Encryption complete.");
-        return doc;
+        return getDocument();
     }
 
     public Element encrypt() throws WSSecurityException {
         if (getParts().isEmpty()) {
-            getParts().add(WSSecurityUtil.getDefaultEncryptionPart(document));
+            getParts().add(WSSecurityUtil.getDefaultEncryptionPart(getDocument()));
         }
 
         return encryptForRef(null, getParts());
@@ -259,7 +260,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         SecretKeySpec secretKeySpec = new SecretKeySpec(symmetricKey.getEncoded(), symmetricKey.getAlgorithm());
         List<String> encDataRefs =
             doEncryption(
-                document, getSecurityHeader(), getIdAllocator(), keyInfo, secretKeySpec, getSymmetricEncAlgorithm(), 
+                getDocument(), getSecurityHeader(), getIdAllocator(), keyInfo, secretKeySpec, getSymmetricEncAlgorithm(), 
                 references, callbackLookup, attachmentCallbackHandler, attachmentEncryptedDataElements,
                 storeBytesInAttachment
             );
@@ -269,7 +270,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
 
         if (dataRef == null) {
             dataRef =
-                document.createElementNS(
+                getDocument().createElementNS(
                     WSConstants.ENC_NS,
                     WSConstants.ENC_PREFIX + ":ReferenceList"
                 );
@@ -283,7 +284,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 );
             }
         }
-        return createDataRefList(document, dataRef, encDataRefs);
+        return createDataRefList(getDocument(), dataRef, encDataRefs);
     }
 
     /**
@@ -762,11 +763,11 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
      */
     private KeyInfo createKeyInfo() throws WSSecurityException {
 
-        KeyInfo keyInfo = new KeyInfo(document);
+        KeyInfo keyInfo = new KeyInfo(getDocument());
         if (embedEncryptedKey) {
             keyInfo.addUnknownElement(getEncryptedKeyElement());
         } else if (keyIdentifierType == WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER) {
-            SecurityTokenReference secToken = new SecurityTokenReference(document);
+            SecurityTokenReference secToken = new SecurityTokenReference(getDocument());
             secToken.addWSSENamespace();
             if (customReferenceValue != null) {
                 secToken.setKeyIdentifierEncKeySHA1(customReferenceValue);
@@ -777,19 +778,19 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
             keyInfo.addUnknownElement(secToken.getElement());
         } else if (WSConstants.WSS_SAML_KI_VALUE_TYPE.equals(customReferenceValue)) {
-            SecurityTokenReference secToken = new SecurityTokenReference(document);
+            SecurityTokenReference secToken = new SecurityTokenReference(getDocument());
             secToken.addWSSENamespace();
             secToken.addTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
             secToken.setKeyIdentifier(WSConstants.WSS_SAML_KI_VALUE_TYPE, getId());
             keyInfo.addUnknownElement(secToken.getElement());
         } else if (WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(customReferenceValue)) {
-            SecurityTokenReference secToken = new SecurityTokenReference(document);
+            SecurityTokenReference secToken = new SecurityTokenReference(getDocument());
             secToken.addWSSENamespace();
             secToken.addTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
             secToken.setKeyIdentifier(WSConstants.WSS_SAML2_KI_VALUE_TYPE, getId());
             keyInfo.addUnknownElement(secToken.getElement());
         } else if (WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(customReferenceValue)) {
-            SecurityTokenReference secToken = new SecurityTokenReference(document);
+            SecurityTokenReference secToken = new SecurityTokenReference(getDocument());
             secToken.addWSSENamespace();
             secToken.addTokenType(WSConstants.WSS_GSS_KRB_V5_AP_REQ);
             secToken.setKeyIdentifier(customReferenceValue, getId(), true);
@@ -801,9 +802,9 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             );
             keyInfo.addUnknownElement(securityTokenReference.getElement());
         } else if (getId() != null) {
-            SecurityTokenReference secToken = new SecurityTokenReference(document);
+            SecurityTokenReference secToken = new SecurityTokenReference(getDocument());
             secToken.addWSSENamespace();
-            Reference ref = new Reference(document);
+            Reference ref = new Reference(getDocument());
             if (encKeyIdDirectId) {
                 ref.setURI(getId());
             } else {
@@ -820,7 +821,7 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
             }
             keyInfo.addUnknownElement(secToken.getElement());
         } else if (!encryptSymmKey && keyIdentifierType == WSConstants.ISSUER_SERIAL) {
-            SecurityTokenReference secToken = new SecurityTokenReference(document);
+            SecurityTokenReference secToken = new SecurityTokenReference(getDocument());
             secToken.addWSSENamespace();
             if (customReferenceValue != null) {
                 secToken.setKeyIdentifierEncKeySHA1(customReferenceValue);

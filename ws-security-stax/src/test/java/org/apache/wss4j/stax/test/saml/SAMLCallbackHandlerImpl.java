@@ -198,10 +198,10 @@ public class SAMLCallbackHandlerImpl implements CallbackHandler {
             Document doc = docBuilder.newDocument();
 
             // Create an Encrypted Key
-            WSSecEncryptedKey encrKey = new WSSecEncryptedKey(null);
+            WSSecEncryptedKey encrKey = new WSSecEncryptedKey(doc);
             encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
             encrKey.setUseThisCert(certs[0]);
-            encrKey.prepare(doc, null);
+            encrKey.prepare(null);
             ephemeralKey = encrKey.getEphemeralKey();
             keyInfo.setEphemeralKey(ephemeralKey);
             Element encryptedKeyElement = encrKey.getEncryptedKeyElement();

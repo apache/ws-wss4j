@@ -55,7 +55,7 @@ public class CertErrorTest extends org.junit.Assert {
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("bob", "security");
         try {
-            builder.build(doc, CryptoFactory.getInstance());
+            builder.build(CryptoFactory.getInstance());
             fail("Expected failure on a bad username");
         } catch (WSSecurityException ex) {
             String expectedError = "No certificates for user \"bob\" were found for signature";
@@ -75,7 +75,7 @@ public class CertErrorTest extends org.junit.Assert {
         WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setUserInfo("alice");
         try {
-            builder.build(doc, CryptoFactory.getInstance());
+            builder.build(CryptoFactory.getInstance());
             fail("Expected failure on a bad username");
         } catch (WSSecurityException ex) {
             String expectedError = "No certificates for user \"alice\" were found for encryption";

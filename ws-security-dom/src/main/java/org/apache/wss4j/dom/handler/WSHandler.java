@@ -196,7 +196,7 @@ public abstract class WSHandler {
             String done =
                 (String)getProperty(reqData.getMsgContext(), WSHandlerConstants.SIG_CONF_DONE);
             if (done == null) {
-                wssConfig.getAction(WSConstants.SC).execute(this, null, doc, reqData);
+                wssConfig.getAction(WSConstants.SC).execute(this, null, reqData);
             }
         }
 
@@ -228,7 +228,7 @@ public abstract class WSHandler {
 
             if (WSConstants.NO_SECURITY != actionToDo.getAction()) {
                 wssConfig.getAction(actionToDo.getAction()).execute(
-                    this, actionToDo.getActionToken(), doc, reqData);
+                    this, actionToDo.getActionToken(), reqData);
             }
         }
 

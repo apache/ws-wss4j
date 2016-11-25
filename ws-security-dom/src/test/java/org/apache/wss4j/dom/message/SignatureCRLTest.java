@@ -97,7 +97,7 @@ public class SignatureCRLTest extends org.junit.Assert {
         sign.setUserInfo("wss40rev", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -131,7 +131,7 @@ public class SignatureCRLTest extends org.junit.Assert {
         sign.setUserInfo("wss40rev", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -169,7 +169,7 @@ public class SignatureCRLTest extends org.junit.Assert {
         sign.setUserInfo("wss40rev", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =

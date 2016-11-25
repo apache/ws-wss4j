@@ -120,7 +120,7 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         LOG.info("Before Encryption Triple DES....");
-        Document encryptedDoc = builder.build(doc, crypto);
+        Document encryptedDoc = builder.build(crypto);
         LOG.info("After Encryption Triple DES....");
 
         String outputString =
@@ -156,7 +156,7 @@ public class EncryptionTest extends org.junit.Assert {
         builder.getParts().add(encP);
 
         LOG.info("Before Encryption AES 128/RSA-15....");
-        encryptedDoc = builder.build(doc, crypto);
+        encryptedDoc = builder.build(crypto);
         LOG.info("After Encryption AES 128/RSA-15....");
         outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -203,7 +203,7 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP);
 
         LOG.info("Before Encryption Triple DES/RSA-OAEP....");
-        Document encryptedDoc = builder.build(doc, crypto);
+        Document encryptedDoc = builder.build(crypto);
         LOG.info("After Encryption Triple DES/RSA-OAEP....");
 
         String outputString =
@@ -243,7 +243,7 @@ public class EncryptionTest extends org.junit.Assert {
         assertNotNull(certs);
         builder.setUseThisPublicKey(certs[0].getPublicKey());
         
-        Document encryptedDoc = builder.build(doc, crypto);
+        Document encryptedDoc = builder.build(crypto);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -280,7 +280,7 @@ public class EncryptionTest extends org.junit.Assert {
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
         LOG.info("Before Encryption....");
 
-        Document encryptedDoc = encrypt.build(doc, encCrypto);
+        Document encryptedDoc = encrypt.build(encCrypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After the first encryption:");
@@ -289,7 +289,7 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
 
-        Document encryptedEncryptedDoc = encrypt.build(encryptedDoc, encCrypto);
+        Document encryptedEncryptedDoc = encrypt.build(encCrypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After the second encryption:");
@@ -321,7 +321,7 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
 
         LOG.info("Before Encrypting ThumbprintSHA1....");
-        Document encryptedDoc = builder.build(doc, encCrypto);
+        Document encryptedDoc = builder.build(encCrypto);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -362,7 +362,7 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
 
         LOG.info("Before Encrypting EncryptedKeySHA1....");
-        Document encryptedDoc = builder.build(doc, encCrypto);
+        Document encryptedDoc = builder.build(encCrypto);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -394,7 +394,7 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setEncryptSymmKey(false);
 
         LOG.info("Before Encrypting EncryptedKeySHA1....");
-        Document encryptedDoc = builder.build(doc, crypto);
+        Document encryptedDoc = builder.build(crypto);
 
         byte[] encodedBytes = KeyUtils.generateDigest(keyData);
         String identifier = Base64.getMimeEncoder().encodeToString(encodedBytes);
@@ -430,7 +430,7 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setEncryptSymmKey(false);
 
         LOG.info("Before Encrypting EncryptedKeySHA1....");
-        Document encryptedDoc = builder.build(doc, crypto);
+        Document encryptedDoc = builder.build(crypto);
 
         byte[] encodedBytes = KeyUtils.generateDigest(keyData);
         String identifier = Base64.getMimeEncoder().encodeToString(encodedBytes);
@@ -514,7 +514,7 @@ public class EncryptionTest extends org.junit.Assert {
         /*
          * Prepare the Encrypt object with the token, setup data structure
          */
-        builder.prepare(doc, crypto);
+        builder.prepare(crypto);
 
         /*
          * Set up the parts structure to encrypt the body
@@ -583,7 +583,7 @@ public class EncryptionTest extends org.junit.Assert {
         /*
          * Prepare the Encrypt object with the token, setup data structure
          */
-        builder.prepare(doc, crypto);
+        builder.prepare(crypto);
 
         /*
          * Set up the parts structure to encrypt the body
@@ -652,7 +652,7 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
-        builder.prepare(doc, crypto);
+        builder.prepare(crypto);
         builder.setEmbedEncryptedKey(true);
 
         SOAPConstants soapConstants = WSSecurityUtil.getSOAPConstants(doc
@@ -694,7 +694,7 @@ public class EncryptionTest extends org.junit.Assert {
         builder.setDigestAlgorithm(WSConstants.SHA256);
 
         LOG.info("Before Encryption Triple DES/RSA-OAEP....");
-        Document encryptedDoc = builder.build(doc, crypto);
+        Document encryptedDoc = builder.build(crypto);
         LOG.info("After Encryption Triple DES/RSA-OAEP....");
 
         String outputString =
@@ -728,7 +728,7 @@ public class EncryptionTest extends org.junit.Assert {
         LOG.info("Before Encryption Triple DES/RSA-OAEP....");
 
         Crypto regexpCrypto = CryptoFactory.getInstance("regexp.properties");
-        Document encryptedDoc = builder.build(doc, regexpCrypto);
+        Document encryptedDoc = builder.build(regexpCrypto);
         LOG.info("After Encryption Triple DES/RSA-OAEP....");
 
         String outputString =

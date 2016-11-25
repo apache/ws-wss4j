@@ -489,7 +489,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             
             WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-            Document securedDocument = wsSign.build(doc, samlAssertion);
+            Document securedDocument = wsSign.build(samlAssertion);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());
@@ -989,7 +989,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
             
             WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-            Document securedDocument = wsSign.build(doc, samlAssertion);
+            Document securedDocument = wsSign.build(samlAssertion);
 
             //some test that we can really sure we get what we want from WSS4J
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_dsig_Signature.getNamespaceURI(), WSSConstants.TAG_dsig_Signature.getLocalPart());

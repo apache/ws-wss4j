@@ -45,8 +45,7 @@ import org.w3c.dom.Document;
  */
 
 public class UsernameTokenSignedAction implements Action {
-    public void execute(WSHandler handler, SecurityActionToken actionToken,
-                        Document doc, RequestData reqData)
+    public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
             throws WSSecurityException {
         CallbackHandler callbackHandler = reqData.getCallbackHandler();
         if (callbackHandler == null) {
@@ -71,7 +70,7 @@ public class UsernameTokenSignedAction implements Action {
         builder.setUserInfo(reqData.getUsername(), passwordCallback.getPassword());
         builder.addCreated();
         builder.addNonce();
-        builder.prepare(doc);
+        builder.prepare();
 
         // Now prepare to sign.
         // First step:  Get a WS Signature object and set config parameters
@@ -115,7 +114,7 @@ public class UsernameTokenSignedAction implements Action {
             sign.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         }
 
-        sign.prepare(doc, null);
+        sign.prepare(null);
 
         // prepend in this order: first the Signature Element and then the
         // UsernameToken Element. This way the server gets the UsernameToken
@@ -128,6 +127,7 @@ public class UsernameTokenSignedAction implements Action {
             parts = signatureToken.getParts();
         } else {
             parts = new ArrayList<>(1);
+            Document doc = reqData.getSecHeader().getSecurityHeaderElement().getOwnerDocument();
             parts.add(WSSecurityUtil.getDefaultEncryptionPart(doc));
         }
         List<javax.xml.crypto.dsig.Reference> referenceList = sign.addReferencesToSign(parts);

@@ -24,12 +24,10 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.message.WSSecTimestamp;
-import org.w3c.dom.Document;
 
 public class TimestampAction implements Action {
 
-    public void execute(WSHandler handler, SecurityActionToken actionToken,
-                        Document doc, RequestData reqData)
+    public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
         throws WSSecurityException {
         //
         // add the Timestamp to the SOAP Envelope
@@ -39,6 +37,6 @@ public class TimestampAction implements Action {
         timeStampBuilder.setPrecisionInMilliSeconds(reqData.isPrecisionInMilliSeconds());
         timeStampBuilder.setTimeToLive(reqData.getTimeStampTTL());
         timeStampBuilder.setWsTimeSource(reqData.getWssConfig().getCurrentTime());
-        timeStampBuilder.build(doc);
+        timeStampBuilder.build();
     }
 }

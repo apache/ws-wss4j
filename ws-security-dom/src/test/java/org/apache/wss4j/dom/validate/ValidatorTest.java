@@ -80,7 +80,7 @@ public class ValidatorTest extends org.junit.Assert {
 
         WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(-1);
-        Document createdDoc = timestamp.build(doc);
+        Document createdDoc = timestamp.build();
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -116,7 +116,7 @@ public class ValidatorTest extends org.junit.Assert {
         sign.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
 
         Crypto crypto = CryptoFactory.getInstance("wss40.properties");
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -159,7 +159,7 @@ public class ValidatorTest extends org.junit.Assert {
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
         builder.setUserInfo("wernerd", "verySecre");
 
-        Document signedDoc = builder.build(doc);
+        Document signedDoc = builder.build();
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -243,7 +243,7 @@ public class ValidatorTest extends org.junit.Assert {
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        Document signedDoc = builder.build(doc, CryptoFactory.getInstance());
+        Document signedDoc = builder.build(CryptoFactory.getInstance());
 
         if (LOG.isDebugEnabled()) {
             String outputString =

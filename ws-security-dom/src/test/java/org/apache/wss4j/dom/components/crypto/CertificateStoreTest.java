@@ -84,7 +84,7 @@ public class CertificateStoreTest extends org.junit.Assert {
         sign.setUserInfo("wss40", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
-        Document signedDoc = sign.build(doc, senderCrypto);
+        Document signedDoc = sign.build(senderCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -116,7 +116,7 @@ public class CertificateStoreTest extends org.junit.Assert {
         sign.setUserInfo("wss40", "security");
         sign.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
 
-        Document signedDoc = sign.build(doc, senderCrypto);
+        Document signedDoc = sign.build(senderCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -154,7 +154,7 @@ public class CertificateStoreTest extends org.junit.Assert {
         sign.setUserInfo("wss40", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        Document signedDoc = sign.build(doc, senderCrypto);
+        Document signedDoc = sign.build(senderCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -188,7 +188,7 @@ public class CertificateStoreTest extends org.junit.Assert {
         sign.setUserInfo("wss40", "security");
         sign.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
 
-        Document signedDoc = sign.build(doc, senderCrypto);
+        Document signedDoc = sign.build(senderCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -222,7 +222,7 @@ public class CertificateStoreTest extends org.junit.Assert {
         sign.setUserInfo("wss40", "security");
         sign.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
 
-        Document signedDoc = sign.build(doc, senderCrypto);
+        Document signedDoc = sign.build(senderCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -257,7 +257,7 @@ public class CertificateStoreTest extends org.junit.Assert {
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
-        Document signedDoc = sign.build(doc, CryptoFactory.getInstance());
+        Document signedDoc = sign.build(CryptoFactory.getInstance());
 
         if (LOG.isDebugEnabled()) {
             String outputString =

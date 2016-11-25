@@ -83,7 +83,7 @@ public class PrincipalTest extends org.junit.Assert {
         
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("wernerd", "verySecret");
-        Document signedDoc = builder.build(doc);
+        Document signedDoc = builder.build();
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -116,7 +116,7 @@ public class PrincipalTest extends org.junit.Assert {
         
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("wernerd", "verySecret");
-        Document signedDoc = builder.build(doc);
+        Document signedDoc = builder.build();
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -152,7 +152,7 @@ public class PrincipalTest extends org.junit.Assert {
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion);
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -195,7 +195,7 @@ public class PrincipalTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion);
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -239,7 +239,7 @@ public class PrincipalTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion);
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             String outputString =

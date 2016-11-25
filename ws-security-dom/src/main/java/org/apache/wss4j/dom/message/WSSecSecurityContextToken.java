@@ -59,13 +59,25 @@ public class WSSecSecurityContextToken {
     private int wscVersion = ConversationConstants.DEFAULT_VERSION;
     private WSSConfig wssConfig;
     private final WSSecHeader securityHeader;
+    private final Document doc;
 
     public WSSecSecurityContextToken(WSSecHeader securityHeader, WSSConfig config) {
         this.securityHeader = securityHeader;
+        if (securityHeader != null && securityHeader.getSecurityHeaderElement() != null) {
+            doc = securityHeader.getSecurityHeaderElement().getOwnerDocument();
+        } else {
+            doc = null;
+        }
+        wssConfig = config;
+    }
+    
+    public WSSecSecurityContextToken(Document doc, WSSConfig config) {
+        this.securityHeader = null;
+        this.doc = doc;
         wssConfig = config;
     }
 
-    public void prepare(Document doc, Crypto crypto) throws WSSecurityException {
+    public void prepare(Crypto crypto) throws WSSecurityException {
 
         if (sct == null) {
             if (identifier != null) {
@@ -83,7 +95,7 @@ public class WSSecSecurityContextToken {
         sct.setID(sctId);
     }
 
-    public void prependSCTElementToHeader(Document doc)
+    public void prependSCTElementToHeader()
         throws WSSecurityException {
         Element secHeaderElement = securityHeader.getSecurityHeaderElement();
         WSSecurityUtil.prependChildElement(secHeaderElement, sct.getElement());

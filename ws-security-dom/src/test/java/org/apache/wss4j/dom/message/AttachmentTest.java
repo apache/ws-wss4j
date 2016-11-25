@@ -117,7 +117,7 @@ public class AttachmentTest extends Assert {
         builder.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
         LOG.info("Before Signing....");
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -163,7 +163,7 @@ public class AttachmentTest extends Assert {
         builder.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
         LOG.info("Before Signing....");
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -220,7 +220,7 @@ public class AttachmentTest extends Assert {
         builder.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
         LOG.info("Before Signing....");
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -266,7 +266,7 @@ public class AttachmentTest extends Assert {
         builder.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
         LOG.info("Before Signing....");
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -330,7 +330,7 @@ public class AttachmentTest extends Assert {
         builder.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
         LOG.info("Before Signing....");
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -381,7 +381,7 @@ public class AttachmentTest extends Assert {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        Document encryptedDoc = encrypt.build(doc, crypto);
+        Document encryptedDoc = encrypt.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -441,7 +441,7 @@ public class AttachmentTest extends Assert {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        Document encryptedDoc = encrypt.build(doc, crypto);
+        Document encryptedDoc = encrypt.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -500,7 +500,7 @@ public class AttachmentTest extends Assert {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        Document encryptedDoc = encrypt.build(doc, crypto);
+        Document encryptedDoc = encrypt.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -555,7 +555,7 @@ public class AttachmentTest extends Assert {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        encrypt.prepare(doc, crypto);
+        encrypt.prepare(crypto);
         Element refs = encrypt.encrypt();
         encrypt.addAttachmentEncryptedDataElements();
         encrypt.addExternalRefElement(refs);
@@ -620,7 +620,7 @@ public class AttachmentTest extends Assert {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        encrypt.prepare(doc, crypto);
+        encrypt.prepare(crypto);
         encrypt.encrypt();
         encrypt.addAttachmentEncryptedDataElements();
         //encrypt.addExternalRefElement(refs);
@@ -684,7 +684,7 @@ public class AttachmentTest extends Assert {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        Document encryptedDoc = encrypt.build(doc, crypto);
+        Document encryptedDoc = encrypt.build(crypto);
 
         Assert.assertEquals(1, encryptedAttachments.get(0).getHeaders().size());
 
@@ -732,7 +732,7 @@ public class AttachmentTest extends Assert {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        Document encryptedDoc = encrypt.build(doc, crypto);
+        Document encryptedDoc = encrypt.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -792,7 +792,7 @@ public class AttachmentTest extends Assert {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        Document encryptedDoc = encrypt.build(doc, crypto);
+        Document encryptedDoc = encrypt.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -844,7 +844,7 @@ public class AttachmentTest extends Assert {
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         signature.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
-        doc = signature.build(doc, crypto);
+        doc = signature.build(crypto);
 
         WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -856,7 +856,7 @@ public class AttachmentTest extends Assert {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        Document encryptedDoc = encrypt.build(doc, crypto);
+        Document encryptedDoc = encrypt.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -922,7 +922,7 @@ public class AttachmentTest extends Assert {
             }
         });
 
-        doc = signature.build(doc, crypto);
+        doc = signature.build(crypto);
 
         WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -945,7 +945,7 @@ public class AttachmentTest extends Assert {
             }
         });
 
-        Document encryptedDoc = encrypt.build(doc, crypto);
+        Document encryptedDoc = encrypt.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -1010,7 +1010,7 @@ public class AttachmentTest extends Assert {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        doc = encrypt.build(doc, crypto);
+        doc = encrypt.build(crypto);
 
         WSSecSignature signature = new WSSecSignature(secHeader);
         signature.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -1020,7 +1020,7 @@ public class AttachmentTest extends Assert {
         signature.setAttachmentCallbackHandler(attachmentCallbackHandler);
         encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        doc = signature.build(doc, crypto);
+        doc = signature.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(doc);
@@ -1087,7 +1087,7 @@ public class AttachmentTest extends Assert {
             }
         });
 
-        doc = encrypt.build(doc, crypto);
+        doc = encrypt.build(crypto);
 
         WSSecSignature signature = new WSSecSignature(secHeader);
         signature.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -1109,7 +1109,7 @@ public class AttachmentTest extends Assert {
             }
         });
 
-        doc = signature.build(doc, crypto);
+        doc = signature.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(doc);

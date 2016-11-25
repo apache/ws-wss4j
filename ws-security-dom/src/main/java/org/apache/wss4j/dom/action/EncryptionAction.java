@@ -34,11 +34,9 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.WSSecEncrypt;
-import org.w3c.dom.Document;
 
 public class EncryptionAction implements Action {
-    public void execute(WSHandler handler, SecurityActionToken actionToken,
-                        Document doc, RequestData reqData)
+    public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
             throws WSSecurityException {
         WSSecEncrypt wsEncrypt = new WSSecEncrypt(reqData.getSecHeader());
         wsEncrypt.setIdAllocator(reqData.getWssConfig().getIdAllocator());
@@ -123,7 +121,7 @@ public class EncryptionAction implements Action {
         wsEncrypt.setStoreBytesInAttachment(reqData.isStoreBytesInAttachment());
 
         try {
-            wsEncrypt.build(doc, encryptionToken.getCrypto());
+            wsEncrypt.build(encryptionToken.getCrypto());
         } catch (WSSecurityException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "empty",
                                           new Object[] {"Error during encryption: "});

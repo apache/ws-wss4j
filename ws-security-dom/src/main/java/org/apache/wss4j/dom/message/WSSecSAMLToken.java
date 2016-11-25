@@ -35,14 +35,16 @@ public class WSSecSAMLToken extends WSSecBase {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSecSAMLToken.class);
 
-    private Document document;
-
     private SamlAssertionWrapper saml;
 
     private Element samlElement;
 
     public WSSecSAMLToken(WSSecHeader securityHeader) {
         super(securityHeader);
+    }
+    
+    public WSSecSAMLToken(Document doc) {
+        super(doc);
     }
 
     /**
@@ -53,12 +55,8 @@ public class WSSecSAMLToken extends WSSecBase {
      * <code>prepare()</code> all parameters such as user, password,
      * passwordType etc. must be set. A complete <code>UsernameToken</code> is
      * constructed.
-     *
-     * @param doc
-     *            The SOAP envelope as W3C document
      */
-    public void prepare(Document doc, SamlAssertionWrapper samlAssertion) {
-        document = doc;
+    public void prepare(SamlAssertionWrapper samlAssertion) {
         saml = samlAssertion;
     }
 
@@ -90,7 +88,7 @@ public class WSSecSAMLToken extends WSSecBase {
         if (saml == null) {
             return null;
         }
-        samlElement = saml.toDOM(document);
+        samlElement = saml.toDOM(getDocument());
         return samlElement;
     }
 
@@ -115,16 +113,15 @@ public class WSSecSAMLToken extends WSSecBase {
      * A complete <code>SAMLAssertion</code> is added to the
      * <code>wsse:Security</code> header.
      *
-     * @param doc      The SOAP envelope as W3C document
      * @param samlAssertion TODO
      * @return Document with UsernameToken added
      */
-    public Document build(Document doc, SamlAssertionWrapper samlAssertion) {
+    public Document build(SamlAssertionWrapper samlAssertion) {
         LOG.debug("Begin add SAMLAssertion token...");
 
-        prepare(doc, samlAssertion);
+        prepare(samlAssertion);
         prependToHeader();
 
-        return doc;
+        return getDocument();
     }
 }

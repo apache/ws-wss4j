@@ -74,7 +74,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
         encrKeyBuilder.setUserInfo("wss40");
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-        encrKeyBuilder.prepare(doc, crypto);
+        encrKeyBuilder.prepare(crypto);
 
         //Key information from the EncryptedKey
         byte[] ek = encrKeyBuilder.getEphemeralKey();
@@ -84,7 +84,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         encrBuilder.setExternalKey(ek, tokenIdentifier);
-        Document encryptedDoc = encrBuilder.build(doc);
+        Document encryptedDoc = encrBuilder.build();
 
         encrKeyBuilder.prependToHeader();
         encrKeyBuilder.prependBSTElementToHeader();
@@ -112,7 +112,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
         encrKeyBuilder.setUserInfo("wss40");
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-        encrKeyBuilder.prepare(doc, crypto);
+        encrKeyBuilder.prepare(crypto);
 
         //Key information from the EncryptedKey
         byte[] ek = encrKeyBuilder.getEphemeralKey();
@@ -122,7 +122,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         encrBuilder.setExternalKey(ek, tokenIdentifier);
-        Document encryptedDoc = encrBuilder.build(doc);
+        Document encryptedDoc = encrBuilder.build();
 
         encrKeyBuilder.prependToHeader();
         encrKeyBuilder.prependBSTElementToHeader();
@@ -146,7 +146,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
         encrKeyBuilder.setUserInfo("wss40");
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-        encrKeyBuilder.prepare(doc, crypto);
+        encrKeyBuilder.prepare(crypto);
 
         //Key information from the EncryptedKey
         byte[] ek = encrKeyBuilder.getEphemeralKey();
@@ -156,7 +156,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
         sigBuilder.setExternalKey(ek, tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-        /* Document signedDoc = */ sigBuilder.build(doc);
+        /* Document signedDoc = */ sigBuilder.build();
 
         encrKeyBuilder.prependToHeader();
         encrKeyBuilder.prependBSTElementToHeader();
@@ -199,7 +199,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         java.security.Key key = crypto.getPrivateKey("wss40", "security");
         sigBuilder.setExternalKey(key.getEncoded(), secToken.getElement());
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-        sigBuilder.build(doc);
+        sigBuilder.build();
 
         sigBuilder.prependDKElementToHeader();
 
@@ -240,7 +240,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         java.security.Key key = crypto.getPrivateKey("wss40", "security");
         sigBuilder.setExternalKey(key.getEncoded(), secToken.getElement());
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-        sigBuilder.build(doc);
+        sigBuilder.build();
 
         sigBuilder.prependDKElementToHeader();
 
@@ -269,7 +269,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
         encrKeyBuilder.setUserInfo("wss40");
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-        encrKeyBuilder.prepare(doc, crypto);
+        encrKeyBuilder.prepare(crypto);
 
         //Key information from the EncryptedKey
         byte[] ek = encrKeyBuilder.getEphemeralKey();
@@ -280,13 +280,13 @@ public class DerivedKeyTest extends org.junit.Assert {
         sigBuilder.setExternalKey(ek, tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         LOG.info("Before HMAC-SHA1 signature");
-        Document signedDoc = sigBuilder.build(doc);
+        sigBuilder.build();
 
         //Derived key signature
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         encrBuilder.setExternalKey(ek, tokenIdentifier);
-        Document signedEncryptedDoc = encrBuilder.build(signedDoc);
+        Document signedEncryptedDoc = encrBuilder.build();
 
         encrKeyBuilder.prependToHeader();
         encrKeyBuilder.prependBSTElementToHeader();
@@ -310,7 +310,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
         encrKeyBuilder.setUserInfo("wss40");
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
-        encrKeyBuilder.prepare(doc, crypto);
+        encrKeyBuilder.prepare(crypto);
 
         //Key information from the EncryptedKey
         byte[] ek = encrKeyBuilder.getEphemeralKey();
@@ -320,14 +320,14 @@ public class DerivedKeyTest extends org.junit.Assert {
         WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         encrBuilder.setExternalKey(ek, tokenIdentifier);
-        encrBuilder.build(doc);
+        encrBuilder.build();
 
         //Derived key signature
         WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
         sigBuilder.setExternalKey(ek, tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         LOG.info("Before HMAC-SHA1 signature");
-        Document encryptedSignedDoc = sigBuilder.build(doc);
+        Document encryptedSignedDoc = sigBuilder.build();
 
         encrKeyBuilder.prependToHeader();
         encrKeyBuilder.prependBSTElementToHeader();

@@ -111,7 +111,7 @@ public class CryptoTest extends org.junit.Assert {
         keyStore.load(input, "security".toCharArray());
         input.close();
         ((Merlin)crypto).setKeyStore(keyStore);
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         // Load the truststore
         Crypto processCrypto = new Merlin();

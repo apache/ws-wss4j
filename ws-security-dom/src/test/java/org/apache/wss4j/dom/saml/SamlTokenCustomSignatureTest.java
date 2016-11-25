@@ -188,7 +188,7 @@ public class SamlTokenCustomSignatureTest extends org.junit.Assert {
         encP.setRequired(false);
         sign.getParts().add(encP);
 
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(doc);

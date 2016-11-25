@@ -120,7 +120,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         Document signedDoc =
             wsSign.build(
-                doc, null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
+                null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
                 "security"
             );
 
@@ -184,7 +184,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         wsSign.setUseDirectReferenceToAssertion(true);
         Document signedDoc =
             wsSign.build(
-                doc, null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
+                null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
                 "security"
             );
 
@@ -251,7 +251,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         wsSign.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
 
         Document signedDoc =
-            wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
+            wsSign.build(userCrypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(doc);
@@ -316,7 +316,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document signedDoc =
-            wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
+            wsSign.build(userCrypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(doc);
@@ -375,15 +375,14 @@ public class SamlReferenceTest extends org.junit.Assert {
         Crypto crypto = CryptoFactory.getInstance("crypto.properties");
         WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        Document samlDoc =
-            wsSign.build(doc, null, samlAssertion, crypto,
-                "16c73ab6-b892-458f-abf5-2f875f74882e", "security"
-            );
+        wsSign.build(null, samlAssertion, crypto,
+            "16c73ab6-b892-458f-abf5-2f875f74882e", "security"
+        );
 
         WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        Document encryptedDoc = builder.build(samlDoc, crypto);
+        Document encryptedDoc = builder.build(crypto);
 
         //
         // Remove the assertion its place in the security header and then append it
@@ -441,7 +440,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
         builder.setCustomEKTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
         builder.setCustomEKTokenId(samlAssertion.getId());
-        builder.prepare(doc, userCrypto);
+        builder.prepare(userCrypto);
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -517,7 +516,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         builder.setCustomEKTokenValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
         builder.setCustomEKTokenId(samlAssertion.getId());
-        builder.prepare(doc, userCrypto);
+        builder.prepare(userCrypto);
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -583,7 +582,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         Document signedDoc =
             wsSign.build(
-                doc, null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
+                null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
                 "security"
             );
 
@@ -646,7 +645,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         wsSign.setUseDirectReferenceToAssertion(true);
         Document signedDoc =
             wsSign.build(
-                doc, null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
+                null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
                 "security"
             );
 
@@ -713,7 +712,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         wsSign.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
 
         Document signedDoc =
-            wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
+            wsSign.build(userCrypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(doc);
@@ -779,7 +778,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
 
         Document signedDoc =
-            wsSign.build(doc, userCrypto, samlAssertion, null, null, null);
+            wsSign.build(userCrypto, samlAssertion, null, null, null);
 
         String outputString =
             XMLUtils.prettyDocumentToString(doc);
@@ -845,7 +844,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
         builder.setCustomEKTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
         builder.setCustomEKTokenId(samlAssertion.getId());
-        builder.prepare(doc, userCrypto);
+        builder.prepare(userCrypto);
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -921,7 +920,7 @@ public class SamlReferenceTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         builder.setCustomEKTokenValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
         builder.setCustomEKTokenId(samlAssertion.getId());
-        builder.prepare(doc, userCrypto);
+        builder.prepare(userCrypto);
 
         WSEncryptionPart encP =
             new WSEncryptionPart(

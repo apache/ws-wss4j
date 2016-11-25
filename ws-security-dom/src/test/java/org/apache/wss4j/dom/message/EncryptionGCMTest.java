@@ -89,7 +89,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128_GCM);
-        Document encryptedDoc = builder.build(doc, crypto);
+        Document encryptedDoc = builder.build(crypto);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -111,7 +111,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_256_GCM);
-        Document encryptedDoc = builder.build(doc, crypto);
+        Document encryptedDoc = builder.build(crypto);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -136,7 +136,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
         builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP_XENC11);
         builder.setDigestAlgorithm(WSConstants.SHA256);
         builder.setMGFAlgorithm(WSConstants.MGF_SHA256);
-        Document encryptedDoc = builder.build(doc, crypto);
+        Document encryptedDoc = builder.build(crypto);
 
         String outputString =
                 XMLUtils.prettyDocumentToString(encryptedDoc);

@@ -88,7 +88,7 @@ public class CryptoProviderTest extends org.junit.Assert {
         sign.setUserInfo("wss86", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -112,7 +112,7 @@ public class CryptoProviderTest extends org.junit.Assert {
         sign.setUserInfo("wss86", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
 
         String outputString = XMLUtils.prettyDocumentToString(signedDoc);
         outputString =
@@ -140,7 +140,7 @@ public class CryptoProviderTest extends org.junit.Assert {
         sign.setUserInfo("wss86", "security");
         sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
 
         String outputString = XMLUtils.prettyDocumentToString(signedDoc);
         outputString =
@@ -201,7 +201,7 @@ public class CryptoProviderTest extends org.junit.Assert {
             
             WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
             encrypt.setUseThisCert(cert);
-            Document encryptedDoc = encrypt.build(doc, crypto);
+            Document encryptedDoc = encrypt.build(crypto);
 
             if (LOG.isDebugEnabled()) {
                 String outputString =
@@ -257,7 +257,7 @@ public class CryptoProviderTest extends org.junit.Assert {
             
             WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
             encrypt.setUseThisCert(cert);
-            Document encryptedDoc = encrypt.build(doc, crypto);
+            Document encryptedDoc = encrypt.build(crypto);
 
             if (LOG.isDebugEnabled()) {
                 String outputString =

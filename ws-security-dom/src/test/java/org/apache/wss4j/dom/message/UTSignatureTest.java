@@ -77,7 +77,7 @@ public class UTSignatureTest extends org.junit.Assert {
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("bob", "security");
         builder.addDerivedKey(true, null, 1000);
-        builder.prepare(doc);
+        builder.prepare();
 
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setCustomTokenValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
@@ -86,7 +86,7 @@ public class UTSignatureTest extends org.junit.Assert {
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
 
-        Document signedDoc = sign.build(doc, null);
+        Document signedDoc = sign.build(null);
         builder.prependToHeader();
 
         String outputString =
@@ -128,7 +128,7 @@ public class UTSignatureTest extends org.junit.Assert {
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("colm", "security");
         builder.addDerivedKey(true, null, 1000);
-        builder.prepare(doc);
+        builder.prepare();
 
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setCustomTokenValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
@@ -137,7 +137,7 @@ public class UTSignatureTest extends org.junit.Assert {
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
 
-        Document signedDoc = sign.build(doc, null);
+        Document signedDoc = sign.build(null);
         builder.prependToHeader();
 
         String outputString =

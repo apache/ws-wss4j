@@ -92,7 +92,7 @@ public class PasswordEncryptorTest extends org.junit.Assert {
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
-        Document signedDoc = builder.build(doc, crypto);
+        Document signedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -143,7 +143,7 @@ public class PasswordEncryptorTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP);
 
-        Document encryptedDoc = builder.build(doc, crypto);
+        Document encryptedDoc = builder.build(crypto);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);

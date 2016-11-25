@@ -70,7 +70,7 @@ public class EncryptedDataInHeaderTest extends org.junit.Assert {
 
         WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(300);
-        timestamp.build(doc);
+        timestamp.build();
 
         WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -88,7 +88,7 @@ public class EncryptedDataInHeaderTest extends org.junit.Assert {
             );
         encrypt.getParts().add(encP);
 
-        encrypt.prepare(doc, crypto);
+        encrypt.prepare(crypto);
         encrypt.prependToHeader();
 
         // Append Reference List to security header

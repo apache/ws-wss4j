@@ -81,7 +81,7 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         secHeader.insertSecurityHeader();
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
-        Document signedDoc = wsSign.build(doc, samlAssertion);
+        Document signedDoc = wsSign.build(samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -125,7 +125,7 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document signedDoc = wsSign.build(doc, samlAssertion);
+        Document signedDoc = wsSign.build(samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -169,7 +169,7 @@ public class SamlAlgorithmSuiteTest extends org.junit.Assert {
         
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document signedDoc = wsSign.build(doc, samlAssertion);
+        Document signedDoc = wsSign.build(samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             String outputString =

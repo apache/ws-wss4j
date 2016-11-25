@@ -129,7 +129,7 @@ public class BSTKerberosTest extends org.junit.Assert {
             new WSEncryptionPart(bst.getID());
         sign.getParts().add(encP);
 
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -159,7 +159,7 @@ public class BSTKerberosTest extends org.junit.Assert {
 
         WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(600);
-        timestamp.build(doc);
+        timestamp.build();
 
         WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -168,7 +168,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         sign.getParts().add(new WSEncryptionPart(bst.getID()));
         sign.getParts().add(new WSEncryptionPart(timestamp.getId()));
 
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -280,7 +280,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         sign.setCustomTokenId(bst.getID());
         sign.setSecretKey(keyData);
 
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -321,7 +321,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         sign.setCustomTokenId(Base64.getMimeEncoder().encodeToString(digestBytes));
         sign.setSecretKey(keyData);
 
-        Document signedDoc = sign.build(doc, crypto);
+        Document signedDoc = sign.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -359,7 +359,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         builder.setEncryptSymmKey(false);
         builder.setCustomReferenceValue(AP_REQ);
         builder.setEncKeyId(bst.getID());
-        Document encryptedDoc = builder.build(doc, crypto);
+        Document encryptedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -400,7 +400,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         byte[] digestBytes = KeyUtils.generateDigest(keyData);
         builder.setEncKeyId(Base64.getMimeEncoder().encodeToString(digestBytes));
 
-        Document encryptedDoc = builder.build(doc, crypto);
+        Document encryptedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =

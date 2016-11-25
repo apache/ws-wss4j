@@ -1572,7 +1572,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
             builder.setSymmetricKey(key);
             builder.setEncryptSymmKey(false);
-            Document securedDocument = builder.build(doc, null);
+            Document securedDocument = builder.build(null);
 
             XPathExpression xPathExpression = getXPath("/soap:Envelope/soap:Body/xenc:EncryptedData/dsig:KeyInfo/wsse:SecurityTokenReference/wsse:KeyIdentifier[@ValueType='http://docs.oasis-open.org/wss/oasis-wss-soap-message-security-1.1#EncryptedKeySHA1']");
             Node node = (Node) xPathExpression.evaluate(securedDocument, XPathConstants.NODE);
@@ -2567,7 +2567,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
             builder.setUserInfo("receiver");
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
-            builder.prepare(doc, crypto);
+            builder.prepare(crypto);
 
             WSEncryptionPart encP = new WSEncryptionPart("definitions", "http://schemas.xmlsoap.org/wsdl/", "Element");
             List<WSEncryptionPart> encryptionParts = new ArrayList<WSEncryptionPart>();
@@ -2611,7 +2611,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
             builder.setUserInfo("receiver");
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
-            builder.prepare(doc, crypto);
+            builder.prepare(crypto);
 
             WSEncryptionPart encP = new WSEncryptionPart("definitions", "http://schemas.xmlsoap.org/wsdl/", "Element");
             List<WSEncryptionPart> encryptionParts = new ArrayList<WSEncryptionPart>();
@@ -2654,7 +2654,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
             builder.setUserInfo("receiver");
             Crypto crypto = CryptoFactory.getInstance("transmitter-crypto.properties");
-            builder.prepare(doc, crypto);
+            builder.prepare(crypto);
 
             WSEncryptionPart encP = new WSEncryptionPart("definitions", "http://schemas.xmlsoap.org/wsdl/", "Element");
             List<WSEncryptionPart> encryptionParts = new ArrayList<WSEncryptionPart>();

@@ -93,7 +93,7 @@ public class EncryptedKeyDataRefTest extends org.junit.Assert {
         /*
          * Prepare the Encrypt object with the token, setup data structure
          */
-        builder.prepare(doc, crypto);
+        builder.prepare(crypto);
 
         /*
          * Set up the parts structure to encrypt the body

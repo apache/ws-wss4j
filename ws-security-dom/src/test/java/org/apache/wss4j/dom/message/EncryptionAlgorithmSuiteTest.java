@@ -75,7 +75,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
 
-        Document encryptedDoc = builder.build(doc, crypto);
+        Document encryptedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -113,7 +113,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSA15);
 
-        Document encryptedDoc = builder.build(doc, wssCrypto);
+        Document encryptedDoc = builder.build(wssCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -150,7 +150,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSA15);
 
-        Document encryptedDoc = builder.build(doc, wssCrypto);
+        Document encryptedDoc = builder.build(wssCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -192,7 +192,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
 
-        Document encryptedDoc = builder.build(doc, wssCrypto);
+        Document encryptedDoc = builder.build(wssCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -231,7 +231,7 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
         builder.setSymmetricKey(key);
         builder.setEncryptSymmKey(false);
 
-        Document encryptedDoc = builder.build(doc, crypto);
+        Document encryptedDoc = builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =

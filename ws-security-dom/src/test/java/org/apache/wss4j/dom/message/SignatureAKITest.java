@@ -67,7 +67,7 @@ public class SignatureAKITest extends org.junit.Assert {
         builder.setUserInfo("wss40", "security");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         Crypto signingCrypto = CryptoFactory.getInstance("wss40.properties");
-        Document signedDoc = builder.build(doc, signingCrypto);
+        Document signedDoc = builder.build(signingCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -94,7 +94,7 @@ public class SignatureAKITest extends org.junit.Assert {
         builder.setUserInfo("wss40", "security");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         Crypto signingCrypto = CryptoFactory.getInstance("wss40.properties");
-        Document signedDoc = builder.build(doc, signingCrypto);
+        Document signedDoc = builder.build(signingCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =

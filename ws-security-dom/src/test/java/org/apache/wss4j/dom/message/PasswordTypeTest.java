@@ -62,7 +62,7 @@ public class PasswordTypeTest extends org.junit.Assert {
         
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("wernerd", "verySecret");
-        Document signedDoc = builder.build(doc);
+        Document signedDoc = builder.build();
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Digest:");
@@ -115,7 +115,7 @@ public class PasswordTypeTest extends org.junit.Assert {
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
         builder.setUserInfo("wernerd", "verySecret");
-        Document signedDoc = builder.build(doc);
+        Document signedDoc = builder.build();
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Text:");

@@ -40,8 +40,7 @@ import org.w3c.dom.Node;
 
 public class EncryptionDerivedAction extends AbstractDerivedAction implements Action {
 
-    public void execute(WSHandler handler, SecurityActionToken actionToken,
-                        Document doc, RequestData reqData)
+    public void execute(WSHandler handler, SecurityActionToken actionToken, RequestData reqData)
             throws WSSecurityException {
         CallbackHandler callbackHandler = reqData.getCallbackHandler();
         if (callbackHandler == null) {
@@ -80,6 +79,7 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
             wsEncrypt.setDerivedKeyLength(encryptionToken.getDerivedKeyLength());
         }
 
+        Document doc = reqData.getSecHeader().getSecurityHeaderElement().getOwnerDocument();
         Element tokenElement =
             setupTokenReference(reqData, encryptionToken, wsEncrypt, passwordCallback, doc);
         wsEncrypt.setAttachmentCallbackHandler(reqData.getAttachmentCallbackHandler());
@@ -93,7 +93,7 @@ public class EncryptionDerivedAction extends AbstractDerivedAction implements Ac
                 wsEncrypt.getParts().add(WSSecurityUtil.getDefaultEncryptionPart(doc));
             }
 
-            wsEncrypt.prepare(doc);
+            wsEncrypt.prepare();
 
             Element externRefList = wsEncrypt.encrypt();
 

@@ -138,7 +138,7 @@ public class XOPAttachmentTest extends AbstractTestBase {
         sigProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.file", "transmitter.jks");
         sigProperties.setProperty("org.apache.wss4j.crypto.merlin.keystore.password", "default");
         Crypto crypto = new Merlin(sigProperties, this.getClass().getClassLoader(), null);
-        Document encryptedDoc = encrypt.build(doc, crypto);
+        Document encryptedDoc = encrypt.build(crypto);
 
         // Find the SOAP Body + replace with a xop:Include to the attachment!
         Element soapBody = WSSecurityUtil.findBodyElement(encryptedDoc);

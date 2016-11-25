@@ -79,7 +79,7 @@ public class ReplayTest extends org.junit.Assert {
 
         WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(300);
-        Document createdDoc = timestamp.build(doc);
+        Document createdDoc = timestamp.build();
 
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -90,7 +90,7 @@ public class ReplayTest extends org.junit.Assert {
                 "Timestamp", WSConstants.WSU_NS, "");
         builder.getParts().add(encP);
 
-        builder.prepare(createdDoc, crypto);
+        builder.prepare(crypto);
 
         List<javax.xml.crypto.dsig.Reference> referenceList =
             builder.addReferencesToSign(builder.getParts());
@@ -130,7 +130,7 @@ public class ReplayTest extends org.junit.Assert {
 
         WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(300);
-        Document createdDoc = timestamp.build(doc);
+        Document createdDoc = timestamp.build();
 
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -141,7 +141,7 @@ public class ReplayTest extends org.junit.Assert {
                 "Timestamp", WSConstants.WSU_NS, "");
         builder.getParts().add(encP);
 
-        builder.prepare(createdDoc, crypto);
+        builder.prepare(crypto);
 
         List<javax.xml.crypto.dsig.Reference> referenceList =
             builder.addReferencesToSign(builder.getParts());
@@ -184,7 +184,7 @@ public class ReplayTest extends org.junit.Assert {
 
         WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(300);
-        Document createdDoc = timestamp.build(doc);
+        Document createdDoc = timestamp.build();
 
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -195,7 +195,7 @@ public class ReplayTest extends org.junit.Assert {
                 "Timestamp", WSConstants.WSU_NS, "");
         builder.getParts().add(encP);
 
-        builder.build(createdDoc, crypto);
+        builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -230,7 +230,7 @@ public class ReplayTest extends org.junit.Assert {
 
         WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(300);
-        Document createdDoc = timestamp.build(doc);
+        Document createdDoc = timestamp.build();
 
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -241,7 +241,7 @@ public class ReplayTest extends org.junit.Assert {
                 "Timestamp", WSConstants.WSU_NS, "");
         builder.getParts().add(encP);
 
-        builder.build(createdDoc, crypto);
+        builder.build(crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -279,7 +279,7 @@ public class ReplayTest extends org.junit.Assert {
 
         WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(0);
-        Document createdDoc = timestamp.build(doc);
+        Document createdDoc = timestamp.build();
 
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -290,7 +290,7 @@ public class ReplayTest extends org.junit.Assert {
                 "Timestamp", WSConstants.WSU_NS, "");
         builder.getParts().add(encP);
 
-        builder.prepare(createdDoc, crypto);
+        builder.prepare(crypto);
 
         List<javax.xml.crypto.dsig.Reference> referenceList =
             builder.addReferencesToSign(builder.getParts());
@@ -330,7 +330,7 @@ public class ReplayTest extends org.junit.Assert {
 
         WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(0);
-        Document createdDoc = timestamp.build(doc);
+        Document createdDoc = timestamp.build();
 
         WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
@@ -341,7 +341,7 @@ public class ReplayTest extends org.junit.Assert {
                 "Timestamp", WSConstants.WSU_NS, "");
         builder.getParts().add(encP);
 
-        builder.prepare(createdDoc, crypto);
+        builder.prepare(crypto);
 
         List<javax.xml.crypto.dsig.Reference> referenceList =
             builder.addReferencesToSign(builder.getParts());
@@ -384,7 +384,7 @@ public class ReplayTest extends org.junit.Assert {
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("wernerd", "verySecret");
 
-        Document signedDoc = builder.build(doc);
+        Document signedDoc = builder.build();
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -419,7 +419,7 @@ public class ReplayTest extends org.junit.Assert {
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("wernerd", "verySecret");
 
-        Document signedDoc = builder.build(doc);
+        Document signedDoc = builder.build();
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -476,7 +476,7 @@ public class ReplayTest extends org.junit.Assert {
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion);
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -531,7 +531,7 @@ public class ReplayTest extends org.junit.Assert {
 
         WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion);
+        Document unsignedDoc = wsSign.build(samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);

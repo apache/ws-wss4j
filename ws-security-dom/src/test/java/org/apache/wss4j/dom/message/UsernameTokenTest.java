@@ -133,7 +133,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("wernerd", "verySecret");
         LOG.info("Before adding UsernameToken PW Digest....");
-        Document signedDoc = builder.build(doc);
+        Document signedDoc = builder.build();
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Digest:");
@@ -186,7 +186,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setUserInfo("wernerd", 
                             Base64.getMimeEncoder().encodeToString(MessageDigest.getInstance("SHA-1").digest("verySecret".getBytes(StandardCharsets.UTF_8))));
         LOG.info("Before adding UsernameToken PW Digest....");
-        Document signedDoc = builder.build(doc);
+        Document signedDoc = builder.build();
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Digest:");
@@ -216,7 +216,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("badusername", "verySecret");
         LOG.info("Before adding UsernameToken PW Digest....");
-        Document signedDoc = builder.build(doc);
+        Document signedDoc = builder.build();
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Digest:");
@@ -248,7 +248,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("wernerd", "verySecre");
         LOG.info("Before adding UsernameToken PW Digest....");
-        Document signedDoc = builder.build(doc);
+        Document signedDoc = builder.build();
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Digest:");
@@ -278,7 +278,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("wernerd", "verySecret");
-        Document signedDoc = builder.build(doc);
+        Document signedDoc = builder.build();
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -435,7 +435,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
         builder.setUserInfo("wernerd", "verySecret");
         LOG.info("Before adding UsernameToken PW Text....");
-        Document signedDoc = builder.build(doc);
+        Document signedDoc = builder.build();
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Text:");
             String outputString =
@@ -477,7 +477,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
 
         builder.setUserInfo("wernerd", passwdDigest);
         LOG.info("Before adding UsernameToken PW Text....");
-        Document signedDoc = builder.build(doc);
+        Document signedDoc = builder.build();
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Text:");
             String outputString =
@@ -499,7 +499,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
         builder.setUserInfo("wernerd", "verySecre");
         LOG.info("Before adding UsernameToken PW Text....");
-        Document signedDoc = builder.build(doc);
+        Document signedDoc = builder.build();
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Text:");
             String outputString =
@@ -581,7 +581,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setPasswordType(null);
         builder.setUserInfo("nopassuser", null);
         LOG.info("Before adding UsernameToken with no password....");
-        Document signedDoc = builder.build(doc);
+        Document signedDoc = builder.build();
         if (LOG.isDebugEnabled()) {
             String outputString =
                 XMLUtils.prettyDocumentToString(signedDoc);
@@ -609,7 +609,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setPasswordType(WSConstants.PASSWORD_TEXT);
         builder.setUserInfo("emptyuser", "");
         LOG.info("Before adding UsernameToken with an empty password....");
-        Document signedDoc = builder.build(doc);
+        Document signedDoc = builder.build();
         if (LOG.isDebugEnabled()) {
             String outputString =
                 XMLUtils.prettyDocumentToString(signedDoc);
@@ -650,7 +650,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setPasswordType("RandomType");
         builder.setUserInfo("wernerd", "verySecret");
 
-        Document signedDoc = builder.build(doc);
+        Document signedDoc = builder.build();
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Text:");
@@ -682,7 +682,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setPasswordType("RandomType");
         builder.setUserInfo("wernerd", "verySecret");
 
-        Document signedDoc = builder.build(doc);
+        Document signedDoc = builder.build();
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW custom type:");
@@ -719,7 +719,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
         builder.setUserInfo("wernerd", "BAD_PASSWORD");
 
-        Document utDoc = builder.build(doc);
+        Document utDoc = builder.build();
 
         //
         // Manually find the Nonce node and set the content to null
@@ -763,7 +763,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
         builder.setUserInfo("wernerd", "BAD_PASSWORD");
 
-        Document utDoc = builder.build(doc);
+        Document utDoc = builder.build();
         //
         // Manually find the Created node and set the content to null
         //
@@ -803,7 +803,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("wernerd", "verySecret");
         LOG.info("Before adding UsernameToken PW Digest....");
-        Document signedDoc = builder.build(doc);
+        Document signedDoc = builder.build();
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
         assertTrue(outputString.contains("EncodingType"));
@@ -914,7 +914,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
         builder.setUserInfo("wernerd", "verySecret");
 
-        Document utDoc = builder.build(doc);
+        Document utDoc = builder.build();
 
         //
         // Manually find the Nonce node and duplicate it
@@ -958,7 +958,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
         builder.setUserInfo("wernerd", "verySecret");
 
-        Document utDoc = builder.build(doc);
+        Document utDoc = builder.build();
 
         //
         // Manually find the Created node and duplicate it
@@ -1002,7 +1002,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
         builder.setUserInfo("wernerd", "verySecret");
 
-        Document utDoc = builder.build(doc);
+        Document utDoc = builder.build();
 
         //
         // Manually find the Nonce node and duplicate it
@@ -1046,7 +1046,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         builder.setPasswordType(WSConstants.PASSWORD_DIGEST);
         builder.setUserInfo("wernerd", "verySecret");
 
-        Document utDoc = builder.build(doc);
+        Document utDoc = builder.build();
 
         //
         // Manually find the Nonce node and duplicate it
@@ -1131,7 +1131,7 @@ public class UsernameTokenTest extends org.junit.Assert implements CallbackHandl
         };
 
         builder.setWsTimeSource(spoofedTimeSource);
-        Document signedDoc = builder.build(doc);
+        Document signedDoc = builder.build();
 
         if (LOG.isDebugEnabled()) {
             String outputString =

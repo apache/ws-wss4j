@@ -60,6 +60,10 @@ public class WSSecSignatureBase extends WSSecBase {
     public WSSecSignatureBase(WSSecHeader securityHeader) {
         super(securityHeader);
     }
+    
+    public WSSecSignatureBase(Document doc) {
+        super(doc);
+    }
 
     /**
      * This method adds references to the Signature.
