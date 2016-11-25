@@ -77,11 +77,11 @@ public class ReplayTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecTimestamp timestamp = new WSSecTimestamp();
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(300);
-        Document createdDoc = timestamp.build(doc, secHeader);
+        Document createdDoc = timestamp.build(doc);
 
-        WSSecSignature builder = new WSSecSignature();
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
@@ -90,10 +90,10 @@ public class ReplayTest extends org.junit.Assert {
                 "Timestamp", WSConstants.WSU_NS, "");
         builder.getParts().add(encP);
 
-        builder.prepare(createdDoc, crypto, secHeader);
+        builder.prepare(createdDoc, crypto);
 
         List<javax.xml.crypto.dsig.Reference> referenceList =
-            builder.addReferencesToSign(builder.getParts(), secHeader);
+            builder.addReferencesToSign(builder.getParts());
 
         builder.computeSignature(referenceList, false, null);
 
@@ -128,11 +128,11 @@ public class ReplayTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecTimestamp timestamp = new WSSecTimestamp();
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(300);
-        Document createdDoc = timestamp.build(doc, secHeader);
+        Document createdDoc = timestamp.build(doc);
 
-        WSSecSignature builder = new WSSecSignature();
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
@@ -141,10 +141,10 @@ public class ReplayTest extends org.junit.Assert {
                 "Timestamp", WSConstants.WSU_NS, "");
         builder.getParts().add(encP);
 
-        builder.prepare(createdDoc, crypto, secHeader);
+        builder.prepare(createdDoc, crypto);
 
         List<javax.xml.crypto.dsig.Reference> referenceList =
-            builder.addReferencesToSign(builder.getParts(), secHeader);
+            builder.addReferencesToSign(builder.getParts());
 
         builder.computeSignature(referenceList, false, null);
 
@@ -182,11 +182,11 @@ public class ReplayTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecTimestamp timestamp = new WSSecTimestamp();
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(300);
-        Document createdDoc = timestamp.build(doc, secHeader);
+        Document createdDoc = timestamp.build(doc);
 
-        WSSecSignature builder = new WSSecSignature();
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
@@ -195,7 +195,7 @@ public class ReplayTest extends org.junit.Assert {
                 "Timestamp", WSConstants.WSU_NS, "");
         builder.getParts().add(encP);
 
-        builder.build(createdDoc, crypto, secHeader);
+        builder.build(createdDoc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -228,11 +228,11 @@ public class ReplayTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecTimestamp timestamp = new WSSecTimestamp();
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(300);
-        Document createdDoc = timestamp.build(doc, secHeader);
+        Document createdDoc = timestamp.build(doc);
 
-        WSSecSignature builder = new WSSecSignature();
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
@@ -241,7 +241,7 @@ public class ReplayTest extends org.junit.Assert {
                 "Timestamp", WSConstants.WSU_NS, "");
         builder.getParts().add(encP);
 
-        builder.build(createdDoc, crypto, secHeader);
+        builder.build(createdDoc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -277,11 +277,11 @@ public class ReplayTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecTimestamp timestamp = new WSSecTimestamp();
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(0);
-        Document createdDoc = timestamp.build(doc, secHeader);
+        Document createdDoc = timestamp.build(doc);
 
-        WSSecSignature builder = new WSSecSignature();
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
@@ -290,10 +290,10 @@ public class ReplayTest extends org.junit.Assert {
                 "Timestamp", WSConstants.WSU_NS, "");
         builder.getParts().add(encP);
 
-        builder.prepare(createdDoc, crypto, secHeader);
+        builder.prepare(createdDoc, crypto);
 
         List<javax.xml.crypto.dsig.Reference> referenceList =
-            builder.addReferencesToSign(builder.getParts(), secHeader);
+            builder.addReferencesToSign(builder.getParts());
 
         builder.computeSignature(referenceList, false, null);
 
@@ -328,11 +328,11 @@ public class ReplayTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecTimestamp timestamp = new WSSecTimestamp();
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(0);
-        Document createdDoc = timestamp.build(doc, secHeader);
+        Document createdDoc = timestamp.build(doc);
 
-        WSSecSignature builder = new WSSecSignature();
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
@@ -341,10 +341,10 @@ public class ReplayTest extends org.junit.Assert {
                 "Timestamp", WSConstants.WSU_NS, "");
         builder.getParts().add(encP);
 
-        builder.prepare(createdDoc, crypto, secHeader);
+        builder.prepare(createdDoc, crypto);
 
         List<javax.xml.crypto.dsig.Reference> referenceList =
-            builder.addReferencesToSign(builder.getParts(), secHeader);
+            builder.addReferencesToSign(builder.getParts());
 
         builder.computeSignature(referenceList, false, null);
 
@@ -377,13 +377,14 @@ public class ReplayTest extends org.junit.Assert {
 
     @Test
     public void testReplayedUsernameToken() throws Exception {
-        WSSecUsernameToken builder = new WSSecUsernameToken();
-        builder.setUserInfo("wernerd", "verySecret");
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, secHeader);
+        
+        WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
+        builder.setUserInfo("wernerd", "verySecret");
+
+        Document signedDoc = builder.build(doc);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -411,13 +412,14 @@ public class ReplayTest extends org.junit.Assert {
 
     @Test
     public void testEhCacheReplayedUsernameToken() throws Exception {
-        WSSecUsernameToken builder = new WSSecUsernameToken();
-        builder.setUserInfo("wernerd", "verySecret");
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, secHeader);
+        
+        WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
+        builder.setUserInfo("wernerd", "verySecret");
+
+        Document signedDoc = builder.build(doc);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -467,14 +469,14 @@ public class ReplayTest extends org.junit.Assert {
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
+        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
+
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(unsignedDoc);
@@ -522,14 +524,14 @@ public class ReplayTest extends org.junit.Assert {
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-
-        WSSecSAMLToken wsSign = new WSSecSAMLToken();
-
+        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        Document unsignedDoc = wsSign.build(doc, samlAssertion, secHeader);
+        WSSecSAMLToken wsSign = new WSSecSAMLToken(secHeader);
+
+        Document unsignedDoc = wsSign.build(doc, samlAssertion);
 
         String outputString =
             XMLUtils.prettyDocumentToString(unsignedDoc);

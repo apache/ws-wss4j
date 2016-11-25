@@ -63,10 +63,10 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
 
-            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.prepare(doc, crypto);
 
-            sctBuilder.prependSCTElementToHeader(doc, secHeader);
+            sctBuilder.prependSCTElementToHeader(doc);
 
             String out =
                 XMLUtils.prettyDocumentToString(doc);
@@ -101,7 +101,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
 
-            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.prepare(doc, crypto);
 
             byte[] tempSecret = WSSecurityUtil.generateNonce(16);
@@ -112,12 +112,12 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             String tokenId = sctBuilder.getSctId();
 
             // Derived key encryption
-            WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+            WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             encrBuilder.setExternalKey(tempSecret, tokenId);
-            encrBuilder.build(doc, secHeader);
+            encrBuilder.build(doc);
 
-            sctBuilder.prependSCTElementToHeader(doc, secHeader);
+            sctBuilder.prependSCTElementToHeader(doc);
 
             if (LOG.isDebugEnabled()) {
                 String out = XMLUtils.prettyDocumentToString(doc);
@@ -150,7 +150,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
 
-            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.setWscVersion(ConversationConstants.VERSION_05_12);
             sctBuilder.prepare(doc, crypto);
 
@@ -162,12 +162,12 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             String tokenId = sctBuilder.getSctId();
 
             // Derived key signature
-            WSSecDKSign sigBuilder = new WSSecDKSign();
+            WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
             sigBuilder.setExternalKey(tempSecret, tokenId);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-            sigBuilder.build(doc, secHeader);
+            sigBuilder.build(doc);
 
-            sctBuilder.prependSCTElementToHeader(doc, secHeader);
+            sctBuilder.prependSCTElementToHeader(doc);
 
             if (LOG.isDebugEnabled()) {
                 String out = XMLUtils.prettyDocumentToString(doc);
@@ -200,7 +200,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
 
-            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.prepare(doc, crypto);
 
             byte[] tempSecret = WSSecurityUtil.generateNonce(16);
@@ -209,13 +209,13 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             callbackHandler.addSecretKey(sctBuilder.getIdentifier(), tempSecret);
 
             // Derived key signature
-            WSSecDKSign sigBuilder = new WSSecDKSign();
+            WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
             sigBuilder.setExternalKey(tempSecret, sctBuilder.getIdentifier());
             sigBuilder.setTokenIdDirectId(true);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-            sigBuilder.build(doc, secHeader);
+            sigBuilder.build(doc);
 
-            sctBuilder.prependSCTElementToHeader(doc, secHeader);
+            sctBuilder.prependSCTElementToHeader(doc);
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("DKT Absolute");
@@ -238,7 +238,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
 
-            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.prepare(doc, crypto);
 
             byte[] tempSecret = WSSecurityUtil.generateNonce(16);
@@ -249,18 +249,18 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             String tokenId = sctBuilder.getSctId();
 
             // Derived key signature
-            WSSecDKSign sigBuilder = new WSSecDKSign();
+            WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
             sigBuilder.setExternalKey(tempSecret, tokenId);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-            sigBuilder.build(doc, secHeader);
+            sigBuilder.build(doc);
 
             // Derived key encryption
-            WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+            WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             encrBuilder.setExternalKey(tempSecret, tokenId);
-            encrBuilder.build(doc, secHeader);
+            encrBuilder.build(doc);
 
-            sctBuilder.prependSCTElementToHeader(doc, secHeader);
+            sctBuilder.prependSCTElementToHeader(doc);
 
             if (LOG.isDebugEnabled()) {
                 String out = XMLUtils.prettyDocumentToString(doc);
@@ -281,7 +281,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
 
-            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.prepare(doc, crypto);
 
             byte[] tempSecret = WSSecurityUtil.generateNonce(16);
@@ -292,18 +292,18 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             String tokenId = sctBuilder.getSctId();
 
             // Derived key encryption
-            WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+            WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
             encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
             encrBuilder.setExternalKey(tempSecret, tokenId);
-            encrBuilder.build(doc, secHeader);
+            encrBuilder.build(doc);
 
             // Derived key signature
-            WSSecDKSign sigBuilder = new WSSecDKSign();
+            WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
             sigBuilder.setExternalKey(tempSecret, tokenId);
             sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-            sigBuilder.build(doc, secHeader);
+            sigBuilder.build(doc);
 
-            sctBuilder.prependSCTElementToHeader(doc, secHeader);
+            sctBuilder.prependSCTElementToHeader(doc);
 
             if (LOG.isDebugEnabled()) {
                 String out = XMLUtils.prettyDocumentToString(doc);
@@ -329,7 +329,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
 
-            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken();
+            WSSecSecurityContextToken sctBuilder = new WSSecSecurityContextToken(secHeader, null);
             sctBuilder.prepare(doc, crypto);
 
             byte[] tempSecret = WSSecurityUtil.generateNonce(16);
@@ -339,15 +339,15 @@ public class SecurityContextTokenTest extends org.junit.Assert {
 
             String tokenId = sctBuilder.getSctId();
 
-            WSSecSignature builder = new WSSecSignature();
+            WSSecSignature builder = new WSSecSignature(secHeader);
             builder.setSecretKey(tempSecret);
             builder.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
             builder.setCustomTokenValueType(WSConstants.WSC_SCT);
             builder.setCustomTokenId(tokenId);
             builder.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
-            builder.build(doc, crypto, secHeader);
+            builder.build(doc, crypto);
 
-            sctBuilder.prependSCTElementToHeader(doc, secHeader);
+            sctBuilder.prependSCTElementToHeader(doc);
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("SCT sign");

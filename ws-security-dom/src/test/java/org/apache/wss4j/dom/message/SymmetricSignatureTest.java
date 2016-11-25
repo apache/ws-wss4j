@@ -99,12 +99,12 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecSignature sign = new WSSecSignature();
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
         sign.setSecretKey(keyData);
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
 
-        Document signedDoc = sign.build(doc, crypto, secHeader);
+        Document signedDoc = sign.build(doc, crypto);
 
         byte[] encodedBytes = KeyUtils.generateDigest(keyData);
         String identifier = Base64.getMimeEncoder().encodeToString(encodedBytes);
@@ -132,21 +132,21 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
+        WSSecEncryptedKey encrKey = new WSSecEncryptedKey(secHeader);
         encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         encrKey.setUserInfo("wss40", "security");
         encrKey.setSymmetricEncAlgorithm(WSConstants.AES_192);
         encrKey.prepare(doc, crypto);
 
-        WSSecSignature sign = new WSSecSignature();
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setCustomTokenId(encrKey.getId());
         sign.setSecretKey(encrKey.getEphemeralKey());
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
         sign.setCustomTokenValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
 
-        Document signedDoc = sign.build(doc, crypto, secHeader);
-        encrKey.prependToHeader(secHeader);
+        Document signedDoc = sign.build(doc, crypto);
+        encrKey.prependToHeader();
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed symmetric message DR:");
@@ -173,28 +173,28 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
+        WSSecEncryptedKey encrKey = new WSSecEncryptedKey(secHeader);
         encrKey.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         encrKey.setUserInfo("wss40", "security");
         encrKey.setSymmetricEncAlgorithm(WSConstants.AES_192);
         encrKey.prepare(doc, crypto);
 
-        WSSecEncrypt encrypt = new WSSecEncrypt();
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         encrypt.setEncKeyId(encrKey.getId());
         encrypt.setEphemeralKey(encrKey.getEphemeralKey());
         encrypt.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         encrypt.setEncryptSymmKey(false);
         encrypt.setEncryptedKeyElement(encrKey.getEncryptedKeyElement());
 
-        WSSecSignature sign = new WSSecSignature();
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setCustomTokenId(encrKey.getId());
         sign.setCustomTokenValueType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
         sign.setSecretKey(encrKey.getEphemeralKey());
         sign.setSignatureAlgorithm(SignatureMethod.HMAC_SHA1);
 
-        Document signedDoc = sign.build(doc, crypto, secHeader);
-        Document encryptedSignedDoc = encrypt.build(signedDoc, crypto, secHeader);
+        Document signedDoc = sign.build(doc, crypto);
+        Document encryptedSignedDoc = encrypt.build(signedDoc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed and encrypted message with IssuerSerial key identifier (both), 3DES:");

@@ -63,13 +63,14 @@ public class SignatureKeyValueTest extends org.junit.Assert {
      */
     @Test
     public void testRSAKeyValue() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("wss40", "security");
-        builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("wss40", "security");
+        builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
+        Document signedDoc = builder.build(doc, crypto);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -105,14 +106,15 @@ public class SignatureKeyValueTest extends org.junit.Assert {
      */
     @Test
     public void testBadRSAKeyValue() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("wss86", "security");
-        builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("wss86", "security");
+        builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
         Document signedDoc =
-            builder.build(doc, CryptoFactory.getInstance("wss86.properties"), secHeader);
+            builder.build(doc, CryptoFactory.getInstance("wss86.properties"));
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -140,13 +142,14 @@ public class SignatureKeyValueTest extends org.junit.Assert {
      */
     @Test
     public void testDSAKeyValue() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("wss40DSA", "security");
-        builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("wss40DSA", "security");
+        builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
+        Document signedDoc = builder.build(doc, crypto);
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);

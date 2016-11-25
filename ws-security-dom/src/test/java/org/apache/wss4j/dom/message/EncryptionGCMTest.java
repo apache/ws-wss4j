@@ -81,14 +81,15 @@ public class EncryptionGCMTest extends org.junit.Assert {
 
     @Test
     public void testAES128GCM() throws Exception {
-        WSSecEncrypt builder = new WSSecEncrypt();
-        builder.setUserInfo("wss40");
-        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        builder.setSymmetricEncAlgorithm(WSConstants.AES_128_GCM);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document encryptedDoc = builder.build(doc, crypto, secHeader);
+        
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
+        builder.setUserInfo("wss40");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        builder.setSymmetricEncAlgorithm(WSConstants.AES_128_GCM);
+        Document encryptedDoc = builder.build(doc, crypto);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -102,14 +103,15 @@ public class EncryptionGCMTest extends org.junit.Assert {
 
     @Test
     public void testAES256GCM() throws Exception {
-        WSSecEncrypt builder = new WSSecEncrypt();
-        builder.setUserInfo("wss40");
-        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        builder.setSymmetricEncAlgorithm(WSConstants.AES_256_GCM);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document encryptedDoc = builder.build(doc, crypto, secHeader);
+        
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
+        builder.setUserInfo("wss40");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        builder.setSymmetricEncAlgorithm(WSConstants.AES_256_GCM);
+        Document encryptedDoc = builder.build(doc, crypto);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -123,17 +125,18 @@ public class EncryptionGCMTest extends org.junit.Assert {
 
     @Test
     public void testAES192GCM_RSAOAEP_SHA256_MGFSHA256() throws Exception {
-        WSSecEncrypt builder = new WSSecEncrypt();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_192_GCM);
         builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP_XENC11);
         builder.setDigestAlgorithm(WSConstants.SHA256);
         builder.setMGFAlgorithm(WSConstants.MGF_SHA256);
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document encryptedDoc = builder.build(doc, crypto, secHeader);
+        Document encryptedDoc = builder.build(doc, crypto);
 
         String outputString =
                 XMLUtils.prettyDocumentToString(encryptedDoc);

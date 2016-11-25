@@ -55,16 +55,16 @@ public class NoSoapPrefixSignatureTest extends org.junit.Assert {
      */
     @Test
     public void testNoSOAPNamespacePrefix() throws Exception {
-        WSSecSignature sign = new WSSecSignature();
-        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.setActor("bob");
         secHeader.insertSecurityHeader();
-        Document signedDoc = sign.build(doc, crypto, secHeader);
+        
+        WSSecSignature sign = new WSSecSignature(secHeader);
+        sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+
+        Document signedDoc = sign.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =

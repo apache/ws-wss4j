@@ -95,12 +95,13 @@ public class ModifiedRequestTest extends org.junit.Assert {
      */
     @Test
     public void testMovedElement() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        LOG.info("Before Signing....");
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -109,13 +110,13 @@ public class ModifiedRequestTest extends org.junit.Assert {
                 "");
         builder.getParts().add(encP);
 
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         //
         // Replace the signed element with a modified element, and move the original
         // signed element into the SOAP header
         //
-        Element secHeaderElement = secHeader.getSecurityHeader();
+        Element secHeaderElement = secHeader.getSecurityHeaderElement();
         Element envelopeElement = signedDoc.getDocumentElement();
         Node valueNode =
             envelopeElement.getElementsByTagNameNS("http://blah.com", "value").item(0);
@@ -149,12 +150,13 @@ public class ModifiedRequestTest extends org.junit.Assert {
      */
     @Test
     public void testMovedElementChangedId() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        LOG.info("Before Signing....");
         Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        LOG.info("Before Signing....");
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -163,13 +165,13 @@ public class ModifiedRequestTest extends org.junit.Assert {
                 "");
         builder.getParts().add(encP);
 
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         //
         // Replace the signed element with a modified element, and move the original
         // signed element into the SOAP header
         //
-        Element secHeaderElement = secHeader.getSecurityHeader();
+        Element secHeaderElement = secHeader.getSecurityHeaderElement();
         Element envelopeElement = signedDoc.getDocumentElement();
         Node valueNode =
             envelopeElement.getElementsByTagNameNS("http://blah.com", "value").item(0);
@@ -228,22 +230,22 @@ public class ModifiedRequestTest extends org.junit.Assert {
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(samlCallback);
-
-        WSSecSignatureSAML wsSign = new WSSecSignatureSAML();
-        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-
+        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
+        WSSecSignatureSAML wsSign = new WSSecSignatureSAML(secHeader);
+        wsSign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+
         Document signedDoc =
             wsSign.build(
                 doc, null, samlAssertion, crypto, "16c73ab6-b892-458f-abf5-2f875f74882e",
-                "security", secHeader
+                "security"
             );
         Element assertionElement = (Element) samlAssertion.getElement().cloneNode(true);
         assertionElement.removeChild(assertionElement.getFirstChild());
-        secHeader.getSecurityHeader().appendChild(assertionElement);
+        secHeader.getSecurityHeaderElement().appendChild(assertionElement);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML 1.1 Authn Assertion (sender vouches):");
@@ -271,11 +273,11 @@ public class ModifiedRequestTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecUsernameToken usernameToken = new WSSecUsernameToken();
+        WSSecUsernameToken usernameToken = new WSSecUsernameToken(secHeader);
         usernameToken.setUserInfo("wss86", "security");
-        Document createdDoc = usernameToken.build(doc, secHeader);
+        Document createdDoc = usernameToken.build(doc);
 
-        WSSecSignature builder = new WSSecSignature();
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
         WSEncryptionPart encP =
@@ -285,14 +287,14 @@ public class ModifiedRequestTest extends org.junit.Assert {
                 "");
         builder.getParts().add(encP);
 
-        builder.prepare(createdDoc, crypto, secHeader);
+        builder.prepare(createdDoc, crypto);
 
         List<javax.xml.crypto.dsig.Reference> referenceList =
-            builder.addReferencesToSign(builder.getParts(), secHeader);
+            builder.addReferencesToSign(builder.getParts());
 
         builder.computeSignature(referenceList, false, null);
 
-        secHeader.getSecurityHeader().appendChild(
+        secHeader.getSecurityHeaderElement().appendChild(
             usernameToken.getUsernameTokenElement().cloneNode(true)
         );
 
@@ -318,15 +320,17 @@ public class ModifiedRequestTest extends org.junit.Assert {
      */
     @Test
     public void testModifiedEncryptedDataStructure() throws Exception {
-        WSSecEncrypt builder = new WSSecEncrypt();
-        builder.setUserInfo("wss40");
-        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
+        builder.setUserInfo("wss40");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
+
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
-        Document encryptedDoc = builder.build(doc, wssCrypto, secHeader);
+        Document encryptedDoc = builder.build(doc, wssCrypto);
 
         Element body = WSSecurityUtil.findBodyElement(doc);
         Element encryptionMethod =
@@ -353,15 +357,17 @@ public class ModifiedRequestTest extends org.junit.Assert {
      */
     @Test
     public void testModifiedEncryptedDataCipherValue() throws Exception {
-        WSSecEncrypt builder = new WSSecEncrypt();
-        builder.setUserInfo("wss40");
-        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
+        builder.setUserInfo("wss40");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
+
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
-        Document encryptedDoc = builder.build(doc, wssCrypto, secHeader);
+        Document encryptedDoc = builder.build(doc, wssCrypto);
 
         Element body = WSSecurityUtil.findBodyElement(doc);
         Element cipherValue =
@@ -400,19 +406,20 @@ public class ModifiedRequestTest extends org.junit.Assert {
      */
     @Test
     public void testModifiedSecurityHeaderEncryptedDataCipherValue() throws Exception {
-        WSSecEncrypt builder = new WSSecEncrypt();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
 
-        WSSecTimestamp timestamp = new WSSecTimestamp();
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(300);
-        timestamp.build(doc, secHeader);
+        timestamp.build(doc);
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -421,7 +428,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
                 "");
         builder.getParts().add(encP);
 
-        Document encryptedDoc = builder.build(doc, wssCrypto, secHeader);
+        Document encryptedDoc = builder.build(doc, wssCrypto);
 
         Element securityHeader =
             WSSecurityUtil.getSecurityHeader(encryptedDoc, "");
@@ -462,15 +469,17 @@ public class ModifiedRequestTest extends org.junit.Assert {
      */
     @Test
     public void testModifiedEncryptedKeyCipherValue() throws Exception {
-        WSSecEncrypt builder = new WSSecEncrypt();
-        builder.setUserInfo("wss40");
-        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
+        builder.setUserInfo("wss40");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
+
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
-        Document encryptedDoc = builder.build(doc, wssCrypto, secHeader);
+        Document encryptedDoc = builder.build(doc, wssCrypto);
 
         Element encryptedKey =
             XMLUtils.findElement(doc.getDocumentElement(), "EncryptedKey", WSConstants.ENC_NS);
@@ -511,15 +520,16 @@ public class ModifiedRequestTest extends org.junit.Assert {
      */
     @Test
     public void testModifiedSignatureReference() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
-        WSSecTimestamp timestamp = new WSSecTimestamp();
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(300);
-        Document createdDoc = timestamp.build(doc, secHeader);
+        Document createdDoc = timestamp.build(doc);
 
         WSEncryptionPart encP =
             new WSEncryptionPart(
@@ -528,7 +538,7 @@ public class ModifiedRequestTest extends org.junit.Assert {
                 "");
         builder.getParts().add(encP);
 
-        Document signedDoc = builder.build(createdDoc, crypto, secHeader);
+        Document signedDoc = builder.build(createdDoc, crypto);
 
         // Modify the Created text of the Timestamp element
         Element timestampElement = timestamp.getElement();
@@ -563,14 +573,15 @@ public class ModifiedRequestTest extends org.junit.Assert {
      */
     @Test
     public void testUntrustedSignature() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("wss40", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("wss40", "security");
 
         Crypto wss40Crypto = CryptoFactory.getInstance("wss40.properties");
-        Document signedDoc = builder.build(doc, wss40Crypto, secHeader);
+        Document signedDoc = builder.build(doc, wss40Crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -591,13 +602,14 @@ public class ModifiedRequestTest extends org.junit.Assert {
      */
     @Test
     public void testModifiedSignature() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         // Modify the Signature element
         Element signatureElement = builder.getSignatureElement();

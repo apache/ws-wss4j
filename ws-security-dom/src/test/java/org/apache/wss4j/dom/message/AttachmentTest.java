@@ -95,7 +95,11 @@ public class AttachmentTest extends Assert {
 
     @Test
     public void testXMLAttachmentContentSignature() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
         builder.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
@@ -113,10 +117,7 @@ public class AttachmentTest extends Assert {
         builder.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
         LOG.info("Before Signing....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -140,7 +141,11 @@ public class AttachmentTest extends Assert {
 
     @Test
     public void testInvalidXMLAttachmentContentSignature() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
         builder.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
@@ -158,10 +163,7 @@ public class AttachmentTest extends Assert {
         builder.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
         LOG.info("Before Signing....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -196,7 +198,11 @@ public class AttachmentTest extends Assert {
 
     @Test
     public void testXMLAttachmentCompleteSignature() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
         builder.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
@@ -214,10 +220,7 @@ public class AttachmentTest extends Assert {
         builder.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
         LOG.info("Before Signing....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -241,7 +244,11 @@ public class AttachmentTest extends Assert {
 
     @Test
     public void testInvalidXMLAttachmentCompleteSignature() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
         builder.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
@@ -259,10 +266,7 @@ public class AttachmentTest extends Assert {
         builder.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
         LOG.info("Before Signing....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -296,7 +300,11 @@ public class AttachmentTest extends Assert {
 
     @Test
     public void testMultipleAttachmentCompleteSignature() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
         builder.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
@@ -322,10 +330,7 @@ public class AttachmentTest extends Assert {
         builder.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
         LOG.info("Before Signing....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, crypto, secHeader);
+        Document signedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -354,12 +359,12 @@ public class AttachmentTest extends Assert {
     @Test
     public void testXMLAttachmentContentEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecEncrypt encrypt = new WSSecEncrypt();
-        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
         encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Content"));
@@ -376,7 +381,7 @@ public class AttachmentTest extends Assert {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        Document encryptedDoc = encrypt.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -413,13 +418,13 @@ public class AttachmentTest extends Assert {
     @Test
     public void testXMLAttachmentContentEncryptionGCM() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecEncrypt encrypt = new WSSecEncrypt();
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         encrypt.setSymmetricEncAlgorithm(WSConstants.AES_128_GCM);
-
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
 
         encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
         encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Content"));
@@ -436,7 +441,7 @@ public class AttachmentTest extends Assert {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        Document encryptedDoc = encrypt.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -473,12 +478,12 @@ public class AttachmentTest extends Assert {
     @Test
     public void testInvalidXMLAttachmentContentEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecEncrypt encrypt = new WSSecEncrypt();
-        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
         encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Content"));
@@ -495,7 +500,7 @@ public class AttachmentTest extends Assert {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        Document encryptedDoc = encrypt.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -528,12 +533,12 @@ public class AttachmentTest extends Assert {
     @Test
     public void testXMLAttachmentContentEncryptionExternalReferenceList() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecEncrypt encrypt = new WSSecEncrypt();
-        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
         encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Content"));
@@ -552,9 +557,9 @@ public class AttachmentTest extends Assert {
 
         encrypt.prepare(doc, crypto);
         Element refs = encrypt.encrypt();
-        encrypt.addAttachmentEncryptedDataElements(secHeader);
-        encrypt.addExternalRefElement(refs, secHeader);
-        encrypt.prependToHeader(secHeader);
+        encrypt.addAttachmentEncryptedDataElements();
+        encrypt.addExternalRefElement(refs);
+        encrypt.prependToHeader();
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(doc);
@@ -593,12 +598,12 @@ public class AttachmentTest extends Assert {
     @Test
     public void testXMLAttachmentContentEncryptionNoReference() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecEncrypt encrypt = new WSSecEncrypt();
-        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
         encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Content"));
@@ -617,9 +622,9 @@ public class AttachmentTest extends Assert {
 
         encrypt.prepare(doc, crypto);
         encrypt.encrypt();
-        encrypt.addAttachmentEncryptedDataElements(secHeader);
-        //encrypt.addExternalRefElement(refs, secHeader);
-        encrypt.prependToHeader(secHeader);
+        encrypt.addAttachmentEncryptedDataElements();
+        //encrypt.addExternalRefElement(refs);
+        encrypt.prependToHeader();
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(doc);
@@ -657,12 +662,12 @@ public class AttachmentTest extends Assert {
     @Test
     public void testXMLAttachmentCompleteEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecEncrypt encrypt = new WSSecEncrypt();
-        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
         encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Element"));
@@ -679,7 +684,7 @@ public class AttachmentTest extends Assert {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        Document encryptedDoc = encrypt.build(doc, crypto);
 
         Assert.assertEquals(1, encryptedAttachments.get(0).getHeaders().size());
 
@@ -705,12 +710,12 @@ public class AttachmentTest extends Assert {
     @Test
     public void testInvalidXMLAttachmentCompleteEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecEncrypt encrypt = new WSSecEncrypt();
-        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
         encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Element"));
@@ -727,7 +732,7 @@ public class AttachmentTest extends Assert {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        Document encryptedDoc = encrypt.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -757,12 +762,12 @@ public class AttachmentTest extends Assert {
     @Test
     public void testMultipleAttachmentCompleteEncryption() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecEncrypt encrypt = new WSSecEncrypt();
-        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
-        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
+        encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
         encrypt.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
         encrypt.getParts().add(new WSEncryptionPart("cid:Attachments", "Element"));
@@ -787,7 +792,7 @@ public class AttachmentTest extends Assert {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        Document encryptedDoc = encrypt.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -822,7 +827,7 @@ public class AttachmentTest extends Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecSignature signature = new WSSecSignature();
+        WSSecSignature signature = new WSSecSignature(secHeader);
         signature.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
         signature.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
@@ -839,9 +844,9 @@ public class AttachmentTest extends Assert {
             new AttachmentCallbackHandler(Collections.singletonList(attachment));
         signature.setAttachmentCallbackHandler(attachmentCallbackHandler);
 
-        doc = signature.build(doc, crypto, secHeader);
+        doc = signature.build(doc, crypto);
 
-        WSSecEncrypt encrypt = new WSSecEncrypt();
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         encrypt.getParts().addAll(signature.getParts());
@@ -851,7 +856,7 @@ public class AttachmentTest extends Assert {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        Document encryptedDoc = encrypt.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -887,7 +892,7 @@ public class AttachmentTest extends Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecSignature signature = new WSSecSignature();
+        WSSecSignature signature = new WSSecSignature(secHeader);
         signature.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
 
         signature.getParts().add(new WSEncryptionPart("Body", "http://schemas.xmlsoap.org/soap/envelope/", "Content"));
@@ -917,9 +922,9 @@ public class AttachmentTest extends Assert {
             }
         });
 
-        doc = signature.build(doc, crypto, secHeader);
+        doc = signature.build(doc, crypto);
 
-        WSSecEncrypt encrypt = new WSSecEncrypt();
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
         encrypt.getParts().addAll(signature.getParts());
@@ -940,7 +945,7 @@ public class AttachmentTest extends Assert {
             }
         });
 
-        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        Document encryptedDoc = encrypt.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -986,7 +991,7 @@ public class AttachmentTest extends Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecEncrypt encrypt = new WSSecEncrypt();
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
@@ -1005,9 +1010,9 @@ public class AttachmentTest extends Assert {
         encrypt.setAttachmentCallbackHandler(attachmentCallbackHandler);
         List<Attachment> encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        doc = encrypt.build(doc, crypto, secHeader);
+        doc = encrypt.build(doc, crypto);
 
-        WSSecSignature signature = new WSSecSignature();
+        WSSecSignature signature = new WSSecSignature(secHeader);
         signature.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         signature.getParts().addAll(encrypt.getParts());
 
@@ -1015,7 +1020,7 @@ public class AttachmentTest extends Assert {
         signature.setAttachmentCallbackHandler(attachmentCallbackHandler);
         encryptedAttachments = attachmentCallbackHandler.getResponseAttachments();
 
-        doc = signature.build(doc, crypto, secHeader);
+        doc = signature.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(doc);
@@ -1051,7 +1056,7 @@ public class AttachmentTest extends Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecEncrypt encrypt = new WSSecEncrypt();
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
@@ -1082,9 +1087,9 @@ public class AttachmentTest extends Assert {
             }
         });
 
-        doc = encrypt.build(doc, crypto, secHeader);
+        doc = encrypt.build(doc, crypto);
 
-        WSSecSignature signature = new WSSecSignature();
+        WSSecSignature signature = new WSSecSignature(secHeader);
         signature.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         signature.getParts().addAll(encrypt.getParts());
 
@@ -1104,7 +1109,7 @@ public class AttachmentTest extends Assert {
             }
         });
 
-        doc = signature.build(doc, crypto, secHeader);
+        doc = signature.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString = XMLUtils.prettyDocumentToString(doc);

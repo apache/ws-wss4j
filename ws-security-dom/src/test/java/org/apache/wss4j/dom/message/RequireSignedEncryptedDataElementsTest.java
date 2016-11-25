@@ -287,17 +287,17 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
     }
 
     private Document getRequestDocument() throws Exception {
-        WSSecEncrypt encrypt = new WSSecEncrypt();
-        WSSecSignature sign = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+        WSSecSignature sign = new WSSecSignature(secHeader);
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         LOG.info("Before Encryption....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        Document encryptedDoc = encrypt.build(doc, crypto, secHeader);
+        Document encryptedDoc = encrypt.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Encryption....");
@@ -306,7 +306,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
 
-        Document encryptedSignedDoc = sign.build(encryptedDoc, crypto, secHeader);
+        Document encryptedSignedDoc = sign.build(encryptedDoc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -318,17 +318,17 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
     }
 
     private Document getRequestDocumentEncryptionFirst() throws Exception {
-        WSSecEncrypt encrypt = new WSSecEncrypt();
-        WSSecSignature sign = new WSSecSignature();
+        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+        WSSecSignature sign = new WSSecSignature(secHeader);
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
         sign.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         LOG.info("Before Encryption....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPMSG);
 
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        Document signedDoc = sign.build(doc, crypto, secHeader);
+        Document signedDoc = sign.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Signing....");
@@ -337,7 +337,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
 
-        Document encryptedDoc = encrypt.build(signedDoc, crypto, secHeader);
+        Document encryptedDoc = encrypt.build(signedDoc, crypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After Encryption....");

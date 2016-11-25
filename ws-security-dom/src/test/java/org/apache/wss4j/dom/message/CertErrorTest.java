@@ -48,13 +48,14 @@ public class CertErrorTest extends org.junit.Assert {
      */
     @Test
     public void testX509Signature() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("bob", "security");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("bob", "security");
         try {
-            builder.build(doc, CryptoFactory.getInstance(), secHeader);
+            builder.build(doc, CryptoFactory.getInstance());
             fail("Expected failure on a bad username");
         } catch (WSSecurityException ex) {
             String expectedError = "No certificates for user \"bob\" were found for signature";
@@ -67,13 +68,14 @@ public class CertErrorTest extends org.junit.Assert {
      */
     @Test
     public void testEncryption() throws Exception {
-        WSSecEncrypt builder = new WSSecEncrypt();
-        builder.setUserInfo("alice");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
+        builder.setUserInfo("alice");
         try {
-            builder.build(doc, CryptoFactory.getInstance(), secHeader);
+            builder.build(doc, CryptoFactory.getInstance());
             fail("Expected failure on a bad username");
         } catch (WSSecurityException ex) {
             String expectedError = "No certificates for user \"alice\" were found for encryption";

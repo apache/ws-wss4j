@@ -66,16 +66,16 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
 
     @Test
     public void testEncryption() throws Exception {
-        WSSecEncrypt builder = new WSSecEncrypt();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        Document encryptedDoc = builder.build(doc, crypto, secHeader);
+        Document encryptedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -102,18 +102,18 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
     public void testEncryptionKeyTransportRSA15() throws Exception {
 
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
-        WSSecEncrypt builder = new WSSecEncrypt();
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSA15);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        Document encryptedDoc = builder.build(doc, wssCrypto, secHeader);
+        Document encryptedDoc = builder.build(doc, wssCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -139,18 +139,18 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
     public void testEncryptionKeyTransportRSA15NoAlgorithmSuite() throws Exception {
 
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
+        
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
-        WSSecEncrypt builder = new WSSecEncrypt();
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSA15);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        Document encryptedDoc = builder.build(doc, wssCrypto, secHeader);
+        Document encryptedDoc = builder.build(doc, wssCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -183,16 +183,16 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
 
         Crypto wssCrypto = CryptoFactory.getInstance("wss40.properties");
 
-        WSSecEncrypt builder = new WSSecEncrypt();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
 
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-
-        Document encryptedDoc = builder.build(doc, wssCrypto, secHeader);
+        Document encryptedDoc = builder.build(doc, wssCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -221,17 +221,17 @@ public class EncryptionAlgorithmSuiteTest extends org.junit.Assert {
         keyGen.init(128);
         SecretKey key = keyGen.generateKey();
         byte[] keyData = key.getEncoded();
-
-        WSSecEncrypt builder = new WSSecEncrypt();
-        builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
-        builder.setSymmetricKey(key);
-        builder.setEncryptSymmKey(false);
-
+        
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        Document encryptedDoc = builder.build(doc, crypto, secHeader);
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
+        builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
+        builder.setSymmetricKey(key);
+        builder.setEncryptSymmKey(false);
+
+        Document encryptedDoc = builder.build(doc, crypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =

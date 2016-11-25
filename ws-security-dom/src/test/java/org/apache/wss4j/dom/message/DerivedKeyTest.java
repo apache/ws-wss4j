@@ -71,7 +71,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         secHeader.insertSecurityHeader();
 
         //EncryptedKey
-        WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
+        WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
         encrKeyBuilder.setUserInfo("wss40");
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
         encrKeyBuilder.prepare(doc, crypto);
@@ -81,13 +81,13 @@ public class DerivedKeyTest extends org.junit.Assert {
         String tokenIdentifier = encrKeyBuilder.getId();
 
         //Derived key encryption
-        WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+        WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         encrBuilder.setExternalKey(ek, tokenIdentifier);
-        Document encryptedDoc = encrBuilder.build(doc, secHeader);
+        Document encryptedDoc = encrBuilder.build(doc);
 
-        encrKeyBuilder.prependToHeader(secHeader);
-        encrKeyBuilder.prependBSTElementToHeader(secHeader);
+        encrKeyBuilder.prependToHeader();
+        encrKeyBuilder.prependBSTElementToHeader();
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: 3DES  + DerivedKeys");
@@ -109,7 +109,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         secHeader.insertSecurityHeader();
 
         //EncryptedKey
-        WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
+        WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
         encrKeyBuilder.setUserInfo("wss40");
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
         encrKeyBuilder.prepare(doc, crypto);
@@ -119,13 +119,13 @@ public class DerivedKeyTest extends org.junit.Assert {
         String tokenIdentifier = encrKeyBuilder.getId();
 
         //Derived key encryption
-        WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+        WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         encrBuilder.setExternalKey(ek, tokenIdentifier);
-        Document encryptedDoc = encrBuilder.build(doc, secHeader);
+        Document encryptedDoc = encrBuilder.build(doc);
 
-        encrKeyBuilder.prependToHeader(secHeader);
-        encrKeyBuilder.prependBSTElementToHeader(secHeader);
+        encrKeyBuilder.prependToHeader();
+        encrKeyBuilder.prependBSTElementToHeader();
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: 3DES  + DerivedKeys");
@@ -143,7 +143,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         secHeader.insertSecurityHeader();
 
         //EncryptedKey
-        WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
+        WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
         encrKeyBuilder.setUserInfo("wss40");
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
         encrKeyBuilder.prepare(doc, crypto);
@@ -153,13 +153,13 @@ public class DerivedKeyTest extends org.junit.Assert {
         String tokenIdentifier = encrKeyBuilder.getId();
 
         //Derived key encryption
-        WSSecDKSign sigBuilder = new WSSecDKSign();
+        WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
         sigBuilder.setExternalKey(ek, tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-        /* Document signedDoc = */ sigBuilder.build(doc, secHeader);
+        /* Document signedDoc = */ sigBuilder.build(doc);
 
-        encrKeyBuilder.prependToHeader(secHeader);
-        encrKeyBuilder.prependBSTElementToHeader(secHeader);
+        encrKeyBuilder.prependToHeader();
+        encrKeyBuilder.prependBSTElementToHeader();
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Signed message: 3DES  + DerivedKeys");
@@ -195,13 +195,13 @@ public class DerivedKeyTest extends org.junit.Assert {
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         secToken.setKeyIdentifierThumb(certs[0]);
 
-        WSSecDKSign sigBuilder = new WSSecDKSign();
+        WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
         java.security.Key key = crypto.getPrivateKey("wss40", "security");
         sigBuilder.setExternalKey(key.getEncoded(), secToken.getElement());
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-        sigBuilder.build(doc, secHeader);
+        sigBuilder.build(doc);
 
-        sigBuilder.prependDKElementToHeader(secHeader);
+        sigBuilder.prependDKElementToHeader();
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: ThumbprintSHA1 + DerivedKeys");
@@ -236,13 +236,13 @@ public class DerivedKeyTest extends org.junit.Assert {
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         secToken.setKeyIdentifierSKI(certs[0], crypto);
 
-        WSSecDKSign sigBuilder = new WSSecDKSign();
+        WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
         java.security.Key key = crypto.getPrivateKey("wss40", "security");
         sigBuilder.setExternalKey(key.getEncoded(), secToken.getElement());
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
-        sigBuilder.build(doc, secHeader);
+        sigBuilder.build(doc);
 
-        sigBuilder.prependDKElementToHeader(secHeader);
+        sigBuilder.prependDKElementToHeader();
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: SKI + DerivedKeys");
@@ -266,7 +266,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         secHeader.insertSecurityHeader();
 
         //EncryptedKey
-        WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
+        WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
         encrKeyBuilder.setUserInfo("wss40");
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
         encrKeyBuilder.prepare(doc, crypto);
@@ -276,20 +276,20 @@ public class DerivedKeyTest extends org.junit.Assert {
         String tokenIdentifier = encrKeyBuilder.getId();
 
         //Derived key encryption
-        WSSecDKSign sigBuilder = new WSSecDKSign();
+        WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
         sigBuilder.setExternalKey(ek, tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         LOG.info("Before HMAC-SHA1 signature");
-        Document signedDoc = sigBuilder.build(doc, secHeader);
+        Document signedDoc = sigBuilder.build(doc);
 
         //Derived key signature
-        WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+        WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         encrBuilder.setExternalKey(ek, tokenIdentifier);
-        Document signedEncryptedDoc = encrBuilder.build(signedDoc, secHeader);
+        Document signedEncryptedDoc = encrBuilder.build(signedDoc);
 
-        encrKeyBuilder.prependToHeader(secHeader);
-        encrKeyBuilder.prependBSTElementToHeader(secHeader);
+        encrKeyBuilder.prependToHeader();
+        encrKeyBuilder.prependBSTElementToHeader();
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: 3DES  + DerivedKeys");
@@ -307,7 +307,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         secHeader.insertSecurityHeader();
 
         //EncryptedKey
-        WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey();
+        WSSecEncryptedKey encrKeyBuilder = new WSSecEncryptedKey(secHeader);
         encrKeyBuilder.setUserInfo("wss40");
         encrKeyBuilder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
         encrKeyBuilder.prepare(doc, crypto);
@@ -317,20 +317,20 @@ public class DerivedKeyTest extends org.junit.Assert {
         String tokenIdentifier = encrKeyBuilder.getId();
 
         //Derived key encryption
-        WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt();
+        WSSecDKEncrypt encrBuilder = new WSSecDKEncrypt(secHeader);
         encrBuilder.setSymmetricEncAlgorithm(WSConstants.AES_128);
         encrBuilder.setExternalKey(ek, tokenIdentifier);
-        encrBuilder.build(doc, secHeader);
+        encrBuilder.build(doc);
 
         //Derived key signature
-        WSSecDKSign sigBuilder = new WSSecDKSign();
+        WSSecDKSign sigBuilder = new WSSecDKSign(secHeader);
         sigBuilder.setExternalKey(ek, tokenIdentifier);
         sigBuilder.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
         LOG.info("Before HMAC-SHA1 signature");
-        Document encryptedSignedDoc = sigBuilder.build(doc, secHeader);
+        Document encryptedSignedDoc = sigBuilder.build(doc);
 
-        encrKeyBuilder.prependToHeader(secHeader);
-        encrKeyBuilder.prependBSTElementToHeader(secHeader);
+        encrKeyBuilder.prependToHeader();
+        encrKeyBuilder.prependBSTElementToHeader();
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encrypted message: 3DES  + DerivedKeys");

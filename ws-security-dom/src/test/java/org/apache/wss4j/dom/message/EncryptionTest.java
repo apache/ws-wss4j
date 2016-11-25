@@ -111,15 +111,16 @@ public class EncryptionTest extends org.junit.Assert {
      */
     @Test
     public void testEncryptionDecryptionRSA15() throws Exception {
-        WSSecEncrypt builder = new WSSecEncrypt();
-        builder.setUserInfo("wss40");
-        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
+        builder.setUserInfo("wss40");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         LOG.info("Before Encryption Triple DES....");
-        Document encryptedDoc = builder.build(doc, crypto, secHeader);
+        Document encryptedDoc = builder.build(doc, crypto);
         LOG.info("After Encryption Triple DES....");
 
         String outputString =
@@ -152,7 +153,7 @@ public class EncryptionTest extends org.junit.Assert {
         secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
         LOG.info("Before Encryption AES 128/RSA-15....");
-        encryptedDoc = builder.build(doc, crypto, secHeader);
+        encryptedDoc = builder.build(doc, crypto);
         LOG.info("After Encryption AES 128/RSA-15....");
         outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -189,15 +190,17 @@ public class EncryptionTest extends org.junit.Assert {
      */
     @Test
     public void testEncryptionDecryptionOAEP() throws Exception {
-        WSSecEncrypt builder = new WSSecEncrypt();
-        builder.setUserInfo("wss40");
-        builder.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
-        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
+        builder.setUserInfo("wss40");
+        builder.setKeyIdentifierType(WSConstants.X509_KEY_IDENTIFIER);
+        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP);
+
         LOG.info("Before Encryption Triple DES/RSA-OAEP....");
-        Document encryptedDoc = builder.build(doc, crypto, secHeader);
+        Document encryptedDoc = builder.build(doc, crypto);
         LOG.info("After Encryption Triple DES/RSA-OAEP....");
 
         String outputString =
@@ -223,12 +226,13 @@ public class EncryptionTest extends org.junit.Assert {
     
     @Test
     public void testEncryptionDecryptionPublicKey() throws Exception {
-        WSSecEncrypt builder = new WSSecEncrypt();
-        builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
-        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
+        builder.setKeyIdentifierType(WSConstants.KEY_VALUE);
+        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP);
         
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("wss40");
@@ -236,7 +240,7 @@ public class EncryptionTest extends org.junit.Assert {
         assertNotNull(certs);
         builder.setUseThisPublicKey(certs[0].getPublicKey());
         
-        Document encryptedDoc = builder.build(doc, crypto, secHeader);
+        Document encryptedDoc = builder.build(doc, crypto);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -264,15 +268,16 @@ public class EncryptionTest extends org.junit.Assert {
      */
     @Test
     public void testEncryptionEncryption() throws Exception {
-        Crypto encCrypto = CryptoFactory.getInstance();
-        WSSecEncrypt encrypt = new WSSecEncrypt();
-        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
-        LOG.info("Before Encryption....");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        Crypto encCrypto = CryptoFactory.getInstance();
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
+        encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e");
+        LOG.info("Before Encryption....");
 
-        Document encryptedDoc = encrypt.build(doc, encCrypto, secHeader);
+        Document encryptedDoc = encrypt.build(doc, encCrypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After the first encryption:");
@@ -281,7 +286,7 @@ public class EncryptionTest extends org.junit.Assert {
             LOG.debug(outputString);
         }
 
-        Document encryptedEncryptedDoc = encrypt.build(encryptedDoc, encCrypto, secHeader);
+        Document encryptedEncryptedDoc = encrypt.build(encryptedDoc, encCrypto);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("After the second encryption:");
@@ -304,15 +309,16 @@ public class EncryptionTest extends org.junit.Assert {
     @Test
     public void testX509EncryptionThumb() throws Exception {
         Crypto encCrypto = CryptoFactory.getInstance();
-        WSSecEncrypt builder = new WSSecEncrypt();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.THUMBPRINT_IDENTIFIER);
 
         LOG.info("Before Encrypting ThumbprintSHA1....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document encryptedDoc = builder.build(doc, encCrypto, secHeader);
+        Document encryptedDoc = builder.build(doc, encCrypto);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -344,15 +350,16 @@ public class EncryptionTest extends org.junit.Assert {
     @Test
     public void testX509EncryptionSHA1() throws Exception {
         Crypto encCrypto = CryptoFactory.getInstance();
-        WSSecEncrypt builder = new WSSecEncrypt();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
 
         LOG.info("Before Encrypting EncryptedKeySHA1....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document encryptedDoc = builder.build(doc, encCrypto, secHeader);
+        Document encryptedDoc = builder.build(doc, encCrypto);
 
         String outputString =
             XMLUtils.prettyDocumentToString(encryptedDoc);
@@ -374,16 +381,17 @@ public class EncryptionTest extends org.junit.Assert {
      */
     @Test
     public void testEncryptionSHA1Symmetric() throws Exception {
-        WSSecEncrypt builder = new WSSecEncrypt();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
         builder.setSymmetricKey(key);
         builder.setEncryptSymmKey(false);
 
         LOG.info("Before Encrypting EncryptedKeySHA1....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document encryptedDoc = builder.build(doc, crypto, secHeader);
+        Document encryptedDoc = builder.build(doc, crypto);
 
         byte[] encodedBytes = KeyUtils.generateDigest(keyData);
         String identifier = Base64.getMimeEncoder().encodeToString(encodedBytes);
@@ -409,16 +417,17 @@ public class EncryptionTest extends org.junit.Assert {
      */
     @Test
     public void testEncryptionSHA1SymmetricBytes() throws Exception {
-        WSSecEncrypt builder = new WSSecEncrypt();
+        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setKeyIdentifierType(WSConstants.ENCRYPTED_KEY_SHA1_IDENTIFIER);
         builder.setEphemeralKey(keyData);
         builder.setEncryptSymmKey(false);
 
         LOG.info("Before Encrypting EncryptedKeySHA1....");
-        Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
-        WSSecHeader secHeader = new WSSecHeader(doc);
-        secHeader.insertSecurityHeader();
-        Document encryptedDoc = builder.build(doc, crypto, secHeader);
+        Document encryptedDoc = builder.build(doc, crypto);
 
         byte[] encodedBytes = KeyUtils.generateDigest(keyData);
         String identifier = Base64.getMimeEncoder().encodeToString(encodedBytes);
@@ -489,13 +498,14 @@ public class EncryptionTest extends org.junit.Assert {
      */
     @Test
     public void testEncryptionDecryptionRSA15STR() throws Exception {
-        WSSecEncrypt builder = new WSSecEncrypt();
-        builder.setUserInfo("wss40");
-        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
+        builder.setUserInfo("wss40");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         LOG.info("Before Encryption Triple DES....");
 
         /*
@@ -520,15 +530,15 @@ public class EncryptionTest extends org.junit.Assert {
          * EncryptedKey element in the Security header (strict layout)
          */
         Element refs = builder.encrypt();
-        builder.addExternalRefElement(refs, secHeader);
+        builder.addExternalRefElement(refs);
 
         /*
          * now add (prepend) the EncryptedKey element, then a
          * BinarySecurityToken if one was setup during prepare
          */
-        builder.prependToHeader(secHeader);
+        builder.prependToHeader();
 
-        builder.prependBSTElementToHeader(secHeader);
+        builder.prependBSTElementToHeader();
 
         Document encryptedDoc = doc;
         LOG.info("After Encryption Triple DES....");
@@ -558,13 +568,14 @@ public class EncryptionTest extends org.junit.Assert {
 
     @Test
     public void testBadAttribute() throws Exception {
-        WSSecEncrypt builder = new WSSecEncrypt();
-        builder.setUserInfo("wss40");
-        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
-        builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
+        builder.setUserInfo("wss40");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
+        builder.setSymmetricEncAlgorithm(WSConstants.TRIPLE_DES);
 
         /*
          * Prepare the Encrypt object with the token, setup data structure
@@ -589,7 +600,7 @@ public class EncryptionTest extends org.junit.Assert {
          * EncryptedKey element in the Security header (strict layout)
          */
         Element refs = builder.encrypt();
-        builder.addExternalRefElement(refs, secHeader);
+        builder.addExternalRefElement(refs);
 
         /*
          * now add (prepend) the EncryptedKey element, then a
@@ -597,9 +608,9 @@ public class EncryptionTest extends org.junit.Assert {
          */
         Element encryptedKeyElement = builder.getEncryptedKeyElement();
         encryptedKeyElement.setAttributeNS(null, "Type", "SomeType");
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), encryptedKeyElement);
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), encryptedKeyElement);
 
-        builder.prependBSTElementToHeader(secHeader);
+        builder.prependBSTElementToHeader();
 
         Document encryptedDoc = doc;
 
@@ -631,8 +642,10 @@ public class EncryptionTest extends org.junit.Assert {
     @Test
     public void testEmbeddedEncryptedKey() throws Exception {
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
+        WSSecHeader secHeader = new WSSecHeader(doc);
+        secHeader.insertSecurityHeader();
 
-        WSSecEncrypt builder = new WSSecEncrypt();
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
         builder.setUserInfo("wss40");
         builder.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
         builder.setSymmetricEncAlgorithm(WSConstants.AES_128);
@@ -668,15 +681,17 @@ public class EncryptionTest extends org.junit.Assert {
      */
     @Test
     public void testEncryptionDecryptionOAEPSHA256() throws Exception {
-        WSSecEncrypt builder = new WSSecEncrypt();
-        builder.setUserInfo("wss40");
-        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP);
-        builder.setDigestAlgorithm(WSConstants.SHA256);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
+        builder.setUserInfo("wss40");
+        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP);
+        builder.setDigestAlgorithm(WSConstants.SHA256);
+
         LOG.info("Before Encryption Triple DES/RSA-OAEP....");
-        Document encryptedDoc = builder.build(doc, crypto, secHeader);
+        Document encryptedDoc = builder.build(doc, crypto);
         LOG.info("After Encryption Triple DES/RSA-OAEP....");
 
         String outputString =
@@ -699,17 +714,18 @@ public class EncryptionTest extends org.junit.Assert {
     // CN has a "*" in it
     @Test
     public void testEncryptionWithRegexpCert() throws Exception {
-        WSSecEncrypt builder = new WSSecEncrypt();
-        builder.setUserInfo("regexp");
-        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
-        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecEncrypt builder = new WSSecEncrypt(secHeader);
+        builder.setUserInfo("regexp");
+        builder.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+        builder.setKeyEncAlgo(WSConstants.KEYTRANSPORT_RSAOAEP);
         LOG.info("Before Encryption Triple DES/RSA-OAEP....");
 
         Crypto regexpCrypto = CryptoFactory.getInstance("regexp.properties");
-        Document encryptedDoc = builder.build(doc, regexpCrypto, secHeader);
+        Document encryptedDoc = builder.build(doc, regexpCrypto);
         LOG.info("After Encryption Triple DES/RSA-OAEP....");
 
         String outputString =

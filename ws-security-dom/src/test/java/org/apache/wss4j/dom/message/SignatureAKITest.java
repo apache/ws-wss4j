@@ -59,14 +59,15 @@ public class SignatureAKITest extends org.junit.Assert {
 
     @Test
     public void testSignatureAKI() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("wss40", "security");
-        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("wss40", "security");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         Crypto signingCrypto = CryptoFactory.getInstance("wss40.properties");
-        Document signedDoc = builder.build(doc, signingCrypto, secHeader);
+        Document signedDoc = builder.build(doc, signingCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
@@ -85,14 +86,15 @@ public class SignatureAKITest extends org.junit.Assert {
     // Here, the CA keystore contains two keys with the same Distinguished Name
     @Test
     public void testSignatureAKIDuplicate() throws Exception {
-        WSSecSignature builder = new WSSecSignature();
-        builder.setUserInfo("wss40", "security");
-        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
+        
+        WSSecSignature builder = new WSSecSignature(secHeader);
+        builder.setUserInfo("wss40", "security");
+        builder.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE);
         Crypto signingCrypto = CryptoFactory.getInstance("wss40.properties");
-        Document signedDoc = builder.build(doc, signingCrypto, secHeader);
+        Document signedDoc = builder.build(doc, signingCrypto);
 
         if (LOG.isDebugEnabled()) {
             String outputString =

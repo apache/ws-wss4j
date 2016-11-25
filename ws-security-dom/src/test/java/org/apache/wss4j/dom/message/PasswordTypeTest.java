@@ -56,12 +56,13 @@ public class PasswordTypeTest extends org.junit.Assert {
      */
     @Test
     public void testPasswordDigest() throws Exception {
-        WSSecUsernameToken builder = new WSSecUsernameToken();
-        builder.setUserInfo("wernerd", "verySecret");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, secHeader);
+        
+        WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
+        builder.setUserInfo("wernerd", "verySecret");
+        Document signedDoc = builder.build(doc);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Digest:");
@@ -107,13 +108,14 @@ public class PasswordTypeTest extends org.junit.Assert {
      */
     @Test
     public void testUsernameTokenText() throws Exception {
-        WSSecUsernameToken builder = new WSSecUsernameToken();
-        builder.setPasswordType(WSConstants.PASSWORD_TEXT);
-        builder.setUserInfo("wernerd", "verySecret");
         Document doc = SOAPUtil.toSOAPPart(SOAPUtil.SAMPLE_SOAP_MSG);
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
-        Document signedDoc = builder.build(doc, secHeader);
+        
+        WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
+        builder.setPasswordType(WSConstants.PASSWORD_TEXT);
+        builder.setUserInfo("wernerd", "verySecret");
+        Document signedDoc = builder.build(doc);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Message with UserNameToken PW Text:");

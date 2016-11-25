@@ -74,20 +74,20 @@ public class UTSignatureTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecUsernameToken builder = new WSSecUsernameToken();
+        WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("bob", "security");
         builder.addDerivedKey(true, null, 1000);
         builder.prepare(doc);
 
-        WSSecSignature sign = new WSSecSignature();
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setCustomTokenValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
         sign.setCustomTokenId(builder.getId());
         sign.setSecretKey(builder.getDerivedKey());
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
 
-        Document signedDoc = sign.build(doc, null, secHeader);
-        builder.prependToHeader(secHeader);
+        Document signedDoc = sign.build(doc, null);
+        builder.prependToHeader();
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);
@@ -125,20 +125,20 @@ public class UTSignatureTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecUsernameToken builder = new WSSecUsernameToken();
+        WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
         builder.setUserInfo("colm", "security");
         builder.addDerivedKey(true, null, 1000);
         builder.prepare(doc);
 
-        WSSecSignature sign = new WSSecSignature();
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setCustomTokenValueType(WSConstants.USERNAMETOKEN_NS + "#UsernameToken");
         sign.setCustomTokenId(builder.getId());
         sign.setSecretKey(builder.getDerivedKey());
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
         sign.setSignatureAlgorithm(WSConstants.HMAC_SHA1);
 
-        Document signedDoc = sign.build(doc, null, secHeader);
-        builder.prependToHeader(secHeader);
+        Document signedDoc = sign.build(doc, null);
+        builder.prependToHeader();
 
         String outputString =
             XMLUtils.prettyDocumentToString(signedDoc);

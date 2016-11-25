@@ -81,10 +81,10 @@ public class SignedBSTTest extends org.junit.Assert {
         String certUri = WSSConfig.getNewInstance().getIdAllocator().createSecureId("X509-", certs[0]);
         bst.setX509Certificate(certs[0]);
         bst.setID(certUri);
-        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeader(), bst.getElement());
+        WSSecurityUtil.prependChildElement(secHeader.getSecurityHeaderElement(), bst.getElement());
 
         // Add the signature
-        WSSecSignature sign = new WSSecSignature();
+        WSSecSignature sign = new WSSecSignature(secHeader);
         sign.setUserInfo("wss40", "security");
         sign.setSignatureAlgorithm(WSConstants.RSA);
         sign.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
@@ -107,10 +107,10 @@ public class SignedBSTTest extends org.junit.Assert {
 
         sign.setCustomTokenId(bst.getID());
         sign.setCustomTokenValueType(bst.getValueType());
-        sign.prepare(doc, crypto, secHeader);
+        sign.prepare(doc, crypto);
 
         List<javax.xml.crypto.dsig.Reference> referenceList =
-            sign.addReferencesToSign(sign.getParts(), secHeader);
+            sign.addReferencesToSign(sign.getParts());
         sign.computeSignature(referenceList, false, null);
 
         if (LOG.isDebugEnabled()) {

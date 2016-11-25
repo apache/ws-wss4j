@@ -68,11 +68,11 @@ public class EncryptedDataInHeaderTest extends org.junit.Assert {
         WSSecHeader secHeader = new WSSecHeader(doc);
         secHeader.insertSecurityHeader();
 
-        WSSecTimestamp timestamp = new WSSecTimestamp();
+        WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
         timestamp.setTimeToLive(300);
-        timestamp.build(doc, secHeader);
+        timestamp.build(doc);
 
-        WSSecEncrypt encrypt = new WSSecEncrypt();
+        WSSecEncrypt encrypt = new WSSecEncrypt(secHeader);
         encrypt.setUserInfo("16c73ab6-b892-458f-abf5-2f875f74882e", "security");
         encrypt.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
 
@@ -89,11 +89,11 @@ public class EncryptedDataInHeaderTest extends org.junit.Assert {
         encrypt.getParts().add(encP);
 
         encrypt.prepare(doc, crypto);
-        encrypt.prependToHeader(secHeader);
+        encrypt.prependToHeader();
 
         // Append Reference List to security header
         Element refs = encrypt.encrypt();
-        secHeader.getSecurityHeader().appendChild(refs);
+        secHeader.getSecurityHeaderElement().appendChild(refs);
 
         if (LOG.isDebugEnabled()) {
             String outputString =
