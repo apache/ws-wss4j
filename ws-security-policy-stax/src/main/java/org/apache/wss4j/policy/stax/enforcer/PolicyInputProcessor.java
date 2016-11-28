@@ -104,18 +104,16 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
         XMLSecEvent xmlSecEvent = inputProcessorChain.processEvent();
 
         List<QName> elementPath = null;
-        switch (xmlSecEvent.getEventType()) {
-            case XMLStreamConstants.START_ELEMENT:
-                XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
-                int documentLevel = xmlSecStartElement.getDocumentLevel();
-                //test for required elements
-                if (documentLevel > 3) {
-                    RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
-                    elementPath = xmlSecStartElement.getElementPath();
-                    requiredElementSecurityEvent.setElementPath(elementPath);
-                    policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
-                }
-                break;
+        if (XMLStreamConstants.START_ELEMENT == xmlSecEvent.getEventType()) {
+            XMLSecStartElement xmlSecStartElement = xmlSecEvent.asStartElement();
+            int documentLevel = xmlSecStartElement.getDocumentLevel();
+            //test for required elements
+            if (documentLevel > 3) {
+                RequiredElementSecurityEvent requiredElementSecurityEvent = new RequiredElementSecurityEvent();
+                elementPath = xmlSecStartElement.getElementPath();
+                requiredElementSecurityEvent.setElementPath(elementPath);
+                policyEnforcer.registerSecurityEvent(requiredElementSecurityEvent);
+            }
         }
 
         //if transport security is active, every element is encrypted/signed
@@ -249,7 +247,7 @@ public class PolicyInputProcessor extends AbstractInputProcessor {
         if (!this.initDone) {
             this.initDone = true;
             this.transportSecurityActive = 
-                Boolean.TRUE == inputProcessorChain.getSecurityContext().get(WSSConstants.TRANSPORT_SECURITY_ACTIVE);
+                Boolean.TRUE.equals(inputProcessorChain.getSecurityContext().get(WSSConstants.TRANSPORT_SECURITY_ACTIVE));
             inputProcessorChain.getSecurityContext().put(WSSConstants.PROP_ALLOW_RSA15_KEYTRANSPORT_ALGORITHM, Boolean.TRUE);
             inputProcessorChain.getSecurityContext().put(WSSConstants.PROP_ALLOW_USERNAMETOKEN_NOPASSWORD, Boolean.TRUE.toString());
         }

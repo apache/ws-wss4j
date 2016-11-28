@@ -147,7 +147,7 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
         outputProcessorChain.processEvent(xmlSecEvent);
     }
 
-    class FinalUsernameTokenOutputProcessor extends AbstractOutputProcessor {
+    static class FinalUsernameTokenOutputProcessor extends AbstractOutputProcessor {
 
         private String wsuId = null;
         private byte[] nonceValue = null;
