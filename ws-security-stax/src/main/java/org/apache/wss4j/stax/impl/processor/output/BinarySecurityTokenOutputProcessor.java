@@ -137,7 +137,7 @@ public class BinarySecurityTokenOutputProcessor extends AbstractOutputProcessor 
         outputProcessorChain.processEvent(xmlSecEvent);
     }
 
-    class FinalBinarySecurityTokenOutputProcessor extends AbstractOutputProcessor {
+    static class FinalBinarySecurityTokenOutputProcessor extends AbstractOutputProcessor {
 
         private final OutboundSecurityToken securityToken;
 

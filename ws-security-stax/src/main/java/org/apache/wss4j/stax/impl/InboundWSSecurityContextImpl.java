@@ -286,7 +286,7 @@ public class InboundWSSecurityContextImpl extends InboundSecurityContextImpl imp
             usernameTokenElementPath.add(WSSConstants.TAG_WSSE_USERNAME_TOKEN);
             boolean encryptsUsernameToken = encryptsElement(tokenSecurityEvent, usernameTokenElementPath, securityEventDeque);
 
-            boolean transportSecurityActive = Boolean.TRUE == get(WSSConstants.TRANSPORT_SECURITY_ACTIVE);
+            boolean transportSecurityActive = Boolean.TRUE.equals(get(WSSConstants.TRANSPORT_SECURITY_ACTIVE));
 
             List<InboundSecurityToken> encryptingSecurityTokens = 
                 isEncryptedToken(tokenSecurityEvent, securityEventDeque, httpsTokenSecurityEvent);

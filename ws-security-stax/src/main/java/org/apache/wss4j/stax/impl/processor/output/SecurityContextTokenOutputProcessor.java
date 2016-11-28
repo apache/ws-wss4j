@@ -137,7 +137,7 @@ public class SecurityContextTokenOutputProcessor extends AbstractOutputProcessor
         outputProcessorChain.processEvent(xmlSecEvent);
     }
 
-    class FinalSecurityContextTokenOutputProcessor extends AbstractOutputProcessor {
+    static class FinalSecurityContextTokenOutputProcessor extends AbstractOutputProcessor {
 
         private final OutboundSecurityToken securityToken;
         private final String identifier;

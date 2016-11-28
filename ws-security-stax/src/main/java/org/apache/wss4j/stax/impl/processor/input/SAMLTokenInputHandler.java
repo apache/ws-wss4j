@@ -533,7 +533,7 @@ public class SAMLTokenInputHandler extends AbstractInputSecurityHeaderHandler {
      * which can not be done until the whole soap-header is processed and we know that the whole soap-body
      * is signed.
      */
-    class SAMLTokenVerifierInputProcessor extends AbstractInputProcessor implements SecurityEventListener {
+    static class SAMLTokenVerifierInputProcessor extends AbstractInputProcessor implements SecurityEventListener {
 
         private SamlAssertionWrapper samlAssertionWrapper;
         private SecurityTokenProvider<InboundSecurityToken> securityTokenProvider;

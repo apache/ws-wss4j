@@ -345,7 +345,7 @@ public class DecryptInputProcessor extends AbstractDecryptInputProcessor {
         }
     }
 
-    private final class DeferredAttachment {
+    private static final class DeferredAttachment {
 
         private EncryptedDataType encryptedDataType;
         private Cipher cipher;

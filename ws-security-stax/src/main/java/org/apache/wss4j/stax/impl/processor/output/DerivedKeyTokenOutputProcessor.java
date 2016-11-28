@@ -189,7 +189,7 @@ public class DerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
         outputProcessorChain.processEvent(xmlSecEvent);
     }
 
-    class FinalDerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
+    static class FinalDerivedKeyTokenOutputProcessor extends AbstractOutputProcessor {
 
         private final OutboundSecurityToken securityToken;
         private final int offset;

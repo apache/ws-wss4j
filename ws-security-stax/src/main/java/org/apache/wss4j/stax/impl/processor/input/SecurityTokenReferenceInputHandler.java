@@ -98,7 +98,7 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
         }
     }
 
-    class InternalSecurityTokenReferenceInputProcessor extends AbstractInputProcessor {
+    static class InternalSecurityTokenReferenceInputProcessor extends AbstractInputProcessor {
 
         private final String securityTokenReferenceId;
         private final QName attribute;

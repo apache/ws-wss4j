@@ -80,7 +80,7 @@ public class CustomTokenOutputProcessor extends AbstractOutputProcessor {
         outputProcessorChain.processEvent(xmlSecEvent);
     }
 
-    class FinalUnknownTokenOutputProcessor extends AbstractOutputProcessor {
+    static class FinalUnknownTokenOutputProcessor extends AbstractOutputProcessor {
 
         private final Element token;
 
