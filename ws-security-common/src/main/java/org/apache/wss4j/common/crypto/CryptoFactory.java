@@ -35,10 +35,6 @@ public abstract class CryptoFactory {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(CryptoFactory.class);
 
-    static {
-        WSProviderConfig.init();
-    }
-
     /**
      * getInstance
      * <p/>
