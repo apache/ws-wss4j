@@ -5,6 +5,17 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.0.10
+==============
+
+Bug
+
+    [WSS-585] - Kerberos processing fails on HP Java 8.0.06
+    [WSS-587] - Concurrency issue in EHCacheManagerHolder
+    [WSS-590] - WSS4J relies on deafult locale
+    [WSS-594] - Copy Security Header SOAP MustUnderstand/Actor to an EncryptedHeader element
+
+
 Release 2.0.9
 =============
 
