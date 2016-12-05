@@ -5,6 +5,25 @@ for a given release.
 Portions of this report were generated using the ReleaseNotes facility
 in Jira.
 
+Release 2.1.8
+=============
+
+Bug
+
+    [WSS-585] - Kerberos processing fails on HP Java 8.0.06
+    [WSS-587] - Concurrency issue in EHCacheManagerHolder
+    [WSS-590] - WSS4J relies on deafult locale
+    [WSS-594] - Copy Security Header SOAP MustUnderstand/Actor to an EncryptedHeader element
+
+Improvement
+
+    [WSS-592] - Add support for a comma-separated list of crls
+
+New Feature
+
+    [WSS-593] - Implement Certificate Issuer DN Constraint support
+
+
 Release 2.1.7
 =============
 
