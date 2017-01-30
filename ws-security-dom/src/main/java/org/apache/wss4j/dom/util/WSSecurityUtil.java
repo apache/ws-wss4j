@@ -1226,7 +1226,12 @@ public final class WSSecurityUtil {
     public static byte[] getBytesFromAttachment(
         String xopUri, RequestData data
     ) throws WSSecurityException {
-        CallbackHandler attachmentCallbackHandler = data.getAttachmentCallbackHandler();
+        return getBytesFromAttachment(xopUri, data.getAttachmentCallbackHandler());
+    }
+    
+    public static byte[] getBytesFromAttachment(
+        String xopUri, CallbackHandler attachmentCallbackHandler
+    ) throws WSSecurityException {
         if (attachmentCallbackHandler == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
         }
