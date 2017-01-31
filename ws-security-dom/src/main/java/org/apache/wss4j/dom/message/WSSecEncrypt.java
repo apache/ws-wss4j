@@ -25,9 +25,7 @@ import java.util.Base64;
 import java.util.List;
 
 import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -38,8 +36,6 @@ import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WsuIdAllocator;
-import org.apache.wss4j.dom.callback.CallbackLookup;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.encryption.Serializer;
@@ -305,77 +301,6 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
                 WSSecurityUtil.prependChildElement(secHeaderElement, encryptedData);
             }
         }
-    }
-
-    /**
-     * Perform encryption on the SOAP envelope.
-     * @param doc The document containing the SOAP envelope as document element
-     * @param idAllocator A WsuIdAllocator used to generate wsu:ID's
-     * @param keyInfo The KeyInfo object to set in EncryptedData
-     * @param secretKey The SecretKey object with which to encrypt data
-     * @param encryptionAlgorithm The encryption algorithm URI to use
-     * @param references The list of references to encrypt
-     * @return a List of references to EncryptedData elements
-     * @throws WSSecurityException
-     */
-    public static List<String> doEncryption(
-        Document doc,
-        WSSecHeader securityHeader,
-        WsuIdAllocator idAllocator,
-        KeyInfo keyInfo,
-        SecretKey secretKey,
-        String encryptionAlgorithm,
-        List<WSEncryptionPart> references,
-        CallbackLookup callbackLookup
-    ) throws WSSecurityException {
-        return doEncryption(
-                doc, securityHeader, idAllocator, keyInfo, secretKey, encryptionAlgorithm,
-                references, callbackLookup, null, null, false);
-    }
-    
-    public static List<String> doEncryption(
-         Document doc,
-         WSSecHeader securityHeader,
-         WsuIdAllocator idAllocator,
-         KeyInfo keyInfo,
-         SecretKey secretKey,
-         String encryptionAlgorithm,
-         List<WSEncryptionPart> references,
-         CallbackLookup callbackLookup,
-         CallbackHandler attachmentCallbackHandler,
-         List<Element> attachmentEncryptedDataElements,
-         boolean storeBytesInAttachment
-    ) throws WSSecurityException {
-        return doEncryption(
-                            doc, securityHeader, idAllocator, keyInfo, secretKey, encryptionAlgorithm,
-                            references, callbackLookup, attachmentCallbackHandler, 
-                            attachmentEncryptedDataElements, storeBytesInAttachment, null);
-    }
-
-    public static List<String> doEncryption(
-            Document doc,
-            WSSecHeader securityHeader,
-            WsuIdAllocator idAllocator,
-            KeyInfo keyInfo,
-            SecretKey secretKey,
-            String encryptionAlgorithm,
-            List<WSEncryptionPart> references,
-            CallbackLookup callbackLookup,
-            CallbackHandler attachmentCallbackHandler,
-            List<Element> attachmentEncryptedDataElements,
-            boolean storeBytesInAttachment,
-            Serializer encryptionSerializer
-    ) throws WSSecurityException {
-        Encryptor encryptor = new Encryptor();
-        encryptor.setDoc(doc);
-        encryptor.setSecurityHeader(securityHeader);
-        encryptor.setIdAllocator(idAllocator);
-        encryptor.setCallbackLookup(callbackLookup);
-        encryptor.setAttachmentCallbackHandler(attachmentCallbackHandler);
-        encryptor.setStoreBytesInAttachment(storeBytesInAttachment);
-        encryptor.setEncryptionSerializer(encryptionSerializer);
-        return
-            encryptor.doEncryption(keyInfo, secretKey, encryptionAlgorithm, references, attachmentEncryptedDataElements);
     }
 
     /**
