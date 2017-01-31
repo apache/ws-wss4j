@@ -421,7 +421,7 @@ public class Encryptor {
         elem.appendChild(elementToEncrypt);
 
         if (securityHeader != null) {
-            NamedNodeMap map = securityHeader.getSecurityHeaderElement().getAttributes();
+            NamedNodeMap map = securityHeader.getSecurityHeader().getAttributes();
             for (int i = 0; i < map.getLength(); i++) {
                 Attr attr = (Attr)map.item(i);
                 if (WSConstants.URI_SOAP11_ENV.equals(attr.getNamespaceURI())

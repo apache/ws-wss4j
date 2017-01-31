@@ -139,8 +139,8 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         SecretKey key = getDerivedKey(symEncAlgo);
 
         Encryptor encryptor = new Encryptor();
-        encryptor.setDoc(getDocument());
-        encryptor.setSecurityHeader(getSecurityHeader());
+        encryptor.setDoc(document);
+        encryptor.setSecurityHeader(secHeader);
         encryptor.setIdAllocator(getIdAllocator());
         encryptor.setCallbackLookup(callbackLookup);
         encryptor.setAttachmentCallbackHandler(attachmentCallbackHandler);

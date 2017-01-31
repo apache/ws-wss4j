@@ -43,6 +43,7 @@ import org.apache.wss4j.dom.message.token.KerberosSecurity;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.xml.security.encryption.Serializer;
 import org.apache.xml.security.keys.KeyInfo;
+import org.apache.xml.security.utils.Base64;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -249,8 +250,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         SecretKeySpec secretKeySpec = new SecretKeySpec(symmetricKey.getEncoded(), symmetricKey.getAlgorithm());
         
         Encryptor encryptor = new Encryptor();
-        encryptor.setDoc(getDocument());
-        encryptor.setSecurityHeader(getSecurityHeader());
+        encryptor.setDoc(document);
+        encryptor.setSecurityHeader(secHeader);
         encryptor.setIdAllocator(getIdAllocator());
         encryptor.setCallbackLookup(callbackLookup);
         encryptor.setAttachmentCallbackHandler(attachmentCallbackHandler);
