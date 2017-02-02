@@ -33,6 +33,25 @@ public class RecipientSignatureToken extends AbstractTokenWrapper {
     public QName getName() {
         return getVersion().getSPConstants().getRecipientSignatureToken();
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof RecipientSignatureToken)) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        
+        return 31 * result + super.hashCode();
+    }
 
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {

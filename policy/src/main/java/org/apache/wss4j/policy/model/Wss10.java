@@ -54,6 +54,37 @@ public class Wss10 extends AbstractSecurityAssertion implements PolicyContaining
     public QName getName() {
         return getVersion().getSPConstants().getWss10();
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof Wss10)) {
+            return false;
+        }
+        
+        Wss10 that = (Wss10)object;
+        if (mustSupportRefKeyIdentifier != that.mustSupportRefKeyIdentifier
+            || mustSupportRefIssuerSerial != that.mustSupportRefIssuerSerial
+            || mustSupportRefExternalURI != that.mustSupportRefExternalURI
+            || mustSupportRefEmbeddedToken != that.mustSupportRefEmbeddedToken) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + Boolean.hashCode(mustSupportRefKeyIdentifier);
+        result = 31 * result + Boolean.hashCode(mustSupportRefIssuerSerial);
+        result = 31 * result + Boolean.hashCode(mustSupportRefExternalURI);
+        result = 31 * result + Boolean.hashCode(mustSupportRefEmbeddedToken);
+        
+        return 31 * result + super.hashCode();
+    }
 
     @Override
     public PolicyComponent normalize() {

@@ -55,6 +55,40 @@ public abstract class AbstractSymmetricAsymmetricBinding extends AbstractBinding
 
         parseNestedSymmetricAsymmetricBindingBasePolicy(nestedPolicy, this);
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        
+        if (!(object instanceof AbstractSymmetricAsymmetricBinding)) {
+            return false;
+        }
+        
+        AbstractSymmetricAsymmetricBinding that = (AbstractSymmetricAsymmetricBinding)object;
+        if (protectionOrder != that.protectionOrder
+            || encryptSignature != that.encryptSignature
+            || protectTokens != that.protectTokens
+            || onlySignEntireHeadersAndBody != that.onlySignEntireHeadersAndBody) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        if (protectionOrder != null) {
+            result = 31 * result + protectionOrder.hashCode();
+        }
+        result = 31 * result + Boolean.hashCode(encryptSignature);
+        result = 31 * result + Boolean.hashCode(protectTokens);
+        result = 31 * result + Boolean.hashCode(onlySignEntireHeadersAndBody);
+        
+        return 31 * result + super.hashCode();
+    }
 
     protected void parseNestedSymmetricAsymmetricBindingBasePolicy(
         Policy nestedPolicy,  AbstractSymmetricAsymmetricBinding asymmetricBindingBase

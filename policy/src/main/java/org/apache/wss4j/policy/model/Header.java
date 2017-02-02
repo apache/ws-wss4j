@@ -35,6 +35,43 @@ public class Header {
     public String getNamespace() {
         return namespace;
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        
+        if (!(object instanceof Header)) {
+            return false;
+        }
+     
+        Header that = (Header)object;
+        if (name != null && !name.equals(that.name)
+            || name == null && that.name != null) {
+            return false;
+        }
+        
+        if (namespace != null && !namespace.equals(that.namespace)
+            || namespace == null && that.namespace != null) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        if (name != null) {
+            result = 31 * result + name.hashCode();
+        }
+        if (namespace != null) {
+            result = 31 * result + namespace.hashCode();
+        }
+        
+        return 31 * result + super.hashCode();
+    }
 
     @Override
     public String toString() {

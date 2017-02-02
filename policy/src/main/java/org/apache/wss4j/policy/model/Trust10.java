@@ -57,6 +57,39 @@ public class Trust10 extends AbstractSecurityAssertion implements PolicyContaini
     }
 
     @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof Trust10)) {
+            return false;
+        }
+        
+        Trust10 that = (Trust10)object;
+        if (mustSupportClientChallenge != that.mustSupportClientChallenge
+            || mustSupportServerChallenge != that.mustSupportServerChallenge
+            || requireClientEntropy != that.requireClientEntropy
+            || requireServerEntropy != that.requireServerEntropy
+            || mustSupportIssuedTokens != that.mustSupportIssuedTokens) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + Boolean.hashCode(mustSupportClientChallenge);
+        result = 31 * result + Boolean.hashCode(mustSupportServerChallenge);
+        result = 31 * result + Boolean.hashCode(requireClientEntropy);
+        result = 31 * result + Boolean.hashCode(requireServerEntropy);
+        result = 31 * result + Boolean.hashCode(mustSupportIssuedTokens);
+        
+        return 31 * result + super.hashCode();
+    }
+    
+    @Override
     public PolicyComponent normalize() {
         return super.normalize(getPolicy());
     }

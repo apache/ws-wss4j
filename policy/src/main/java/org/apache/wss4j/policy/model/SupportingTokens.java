@@ -60,6 +60,74 @@ public class SupportingTokens extends AbstractSecurityAssertion implements Polic
     public QName getName() {
         return supportingTokenType;
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        
+        if (!(object instanceof SupportingTokens)) {
+            return false;
+        }
+        
+        SupportingTokens that = (SupportingTokens)object;
+        if (supportingTokenType != null && !supportingTokenType.equals(that.supportingTokenType)
+            || supportingTokenType == null && that.supportingTokenType != null) {
+            return false;
+        }
+        if (algorithmSuite != null && !algorithmSuite.equals(that.algorithmSuite)
+            || algorithmSuite == null && that.algorithmSuite != null) {
+            return false;
+        }
+        if (signedParts != null && !signedParts.equals(that.signedParts)
+            || signedParts == null && that.signedParts != null) {
+            return false;
+        }
+        if (signedElements != null && !signedElements.equals(that.signedElements)
+            || signedElements == null && that.signedElements != null) {
+            return false;
+        }
+        if (encryptedParts != null && !encryptedParts.equals(that.encryptedParts)
+            || encryptedParts == null && that.encryptedParts != null) {
+            return false;
+        }
+        if (encryptedElements != null && !encryptedElements.equals(that.encryptedElements)
+            || encryptedElements == null && that.encryptedElements != null) {
+            return false;
+        }
+        if (!tokens.equals(that.tokens)) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        if (supportingTokenType != null) {
+            result = 31 * result + supportingTokenType.hashCode();
+        }
+        if (algorithmSuite != null) {
+            result = 31 * result + algorithmSuite.hashCode();
+        }
+        if (signedParts != null) {
+            result = 31 * result + signedParts.hashCode();
+        }
+        if (signedElements != null) {
+            result = 31 * result + signedElements.hashCode();
+        }
+        if (encryptedParts != null) {
+            result = 31 * result + encryptedParts.hashCode();
+        }
+        if (encryptedElements != null) {
+            result = 31 * result + encryptedElements.hashCode();
+        }
+        result = 31 * result + tokens.hashCode();
+        
+        return 31 * result + super.hashCode();
+    }
 
     @Override
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {

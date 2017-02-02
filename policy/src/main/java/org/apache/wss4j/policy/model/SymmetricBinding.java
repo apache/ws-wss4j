@@ -42,6 +42,49 @@ public class SymmetricBinding extends AbstractSymmetricAsymmetricBinding {
     public QName getName() {
         return getVersion().getSPConstants().getSymmetricBinding();
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        
+        if (!(object instanceof SymmetricBinding)) {
+            return false;
+        }
+        
+        SymmetricBinding that = (SymmetricBinding)object;
+        if (encryptionToken != null && !encryptionToken.equals(that.encryptionToken)
+            || encryptionToken == null && that.encryptionToken != null) {
+            return false;
+        }
+        if (signatureToken != null && !signatureToken.equals(that.signatureToken)
+            || signatureToken == null && that.signatureToken != null) {
+            return false;
+        }
+        if (protectionToken != null && !protectionToken.equals(that.protectionToken)
+            || protectionToken == null && that.protectionToken != null) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        if (encryptionToken != null) {
+            result = 31 * result + encryptionToken.hashCode();
+        }
+        if (signatureToken != null) {
+            result = 31 * result + signatureToken.hashCode();
+        }
+        if (protectionToken != null) {
+            result = 31 * result + protectionToken.hashCode();
+        }
+        
+        return 31 * result + super.hashCode();
+    }
 
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {

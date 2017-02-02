@@ -64,6 +64,33 @@ public class HttpsToken extends AbstractToken {
     public QName getName() {
         return getVersion().getSPConstants().getHttpsToken();
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof HttpsToken)) {
+            return false;
+        }
+        
+        HttpsToken that = (HttpsToken)object;
+        if (authenticationType != that.authenticationType) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        if (authenticationType != null) {
+            result = 31 * result + authenticationType.hashCode();
+        }
+        
+        return 31 * result + super.hashCode();
+    }
 
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {

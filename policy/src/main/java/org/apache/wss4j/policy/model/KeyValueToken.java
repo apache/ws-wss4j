@@ -42,6 +42,31 @@ public class KeyValueToken extends AbstractToken {
     public QName getName() {
         return getVersion().getSPConstants().getKeyValueToken();
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof KeyValueToken)) {
+            return false;
+        }
+        
+        KeyValueToken that = (KeyValueToken)object;
+        if (rsaKeyValue != that.rsaKeyValue) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + Boolean.hashCode(rsaKeyValue);
+        
+        return 31 * result + super.hashCode();
+    }
 
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {

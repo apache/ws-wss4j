@@ -18,27 +18,20 @@
  */
 package org.apache.wss4j.policy.model;
 
-import org.apache.neethi.Constants;
 import org.apache.neethi.Policy;
 import org.apache.wss4j.policy.SPConstants;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import java.util.List;
 
-public class SignedParts extends RequiredParts {
+public class SignedParts extends AbstractSecuredParts {
 
-    private boolean body;
-    private Attachments attachments;
     private boolean signAllHeaders;
 
     public SignedParts(SPConstants.SPVersion version, boolean body, Attachments attachments,
                        List<Header> headers, boolean signAllHeaders) {
-        super(version, headers);
+        super(version, body, attachments, headers);
 
-        this.body = body;
-        this.attachments = attachments;
         this.signAllHeaders = signAllHeaders;
     }
 
@@ -46,38 +39,30 @@ public class SignedParts extends RequiredParts {
     public QName getName() {
         return getVersion().getSPConstants().getSignedParts();
     }
-
+    
     @Override
-    public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        writer.writeStartElement(getName().getPrefix(), getName().getLocalPart(), getName().getNamespaceURI());
-        writer.writeNamespace(getName().getPrefix(), getName().getNamespaceURI());
-        if (!isNormalized() && isOptional()) {
-            writer.writeAttribute(Constants.ATTR_WSP,
-                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP),
-                                  Constants.ATTR_OPTIONAL, "true");
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
         }
-        if (isIgnorable()) {
-            writer.writeAttribute(Constants.ATTR_WSP,
-                                  writer.getNamespaceContext().getNamespaceURI(Constants.ATTR_WSP),
-                                  Constants.ATTR_IGNORABLE, "true");
+        if (!(object instanceof SignedParts)) {
+            return false;
         }
-        if (isBody()) {
-            final QName body = getVersion().getSPConstants().getBody();
-            writer.writeEmptyElement(body.getPrefix(), body.getLocalPart(), body.getNamespaceURI());
+        
+        SignedParts that = (SignedParts)object;
+        if (signAllHeaders != that.signAllHeaders) {
+            return false;
         }
-        for (int i = 0; i < getHeaders().size(); i++) {
-            Header header = getHeaders().get(i);
-            final QName headerName = getVersion().getSPConstants().getHeader();
-            writer.writeEmptyElement(headerName.getPrefix(), headerName.getLocalPart(), headerName.getNamespaceURI());
-            if (header.getName() != null) {
-                writer.writeAttribute(SPConstants.NAME, header.getName());
-            }
-            writer.writeAttribute(SPConstants.NAMESPACE, header.getNamespace());
-        }
-        if (getAttachments() != null) {
-            getAttachments().serialize(writer);
-        }
-        writer.writeEndElement();
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + Boolean.hashCode(signAllHeaders);
+        
+        return 31 * result + super.hashCode();
     }
 
     @Override
@@ -85,22 +70,6 @@ public class SignedParts extends RequiredParts {
         return new SignedParts(getVersion(), isBody(),
                 getAttachments() == null ? null : (Attachments) getAttachments().clone(nestedPolicy),
                 getHeaders(), isSignAllHeaders());
-    }
-
-    public boolean isBody() {
-        return body;
-    }
-
-    protected void setBody(boolean body) {
-        this.body = body;
-    }
-
-    public Attachments getAttachments() {
-        return attachments;
-    }
-
-    protected void setAttachments(Attachments attachments) {
-        this.attachments = attachments;
     }
 
     public boolean isSignAllHeaders() {

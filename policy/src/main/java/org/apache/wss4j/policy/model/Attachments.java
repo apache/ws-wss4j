@@ -43,6 +43,36 @@ public class Attachments extends AbstractSecurityAssertion {
     public QName getName() {
         return getVersion().getSPConstants().getAttachments();
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        
+        if (!(object instanceof Attachments)) {
+            return false;
+        }
+        
+        Attachments that = (Attachments)object;
+        if (contentSignatureTransform != that.contentSignatureTransform) {
+            return false;
+        }
+        if (attachmentCompleteSignatureTransform != that.attachmentCompleteSignatureTransform) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + Boolean.hashCode(contentSignatureTransform);
+        result = 31 * result + Boolean.hashCode(attachmentCompleteSignatureTransform);
+        
+        return 31 * result + super.hashCode();
+    }
 
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {

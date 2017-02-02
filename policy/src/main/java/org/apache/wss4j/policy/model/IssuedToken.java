@@ -50,6 +50,47 @@ public class IssuedToken extends AbstractToken {
     public QName getName() {
         return getVersion().getSPConstants().getIssuedToken();
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof IssuedToken)) {
+            return false;
+        }
+        
+        IssuedToken that = (IssuedToken)object;
+        if (requireExternalReference != that.requireExternalReference
+            || requireInternalReference != that.requireInternalReference) {
+            return false;
+        }
+        
+        if (requestSecurityTokenTemplate == null && that.requestSecurityTokenTemplate != null
+            || requestSecurityTokenTemplate != null && requestSecurityTokenTemplate == null) {
+            return false;
+        }
+        
+        if (requestSecurityTokenTemplate != null 
+            && !DOM2Writer.nodeToString(requestSecurityTokenTemplate).equals(
+                DOM2Writer.nodeToString(that.requestSecurityTokenTemplate))) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        if (requestSecurityTokenTemplate != null) {
+            result = 31 * result + DOM2Writer.nodeToString(requestSecurityTokenTemplate).hashCode();
+        }
+        result = 31 * result + Boolean.hashCode(requireExternalReference);
+        result = 31 * result + Boolean.hashCode(requireInternalReference);
+        
+        return 31 * result + super.hashCode();
+    }
 
     @Override
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {

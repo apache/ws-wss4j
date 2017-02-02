@@ -33,7 +33,26 @@ public class RecipientEncryptionToken extends AbstractTokenWrapper {
     public QName getName() {
         return getVersion().getSPConstants().getRecipientEncryptionToken();
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof RecipientEncryptionToken)) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
 
+    @Override
+    public int hashCode() {
+        int result = 17;
+        
+        return 31 * result + super.hashCode();
+    }
+    
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
         return new RecipientEncryptionToken(getVersion(), nestedPolicy);

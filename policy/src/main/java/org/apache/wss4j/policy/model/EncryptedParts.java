@@ -24,15 +24,35 @@ import org.apache.wss4j.policy.SPConstants;
 import javax.xml.namespace.QName;
 import java.util.List;
 
-public class EncryptedParts extends SignedParts {
+public class EncryptedParts extends AbstractSecuredParts {
 
     public EncryptedParts(SPConstants.SPVersion version, boolean body, Attachments attachments, List<Header> headers) {
-        super(version, body, attachments, headers, false);
+        super(version, body, attachments, headers);
     }
 
     @Override
     public QName getName() {
         return getVersion().getSPConstants().getEncryptedParts();
+    }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        
+        if (!(object instanceof EncryptedParts)) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        
+        return 31 * result + super.hashCode();
     }
 
     @Override

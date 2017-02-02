@@ -44,6 +44,35 @@ public class SecurityContextToken extends AbstractToken {
     public QName getName() {
         return getVersion().getSPConstants().getSecurityContextToken();
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof SecurityContextToken)) {
+            return false;
+        }
+        
+        SecurityContextToken that = (SecurityContextToken)object;
+        if (requireExternalUriReference != that.requireExternalUriReference
+            || sc13SecurityContextToken != that.sc13SecurityContextToken
+            || sc10SecurityContextToken != that.sc10SecurityContextToken) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + Boolean.hashCode(requireExternalUriReference);
+        result = 31 * result + Boolean.hashCode(sc13SecurityContextToken);
+        result = 31 * result + Boolean.hashCode(sc10SecurityContextToken);
+        
+        return 31 * result + super.hashCode();
+    }
 
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {

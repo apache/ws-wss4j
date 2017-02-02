@@ -260,6 +260,115 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
             this.maximumAsymmetricKeyLength = algorithmSuiteType.maximumAsymmetricKeyLength;
             this.mgfAlgo = algorithmSuiteType.mgfAlgo;
         }
+        
+        @Override
+        public boolean equals(Object object) {
+            if (object == this) {
+                return true;
+            }
+            
+            if (!(object instanceof AlgorithmSuiteType)) {
+                return false;
+            }
+            
+            AlgorithmSuiteType that = (AlgorithmSuiteType)object;
+            if (name != null && !name.equals(that.name)
+                || name == null && that.name != null) {
+                return false;
+            }
+            if (digest != null && !digest.equals(that.digest)
+                || digest == null && that.digest != null) {
+                return false;
+            }
+            if (encryption != null && !encryption.equals(that.encryption)
+                || encryption == null && that.encryption != null) {
+                return false;
+            }
+            if (symmetricKeyWrap != null && !symmetricKeyWrap.equals(that.symmetricKeyWrap)
+                || symmetricKeyWrap == null && that.symmetricKeyWrap != null) {
+                return false;
+            }
+            if (asymmetricKeyWrap != null && !asymmetricKeyWrap.equals(that.asymmetricKeyWrap)
+                || asymmetricKeyWrap == null && that.asymmetricKeyWrap != null) {
+                return false;
+            }
+            if (encryptionKeyDerivation != null && !encryptionKeyDerivation.equals(that.encryptionKeyDerivation)
+                || encryptionKeyDerivation == null && that.encryptionKeyDerivation != null) {
+                return false;
+            }
+            if (signatureKeyDerivation != null && !signatureKeyDerivation.equals(that.signatureKeyDerivation)
+                || signatureKeyDerivation == null && that.signatureKeyDerivation != null) {
+                return false;
+            }
+            if (ns != null && !ns.equals(that.ns)
+                || ns == null && that.ns != null) {
+                return false;
+            }
+            if (mgfAlgo != null && !mgfAlgo.equals(that.mgfAlgo)
+                || mgfAlgo == null && that.mgfAlgo != null) {
+                return false;
+            }
+            if (encryptionDigest != null && !encryptionDigest.equals(that.encryptionDigest)
+                || encryptionDigest == null && that.encryptionDigest != null) {
+                return false;
+            }
+            
+            if (encryptionDerivedKeyLength != that.encryptionDerivedKeyLength
+                || signatureDerivedKeyLength != that.signatureDerivedKeyLength
+                || minimumSymmetricKeyLength != that.minimumSymmetricKeyLength
+                || maximumSymmetricKeyLength != that.maximumSymmetricKeyLength
+                || minimumAsymmetricKeyLength != that.minimumAsymmetricKeyLength
+                || maximumAsymmetricKeyLength != that.maximumAsymmetricKeyLength) {
+                return false;
+            }
+            
+            return true;
+        }
+        
+        @Override
+        public int hashCode() {
+            int result = 17;
+            if (name != null) {
+                result = 31 * result + name.hashCode();
+            }
+            if (digest != null) {
+                result = 31 * result + digest.hashCode();
+            }
+            if (encryption != null) {
+                result = 31 * result + encryption.hashCode();
+            }
+            if (symmetricKeyWrap != null) {
+                result = 31 * result + symmetricKeyWrap.hashCode();
+            }
+            if (asymmetricKeyWrap != null) {
+                result = 31 * result + asymmetricKeyWrap.hashCode();
+            }
+            if (encryptionKeyDerivation != null) {
+                result = 31 * result + encryptionKeyDerivation.hashCode();
+            }
+            if (signatureKeyDerivation != null) {
+                result = 31 * result + signatureKeyDerivation.hashCode();
+            }
+            
+            result = 31 * result + Integer.hashCode(encryptionDerivedKeyLength);
+            result = 31 * result + Integer.hashCode(signatureDerivedKeyLength);
+            result = 31 * result + Integer.hashCode(minimumSymmetricKeyLength);
+            result = 31 * result + Integer.hashCode(maximumSymmetricKeyLength);
+            result = 31 * result + Integer.hashCode(minimumAsymmetricKeyLength);
+            result = 31 * result + Integer.hashCode(maximumAsymmetricKeyLength);
+            
+            if (mgfAlgo != null) {
+                result = 31 * result + mgfAlgo.hashCode();
+            }
+            if (ns != null) {
+                result = 31 * result + ns.hashCode();
+            }
+            if (encryptionDigest != null) {
+                result = 31 * result + encryptionDigest.hashCode();
+            }
+            
+            return 31 * result + super.hashCode();
+        }
 
         public String getName() {
             return name;
@@ -476,6 +585,73 @@ public class AlgorithmSuite extends AbstractSecurityAssertion implements PolicyC
     @Override
     public QName getName() {
         return getVersion().getSPConstants().getAlgorithmSuite();
+    }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        
+        if (!(object instanceof AlgorithmSuite)) {
+            return false;
+        }
+        
+        AlgorithmSuite that = (AlgorithmSuite)object;
+        if (c14n != that.c14n || soapNormType != that.soapNormType || strType != that.strType
+            || xPathType != that.xPathType) {
+            return false;
+        }
+        
+        if (algorithmSuiteType != null && !algorithmSuiteType.equals(that.algorithmSuiteType)
+            || algorithmSuiteType == null && that.algorithmSuiteType != null) {
+            return false;
+        }
+        if (symmetricSignature != null && !symmetricSignature.equals(that.symmetricSignature)
+            || symmetricSignature == null && that.symmetricSignature != null) {
+            return false;
+        }
+        if (asymmetricSignature != null && !asymmetricSignature.equals(that.asymmetricSignature)
+            || asymmetricSignature == null && that.asymmetricSignature != null) {
+            return false;
+        }
+        if (computedKey != null && !computedKey.equals(that.computedKey)
+            || computedKey == null && that.computedKey != null) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        if (c14n != null) {
+            result = 31 * result + c14n.hashCode();
+        }
+        if (soapNormType != null) {
+            result = 31 * result + soapNormType.hashCode();
+        }
+        if (strType != null) {
+            result = 31 * result + strType.hashCode();
+        }
+        if (xPathType != null) {
+            result = 31 * result + xPathType.hashCode();
+        }
+        if (algorithmSuiteType != null) {
+            result = 31 * result + algorithmSuiteType.hashCode();
+        }
+        if (symmetricSignature != null) {
+            result = 31 * result + symmetricSignature.hashCode();
+        }
+        if (asymmetricSignature != null) {
+            result = 31 * result + asymmetricSignature.hashCode();
+        }
+        if (computedKey != null) {
+            result = 31 * result + computedKey.hashCode();
+        }
+        
+        return 31 * result + super.hashCode();
     }
 
     @Override
