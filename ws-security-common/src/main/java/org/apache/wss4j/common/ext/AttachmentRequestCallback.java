@@ -25,6 +25,7 @@ public class AttachmentRequestCallback implements Callback {
 
     private String attachmentId;
     private List<Attachment> attachments;
+    private boolean removeAttachments = true;
 
     /**
      * The requested attachment which will be secured. If null all attachments are requested
@@ -43,5 +44,17 @@ public class AttachmentRequestCallback implements Callback {
 
     public void setAttachments(List<Attachment> attachments) {
         this.attachments = attachments;
+    }
+
+    public boolean isRemoveAttachments() {
+        return removeAttachments;
+    }
+
+    /**
+     * Set whether to remove the attachments when we're reading them. 
+     * The default is "true".
+     */
+    public void setRemoveAttachments(boolean removeAttachments) {
+        this.removeAttachments = removeAttachments;
     }
 }
