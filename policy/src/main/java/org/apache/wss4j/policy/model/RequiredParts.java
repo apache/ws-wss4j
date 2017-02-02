@@ -41,6 +41,31 @@ public class RequiredParts extends AbstractSecurityAssertion {
     public QName getName() {
         return getVersion().getSPConstants().getRequiredParts();
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof RequiredParts)) {
+            return false;
+        }
+        
+        RequiredParts that = (RequiredParts)object;
+        if (!headers.equals(that.headers)) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + headers.hashCode();
+        
+        return 31 * result + super.hashCode();
+    }
 
     @Override
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {

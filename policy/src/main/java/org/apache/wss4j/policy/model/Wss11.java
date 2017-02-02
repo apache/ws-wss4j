@@ -42,6 +42,35 @@ public class Wss11 extends Wss10 {
     public QName getName() {
         return getVersion().getSPConstants().getWss11();
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof Wss11)) {
+            return false;
+        }
+        
+        Wss11 that = (Wss11)object;
+        if (mustSupportRefThumbprint != that.mustSupportRefThumbprint
+            || mustSupportRefEncryptedKey != that.mustSupportRefEncryptedKey
+            || requireSignatureConfirmation != that.requireSignatureConfirmation) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + Boolean.hashCode(mustSupportRefThumbprint);
+        result = 31 * result + Boolean.hashCode(mustSupportRefEncryptedKey);
+        result = 31 * result + Boolean.hashCode(requireSignatureConfirmation);
+        
+        return 31 * result + super.hashCode();
+    }
 
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {

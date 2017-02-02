@@ -50,6 +50,48 @@ public abstract class AbstractBinding extends AbstractSecurityAssertion implemen
     public Policy getPolicy() {
         return nestedPolicy;
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        
+        if (!(object instanceof AbstractBinding)) {
+            return false;
+        }
+        
+        AbstractBinding that = (AbstractBinding)object;
+        if (algorithmSuite != null && !algorithmSuite.equals(that.algorithmSuite)
+            || algorithmSuite == null && that.algorithmSuite != null) {
+            return false;
+        }
+        
+        if (layout != null && !layout.equals(that.layout)
+            || layout == null && that.layout != null) {
+            return false;
+        }
+        
+        if (includeTimestamp != that.includeTimestamp) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        if (algorithmSuite != null) {
+            result = 31 * result + algorithmSuite.hashCode();
+        }
+        if (layout != null) {
+            result = 31 * result + layout.hashCode();
+        }
+        result = 31 * result + Boolean.hashCode(includeTimestamp);
+        
+        return 31 * result + super.hashCode();
+    }
 
     @Override
     public PolicyComponent normalize() {

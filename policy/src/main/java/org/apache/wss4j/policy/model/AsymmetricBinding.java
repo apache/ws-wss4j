@@ -45,6 +45,72 @@ public class AsymmetricBinding extends AbstractSymmetricAsymmetricBinding {
     public QName getName() {
         return getVersion().getSPConstants().getAsymmetricBinding();
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        
+        if (!(object instanceof AsymmetricBinding)) {
+            return false;
+        }
+        
+        AsymmetricBinding that = (AsymmetricBinding)object;
+        if (initiatorToken != null && !initiatorToken.equals(that.initiatorToken)
+            || initiatorToken == null && that.initiatorToken != null) {
+            return false;
+        }
+        if (initiatorSignatureToken != null && !initiatorSignatureToken.equals(that.initiatorSignatureToken)
+            || initiatorSignatureToken == null && that.initiatorSignatureToken != null) {
+            return false;
+        }
+        if (initiatorEncryptionToken != null && !initiatorEncryptionToken.equals(that.initiatorEncryptionToken)
+            || initiatorEncryptionToken == null && that.initiatorEncryptionToken != null) {
+            return false;
+        }
+        
+        if (recipientToken != null && !recipientToken.equals(that.recipientToken)
+            || recipientToken == null && that.recipientToken != null) {
+            return false;
+        }
+        if (recipientSignatureToken != null && !recipientSignatureToken.equals(that.recipientSignatureToken)
+            || recipientSignatureToken == null && that.recipientSignatureToken != null) {
+            return false;
+        }
+        if (recipientEncryptionToken != null && !recipientEncryptionToken.equals(that.recipientEncryptionToken)
+            || recipientEncryptionToken == null && that.recipientEncryptionToken != null) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        if (initiatorToken != null) {
+            result = 31 * result + initiatorToken.hashCode();
+        }
+        if (initiatorSignatureToken != null) {
+            result = 31 * result + initiatorSignatureToken.hashCode();
+        }
+        if (initiatorEncryptionToken != null) {
+            result = 31 * result + initiatorEncryptionToken.hashCode();
+        }
+        
+        if (recipientToken != null) {
+            result = 31 * result + recipientToken.hashCode();
+        }
+        if (recipientSignatureToken != null) {
+            result = 31 * result + recipientSignatureToken.hashCode();
+        }
+        if (recipientEncryptionToken != null) {
+            result = 31 * result + recipientEncryptionToken.hashCode();
+        }
+        
+        return 31 * result + super.hashCode();
+    }
 
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {

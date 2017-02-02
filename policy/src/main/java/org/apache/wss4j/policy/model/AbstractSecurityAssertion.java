@@ -72,7 +72,44 @@ public abstract class AbstractSecurityAssertion implements Assertion {
     public boolean equal(PolicyComponent policyComponent) {
         return policyComponent == this;
     }
-
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof AbstractSecurityAssertion)) {
+            return false;
+        }
+        
+        AbstractSecurityAssertion that = (AbstractSecurityAssertion)object;
+        if (isOptional != that.isOptional) {
+            return false;
+        }
+        if (isIgnorable != that.isIgnorable) {
+            return false;
+        }
+        
+        if (version != null && !version.equals(that.version)
+            || version == null && that.version != null) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        if (version != null) {
+            result = 31 * result + version.hashCode();
+        }
+        result = 31 * result + Boolean.hashCode(isOptional);
+        result = 31 * result + Boolean.hashCode(isIgnorable);
+        
+        return result;
+    }
+    
     @Override
     public PolicyComponent normalize() {
         if (normalized == null) {

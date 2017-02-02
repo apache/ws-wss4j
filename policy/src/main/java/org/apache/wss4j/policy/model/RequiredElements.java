@@ -46,6 +46,40 @@ public class RequiredElements extends AbstractSecurityAssertion {
     public QName getName() {
         return getVersion().getSPConstants().getRequiredElements();
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        
+        if (!(object instanceof RequiredElements)) {
+            return false;
+        }
+        
+        RequiredElements that = (RequiredElements)object;
+        if (xPathVersion != null && !xPathVersion.equals(that.xPathVersion)
+            || xPathVersion == null && that.xPathVersion != null) {
+            return false;
+        }
+        
+        if (!xPaths.equals(that.xPaths)) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        if (xPathVersion != null) {
+            result = 31 * result + xPathVersion.hashCode();
+        }
+        result = 31 * result + xPaths.hashCode();
+        
+        return 31 * result + super.hashCode();
+    }
 
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {

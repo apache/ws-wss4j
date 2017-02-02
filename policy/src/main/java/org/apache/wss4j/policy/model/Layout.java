@@ -69,6 +69,34 @@ public class Layout extends AbstractSecurityAssertion implements PolicyContainin
     public QName getName() {
         return getVersion().getSPConstants().getLayout();
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        
+        if (!(object instanceof Layout)) {
+            return false;
+        }
+        
+        Layout that = (Layout)object;
+        if (layoutType != that.layoutType) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        if (layoutType != null) {
+            result = 31 * result + layoutType.hashCode();
+        }
+        
+        return 31 * result + super.hashCode();
+    }
 
     @Override
     public PolicyComponent normalize() {

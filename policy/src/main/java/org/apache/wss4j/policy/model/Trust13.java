@@ -44,6 +44,37 @@ public class Trust13 extends Trust10 {
     public QName getName() {
         return getVersion().getSPConstants().getTrust13();
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof Trust13)) {
+            return false;
+        }
+        
+        Trust13 that = (Trust13)object;
+        if (requireRequestSecurityTokenCollection != that.requireRequestSecurityTokenCollection
+            || requireAppliesTo != that.requireAppliesTo
+            || scopePolicy15 != that.scopePolicy15
+            || mustSupportInteractiveChallenge != that.mustSupportInteractiveChallenge) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + Boolean.hashCode(requireRequestSecurityTokenCollection);
+        result = 31 * result + Boolean.hashCode(requireAppliesTo);
+        result = 31 * result + Boolean.hashCode(scopePolicy15);
+        result = 31 * result + Boolean.hashCode(mustSupportInteractiveChallenge);
+        
+        return 31 * result + super.hashCode();
+    }
 
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {

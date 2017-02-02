@@ -71,6 +71,43 @@ public class X509Token extends AbstractToken {
     public QName getName() {
         return getVersion().getSPConstants().getX509Token();
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof X509Token)) {
+            return false;
+        }
+        
+        X509Token that = (X509Token)object;
+        if (tokenType != that.tokenType) {
+            return false;
+        }
+        if (requireKeyIdentifierReference != that.requireKeyIdentifierReference
+            || requireIssuerSerialReference != that.requireIssuerSerialReference
+            || requireEmbeddedTokenReference != that.requireEmbeddedTokenReference
+            || requireThumbprintReference != that.requireThumbprintReference) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        if (tokenType != null) {
+            result = 31 * result + tokenType.hashCode();
+        }
+        result = 31 * result + Boolean.hashCode(requireKeyIdentifierReference);
+        result = 31 * result + Boolean.hashCode(requireIssuerSerialReference);
+        result = 31 * result + Boolean.hashCode(requireEmbeddedTokenReference);
+        result = 31 * result + Boolean.hashCode(requireThumbprintReference);
+        
+        return 31 * result + super.hashCode();
+    }
 
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {

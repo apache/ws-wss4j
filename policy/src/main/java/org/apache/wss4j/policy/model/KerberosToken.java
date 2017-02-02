@@ -60,6 +60,37 @@ public class KerberosToken extends AbstractToken {
     public QName getName() {
         return getVersion().getSPConstants().getKerberosToken();
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof KerberosToken)) {
+            return false;
+        }
+        
+        KerberosToken that = (KerberosToken)object;
+        if (requireKeyIdentifierReference != that.requireKeyIdentifierReference) {
+            return false;
+        }
+        if (apReqTokenType != that.apReqTokenType) {
+            return false;
+        }
+        
+        return super.equals(object);
+    }
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        if (apReqTokenType != null) {
+            result = 31 * result + apReqTokenType.hashCode();
+        }
+        result = 31 * result + Boolean.hashCode(requireKeyIdentifierReference);
+        
+        return 31 * result + super.hashCode();
+    }
 
     @Override
     protected AbstractSecurityAssertion cloneAssertion(Policy nestedPolicy) {
