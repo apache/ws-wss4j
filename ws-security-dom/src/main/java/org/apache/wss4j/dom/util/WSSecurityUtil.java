@@ -531,9 +531,15 @@ public final class WSSecurityUtil {
     ) throws WSSecurityException {
         return getBytesFromAttachment(xopUri, data.getAttachmentCallbackHandler());
     }
-    
+
     public static byte[] getBytesFromAttachment(
         String xopUri, CallbackHandler attachmentCallbackHandler
+    ) throws WSSecurityException {
+        return getBytesFromAttachment(xopUri, attachmentCallbackHandler, true);
+    }
+
+    public static byte[] getBytesFromAttachment(
+        String xopUri, CallbackHandler attachmentCallbackHandler, boolean removeAttachments
     ) throws WSSecurityException {
         if (attachmentCallbackHandler == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
@@ -551,6 +557,7 @@ public final class WSSecurityUtil {
 
         AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
         attachmentRequestCallback.setAttachmentId(attachmentId);
+        attachmentRequestCallback.setRemoveAttachments(removeAttachments);
 
         try {
             attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
