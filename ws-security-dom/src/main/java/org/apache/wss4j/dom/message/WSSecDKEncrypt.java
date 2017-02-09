@@ -140,6 +140,7 @@ public class WSSecDKEncrypt extends WSSecDerivedKeyBase {
         encryptor.setAttachmentCallbackHandler(attachmentCallbackHandler);
         encryptor.setStoreBytesInAttachment(storeBytesInAttachment);
         encryptor.setEncryptionSerializer(encryptionSerializer);
+        encryptor.setWsDocInfo(getWsDocInfo());
         List<String> encDataRefs =
             encryptor.doEncryption(keyInfo, key, symEncAlgo, references, attachmentEncryptedDataElements);
         

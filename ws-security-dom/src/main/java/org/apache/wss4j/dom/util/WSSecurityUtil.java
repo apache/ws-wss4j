@@ -525,6 +525,24 @@ public final class WSSecurityUtil {
             );
         }
     }
+    
+    public static void inlineAttachments(List<Element> includeElements, 
+                                         CallbackHandler attachmentCallbackHandler,
+                                         boolean removeAttachments) throws WSSecurityException {
+        for (Element includeElement : includeElements) {
+            String xopURI = includeElement.getAttributeNS(null, "href");
+            if (xopURI != null) {
+                // Retrieve the attachment bytes
+                byte[] attachmentBytes = 
+                    WSSecurityUtil.getBytesFromAttachment(xopURI, attachmentCallbackHandler, removeAttachments);
+                String encodedBytes = Base64.getMimeEncoder().encodeToString(attachmentBytes);
+
+                Node encodedChild =
+                    includeElement.getOwnerDocument().createTextNode(encodedBytes);
+                includeElement.getParentNode().replaceChild(encodedChild, includeElement);
+            }
+        }
+    }
 
     public static byte[] getBytesFromAttachment(
         String xopUri, RequestData data
@@ -545,15 +563,7 @@ public final class WSSecurityUtil {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
         }
 
-        String attachmentId = null;
-        try {
-            attachmentId = URLDecoder.decode(xopUri.substring("cid:".length()), StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            throw new WSSecurityException(
-                WSSecurityException.ErrorCode.INVALID_SECURITY,
-                "empty", new Object[] {"Attachment ID cannot be decoded: " + xopUri}
-            );
-        }
+        String attachmentId = getAttachmentId(xopUri);
 
         AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
         attachmentRequestCallback.setAttachmentId(attachmentId);
@@ -576,6 +586,17 @@ public final class WSSecurityUtil {
             return JavaUtils.getBytesFromStream(inputStream);
         } catch (UnsupportedCallbackException | IOException e) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
+        }
+    }
+    
+    public static String getAttachmentId(String xopUri) throws WSSecurityException {
+        try {
+            return URLDecoder.decode(xopUri.substring("cid:".length()), StandardCharsets.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            throw new WSSecurityException(
+                WSSecurityException.ErrorCode.INVALID_SECURITY,
+                "empty", new Object[] {"Attachment ID cannot be decoded: " + xopUri}
+            );
         }
     }
 
@@ -607,4 +628,6 @@ public final class WSSecurityUtil {
         }
 
     }
+    
+    
 }

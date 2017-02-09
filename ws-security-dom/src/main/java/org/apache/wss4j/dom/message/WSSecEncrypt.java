@@ -237,6 +237,8 @@ public class WSSecEncrypt extends WSSecEncryptedKey {
         encryptor.setAttachmentCallbackHandler(attachmentCallbackHandler);
         encryptor.setStoreBytesInAttachment(storeBytesInAttachment);
         encryptor.setEncryptionSerializer(getEncryptionSerializer());
+        encryptor.setExpandXopInclude(isExpandXopInclude());
+        encryptor.setWsDocInfo(getWsDocInfo());
         List<String> encDataRefs =
             encryptor.doEncryption(keyInfo, secretKeySpec, getSymmetricEncAlgorithm(), references, attachmentEncryptedDataElements);
         if (encDataRefs.isEmpty()) {

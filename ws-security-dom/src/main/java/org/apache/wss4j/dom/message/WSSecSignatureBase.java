@@ -38,6 +38,7 @@ import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.Attachment;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.callback.DOMCallbackLookup;
@@ -56,6 +57,8 @@ public class WSSecSignatureBase extends WSSecBase {
 
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(WSSecSignatureBase.class);
+    
+    private List<Element> clonedElements = new ArrayList<>();
 
     public WSSecSignatureBase(WSSecHeader securityHeader) {
         super(securityHeader);
@@ -103,7 +106,7 @@ public class WSSecSignatureBase extends WSSecBase {
             String idToSign = encPart.getId();
             String elemName = encPart.getName();
             Element element = encPart.getElement();
-
+            
             //
             // Set up the elements to sign. There is one reserved element
             // names: "STRTransform": Setup the ds:Reference to use STR Transform
@@ -146,6 +149,8 @@ public class WSSecSignatureBase extends WSSecBase {
                             );
                     }
                     if (element != null) {
+                        cloneElement(element);
+                        
                         wsDocInfo.addTokenElement(element, false);
                     } else if (!encPart.isRequired()) {
                         continue;
@@ -181,6 +186,9 @@ public class WSSecSignatureBase extends WSSecBase {
                             new Object[] {nmSpace + ", " + elemName});
                     }
                     for (Element elementToSign : elementsToSign) {
+                        
+                        cloneElement(elementToSign);
+                        
                         TransformParameterSpec transformSpec = null;
                         if (addInclusivePrefixes) {
                             List<String> prefixes = getInclusivePrefixes(elementToSign);
@@ -218,6 +226,24 @@ public class WSSecSignatureBase extends WSSecBase {
             referenceList.addAll(attachmentReferenceList);
         }
         return referenceList;
+    }
+    
+    private void cloneElement(Element element) throws WSSecurityException {
+        if (expandXopInclude) {
+            // Look for xop:Include Nodes
+            List<Element> includeElements =
+                XMLUtils.findElements(element.getFirstChild(), "Include", WSConstants.XOP_NS);
+            if (includeElements != null && !includeElements.isEmpty()) {
+                // Clone the Element to be signed + insert the clone into the tree at the same level
+                // We will expand the xop:Include for one of the nodes + sign that (and then remove it), 
+                // while leaving the original in the tree to be sent in the message
+                Element clonedElement = (Element)element.cloneNode(true);
+                element.getParentNode().appendChild(clonedElement);
+                clonedElements.add(element);
+            
+                WSSecurityUtil.inlineAttachments(includeElements, attachmentCallbackHandler, false);
+            }
+        }
     }
 
     private List<javax.xml.crypto.dsig.Reference> addAttachmentReferences(
@@ -316,4 +342,13 @@ public class WSSecSignatureBase extends WSSecBase {
         return transformParam;
     }
 
+    protected void cleanup() {
+        if (!clonedElements.isEmpty()) {
+            for (Element clonedElement : clonedElements) {
+                clonedElement.getParentNode().removeChild(clonedElement);
+            }
+            clonedElements.clear();
+        }
+    }
+    
 }

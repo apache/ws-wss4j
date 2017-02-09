@@ -22,6 +22,7 @@ package org.apache.wss4j.dom.message;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WsuIdAllocator;
 import org.apache.wss4j.dom.callback.CallbackLookup;
 import org.apache.wss4j.dom.callback.DOMCallbackLookup;
@@ -47,11 +48,13 @@ public class WSSecBase {
     protected CallbackLookup callbackLookup;
     protected CallbackHandler attachmentCallbackHandler;
     protected boolean storeBytesInAttachment;
+    protected boolean expandXopInclude;
 
     private WsuIdAllocator idAllocator;
     private final List<WSEncryptionPart> parts = new ArrayList<>();
     private final WSSecHeader securityHeader;
     private final Document doc;
+    private WSDocInfo wsDocInfo;
 
     public WSSecBase(WSSecHeader securityHeader) {
         this.securityHeader = securityHeader;
@@ -214,4 +217,19 @@ public class WSSecBase {
         this.idAllocator = idAllocator;
     }
 
+    public boolean isExpandXopInclude() {
+        return expandXopInclude;
+    }
+
+    public void setExpandXopInclude(boolean expandXopInclude) {
+        this.expandXopInclude = expandXopInclude;
+    }
+
+    public WSDocInfo getWsDocInfo() {
+        return wsDocInfo;
+    }
+
+    public void setWsDocInfo(WSDocInfo wsDocInfo) {
+        this.wsDocInfo = wsDocInfo;
+    }
 }

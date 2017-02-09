@@ -19,6 +19,7 @@
 
 package org.apache.wss4j.dom.message;
 
+import java.io.IOException;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.Attachment;
@@ -40,6 +42,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.AttachmentUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.WsuIdAllocator;
 import org.apache.wss4j.dom.callback.CallbackLookup;
 import org.apache.wss4j.dom.callback.DOMCallbackLookup;
@@ -75,6 +78,8 @@ public class Encryptor {
     private CallbackHandler attachmentCallbackHandler;
     private boolean storeBytesInAttachment;
     private Serializer encryptionSerializer;
+    private boolean expandXopInclude;
+    private WSDocInfo wsDocInfo;
 
     public List<String> doEncryption(
         KeyInfo keyInfo,
@@ -124,7 +129,62 @@ public class Encryptor {
                     new Object[] {"{" + encPart.getNamespace() + "}" + encPart.getName()});
             }
 
-            if (storeBytesInAttachment) {
+            if (expandXopInclude) {
+                for (Element elementToEncrypt : elementsToEncrypt) {
+                    Element encrElement = elementToEncrypt;
+                    
+                    // Look for xop:Include Nodes
+                    List<Element> includeElements =
+                        XMLUtils.findElements(elementToEncrypt.getFirstChild(), "Include", WSConstants.XOP_NS);
+                    if (includeElements != null && !includeElements.isEmpty()) {
+                        // See if we already have an expanded Element available (from Signature) that matches the current Element
+                        Element matchingElement = findMatchingExpandedElement(encrElement);
+                        if (matchingElement != null && matchingElement != encrElement) {
+                            // If so then replace the existing Element to encrypt in the SOAP Envelope
+                            encrElement.getParentNode().replaceChild(matchingElement, encrElement);
+                            encrElement = matchingElement;
+                        }
+
+                        if (encrElement == elementToEncrypt) {
+                            // Here we didn't find an already expanded Element, so inline the attachment bytes
+                            WSSecurityUtil.inlineAttachments(includeElements, attachmentCallbackHandler, true);
+                        } else {
+                            // We already have an expanded Element, but might need to delete the attachments
+                            for (Element includeElement : includeElements) {
+                                String xopURI = includeElement.getAttributeNS(null, "href");
+                                if (xopURI != null) {
+                                    // Delete the attachment
+                                    
+                                    AttachmentRequestCallback attachmentRequestCallback = new AttachmentRequestCallback();
+                                    attachmentRequestCallback.setAttachmentId(WSSecurityUtil.getAttachmentId(xopURI));
+                                    
+                                    try {
+                                        attachmentCallbackHandler.handle(new Callback[]{attachmentRequestCallback});
+                                    } catch (UnsupportedCallbackException | IOException e) {
+                                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK, e);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (storeBytesInAttachment) {
+                        try {
+                            String id =
+                                encryptElementInAttachment(keyInfo, secretKey, encryptionAlgorithm, encPart, encrElement);
+                            encPart.setEncId(id);
+                            encDataRef.add("#" + id);
+                        } catch (Exception ex) {
+                            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex);
+                        }
+                    } else {
+                        String id =
+                            encryptElement(encrElement, encPart.getEncModifier(), xmlCipher, secretKey, keyInfo);
+                        encPart.setEncId(id);
+                        encDataRef.add("#" + id);
+                    }
+                }
+            } else if (storeBytesInAttachment) {
                 for (Element elementToEncrypt : elementsToEncrypt) {
                     try {
                         String id =
@@ -153,6 +213,28 @@ public class Encryptor {
         }
 
         return encDataRef;
+    }
+    
+    private Element findMatchingExpandedElement(Element element) {
+        Element matchingElement = null;
+        
+        if (element.hasAttributeNS(WSConstants.WSU_NS, "Id")) {
+            String id = element.getAttributeNS(WSConstants.WSU_NS, "Id");
+            matchingElement = wsDocInfo.getTokenElement(id);
+        }
+        
+        if (matchingElement == null && element.hasAttributeNS(null, "Id")) {
+            String id = element.getAttributeNS(null, "Id");
+            matchingElement = wsDocInfo.getTokenElement(id);
+        }
+        
+        // Check the Elements are the same
+        if (matchingElement != null && matchingElement.getNamespaceURI().equals(element.getNamespaceURI())
+            && matchingElement.getLocalName().equals(element.getLocalName())) {
+            return matchingElement;
+        }
+        
+        return null;
     }
 
     private String encryptElementInAttachment(
@@ -495,6 +577,22 @@ public class Encryptor {
 
     public void setEncryptionSerializer(Serializer encryptionSerializer) {
         this.encryptionSerializer = encryptionSerializer;
+    }
+
+    public boolean isExpandXopInclude() {
+        return expandXopInclude;
+    }
+
+    public void setExpandXopInclude(boolean expandXopInclude) {
+        this.expandXopInclude = expandXopInclude;
+    }
+
+    public WSDocInfo getWsDocInfo() {
+        return wsDocInfo;
+    }
+
+    public void setWsDocInfo(WSDocInfo wsDocInfo) {
+        this.wsDocInfo = wsDocInfo;
     }
 
 }

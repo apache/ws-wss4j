@@ -84,7 +84,6 @@ public class WSSecSignature extends WSSecSignatureBase {
     protected CanonicalizationMethod c14nMethod;
     protected XMLSignature sig;
     protected byte[] secretKey;
-    protected WSDocInfo wsDocInfo;
     protected String strUri;
     protected Element bstToken;
     protected String keyInfoUri;
@@ -146,7 +145,11 @@ public class WSSecSignature extends WSSecSignatureBase {
         // retrieval
         //
         crypto = cr;
-        wsDocInfo = new WSDocInfo(getDocument());
+        WSDocInfo wsDocInfo = getWsDocInfo();
+        if (wsDocInfo == null) {
+            wsDocInfo = new WSDocInfo(getDocument());
+            super.setWsDocInfo(wsDocInfo);
+        }
         wsDocInfo.setCrypto(cr);
 
         //
@@ -396,7 +399,7 @@ public class WSSecSignature extends WSSecSignatureBase {
             addReferencesToSign(
                 getDocument(),
                 references,
-                wsDocInfo,
+                getWsDocInfo(),
                 signatureFactory,
                 addInclusivePrefixes,
                 digestAlgo
@@ -444,7 +447,7 @@ public class WSSecSignature extends WSSecSignatureBase {
             final String attachmentId = getIdAllocator().createId("", getDocument());
             WSSecurityUtil.storeBytesInAttachment(bstToken, getDocument(), attachmentId,
                                                   certBytes, attachmentCallbackHandler);
-            wsDocInfo.addTokenElement(bstToken, false);
+            getWsDocInfo().addTokenElement(bstToken, false);
         } else {
             BinarySecurity binarySecurity = null;
             if (!useSingleCert) {
@@ -456,7 +459,7 @@ public class WSSecSignature extends WSSecSignatureBase {
             }
             binarySecurity.setID(certUri);
             bstToken = binarySecurity.getElement();
-            wsDocInfo.addTokenElement(bstToken, false);
+            getWsDocInfo().addTokenElement(bstToken, false);
         }
 
         bstAddedToSecurityHeader = false;
@@ -571,14 +574,16 @@ public class WSSecSignature extends WSSecSignatureBase {
                     WSConstants.C14N_EXCL_OMIT_COMMENTS_PREFIX
                 );
             }
-            signContext.setProperty(STRTransform.TRANSFORM_WS_DOC_INFO, wsDocInfo);
-            wsDocInfo.setCallbackLookup(callbackLookup);
+            signContext.setProperty(STRTransform.TRANSFORM_WS_DOC_INFO, getWsDocInfo());
+            getWsDocInfo().setCallbackLookup(callbackLookup);
 
             // Add the elements to sign to the Signature Context
-            wsDocInfo.setTokensOnContext((DOMSignContext)signContext);
+            getWsDocInfo().setTokensOnContext((DOMSignContext)signContext);
             sig.sign(signContext);
 
             signatureValue = sig.getSignatureValue().getValue();
+            
+            cleanup();
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
             throw new WSSecurityException(

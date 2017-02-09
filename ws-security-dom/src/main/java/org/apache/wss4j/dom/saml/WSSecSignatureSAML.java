@@ -216,7 +216,10 @@ public class WSSecSignatureSAML extends WSSecSignature {
         // Gather some info about the document to process and store it for
         // retrieval
         //
-        wsDocInfo = new WSDocInfo(getDocument());
+        if (super.getWsDocInfo() == null) {
+            WSDocInfo wsDocInfo = new WSDocInfo(getDocument());
+            super.setWsDocInfo(wsDocInfo);
+        }
 
 
         X509Certificate[] certs = null;
@@ -226,7 +229,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
             cryptoType.setAlias(issuerKeyName);
             certs = issuerCrypto.getX509Certificates(cryptoType);
-            wsDocInfo.setCrypto(issuerCrypto);
+            getWsDocInfo().setCrypto(issuerCrypto);
         } else {
             //
             // in case of key holder: - get the user's certificate that _must_ be
@@ -246,13 +249,13 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 actionToken.setCrypto(userCrypto);
                 SAMLKeyInfo samlKeyInfo =
                     SAMLUtil.getCredentialFromSubject(
-                            samlAssertion, new WSSSAMLKeyInfoProcessor(data, wsDocInfo),
+                            samlAssertion, new WSSSAMLKeyInfoProcessor(data, getWsDocInfo()),
                             userCrypto, data.getCallbackHandler()
                     );
                 if (samlKeyInfo != null) {
                     publicKey = samlKeyInfo.getPublicKey();
                     certs = samlKeyInfo.getCerts();
-                    wsDocInfo.setCrypto(userCrypto);
+                    getWsDocInfo().setCrypto(userCrypto);
                 }
             }
         }
@@ -361,7 +364,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                     Element elem = secRefSaml.getElement();
                     elem.appendChild(keyId);
                 }
-                wsDocInfo.addTokenElement(secRefSaml.getElement(), false);
+                getWsDocInfo().addTokenElement(secRefSaml.getElement(), false);
             }
         } catch (Exception ex) {
             throw new WSSecurityException(
@@ -372,7 +375,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
         X509Certificate cert = certs != null ? certs[0] : null;
         configureKeyInfo(secRef, cert, iCrypto != null ? iCrypto : uCrypto, samlAssertion);
 
-        wsDocInfo.addTokenElement(samlToken, false);
+        getWsDocInfo().addTokenElement(samlToken, false);
     }
     
     private void configureKeyInfo(
@@ -388,7 +391,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
                 ((X509Security) binarySecurity).setX509Certificate(cert);
                 binarySecurity.setID(certUri);
                 bstToken = binarySecurity.getElement();
-                wsDocInfo.addTokenElement(bstToken, false);
+                getWsDocInfo().addTokenElement(bstToken, false);
                 ref.setValueType(binarySecurity.getValueType());
                 secRef.setReference(ref);
                 break;
@@ -447,7 +450,7 @@ public class WSSecSignatureSAML extends WSSecSignature {
             elem.appendChild(keyId);
         }
         XMLStructure structure = new DOMStructure(secRef.getElement());
-        wsDocInfo.addTokenElement(secRef.getElement(), false);
+        getWsDocInfo().addTokenElement(secRef.getElement(), false);
 
         KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
         keyInfo =
@@ -528,11 +531,11 @@ public class WSSecSignatureSAML extends WSSecSignature {
                     WSConstants.C14N_EXCL_OMIT_COMMENTS_PREFIX
                 );
             }
-            signContext.setProperty(STRTransform.TRANSFORM_WS_DOC_INFO, wsDocInfo);
-            wsDocInfo.setCallbackLookup(callbackLookup);
+            signContext.setProperty(STRTransform.TRANSFORM_WS_DOC_INFO, getWsDocInfo());
+            getWsDocInfo().setCallbackLookup(callbackLookup);
 
             // Add the elements to sign to the Signature Context
-            wsDocInfo.setTokensOnContext((DOMSignContext)signContext);
+            getWsDocInfo().setTokensOnContext((DOMSignContext)signContext);
 
             sig.sign(signContext);
 
