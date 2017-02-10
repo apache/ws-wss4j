@@ -201,8 +201,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
-            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < securityEvents.size(); i++) {
@@ -282,8 +282,8 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
-            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < securityEvents.size(); i++) {
@@ -415,9 +415,9 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
-            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < securityEvents.size(); i++) {
@@ -504,9 +504,9 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
-            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < securityEvents.size(); i++) {
@@ -671,10 +671,10 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
-            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < securityEvents.size(); i++) {
@@ -770,10 +770,10 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
-            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < securityEvents.size(); i++) {
@@ -894,10 +894,10 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
-            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < securityEvents.size(); i++) {
@@ -993,10 +993,10 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
-            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < securityEvents.size(); i++) {
@@ -1090,9 +1090,9 @@ public class SecurityContextTokenTest extends AbstractTestBase {
             String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
-            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < securityEvents.size(); i++) {

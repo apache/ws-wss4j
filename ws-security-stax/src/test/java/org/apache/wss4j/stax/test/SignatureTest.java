@@ -1352,9 +1352,9 @@ public class SignatureTest extends AbstractTestBase {
             String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
-            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> signedElementSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < securityEvents.size(); i++) {

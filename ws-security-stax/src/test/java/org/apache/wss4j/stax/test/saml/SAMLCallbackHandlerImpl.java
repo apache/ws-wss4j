@@ -163,7 +163,7 @@ public class SAMLCallbackHandlerImpl implements CallbackHandler {
             if (customAttributeValues != null) {
                 attributeBean.setAttributeValues(customAttributeValues);
             } else {
-                List<Object> attributes = new ArrayList<Object>();
+                List<Object> attributes = new ArrayList<>();
                 attributes.add("user");
                 attributeBean.setAttributeValues(attributes);
             }

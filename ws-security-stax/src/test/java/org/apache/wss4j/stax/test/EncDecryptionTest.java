@@ -212,8 +212,8 @@ public class EncDecryptionTest extends AbstractTestBase {
             String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
-            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < securityEvents.size(); i++) {
@@ -358,8 +358,8 @@ public class EncDecryptionTest extends AbstractTestBase {
             String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
-            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < securityEvents.size(); i++) {
@@ -562,24 +562,24 @@ public class EncDecryptionTest extends AbstractTestBase {
             String encryptedPartCorrelationID17 = contentEncryptedElementSecurityEventList.get(16).getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
-            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents1 = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents2 = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents3 = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents4 = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents5 = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents6 = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents7 = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents8 = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents9 = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents10 = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents11 = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents12 = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents13 = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents14 = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents15 = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents16 = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents17 = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents1 = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents2 = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents3 = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents4 = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents5 = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents6 = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents7 = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents8 = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents9 = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents10 = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents11 = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents12 = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents13 = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents14 = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents15 = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents16 = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents17 = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < securityEvents.size(); i++) {
@@ -929,8 +929,8 @@ public class EncDecryptionTest extends AbstractTestBase {
             String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
-            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < securityEvents.size(); i++) {
@@ -1804,8 +1804,8 @@ public class EncDecryptionTest extends AbstractTestBase {
             String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
-            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < securityEvents.size(); i++) {
@@ -2496,8 +2496,8 @@ public class EncDecryptionTest extends AbstractTestBase {
             String encryptedPartCorrelationID = encryptedPartSecurityEvent.getCorrelationID();
             String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
-            List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
-            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> operationSecurityEvents = new ArrayList<>();
+            List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<>();
 
             List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
             for (int i = 0; i < securityEvents.size(); i++) {
@@ -2570,7 +2570,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             builder.prepare(crypto);
 
             WSEncryptionPart encP = new WSEncryptionPart("definitions", "http://schemas.xmlsoap.org/wsdl/", "Element");
-            List<WSEncryptionPart> encryptionParts = new ArrayList<WSEncryptionPart>();
+            List<WSEncryptionPart> encryptionParts = new ArrayList<>();
             encryptionParts.add(encP);
             Element ref = builder.encryptForRef(null, encryptionParts);
             ref.removeChild(ref.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#", "DataReference").item(0));
@@ -2614,7 +2614,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             builder.prepare(crypto);
 
             WSEncryptionPart encP = new WSEncryptionPart("definitions", "http://schemas.xmlsoap.org/wsdl/", "Element");
-            List<WSEncryptionPart> encryptionParts = new ArrayList<WSEncryptionPart>();
+            List<WSEncryptionPart> encryptionParts = new ArrayList<>();
             encryptionParts.add(encP);
             Element ref = builder.encryptForRef(null, encryptionParts);
             builder.addExternalRefElement(ref);
@@ -2657,7 +2657,7 @@ public class EncDecryptionTest extends AbstractTestBase {
             builder.prepare(crypto);
 
             WSEncryptionPart encP = new WSEncryptionPart("definitions", "http://schemas.xmlsoap.org/wsdl/", "Element");
-            List<WSEncryptionPart> encryptionParts = new ArrayList<WSEncryptionPart>();
+            List<WSEncryptionPart> encryptionParts = new ArrayList<>();
             encryptionParts.add(encP);
             Element ref = builder.encryptForRef(null, encryptionParts);
             builder.prependToHeader();

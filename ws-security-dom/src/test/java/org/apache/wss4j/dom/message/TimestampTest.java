@@ -670,7 +670,7 @@ public class TimestampTest extends org.junit.Assert {
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         wssConfig.setValidator(WSConstants.TIMESTAMP, new NoOpValidator());
         try {
-            verify(doc, wssConfig, new ArrayList<BSPRule>());
+            verify(doc, wssConfig, new ArrayList<>());
             fail("The timestamp validation should have failed");
         } catch (WSSecurityException ex) {
             assertTrue(ex.getErrorCode() == WSSecurityException.ErrorCode.INVALID_SECURITY);

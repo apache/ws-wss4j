@@ -78,7 +78,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
-        final List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        final List<SecurityEvent> securityEventList = new ArrayList<>();
         //done signature; now test sig-verification:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -174,7 +174,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
-        final List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        final List<SecurityEvent> securityEventList = new ArrayList<>();
         //done signature; now test sig-verification:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -241,7 +241,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
     @Test
     public void testDefaultConfigurationOutbound() throws Exception {
 
-        final List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        final List<SecurityEvent> securityEventList = new ArrayList<>();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();
@@ -337,7 +337,7 @@ public class SignatureConfirmationTest extends AbstractTestBase {
     @Test
     public void testOutboundNoSignatureConfirmation() throws Exception {
 
-        final List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        final List<SecurityEvent> securityEventList = new ArrayList<>();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();

@@ -139,7 +139,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
     public Document doInboundSecurity(WSSSecurityProperties securityProperties, XMLStreamReader xmlStreamReader,
                                       SecurityEventListener securityEventListener)
             throws XMLStreamException, ParserConfigurationException, XMLSecurityException {
-        return doInboundSecurity(securityProperties, xmlStreamReader, new ArrayList<SecurityEvent>(), securityEventListener);
+        return doInboundSecurity(securityProperties, xmlStreamReader, new ArrayList<>(), securityEventListener);
     }
 
     public Document doInboundSecurity(WSSSecurityProperties securityProperties, XMLStreamReader xmlStreamReader,
@@ -154,7 +154,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
             throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<>());
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
         xmlStreamWriter.close();
@@ -166,7 +166,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         WSSSecurityProperties securityProperties = ConfigurationConverter.convert(config);
         OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<SecurityEvent>());
+        XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, "UTF-8", new ArrayList<>());
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
         xmlStreamWriter.close();
@@ -277,7 +277,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
 
         // Disable PrefixList checking as the stax code doesn't support this yet
         //todo
-        List<BSPRule> ignoredRules = new ArrayList<BSPRule>();
+        List<BSPRule> ignoredRules = new ArrayList<>();
         ignoredRules.add(BSPRule.R5404);
         ignoredRules.add(BSPRule.R5406);
         ignoredRules.add(BSPRule.R5407);
@@ -529,7 +529,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
              */
             List<WSHandlerResult> results = null;
             if ((results = (List<WSHandlerResult>) mc.get(WSHandlerConstants.RECV_RESULTS)) == null) {
-                results = new ArrayList<WSHandlerResult>();
+                results = new ArrayList<>();
                 mc.put(WSHandlerConstants.RECV_RESULTS, results);
             }
             WSHandlerResult rResult = new WSHandlerResult(actor, wsResult);
@@ -545,7 +545,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
         protected boolean checkReceiverResults(
                 List<WSSecurityEngineResult> wsResult, List<Integer> actions
         ) {
-            List<WSSecurityEngineResult> wsSecurityEngineResults = new ArrayList<WSSecurityEngineResult>();
+            List<WSSecurityEngineResult> wsSecurityEngineResults = new ArrayList<>();
             for (WSSecurityEngineResult result : wsResult) {
                 boolean found = false;
                 for (WSSecurityEngineResult res : wsSecurityEngineResults) {
@@ -610,7 +610,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
 
     protected class TestSecurityEventListener implements SecurityEventListener {
         private SecurityEventConstants.Event[] expectedEvents;
-        private List<SecurityEvent> receivedSecurityEvents = new ArrayList<SecurityEvent>();
+        private List<SecurityEvent> receivedSecurityEvents = new ArrayList<>();
 
         public TestSecurityEventListener(SecurityEventConstants.Event[] expectedEvents) {
             this.expectedEvents = expectedEvents;
@@ -632,7 +632,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
 
         @SuppressWarnings("unchecked")
         public <T> List<T> getSecurityEvents(SecurityEventConstants.Event securityEvent) {
-            List<T> foundEvents = new ArrayList<T>();
+            List<T> foundEvents = new ArrayList<>();
             for (SecurityEvent event : receivedSecurityEvents) {
                 if (event.getSecurityEventType() == securityEvent) {
                     foundEvents.add((T) event);

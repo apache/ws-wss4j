@@ -542,7 +542,7 @@ public class WSSUtils extends XMLSecurityUtils {
             abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain,
                     WSSConstants.TAG_WSSE_SECURITY_TOKEN_REFERENCE, true, attributes);
 
-            attributes = new ArrayList<XMLSecAttribute>(1);
+            attributes = new ArrayList<>(1);
             attributes.add(abstractOutputProcessor.createAttribute(WSSConstants.ATT_NULL_URI,
                     "#" + encryptionPartDef.getKeyId()));
             abstractOutputProcessor.createStartElementAndOutputAsEvent(outputProcessorChain,

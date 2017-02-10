@@ -34,7 +34,7 @@ public class AttributeStatementBean {
      * Constructor SamlAttributeStatement creates a new SamlAttributeStatement instance.
      */
     public AttributeStatementBean() {
-        attributeBeans = new ArrayList<AttributeBean>();
+        attributeBeans = new ArrayList<>();
     }
 
     /**

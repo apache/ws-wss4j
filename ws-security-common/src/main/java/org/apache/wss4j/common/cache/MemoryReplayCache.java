@@ -40,7 +40,7 @@ public class MemoryReplayCache implements ReplayCache {
     public static final long DEFAULT_TTL = 60L * 5L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
     private final SortedMap<Date, List<String>> cache = new TreeMap<>();
-    private final Set<String> ids = Collections.synchronizedSet(new HashSet<String>());
+    private final Set<String> ids = Collections.synchronizedSet(new HashSet<>());
 
     /**
      * Add the given identifier to the cache. It will be cached for a default amount of time.

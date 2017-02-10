@@ -378,7 +378,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
             Crypto userCrypto = CryptoFactory.getInstance("receiver-crypto.properties");
             builder.prepare(userCrypto);
 
-            List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+            List<WSEncryptionPart> parts = new ArrayList<>();
             WSEncryptionPart encP =
                     new WSEncryptionPart(
                             "add", "http://ws.apache.org/counter/counter_port_type", "Element"
@@ -463,7 +463,7 @@ public class SAMLTokenReferenceTest extends AbstractTestBase {
              Crypto userCrypto = CryptoFactory.getInstance("receiver-crypto.properties");
              builder.prepare(userCrypto);
 
-             List<WSEncryptionPart> parts = new ArrayList<WSEncryptionPart>();
+             List<WSEncryptionPart> parts = new ArrayList<>();
              WSEncryptionPart encP =
                      new WSEncryptionPart(
                              "add", "http://ws.apache.org/counter/counter_port_type", "Element"

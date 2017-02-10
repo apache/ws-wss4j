@@ -407,7 +407,7 @@ public class SignatureEncryptionTest extends AbstractTestBase {
 
             WSEncryptionPart bst = new WSEncryptionPart("BinarySecurityToken", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Element");
             WSEncryptionPart def = new WSEncryptionPart("definitions", "http://schemas.xmlsoap.org/wsdl/", "Element");
-            List<WSEncryptionPart> encryptionParts = new ArrayList<WSEncryptionPart>();
+            List<WSEncryptionPart> encryptionParts = new ArrayList<>();
             encryptionParts.add(bst);
             encryptionParts.add(def);
             Element ref = builder.encryptForRef(null, encryptionParts);

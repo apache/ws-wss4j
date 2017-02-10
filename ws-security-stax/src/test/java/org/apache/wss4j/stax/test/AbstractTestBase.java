@@ -287,7 +287,7 @@ public abstract class AbstractTestBase extends Assert {
 
         // Disable PrefixList checking as the stax code doesn't support this yet
         //todo
-        List<BSPRule> ignoredRules = new ArrayList<BSPRule>();
+        List<BSPRule> ignoredRules = new ArrayList<>();
         ignoredRules.add(BSPRule.R5404);
         ignoredRules.add(BSPRule.R5406);
         ignoredRules.add(BSPRule.R5407);
@@ -547,7 +547,7 @@ public abstract class AbstractTestBase extends Assert {
              */
             List<WSHandlerResult> results = null;
             if ((results = (List<WSHandlerResult>) mc.get(WSHandlerConstants.RECV_RESULTS)) == null) {
-                results = new ArrayList<WSHandlerResult>();
+                results = new ArrayList<>();
                 mc.put(WSHandlerConstants.RECV_RESULTS, results);
             }
             results.add(0, wsResult);
@@ -631,7 +631,7 @@ public abstract class AbstractTestBase extends Assert {
 
     protected class TestSecurityEventListener implements SecurityEventListener {
         private SecurityEventConstants.Event[] expectedEvents;
-        private List<SecurityEvent> receivedSecurityEvents = new ArrayList<SecurityEvent>();
+        private List<SecurityEvent> receivedSecurityEvents = new ArrayList<>();
 
         public TestSecurityEventListener(SecurityEventConstants.Event[] expectedEvents) {
             this.expectedEvents = expectedEvents;
@@ -653,7 +653,7 @@ public abstract class AbstractTestBase extends Assert {
 
         @SuppressWarnings("unchecked")
         public <T> List<T> getSecurityEvents(SecurityEventConstants.Event securityEvent) {
-            List<T> foundEvents = new ArrayList<T>();
+            List<T> foundEvents = new ArrayList<>();
             for (SecurityEvent event : receivedSecurityEvents) {
                 if (event.getSecurityEventType() == securityEvent) {
                     foundEvents.add((T) event);

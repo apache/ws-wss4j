@@ -567,7 +567,7 @@ public class SAMLTokenHOKTest extends AbstractTestBase {
                     securityProperties.getSignatureVerificationCrypto().getX509Certificates(cryptoType)[0]);
             httpsTokenSecurityEvent.setSecurityToken(httpsSecurityToken);
 
-            List<SecurityEvent> requestSecurityEvents = new ArrayList<SecurityEvent>();
+            List<SecurityEvent> requestSecurityEvents = new ArrayList<>();
             requestSecurityEvents.add(httpsTokenSecurityEvent);
 
             XMLStreamReader xmlStreamReader = wsSecIn.processInMessage(

@@ -586,7 +586,7 @@ public class TimestampTest extends AbstractTestBase {
             NodeList nodeList = securedDocument.getElementsByTagNameNS(WSSConstants.TAG_WSU_TIMESTAMP.getNamespaceURI(), WSSConstants.TAG_WSU_TIMESTAMP.getLocalPart());
             Assert.assertEquals(nodeList.item(0).getParentNode().getLocalName(), WSSConstants.TAG_WSSE_SECURITY.getLocalPart());
 
-            List<Node> nodesToRemove = new ArrayList<Node>();
+            List<Node> nodesToRemove = new ArrayList<>();
             for (int i = 0; i < nodeList.item(0).getChildNodes().getLength(); i++) {
                 Node node = nodeList.item(0).getChildNodes().item(i);
                 if (node.getNodeType() == Node.ELEMENT_NODE

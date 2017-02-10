@@ -434,7 +434,7 @@ public class SamlConditionsTest extends AbstractTestBase {
             ConditionsBean conditions = new ConditionsBean();
             conditions.setTokenPeriodMinutes(5);
             ProxyRestrictionBean proxyRestriction = new ProxyRestrictionBean();
-            List<String> audiences = new ArrayList<String>();
+            List<String> audiences = new ArrayList<>();
             audiences.add("http://apache.org/one");
             audiences.add("http://apache.org/two");
             proxyRestriction.getAudienceURIs().addAll(audiences);
@@ -479,7 +479,7 @@ public class SamlConditionsTest extends AbstractTestBase {
 
             ConditionsBean conditions = new ConditionsBean();
             conditions.setTokenPeriodMinutes(5);
-            List<String> audiences = new ArrayList<String>();
+            List<String> audiences = new ArrayList<>();
             audiences.add("http://apache.org/one");
             audiences.add("http://apache.org/two");
             AudienceRestrictionBean audienceRestrictionBean = new AudienceRestrictionBean();
@@ -514,7 +514,7 @@ public class SamlConditionsTest extends AbstractTestBase {
     @Test
     public void testSAML2AudienceRestrictionValidation() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        List<String> audiences = new ArrayList<String>();
+        List<String> audiences = new ArrayList<>();
         {
             SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
             callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
@@ -576,7 +576,7 @@ public class SamlConditionsTest extends AbstractTestBase {
     @Test
     public void testSAML1AudienceRestrictionValidation() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        List<String> audiences = new ArrayList<String>();
+        List<String> audiences = new ArrayList<>();
         {
             SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
             callbackHandler.setStatement(SAML1CallbackHandler.Statement.AUTHN);
@@ -722,7 +722,7 @@ public class SamlConditionsTest extends AbstractTestBase {
         }
 
         // This should fail as the expected audience isn't in the assertion
-        List<String> audiences = new ArrayList<String>();
+        List<String> audiences = new ArrayList<>();
         audiences.add("http://apache.org/three");
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();

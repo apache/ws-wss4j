@@ -123,7 +123,7 @@ public class WCFUsernameTokenTest extends org.junit.Assert {
      * Verifies the soap envelope
      */
     private WSHandlerResult verify(Document doc) throws Exception {
-        return verify(doc, new ArrayList<BSPRule>(0));
+        return verify(doc, new ArrayList<>(0));
     }
 
     /**

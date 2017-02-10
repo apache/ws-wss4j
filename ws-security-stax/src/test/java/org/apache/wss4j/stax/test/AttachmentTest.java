@@ -198,7 +198,7 @@ public class AttachmentTest extends AbstractTestBase {
                             throw new RuntimeException("wrong attachment requested");
                         }
 
-                        List<Attachment> attachments = new ArrayList<Attachment>();
+                        List<Attachment> attachments = new ArrayList<>();
                         attachment.setSourceStream(new ByteArrayInputStream(
                                 SOAPUtil.SAMPLE_SOAP_MSG.replace("15", "16").getBytes(StandardCharsets.UTF_8)));
                         attachments.add(attachment);
@@ -325,7 +325,7 @@ public class AttachmentTest extends AbstractTestBase {
                             throw new RuntimeException("wrong attachment requested");
                         }
 
-                        List<Attachment> attachments = new ArrayList<Attachment>();
+                        List<Attachment> attachments = new ArrayList<>();
                         attachments.add(attachment);
                         attachmentRequestCallback.setAttachments(attachments);
                     }
@@ -961,7 +961,7 @@ public class AttachmentTest extends AbstractTestBase {
                 public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
                     if (callbacks[0] instanceof AttachmentRequestCallback) {
                         AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
-                        List<Attachment> attachments = new ArrayList<Attachment>();
+                        List<Attachment> attachments = new ArrayList<>();
                         attachments.add(attachment[0]);
                         attachmentRequestCallback.setAttachments(attachments);
                     } else {
@@ -1005,7 +1005,7 @@ public class AttachmentTest extends AbstractTestBase {
                             throw new RuntimeException("wrong attachment requested");
                         }
 
-                        List<Attachment> attachments = new ArrayList<Attachment>();
+                        List<Attachment> attachments = new ArrayList<>();
                         attachments.add(attachment[0]);
                         attachmentRequestCallback.setAttachments(attachments);
                     } else {
@@ -1062,7 +1062,7 @@ public class AttachmentTest extends AbstractTestBase {
                 public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
                     if (callbacks[0] instanceof AttachmentRequestCallback) {
                         AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
-                        List<Attachment> attachments = new ArrayList<Attachment>();
+                        List<Attachment> attachments = new ArrayList<>();
                         attachments.add(attachment[0]);
                         attachmentRequestCallback.setAttachments(attachments);
                     } else {
@@ -1094,7 +1094,7 @@ public class AttachmentTest extends AbstractTestBase {
                             throw new RuntimeException("wrong attachment requested");
                         }
 
-                        List<Attachment> attachments = new ArrayList<Attachment>();
+                        List<Attachment> attachments = new ArrayList<>();
                         attachments.add(attachment[0]);
 
                         if (attachment[0].getHeaders().size() == 6) {
@@ -1155,7 +1155,7 @@ public class AttachmentTest extends AbstractTestBase {
                 public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
                     if (callbacks[0] instanceof AttachmentRequestCallback) {
                         AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
-                        List<Attachment> attachments = new ArrayList<Attachment>();
+                        List<Attachment> attachments = new ArrayList<>();
                         attachments.add(attachment[0]);
                         attachmentRequestCallback.setAttachments(attachments);
                     } else {
@@ -1199,7 +1199,7 @@ public class AttachmentTest extends AbstractTestBase {
                             throw new RuntimeException("wrong attachment requested");
                         }
 
-                        List<Attachment> attachments = new ArrayList<Attachment>();
+                        List<Attachment> attachments = new ArrayList<>();
                         attachments.add(attachment[0]);
                         attachmentRequestCallback.setAttachments(attachments);
                     } else {
@@ -1256,7 +1256,7 @@ public class AttachmentTest extends AbstractTestBase {
                 public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
                     if (callbacks[0] instanceof AttachmentRequestCallback) {
                         AttachmentRequestCallback attachmentRequestCallback = (AttachmentRequestCallback) callbacks[0];
-                        List<Attachment> attachments = new ArrayList<Attachment>();
+                        List<Attachment> attachments = new ArrayList<>();
                         attachments.add(attachment[0]);
                         attachmentRequestCallback.setAttachments(attachments);
                     } else {
@@ -1302,7 +1302,7 @@ public class AttachmentTest extends AbstractTestBase {
                             throw new RuntimeException("wrong attachment requested");
                         }
 
-                        List<Attachment> attachments = new ArrayList<Attachment>();
+                        List<Attachment> attachments = new ArrayList<>();
                         attachments.add(attachment[0]);
                         attachmentRequestCallback.setAttachments(attachments);
                     } else {

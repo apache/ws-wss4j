@@ -619,7 +619,7 @@ public class HeaderOrderingTest extends AbstractTestBase {
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
-        final List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        final List<SecurityEvent> securityEventList = new ArrayList<>();
         //done signature; now test sig-verification:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();

@@ -754,7 +754,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -865,7 +865,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
                 }
             });
 
-            final List<KerberosTokenSecurityEvent> kerberosTokenSecurityEvents = new ArrayList<KerberosTokenSecurityEvent>();
+            final List<KerberosTokenSecurityEvent> kerberosTokenSecurityEvents = new ArrayList<>();
 
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             SecurityEventListener securityEventListener = new SecurityEventListener() {
@@ -962,7 +962,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
                 }
             });
 
-            final List<KerberosTokenSecurityEvent> kerberosTokenSecurityEvents = new ArrayList<KerberosTokenSecurityEvent>();
+            final List<KerberosTokenSecurityEvent> kerberosTokenSecurityEvents = new ArrayList<>();
 
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             SecurityEventListener securityEventListener = new SecurityEventListener() {
@@ -1021,7 +1021,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
             OutboundWSSec wsSecOut = WSSec.getOutboundWSSec(securityProperties);
-            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<SecurityEvent>());
+            XMLStreamWriter xmlStreamWriter = wsSecOut.processOutMessage(baos, StandardCharsets.UTF_8.name(), new ArrayList<>());
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(this.getClass().getClassLoader().getResourceAsStream("testdata/plain-soap-1.1.xml"));
             XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
             xmlStreamWriter.close();
@@ -1129,7 +1129,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
                 }
             });
 
-            final List<KerberosTokenSecurityEvent> kerberosTokenSecurityEvents = new ArrayList<KerberosTokenSecurityEvent>();
+            final List<KerberosTokenSecurityEvent> kerberosTokenSecurityEvents = new ArrayList<>();
 
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             SecurityEventListener securityEventListener = new SecurityEventListener() {
@@ -1225,7 +1225,7 @@ public class KerberosTest extends AbstractLdapTestUnit {
                 }
             });
 
-            final List<KerberosTokenSecurityEvent> kerberosTokenSecurityEvents = new ArrayList<KerberosTokenSecurityEvent>();
+            final List<KerberosTokenSecurityEvent> kerberosTokenSecurityEvents = new ArrayList<>();
 
             InboundWSSec wsSecIn = WSSec.getInboundWSSec(securityProperties);
             SecurityEventListener securityEventListener = new SecurityEventListener() {

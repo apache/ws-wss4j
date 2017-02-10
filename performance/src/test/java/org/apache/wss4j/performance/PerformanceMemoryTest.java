@@ -294,7 +294,7 @@ public class PerformanceMemoryTest extends AbstractTestBase {
         }
 
         InputStream sourceDocument = new BufferedInputStream(new FileInputStream(source));
-        XMLStreamWriter xmlStreamWriter = outboundWSSec.processOutMessage(new BufferedOutputStream(new FileOutputStream(output)), "UTF-8", new ArrayList<SecurityEvent>());
+        XMLStreamWriter xmlStreamWriter = outboundWSSec.processOutMessage(new BufferedOutputStream(new FileOutputStream(output)), "UTF-8", new ArrayList<>());
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
         xmlStreamWriter.close();
@@ -322,7 +322,7 @@ public class PerformanceMemoryTest extends AbstractTestBase {
         }
 
         InputStream sourceDocument = new BufferedInputStream(new FileInputStream(source));
-        XMLStreamWriter xmlStreamWriter = outboundWSSecCompressed.processOutMessage(new BufferedOutputStream(new FileOutputStream(output)), "UTF-8", new ArrayList<SecurityEvent>());
+        XMLStreamWriter xmlStreamWriter = outboundWSSecCompressed.processOutMessage(new BufferedOutputStream(new FileOutputStream(output)), "UTF-8", new ArrayList<>());
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(sourceDocument);
         XmlReaderToWriter.writeAll(xmlStreamReader, xmlStreamWriter);
         xmlStreamWriter.close();

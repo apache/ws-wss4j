@@ -138,11 +138,11 @@ public class InteroperabilityTest extends AbstractTestBase {
         String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
         String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
-        List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
-        List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
-        List<SecurityEvent> signedElementSecurityEvents1 = new ArrayList<SecurityEvent>();
-        List<SecurityEvent> signedElementSecurityEvents2 = new ArrayList<SecurityEvent>();
-        List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> operationSecurityEvents = new ArrayList<>();
+        List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<>();
+        List<SecurityEvent> signedElementSecurityEvents1 = new ArrayList<>();
+        List<SecurityEvent> signedElementSecurityEvents2 = new ArrayList<>();
+        List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<>();
 
         List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
         for (int i = 0; i < securityEvents.size(); i++) {
@@ -300,12 +300,12 @@ public class InteroperabilityTest extends AbstractTestBase {
         String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
         String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
-        List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
-        List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
-        List<SecurityEvent> encryptedElementSecurityEvents = new ArrayList<SecurityEvent>();
-        List<SecurityEvent> signedElementSecurityEvents1 = new ArrayList<SecurityEvent>();
-        List<SecurityEvent> signedElementSecurityEvents2 = new ArrayList<SecurityEvent>();
-        List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> operationSecurityEvents = new ArrayList<>();
+        List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<>();
+        List<SecurityEvent> encryptedElementSecurityEvents = new ArrayList<>();
+        List<SecurityEvent> signedElementSecurityEvents1 = new ArrayList<>();
+        List<SecurityEvent> signedElementSecurityEvents2 = new ArrayList<>();
+        List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<>();
 
         List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
         for (int i = 0; i < securityEvents.size(); i++) {
@@ -437,10 +437,10 @@ public class InteroperabilityTest extends AbstractTestBase {
         String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
         String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
-        List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
-        List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
-        List<SecurityEvent> signedElementSecurityEvents1 = new ArrayList<SecurityEvent>();
-        List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> operationSecurityEvents = new ArrayList<>();
+        List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<>();
+        List<SecurityEvent> signedElementSecurityEvents1 = new ArrayList<>();
+        List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<>();
 
         List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
         for (int i = 0; i < securityEvents.size(); i++) {
@@ -611,12 +611,12 @@ public class InteroperabilityTest extends AbstractTestBase {
         String signatureValueCorrelationID = signatureValueSecurityEvent.getCorrelationID();
         String operationCorrelationID = operationSecurityEvent.getCorrelationID();
 
-        List<SecurityEvent> operationSecurityEvents = new ArrayList<SecurityEvent>();
-        List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<SecurityEvent>();
-        List<SecurityEvent> encryptedElementSecurityEvents = new ArrayList<SecurityEvent>();
-        List<SecurityEvent> signedElementSecurityEvents1 = new ArrayList<SecurityEvent>();
-        List<SecurityEvent> signedElementSecurityEvents2 = new ArrayList<SecurityEvent>();
-        List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<SecurityEvent>();
+        List<SecurityEvent> operationSecurityEvents = new ArrayList<>();
+        List<SecurityEvent> encryptedPartSecurityEvents = new ArrayList<>();
+        List<SecurityEvent> encryptedElementSecurityEvents = new ArrayList<>();
+        List<SecurityEvent> signedElementSecurityEvents1 = new ArrayList<>();
+        List<SecurityEvent> signedElementSecurityEvents2 = new ArrayList<>();
+        List<SecurityEvent> signatureValueSecurityEvents = new ArrayList<>();
 
         List<SecurityEvent> securityEvents = securityEventListener.getReceivedSecurityEvents();
         for (int i = 0; i < securityEvents.size(); i++) {
@@ -672,7 +672,7 @@ public class InteroperabilityTest extends AbstractTestBase {
             transformer.transform(new DOMSource(securedDocument), new StreamResult(baos));
         }
 
-        final List<SecurityEvent> securityEventList = new ArrayList<SecurityEvent>();
+        final List<SecurityEvent> securityEventList = new ArrayList<>();
         //done signature; now test sig-verification:
         {
             WSSSecurityProperties securityProperties = new WSSSecurityProperties();

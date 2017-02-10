@@ -768,7 +768,7 @@ public class SAMLTokenTest extends AbstractTestBase {
             XSAny attributeValue = xsAnyBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             attributeValue.getUnknownXMLObjects().add(conditions);
 
-            List<Object> attributeValues = new ArrayList<Object>();
+            List<Object> attributeValues = new ArrayList<>();
             attributeValues.add(attributeValue);
             callbackHandler.setCustomAttributeValues(attributeValues);
 

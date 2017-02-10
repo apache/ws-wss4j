@@ -90,7 +90,7 @@ public final class ConfigurationConverter {
             return;
         }
         String[] single = actionToParse.split("\\s");
-        List<Action> actions = new ArrayList<Action>();
+        List<Action> actions = new ArrayList<>();
         for (int i = 0; i < single.length; i++) {
             if (single[i].equals(ConfigurationConstants.USERNAME_TOKEN)) {
                 actions.add(WSSConstants.USERNAMETOKEN);
