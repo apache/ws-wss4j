@@ -19,7 +19,6 @@
 
 package org.apache.wss4j.dom.processor;
 
-import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
@@ -31,8 +30,7 @@ public interface Processor {
 
     List<WSSecurityEngineResult> handleToken(
         Element elem,
-        RequestData request,
-        WSDocInfo wsDocInfo
+        RequestData request
     ) throws WSSecurityException;
 
 }

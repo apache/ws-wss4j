@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.Timestamp;
@@ -37,8 +36,7 @@ public class TimestampProcessor implements Processor {
 
     public List<WSSecurityEngineResult> handleToken(
         Element elem,
-        RequestData data,
-        WSDocInfo wsDocInfo
+        RequestData data
     ) throws WSSecurityException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Found Timestamp list element");
@@ -64,8 +62,8 @@ public class TimestampProcessor implements Processor {
             result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
         }
 
-        wsDocInfo.addTokenElement(elem);
-        wsDocInfo.addResult(result);
+        data.getWsDocInfo().addTokenElement(elem);
+        data.getWsDocInfo().addResult(result);
         return java.util.Collections.singletonList(result);
     }
 

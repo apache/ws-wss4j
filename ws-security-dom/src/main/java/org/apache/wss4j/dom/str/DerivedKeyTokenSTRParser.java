@@ -53,7 +53,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
      */
     public STRParserResult parseSecurityTokenReference(STRParserParameters parameters) throws WSSecurityException {
 
-        if (parameters == null || parameters.getData() == null || parameters.getWsDocInfo() == null
+        if (parameters == null || parameters.getData() == null || parameters.getData().getWsDocInfo() == null
             || parameters.getStrElement() == null) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, "invalidSTRParserParameter"
@@ -71,7 +71,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
             uri = secRef.getKeyIdentifierValue();
         }
 
-        WSSecurityEngineResult result = parameters.getWsDocInfo().getResult(uri);
+        WSSecurityEngineResult result = parameters.getData().getWsDocInfo().getResult(uri);
         if (result != null) {
             return processPreviousResult(result, secRef, parameters);
         }
@@ -110,8 +110,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
             STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion, data.getBSPEnforcer());
 
             SAMLKeyInfo keyInfo =
-                SAMLUtil.getCredentialFromSubject(samlAssertion,
-                        new WSSSAMLKeyInfoProcessor(data, parameters.getWsDocInfo()),
+                SAMLUtil.getCredentialFromSubject(samlAssertion, new WSSSAMLKeyInfoProcessor(data),
                         data.getSigVerCrypto(), data.getCallbackHandler());
             // TODO Handle malformed SAML tokens where they don't have the
             // secret in them
@@ -155,7 +154,7 @@ public class DerivedKeyTokenSTRParser implements STRParser {
                 if (secretKey == null) {
                     byte[] keyBytes = secRef.getSKIBytes();
                     List<WSSecurityEngineResult> resultsList =
-                        parameters.getWsDocInfo().getResultsByTag(WSConstants.BST);
+                        data.getWsDocInfo().getResultsByTag(WSConstants.BST);
                     for (WSSecurityEngineResult bstResult : resultsList) {
                         BinarySecurity bstToken =
                             (BinarySecurity)bstResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);

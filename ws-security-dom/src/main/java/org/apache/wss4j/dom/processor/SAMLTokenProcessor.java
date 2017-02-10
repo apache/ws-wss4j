@@ -43,7 +43,6 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
-import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
@@ -71,8 +70,7 @@ public class SAMLTokenProcessor implements Processor {
 
     public List<WSSecurityEngineResult> handleToken(
         Element elem,
-        RequestData data,
-        WSDocInfo wsDocInfo
+        RequestData data
     ) throws WSSecurityException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Found SAML Assertion element");
@@ -82,12 +80,10 @@ public class SAMLTokenProcessor implements Processor {
             data.getValidator(new QName(elem.getNamespaceURI(), elem.getLocalName()));
 
         SamlAssertionWrapper samlAssertion = new SamlAssertionWrapper(elem);
-        XMLSignature xmlSignature =
-            verifySignatureKeysAndAlgorithms(samlAssertion, data, wsDocInfo);
+        XMLSignature xmlSignature = verifySignatureKeysAndAlgorithms(samlAssertion, data);
         List<WSDataRef> dataRefs = createDataRefs(elem, samlAssertion, xmlSignature);
 
-        Credential credential =
-            handleSAMLToken(samlAssertion, data, validator, wsDocInfo);
+        Credential credential = handleSAMLToken(samlAssertion, data, validator);
         samlAssertion = credential.getSamlAssertion();
         if (LOG.isDebugEnabled()) {
             LOG.debug("SAML Assertion issuer " + samlAssertion.getIssuerString());
@@ -96,9 +92,9 @@ public class SAMLTokenProcessor implements Processor {
 
         // See if the token has been previously processed
         String id = samlAssertion.getId();
-        Element foundElement = wsDocInfo.getTokenElement(id);
+        Element foundElement = data.getWsDocInfo().getTokenElement(id);
         if (elem.equals(foundElement)) {
-            WSSecurityEngineResult result = wsDocInfo.getResult(id);
+            WSSecurityEngineResult result = data.getWsDocInfo().getResult(id);
             return java.util.Collections.singletonList(result);
         } else if (foundElement != null) {
             throw new WSSecurityException(
@@ -106,7 +102,7 @@ public class SAMLTokenProcessor implements Processor {
             );
         }
 
-        wsDocInfo.addTokenElement(elem);
+        data.getWsDocInfo().addTokenElement(elem);
         WSSecurityEngineResult result = null;
         if (samlAssertion.isSigned()) {
             result = new WSSecurityEngineResult(WSConstants.ST_SIGNED, samlAssertion);
@@ -139,19 +135,18 @@ public class SAMLTokenProcessor implements Processor {
             }
             result.put(WSSecurityEngineResult.TAG_SUBJECT, credential.getSubject());
         }
-        wsDocInfo.addResult(result);
+        data.getWsDocInfo().addResult(result);
         return java.util.Collections.singletonList(result);
     }
 
     public Credential handleSAMLToken(
         SamlAssertionWrapper samlAssertion,
         RequestData data,
-        Validator validator,
-        WSDocInfo docInfo
+        Validator validator
     ) throws WSSecurityException {
         // Parse the subject if it exists
         samlAssertion.parseSubject(
-            new WSSSAMLKeyInfoProcessor(data, docInfo), data.getSigVerCrypto(),
+            new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto(),
             data.getCallbackHandler()
         );
 
@@ -166,8 +161,7 @@ public class SAMLTokenProcessor implements Processor {
 
     private XMLSignature verifySignatureKeysAndAlgorithms(
         SamlAssertionWrapper samlAssertion,
-        RequestData data,
-        WSDocInfo wsDocInfo
+        RequestData data
     ) throws WSSecurityException {
         if (samlAssertion.isSigned()) {
             Signature sig = samlAssertion.getSignature();
@@ -180,7 +174,7 @@ public class SAMLTokenProcessor implements Processor {
             }
             SAMLKeyInfo samlKeyInfo =
                 SAMLUtil.getCredentialFromKeyInfo(
-                    keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(data, wsDocInfo), data.getSigVerCrypto()
+                    keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto()
                 );
 
             PublicKey key = null;

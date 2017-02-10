@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.w3c.dom.Element;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.crypto.AlgorithmSuite;
 import org.apache.wss4j.common.crypto.AlgorithmSuiteValidator;
@@ -43,8 +42,7 @@ public class DerivedKeyTokenProcessor implements Processor {
 
     public List<WSSecurityEngineResult> handleToken(
         Element elem,
-        RequestData data,
-        WSDocInfo wsDocInfo
+        RequestData data
     ) throws WSSecurityException {
         // Deserialize the DKT
         DerivedKeyToken dkt = new DerivedKeyToken(elem, data.getBSPEnforcer());
@@ -64,7 +62,6 @@ public class DerivedKeyTokenProcessor implements Processor {
         if (secRefElement != null) {
             STRParserParameters parameters = new STRParserParameters();
             parameters.setData(data);
-            parameters.setWsDocInfo(wsDocInfo);
             parameters.setStrElement(secRefElement);
 
             STRParser strParser = new DerivedKeyTokenSTRParser();
@@ -83,7 +80,7 @@ public class DerivedKeyTokenProcessor implements Processor {
         byte[] keyBytes = dkt.deriveKey(length, secret);
         WSSecurityEngineResult result =
             new WSSecurityEngineResult(WSConstants.DKT, null, keyBytes, null);
-        wsDocInfo.addTokenElement(elem);
+        data.getWsDocInfo().addTokenElement(elem);
         String tokenId = dkt.getID();
         if (!"".equals(tokenId)) {
             result.put(WSSecurityEngineResult.TAG_ID, tokenId);
@@ -91,7 +88,7 @@ public class DerivedKeyTokenProcessor implements Processor {
         result.put(WSSecurityEngineResult.TAG_DERIVED_KEY_TOKEN, dkt);
         result.put(WSSecurityEngineResult.TAG_SECRET, secret);
         result.put(WSSecurityEngineResult.TAG_TOKEN_ELEMENT, dkt.getElement());
-        wsDocInfo.addResult(result);
+        data.getWsDocInfo().addResult(result);
         return Collections.singletonList(result);
     }
 

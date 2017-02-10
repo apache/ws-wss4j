@@ -23,7 +23,6 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.processor.Processor;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 
 /**
@@ -34,8 +33,7 @@ public class CustomProcessor implements Processor {
     public final java.util.List<WSSecurityEngineResult>
     handleToken(
         final org.w3c.dom.Element elem,
-        final RequestData data,
-        final WSDocInfo wsDocInfo
+        final RequestData data
     ) throws WSSecurityException {
         final WSSecurityEngineResult result =
             new WSSecurityEngineResult(WSConstants.UT_SIGN);

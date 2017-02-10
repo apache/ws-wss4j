@@ -21,7 +21,6 @@ package org.apache.wss4j.dom.str;
 
 import org.w3c.dom.Element;
 
-import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.handler.RequestData;
 
 /**
@@ -32,7 +31,6 @@ public class STRParserParameters {
     private int derivationKeyLength;
     private Element strElement;
     private RequestData data;
-    private WSDocInfo wsDocInfo;
 
     public int getDerivationKeyLength() {
         return derivationKeyLength;
@@ -57,14 +55,5 @@ public class STRParserParameters {
     public void setData(RequestData data) {
         this.data = data;
     }
-
-    public WSDocInfo getWsDocInfo() {
-        return wsDocInfo;
-    }
-
-    public void setWsDocInfo(WSDocInfo wsDocInfo) {
-        this.wsDocInfo = wsDocInfo;
-    }
-
 
 }

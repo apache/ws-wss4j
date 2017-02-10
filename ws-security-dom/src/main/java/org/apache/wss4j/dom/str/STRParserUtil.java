@@ -71,12 +71,11 @@ public final class STRParserUtil {
     public static SamlAssertionWrapper getAssertionFromKeyIdentifier(
         SecurityTokenReference secRef,
         Element strElement,
-        RequestData request,
-        WSDocInfo wsDocInfo
+        RequestData request
     ) throws WSSecurityException {
         String keyIdentifierValue = secRef.getKeyIdentifierValue();
         String type = secRef.getKeyIdentifierValueType();
-        WSSecurityEngineResult result = wsDocInfo.getResult(keyIdentifierValue);
+        WSSecurityEngineResult result = request.getWsDocInfo().getResult(keyIdentifierValue);
 
         SamlAssertionWrapper samlAssertion = null;
         Element token = null;
@@ -87,7 +86,7 @@ public final class STRParserUtil {
         } else {
             token =
                 findProcessedTokenElement(
-                    strElement.getOwnerDocument(), wsDocInfo, request.getCallbackHandler(),
+                    strElement.getOwnerDocument(), request.getWsDocInfo(), request.getCallbackHandler(),
                     keyIdentifierValue, type
                 );
             if (token != null) {
@@ -100,7 +99,7 @@ public final class STRParserUtil {
             }
             token =
                 findUnprocessedTokenElement(
-                    strElement.getOwnerDocument(), wsDocInfo, request.getCallbackHandler(),
+                    strElement.getOwnerDocument(), request.getWsDocInfo(), request.getCallbackHandler(),
                     keyIdentifierValue, type
                 );
 
@@ -110,8 +109,7 @@ public final class STRParserUtil {
                 );
             }
             Processor proc = request.getWssConfig().getProcessor(WSConstants.SAML_TOKEN);
-            List<WSSecurityEngineResult> samlResult =
-                proc.handleToken(token, request, wsDocInfo);
+            List<WSSecurityEngineResult> samlResult = proc.handleToken(token, request);
             return
                 (SamlAssertionWrapper)samlResult.get(0).get(
                     WSSecurityEngineResult.TAG_SAML_ASSERTION

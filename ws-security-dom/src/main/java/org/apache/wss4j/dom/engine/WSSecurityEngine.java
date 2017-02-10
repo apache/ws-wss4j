@@ -317,6 +317,7 @@ public class WSSecurityEngine {
         wsDocInfo.setCallbackLookup(callbackLookupToUse);
         wsDocInfo.setCrypto(requestData.getSigVerCrypto());
         wsDocInfo.setSecurityHeader(securityHeader);
+        requestData.setWsDocInfo(wsDocInfo);
 
         final WSSConfig cfg = getWssConfig();
         Node node = securityHeader.getFirstChild();
@@ -341,8 +342,7 @@ public class WSSecurityEngine {
                 //
                 Processor p = cfg.getProcessor(el);
                 if (p != null) {
-                    List<WSSecurityEngineResult> results =
-                        p.handleToken((Element) node, requestData, wsDocInfo);
+                    List<WSSecurityEngineResult> results = p.handleToken((Element) node, requestData);
                     if (!results.isEmpty()) {
                         returnResults.addAll(0, results);
                     }

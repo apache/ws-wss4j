@@ -32,7 +32,6 @@ import org.apache.wss4j.common.token.PKIPathSecurity;
 import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.KerberosSecurity;
@@ -51,15 +50,14 @@ public class BinarySecurityTokenProcessor implements Processor {
      */
     public List<WSSecurityEngineResult> handleToken(
         Element elem,
-        RequestData data,
-        WSDocInfo wsDocInfo
+        RequestData data
     ) throws WSSecurityException {
         // See if the token has been previously processed
         String id = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
         if (!"".equals(id)) {
-            Element foundElement = wsDocInfo.getTokenElement(id);
+            Element foundElement = data.getWsDocInfo().getTokenElement(id);
             if (elem.equals(foundElement)) {
-                WSSecurityEngineResult result = wsDocInfo.getResult(id);
+                WSSecurityEngineResult result = data.getWsDocInfo().getResult(id);
                 return java.util.Collections.singletonList(result);
             } else if (foundElement != null) {
                 throw new WSSecurityException(
@@ -81,7 +79,7 @@ public class BinarySecurityTokenProcessor implements Processor {
 
         WSSecurityEngineResult result =
             new WSSecurityEngineResult(WSConstants.BST, token, certs);
-        wsDocInfo.addTokenElement(elem);
+        data.getWsDocInfo().addTokenElement(elem);
         if (!"".equals(id)) {
             result.put(WSSecurityEngineResult.TAG_ID, id);
         }
@@ -121,7 +119,7 @@ public class BinarySecurityTokenProcessor implements Processor {
             }
         }
 
-        wsDocInfo.addResult(result);
+        data.getWsDocInfo().addResult(result);
         return java.util.Collections.singletonList(result);
     }
 

@@ -106,8 +106,7 @@ public class SignatureProcessor implements Processor {
 
     public List<WSSecurityEngineResult> handleToken(
         Element elem,
-        RequestData data,
-        WSDocInfo wsDocInfo
+        RequestData data
     ) throws WSSecurityException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Found signature element");
@@ -159,7 +158,6 @@ public class SignatureProcessor implements Processor {
             } else {
                 STRParserParameters parameters = new STRParserParameters();
                 parameters.setData(data);
-                parameters.setWsDocInfo(wsDocInfo);
                 parameters.setStrElement(child);
                 if (signatureMethod != null) {
                     parameters.setDerivationKeyLength(KeyUtils.getKeyLength(signatureMethod));
@@ -222,13 +220,13 @@ public class SignatureProcessor implements Processor {
         }
 
         XMLSignature xmlSignature =
-            verifyXMLSignature(elem, certs, publicKey, secretKey, signatureMethod, data, wsDocInfo);
+            verifyXMLSignature(elem, certs, publicKey, secretKey, signatureMethod, data, data.getWsDocInfo());
         byte[] signatureValue = xmlSignature.getSignatureValue().getValue();
         String c14nMethod = xmlSignature.getSignedInfo().getCanonicalizationMethod().getAlgorithm();
 
         List<WSDataRef> dataRefs =
             buildProtectedRefs(
-                elem.getOwnerDocument(), xmlSignature.getSignedInfo(), data, wsDocInfo
+                elem.getOwnerDocument(), xmlSignature.getSignedInfo(), data, data.getWsDocInfo()
             );
         if (dataRefs.isEmpty()) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_CHECK);
@@ -258,8 +256,8 @@ public class SignatureProcessor implements Processor {
                 result.put(WSSecurityEngineResult.TAG_SUBJECT, credential.getSubject());
             }
         }
-        wsDocInfo.addResult(result);
-        wsDocInfo.addTokenElement(elem);
+        data.getWsDocInfo().addResult(result);
+        data.getWsDocInfo().addTokenElement(elem);
         return java.util.Collections.singletonList(result);
     }
 

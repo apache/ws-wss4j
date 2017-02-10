@@ -244,12 +244,13 @@ public class WSSecSignatureSAML extends WSSecSignature {
             }
             if (secretKey == null) {
                 RequestData data = new RequestData();
+                data.setWsDocInfo(getWsDocInfo());
                 SignatureActionToken actionToken = new SignatureActionToken();
                 data.setSignatureToken(actionToken);
                 actionToken.setCrypto(userCrypto);
                 SAMLKeyInfo samlKeyInfo =
                     SAMLUtil.getCredentialFromSubject(
-                            samlAssertion, new WSSSAMLKeyInfoProcessor(data, getWsDocInfo()),
+                            samlAssertion, new WSSSAMLKeyInfoProcessor(data),
                             userCrypto, data.getCallbackHandler()
                     );
                 if (samlKeyInfo != null) {

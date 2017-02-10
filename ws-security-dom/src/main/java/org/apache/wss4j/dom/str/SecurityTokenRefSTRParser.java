@@ -59,7 +59,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
      */
     public STRParserResult parseSecurityTokenReference(STRParserParameters parameters) throws WSSecurityException {
 
-        if (parameters == null || parameters.getData() == null || parameters.getWsDocInfo() == null
+        if (parameters == null || parameters.getData() == null || parameters.getData().getWsDocInfo() == null
             || parameters.getStrElement() == null) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, "invalidSTRParserParameter"
@@ -77,7 +77,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
             uri = secRef.getKeyIdentifierValue();
         }
 
-        WSSecurityEngineResult result = parameters.getWsDocInfo().getResult(uri);
+        WSSecurityEngineResult result = parameters.getData().getWsDocInfo().getResult(uri);
         if (result != null) {
             return processPreviousResult(result, secRef, uri, parameters);
         }
@@ -91,13 +91,11 @@ public class SecurityTokenRefSTRParser implements STRParser {
     private byte[] getSecretKeyFromAssertion(
         SamlAssertionWrapper samlAssertion,
         SecurityTokenReference secRef,
-        RequestData data,
-        WSDocInfo wsDocInfo
+        RequestData data
     ) throws WSSecurityException {
         STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion, data.getBSPEnforcer());
         SAMLKeyInfo samlKi =
-            SAMLUtil.getCredentialFromSubject(samlAssertion,
-                    new WSSSAMLKeyInfoProcessor(data, wsDocInfo),
+            SAMLUtil.getCredentialFromSubject(samlAssertion, new WSSSAMLKeyInfoProcessor(data),
                     data.getSigVerCrypto(), data.getCallbackHandler());
         if (samlKi == null) {
             throw new WSSecurityException(
@@ -137,7 +135,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
             SamlAssertionWrapper samlAssertion =
                 (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
             byte[] secretKey =
-                getSecretKeyFromAssertion(samlAssertion, secRef, data, parameters.getWsDocInfo());
+                getSecretKeyFromAssertion(samlAssertion, secRef, data);
             parserResult.setSecretKey(secretKey);
         } else if (action != null
             && (WSConstants.SCT == action.intValue() || WSConstants.BST == action.intValue())) {
@@ -171,7 +169,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
         STRParserResult parserResult = new STRParserResult();
         RequestData data = parameters.getData();
         Element strElement = parameters.getStrElement();
-        WSDocInfo wsDocInfo = parameters.getWsDocInfo();
+        WSDocInfo wsDocInfo = data.getWsDocInfo();
 
         if (secRef.containsReference()) {
             Reference reference = secRef.getReference();
@@ -186,8 +184,7 @@ public class SecurityTokenRefSTRParser implements STRParser {
                 QName el = new QName(token.getNamespaceURI(), token.getLocalName());
                 if (el.equals(WSConstants.BINARY_TOKEN)) {
                     Processor proc = data.getWssConfig().getProcessor(WSConstants.BINARY_TOKEN);
-                    List<WSSecurityEngineResult> bstResult =
-                            proc.handleToken(token, data, wsDocInfo);
+                    List<WSSecurityEngineResult> bstResult = proc.handleToken(token, data);
                     BinarySecurity bstToken =
                             (BinarySecurity)bstResult.get(0).get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
                     STRParserUtil.checkBinarySecurityBSPCompliance(secRef, bstToken, data.getBSPEnforcer());
@@ -210,10 +207,9 @@ public class SecurityTokenRefSTRParser implements STRParser {
                 if (secretKey == null) {
                     SamlAssertionWrapper samlAssertion =
                         STRParserUtil.getAssertionFromKeyIdentifier(
-                            secRef, strElement,
-                            data, wsDocInfo
+                            secRef, strElement, data
                         );
-                    secretKey = getSecretKeyFromAssertion(samlAssertion, secRef, data, wsDocInfo);
+                    secretKey = getSecretKeyFromAssertion(samlAssertion, secRef, data);
                 }
                 parserResult.setSecretKey(secretKey);
             } else if (WSConstants.WSS_KRB_KI_VALUE_TYPE.equals(valueType)) {

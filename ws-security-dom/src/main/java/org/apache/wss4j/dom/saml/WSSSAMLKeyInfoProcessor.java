@@ -36,7 +36,6 @@ import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SAMLKeyInfoProcessor;
 import org.apache.wss4j.common.token.SecurityTokenReference;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.processor.EncryptedKeyProcessor;
@@ -60,11 +59,9 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
         new QName(WST_NS_05_12, "BinarySecret");
 
     private RequestData data;
-    private WSDocInfo docInfo;
 
-    public WSSSAMLKeyInfoProcessor(RequestData data, WSDocInfo docInfo) {
+    public WSSSAMLKeyInfoProcessor(RequestData data) {
         this.data = data;
-        this.docInfo = docInfo;
     }
 
     public SAMLKeyInfo processSAMLKeyInfo(Element keyInfoElement) throws WSSecurityException {
@@ -82,7 +79,7 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
                 if (el.equals(WSConstants.ENCRYPTED_KEY)) {
                     EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
                     List<WSSecurityEngineResult> result =
-                        proc.handleToken((Element)node, data, docInfo, data.getSamlAlgorithmSuite());
+                        proc.handleToken((Element)node, data, data.getSamlAlgorithmSuite());
                     byte[] secret =
                         (byte[])result.get(0).get(
                             WSSecurityEngineResult.TAG_SECRET
@@ -94,7 +91,6 @@ public class WSSSAMLKeyInfoProcessor implements SAMLKeyInfoProcessor {
                 } else if (SecurityTokenReference.STR_QNAME.equals(el)) {
                     STRParserParameters parameters = new STRParserParameters();
                     parameters.setData(data);
-                    parameters.setWsDocInfo(docInfo);
                     parameters.setStrElement((Element)node);
 
                     STRParser strParser = new SignatureSTRParser();

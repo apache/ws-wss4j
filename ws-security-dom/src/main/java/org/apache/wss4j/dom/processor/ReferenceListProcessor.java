@@ -41,7 +41,6 @@ import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
-import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.str.STRParser;
@@ -58,21 +57,20 @@ public class ReferenceListProcessor implements Processor {
 
     public List<WSSecurityEngineResult> handleToken(
         Element elem,
-        RequestData data,
-        WSDocInfo wsDocInfo
+        RequestData data
     ) throws WSSecurityException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Found reference list element");
         }
-        List<WSDataRef> dataRefs = handleReferenceList(elem, data, wsDocInfo);
+        List<WSDataRef> dataRefs = handleReferenceList(elem, data);
         WSSecurityEngineResult result =
             new WSSecurityEngineResult(WSConstants.ENCR, dataRefs);
         String tokenId = elem.getAttributeNS(null, "Id");
         if (!"".equals(tokenId)) {
             result.put(WSSecurityEngineResult.TAG_ID, tokenId);
         }
-        wsDocInfo.addTokenElement(elem);
-        wsDocInfo.addResult(result);
+        data.getWsDocInfo().addTokenElement(elem);
+        data.getWsDocInfo().addResult(result);
         return Collections.singletonList(result);
     }
 
@@ -84,8 +82,7 @@ public class ReferenceListProcessor implements Processor {
      */
     private List<WSDataRef> handleReferenceList(
         Element elem,
-        RequestData data,
-        WSDocInfo wsDocInfo
+        RequestData data
     ) throws WSSecurityException {
         List<WSDataRef> dataRefs = new ArrayList<>();
         for (Node node = elem.getFirstChild();
@@ -99,10 +96,9 @@ public class ReferenceListProcessor implements Processor {
                 dataRefURI = XMLUtils.getIDFromReference(dataRefURI);
 
                 // See whether we have already processed the encrypted node
-                if (!wsDocInfo.hasResult(WSConstants.ENCR, dataRefURI)) {
+                if (!data.getWsDocInfo().hasResult(WSConstants.ENCR, dataRefURI)) {
                     WSDataRef dataRef =
-                        decryptDataRefEmbedded(
-                            elem.getOwnerDocument(), dataRefURI, data, wsDocInfo);
+                        decryptDataRefEmbedded(elem.getOwnerDocument(), dataRefURI, data);
                     dataRefs.add(dataRef);
                 }
             }
@@ -118,8 +114,7 @@ public class ReferenceListProcessor implements Processor {
     private WSDataRef decryptDataRefEmbedded(
         Document doc,
         String dataRefURI,
-        RequestData data,
-        WSDocInfo wsDocInfo
+        RequestData data
     ) throws WSSecurityException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Found data reference: " + dataRefURI);
@@ -128,11 +123,11 @@ public class ReferenceListProcessor implements Processor {
         // Find the encrypted data element referenced by dataRefURI
         //
         Element encryptedDataElement =
-            EncryptionUtils.findEncryptedDataElement(doc, wsDocInfo, dataRefURI);
+            EncryptionUtils.findEncryptedDataElement(doc, data.getWsDocInfo(), dataRefURI);
 
         if (encryptedDataElement != null && data.isRequireSignedEncryptedDataElements()) {
             List<WSSecurityEngineResult> signedResults =
-                wsDocInfo.getResultsByTag(WSConstants.SIGN);
+                data.getWsDocInfo().getResultsByTag(WSConstants.SIGN);
             SignatureUtils.verifySignedElement(encryptedDataElement, signedResults);
         }
         //
@@ -167,7 +162,6 @@ public class ReferenceListProcessor implements Processor {
         } else {
             STRParserParameters parameters = new STRParserParameters();
             parameters.setData(data);
-            parameters.setWsDocInfo(wsDocInfo);
             parameters.setStrElement(secRefToken);
             if (symEncAlgo != null) {
                 parameters.setDerivationKeyLength(KeyUtils.getKeyLength(symEncAlgo));

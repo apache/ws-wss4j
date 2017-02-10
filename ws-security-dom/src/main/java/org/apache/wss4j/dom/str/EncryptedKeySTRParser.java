@@ -54,7 +54,7 @@ public class EncryptedKeySTRParser implements STRParser {
      * @throws WSSecurityException
      */
     public STRParserResult parseSecurityTokenReference(STRParserParameters parameters) throws WSSecurityException {
-        if (parameters == null || parameters.getData() == null || parameters.getWsDocInfo() == null
+        if (parameters == null || parameters.getData() == null || parameters.getData().getWsDocInfo() == null
             || parameters.getStrElement() == null) {
             throw new WSSecurityException(
                 WSSecurityException.ErrorCode.FAILURE, "invalidSTRParserParameter"
@@ -72,7 +72,7 @@ public class EncryptedKeySTRParser implements STRParser {
             uri = secRef.getKeyIdentifierValue();
         }
 
-        WSSecurityEngineResult result = parameters.getWsDocInfo().getResult(uri);
+        WSSecurityEngineResult result = parameters.getData().getWsDocInfo().getResult(uri);
         if (result != null) {
             return processPreviousResult(result, secRef, parameters);
         }
@@ -110,8 +110,7 @@ public class EncryptedKeySTRParser implements STRParser {
             STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion, data.getBSPEnforcer());
 
             SAMLKeyInfo keyInfo =
-                SAMLUtil.getCredentialFromSubject(samlAssertion,
-                        new WSSSAMLKeyInfoProcessor(data, parameters.getWsDocInfo()),
+                SAMLUtil.getCredentialFromSubject(samlAssertion, new WSSSAMLKeyInfoProcessor(data),
                         data.getSigVerCrypto(), data.getCallbackHandler());
             parserResult.setCerts(keyInfo.getCerts());
             parserResult.setPublicKey(keyInfo.getPublicKey());
@@ -135,7 +134,7 @@ public class EncryptedKeySTRParser implements STRParser {
         STRParserResult parserResult = new STRParserResult();
         RequestData data = parameters.getData();
         Element strElement = parameters.getStrElement();
-        WSDocInfo wsDocInfo = parameters.getWsDocInfo();
+        WSDocInfo wsDocInfo = data.getWsDocInfo();
         Crypto crypto = data.getDecCrypto();
 
         if (secRef.containsKeyIdentifier()) {
@@ -143,13 +142,13 @@ public class EncryptedKeySTRParser implements STRParser {
                 || WSConstants.WSS_SAML2_KI_VALUE_TYPE.equals(secRef.getKeyIdentifierValueType())) {
                 SamlAssertionWrapper samlAssertion =
                     STRParserUtil.getAssertionFromKeyIdentifier(
-                        secRef, strElement, data, wsDocInfo
+                        secRef, strElement, data
                     );
                 STRParserUtil.checkSamlTokenBSPCompliance(secRef, samlAssertion, data.getBSPEnforcer());
 
                 SAMLKeyInfo samlKi =
                     SAMLUtil.getCredentialFromSubject(samlAssertion,
-                            new WSSSAMLKeyInfoProcessor(data, wsDocInfo),
+                            new WSSSAMLKeyInfoProcessor(data),
                             data.getSigVerCrypto(), data.getCallbackHandler());
                 parserResult.setCerts(samlKi.getCerts());
                 parserResult.setPublicKey(samlKi.getPublicKey());

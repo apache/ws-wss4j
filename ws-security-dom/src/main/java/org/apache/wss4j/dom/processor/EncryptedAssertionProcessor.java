@@ -31,7 +31,6 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
-import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 
@@ -45,8 +44,7 @@ public class EncryptedAssertionProcessor implements Processor {
 
     public List<WSSecurityEngineResult> handleToken(
         Element elem,
-        RequestData request,
-        WSDocInfo wsDocInfo
+        RequestData request
     ) throws WSSecurityException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Found EncryptedAssertion element");
@@ -74,7 +72,7 @@ public class EncryptedAssertionProcessor implements Processor {
                               ((Element)currentChild).getLocalName());
                 Processor proc = request.getWssConfig().getProcessor(el);
                 if (proc != null) {
-                    completeResults.addAll(proc.handleToken(((Element)currentChild), request, wsDocInfo));
+                    completeResults.addAll(proc.handleToken(((Element)currentChild), request));
                 }
             }
         }
@@ -98,8 +96,7 @@ public class EncryptedAssertionProcessor implements Processor {
                                 if (LOG.isDebugEnabled()) {
                                     LOG.debug("Processing decrypted element with: " + proc.getClass().getName());
                                 }
-                                List<WSSecurityEngineResult> results =
-                                    proc.handleToken(decryptedElem, request, wsDocInfo);
+                                List<WSSecurityEngineResult> results = proc.handleToken(decryptedElem, request);
                                 completeResults.addAll(0, results);
                                 return completeResults;
                             }
@@ -128,7 +125,7 @@ public class EncryptedAssertionProcessor implements Processor {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Processing decrypted element with: " + proc.getClass().getName());
             }
-            return proc.handleToken(encryptedDataElement, request, wsDocInfo);
+            return proc.handleToken(encryptedDataElement, request);
         }
 
         return Collections.emptyList();

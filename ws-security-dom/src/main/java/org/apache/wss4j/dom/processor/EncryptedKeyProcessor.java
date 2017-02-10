@@ -74,16 +74,14 @@ public class EncryptedKeyProcessor implements Processor {
 
     public List<WSSecurityEngineResult> handleToken(
         Element elem,
-        RequestData data,
-        WSDocInfo wsDocInfo
+        RequestData data
     ) throws WSSecurityException {
-        return handleToken(elem, data, wsDocInfo, data.getAlgorithmSuite());
+        return handleToken(elem, data, data.getAlgorithmSuite());
     }
 
     public List<WSSecurityEngineResult> handleToken(
         Element elem,
         RequestData data,
-        WSDocInfo wsDocInfo,
         AlgorithmSuite algorithmSuite
     ) throws WSSecurityException {
         if (LOG.isDebugEnabled()) {
@@ -93,7 +91,7 @@ public class EncryptedKeyProcessor implements Processor {
         // See if this key has already been processed. If so then just return the result
         String id = elem.getAttributeNS(null, "Id");
         if (!"".equals(id)) {
-             WSSecurityEngineResult result = wsDocInfo.getResult(id);
+             WSSecurityEngineResult result = data.getWsDocInfo().getResult(id);
              if (result != null 
                  && WSConstants.ENCR == (Integer)result.get(WSSecurityEngineResult.TAG_ACTION)
              ) {
@@ -146,7 +144,6 @@ public class EncryptedKeyProcessor implements Processor {
                 && WSConstants.WSSE_NS.equals(keyInfoChildElement.getNamespaceURI())) {
                 STRParserParameters parameters = new STRParserParameters();
                 parameters.setData(data);
-                parameters.setWsDocInfo(wsDocInfo);
                 parameters.setStrElement(keyInfoChildElement);
 
                 STRParser strParser = new EncryptedKeySTRParser();
@@ -208,16 +205,16 @@ public class EncryptedKeyProcessor implements Processor {
         }
 
         if (symmetricKeyWrap) {
-            decryptedBytes = getSymmetricDecryptedBytes(data, wsDocInfo, keyInfoChildElement,
+            decryptedBytes = getSymmetricDecryptedBytes(data, data.getWsDocInfo(), keyInfoChildElement,
                                                         refList, encryptedEphemeralKey);
         } else {
             PrivateKey privateKey = getPrivateKey(data, certs, publicKey);
-            decryptedBytes = getAsymmetricDecryptedBytes(data, wsDocInfo, encryptedKeyTransportMethod,
+            decryptedBytes = getAsymmetricDecryptedBytes(data, data.getWsDocInfo(), encryptedKeyTransportMethod,
                                                          encryptedEphemeralKey, refList,
                                                          elem, privateKey);
         }
 
-        List<WSDataRef> dataRefs = decryptDataRefs(refList, wsDocInfo, decryptedBytes, data);
+        List<WSDataRef> dataRefs = decryptDataRefs(refList, data.getWsDocInfo(), decryptedBytes, data);
 
         WSSecurityEngineResult result = new WSSecurityEngineResult(
                 WSConstants.ENCR,
@@ -241,8 +238,8 @@ public class EncryptedKeyProcessor implements Processor {
         if (publicKey != null) {
             result.put(WSSecurityEngineResult.TAG_PUBLIC_KEY, publicKey);
         }
-        wsDocInfo.addResult(result);
-        wsDocInfo.addTokenElement(elem);
+        data.getWsDocInfo().addResult(result);
+        data.getWsDocInfo().addTokenElement(elem);
         return Collections.singletonList(result);
     }
     

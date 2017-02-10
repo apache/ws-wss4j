@@ -41,6 +41,7 @@ import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.SOAPConstants;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.dom.validate.Validator;
@@ -91,6 +92,7 @@ public class RequestData {
     private boolean requireTimestampExpires;
     private boolean storeBytesInAttachment;
     private Serializer encryptionSerializer;
+    private WSDocInfo wsDocInfo;
 
     /**
      * Whether to add an InclusiveNamespaces PrefixList as a CanonicalizationMethod
@@ -749,5 +751,13 @@ public class RequestData {
 
     public void setAddUsernameTokenNonce(boolean addUsernameTokenNonce) {
         this.addUsernameTokenNonce = addUsernameTokenNonce;
+    }
+
+    public WSDocInfo getWsDocInfo() {
+        return wsDocInfo;
+    }
+
+    public void setWsDocInfo(WSDocInfo wsDocInfo) {
+        this.wsDocInfo = wsDocInfo;
     }
 }

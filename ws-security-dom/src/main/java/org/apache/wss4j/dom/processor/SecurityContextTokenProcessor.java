@@ -20,7 +20,6 @@
 package org.apache.wss4j.dom.processor;
 
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -46,8 +45,7 @@ public class SecurityContextTokenProcessor implements Processor {
 
     public List<WSSecurityEngineResult> handleToken(
         Element elem,
-        RequestData data,
-        WSDocInfo wsDocInfo
+        RequestData data
     ) throws WSSecurityException {
         SecurityContextToken sct = new SecurityContextToken(elem);
 
@@ -85,8 +83,8 @@ public class SecurityContextTokenProcessor implements Processor {
             result.put(WSSecurityEngineResult.TAG_SECRET, secret);
         }
 
-        wsDocInfo.addTokenElement(elem);
-        wsDocInfo.addResult(result);
+        data.getWsDocInfo().addTokenElement(elem);
+        data.getWsDocInfo().addResult(result);
         return java.util.Collections.singletonList(result);
     }
 

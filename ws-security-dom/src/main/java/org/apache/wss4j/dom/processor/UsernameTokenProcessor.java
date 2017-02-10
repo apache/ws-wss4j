@@ -29,7 +29,6 @@ import org.w3c.dom.Element;
 import org.apache.wss4j.common.cache.ReplayCache;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.UsernameToken;
@@ -42,8 +41,7 @@ public class UsernameTokenProcessor implements Processor {
 
     public List<WSSecurityEngineResult> handleToken(
         Element elem,
-        RequestData data,
-        WSDocInfo wsDocInfo
+        RequestData data
     ) throws WSSecurityException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Found UsernameToken list element");
@@ -51,9 +49,9 @@ public class UsernameTokenProcessor implements Processor {
         // See if the token has been previously processed
         String id = elem.getAttributeNS(WSConstants.WSU_NS, "Id");
         if (!"".equals(id)) {
-            Element foundElement = wsDocInfo.getTokenElement(id);
+            Element foundElement = data.getWsDocInfo().getTokenElement(id);
             if (elem.equals(foundElement)) {
-                WSSecurityEngineResult result = wsDocInfo.getResult(id);
+                WSSecurityEngineResult result = data.getWsDocInfo().getResult(id);
                 return java.util.Collections.singletonList(result);
             } else if (foundElement != null) {
                 throw new WSSecurityException(
@@ -109,8 +107,8 @@ public class UsernameTokenProcessor implements Processor {
             result.put(WSSecurityEngineResult.TAG_SUBJECT, credential.getSubject());
         }
 
-        wsDocInfo.addTokenElement(elem);
-        wsDocInfo.addResult(result);
+        data.getWsDocInfo().addTokenElement(elem);
+        data.getWsDocInfo().addResult(result);
         return java.util.Collections.singletonList(result);
     }
 

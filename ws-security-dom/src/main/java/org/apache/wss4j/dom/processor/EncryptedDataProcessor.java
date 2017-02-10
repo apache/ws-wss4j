@@ -38,7 +38,6 @@ import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
-import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
@@ -63,8 +62,7 @@ public class EncryptedDataProcessor implements Processor {
 
     public List<WSSecurityEngineResult> handleToken(
         Element elem,
-        RequestData request,
-        WSDocInfo wsDocInfo
+        RequestData data
     ) throws WSSecurityException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Found EncryptedData element");
@@ -82,7 +80,7 @@ public class EncryptedDataProcessor implements Processor {
         }
 
         String symEncAlgo = X509Util.getEncAlgo(elem);
-        checkBSPCompliance(symEncAlgo, request.getBSPEnforcer());
+        checkBSPCompliance(symEncAlgo, data.getBSPEnforcer());
 
         // Get the Key either via a SecurityTokenReference or an EncryptedKey
         Element secRefToken =
@@ -98,9 +96,9 @@ public class EncryptedDataProcessor implements Processor {
                 kiElem, "RetrievalMethod", WSConstants.SIG_NS
             );
 
-        if (request.isRequireSignedEncryptedDataElements()) {
+        if (data.isRequireSignedEncryptedDataElements()) {
             List<WSSecurityEngineResult> signedResults =
-                wsDocInfo.getResultsByTag(WSConstants.SIGN);
+                data.getWsDocInfo().getResultsByTag(WSConstants.SIGN);
             SignatureUtils.verifySignedElement(elem, signedResults);
         }
 
@@ -109,8 +107,7 @@ public class EncryptedDataProcessor implements Processor {
         Principal principal = null;
         if (secRefToken != null) {
             STRParserParameters parameters = new STRParserParameters();
-            parameters.setData(request);
-            parameters.setWsDocInfo(wsDocInfo);
+            parameters.setData(data);
             parameters.setStrElement(secRefToken);
             if (symEncAlgo != null) {
                 parameters.setDerivationKeyLength(KeyUtils.getKeyLength(symEncAlgo));
@@ -122,10 +119,10 @@ public class EncryptedDataProcessor implements Processor {
             principal = parserResult.getPrincipal();
             key = KeyUtils.prepareSecretKey(symEncAlgo, secretKey);
             encrKeyResults = new ArrayList<>();
-        } else if (encryptedKeyElement != null && request.getWssConfig() != null) {
-            WSSConfig wssConfig = request.getWssConfig();
+        } else if (encryptedKeyElement != null && data.getWssConfig() != null) {
+            WSSConfig wssConfig = data.getWssConfig();
             Processor encrKeyProc = wssConfig.getProcessor(WSConstants.ENCRYPTED_KEY);
-            encrKeyResults = encrKeyProc.handleToken(encryptedKeyElement, request, wsDocInfo);
+            encrKeyResults = encrKeyProc.handleToken(encryptedKeyElement, data);
             byte[] symmKey =
                 (byte[])encrKeyResults.get(0).get(WSSecurityEngineResult.TAG_SECRET);
             key = KeyUtils.prepareSecretKey(symEncAlgo, symmKey);
@@ -134,7 +131,7 @@ public class EncryptedDataProcessor implements Processor {
                 retrievalMethodElement.getAttributeNS(null, "Type"))) {
             String uri = retrievalMethodElement.getAttributeNS(null, "URI");
             uri = XMLUtils.getIDFromReference(uri);
-            WSSecurityEngineResult result = wsDocInfo.getResult(uri);
+            WSSecurityEngineResult result = data.getWsDocInfo().getResult(uri);
             if (result != null) {
                 byte[] symmKey = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
                 key = KeyUtils.prepareSecretKey(symEncAlgo, symmKey);
@@ -146,7 +143,7 @@ public class EncryptedDataProcessor implements Processor {
         }
 
         // Check for compliance against the defined AlgorithmSuite
-        AlgorithmSuite algorithmSuite = request.getAlgorithmSuite();
+        AlgorithmSuite algorithmSuite = data.getAlgorithmSuite();
         if (algorithmSuite != null) {
             AlgorithmSuiteValidator algorithmSuiteValidator = new
                 AlgorithmSuiteValidator(algorithmSuite);
@@ -165,15 +162,15 @@ public class EncryptedDataProcessor implements Processor {
 
         WSDataRef dataRef = EncryptionUtils.decryptEncryptedData(
                 elem.getOwnerDocument(), encryptedDataId, elem, key, symEncAlgo,
-                request.getAttachmentCallbackHandler(), request.getEncryptionSerializer());
+                data.getAttachmentCallbackHandler(), data.getEncryptionSerializer());
 
         WSSecurityEngineResult result =
                 new WSSecurityEngineResult(WSConstants.ENCR, Collections.singletonList(dataRef));
         if (!"".equals(encryptedDataId)) {
             result.put(WSSecurityEngineResult.TAG_ID, encryptedDataId);
         }
-        wsDocInfo.addResult(result);
-        wsDocInfo.addTokenElement(elem);
+        data.getWsDocInfo().addResult(result);
+        data.getWsDocInfo().addTokenElement(elem);
 
         List<WSSecurityEngineResult> completeResults = new LinkedList<>();
         if (encrKeyResults != null) {
@@ -181,19 +178,18 @@ public class EncryptedDataProcessor implements Processor {
         }
         completeResults.add(result);
 
-        WSSConfig wssConfig = request.getWssConfig();
+        WSSConfig wssConfig = data.getWssConfig();
         if (wssConfig != null) {
             // Get hold of the plain text element
             Element decryptedElem = dataRef.getProtectedElement();
             if (decryptedElem != null) { //is null if we processed an attachment
                 QName el = new QName(decryptedElem.getNamespaceURI(), decryptedElem.getLocalName());
-                Processor proc = request.getWssConfig().getProcessor(el);
+                Processor proc = data.getWssConfig().getProcessor(el);
                 if (proc != null) {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Processing decrypted element with: " + proc.getClass().getName());
                     }
-                    List<WSSecurityEngineResult> results =
-                            proc.handleToken(decryptedElem, request, wsDocInfo);
+                    List<WSSecurityEngineResult> results = proc.handleToken(decryptedElem, data);
                     completeResults.addAll(0, results);
                     return completeResults;
                 }

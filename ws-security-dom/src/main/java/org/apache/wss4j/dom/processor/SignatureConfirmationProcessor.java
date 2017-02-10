@@ -20,7 +20,6 @@
 package org.apache.wss4j.dom.processor;
 
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.RequestData;
@@ -35,8 +34,7 @@ public class SignatureConfirmationProcessor implements Processor {
 
     public List<WSSecurityEngineResult> handleToken(
         Element elem,
-        RequestData data,
-        WSDocInfo wsDocInfo
+        RequestData data
     ) throws WSSecurityException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Found SignatureConfirmation list element");
@@ -52,8 +50,8 @@ public class SignatureConfirmationProcessor implements Processor {
         if (!"".equals(tokenId)) {
             result.put(WSSecurityEngineResult.TAG_ID, tokenId);
         }
-        wsDocInfo.addResult(result);
-        wsDocInfo.addTokenElement(elem);
+        data.getWsDocInfo().addResult(result);
+        data.getWsDocInfo().addTokenElement(elem);
         return java.util.Collections.singletonList(result);
     }
 
