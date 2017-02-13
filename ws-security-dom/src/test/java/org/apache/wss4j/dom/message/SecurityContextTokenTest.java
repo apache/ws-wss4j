@@ -45,7 +45,7 @@ public class SecurityContextTokenTest extends org.junit.Assert {
         org.slf4j.LoggerFactory.getLogger(SecurityContextTokenTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private SecretKeyCallbackHandler callbackHandler = new SecretKeyCallbackHandler();
-    private Crypto crypto = null;
+    private Crypto crypto;
 
     public SecurityContextTokenTest() throws Exception {
         crypto = CryptoFactory.getInstance("wss40.properties");

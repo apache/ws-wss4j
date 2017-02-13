@@ -78,7 +78,7 @@ public class XOPAttachmentTest extends org.junit.Assert {
             org.slf4j.LoggerFactory.getLogger(XOPAttachmentTest.class);
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = null;
+    private Crypto crypto;
 
     public XOPAttachmentTest() throws Exception {
         WSSConfig.init();

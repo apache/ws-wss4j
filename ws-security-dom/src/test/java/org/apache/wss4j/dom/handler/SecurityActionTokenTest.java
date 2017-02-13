@@ -59,7 +59,7 @@ public class SecurityActionTokenTest extends org.junit.Assert {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SecurityActionTokenTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = null;
+    private Crypto crypto;
     private byte[] keyData;
 
     @org.junit.AfterClass

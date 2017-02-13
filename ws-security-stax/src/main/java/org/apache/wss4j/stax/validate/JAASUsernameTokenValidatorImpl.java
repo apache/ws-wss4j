@@ -46,7 +46,7 @@ public class JAASUsernameTokenValidatorImpl implements UsernameTokenValidator {
     private static final transient org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(JAASUsernameTokenValidatorImpl.class);
 
-    private String contextName = null;
+    private String contextName;
 
     public void setContextName(String name) {
         contextName = name;

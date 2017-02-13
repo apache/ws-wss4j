@@ -39,7 +39,7 @@ import org.apache.xml.security.stax.impl.util.UnsynchronizedByteArrayInputStream
 
 public class X509PKIPathv1SecurityTokenImpl extends X509SecurityTokenImpl {
 
-    private String alias = null;
+    private String alias;
 
     public X509PKIPathv1SecurityTokenImpl(
             WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto, CallbackHandler callbackHandler,

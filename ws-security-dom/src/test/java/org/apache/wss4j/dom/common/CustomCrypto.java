@@ -23,7 +23,7 @@ import org.apache.wss4j.common.crypto.Merlin;
 
 public class CustomCrypto extends Merlin {
 
-    private java.util.Map<String, Object> config = null;
+    private java.util.Map<String, Object> config;
 
     public
     CustomCrypto(

@@ -41,8 +41,8 @@ public class CallbackHandlerImpl implements CallbackHandler {
     private String subjectQualifier = "www.example.com";
     private String confirmationMethod = SAML1Constants.CONF_SENDER_VOUCHES;
     private X509Certificate[] certs;
-    private byte[] ephemeralKey = null;
-    private String issuer = null;
+    private byte[] ephemeralKey;
+    private String issuer;
 
     public CallbackHandlerImpl() {
     }

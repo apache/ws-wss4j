@@ -64,7 +64,7 @@ public class BSTKerberosTest extends org.junit.Assert {
         WSConstants.SOAPMESSAGE_NS + "#Base64Binary";
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
-    private Crypto crypto = null;
+    private Crypto crypto;
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {

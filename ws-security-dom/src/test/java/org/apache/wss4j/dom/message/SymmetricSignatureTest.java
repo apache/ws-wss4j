@@ -63,7 +63,7 @@ public class SymmetricSignatureTest extends org.junit.Assert implements Callback
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
     private byte[] keyData;
-    private Crypto crypto = null;
+    private Crypto crypto;
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {

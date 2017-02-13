@@ -80,7 +80,7 @@ public class SamlAssertionWrapper {
     /**
      * Raw SAML Object
      */
-    private SAMLObject samlObject = null;
+    private SAMLObject samlObject;
 
     /**
      * Which SAML specification to use (currently, only v1.1 and v2.0 are supported)
@@ -527,7 +527,7 @@ public class SamlAssertionWrapper {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Using Signature algorithm " + sigAlgo);
         }
-        PrivateKey privateKey = null;
+        PrivateKey privateKey;
         try {
             privateKey = issuerCrypto.getPrivateKey(issuerKeyName, issuerKeyPassword);
         } catch (Exception ex) {

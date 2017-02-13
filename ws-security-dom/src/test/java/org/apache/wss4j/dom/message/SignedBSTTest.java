@@ -51,7 +51,7 @@ public class SignedBSTTest extends org.junit.Assert {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignedBSTTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = null;
+    private Crypto crypto;
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {

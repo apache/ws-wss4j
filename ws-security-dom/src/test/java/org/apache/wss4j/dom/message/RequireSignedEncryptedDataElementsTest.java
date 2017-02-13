@@ -67,7 +67,7 @@ public class RequireSignedEncryptedDataElementsTest extends org.junit.Assert {
         + "</SOAP-ENV:Envelope>";
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
-    private Crypto crypto = null;
+    private Crypto crypto;
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {

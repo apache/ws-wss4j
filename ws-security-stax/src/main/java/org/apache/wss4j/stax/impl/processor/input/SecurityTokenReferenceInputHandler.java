@@ -152,7 +152,7 @@ public class SecurityTokenReferenceInputHandler extends AbstractInputSecurityHea
                         SecurityTokenProvider<InboundSecurityToken> securityTokenProvider =
                                 new SecurityTokenProvider<InboundSecurityToken>() {
 
-                            private InboundSecurityToken securityToken = null;
+                            private InboundSecurityToken securityToken;
 
                             @Override
                             public InboundSecurityToken getSecurityToken() throws XMLSecurityException {

@@ -57,19 +57,19 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
         AUTHN, ATTR, AUTHZ
     }
 
-    protected String subjectName = null;
-    protected String subjectQualifier = null;
-    protected String confirmationMethod = null;
+    protected String subjectName;
+    protected String subjectQualifier;
+    protected String confirmationMethod;
     protected X509Certificate[] certs;
     protected Statement statement = Statement.AUTHN;
     protected CERT_IDENTIFIER certIdentifier = CERT_IDENTIFIER.X509_CERT;
-    protected byte[] ephemeralKey = null;
-    protected String issuer = null;
+    protected byte[] ephemeralKey;
+    protected String issuer;
     protected String issuerFormat;
-    protected String subjectNameIDFormat = null;
-    protected String subjectLocalityIpAddress = null;
-    protected String subjectLocalityDnsAddress = null;
-    protected DateTime sessionNotOnOrAfter = null;
+    protected String subjectNameIDFormat;
+    protected String subjectLocalityIpAddress;
+    protected String subjectLocalityDnsAddress;
+    protected DateTime sessionNotOnOrAfter;
     protected DateTime authenticationInstant;
     public DateTime getAuthenticationInstant() {
         return authenticationInstant;
@@ -79,10 +79,10 @@ public abstract class AbstractSAMLCallbackHandler implements CallbackHandler {
         this.authenticationInstant = authenticationInstant;
     }
 
-    protected String resource = null;
-    protected List<Object> customAttributeValues = null;
-    protected ConditionsBean conditions = null;
-    protected SubjectConfirmationDataBean subjectConfirmationData = null;
+    protected String resource;
+    protected List<Object> customAttributeValues;
+    protected ConditionsBean conditions;
+    protected SubjectConfirmationDataBean subjectConfirmationData;
     private Crypto issuerCrypto;
     private String issuerName;
     private String issuerPassword;

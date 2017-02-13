@@ -58,7 +58,7 @@ public class EncryptionGCMTest extends org.junit.Assert {
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler keystoreCallbackHandler = new KeystoreCallbackHandler();
-    private Crypto crypto = null;
+    private Crypto crypto;
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {

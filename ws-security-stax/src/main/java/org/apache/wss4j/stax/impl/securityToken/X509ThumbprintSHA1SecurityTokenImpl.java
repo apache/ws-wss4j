@@ -31,7 +31,7 @@ import java.security.cert.X509Certificate;
 
 public class X509ThumbprintSHA1SecurityTokenImpl extends X509SecurityTokenImpl {
 
-    private String alias = null;
+    private String alias;
     private final byte[] binaryContent;
 
     X509ThumbprintSHA1SecurityTokenImpl(

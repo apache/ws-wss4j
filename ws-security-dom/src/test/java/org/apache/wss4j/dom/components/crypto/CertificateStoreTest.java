@@ -55,7 +55,7 @@ public class CertificateStoreTest extends org.junit.Assert {
         org.slf4j.LoggerFactory.getLogger(CertificateStoreTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private Crypto senderCrypto = CryptoFactory.getInstance("wss40.properties");
-    private Crypto receiverCrypto = null;
+    private Crypto receiverCrypto;
     private CallbackHandler keystoreCallbackHandler = new KeystoreCallbackHandler();
 
     @org.junit.AfterClass

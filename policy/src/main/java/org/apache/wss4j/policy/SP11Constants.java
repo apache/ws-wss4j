@@ -22,7 +22,7 @@ import javax.xml.namespace.QName;
 
 public class SP11Constants extends SPConstants {
 
-    private static SP11Constants sp11Constants = null;
+    private static SP11Constants sp11Constants;
 
     protected SP11Constants() {
     }

@@ -64,8 +64,8 @@ public class SamlReferenceTest extends org.junit.Assert {
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private Crypto crypto = CryptoFactory.getInstance("crypto.properties");
-    private Crypto trustCrypto = null;
-    private Crypto issuerCrypto = null;
+    private Crypto trustCrypto;
+    private Crypto issuerCrypto;
     private Crypto userCrypto = CryptoFactory.getInstance("wss40.properties");
 
     @org.junit.AfterClass

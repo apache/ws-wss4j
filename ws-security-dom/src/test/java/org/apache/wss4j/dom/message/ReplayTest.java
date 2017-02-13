@@ -59,7 +59,7 @@ public class ReplayTest extends org.junit.Assert {
         org.slf4j.LoggerFactory.getLogger(ReplayTest.class);
 
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
-    private Crypto crypto = null;
+    private Crypto crypto;
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {

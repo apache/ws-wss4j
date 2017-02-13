@@ -149,10 +149,10 @@ public class UsernameTokenOutputProcessor extends AbstractOutputProcessor {
 
     static class FinalUsernameTokenOutputProcessor extends AbstractOutputProcessor {
 
-        private String wsuId = null;
-        private byte[] nonceValue = null;
-        private String password = null;
-        private XMLGregorianCalendar created = null;
+        private String wsuId;
+        private byte[] nonceValue;
+        private String password;
+        private XMLGregorianCalendar created;
         private byte[] salt;
         private int iterations;
         private XMLSecurityConstants.Action action;

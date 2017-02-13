@@ -81,7 +81,7 @@ public class SignaturePartsTest extends org.junit.Assert {
         "</soapenv:Envelope>";
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = null;
+    private Crypto crypto;
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {

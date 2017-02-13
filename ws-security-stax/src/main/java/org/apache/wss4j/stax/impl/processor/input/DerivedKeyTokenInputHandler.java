@@ -73,7 +73,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
 
         SecurityTokenProvider<InboundSecurityToken> securityTokenProvider = new SecurityTokenProvider<InboundSecurityToken>() {
 
-            private AbstractInboundSecurityToken derivedKeySecurityToken = null;
+            private AbstractInboundSecurityToken derivedKeySecurityToken;
 
             @Override
             public InboundSecurityToken getSecurityToken() throws XMLSecurityException {
@@ -88,7 +88,7 @@ public class DerivedKeyTokenInputHandler extends AbstractInputSecurityHeaderHand
                         derivedKeyTokenType.getId(), WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE,
                         true) {
 
-                    private InboundSecurityToken referencedSecurityToken = null;
+                    private InboundSecurityToken referencedSecurityToken;
 
                     private InboundSecurityToken getReferencedSecurityToken() throws XMLSecurityException {
                         if (this.referencedSecurityToken != null) {

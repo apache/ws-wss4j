@@ -48,7 +48,7 @@ import java.security.cert.X509Certificate;
 public class BinarySecurityTokenTest extends org.junit.Assert {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(BinarySecurityTokenTest.class);
-    private Crypto crypto = null;
+    private Crypto crypto;
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {

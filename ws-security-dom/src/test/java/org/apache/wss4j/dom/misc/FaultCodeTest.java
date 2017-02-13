@@ -52,7 +52,7 @@ import org.w3c.dom.Document;
  */
 public class FaultCodeTest extends org.junit.Assert implements CallbackHandler {
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = null;
+    private Crypto crypto;
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {

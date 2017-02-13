@@ -74,8 +74,8 @@ public class SignatureCertTest extends org.junit.Assert {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureCertTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = null;
-    private Crypto cryptoCA = null;
+    private Crypto crypto;
+    private Crypto cryptoCA;
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {

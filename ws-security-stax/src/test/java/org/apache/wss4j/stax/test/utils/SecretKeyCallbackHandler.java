@@ -38,7 +38,7 @@ import java.util.Map;
 public class SecretKeyCallbackHandler implements CallbackHandler {
 
     private Map<String, byte[]> secrets = new HashMap<String, byte[]>();
-    private byte[] outboundSecret = null;
+    private byte[] outboundSecret;
 
     @Override
     public void handle(Callback[] callbacks)

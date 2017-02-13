@@ -46,8 +46,8 @@ import org.w3c.dom.Element;
 public class SignatureIssuerCertConstraintsTest extends org.junit.Assert {
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SignatureIssuerCertConstraintsTest.class);
-    private Crypto crypto = null;
-    private Crypto cryptoCA = null;
+    private Crypto crypto;
+    private Crypto cryptoCA;
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {

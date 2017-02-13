@@ -51,7 +51,7 @@ import org.w3c.dom.Element;
 
 public class AssertionSigningTest extends Assert {
 
-    private Crypto issuerCrypto = null;
+    private Crypto issuerCrypto;
     // Default Canonicalization algorithm used by SamlAssertionWrapper class.
     private final String defaultCanonicalizationAlgorithm = SignatureConstants.ALGO_ID_C14N_EXCL_OMIT_COMMENTS;
     // Default RSA Signature algorithm used by SamlAssertionWrapper class.

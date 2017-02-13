@@ -64,7 +64,7 @@ public class AttachmentTest extends Assert {
             org.slf4j.LoggerFactory.getLogger(AttachmentTest.class);
 
     private WSSecurityEngine secEngine = new WSSecurityEngine();
-    private Crypto crypto = null;
+    private Crypto crypto;
 
     public AttachmentTest() throws Exception {
         WSSConfig.init();

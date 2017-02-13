@@ -33,7 +33,7 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 
 public class X509IssuerSerialTokenImpl extends X509SecurityTokenImpl {
 
-    private String alias = null;
+    private String alias;
     private final X509IssuerSerialType x509IssuerSerialType;
 
     X509IssuerSerialTokenImpl(

@@ -46,7 +46,7 @@ import java.util.*;
 
 public class WSSSignatureEndingOutputProcessor extends AbstractSignatureEndingOutputProcessor {
 
-    private SignedInfoProcessor signedInfoProcessor = null;
+    private SignedInfoProcessor signedInfoProcessor;
 
     public WSSSignatureEndingOutputProcessor(WSSSignatureOutputProcessor signatureOutputProcessor) throws XMLSecurityException {
         super(signatureOutputProcessor);

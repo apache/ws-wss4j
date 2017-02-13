@@ -274,7 +274,7 @@ public class PerformanceMemoryTest extends AbstractTestBase {
     }
 
 
-    private OutboundWSSec outboundWSSec = null;
+    private OutboundWSSec outboundWSSec;
 
     private void doStreamingSecurityOutbound(File source, File output) throws Exception {
         if (outboundWSSec == null) {
@@ -301,7 +301,7 @@ public class PerformanceMemoryTest extends AbstractTestBase {
         xmlStreamReader.close();
     }
 
-    private OutboundWSSec outboundWSSecCompressed = null;
+    private OutboundWSSec outboundWSSecCompressed;
 
     private void doStreamingSecurityOutboundCompressed(File source, File output, String compress) throws Exception {
         if (outboundWSSecCompressed == null) {
@@ -373,7 +373,7 @@ public class PerformanceMemoryTest extends AbstractTestBase {
         doInboundSecurityWithWSS4J_1(documentBuilderFactory.newDocumentBuilder().parse(input), action, properties, false);
     }
 
-    private InboundWSSec inboundWSSec = null;
+    private InboundWSSec inboundWSSec;
 
     private void doStreamingInSecurity(File input) throws Exception {
         if (inboundWSSec == null) {

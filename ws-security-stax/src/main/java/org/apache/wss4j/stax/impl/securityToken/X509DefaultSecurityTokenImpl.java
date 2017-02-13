@@ -28,7 +28,7 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 
 public class X509DefaultSecurityTokenImpl extends X509SecurityTokenImpl {
 
-    private String alias = null;
+    private String alias;
 
     X509DefaultSecurityTokenImpl(
             WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto, CallbackHandler callbackHandler,

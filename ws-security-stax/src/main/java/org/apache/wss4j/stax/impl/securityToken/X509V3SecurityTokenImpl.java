@@ -35,7 +35,7 @@ import java.security.cert.X509Certificate;
 
 public class X509V3SecurityTokenImpl extends X509SecurityTokenImpl {
 
-    private String alias = null;
+    private String alias;
 
     public X509V3SecurityTokenImpl(
             WSInboundSecurityContext wsInboundSecurityContext, Crypto crypto, CallbackHandler callbackHandler,

@@ -63,17 +63,17 @@ public class SAMLCallbackHandlerImpl implements CallbackHandler {
     private X509Certificate[] certs;
     private Statement statement = Statement.AUTHN;
     private KeyInfoBean.CERT_IDENTIFIER certIdentifier = KeyInfoBean.CERT_IDENTIFIER.X509_CERT;
-    private byte[] ephemeralKey = null;
-    private String issuer = null;
+    private byte[] ephemeralKey;
+    private String issuer;
     private String issuerFormat;
     private Version samlVersion = Version.SAML_11;
 
-    private String subjectNameIDFormat = null;
-    private String subjectLocalityIpAddress = null;
-    private String subjectLocalityDnsAddress = null;
-    private String resource = null;
-    private List<Object> customAttributeValues = null;
-    private ConditionsBean conditions = null;
+    private String subjectNameIDFormat;
+    private String subjectLocalityIpAddress;
+    private String subjectLocalityDnsAddress;
+    private String resource;
+    private List<Object> customAttributeValues;
+    private ConditionsBean conditions;
 
     private boolean signAssertion = true;
 

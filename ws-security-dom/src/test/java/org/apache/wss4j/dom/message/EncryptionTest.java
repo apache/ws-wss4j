@@ -76,7 +76,7 @@ public class EncryptionTest extends org.junit.Assert {
     private SecretKeyCallbackHandler secretKeyCallbackHandler = new SecretKeyCallbackHandler();
     private byte[] keyData;
     private SecretKey key;
-    private Crypto crypto = null;
+    private Crypto crypto;
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {

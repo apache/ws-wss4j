@@ -57,7 +57,7 @@ public class PasswordEncryptorTest extends org.junit.Assert {
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
     private PasswordEncryptor passwordEncryptor =
         new JasyptPasswordEncryptor("this-is-a-secret");
-    private Crypto crypto = null;
+    private Crypto crypto;
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {

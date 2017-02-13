@@ -47,7 +47,7 @@ public class DerivedKeyTest extends org.junit.Assert {
         org.slf4j.LoggerFactory.getLogger(DerivedKeyTest.class);
     private WSSecurityEngine secEngine = new WSSecurityEngine();
     private CallbackHandler callbackHandler = new KeystoreCallbackHandler();
-    private Crypto crypto = null;
+    private Crypto crypto;
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
