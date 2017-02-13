@@ -427,7 +427,7 @@ public class PerformanceMemoryTest extends AbstractTestBase {
 
         private ThreadStopper threadStopper;
         private FileWriter fileWriter;
-        private long memoryDiff = 0;
+        private long memoryDiff;
 
         private List<Integer> memory = new LinkedList<Integer>();
 

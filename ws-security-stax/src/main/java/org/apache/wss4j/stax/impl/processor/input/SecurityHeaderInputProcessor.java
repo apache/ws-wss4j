@@ -54,7 +54,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
         org.slf4j.LoggerFactory.getLogger(SecurityHeaderInputProcessor.class);
 
     private final ArrayDeque<XMLSecEvent> xmlSecEventList = new ArrayDeque<XMLSecEvent>();
-    private int startIndexForProcessor = 0;
+    private int startIndexForProcessor;
 
     public SecurityHeaderInputProcessor(WSSSecurityProperties securityProperties) {
         super(securityProperties);

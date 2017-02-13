@@ -45,8 +45,8 @@ public class NSStack {
         org.slf4j.LoggerFactory.getLogger(NSStack.class);
 
     private Mapping[] stack;
-    private int top = 0;
-    private int iterator = 0;
+    private int top;
+    private int iterator;
     private int currentDefaultNS = -1;
     // invariant member variable to track low-level logging requirements
     // we cache this once per instance lifecycle to avoid repeated lookups

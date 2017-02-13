@@ -56,7 +56,7 @@ public class SecurityHeaderReorderProcessor extends AbstractOutputProcessor {
     private final Map<XMLSecurityConstants.Action, Map<SecurityHeaderOrder, Deque<XMLSecEvent>>> actionEventMap =
             new LinkedHashMap<XMLSecurityConstants.Action, Map<SecurityHeaderOrder, Deque<XMLSecEvent>>>();
 
-    private int securityHeaderIndex = 0;
+    private int securityHeaderIndex;
     private Deque<XMLSecEvent> currentDeque;
 
     public SecurityHeaderReorderProcessor() throws XMLSecurityException {
