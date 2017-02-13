@@ -143,7 +143,7 @@ public class SecurityHeaderInputProcessor extends AbstractInputProcessor {
                             ((WSSSecurityProperties) getSecurityProperties()).getActor())) {
                         //we are in the security header and the depth is +1, so every child
                         //element should have a responsible handler with the exception of an EncryptedData SecurityHeader
-                        //which is already handled in the above StartElement logic (@see comment above).
+                        //which is already handled in the above StartElement Logic (@see comment above).
                         if (!WSSConstants.TAG_xenc_EncryptedData.equals(xmlSecEndElement.getName())) {
                             engageSecurityHeaderHandler(subInputProcessorChain, getSecurityProperties(),
                                     xmlSecEventList, startIndexForProcessor, xmlSecEndElement.getName());

@@ -363,9 +363,9 @@ public abstract class AbstractTestBase extends org.junit.Assert {
 
     class CustomWSS4JHandler extends WSHandler {
 
-        private final org.slf4j.Logger log =
+        private final org.slf4j.Logger LOG =
             org.slf4j.LoggerFactory.getLogger(CustomWSS4JHandler.class.getName());
-        private final boolean doDebug = log.isDebugEnabled();
+        private final boolean doDebug = LOG.isDebugEnabled();
 
         /**
          * Handles incoming web service requests and outgoing responses
@@ -420,7 +420,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
                 );
             }
             if (doDebug) {
-                log.debug("Actor: " + reqData.getActor());
+                LOG.debug("Actor: " + reqData.getActor());
             }
             /*
             * Now get the SOAP part from the request message and convert it into a
@@ -435,8 +435,8 @@ public abstract class AbstractTestBase extends org.junit.Assert {
                 );
             }
             if (doDebug) {
-                log.debug("WSS4JHandler: orginal SOAP request: ");
-                log.debug(XMLUtils.prettyDocumentToString(doc));
+                LOG.debug("WSS4JHandler: orginal SOAP request: ");
+                LOG.debug(XMLUtils.prettyDocumentToString(doc));
             }
             doSenderAction(doc, reqData, actions, isRequest);
 
@@ -489,7 +489,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
                 wsResult = secEngine.processSecurityHeader(elem, reqData);
             } catch (WSSecurityException ex) {
                 if (doDebug) {
-                    log.debug(ex.getMessage(), ex);
+                    LOG.debug(ex.getMessage(), ex);
                 }
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "empty",
                         "WSS4JHandler: security processing failed", ex
@@ -510,7 +510,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
             }
 
             if (doDebug) {
-                log.debug("Processed received SOAP request");
+                LOG.debug("Processed received SOAP request");
             }
 
             /*
@@ -535,7 +535,7 @@ public abstract class AbstractTestBase extends org.junit.Assert {
             WSHandlerResult rResult = new WSHandlerResult(actor, wsResult);
             results.add(0, rResult);
             if (doDebug) {
-                log.debug("WSS4JHandler: exit invoke()");
+                LOG.debug("WSS4JHandler: exit invoke()");
             }
 
             return true;

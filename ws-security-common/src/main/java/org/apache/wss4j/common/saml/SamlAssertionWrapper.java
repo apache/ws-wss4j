@@ -72,7 +72,7 @@ import org.w3c.dom.Element;
  */
 public class SamlAssertionWrapper {
     /**
-     * Field log
+     * Field LOG
      */
     private static final org.slf4j.Logger LOG =
         org.slf4j.LoggerFactory.getLogger(SamlAssertionWrapper.class);
