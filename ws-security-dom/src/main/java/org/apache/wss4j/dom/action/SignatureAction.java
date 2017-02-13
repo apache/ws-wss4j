@@ -59,6 +59,7 @@ public class SignatureAction implements Action {
         WSSecSignature wsSign = new WSSecSignature(reqData.getSecHeader());
         wsSign.setIdAllocator(reqData.getWssConfig().getIdAllocator());
         wsSign.setAddInclusivePrefixes(reqData.isAddInclusivePrefixes());
+        wsSign.setWsDocInfo(reqData.getWsDocInfo());
 
         if (signatureToken.getKeyIdentifierId() != 0) {
             wsSign.setKeyIdentifierType(signatureToken.getKeyIdentifierId());

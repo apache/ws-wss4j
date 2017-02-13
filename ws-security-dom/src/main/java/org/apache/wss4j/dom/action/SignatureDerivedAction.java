@@ -61,6 +61,7 @@ public class SignatureDerivedAction extends AbstractDerivedAction implements Act
         WSSecDKSign wsSign = new WSSecDKSign(reqData.getSecHeader());
         wsSign.setIdAllocator(reqData.getWssConfig().getIdAllocator());
         wsSign.setAddInclusivePrefixes(reqData.isAddInclusivePrefixes());
+        wsSign.setWsDocInfo(reqData.getWsDocInfo());
 
         if (signatureToken.getSignatureAlgorithm() != null) {
             wsSign.setSignatureAlgorithm(signatureToken.getSignatureAlgorithm());

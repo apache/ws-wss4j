@@ -37,6 +37,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDocInfo;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.common.EncryptionActionToken;
@@ -88,6 +89,11 @@ public abstract class WSHandler {
         if (wssConfig == null) {
             wssConfig = WSSConfig.getNewInstance();
             reqData.setWssConfig(wssConfig);
+        }
+        
+        if (reqData.getWsDocInfo() == null) {
+            WSDocInfo wsDocInfo = new WSDocInfo(doc);
+            reqData.setWsDocInfo(wsDocInfo);
         }
 
         Object mc = reqData.getMsgContext();

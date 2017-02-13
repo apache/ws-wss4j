@@ -37,6 +37,7 @@ public class TimestampAction implements Action {
         timeStampBuilder.setPrecisionInMilliSeconds(reqData.isPrecisionInMilliSeconds());
         timeStampBuilder.setTimeToLive(reqData.getTimeStampTTL());
         timeStampBuilder.setWsTimeSource(reqData.getWssConfig().getCurrentTime());
+        timeStampBuilder.setWsDocInfo(reqData.getWsDocInfo());
         timeStampBuilder.build();
     }
 }

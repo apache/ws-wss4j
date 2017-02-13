@@ -40,6 +40,7 @@ public class EncryptionAction implements Action {
             throws WSSecurityException {
         WSSecEncrypt wsEncrypt = new WSSecEncrypt(reqData.getSecHeader());
         wsEncrypt.setIdAllocator(reqData.getWssConfig().getIdAllocator());
+        wsEncrypt.setWsDocInfo(reqData.getWsDocInfo());
 
         EncryptionActionToken encryptionToken = null;
         if (actionToken instanceof EncryptionActionToken) {
